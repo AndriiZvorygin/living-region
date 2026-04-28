@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+import fs from 'node:fs';
+import path from 'node:path';
 import { createWorld } from '../model/world.mjs';
 import { createPatch } from '../model/patch.mjs';
 import { createPlantGroup } from '../model/plant_group.mjs';
@@ -10,6 +12,14 @@ import { createNetwork } from '../model/network.mjs';
 import { createMarket } from '../model/market.mjs';
 import { greyCountySeedNodes } from './grey_county_seed_nodes.mjs';
 import { validateGreyCountySeedTotals } from './grey_county_census_summary.mjs';
+import {
+  normalizeName,
+  extractMunicipalityName,
+  extractSettlementFields,
+  extractLandUseRawValue,
+  extractMunicipalityHint,
+  mapOfficialPlanLandUseCategory
+} from './grey_land_use_mapping.mjs';
 
 const SCALE_PRESETS = {
   tiny: { populationScaleMultiplier: 0.005, areaScaleMultiplier: 0.005 },
@@ -580,6 +590,140 @@ function classifyHouseholdContext(node, index, landAccessType) {
   return 'ruralResidential';
 }
 
+function safeReadGeoJsonFeatures(filePath, warnings, label) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      warnings.push(`open-data geometry missing: ${label} (${filePath})`);
+      return [];
+    }
+    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return Array.isArray(parsed?.features) ? parsed.features : [];
+  } catch (error) {
+    warnings.push(`open-data geometry read failed: ${label} (${error.message})`);
+    return [];
+  }
+}
+
+function mapMunicipalityCodeHintToId(value) {
+  const code = String(value ?? '').trim().toUpperCase();
+  const map = {
+    WG: 'west-grey',
+    BM: 'blue-mountains',
+    GH: 'grey-highlands',
+    SG: 'southgate',
+    GB: 'georgian-bluffs',
+    MF: 'meaford',
+    CS: 'chatsworth',
+    OS: 'owen-sound',
+    HAN: 'hanover'
+  };
+  return map[code] ?? null;
+}
+
+function canonicalMunicipalityName(value) {
+  return normalizeName(value)
+    .replace(/^(township|town|city|municipality)\s+of\s+/, '')
+    .replace(/^the\s+/, '')
+    .trim();
+}
+
+function loadGreyOpenDataGeometry(inputDir, nodesByMunicipalityId) {
+  const warnings = [];
+  const municipalitiesPath = path.join(inputDir, 'municipality-boundaries.geojson');
+  const settlementsPath = path.join(inputDir, 'settlement-boundaries.geojson');
+  const landUsePath = path.join(inputDir, 'official-plan-schedule-a-land-use.geojson');
+
+  const municipalityFeatures = safeReadGeoJsonFeatures(municipalitiesPath, warnings, 'municipality-boundaries');
+  const settlementFeatures = safeReadGeoJsonFeatures(settlementsPath, warnings, 'settlement-boundaries');
+  const landUseFeatures = safeReadGeoJsonFeatures(landUsePath, warnings, 'official-plan-schedule-a-land-use');
+
+  const municipalityById = new Map();
+  const municipalityWarnings = [];
+  for (const feature of municipalityFeatures) {
+    const properties = feature?.properties ?? {};
+    const municipalityName = extractMunicipalityName(properties);
+    const normalized = canonicalMunicipalityName(municipalityName);
+    const node = [...nodesByMunicipalityId.values()]
+      .find((candidate) => canonicalMunicipalityName(candidate.municipalityName) === normalized);
+    if (!node) {
+      municipalityWarnings.push(`unmatched municipality feature: ${municipalityName ?? 'unknown'}`);
+      continue;
+    }
+    municipalityById.set(node.municipalityId, {
+      municipalityId: node.municipalityId,
+      municipalityName: node.municipalityName,
+      geometry: feature.geometry ?? null,
+      sourceProperties: properties
+    });
+  }
+
+  const settlementByMunicipalityId = new Map();
+  const mappedSettlements = settlementFeatures.map((feature, index) => {
+    const properties = feature?.properties ?? {};
+    const extracted = extractSettlementFields(properties);
+    const municipalityHint = extracted.municipalityName;
+    const municipalityId = mapMunicipalityCodeHintToId(municipalityHint)
+      ?? [...nodesByMunicipalityId.values()].find((candidate) => normalizeName(candidate.municipalityName) === normalizeName(municipalityHint))?.municipalityId
+      ?? null;
+    const mapped = {
+      id: `open-settlement-${index + 1}`,
+      municipalityId,
+      settlementName: extracted.settlementName ?? `Settlement ${index + 1}`,
+      settlementType: extracted.settlementType,
+      settlementTypeRaw: extracted.settlementTypeRaw,
+      geometry: feature.geometry ?? null,
+      sourceProperties: properties
+    };
+    if (municipalityId) {
+      const list = settlementByMunicipalityId.get(municipalityId) ?? [];
+      list.push(mapped);
+      settlementByMunicipalityId.set(municipalityId, list);
+    }
+    return mapped;
+  });
+
+  const landUseCategoryCounts = {};
+  let unclassifiedLandUseCount = 0;
+  let unassignedMunicipalityLandUseCount = 0;
+  const mappedLandUse = landUseFeatures.map((feature, index) => {
+    const properties = feature?.properties ?? {};
+    const rawLandUse = extractLandUseRawValue(properties);
+    const category = mapOfficialPlanLandUseCategory(rawLandUse);
+    if (category === 'unknown') unclassifiedLandUseCount += 1;
+    landUseCategoryCounts[category] = (landUseCategoryCounts[category] ?? 0) + 1;
+    const municipalityHint = extractMunicipalityHint(properties);
+    const municipalityId = mapMunicipalityCodeHintToId(municipalityHint)
+      ?? [...nodesByMunicipalityId.values()].find((candidate) => normalizeName(candidate.municipalityName) === normalizeName(municipalityHint))?.municipalityId
+      ?? null;
+    if (!municipalityId) unassignedMunicipalityLandUseCount += 1;
+    return {
+      id: `open-landuse-${index + 1}`,
+      municipalityId,
+      rawLandUse: rawLandUse === null || rawLandUse === undefined ? null : String(rawLandUse),
+      category,
+      geometry: feature.geometry ?? null,
+      sourceProperties: properties
+    };
+  });
+
+  warnings.push(...municipalityWarnings);
+
+  return {
+    municipalityFeatures,
+    settlementFeatures: mappedSettlements,
+    landUseFeatures: mappedLandUse,
+    municipalityById,
+    settlementByMunicipalityId,
+    warnings,
+    metrics: {
+      realLandUseFeatureCount: mappedLandUse.length,
+      landUseCategoryCounts,
+      unclassifiedLandUseCount,
+      unassignedMunicipalityLandUseCount
+    }
+  };
+}
+
 export function generateGreyCountyWorld(options = {}) {
   const includeRail = options.includeRail ?? false;
   const includeWaterFreight = options.includeWaterFreight ?? false;
@@ -587,6 +731,8 @@ export function generateGreyCountyWorld(options = {}) {
   const seedName = options.seedName ?? 'grey-county-seed-census-scaled';
   const baseYear = options.baseYear ?? 2026;
   const roadWiggleFactor = options.roadWiggleFactor ?? 1.2;
+  const useOpenDataGeometry = options.useOpenDataGeometry ?? false;
+  const openDataInputDir = path.resolve(options.openDataInputDir ?? 'know/input/gis');
 
   const seedValidation = validateGreyCountySeedTotals(greyCountySeedNodes);
   if (!seedValidation.valid) {
@@ -595,6 +741,9 @@ export function generateGreyCountyWorld(options = {}) {
 
   const nodes = greyCountySeedNodes.map((node) => ({ ...node }));
   const nodesByMunicipalityId = new Map(nodes.map((node) => [node.municipalityId, node]));
+  const openDataGeometry = useOpenDataGeometry
+    ? loadGreyOpenDataGeometry(openDataInputDir, nodesByMunicipalityId)
+    : null;
 
   const scaling = generateMunicipalityTargets(nodes, options);
   const targetByMunicipalityId = new Map(scaling.targets.map((target) => [target.municipalityId, target]));
@@ -620,14 +769,20 @@ export function generateGreyCountyWorld(options = {}) {
     for (const [patchType, areaHa] of Object.entries(patchAreas)) {
       const landUse = patchLandUse(patchType);
       const [offsetX, offsetY] = patchOffsetByType[patchType];
+      const realMunicipalityGeometry = openDataGeometry?.municipalityById.get(node.municipalityId)?.geometry ?? null;
+      const settlementCandidates = openDataGeometry?.settlementByMunicipalityId.get(node.municipalityId) ?? [];
+      const settlementGeometry = settlementCandidates.length > 0 ? settlementCandidates[0].geometry : null;
+      const patchGeometry = useOpenDataGeometry
+        ? (patchType.includes('Residential') || patchType === 'settlementCore'
+          ? (settlementGeometry ?? realMunicipalityGeometry)
+          : (realMunicipalityGeometry ?? (includeSyntheticPolygons ? makeSquarePolygon(node.lat, node.lon, areaHa, offsetX, offsetY) : null)))
+        : (includeSyntheticPolygons ? makeSquarePolygon(node.lat, node.lon, areaHa, offsetX, offsetY) : null);
 
       const patch = createPatch({
         id: makePatchId(node.municipalityId, patchType),
         name: `${node.nodeName} ${patchType}`,
         areaHa,
-        geometry: includeSyntheticPolygons
-          ? makeSquarePolygon(node.lat, node.lon, areaHa, offsetX, offsetY)
-          : null,
+        geometry: patchGeometry,
         landUse,
         zoning: patchZoning(landUse),
         ownershipType: 'mixed',
@@ -660,12 +815,15 @@ export function generateGreyCountyWorld(options = {}) {
       });
 
       patch.sourceProperties = {
-        syntheticGeometry: true,
+        syntheticGeometry: !useOpenDataGeometry,
+        geometrySource: useOpenDataGeometry ? 'grey-open-data' : 'synthetic',
         sourceTag: node.sourceTag,
         municipalityId: node.municipalityId,
         municipalityName: node.municipalityName,
         nodeName: node.nodeName,
-        note: 'Service-node anchored synthetic polygon. Replace with municipal/parcels GIS for calibrated runs.'
+        note: useOpenDataGeometry
+          ? 'Geometry from Grey open-data municipality/settlement layers; census scaling retained for population/area.'
+          : 'Service-node anchored synthetic polygon. Replace with municipal/parcels GIS for calibrated runs.'
       };
 
       patches.push(patch);
@@ -1195,6 +1353,10 @@ export function generateGreyCountyWorld(options = {}) {
       noLandAccessPopulation: municipalityNoLandAccessPopulation,
       landAccessHouseholds: municipalityLandAccessHouseholds,
       foodProducingHouseholds: municipalityFoodProducingHouseholds,
+      geometrySource: useOpenDataGeometry ? 'grey-open-data' : 'synthetic',
+      realGeometryMatched: Boolean(openDataGeometry?.municipalityById.get(node.municipalityId)),
+      realGeometry: openDataGeometry?.municipalityById.get(node.municipalityId)?.geometry ?? null,
+      sourceProperties: openDataGeometry?.municipalityById.get(node.municipalityId)?.sourceProperties ?? null,
       settlementPatchAreaHa: patchAreas.settlementCore + patchAreas.olderResidential + patchAreas.edgeResidential,
       croplandPatchAreaHa: patchAreas.croplandCatchment + patchAreas.marketGardenBelt + patchAreas.orchardNutBelt,
       pasturePatchAreaHa: patchAreas.pastureCatchment,
@@ -1305,11 +1467,20 @@ export function generateGreyCountyWorld(options = {}) {
     includeRail,
     includeWaterFreight,
     includeSyntheticPolygons,
-    syntheticGeometry: true,
+    useOpenDataGeometry,
+    syntheticGeometry: !useOpenDataGeometry,
+    geometrySource: useOpenDataGeometry ? 'grey-open-data' : 'synthetic',
     sourceTag: 'grey-county-census-seed-v2021',
+    openDataInputDir: useOpenDataGeometry ? openDataInputDir : null,
     scaling,
     censusValidation: seedValidation,
     municipalities: municipalitySummaryRows,
+    openDataGeometry: useOpenDataGeometry ? {
+      municipalityBoundaries: Array.from(openDataGeometry?.municipalityById.values() ?? []),
+      settlementBoundaries: openDataGeometry?.settlementFeatures ?? [],
+      landUsePatches: openDataGeometry?.landUseFeatures ?? [],
+      warnings: openDataGeometry?.warnings ?? []
+    } : null,
     summaryCsvText: createMunicipalSummaryCsv(municipalitySummaryRows),
     summary: {
       municipalities: nodes.length,
@@ -1325,10 +1496,20 @@ export function generateGreyCountyWorld(options = {}) {
       roadSegments: roadSegments.length,
       railSegments: railSegments.length,
       waterSegments: waterSegments.length,
+      municipalityFeaturesMatched: useOpenDataGeometry ? (openDataGeometry?.municipalityById.size ?? 0) : 0,
+      settlementFeaturesImported: useOpenDataGeometry ? (openDataGeometry?.settlementFeatures.length ?? 0) : 0,
+      landUseFeaturesImported: useOpenDataGeometry ? (openDataGeometry?.landUseFeatures.length ?? 0) : 0,
+      realLandUseFeatureCount: useOpenDataGeometry ? (openDataGeometry?.metrics.realLandUseFeatureCount ?? 0) : 0,
+      landUseCategoryCounts: useOpenDataGeometry ? (openDataGeometry?.metrics.landUseCategoryCounts ?? {}) : {},
+      unclassifiedLandUseCount: useOpenDataGeometry ? (openDataGeometry?.metrics.unclassifiedLandUseCount ?? 0) : 0,
+      unassignedMunicipalityLandUseCount: useOpenDataGeometry ? (openDataGeometry?.metrics.unassignedMunicipalityLandUseCount ?? 0) : 0,
       stations: infrastructures.filter((item) => ['railStation', 'railHalt', 'freightSiding'].includes(item.type) && item.networkId === 'network-grey-rail').length,
       freightAnchors: infrastructures.filter((item) => ['grainDepot', 'rootCellarDepot', 'coldStorageDepot', 'woodFuelDepot', 'timberSiding', 'farmInputDepot', 'nurseryStockDepot', 'repairMaterialsDepot', 'compostTransferDepot', 'constructionMaterialsDepot', 'emergencySupplyDepot', 'marketDepot', 'intermodalDepot'].includes(item.type)).length
     },
-    notes: 'Synthetic coordinate-seeded geometry with census-scaled municipality population and land area. Replace with real municipal boundaries/parcels/centrelines for production calibration.'
+    warnings: useOpenDataGeometry ? (openDataGeometry?.warnings ?? []) : [],
+    notes: useOpenDataGeometry
+      ? 'Municipal/settlement/land-use geometry imported from Grey open data where available; census population/land-area scaling retained; roads remain synthetic until verified centrelines are added.'
+      : 'Synthetic coordinate-seeded geometry with census-scaled municipality population and land area. Replace with real municipal boundaries/parcels/centrelines for production calibration.'
   };
 
   return world;

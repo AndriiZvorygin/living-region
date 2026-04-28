@@ -21,6 +21,7 @@ It is designed to make assumptions visible and testable, not to produce official
 - Deterministic formulas and tests.
 - Open-source under AGPL-3.0-or-later.
 - Grey County census-scaled seed model.
+- Real Grey County Open Data ingestion for municipal boundaries, settlement boundaries, and Official Plan Schedule A land use.
 - GeoJSON/CSV output.
 - Real GIS import scaffolding.
 - No web UI yet.
@@ -171,12 +172,22 @@ npm run seed:grey:full
 npm run demo:grey:full
 npm run demo:grey:rail:full
 npm run demo:grey:compare-food
+npm run grey:download-data
+npm run grey:summarize-gis
+npm run grey:import-data
+npm run seed:grey:open-data
+npm run demo:grey:open-data
 ```
 
 - `seed:grey:full`: generate the full-county census-scaled seed world and map layers.
 - `demo:grey:full`: run the no-rail full-county scenario diagnostics.
 - `demo:grey:rail:full`: run the rail freight-corridor full-county diagnostics.
 - `demo:grey:compare-food`: compare food diagnostics between no-rail and rail scenarios.
+- `grey:download-data`: download verified Grey Open Data layers into `know/input/gis`.
+- `grey:summarize-gis`: inspect downloaded GeoJSON feature counts/fields/bounds.
+- `grey:import-data`: import downloaded Grey layers into a structured world-layer JSON.
+- `seed:grey:open-data`: generate a census-scaled Grey world using real municipal/settlement/land-use geometry.
+- `demo:grey:open-data`: run a scenario on the open-data geometry world (roads remain synthetic).
 
 ## Outputs
 
@@ -227,7 +238,8 @@ Living Region is licensed under GNU Affero General Public License v3.0 or later 
 ## Limitations
 
 - Synthetic demo/seed geometry is scaffolding.
-- Grey County population/land-area scale is census-grounded, but geometry is generated.
+- Grey County population/land-area scale is census-grounded; municipal/settlement/land-use geometry can now come from downloaded Grey open data.
+- Road centrelines and lot fabric still need verified sources; until then road network modelling remains synthetic/generated links.
 - Formulas are coarse and transparent, not calibrated econometrics.
 - No web UI yet.
 - No full routing engine yet.

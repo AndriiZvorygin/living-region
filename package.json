@@ -30,6 +30,13 @@
     "seed:grey:medium": "node command/generate_grey_county_seed.mjs --scale=medium --rail=true --water=true",
     "seed:grey:full": "node command/generate_grey_county_seed.mjs --scale=full-county",
     "seed:grey:full:rail": "node command/generate_grey_county_seed.mjs --scale=full-county --rail=true --water=true",
+    "seed:grey:open-data": "node command/seed_grey_open_data.mjs",
+    "demo:grey:open-data": "node command/run_grey_open_data.mjs",
+    "grey:open-data": "node command/grey_open_data.mjs",
+    "grey:discover-data": "node command/discover_grey_open_data.mjs",
+    "grey:download-data": "node command/download_grey_open_data.mjs --all",
+    "grey:import-data": "node command/import_grey_open_data.mjs",
+    "grey:summarize-gis": "node command/summarize_grey_gis.mjs",
     "check:food-energy-terms": "node command/check_food_energy_terms.mjs",
     "test": "vitest run"
   },
