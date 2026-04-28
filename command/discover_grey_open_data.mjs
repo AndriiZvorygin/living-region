@@ -67,6 +67,8 @@ for (const item of results) {
   console.log(`  layerId: ${item.layerId ?? 'n/a'}`);
   console.log(`  layerName: ${item.layerName ?? 'n/a'}`);
   console.log(`  layers: ${(item.layers ?? []).map((x) => `${x.id}:${x.name}`).join(', ') || 'none'}`);
+  console.log(`  fields: ${(item.serviceFieldNames ?? []).join(', ') || 'none'}`);
+  console.log(`  semanticFields: ${JSON.stringify(item.semanticFieldGuesses ?? {})}`);
   console.log(`  confidence: ${Number(item.confidence ?? 0).toFixed(2)}`);
   if (printCandidates && (item.candidates ?? []).length > 0) {
     for (const candidate of item.candidates.slice(0, 10)) {
@@ -83,3 +85,15 @@ for (const item of results) {
 const outPath = path.join(outputDir, 'grey-open-data-discovery.json');
 fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date().toISOString(), dryRun, sources: results }, null, 2));
 console.log(`written: ${outPath}`);
+
+const fieldInventoryPath = path.join(outputDir, 'grey-field-inventory.json');
+fs.writeFileSync(fieldInventoryPath, JSON.stringify({
+  generatedAt: new Date().toISOString(),
+  sources: results.map((item) => ({
+    id: item.id,
+    name: item.name,
+    fieldNames: item.serviceFieldNames ?? [],
+    semanticFieldGuesses: item.semanticFieldGuesses ?? {}
+  }))
+}, null, 2));
+console.log(`written: ${fieldInventoryPath}`);

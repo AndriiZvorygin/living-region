@@ -15,6 +15,7 @@ import {
   mergeFeatureCollections
 } from '../program/gis/arcgis_rest_download.mjs';
 import { greyOpenDataManifest, validateGreyOpenDataManifest } from '../program/data/grey_open_data_manifest.mjs';
+import { buildGreySecondaryDataReport } from '../program/report/grey_secondary_data_report.mjs';
 
 describe('grey open data tools', () => {
   test('extract itemId and serviceUrl from ArcGIS-style html', () => {
@@ -66,6 +67,18 @@ describe('grey open data tools', () => {
     ]));
   });
 
+  test('manifest includes secondary useful data sources', () => {
+    const ids = greyOpenDataManifest.map((s) => s.id);
+    expect(ids).toEqual(expect.arrayContaining([
+      'grey-transit-bus-stops',
+      'official-road-cycling-routes',
+      'managed-forest-boundary',
+      'on-farm-rural-business-listing',
+      'bridges-culverts-structures',
+      'lot-fabric-improved-lio'
+    ]));
+  });
+
   test('rank candidates prefers better title/type/access matches', () => {
     const source = {
       sourcePageUrl: 'https://maps.grey.ca/datasets/grey::municipality-boundary-2/about',
@@ -82,6 +95,61 @@ describe('grey open data tools', () => {
     });
     expect(ranked[0].id).toBe('b');
     expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
+  });
+
+  test('Grey County Roads outranks Road Transfers for road-centrelines', () => {
+    const source = {
+      id: 'road-centrelines-grey',
+      sourcePageUrl: 'https://maps.grey.ca/datasets/grey-county-roads-/about',
+      preferredItemId: '0aebf6c0c6c5420f8161d3123756aa74',
+      expectedTitleTerms: ['grey', 'county', 'roads'],
+      expectedOwnerTerms: ['grey'],
+      expectedUrlTerms: ['road', 'featureserver']
+    };
+    const ranked = rankArcgisCandidates({
+      source,
+      candidates: [
+        { id: 'x', title: 'Road Transfers', owner: 'grey', type: 'Feature Service', access: 'public', url: 'https://x/FeatureServer' },
+        { id: '0aebf6c0c6c5420f8161d3123756aa74', title: 'Grey County Roads', owner: 'grey', type: 'Feature Service', access: 'public', url: 'https://x/FeatureServer' }
+      ]
+    });
+    expect(ranked[0].title).toMatch(/Grey County Roads/i);
+  });
+
+  test('ranking prefers Grey-owned trail/transit sources over unrelated owners', () => {
+    const source = {
+      id: 'county-trails',
+      sourcePageUrl: 'https://maps.grey.ca/pages/open-data',
+      expectedTitleTerms: ['trail', 'county'],
+      expectedOwnerTerms: ['grey'],
+      expectedUrlTerms: ['feature']
+    };
+    const ranked = rankArcgisCandidates({
+      source,
+      candidates: [
+        { id: 'a', title: 'County Trails', owner: 'random_city', type: 'Feature Service', access: 'public', url: 'https://other/FeatureServer' },
+        { id: 'b', title: 'County Trails', owner: 'service_grey', type: 'Feature Service', access: 'public', url: 'https://maps.grey.ca/FeatureServer' }
+      ]
+    });
+    expect(ranked[0].id).toBe('b');
+  });
+
+  test('lot fabric ranking prefers Ontario/LIO-style owner over municipal copy', () => {
+    const source = {
+      id: 'lot-fabric-improved-lio',
+      sourcePageUrl: 'https://geohub.lio.gov.on.ca/datasets/lot-fabric-improved/',
+      expectedTitleTerms: ['lot', 'fabric', 'improved'],
+      expectedOwnerTerms: ['ontario', 'lio'],
+      expectedUrlTerms: ['feature']
+    };
+    const ranked = rankArcgisCandidates({
+      source,
+      candidates: [
+        { id: 'a', title: 'Lot Fabric Improved', owner: 'shahir.alam@peelregion.ca_RegionofPeel', type: 'Feature Service', access: 'public', url: 'https://peel/FeatureServer' },
+        { id: 'b', title: 'Lot Fabric Improved', owner: 'lio_ontario', type: 'Feature Service', access: 'public', url: 'https://geohub.lio.gov.on.ca/FeatureServer' }
+      ]
+    });
+    expect(ranked[0].id).toBe('b');
   });
 
   test('service inspection chooses expected geometry/type layer', () => {
@@ -209,11 +277,50 @@ describe('grey open data tools', () => {
     expect(run.stdout).toContain('lot-fabric-improved');
   });
 
+  test('all-useful skips unverified low-confidence/guarded in dry-run by default', () => {
+    const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--all-useful', '--dry-run'], { encoding: 'utf8' });
+    expect(run.status).toBe(0);
+    expect(run.stdout).toContain('municipality-boundaries');
+  });
+
   test('explicit unverified source emits warning', () => {
-    const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--dry-run', '--source=road-centrelines'], { encoding: 'utf8' });
+    const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--dry-run', '--source=road-centrelines-grey'], { encoding: 'utf8' });
     expect(run.status).toBe(0);
     const merged = `${run.stdout}\n${run.stderr}`;
     expect(merged).toContain('unverified');
+  });
+
+  test('ORN fallback is marked large/provincewide unless filtered', () => {
+    const source = greyOpenDataManifest.find((s) => s.id === 'road-centrelines-orn');
+    expect(source?.largeDataset).toBe(true);
+  });
+
+  test('large download safeguard blocks unfiltered provincewide download', () => {
+    const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--source=road-centrelines-orn'], { encoding: 'utf8' });
+    expect(run.status).toBe(0);
+    expect(run.stdout).toContain('blocked');
+  });
+
+  test('data-status command exits successfully', () => {
+    const run = spawnSync('node', ['command/grey_data_status.mjs'], { encoding: 'utf8' });
+    expect(run.status).toBe(0);
+    expect(run.stdout).toContain('real vs synthetic model status');
+  });
+
+  test('secondary report summarizes feature counts', () => {
+    const inputDir = path.resolve('know/input/gis-secondary-fixture');
+    const outputDir = path.resolve('know/produce/secondary-fixture');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.writeFileSync(path.join(inputDir, 'grey-transit-bus-stops.geojson'), JSON.stringify({ type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [0, 0] } }] }));
+    fs.writeFileSync(path.join(inputDir, 'county-trails.geojson'), JSON.stringify({ type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[0, 0], [0.01, 0.01]] } }] }));
+    try {
+      const { summary } = buildGreySecondaryDataReport({ inputDir, outputDir });
+      expect(summary.transitStopCount).toBe(1);
+      expect(summary.trailFeatureCount).toBe(1);
+    } finally {
+      fs.rmSync(inputDir, { recursive: true, force: true });
+      fs.rmSync(outputDir, { recursive: true, force: true });
+    }
   });
 
   test('candidates option prints candidate lines in non-dry-run mode', () => {

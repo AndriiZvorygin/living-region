@@ -13,6 +13,21 @@ function scoreTermMatches(text, terms = []) {
   return terms.reduce((sum, term) => (hay.includes(lowerText(term)) ? sum + 1 : sum), 0);
 }
 
+function guessSemanticFields(fieldNames = []) {
+  const names = fieldNames.map((x) => String(x));
+  const pick = (patterns) => names.find((name) => patterns.some((p) => p.test(name))) ?? null;
+  return {
+    roadNameField: pick([/road.*name/i, /^name$/i, /street/i]),
+    roadClassField: pick([/class/i, /func/i, /roadtype/i]),
+    jurisdictionField: pick([/juris/i, /owner/i, /maint/i, /municip/i, /county/i]),
+    surfaceField: pick([/surface/i, /pave/i]),
+    speedField: pick([/speed/i, /limit/i]),
+    lanesField: pick([/lane/i]),
+    settlementNameField: pick([/settle/i, /community/i, /^name$/i]),
+    landUseDesignationField: pick([/land[_\s]?use/i, /designation/i, /final.*type/i, /sched/i])
+  };
+}
+
 export function extractArcgisItemIdFromHtml(html) {
   if (!html) return null;
   const matches = [];
@@ -57,6 +72,14 @@ export async function fetchServiceMetadata(serviceUrl, fetchImpl = fetch) {
   }
   const json = await response.json();
   return { ok: true, url, status: response.status, metadata: json, warnings: [] };
+}
+
+async function fetchLayerMetadata(serviceUrl, layerId, fetchImpl = fetch) {
+  if (layerId === null || layerId === undefined) return { ok: false, metadata: null, warnings: [] };
+  const url = `${serviceUrl.replace(/\/$/, '')}/${layerId}?f=json`;
+  const response = await fetchImpl(url);
+  if (!response.ok) return { ok: false, metadata: null, warnings: [`layer metadata request failed: ${response.status}`] };
+  return { ok: true, metadata: await response.json(), warnings: [] };
 }
 
 export async function discoverArcgisDatasetFromHubPage(sourcePageUrl, options = {}) {
@@ -127,6 +150,20 @@ export function rankArcgisCandidates({ candidates, source }) {
       if (/map service/i.test(type)) score += 6;
       if ((candidate.access ?? '').toLowerCase() === 'public') score += 4;
       if (/FeatureServer|MapServer/i.test(url)) score += 8;
+      if (source.preferredItemId && candidate.id === source.preferredItemId) score += 25;
+      if (/grey|service_grey|maps\.grey\.ca/i.test(owner) || /maps\.grey\.ca|gis\.grey\.ca/i.test(url)) score += 12;
+      if ((source.expectedOwnerTerms ?? []).includes('grey') && !/grey|service_grey|maps\.grey\.ca/i.test(owner) && !/maps\.grey\.ca|gis\.grey\.ca/i.test(url)) score -= 10;
+      if ((source.id ?? '').includes('road-centrelines')) {
+        if (/grey county roads|all roads in grey county/i.test(title)) score += 22;
+        if (/transfer/i.test(title)) score -= 30;
+      }
+      if ((source.id ?? '').includes('trail') || (source.id ?? '').includes('cycling') || (source.id ?? '').includes('transit')) {
+        if (/trail|cycling|cycle|transit|bus/i.test(title)) score += 10;
+      }
+      if ((source.id ?? '').includes('lot-fabric')) {
+        if (/ontario|lio|mnrf|geohub/i.test(owner) || /geohub\.lio\.gov\.on\.ca/i.test(url)) score += 20;
+        if (/peel|regionofpeel|city|municipality/i.test(owner)) score -= 15;
+      }
       return { ...candidate, score };
     })
     .sort((a, b) => b.score - a.score);
@@ -142,6 +179,7 @@ export function chooseLayerFromService(serviceMeta, source) {
     if (expectedGeometry.includes('polygon') && /polygon/i.test(layer.geometryType ?? '')) score += 10;
     if (expectedGeometry.includes('line') && /(polyline|line)/i.test(layer.geometryType ?? '')) score += 10;
     score += scoreTermMatches(layerName, expectedTerms) * 6;
+    if ((source.id ?? '').includes('road-centrelines') && /transfer/i.test(layerName)) score -= 8;
     return { ...layer, score };
   }).sort((a, b) => b.score - a.score);
 
@@ -229,6 +267,8 @@ export async function discoverLayerDownloadInfo(source, options = {}) {
       layerId = layerInfo.selectedLayerId;
     }
   }
+  const layerMeta = await fetchLayerMetadata(serviceUrl, layerId, fetchImpl);
+  warnings.push(...(layerMeta.warnings ?? []));
 
   const confidenceScore = selectedCandidate?.score ?? (itemId || serviceUrl ? 15 : 0);
   const confidence = confidenceFromScore(confidenceScore);
@@ -275,6 +315,12 @@ export async function discoverLayerDownloadInfo(source, options = {}) {
       licenseInfo: itemMetadata.licenseInfo ?? null,
       termsOfUse: itemMetadata.termsOfUse ?? null
     } : null,
+    serviceFieldNames: Array.isArray(layerMeta.metadata?.fields)
+      ? layerMeta.metadata.fields.map((f) => f.name).filter(Boolean)
+      : [],
+    semanticFieldGuesses: guessSemanticFields(
+      Array.isArray(layerMeta.metadata?.fields) ? layerMeta.metadata.fields.map((f) => f.name) : []
+    ),
     confidence,
     confidenceScore,
     warnings,

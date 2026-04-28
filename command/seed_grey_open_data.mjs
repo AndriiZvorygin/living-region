@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { generateGreyCountyWorld } from '../program/data/generate_grey_county_world.mjs';
+import { summarizeGreySecondaryCollections } from '../program/data/grey_secondary_counts.mjs';
 
 const outputDir = path.resolve('know/produce');
 fs.mkdirSync(outputDir, { recursive: true });
@@ -62,6 +63,7 @@ fs.writeFileSync(municipalitiesPath, JSON.stringify({ type: 'FeatureCollection',
 fs.writeFileSync(settlementsPath, JSON.stringify({ type: 'FeatureCollection', features: settlementFeatures }, null, 2));
 fs.writeFileSync(landUsePath, JSON.stringify({ type: 'FeatureCollection', features: landUseFeatures }, null, 2));
 
+const secondarySummary = summarizeGreySecondaryCollections(world);
 const summary = {
   generatedAt: new Date().toISOString(),
   worldPath,
@@ -72,8 +74,17 @@ const summary = {
   landUseCategoryCounts: world.seedMeta.summary.landUseCategoryCounts,
   unclassifiedLandUseCount: world.seedMeta.summary.unclassifiedLandUseCount,
   unassignedMunicipalityLandUseCount: world.seedMeta.summary.unassignedMunicipalityLandUseCount,
+  roadSource: world.seedMeta.summary.roadSource,
+  roadFeatureCount: world.seedMeta.summary.roadFeatureCount,
+  totalRoadKm: world.seedMeta.summary.totalRoadKm,
+  roadClassCounts: world.seedMeta.summary.roadClassCounts,
+  roadJurisdictionCounts: world.seedMeta.summary.roadJurisdictionCounts,
+  roadFieldsDetected: world.seedMeta.summary.roadFieldsDetected,
+  ...secondarySummary,
   warnings: world.seedMeta.warnings ?? [],
-  note: 'Roads remain synthetic/unverified in this open-data geometry mode.'
+  note: (world.seedMeta.summary.roadSource === 'grey-open-data')
+    ? 'Road centrelines imported from Grey open data.'
+    : 'Roads remain synthetic/unverified in this open-data geometry mode.'
 };
 fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
 
@@ -86,8 +97,22 @@ console.log(`municipality features matched: ${summary.municipalityFeaturesMatche
 console.log(`settlement features imported: ${summary.settlementFeaturesImported}`);
 console.log(`land-use features imported: ${summary.landUseFeaturesImported}`);
 console.log(`land-use category counts: ${JSON.stringify(summary.landUseCategoryCounts)}`);
+console.log(`roadSource: ${summary.roadSource ?? 'synthetic'}`);
+console.log(`roadFeatureCount: ${summary.roadFeatureCount ?? 0}`);
+console.log(`totalRoadKm: ${Number(summary.totalRoadKm ?? 0).toFixed(2)}`);
+console.log(`roadClassCounts: ${JSON.stringify(summary.roadClassCounts ?? {})}`);
+console.log(`roadJurisdictionCounts: ${JSON.stringify(summary.roadJurisdictionCounts ?? {})}`);
+console.log(`roadFieldsDetected: ${JSON.stringify(summary.roadFieldsDetected ?? {})}`);
+console.log(`transitStopCount: ${summary.transitStopCount ?? 0}`);
+console.log(`trailFeatureCount: ${summary.trailFeatureCount ?? 0}`);
+console.log(`cyclingRouteFeatureCount: ${summary.cyclingRouteFeatureCount ?? 0}`);
+console.log(`managedForestFeatureCount: ${summary.managedForestFeatureCount ?? 0}`);
+console.log(`ruralBusinessCount: ${summary.ruralBusinessCount ?? 0}`);
+console.log(`facilityCount: ${summary.facilityCount ?? 0}`);
+console.log(`roadStructureCount: ${summary.roadStructureCount ?? 0}`);
+console.log(`secondaryDataCoverageScore: ${(summary.secondaryDataCoverageScore ?? 0).toFixed(3)}`);
 console.log(`warnings: ${summary.warnings.length}`);
 for (const warning of summary.warnings) {
   console.log(`  - ${warning}`);
 }
-console.log('road source: synthetic (road centrelines unverified)');
+console.log(`road source note: ${summary.note}`);

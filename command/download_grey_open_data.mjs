@@ -48,6 +48,11 @@ const explicitServiceUrl = args['service-url'] ?? null;
 const explicitItemId = args['item-id'] ?? null;
 const explicitLayerId = args['layer-id'] !== undefined ? Number(args['layer-id']) : null;
 const includeUnverified = toBool(args['include-unverified'], false);
+const allowLargeDownload = toBool(args['allow-large-download'], false);
+const secondaryOnly = toBool(args.secondary, false);
+const allUseful = toBool(args['all-useful'], false);
+const explicitWhere = args.where ?? null;
+const explicitBbox = args.bbox ?? null;
 const all = sourceId ? false : toBool(args.all, true);
 const overridesPath = path.resolve('know/input/gis/source-overrides.json');
 const overrides = fs.existsSync(overridesPath) ? JSON.parse(fs.readFileSync(overridesPath, 'utf8')) : {};
@@ -58,7 +63,13 @@ if (selected.length === 0) {
   process.exit(1);
 }
 if (all && !includeUnverified) {
-  selected = selected.filter((s) => s.verified);
+  if (allUseful) {
+    selected = selected.filter((s) => s.status !== 'webSummaryOnly');
+  } else if (secondaryOnly) {
+    selected = selected.filter((s) => !['municipality-boundaries', 'settlement-boundaries', 'official-plan-schedule-a-land-use', 'road-centrelines-grey'].includes(s.id));
+  } else {
+    selected = selected.filter((s) => s.verified);
+  }
 }
 
 fs.mkdirSync(outDir, { recursive: true });
@@ -78,6 +89,21 @@ for (const source of selected) {
     ? { ...sourceWithOverride, layers: [], warnings: dryRun ? ['dry-run: discovery skipped'] : [] }
     : await discoverLayerDownloadInfo({ ...sourceWithOverride });
 
+  if (!sourceId && allUseful && !dryRun) {
+    const confidence = discovered.confidence ?? 0;
+    const largeGuarded = source.largeDownloadGuarded || source.largeDataset;
+    if ((source.verified !== true && confidence < 0.75) || source.status === 'webSummaryOnly' || source.expectedGeometryType === 'None') {
+      console.log(`${source.id}: skipped (not verified and low-confidence or non-downloadable source)`);
+      manifestRows.push({ id: source.id, ok: false, reason: 'not-useful-downloadable' });
+      continue;
+    }
+    if (largeGuarded && !allowLargeDownload && !explicitWhere && !explicitBbox) {
+      console.log(`${source.id}: skipped (large-download guarded; use --allow-large-download or filters)`);
+      manifestRows.push({ id: source.id, ok: false, reason: 'large-download-guarded' });
+      continue;
+    }
+  }
+
   const discoveredServiceUrl = explicitServiceUrl ?? discovered.serviceUrl ?? sourceWithOverride.serviceUrl ?? null;
   const itemId = explicitItemId ?? discovered.itemId ?? sourceWithOverride.itemId ?? null;
   let layerId = explicitLayerId ?? discovered.layerId ?? sourceWithOverride.layerId ?? null;
@@ -91,11 +117,17 @@ for (const source of selected) {
     continue;
   }
 
+  if (source.largeDataset && !allowLargeDownload && !explicitWhere && !explicitBbox) {
+    console.log(`${source.id}: blocked (large dataset requires --allow-large-download or --where/--bbox filter)`);
+    manifestRows.push({ id: source.id, ok: false, reason: 'large-download-blocked' });
+    continue;
+  }
+
   let downloadResult = null;
   if (itemId) {
     downloadResult = await downloadHubItemGeoJson({ hubBaseUrl: source.sourcePageUrl, itemId, layerId, serviceUrl });
   } else if (serviceUrl) {
-    downloadResult = await downloadFeatureLayerAsGeoJson({ serviceUrl, layerId });
+    downloadResult = await downloadFeatureLayerAsGeoJson({ serviceUrl, layerId, where: explicitWhere ?? '1=1' });
     downloadResult = { ...downloadResult, mode: 'rest-only', ok: true };
   } else {
     console.log(`${source.id}: skipped (no itemId/serviceUrl discovered)`);

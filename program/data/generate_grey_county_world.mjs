@@ -96,6 +96,26 @@ function haversineKm(latA, lonA, latB, lonB) {
   return earthRadiusKm * c;
 }
 
+function geometryLengthKm(geometry) {
+  if (!geometry?.type) return 0;
+  const lines = geometry.type === 'LineString'
+    ? [geometry.coordinates]
+    : geometry.type === 'MultiLineString'
+      ? geometry.coordinates
+      : [];
+  let length = 0;
+  for (const line of lines) {
+    for (let i = 1; i < (line?.length ?? 0); i += 1) {
+      const [lonA, latA] = line[i - 1];
+      const [lonB, latB] = line[i];
+      if ([lonA, latA, lonB, latB].every((v) => Number.isFinite(v))) {
+        length += haversineKm(latA, lonA, latB, lonB);
+      }
+    }
+  }
+  return length;
+}
+
 function kmToLatDeg(km) {
   return km / 111;
 }
@@ -724,6 +744,55 @@ function loadGreyOpenDataGeometry(inputDir, nodesByMunicipalityId) {
   };
 }
 
+function loadGreyRoads(inputDir, warnings) {
+  const roadsPath = path.join(inputDir, 'road-centrelines-grey.geojson');
+  if (!fs.existsSync(roadsPath)) {
+    warnings.push(`open-data roads missing: ${roadsPath}`);
+    return { features: [], roadSource: 'synthetic' };
+  }
+  const parsed = JSON.parse(fs.readFileSync(roadsPath, 'utf8'));
+  const features = Array.isArray(parsed?.features) ? parsed.features : [];
+  return { features, roadSource: 'grey-open-data' };
+}
+
+function loadSecondaryLayerCounts(inputDir) {
+  const sourceIds = [
+    'grey-transit-bus-stops',
+    'grey-transit-routes',
+    'official-road-cycling-routes',
+    'county-trails',
+    'cp-rail-trail',
+    'hiking-trails',
+    'tom-thomson-trail',
+    'managed-forest-boundary',
+    'hazardous-forest-types-wildfire',
+    'on-farm-rural-business-listing',
+    'public-facilities',
+    'community-facilities',
+    'libraries',
+    'arenas-community-centres',
+    'works-yards-depots',
+    'emergency-services',
+    'bridges-culverts-structures',
+    'road-projects-construction-resurfacing'
+  ];
+  const counts = {};
+  for (const id of sourceIds) {
+    const filePath = path.join(inputDir, `${id}.geojson`);
+    if (!fs.existsSync(filePath)) {
+      counts[id] = 0;
+      continue;
+    }
+    try {
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      counts[id] = Array.isArray(parsed?.features) ? parsed.features.length : 0;
+    } catch {
+      counts[id] = 0;
+    }
+  }
+  return counts;
+}
+
 export function generateGreyCountyWorld(options = {}) {
   const includeRail = options.includeRail ?? false;
   const includeWaterFreight = options.includeWaterFreight ?? false;
@@ -732,6 +801,7 @@ export function generateGreyCountyWorld(options = {}) {
   const baseYear = options.baseYear ?? 2026;
   const roadWiggleFactor = options.roadWiggleFactor ?? 1.2;
   const useOpenDataGeometry = options.useOpenDataGeometry ?? false;
+  const useOpenDataRoads = options.useOpenDataRoads ?? useOpenDataGeometry;
   const openDataInputDir = path.resolve(options.openDataInputDir ?? 'know/input/gis');
 
   const seedValidation = validateGreyCountySeedTotals(greyCountySeedNodes);
@@ -744,6 +814,9 @@ export function generateGreyCountyWorld(options = {}) {
   const openDataGeometry = useOpenDataGeometry
     ? loadGreyOpenDataGeometry(openDataInputDir, nodesByMunicipalityId)
     : null;
+  const roadWarnings = [];
+  const openDataRoads = useOpenDataRoads ? loadGreyRoads(openDataInputDir, roadWarnings) : { features: [], roadSource: 'synthetic' };
+  const secondaryCounts = useOpenDataGeometry ? loadSecondaryLayerCounts(openDataInputDir) : {};
 
   const scaling = generateMunicipalityTargets(nodes, options);
   const targetByMunicipalityId = new Map(scaling.targets.map((target) => [target.municipalityId, target]));
@@ -1366,7 +1439,72 @@ export function generateGreyCountyWorld(options = {}) {
     });
   }
 
-  const roadSegments = buildRoadSegments(nodesByMunicipalityId, scaling.scaleKey !== 'tiny', roadWiggleFactor);
+  let roadSegments = buildRoadSegments(nodesByMunicipalityId, scaling.scaleKey !== 'tiny', roadWiggleFactor);
+  let roadFeatureCount = 0;
+  let totalRoadKm = roadSegments.reduce((sum, s) => sum + (s.lengthKm ?? 0), 0);
+  const roadClassCounts = {};
+  const roadJurisdictionCounts = {};
+  const roadFieldsDetected = {};
+  if (useOpenDataRoads && openDataRoads.features.length > 0) {
+    const features = openDataRoads.features;
+    roadFeatureCount = features.length;
+    const propertyKeys = new Set();
+    const pickRoad = (props, keys) => {
+      const all = Object.keys(props ?? {});
+      for (const key of keys) {
+        const hit = all.find((k) => k.toLowerCase() === key.toLowerCase());
+        if (hit && props[hit] !== undefined && props[hit] !== null && String(props[hit]).trim() !== '') return props[hit];
+      }
+      return null;
+    };
+    roadSegments = features.map((feature, index) => {
+      const props = feature?.properties ?? {};
+      for (const key of Object.keys(props)) propertyKeys.add(key);
+      const roadName = pickRoad(props, ['ROAD_NAME', 'RoadName', 'ROADNAME', 'NAME']);
+      const roadClass = pickRoad(props, ['ORN_ROAD_CLASS', 'ROAD_CLASS', 'CLASS', 'FUNCTIONAL_CLASS', 'TYPE']) ?? 'unknown';
+      const jurisdiction = pickRoad(props, ['JURIS_L', 'JURISDICTION', 'OWNER', 'ROAD_AUTHORITY', 'MUNICIPAL', 'COUNTY']) ?? 'unknown';
+      const speedLimit = Number(pickRoad(props, ['SPEED_LIMI', 'SPEED_LIMIT', 'SPEED', 'POSTED_SPEED']) ?? 0) || null;
+      const sourceLength = Number(props.LENGTH_KM ?? props.LENGTH ?? props.Shape_STLength__ ?? 0);
+      const lengthKm = sourceLength > 0 && sourceLength < 500 ? sourceLength : geometryLengthKm(feature.geometry);
+      roadClassCounts[String(roadClass)] = (roadClassCounts[String(roadClass)] ?? 0) + 1;
+      roadJurisdictionCounts[String(jurisdiction)] = (roadJurisdictionCounts[String(jurisdiction)] ?? 0) + 1;
+      return {
+        id: `road-open-${index + 1}`,
+        type: 'collectorRoad',
+        lengthKm: Math.max(0.01, lengthKm || 0.01),
+        condition: 0.72,
+        capacityPassengerKmPerYear: 1_500_000,
+        capacityTonneKmPerYear: 900_000,
+        maintenanceCostPerKmPerYear: 7_500,
+        maintenanceLabourDaysPerKmPerYear: 10,
+        maintenanceMaterialsKgPerKmPerYear: 580,
+        capitalRenewalCostPerKm: 100_000,
+        bridgeOrCulvertFactor: 1.1,
+        winterMaintenanceFactor: 1.2,
+        climateStressFactor: 1.2,
+        rightOfWayStatus: 'active',
+        electrified: false,
+        electricTractionAvailable: false,
+        dieselTractionAvailable: true,
+        maxSpeedKmh: speedLimit ?? 70,
+        stopsOrSidings: 0,
+        connectsSettlementIds: [],
+        roadName,
+        roadClass,
+        jurisdiction,
+        surface: pickRoad(props, ['PAVED_STATUS', 'SURFACE', 'PAVEMENT']),
+        sourceProperties: props,
+        geometry: feature.geometry ?? null
+      };
+    });
+    totalRoadKm = roadSegments.reduce((sum, s) => sum + (s.lengthKm ?? 0), 0);
+    roadFieldsDetected.roadNameField = [...propertyKeys].find((k) => /road.*name|name|street/i.test(k)) ?? null;
+    roadFieldsDetected.roadClassField = [...propertyKeys].find((k) => /class|functional|type/i.test(k)) ?? null;
+    roadFieldsDetected.jurisdictionField = [...propertyKeys].find((k) => /juris|owner|municip|county/i.test(k)) ?? null;
+    roadFieldsDetected.surfaceField = [...propertyKeys].find((k) => /surface|pave/i.test(k)) ?? null;
+    roadFieldsDetected.speedField = [...propertyKeys].find((k) => /speed|limit/i.test(k)) ?? null;
+    roadFieldsDetected.lanesField = [...propertyKeys].find((k) => /lane/i.test(k)) ?? null;
+  }
   const railSegments = includeRail ? buildRailSegments(nodesByMunicipalityId) : [];
   const waterSegments = includeWaterFreight ? buildWaterSegments(nodesByMunicipalityId) : [];
 
@@ -1479,7 +1617,7 @@ export function generateGreyCountyWorld(options = {}) {
       municipalityBoundaries: Array.from(openDataGeometry?.municipalityById.values() ?? []),
       settlementBoundaries: openDataGeometry?.settlementFeatures ?? [],
       landUsePatches: openDataGeometry?.landUseFeatures ?? [],
-      warnings: openDataGeometry?.warnings ?? []
+      warnings: [...(openDataGeometry?.warnings ?? []), ...roadWarnings]
     } : null,
     summaryCsvText: createMunicipalSummaryCsv(municipalitySummaryRows),
     summary: {
@@ -1494,6 +1632,31 @@ export function generateGreyCountyWorld(options = {}) {
       dwellingUnits: dwellingUnitsCount,
       vacancyRate: generatedVacancyRate,
       roadSegments: roadSegments.length,
+      roadSource: useOpenDataRoads ? openDataRoads.roadSource : 'synthetic',
+      roadFeatureCount: roadFeatureCount || roadSegments.length,
+      totalRoadKm,
+      roadClassCounts,
+      roadJurisdictionCounts,
+      roadFieldsDetected,
+      roadMaintenanceDemandMoney: totalRoadKm * 7500,
+      maintenanceCostPerRoadKmAverage: totalRoadKm > 0 ? 7500 : 0,
+      roadKmPerResident: syntheticPopulation > 0 ? totalRoadKm / syntheticPopulation : 0,
+      roadKmPerSettlementArea: nodes.length > 0 ? totalRoadKm / nodes.length : 0,
+      transitStopCount: secondaryCounts['grey-transit-bus-stops'] ?? 0,
+      trailFeatureCount: (secondaryCounts['county-trails'] ?? 0) + (secondaryCounts['cp-rail-trail'] ?? 0) + (secondaryCounts['hiking-trails'] ?? 0) + (secondaryCounts['tom-thomson-trail'] ?? 0),
+      cyclingRouteFeatureCount: secondaryCounts['official-road-cycling-routes'] ?? 0,
+      managedForestFeatureCount: secondaryCounts['managed-forest-boundary'] ?? 0,
+      ruralBusinessCount: secondaryCounts['on-farm-rural-business-listing'] ?? 0,
+      facilityCount: (secondaryCounts['public-facilities'] ?? 0) + (secondaryCounts['community-facilities'] ?? 0) + (secondaryCounts['libraries'] ?? 0) + (secondaryCounts['arenas-community-centres'] ?? 0) + (secondaryCounts['works-yards-depots'] ?? 0) + (secondaryCounts['emergency-services'] ?? 0),
+      roadStructureCount: secondaryCounts['bridges-culverts-structures'] ?? 0,
+      secondaryDataCoverageScore: Math.min(1, [
+        secondaryCounts['grey-transit-bus-stops'] ?? 0,
+        secondaryCounts['official-road-cycling-routes'] ?? 0,
+        secondaryCounts['managed-forest-boundary'] ?? 0,
+        secondaryCounts['on-farm-rural-business-listing'] ?? 0,
+        secondaryCounts['public-facilities'] ?? 0,
+        secondaryCounts['bridges-culverts-structures'] ?? 0
+      ].filter((v) => v > 0).length / 6),
       railSegments: railSegments.length,
       waterSegments: waterSegments.length,
       municipalityFeaturesMatched: useOpenDataGeometry ? (openDataGeometry?.municipalityById.size ?? 0) : 0,
@@ -1506,7 +1669,7 @@ export function generateGreyCountyWorld(options = {}) {
       stations: infrastructures.filter((item) => ['railStation', 'railHalt', 'freightSiding'].includes(item.type) && item.networkId === 'network-grey-rail').length,
       freightAnchors: infrastructures.filter((item) => ['grainDepot', 'rootCellarDepot', 'coldStorageDepot', 'woodFuelDepot', 'timberSiding', 'farmInputDepot', 'nurseryStockDepot', 'repairMaterialsDepot', 'compostTransferDepot', 'constructionMaterialsDepot', 'emergencySupplyDepot', 'marketDepot', 'intermodalDepot'].includes(item.type)).length
     },
-    warnings: useOpenDataGeometry ? (openDataGeometry?.warnings ?? []) : [],
+    warnings: useOpenDataGeometry ? [...(openDataGeometry?.warnings ?? []), ...roadWarnings] : roadWarnings,
     notes: useOpenDataGeometry
       ? 'Municipal/settlement/land-use geometry imported from Grey open data where available; census population/land-area scaling retained; roads remain synthetic until verified centrelines are added.'
       : 'Synthetic coordinate-seeded geometry with census-scaled municipality population and land area. Replace with real municipal boundaries/parcels/centrelines for production calibration.'

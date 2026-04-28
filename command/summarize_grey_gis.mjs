@@ -58,6 +58,20 @@ function computeBbox(features) {
   return [minX, minY, maxX, maxY];
 }
 
+function guessSemanticFields(keys = []) {
+  const pick = (patterns) => keys.find((name) => patterns.some((p) => p.test(name))) ?? null;
+  return {
+    roadNameField: pick([/road.*name/i, /^name$/i, /street/i]),
+    roadClassField: pick([/class/i, /func/i, /roadtype/i]),
+    jurisdictionField: pick([/juris/i, /owner/i, /maint/i, /municip/i, /county/i]),
+    surfaceField: pick([/surface/i, /pave/i]),
+    speedField: pick([/speed/i, /limit/i]),
+    lanesField: pick([/lane/i]),
+    settlementNameField: pick([/settle/i, /community/i, /^name$/i]),
+    landUseDesignationField: pick([/land[_\\s]?use/i, /designation/i, /final.*type/i, /sched/i])
+  };
+}
+
 const args = parseArgs(process.argv.slice(2));
 const inputDir = path.resolve(args.dir ?? 'know/input/gis');
 const outputPath = path.resolve(args.out ?? 'know/produce/grey-gis-summary.json');
@@ -82,6 +96,8 @@ for (const file of files) {
     bbox: computeBbox(features),
     sampleProperties: features[0]?.properties ?? {}
   };
+  const keys = summary.topPropertyKeys.map((x) => x.key);
+  summary.semanticFieldGuesses = guessSemanticFields(keys);
   summaries.push(summary);
 
   console.log(`${file}:`);
@@ -90,8 +106,20 @@ for (const file of files) {
   console.log(`  topPropertyKeys: ${summary.topPropertyKeys.map((k) => k.key).join(', ') || 'none'}`);
   console.log(`  bbox: ${summary.bbox ? summary.bbox.join(', ') : 'n/a'}`);
   console.log(`  sampleProperties: ${JSON.stringify(summary.sampleProperties)}`);
+  console.log(`  semanticFields: ${JSON.stringify(summary.semanticFieldGuesses)}`);
 }
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify({ generatedAt: new Date().toISOString(), inputDir, files: summaries }, null, 2));
 console.log(`written: ${outputPath}`);
+const fieldInventoryPath = path.resolve('know/produce/grey-field-inventory.json');
+fs.writeFileSync(fieldInventoryPath, JSON.stringify({
+  generatedAt: new Date().toISOString(),
+  files: summaries.map((file) => ({
+    file: file.file,
+    fields: file.topPropertyKeys.map((x) => x.key),
+    semanticFieldGuesses: file.semanticFieldGuesses,
+    sampleProperties: file.sampleProperties
+  }))
+}, null, 2));
+console.log(`written: ${fieldInventoryPath}`);

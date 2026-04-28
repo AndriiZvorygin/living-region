@@ -22,6 +22,8 @@ It is designed to make assumptions visible and testable, not to produce official
 - Open-source under AGPL-3.0-or-later.
 - Grey County census-scaled seed model.
 - Real Grey County Open Data ingestion for municipal boundaries, settlement boundaries, and Official Plan Schedule A land use.
+- Secondary useful data can be discovered/downloaded with `npm run grey:discover-all-data` and `npm run grey:download-data -- --all-useful`.
+- Road centrelines, parcels/lot fabric, structures/condition, and public facilities are still being verified/imported.
 - GeoJSON/CSV output.
 - Real GIS import scaffolding.
 - No web UI yet.
@@ -188,6 +190,7 @@ npm run demo:grey:open-data
 - `grey:import-data`: import downloaded Grey layers into a structured world-layer JSON.
 - `seed:grey:open-data`: generate a census-scaled Grey world using real municipal/settlement/land-use geometry.
 - `demo:grey:open-data`: run a scenario on the open-data geometry world (roads remain synthetic).
+- `report:grey:secondary`: summarize downloaded secondary useful layers.
 
 ## Outputs
 
@@ -200,6 +203,23 @@ Generated output types in `know/produce/` include:
 - GeoJSON layers
 
 `know/produce/` is ignored by git.
+
+### Real-data baseline reports
+
+Run:
+
+```bash
+npm run report:grey:baseline
+```
+
+Outputs:
+
+- `know/produce/grey-baseline-summary.json`
+- `know/produce/grey-baseline-municipality-summary.csv`
+- `know/produce/grey-baseline-roads-summary.csv`
+- `know/produce/grey-baseline-land-use-summary.csv`
+
+These reports summarize downloaded real Grey County layers before scenario modelling, so measured/open-data structure is easier to separate from model assumptions.
 
 ## Real-data priority
 
@@ -240,6 +260,7 @@ Living Region is licensed under GNU Affero General Public License v3.0 or later 
 - Synthetic demo/seed geometry is scaffolding.
 - Grey County population/land-area scale is census-grounded; municipal/settlement/land-use geometry can now come from downloaded Grey open data.
 - Road centrelines and lot fabric still need verified sources; until then road network modelling remains synthetic/generated links.
+- Road structures/conditions and public facilities/service nodes are still pending open-data ingestion.
 - Formulas are coarse and transparent, not calibrated econometrics.
 - No web UI yet.
 - No full routing engine yet.
