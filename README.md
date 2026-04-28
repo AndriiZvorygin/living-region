@@ -61,6 +61,39 @@ Example full Grey County rail scenario output:
 - Transport diesel deficit: 174,480 L
 - Road maintenance backlog: $16,744,204
 
+### Rural transition and resilience signals
+
+Living Region is designed to expose the pressures that can drive or constrain urban-to-rural transition. The current Grey County census-scale model already reports indicators such as:
+
+- `foodCoverage`: how much local food demand can be met by modelled local production.
+- `foodSurplusCalories`: whether the region has a food surplus or deficit under the scenario.
+- `averageHouseholdStress`: combined pressure from food, housing, fuel, transport, and service access.
+- `transportDieselDeficitLitre`: unmet diesel demand for passenger and freight movement.
+- `roadMaintenanceBacklogMoney`: accumulated road maintenance pressure.
+- `railPassengerKm` and `railFreightTonneKm`: how much movement shifts to rail in corridor scenarios.
+- `railUtilizationRatio`: whether a rail corridor has enough demand to become useful.
+- `infrastructureCondition`: whether roads, services, and other infrastructure are being maintained or degrading.
+
+These metrics help test questions such as: How much local food capacity would be needed to support existing settlement patterns? How much does transport fuel scarcity constrain rural access? Does rail or freight consolidation reduce road and diesel pressure? How much infrastructure maintenance burden is created by spread-out settlement? Which scenarios reduce household stress, and which merely shift stress from one system to another?
+
+Example full Grey County rural-transition comparison:
+
+- No-rail full Grey scenario:
+  - Food coverage ratio: 0.697
+  - Food deficit: -31,970,274,138 calories
+  - Infrastructure condition: 0.468
+
+- Rail freight-corridor full Grey scenario:
+  - Food coverage ratio: 0.761
+  - Food deficit: -23,333,874,138 calories
+  - Rail passenger-km: 4,063,097
+  - Rail freight tonne-km: 268,679
+  - Rail utilization ratio: 0.133
+  - Transport diesel deficit: 174,480 L
+  - Road maintenance backlog: $16,744,204
+
+These are not forecasts. They are scenario diagnostics. Their purpose is to show which assumptions create food deficits, transport bottlenecks, road maintenance burdens, rural access problems, or settlement patterns that may require adaptation.
+
 The current Grey County model is census-scaled, but still uses generated geometry. The population and land-area totals are grounded in public census data; the patch shapes, road links, rail corridors, buildings, and freight anchors are scenario scaffolding until replaced with real GIS layers.
 
 Generated outputs include:
@@ -109,6 +142,7 @@ The census-scale model is already useful for checking municipal scale, populatio
 - Households, labour allocation, stress, migration, and population change
 - Buildings, rents, housing demand, and real-estate value dynamics
 - Transportation demand, mode substitution, fuel constraints, and settlement form
+- Urban-to-rural transition pressure, including food coverage, local service access, transport fuel constraints, rural land capacity, road maintenance burden, and settlement rebalancing
 - Road/rail maintenance burdens, backlog effects, and service reliability
 - Food, freight, and energy balances under changing resource assumptions
 
