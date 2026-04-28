@@ -56,6 +56,10 @@ export const defaultConstants = {
     energyConstraintDieselWeight: 0.35,
     energyConstraintMin: 0.45
   },
+  foodLabour: {
+    seasonalPeakMultiplier: 1.25,
+    baseSkillRequirement: 0.45
+  },
   infrastructure: {
     baseDecayRate: 0.05,
     budgetDecayPenalty: 0.8,
@@ -565,7 +569,14 @@ export const defaultConstants = {
   market: {
     dieselPriceMultiplier: 1,
     gasolinePriceMultiplier: 1,
-    electricityPriceMultiplier: 1
+    electricityPriceMultiplier: 1,
+    baselineFoodPricePerGJ: 220,
+    foodPriceInflationRate: 0.015,
+    foodPriceSensitivityToLocalDeficit: 0.28,
+    foodPriceSensitivityToTransportFuelStress: 0.16,
+    foodPriceSensitivityToInputCostIndex: 0.12,
+    warningFoodCostBurden: 0.15,
+    severeFoodCostBurden: 0.25
   },
   housing: {
     // Monthly rent bounds and growth controls.

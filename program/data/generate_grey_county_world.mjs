@@ -516,6 +516,70 @@ function createMunicipalSummaryCsv(summaryRows) {
   return lines.join('\n');
 }
 
+function classifyLandAccess(node, index, patchAreas) {
+  const isUrbanCore = node.urbanShare > 0.72;
+  const isTownship = node.municipalityType === 'township';
+  const cycle = index % 10;
+
+  if (isUrbanCore) {
+    if (cycle < 6) {
+      return { type: 'none', ha: 0, gardenM2: 40 + cycle * 8 };
+    }
+    if (cycle < 9) {
+      return { type: 'garden', ha: 0.015 + cycle * 0.001, gardenM2: 120 + cycle * 20 };
+    }
+    return { type: 'allotment', ha: 0.03, gardenM2: 300 };
+  }
+
+  if (isTownship) {
+    if (cycle < 4) {
+      return { type: 'farm', ha: Math.max(0.4, patchAreas.croplandCatchment * 0.0008), gardenM2: 600 };
+    }
+    if (cycle < 7) {
+      return { type: 'common', ha: Math.max(0.15, patchAreas.pastureCatchment * 0.0004), gardenM2: 380 };
+    }
+    if (cycle < 9) {
+      return { type: 'garden', ha: 0.06, gardenM2: 480 };
+    }
+    return { type: 'cooperative', ha: 0.12, gardenM2: 420 };
+  }
+
+  if (cycle < 4) {
+    return { type: 'garden', ha: 0.05, gardenM2: 460 };
+  }
+  if (cycle < 7) {
+    return { type: 'farm', ha: Math.max(0.18, patchAreas.marketGardenBelt * 0.0009), gardenM2: 520 };
+  }
+  if (cycle < 9) {
+    return { type: 'cooperative', ha: 0.1, gardenM2: 350 };
+  }
+  return { type: 'none', ha: 0, gardenM2: 60 };
+}
+
+function classifyHouseholdContext(node, index, landAccessType) {
+  const cycle = index % 10;
+  const highDensity = node.municipalityId === 'owen-sound' || node.municipalityId === 'hanover';
+  if (highDensity && cycle < 6) {
+    return 'urbanCore';
+  }
+  if (['meaford', 'blue-mountains', 'west-grey', 'grey-highlands', 'southgate'].includes(node.municipalityId) && cycle < 4) {
+    return 'townCore';
+  }
+  if (['georgian-bluffs', 'chatsworth'].includes(node.municipalityId) && cycle < 4) {
+    return 'villageCore';
+  }
+  if (landAccessType === 'farm') {
+    return 'farmstead';
+  }
+  if (landAccessType === 'common' || landAccessType === 'cooperative') {
+    return 'common/cooperative';
+  }
+  if (landAccessType === 'none') {
+    return 'settlementEdge';
+  }
+  return 'ruralResidential';
+}
+
 export function generateGreyCountyWorld(options = {}) {
   const includeRail = options.includeRail ?? false;
   const includeWaterFreight = options.includeWaterFreight ?? false;
@@ -989,6 +1053,11 @@ export function generateGreyCountyWorld(options = {}) {
       ? residentialBuildingIds
       : settlementBuildingIds;
     let remainingPopulationToAssign = target.scaledPopulation;
+    let municipalityFarmAccessPopulation = 0;
+    let municipalityGardenAccessPopulation = 0;
+    let municipalityNoLandAccessPopulation = 0;
+    let municipalityLandAccessHouseholds = 0;
+    let municipalityFoodProducingHouseholds = 0;
 
     for (let i = 0; i < target.generatedHouseholds; i += 1) {
       const homeBuildingId = homePool[i % homePool.length];
@@ -1000,6 +1069,10 @@ export function generateGreyCountyWorld(options = {}) {
       remainingPopulationToAssign -= householdSize;
       const workers = Math.max(1, Math.min(householdSize, Math.round(householdSize * (0.56 + node.serviceLevel * 0.15))));
       const dependents = Math.max(0, householdSize - workers);
+      const landAccess = classifyLandAccess(node, i, patchAreas);
+      const farmLikeAccess = ['farm', 'common', 'cooperative'].includes(landAccess.type);
+      const gardenLikeAccess = ['garden', 'allotment'].includes(landAccess.type);
+      const householdContext = classifyHouseholdContext(node, i, landAccess.type);
 
       const household = createHousehold({
         id: `household-${node.municipalityId}-${i + 1}`,
@@ -1021,7 +1094,7 @@ export function generateGreyCountyWorld(options = {}) {
           care: Math.min(0.95, 0.4 + node.serviceLevel * 0.3)
         },
         access: {
-          landHa: Number(((1 - node.urbanShare) * 1.5 + (i % 5 === 0 ? 0.28 : 0.05)).toFixed(2)),
+          landHa: Number(Math.max(0, landAccess.ha).toFixed(3)),
           tools: Math.min(1, 0.42 + node.serviceLevel * 0.3),
           vehicleAccess: Math.min(1, 0.36 + (1 - node.serviceLevel) * 0.46),
           transitAccess: Math.min(1, 0.24 + node.serviceLevel * 0.65),
@@ -1029,6 +1102,16 @@ export function generateGreyCountyWorld(options = {}) {
           machinePower: Math.min(1, 0.18 + node.serviceLevel * 0.34),
           marketAccess: Math.min(1, 0.33 + node.serviceLevel * 0.56)
         },
+        landAccessType: landAccess.type,
+        householdContext,
+        productiveLandAccessHa: Number(landAccess.ha.toFixed(3)),
+        gardenAccessM2: Math.round(landAccess.gardenM2),
+        distanceToProductiveLandKm: landAccess.type === 'none' ? 2.8 : (gardenLikeAccess ? 0.6 : 1.4),
+        foodProductionSkill: Math.min(0.98, 0.24 + (1 - node.urbanShare) * 0.66 + (farmLikeAccess ? 0.1 : 0)),
+        availableFoodProductionLabourDays: Math.round(workers * (farmLikeAccess ? 105 : (gardenLikeAccess ? 75 : 22))),
+        toolAccessLevel: Math.min(1, 0.4 + node.serviceLevel * 0.3 + (gardenLikeAccess ? 0.06 : 0)),
+        inputAccessLevel: Math.min(1, 0.33 + node.serviceLevel * 0.56),
+        machineryAccessLevel: Math.min(1, 0.14 + node.serviceLevel * 0.32 + (farmLikeAccess ? 0.18 : 0)),
         reserves: {
           calories: Math.round(37_000 + (1 - node.urbanShare) * 16_000),
           firewoodKg: Math.round(440 + (1 - node.urbanShare) * 880),
@@ -1048,6 +1131,17 @@ export function generateGreyCountyWorld(options = {}) {
 
       households.push(household);
       householdIds.push(household.id);
+      if (landAccess.type === 'none') {
+        municipalityNoLandAccessPopulation += householdSize;
+      } else {
+        municipalityLandAccessHouseholds += 1;
+        municipalityFoodProducingHouseholds += 1;
+        if (farmLikeAccess) {
+          municipalityFarmAccessPopulation += householdSize;
+        } else {
+          municipalityGardenAccessPopulation += householdSize;
+        }
+      }
     }
 
     const actualPopulation = households
@@ -1096,6 +1190,11 @@ export function generateGreyCountyWorld(options = {}) {
       generatedHouseholds: target.generatedHouseholds,
       generatedDwellingUnits: target.generatedDwellingUnits,
       generatedVacancyRate: target.generatedVacancyRate,
+      farmAccessPopulation: municipalityFarmAccessPopulation,
+      gardenAccessPopulation: municipalityGardenAccessPopulation,
+      noLandAccessPopulation: municipalityNoLandAccessPopulation,
+      landAccessHouseholds: municipalityLandAccessHouseholds,
+      foodProducingHouseholds: municipalityFoodProducingHouseholds,
       settlementPatchAreaHa: patchAreas.settlementCore + patchAreas.olderResidential + patchAreas.edgeResidential,
       croplandPatchAreaHa: patchAreas.croplandCatchment + patchAreas.marketGardenBelt + patchAreas.orchardNutBelt,
       pasturePatchAreaHa: patchAreas.pastureCatchment,

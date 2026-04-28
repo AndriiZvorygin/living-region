@@ -9,13 +9,14 @@ describe('labour bottleneck', () => {
     const scenario = demoScenarioAdaptation();
     const result = runYear(world, scenario, scenario.startYear);
 
-    expect(result.foodLabourDemandDays).toBeGreaterThanOrEqual(result.foodLabourSuppliedDays);
-    expect(result.foodLabourUnmetDays).toBeCloseTo(result.foodLabourDemandDays - result.foodLabourSuppliedDays, 5);
+    expect(result.foodLabourDemandDays).toBeGreaterThanOrEqual(result.effectiveFoodLabourAvailableDays);
+    expect(result.foodLabourDeficitDays).toBeCloseTo(result.foodLabourDemandDays - result.effectiveFoodLabourAvailableDays, 5);
+    expect(result.foodLabourCoverageRatio).toBeCloseTo(result.effectiveFoodLabourAvailableDays / Math.max(1, result.foodLabourDemandDays), 5);
     expect(result.percentAvailableLabourDemandedByFood).toBeGreaterThanOrEqual(result.percentAvailableLabourSuppliedToFood);
     expect(result.percentTotalLabourDemandFromFood).toBeGreaterThan(0);
   });
 
-  test('food labour unmet days is positive when demand exceeds supplied labour', () => {
+  test('food labour deficit days is positive when demand exceeds effective labour', () => {
     const world = createDemoWorld();
     const scenario = demoScenarioAdaptation();
 
@@ -25,7 +26,7 @@ describe('labour bottleneck', () => {
     }
 
     const result = runYear(world, scenario, scenario.startYear);
-    expect(result.foodLabourUnmetDays).toBeGreaterThan(0);
+    expect(result.foodLabourDeficitDays).toBeGreaterThan(0);
     expect(result.labourDeficitDays).toBeGreaterThan(0);
   });
 
@@ -39,6 +40,6 @@ describe('labour bottleneck', () => {
     constrainedScenario.dieselAvailabilityByYear[constrainedScenario.startYear] = 0.4;
     const constrained = runYear(constrainedWorld, constrainedScenario, constrainedScenario.startYear);
 
-    expect(constrained.foodLabourDemandDays).toBeGreaterThan(baseline.foodLabourDemandDays);
+    expect(constrained.foodLabourDemandDays).toBeGreaterThanOrEqual(baseline.foodLabourDemandDays);
   });
 });

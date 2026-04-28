@@ -1,5 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 export function createHousehold(input) {
+  const landAccessType = input.landAccessType ?? 'none';
+  const productiveLandAccessHa = input.productiveLandAccessHa ?? input.access?.landHa ?? 0;
+  const gardenAccessM2 = input.gardenAccessM2 ?? productiveLandAccessHa * 10_000;
+  const distanceToProductiveLandKm = input.distanceToProductiveLandKm ?? (productiveLandAccessHa > 0 ? 0.8 : 2.4);
+  const foodProductionSkill = input.foodProductionSkill ?? input.skills?.farming ?? 0.5;
+  const availableFoodProductionLabourDays = input.availableFoodProductionLabourDays ?? ((input.people?.workers ?? 2) * 78);
+  const toolAccessLevel = input.toolAccessLevel ?? input.access?.tools ?? 0.5;
+  const inputAccessLevel = input.inputAccessLevel ?? input.access?.marketAccess ?? 0.5;
+  const machineryAccessLevel = input.machineryAccessLevel ?? input.access?.machinePower ?? 0.2;
+
   return {
     id: input.id,
     settlementId: input.settlementId,
@@ -51,6 +61,16 @@ export function createHousehold(input) {
       commuteTolerance: input.preferences?.commuteTolerance ?? 0.5,
       landAccessDesire: input.preferences?.landAccessDesire ?? 0.5
     },
+    landAccessType,
+    householdContext: input.householdContext ?? 'settlementEdge',
+    productiveLandAccessHa,
+    gardenAccessM2,
+    distanceToProductiveLandKm,
+    foodProductionSkill,
+    availableFoodProductionLabourDays,
+    toolAccessLevel,
+    inputAccessLevel,
+    machineryAccessLevel,
     state: {
       health: input.state?.health ?? 0.8,
       morale: input.state?.morale ?? 0.7,

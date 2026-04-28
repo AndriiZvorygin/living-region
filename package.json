@@ -13,6 +13,7 @@
     "demo:grey:rail": "node command/run_grey_county_seed.mjs --rail=true",
     "demo:grey:full": "node command/run_grey_county_seed.mjs --scale=full-county",
     "demo:grey:rail:full": "node command/run_grey_county_seed.mjs --rail=true --scale=full-county",
+    "demo:grey:compare-food": "node command/run_grey_compare_food.mjs",
     "demo:grey:inspect": "node command/run_grey_county_seed_inspect.mjs",
     "demo:grey:rail:inspect": "node command/run_grey_county_seed_inspect.mjs --rail=true",
     "demo:compare-rail": "node command/run_demo_compare_rail.mjs",

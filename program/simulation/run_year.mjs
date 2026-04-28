@@ -26,6 +26,9 @@ import { calculateFreightDemand } from './freight_demand.mjs';
 import { allocateFreight } from './freight_allocation.mjs';
 import { calculateBreakEvenDiagnostics } from './break_even_diagnostics.mjs';
 import { evaluateUnitSanity } from './unit_sanity.mjs';
+import { calculateFoodLabour } from './food_labour.mjs';
+import { calculateProductionCostThresholds } from './production_cost_thresholds.mjs';
+import { calculateRuralTransitionMetrics } from './rural_transition.mjs';
 
 function consecutiveFoodDeficitYears(world) {
   let deficits = 0;
@@ -350,13 +353,18 @@ export function runYear(world, scenario, year) {
     transportLabourDemandDays: combinedTransport.transportLabourDemandDays + freightAllocation.freightHandlingLabourDays
   });
 
+  const foodLabour = calculateFoodLabour(world, production, labour, { constants });
+
   const productionConstants = constants.production ?? {};
   const energyConstraintBase = productionConstants.energyConstraintBase ?? 0.65;
   const energyConstraintDieselWeight = productionConstants.energyConstraintDieselWeight ?? 0.35;
   const energyConstraintMin = productionConstants.energyConstraintMin ?? 0.45;
 
   const energyConstraintFactor = clamp(energyConstraintBase + dieselAvailability * energyConstraintDieselWeight, energyConstraintMin, 1);
-  const effectiveProducedCalories = production.producedCalories * labour.foodHarvestFactor * energyConstraintFactor;
+  const effectiveProducedCalories = production.producedCalories
+    * labour.foodHarvestFactor
+    * energyConstraintFactor
+    * foodLabour.productionAdjustmentFactor;
 
   for (const patch of world.patches) {
     patch.metrics = {
@@ -379,6 +387,33 @@ export function runYear(world, scenario, year) {
     constants,
     effectiveProducedCalories,
     producedWoodKg: production.producedWoodKg
+  });
+
+  const caloriesPerGj = 239_005.736;
+  const producedFoodGJ = effectiveProducedCalories / caloriesPerGj;
+  const totalFoodDemandGJ = consumption.consumedCalories / caloriesPerGj;
+  const foodSurplusGJ = consumption.foodSurplusCalories / caloriesPerGj;
+
+  const previousFoodPricePerGJ = world.metricsByYear.at(-1)?.foodPricePerGJ ?? (constants.market?.baselineFoodPricePerGJ ?? 220);
+  const deficitShare = totalFoodDemandGJ > 0 ? clamp(-foodSurplusGJ / totalFoodDemandGJ, 0, 1.5) : 0;
+  const foodPriceInflationRate = constants.market?.foodPriceInflationRate ?? 0.015;
+  const deficitSensitivity = constants.market?.foodPriceSensitivityToLocalDeficit ?? 0.28;
+  const fuelSensitivity = constants.market?.foodPriceSensitivityToTransportFuelStress ?? 0.16;
+  const inputSensitivity = constants.market?.foodPriceSensitivityToInputCostIndex ?? 0.12;
+  const fertilizerCostIndex = 1 + (1 - fertilizerAvailability) * 0.6;
+  const machineryCostIndex = 1 + (1 - dieselAvailability) * 0.35;
+  const foodPricePerGJ = previousFoodPricePerGJ
+    * (1 + foodPriceInflationRate)
+    * (1 + deficitShare * deficitSensitivity)
+    * (1 + combinedTransport.transportFuelStress * fuelSensitivity)
+    * (1 + (fertilizerCostIndex - 1) * inputSensitivity);
+
+  const productionThresholds = calculateProductionCostThresholds(constants, {
+    dieselPricePerLitre: primaryMarket?.prices?.dieselLitre ?? 1.56,
+    fertilizerCostIndex,
+    machineryCostIndex,
+    wageOrLabourOpportunityCostPerDay: primaryMarket?.prices?.labourDay ?? 130,
+    foodPricePerGJ
   });
 
   const energy = calculateEnergyBalance(world, {
@@ -404,6 +439,58 @@ export function runYear(world, scenario, year) {
     fuelDeficitPressure: consumption.fuelDeficitPressure,
     transportSystemStress,
     energy
+  });
+
+  const warningFoodCostBurden = constants.market?.warningFoodCostBurden ?? 0.15;
+  const severeFoodCostBurden = constants.market?.severeFoodCostBurden ?? 0.25;
+  let householdAnnualFoodEnergyNeedGJ = 0;
+  let householdFoodCost = 0;
+  let householdFoodCostBurden = 0;
+  let foodAffordabilityStress = 0;
+  let householdsFoodCostBurdenHigh = 0;
+  let householdsFoodInsecureRisk = 0;
+  for (const household of world.households) {
+    const hhNeedGJ = (household.people.total * (scenario.annualCaloriesPerPerson ?? constants.annualCaloriesPerPerson ?? 900_000)) / caloriesPerGj;
+    const hhFoodCost = hhNeedGJ * foodPricePerGJ;
+    const hhIncome = Math.max(1, household.income.wageIncome + household.income.farmIncome + household.income.transferIncome + household.income.enterpriseIncome);
+    const hhBurden = hhFoodCost / hhIncome;
+    const hhStress = clamp((hhBurden - warningFoodCostBurden) / Math.max(0.01, severeFoodCostBurden - warningFoodCostBurden), 0, 2);
+    household.state.foodAffordabilityStress = hhStress;
+    householdAnnualFoodEnergyNeedGJ += hhNeedGJ;
+    householdFoodCost += hhFoodCost;
+    householdFoodCostBurden += hhBurden;
+    foodAffordabilityStress += hhStress;
+    if (hhBurden >= warningFoodCostBurden) {
+      householdsFoodCostBurdenHigh += 1;
+    }
+    if (hhBurden >= severeFoodCostBurden || hhStress >= 1) {
+      householdsFoodInsecureRisk += 1;
+    }
+  }
+  if (world.households.length > 0) {
+    householdAnnualFoodEnergyNeedGJ /= world.households.length;
+    householdFoodCost /= world.households.length;
+    householdFoodCostBurden /= world.households.length;
+    foodAffordabilityStress /= world.households.length;
+  }
+  const foodPriceThresholdForHighBurden = householdAnnualFoodEnergyNeedGJ > 0
+    ? (constants.market?.warningFoodCostBurden ?? 0.15) * (householdFoodCostBurden > 0 ? householdFoodCost / householdFoodCostBurden : 1)
+      / householdAnnualFoodEnergyNeedGJ
+    : 0;
+  const foodPriceThresholdForSevereBurden = householdAnnualFoodEnergyNeedGJ > 0
+    ? (constants.market?.severeFoodCostBurden ?? 0.25) * (householdFoodCostBurden > 0 ? householdFoodCost / householdFoodCostBurden : 1)
+      / householdAnnualFoodEnergyNeedGJ
+    : 0;
+  const currentFoodPriceAsShareOfHighBurdenThreshold = foodPriceThresholdForHighBurden > 0 ? foodPricePerGJ / foodPriceThresholdForHighBurden : 0;
+  const currentFoodPriceAsShareOfSevereBurdenThreshold = foodPriceThresholdForSevereBurden > 0 ? foodPricePerGJ / foodPriceThresholdForSevereBurden : 0;
+
+  const ruralTransition = calculateRuralTransitionMetrics(world, {
+    allowCooperativeFallback: true,
+    foodAffordabilityStress,
+    transportFuelStress: combinedTransport.transportFuelStress,
+    fertilizerCostIndex,
+    machineryCostIndex,
+    housingStress: stress.averageHousingStress
   });
 
   const infra = applyInfrastructureDecay(world, {
@@ -530,9 +617,15 @@ export function runYear(world, scenario, year) {
     percentAvailableLabourDemandedByFood: labour.percentAvailableLabourDemandedByFood,
     percentAvailableLabourSuppliedToFood: labour.percentAvailableLabourSuppliedToFood,
     percentTotalLabourDemandFromFood: labour.percentTotalLabourDemandFromFood,
-    foodLabourDemandDays: labour.foodLabourDemandDays,
+    foodLabourDemandDays: foodLabour.foodLabourDemandDays,
     foodLabourSuppliedDays: labour.foodLabourSuppliedDays,
     foodLabourUnmetDays: labour.foodLabourUnmetDays,
+    totalFoodDemandGJ,
+    netFoodAvailableGJ: producedFoodGJ,
+    foodSurplusGJ,
+    humanEdibleFoodHa: world.patches
+      .filter((patch) => ['cropland', 'pasture', 'mixed'].includes(patch.landUse))
+      .reduce((sum, patch) => sum + patch.areaHa, 0),
     labourAvailableDays: labour.labourAvailableDays,
     labourDemandFuelDays: labour.labourDemandFuelDays,
     labourDemandMaintenanceDays: labour.labourDemandMaintenanceDays,
@@ -716,6 +809,41 @@ export function runYear(world, scenario, year) {
     fuelDeficitKg: consumption.fuelDeficitKg,
     localFoodCoverageRatio: consumption.localFoodCoverageRatio,
     foodDeficitPerPerson: consumption.foodDeficitPerPerson,
+    foodPricePerGJ,
+    householdAnnualFoodEnergyNeedGJ,
+    householdFoodCost,
+    householdFoodCostBurden,
+    foodAffordabilityStress,
+    householdsFoodCostBurdenHigh,
+    householdsFoodInsecureRisk,
+    foodPriceThresholdForHighBurden,
+    foodPriceThresholdForSevereBurden,
+    currentFoodPriceAsShareOfHighBurdenThreshold,
+    currentFoodPriceAsShareOfSevereBurdenThreshold,
+    productionCostPerGJByMode: productionThresholds.productionCostPerGJByMode,
+    cheapestProductionMode: productionThresholds.cheapestProductionMode,
+    labourIntensiveBeatsMechanized: productionThresholds.labourIntensiveBeatsMechanized,
+    dieselPriceThresholdForLabourIntensive: productionThresholds.dieselPriceThresholdForLabourIntensive,
+    dieselPriceThresholdForMarketGardenAtMarketWage: productionThresholds.dieselPriceThresholdForMarketGardenAtMarketWage,
+    dieselPriceThresholdForHouseholdGardenAtSubsistenceLabour: productionThresholds.dieselPriceThresholdForHouseholdGardenAtSubsistenceLabour,
+    dieselPriceThresholdForCooperativeSmallFarm: productionThresholds.dieselPriceThresholdForCooperativeSmallFarm,
+    fertilizerCostThresholdForLowInput: productionThresholds.fertilizerCostThresholdForLowInput,
+    machineryCostThresholdForSmallScale: productionThresholds.machineryCostThresholdForSmallScale,
+    foodPriceThresholdForHouseholdProduction: productionThresholds.foodPriceThresholdForHouseholdProduction,
+    breakEvenGardenAreaM2PerHousehold: productionThresholds.breakEvenGardenAreaM2PerHousehold,
+    breakEvenFarmAccessHaPerHousehold: productionThresholds.breakEvenFarmAccessHaPerHousehold,
+    rawFoodLabourAvailableDays: foodLabour.rawFoodLabourAvailableDays,
+    effectiveFoodLabourAvailableDays: foodLabour.effectiveFoodLabourAvailableDays,
+    skillAdjustedFoodLabourAvailableDays: foodLabour.skillAdjustedFoodLabourAvailableDays,
+    foodLabourAvailableDays: foodLabour.effectiveFoodLabourAvailableDays,
+    skilledFoodLabourAvailableDays: foodLabour.skillAdjustedFoodLabourAvailableDays,
+    foodLabourDeficitDays: foodLabour.foodLabourDeficitDays,
+    foodLabourCoverageRatio: foodLabour.foodLabourCoverageRatio,
+    foodLabourShareOfTotalLabour: foodLabour.foodLabourShareOfTotalLabour,
+    seasonalFoodLabourPeakPressure: foodLabour.seasonalFoodLabourPeakPressure,
+    mechanizedLabourSubstitutionDays: foodLabour.mechanizedLabourSubstitutionDays,
+    manualLabourSubstitutionNeededDays: foodLabour.manualLabourSubstitutionNeededDays,
+    ...ruralTransition,
     averageFoodStress: stress.averageFoodStress,
     averageFuelStress: stress.averageFuelStress,
     averageHousingStress: stress.averageHousingStress,

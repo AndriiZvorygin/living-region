@@ -156,6 +156,15 @@ The census-scale model is already useful for checking municipal scale, populatio
 - Road/rail maintenance burdens, backlog effects, and service reliability
 - Food, freight, and energy balances under changing resource assumptions
 
+### Rural transition metrics
+
+Living Region tracks rural-transition pressure through settlement form, land access, food-producing households, food labour demand, food affordability stress, transport fuel constraints, and local food coverage. The model distinguishes people who have no productive land access from those with garden, farm, common, or cooperative land access.
+
+Food affordability pressure can drive household/cooperative food production before production becomes cheaper under market-wage labour accounting.
+Living Region models rural transition as a combined pressure system (food affordability, fuel/input costs, machinery pressure, housing stress, employment pressure, and land/co-op access), not a single fuel-price threshold.
+
+Urban/town/village/rural categories are scenario diagnostics, not official Census classifications yet. These are scenario diagnostics, not predictions. Food insecurity risk is modelled as affordability pressure, not as a direct survey estimate.
+
 ## Current Status
 
 - MVP CLI simulator with deterministic formulas and test coverage

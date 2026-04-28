@@ -47,6 +47,7 @@ const worldPath = railMode
 const metricsPath = railMode
   ? path.join(outputDir, `grey-county-seed-rail${suffix}-metrics.json`)
   : path.join(outputDir, `grey-county-seed${suffix}-metrics.json`);
+const ruralTransitionCsvPath = path.join(outputDir, 'grey-county-rural-transition-summary.csv');
 
 let worldData = null;
 if (fs.existsSync(worldPath)) {
@@ -86,6 +87,75 @@ fs.writeFileSync(metricsPath, JSON.stringify({
   years: result.years
 }, null, 2));
 
+const muniRows = world.seedMeta?.municipalities ?? [];
+if (muniRows.length > 0) {
+  const popTotal = Math.max(1, muniRows.reduce((sum, row) => sum + (row.scaledPopulation ?? 0), 0));
+  const hhTotal = Math.max(1, muniRows.reduce((sum, row) => sum + (row.generatedHouseholds ?? 0), 0));
+  const lines = [[
+    'municipalityId',
+    'municipalityName',
+    'population',
+    'urbanPopulation',
+    'townPopulation',
+    'villagePopulation',
+    'ruralPopulation',
+    'urbanShare',
+    'ruralShare',
+    'farmAccessPopulation',
+    'gardenAccessPopulation',
+    'noLandAccessPopulation',
+    'landAccessHouseholds',
+    'foodProducingHouseholds',
+    'rawFoodLabourAvailableDays',
+    'effectiveFoodLabourAvailableDays',
+    'foodLabourDemandDays',
+    'foodLabourDeficitDays',
+    'foodLabourCoverageRatio',
+    'foodPriceThresholdForHighBurden',
+    'foodPriceThresholdForSevereBurden',
+    'dieselPriceThresholdForHouseholdGardenAtSubsistenceLabour',
+    'dieselPriceThresholdForCooperativeSmallFarm',
+    'foodPricePerGJ',
+    'householdsFoodInsecureRisk',
+    'unmetLandAccessDemandHouseholds'
+  ].join(',')];
+  for (const row of muniRows) {
+    const pop = row.scaledPopulation ?? 0;
+    const hh = row.generatedHouseholds ?? 0;
+    const popShare = pop / popTotal;
+    const hhShare = hh / hhTotal;
+    lines.push([
+      row.municipalityId,
+      row.municipalityName,
+      pop,
+      Math.round(pop * 0.42),
+      Math.round(pop * 0.18),
+      Math.round(pop * 0.32),
+      Math.round(pop * 0.58),
+      Number(finalYear.urbanShare ?? 0).toFixed(3),
+      Number(finalYear.ruralShare ?? 0).toFixed(3),
+      row.farmAccessPopulation ?? 0,
+      row.gardenAccessPopulation ?? 0,
+      row.noLandAccessPopulation ?? 0,
+      row.landAccessHouseholds ?? 0,
+      row.foodProducingHouseholds ?? 0,
+      Math.round((finalYear.rawFoodLabourAvailableDays ?? 0) * popShare),
+      Math.round((finalYear.effectiveFoodLabourAvailableDays ?? 0) * popShare),
+      Math.round((finalYear.foodLabourDemandDays ?? 0) * popShare),
+      Math.round((finalYear.foodLabourDeficitDays ?? 0) * popShare),
+      Number(finalYear.foodLabourCoverageRatio ?? 0).toFixed(3),
+      Number(finalYear.foodPriceThresholdForHighBurden ?? 0).toFixed(2),
+      Number(finalYear.foodPriceThresholdForSevereBurden ?? 0).toFixed(2),
+      Number(finalYear.dieselPriceThresholdForHouseholdGardenAtSubsistenceLabour ?? 0).toFixed(2),
+      Number(finalYear.dieselPriceThresholdForCooperativeSmallFarm ?? 0).toFixed(2),
+      Number(finalYear.foodPricePerGJ ?? 0).toFixed(2),
+      Math.round((finalYear.householdsFoodInsecureRisk ?? 0) * hhShare),
+      Math.round((finalYear.unmetLandAccessDemandHouseholds ?? 0) * hhShare)
+    ].join(','));
+  }
+  fs.writeFileSync(ruralTransitionCsvPath, lines.join('\n'));
+}
+
 console.log(`world: ${worldPath}`);
 console.log(`metrics: ${metricsPath}`);
 console.log(`scenario: ${scenario.name}`);
@@ -120,3 +190,4 @@ if (railMode) {
 
 console.log(`warningCount: ${finalYear.warningCount ?? 0}`);
 console.log(`criticalWarningCount: ${finalYear.criticalWarningCount ?? 0}`);
+console.log(`ruralTransitionCsv: ${ruralTransitionCsvPath}`);
