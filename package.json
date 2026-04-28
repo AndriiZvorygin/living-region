@@ -34,6 +34,7 @@
     "demo:grey:open-data": "node command/run_grey_open_data.mjs",
     "report:grey:baseline": "node command/report_grey_baseline.mjs",
     "report:grey:secondary": "node command/report_grey_secondary.mjs",
+    "report:grey:public-baseline": "node command/report_grey_public_baseline.mjs",
     "grey:open-data": "node command/grey_open_data.mjs",
     "grey:discover-data": "node command/discover_grey_open_data.mjs",
     "grey:discover-all-data": "node command/discover_all_grey_data.mjs",
@@ -43,6 +44,7 @@
     "grey:import-roads": "node command/import_grey_roads.mjs",
     "grey:summarize-gis": "node command/summarize_grey_gis.mjs",
     "grey:data-status": "node command/grey_data_status.mjs",
+    "grey:status": "node command/grey_status.mjs",
     "check:food-energy-terms": "node command/check_food_energy_terms.mjs",
     "test": "vitest run"
   },

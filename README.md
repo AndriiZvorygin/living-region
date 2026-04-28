@@ -221,6 +221,22 @@ Outputs:
 
 These reports summarize downloaded real Grey County layers before scenario modelling, so measured/open-data structure is easier to separate from model assumptions.
 
+### Public baseline report
+
+Run:
+
+```bash
+npm run report:grey:public-baseline
+```
+
+Outputs:
+
+- `know/produce/grey-public-baseline.md`
+- `know/produce/grey-public-baseline.json`
+- `know/produce/grey-public-baseline-municipal.csv`
+
+This report summarizes the real Grey County Open Data currently loaded and separates real spatial inputs from modelled assumptions.
+
 ## Real-data priority
 
 Minimum real GIS layers to replace generated geometry:
