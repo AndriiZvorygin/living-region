@@ -15,6 +15,47 @@ npm run demo:grey
 npm run export:geojson
 ```
 
+## Example outputs
+
+Living Region currently produces scenario metrics and GeoJSON layers that can be inspected in GIS tools or used for further analysis.
+
+Example synthetic demo output:
+
+- Final-year population: 264
+- Average monthly rent: $608.87
+- Infrastructure condition: 0.445
+
+Example Grey County seed output:
+
+- Final-year population: 2,191
+- Food coverage ratio: 0.728
+- Average monthly rent: $1,248.26
+
+Example GeoJSON outputs:
+
+- `know/produce/demo-patches-final.geojson`
+- `know/produce/demo-buildings-final.geojson`
+- `know/produce/demo-networks-final.geojson`
+- `know/produce/demo-stations-final.geojson`
+- `know/produce/demo-freight-anchors-final.geojson`
+
+These outputs are generated files and are intentionally ignored by git. They can be recreated with:
+
+```bash
+npm run demo
+npm run demo:grey
+npm run export:geojson
+```
+
+The Grey County seed model uses real 2021 Census population and land-area scaling, but its patch geometry, roads, rail, buildings, and freight systems are still synthetic scenario scaffolding. These outputs are useful for testing model structure, not for making official policy claims.
+
+What the numbers mean:
+
+- `foodCoverage` is local production divided by local food demand.
+- `averageRent` is average monthly rent-equivalent housing cost.
+- `infrastructureCondition` is a 0 to 1 index, where 1 means fully maintained and 0 means failed.
+- GeoJSON files can be opened in QGIS, ArcGIS, or web mapping tools.
+
 ## What Living Region Models
 
 - Land patches, plant groups, and ecological productivity
