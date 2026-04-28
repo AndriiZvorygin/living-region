@@ -1,26 +1,32 @@
 # Living Region
 
-Living Region is an open-source map-based simulator for exploring how land use, housing, roads, food, energy, population, and local services affect each other over time, so communities can test regional planning scenarios more transparently.
+Living Region is an open-source map-based regional simulator for exploring how land use, housing, roads, food energy, transportation, infrastructure, population, local services, and rural-transition pressure affect each other over time.
 
-It models a region as interdependent systems: settlements, households, land patches, roads, rail corridors, buildings, services, freight, food production, energy demand, infrastructure maintenance, and population movement. The purpose is not to predict the future with false precision, but to make assumptions visible and testable.
-Food, wood, heat, electricity, diesel, and other energy flows are modelled in SI units, with food energy reported mainly in GJ.
+It is designed to make assumptions visible and testable, not to produce official forecasts.
 
-## Quickstart
+## Why this exists
 
-```bash
-npm install
-npm test
-npm run demo
-npm run seed:grey
-npm run demo:grey
-npm run export:geojson
-```
+- Many city-building and planning tools understate food production, land access, energy constraints, road maintenance burden, and rural labour constraints.
+- Living Region treats a region as an interdependent metabolism rather than separate policy silos.
+- It helps test questions such as:
+  - How much local food energy can a region produce under different land/labour/input assumptions?
+  - Who has access to productive land?
+  - What happens when food, fuel, machinery, and housing costs rise together?
+  - How much road maintenance burden comes from spread-out settlement?
+  - When could rail/freight corridors become useful?
 
-## Example outputs
+## Current status
 
-Living Region already includes a Grey County seed model grounded in 2021 Census population and land-area totals for the nine lower-tier municipalities. This gives the simulator a real municipality-scale foundation before full GIS layers are imported.
+- CLI-first Node.js simulator.
+- Deterministic formulas and tests.
+- Open-source under AGPL-3.0-or-later.
+- Grey County census-scaled seed model.
+- GeoJSON/CSV output.
+- Real GIS import scaffolding.
+- No web UI yet.
+- Synthetic geometry still needs replacement with real GIS layers.
 
-Current Grey County census-scale seed inputs:
+## Grey County census-scaled seed model
 
 | Municipality | 2021 population | Land area |
 |---|---:|---:|
@@ -35,61 +41,93 @@ Current Grey County census-scale seed inputs:
 | Chatsworth | 7,080 | 594.44 km² |
 | **Grey County total** | **100,905** | **4,497.93 km²** |
 
-From those real population and land-area inputs, Living Region generates a municipality-scale model with households, dwelling units, land patches, food demand, freight demand, road burden, and optional rail-corridor scenarios.
+- Population and land-area scale are census-grounded.
+- Geometry, roads, rail, buildings, freight anchors, and patch shapes are still generated scaffolding.
+- This is a transition stage before real GIS layers are imported.
 
-Example full Grey County seed output:
+## What the model currently tracks
 
-- Population: 100,905
-- Synthetic patch area: 449,793 ha
-- Households: 41,973
-- Dwelling units: 46,712
-- Vacancy rate: 10.15%
+### Land and food energy
 
-Example full Grey County scenario output:
+- Food energy demand and production in GJ.
+- Food coverage.
+- Food surplus/deficit in GJ.
+- Human-edible food hectares.
+- Yield/loss diagnostics.
+- Municipal self-coverage versus regional foodshed coverage.
 
-- Final-year population: 110,227
+### Rural transition
+
+- Urban/town/village/rural population.
+- Land access: none, garden, farm, common, cooperative.
+- Food-producing households.
+- Food labour demand and effective supply.
+- Combined `ruralTransitionPressureIndex`.
+- Households at garden/co-op/relocation trigger.
+- Households blocked by no land access, low skill, tools, or inputs.
+
+### Housing and households
+
+- Dwelling units, vacancy, rent pressure.
+- Average monthly rent-equivalent cost.
+- Housing stress and cost burden.
+
+### Roads, transport, and rail
+
+- Road maintenance backlog and infrastructure condition.
+- Transport diesel deficit.
+- Passenger-km and freight tonne-km.
+- Rail utilization and freight corridor diagnostics.
+- Rail/road cost and break-even diagnostics.
+
+### Energy
+
+- Food, wood, heat, electricity, diesel, and other energy flows in SI units.
+- Food energy is reported mainly in GJ.
+
+## Example outputs
+
+These are scenario diagnostics from the current generated land-use/yield/loss assumptions. They are not measured agricultural capacity or official forecasts.
+
+### Full Grey County scenario
+
+Command:
+
+```bash
+npm run demo:grey:full
+```
+
+Example output:
+
 - `foodCoverage`: 0.724
 - `foodSurplusGJ`: -123,585.32
-- Average monthly rent: $1,253.92
-- Infrastructure condition: 0.468
+- `averageRent`: $1,253.92
+- `infrastructureCondition`: 0.468
 
-Example full Grey County rail scenario output:
+### Full Grey County rail freight-corridor scenario
 
-- Final-year population: 104,930
+Command:
+
+```bash
+npm run demo:grey:rail:full
+```
+
+Example output:
+
 - `foodCoverage`: 0.658
 - `foodSurplusGJ`: -395,124.41
 - `railPassengerKm`: 4,723,641
 - `railFreightTonneKm`: 308,416
 
-### Rural transition and resilience signals
+### Grey County inspect food balance
 
-Living Region is designed to expose the pressures that can drive or constrain urban-to-rural transition. The current Grey County census-scale model already reports indicators such as:
+Command:
 
-- `foodCoverage`: how much local food demand can be met by modelled local production.
-- `foodSurplusGJ`: whether the region has a food surplus or deficit under the scenario, expressed in GJ.
-- `averageHouseholdStress`: combined pressure from food, housing, fuel, transport, and service access.
-- `transportDieselDeficitLitre`: unmet diesel demand for passenger and freight movement.
-- `roadMaintenanceBacklogMoney`: accumulated road maintenance pressure.
-- `railPassengerKm` and `railFreightTonneKm`: how much movement shifts to rail in corridor scenarios.
-- `railUtilizationRatio`: whether a rail corridor has enough demand to become useful.
-- `infrastructureCondition`: whether roads, services, and other infrastructure are being maintained or degrading.
+```bash
+npm run demo:grey:inspect
+```
 
-These metrics help test questions such as: How much local food capacity would be needed to support existing settlement patterns? How much does transport fuel scarcity constrain rural access? Does rail or freight consolidation reduce road and diesel pressure? How much infrastructure maintenance burden is created by spread-out settlement? Which scenarios reduce household stress, and which merely shift stress from one system to another?
-
-Example full Grey County rural-transition comparison:
-
-- No-rail full Grey scenario:
-  - `foodCoverage`: 0.724
-  - `foodSurplusGJ`: -123,585.32
-  - Infrastructure condition: 0.468
-
-- Rail freight-corridor full Grey scenario:
-  - `foodCoverage`: 0.658
-  - `foodSurplusGJ`: -395,124.41
-  - `railPassengerKm`: 4,723,641
-  - `railFreightTonneKm`: 308,416
-
-Example `npm run demo:grey:inspect` Food Balance output:
+Example output:
 
 - `annualFoodEnergyGJPerPerson`: 3.7656
 - `totalFoodDemandGJ`: 8,152.52
@@ -98,111 +136,99 @@ Example `npm run demo:grey:inspect` Food Balance output:
 - `foodSurplusGJ`: -2,322.81
 - `foodCoverage`: 0.715
 
-These are not forecasts. They are scenario diagnostics. Their purpose is to show which assumptions create food deficits, transport bottlenecks, road maintenance burdens, rural access problems, or settlement patterns that may require adaptation.
+### Rural transition pressure example
 
-The current Grey County model is census-scaled, but still uses generated geometry. The population and land-area totals are grounded in public census data; the patch shapes, road links, rail corridors, buildings, and freight anchors are scenario scaffolding until replaced with real GIS layers.
+- `ruralTransitionPressureIndex`: 0.492
+- `foodAffordabilityStress`: 0.806
+- `transportFuelStress`: 0.264
+- `housingStress`: 0.890
+- `inputCostStress`: 0.240
+- `machineryCostStress`: 0.175
+- `landAccessOpportunity`: 0.775
+- `householdsAtGardenTrigger`: 840
+- `householdsAtCoopTrigger`: 189
+- `householdsAtRelocationTrigger`: 0
+- `householdsBlockedByNoLandAccess`: 189
+- `potentialAddedFoodEnergyGJIfLandAccessMet`: 45.00
 
-Generated outputs include:
+## Quickstart
 
-- `know/produce/grey-county-seed-municipal-summary.csv`
-- `know/produce/grey-county-seed-world-full.json`
-- `know/produce/grey-county-seed-full-metrics.json`
-- `know/produce/grey-county-seed-rail-full-metrics.json`
-- `know/produce/grey-county-seed-patches.geojson`
-- `know/produce/grey-county-seed-networks.geojson`
-- `know/produce/grey-county-seed-stations.geojson`
+```bash
+npm install
+npm test
+npm run demo
+npm run seed:grey
+npm run demo:grey
+npm run demo:grey:inspect
+npm run export:geojson
+npm run check:food-energy-terms
+```
 
-These can be regenerated with:
+## Useful Grey County commands
 
 ```bash
 npm run seed:grey:full
 npm run demo:grey:full
 npm run demo:grey:rail:full
+npm run demo:grey:compare-food
 ```
 
-The point of the current seed model is to use the best available structured data already in the repository: real municipality population and land-area scale from the 2021 Census, plus transparent generated assumptions for the spatial layers that still need to be replaced.
+- `seed:grey:full`: generate the full-county census-scaled seed world and map layers.
+- `demo:grey:full`: run the no-rail full-county scenario diagnostics.
+- `demo:grey:rail:full`: run the rail freight-corridor full-county diagnostics.
+- `demo:grey:compare-food`: compare food diagnostics between no-rail and rail scenarios.
 
-The current food balance is a scenario diagnostic based on generated land-use/yield/loss assumptions. It is not a measured agricultural capacity assessment.
-Food energy uses SI units internally (joules), so it can be compared directly with wood heat, electricity, diesel, and other regional energy flows.
-Food energy is modelled in joules internally and normally reported as GJ. Older calorie-named fields may appear only as deprecated compatibility aliases during the transition.
+## Outputs
 
-What the numbers mean:
+Generated output types in `know/produce/` include:
 
-- `foodCoverage` is local production divided by local food demand.
-- `averageRent` is average monthly rent-equivalent housing cost.
-- `infrastructureCondition` is a 0 to 1 index, where 1 means fully maintained and 0 means failed.
-- GeoJSON files can be opened in QGIS, ArcGIS, or web mapping tools.
+- metrics JSON
+- municipal summary CSV
+- food balance CSV
+- rural transition CSV
+- GeoJSON layers
+
+`know/produce/` is ignored by git.
 
 ## Real-data priority
 
-The next milestone is to replace the generated geometry with the best public/open GIS layers available for Grey County.
-
-Minimum useful layers:
+Minimum real GIS layers to replace generated geometry:
 
 1. Municipal boundary polygons
 2. Road centrelines with road class/type
 3. Settlement, village, hamlet, or urban boundary polygons
 4. Official Plan land-use designation polygons
 
-The census-scale model is already useful for checking municipal scale, population/land-area ratios, dwelling assumptions, food demand, and scenario diagnostics. Real GIS layers will make the map geometry, road network, settlement boundaries, land-use classes, and corridor analysis much more accurate.
-
-## What Living Region Models
-
-- Land patches, plant groups, and ecological productivity
-- Households, labour allocation, stress, migration, and population change
-- Buildings, rents, housing demand, and real-estate value dynamics
-- Transportation demand, mode substitution, fuel constraints, and settlement form
-- Urban-to-rural transition pressure, including food coverage, local service access, transport fuel constraints, rural land capacity, road maintenance burden, and settlement rebalancing
-- Road/rail maintenance burdens, backlog effects, and service reliability
-- Food, freight, and energy balances under changing resource assumptions
-
-### Rural transition metrics
-
-Living Region tracks rural-transition pressure through settlement form, land access, food-producing households, food labour demand, food affordability stress, transport fuel constraints, and local food coverage. The model distinguishes people who have no productive land access from those with garden, farm, common, or cooperative land access.
-
-Food affordability pressure can drive household/cooperative food production before production becomes cheaper under market-wage labour accounting.
-Living Region models rural transition as a combined pressure system (food affordability, fuel/input costs, machinery pressure, housing stress, employment pressure, and land/co-op access), not a single fuel-price threshold.
-
-Urban/town/village/rural categories are scenario diagnostics, not official Census classifications yet. These are scenario diagnostics, not predictions. Food insecurity risk is modelled as affordability pressure, not as a direct survey estimate.
-
-## Current Status
-
-- MVP CLI simulator with deterministic formulas and test coverage
-- GeoJSON export for map viewing workflows
-- GeoJSON + CSV import scaffolding for real regional inputs
-- Calibration profiles and sensitivity commands for transparent scenario testing
-- Older calorie-named fields are now isolated as deprecated compatibility aliases. Active model fields and new outputs use joules/GJ.
-- `npm run check:food-energy-terms` verifies that active code/docs do not reintroduce unapproved calorie/kcal terminology.
-
-## Grey County Synthetic Seed Model
-
-- Includes a coordinate-seeded Grey County starter world for rapid experimentation
-- Geometry is synthetic by design (generated catchments and networks)
-- Census population/land-area scaling is used where implemented
-- Real GIS boundary and network data should replace synthetic geometry before policy/public claims
+These would replace generated geometry and make road burden, settlement structure, land-use shares, and corridor analysis much more credible.
 
 ## GIS/Open Data Workflow
 
-- Start with `know/input-example/` and copy to `know/input/`
-- Import GeoJSON/CSV bundle with `npm run import:region`
-- Run scenarios on imported worlds with `npm run demo:imported`
-- GeoJSON is first-class in MVP; GeoPackage is a documented next step
-- Imported data remains under the source provider’s licence/terms
+- Start with `know/input-example/`.
+- Copy to `know/input/`.
+- Import GeoJSON/CSV bundle with `npm run import:region`.
+- Run imported scenarios with `npm run demo:imported`.
+- Imported data remains under source-provider licence/terms.
 
 See [open-data.md](/home/htaf/living-region/docs/open-data.md) and [import-schema.md](/home/htaf/living-region/docs/import-schema.md).
 
+## Development
+
+- Node.js ESM project.
+- Tests live under `quiz/`.
+- Formulas are deterministic and inspectable.
+- Core constants live in `program/data/default_constants.mjs` and calibration profiles.
+- No hidden magic constants; assumptions are explicit in code/data.
+- `npm run check:food-energy-terms` guards docs against accidental reintroduction of disallowed food-energy wording.
+
 ## Licence
 
-Living Region is licensed under the GNU Affero General Public License v3.0 or later (`AGPL-3.0-or-later`). See [LICENSE](/home/htaf/living-region/LICENSE) and [NOTICE](/home/htaf/living-region/NOTICE).
-
-## Contributing
-
-Contributions are welcome. Start with [CONTRIBUTING.md](/home/htaf/living-region/CONTRIBUTING.md).
+Living Region is licensed under GNU Affero General Public License v3.0 or later (`AGPL-3.0-or-later`). See [LICENSE](/home/htaf/living-region/LICENSE) and [NOTICE](/home/htaf/living-region/NOTICE).
 
 ## Limitations
 
-- Synthetic demo and seed data are scaffolds, not official planning datasets
-- Formulas are intentionally coarse and transparent rather than tightly calibrated econometrics
-- No web UI in MVP
-- No full routing engine or detailed seasonal transport model yet
-- Outputs are scenario scaffolds for assumption testing, not official forecasts
+- Synthetic demo/seed geometry is scaffolding.
+- Grey County population/land-area scale is census-grounded, but geometry is generated.
+- Formulas are coarse and transparent, not calibrated econometrics.
+- No web UI yet.
+- No full routing engine yet.
+- Outputs are scenario diagnostics, not official forecasts.
