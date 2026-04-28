@@ -17,37 +17,71 @@ npm run export:geojson
 
 ## Example outputs
 
-Living Region currently produces scenario metrics and GeoJSON layers that can be inspected in GIS tools or used for further analysis.
+Living Region already includes a Grey County seed model grounded in 2021 Census population and land-area totals for the nine lower-tier municipalities. This gives the simulator a real municipality-scale foundation before full GIS layers are imported.
 
-Example synthetic demo output:
+Current Grey County census-scale seed inputs:
 
-- Final-year population: 264
-- Average monthly rent: $608.87
-- Infrastructure condition: 0.445
+| Municipality | 2021 population | Land area |
+|---|---:|---:|
+| Owen Sound | 21,612 | 24.21 km² |
+| West Grey | 13,131 | 875.21 km² |
+| Meaford | 11,485 | 587.57 km² |
+| Georgian Bluffs | 11,100 | 599.96 km² |
+| Grey Highlands | 10,424 | 879.03 km² |
+| The Blue Mountains | 9,390 | 284.65 km² |
+| Southgate | 8,716 | 643.08 km² |
+| Hanover | 7,967 | 9.78 km² |
+| Chatsworth | 7,080 | 594.44 km² |
+| **Grey County total** | **100,905** | **4,497.93 km²** |
 
-Example Grey County seed output:
+From those real population and land-area inputs, Living Region generates a municipality-scale model with households, dwelling units, land patches, food demand, freight demand, road burden, and optional rail-corridor scenarios.
 
-- Final-year population: 2,191
-- Food coverage ratio: 0.728
-- Average monthly rent: $1,248.26
+Example full Grey County seed output:
 
-Example GeoJSON outputs:
+- Population: 100,905
+- Synthetic patch area: 449,793 ha
+- Households: 41,973
+- Dwelling units: 46,712
+- Vacancy rate: 10.15%
 
-- `know/produce/demo-patches-final.geojson`
-- `know/produce/demo-buildings-final.geojson`
-- `know/produce/demo-networks-final.geojson`
-- `know/produce/demo-stations-final.geojson`
-- `know/produce/demo-freight-anchors-final.geojson`
+Example full Grey County scenario output:
 
-These outputs are generated files and are intentionally ignored by git. They can be recreated with:
+- Final-year population: 110,227
+- Average monthly rent: $1,253.92
+- Food coverage ratio: 0.697
+- Infrastructure condition: 0.468
+
+Example full Grey County rail scenario output:
+
+- Final-year population: 104,930
+- Food coverage ratio: 0.761
+- Rail passenger-km: 4,063,097
+- Rail freight tonne-km: 268,679
+- Rail utilization ratio: 0.133
+- Transport diesel deficit: 174,480 L
+- Road maintenance backlog: $16,744,204
+
+The current Grey County model is census-scaled, but still uses generated geometry. The population and land-area totals are grounded in public census data; the patch shapes, road links, rail corridors, buildings, and freight anchors are scenario scaffolding until replaced with real GIS layers.
+
+Generated outputs include:
+
+- `know/produce/grey-county-seed-municipal-summary.csv`
+- `know/produce/grey-county-seed-world-full.json`
+- `know/produce/grey-county-seed-full-metrics.json`
+- `know/produce/grey-county-seed-rail-full-metrics.json`
+- `know/produce/grey-county-seed-patches.geojson`
+- `know/produce/grey-county-seed-networks.geojson`
+- `know/produce/grey-county-seed-stations.geojson`
+
+These can be regenerated with:
 
 ```bash
-npm run demo
-npm run demo:grey
-npm run export:geojson
+npm run seed:grey:full
+npm run demo:grey:full
+npm run demo:grey:rail:full
 ```
 
-The Grey County seed model uses real 2021 Census population and land-area scaling, but its patch geometry, roads, rail, buildings, and freight systems are still synthetic scenario scaffolding. These outputs are useful for testing model structure, not for making official policy claims.
+The point of the current seed model is to use the best available structured data already in the repository: real municipality population and land-area scale from the 2021 Census, plus transparent generated assumptions for the spatial layers that still need to be replaced.
 
 What the numbers mean:
 
@@ -55,6 +89,19 @@ What the numbers mean:
 - `averageRent` is average monthly rent-equivalent housing cost.
 - `infrastructureCondition` is a 0 to 1 index, where 1 means fully maintained and 0 means failed.
 - GeoJSON files can be opened in QGIS, ArcGIS, or web mapping tools.
+
+## Real-data priority
+
+The next milestone is to replace the generated geometry with the best public/open GIS layers available for Grey County.
+
+Minimum useful layers:
+
+1. Municipal boundary polygons
+2. Road centrelines with road class/type
+3. Settlement, village, hamlet, or urban boundary polygons
+4. Official Plan land-use designation polygons
+
+The census-scale model is already useful for checking municipal scale, population/land-area ratios, dwelling assumptions, food demand, and scenario diagnostics. Real GIS layers will make the map geometry, road network, settlement boundaries, land-use classes, and corridor analysis much more accurate.
 
 ## What Living Region Models
 
