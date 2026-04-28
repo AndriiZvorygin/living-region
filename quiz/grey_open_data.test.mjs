@@ -75,8 +75,14 @@ describe('grey open data tools', () => {
       'managed-forest-boundary',
       'on-farm-rural-business-listing',
       'bridges-culverts-structures',
-      'lot-fabric-improved-lio'
+      'lot-fabric-improved-lio',
+      'lots-and-concessions-grey'
     ]));
+  });
+
+  test('discovery parses item page URL with item id', () => {
+    const html = '<a href=\"https://maps.grey.ca/items/0ac029841e5848e0b4596827a30c3cf7\">Item</a>';
+    expect(extractArcgisItemIdFromHtml(html)).toBe('0ac029841e5848e0b4596827a30c3cf7');
   });
 
   test('rank candidates prefers better title/type/access matches', () => {
@@ -305,6 +311,50 @@ describe('grey open data tools', () => {
     const run = spawnSync('node', ['command/grey_data_status.mjs'], { encoding: 'utf8' });
     expect(run.status).toBe(0);
     expect(run.stdout).toContain('real vs synthetic model status');
+  });
+
+  test('data-status reports lots-and-concessions-grey when downloaded', () => {
+    const filePath = path.resolve('know/input/gis/lots-and-concessions-grey.geojson');
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify({
+      type: 'FeatureCollection',
+      features: [{ type: 'Feature', properties: { LOT: '1', CONCESSION: '2' }, geometry: { type: 'Polygon', coordinates: [[[-80.9,44.4],[-80.8,44.4],[-80.8,44.5],[-80.9,44.5],[-80.9,44.4]]] } }]
+    }));
+    try {
+      const run = spawnSync('node', ['command/grey_data_status.mjs'], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('lots-and-concessions-grey');
+    } finally {
+      fs.rmSync(filePath, { force: true });
+    }
+  });
+
+  test('lot/concession fields are detected by summarize command', () => {
+    const inputDir = path.resolve('know/input/gis-lot-fixture');
+    const outPath = path.resolve('know/produce/grey-gis-summary-lot-fixture.json');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.writeFileSync(path.join(inputDir, 'lots-and-concessions-grey.geojson'), JSON.stringify({
+      type: 'FeatureCollection',
+      features: [{ type: 'Feature', properties: { LOT: '12', CONCESSION: '3', TOWNSHIP: 'Artemesia', MUNICIPALITY: 'Grey Highlands' }, geometry: { type: 'Polygon', coordinates: [[[-80.9,44.4],[-80.8,44.4],[-80.8,44.5],[-80.9,44.5],[-80.9,44.4]]] } }]
+    }));
+    try {
+      const run = spawnSync('node', ['command/summarize_grey_gis.mjs', `--dir=${inputDir}`, `--out=${outPath}`], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      const summary = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+      const file = summary.files.find((f) => f.file === 'lots-and-concessions-grey.geojson');
+      expect(file.semanticFieldGuesses.lotField).toBe('LOT');
+      expect(file.semanticFieldGuesses.concessionField).toBe('CONCESSION');
+    } finally {
+      fs.rmSync(inputDir, { recursive: true, force: true });
+      fs.rmSync(outPath, { force: true });
+    }
+  });
+
+  test('LIO fallback remains guarded and is not used when Grey source explicitly requested', () => {
+    const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--dry-run', '--source=lots-and-concessions-grey'], { encoding: 'utf8' });
+    expect(run.status).toBe(0);
+    expect(run.stdout).toContain('lots-and-concessions-grey');
+    expect(run.stdout).not.toContain('lot-fabric-improved-lio');
   });
 
   test('secondary report summarizes feature counts', () => {

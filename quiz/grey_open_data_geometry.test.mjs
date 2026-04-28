@@ -114,12 +114,23 @@ describe('grey open-data geometry mapping', () => {
       type: 'FeatureCollection',
       features: [{ type: 'Feature', properties: { NAME: 'Trail A' }, geometry: { type: 'LineString', coordinates: [[-80.95,44.05],[-80.9,44.1]] } }]
     }));
+    fs.writeFileSync(path.join(dir, 'lots-and-concessions-grey.geojson'), JSON.stringify({
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: { LOT: '12', CONCESSION: '3', TOWNSHIP: 'Owen Sound Township' },
+        geometry: { type: 'Polygon', coordinates: [[[-80.95,44.05],[-80.9,44.05],[-80.9,44.1],[-80.95,44.1],[-80.95,44.05]]] }
+      }]
+    }));
     try {
       const run = spawnSync('node', ['command/import_grey_open_data.mjs', `--dir=${dir}`, `--out=${outPath}`], { encoding: 'utf8' });
       expect(run.status).toBe(0);
       const parsed = JSON.parse(fs.readFileSync(outPath, 'utf8'));
       expect(parsed.transitStops.length).toBe(1);
       expect(parsed.trails.length).toBe(1);
+      expect(parsed.lotsAndConcessions.length).toBe(1);
+      expect(parsed.lotsAndConcessions[0].sourceProperties.LOT).toBe('12');
+      expect(parsed.lotsAndConcessions[0].municipalityId).toBeTruthy();
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
       fs.rmSync(outPath, { force: true });

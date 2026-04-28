@@ -69,7 +69,7 @@ const landUseFeatures = readGeoJson('official-plan-schedule-a-land-use.geojson',
 const roadFeatures = fs.existsSync(path.join(sourceDir, 'road-centrelines-grey.geojson'))
   ? readGeoJson('road-centrelines-grey.geojson', warnings)
   : readGeoJson('road-centrelines.geojson', warnings);
-const lotFeatures = readGeoJson('lot-fabric-improved.geojson', warnings);
+const lotFeaturesLegacy = readGeoJson('lot-fabric-improved.geojson', warnings);
 const secondarySourceFiles = [
   { sourceId: 'grey-transit-bus-stops', file: 'grey-transit-bus-stops.geojson', collection: 'transitStops' },
   { sourceId: 'grey-transit-routes', file: 'grey-transit-routes.geojson', collection: 'transitRoutes' },
@@ -91,6 +91,7 @@ const secondarySourceFiles = [
   { sourceId: 'bridges-culverts-structures', file: 'bridges-culverts-structures.geojson', collection: 'roadStructures' },
   { sourceId: 'road-projects-construction-resurfacing', file: 'road-projects-construction-resurfacing.geojson', collection: 'roadProjects' },
   { sourceId: 'road-condition', file: 'road-condition.geojson', collection: 'roadProjects' },
+  { sourceId: 'lots-and-concessions-grey', file: 'lots-and-concessions-grey.geojson', collection: 'lotsAndConcessions' },
   { sourceId: 'lot-fabric-improved-lio', file: 'lot-fabric-improved-lio.geojson', collection: 'lotFabric' }
 ];
 
@@ -123,7 +124,8 @@ const world = {
     geometry: feature.geometry ?? null,
     sourceProperties: props
   })),
-  lotFabric: mapFeatures(lotFeatures, (feature, props, index) => ({
+  lotsAndConcessions: [],
+  lotFabric: mapFeatures(lotFeaturesLegacy, (feature, props, index) => ({
     id: pickString(props, ['OBJECTID', 'id', 'ID']) ?? `lot-${index + 1}`,
     lot: pickString(props, ['LOT', 'LOT_NO']) ?? null,
     concession: pickString(props, ['CONCESSION', 'CON_NO']) ?? null,
@@ -165,7 +167,7 @@ for (const entry of secondarySourceFiles) {
       municipality = assigned.matched ? { id: assigned.matched.municipalityId, name: assigned.matched.municipalityName } : null;
       assignmentMethod = municipality ? 'geometryCentroid' : 'unassigned';
     }
-    world[entry.collection].push({
+    const base = {
       id: `${entry.sourceId}-${index + 1}`,
       sourceId: entry.sourceId,
       mappedType: entry.collection,
@@ -176,7 +178,14 @@ for (const entry of secondarySourceFiles) {
       sourceProperties: props,
       confidence: assignmentMethod === 'unassigned' ? 0.2 : (assignmentMethod === 'geometryCentroid' ? 0.7 : 0.9),
       warnings: assignmentMethod === 'unassigned' ? ['municipality assignment missing'] : []
-    });
+    };
+    if (entry.sourceId === 'lots-and-concessions-grey') {
+      base.lot = pickString(props, ['LOT', 'LOT_NO', 'LOT_NUMBER', 'LOTNUM']) ?? null;
+      base.concession = pickString(props, ['CONCESSION', 'CON_NO', 'CONCESSION_NO']) ?? null;
+      base.township = pickString(props, ['TOWNSHIP', 'GEOGRAPHIC_TOWNSHIP', 'MUNICIPAL']) ?? null;
+      base.municipality = pickString(props, ['MUNICIPALITY', 'MUNICIPAL', 'MUN_NAME']) ?? null;
+    }
+    world[entry.collection].push(base);
   }
 }
 
@@ -188,6 +197,7 @@ console.log(`settlement boundary features: ${world.settlementBoundaries.length}`
 console.log(`land-use features: ${world.landUsePatches.length}`);
 console.log(`road features: ${world.roadCentrelines.length}`);
 console.log(`lots/fabric features: ${world.lotFabric.length}`);
+console.log(`lots and concessions features: ${world.lotsAndConcessions.length}`);
 console.log(`transit stops: ${world.transitStops.length}`);
 console.log(`transit routes: ${world.transitRoutes.length}`);
 console.log(`cycling routes: ${world.cyclingRoutes.length}`);

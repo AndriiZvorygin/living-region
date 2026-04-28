@@ -197,7 +197,8 @@ export function buildGreyPublicBaselineReport(options = {}) {
     ['on-farm-rural-business-listing', 'On-farm/rural businesses', 'Rural economy and local service nodes'],
     ['public-facilities', 'Public facilities', 'Service node baseline'],
     ['bridges-culverts-structures', 'Bridges/culverts/structures', 'Infrastructure fragility and maintenance pressure'],
-    ['road-condition', 'Road condition', 'Condition pressure proxy']
+    ['road-condition', 'Road condition', 'Condition pressure proxy'],
+    ['lots-and-concessions-grey', 'Lots and concessions', 'Rural lot/concession reference (not parcel ownership)']
   ];
 
   const secondaryLayers = secondaryLayerDefs.map(([id, layer, modelUse]) => ({ id, layer, modelUse, ...readGeoJsonCount(inputDir, id) }));
@@ -229,6 +230,13 @@ export function buildGreyPublicBaselineReport(options = {}) {
   const facilityCount = layersById['public-facilities']?.featureCount ?? 0;
   const roadStructureCount = layersById['bridges-culverts-structures']?.featureCount ?? 0;
   const roadConditionFeatureCount = layersById['road-condition']?.featureCount ?? 0;
+  const lotsAndConcessionsFeatureCount = layersById['lots-and-concessions-grey']?.featureCount ?? 0;
+  const lotsSummary = Array.isArray(gisSummary?.files)
+    ? gisSummary.files.find((f) => f.file === 'lots-and-concessions-grey.geojson')
+    : null;
+  const lotsFieldNames = Array.isArray(lotsSummary?.topPropertyKeys)
+    ? lotsSummary.topPropertyKeys.map((x) => x.key)
+    : [];
 
   const pop = regionalIndicators.population2021;
   const roadKm = regionalIndicators.totalRoadKm;
@@ -243,6 +251,8 @@ export function buildGreyPublicBaselineReport(options = {}) {
     facilityCount,
     roadStructureCount,
     roadConditionFeatureCount,
+    lotsAndConcessionsFeatureCount,
+    lotsAndConcessionsFieldNames: lotsFieldNames,
     transitStopsPer1000Residents: pop > 0 ? (transitStopCount / pop) * 1000 : 0,
     ruralBusinessesPer1000Residents: pop > 0 ? (ruralBusinessCount / pop) * 1000 : 0,
     facilitiesPer1000Residents: pop > 0 ? (facilityCount / pop) * 1000 : 0,
@@ -396,12 +406,15 @@ export function buildGreyPublicBaselineReport(options = {}) {
     `- Managed forest features: ${managedForestFeatureCount}`,
     `- Structures (bridges/culverts): ${roadStructureCount}`,
     `- Road condition features: ${roadConditionFeatureCount}`,
+    `- Lots and concessions features: ${lotsAndConcessionsFeatureCount}`,
+    `- Lots and concessions likely fields: ${lotsFieldNames.join(', ') || 'unknown'}`,
     `- Transit stops per 1,000 residents: ${formatNumber(serviceAccessIndicators.transitStopsPer1000Residents, 3)}`,
     `- Rural businesses per 1,000 residents: ${formatNumber(serviceAccessIndicators.ruralBusinessesPer1000Residents, 3)}`,
     `- Facilities per 1,000 residents: ${formatNumber(serviceAccessIndicators.facilitiesPer1000Residents, 3)}`,
     `- Road structures per 100 km of road: ${formatNumber(serviceAccessIndicators.roadStructuresPer100KmRoad, 3)}`,
     '',
     'Do not interpret these as direct service-access outcomes yet; they are structural indicators.',
+    'Lots and Concessions is used here as a rural land-structure reference, not parcel ownership evidence.',
     '',
     '## Rural-transition relevance',
     '',

@@ -52,6 +52,7 @@ export function buildGreySecondaryDataReport(options = {}) {
     ['bridges-culverts-structures', 'roadStructures'],
     ['road-projects-construction-resurfacing', 'roadProjects'],
     ['road-condition', 'roadProjects'],
+    ['lots-and-concessions-grey', 'lotFabric'],
     ['lot-fabric-improved-lio', 'lotFabric']
   ];
 
@@ -85,6 +86,7 @@ export function buildGreySecondaryDataReport(options = {}) {
     ruralBusinessCount: counts['on-farm-rural-business-listing'] ?? 0,
     facilityCount: (counts['public-facilities'] ?? 0) + (counts['community-facilities'] ?? 0) + (counts['libraries'] ?? 0) + (counts['arenas-community-centres'] ?? 0) + (counts['works-yards-depots'] ?? 0) + (counts['emergency-services'] ?? 0),
     structuresProjectsCount: (counts['bridges-culverts-structures'] ?? 0) + (counts['road-projects-construction-resurfacing'] ?? 0) + (counts['road-condition'] ?? 0),
+    lotsAndConcessionsFeatureCount: counts['lots-and-concessions-grey'] ?? 0,
     populationEstimateRecords: counts['population-estimates-2011-2041'] ?? 0,
     municipalityAssignmentCompleteness: 'pending-import-level-check',
     warnings: ['Length estimates use simple geometry approximation when source length fields are unavailable.']

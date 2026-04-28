@@ -11,6 +11,7 @@ console.log(`hazardous forest features: ${summary.hazardousForestFeatureCount}`)
 console.log(`rural businesses: ${summary.ruralBusinessCount}`);
 console.log(`facilities: ${summary.facilityCount}`);
 console.log(`structures/projects: ${summary.structuresProjectsCount}`);
+console.log(`lots and concessions features: ${summary.lotsAndConcessionsFeatureCount ?? 0}`);
 console.log(`population estimate records: ${summary.populationEstimateRecords}`);
 console.log(`summary json: ${paths.jsonPath}`);
 console.log(`summary csv: ${paths.csvPath}`);

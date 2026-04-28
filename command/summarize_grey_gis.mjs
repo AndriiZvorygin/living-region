@@ -68,7 +68,11 @@ function guessSemanticFields(keys = []) {
     speedField: pick([/speed/i, /limit/i]),
     lanesField: pick([/lane/i]),
     settlementNameField: pick([/settle/i, /community/i, /^name$/i]),
-    landUseDesignationField: pick([/land[_\\s]?use/i, /designation/i, /final.*type/i, /sched/i])
+    landUseDesignationField: pick([/land[_\\s]?use/i, /designation/i, /final.*type/i, /sched/i]),
+    lotField: pick([/^lot$/i, /lot.*num/i]),
+    concessionField: pick([/concession/i, /con_?no/i]),
+    townshipField: pick([/township/i, /geo.*town/i]),
+    municipalityField: pick([/municipal/i, /mun_?name/i, /^county$/i])
   };
 }
 

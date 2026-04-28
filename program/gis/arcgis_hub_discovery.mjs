@@ -24,7 +24,11 @@ function guessSemanticFields(fieldNames = []) {
     speedField: pick([/speed/i, /limit/i]),
     lanesField: pick([/lane/i]),
     settlementNameField: pick([/settle/i, /community/i, /^name$/i]),
-    landUseDesignationField: pick([/land[_\s]?use/i, /designation/i, /final.*type/i, /sched/i])
+    landUseDesignationField: pick([/land[_\s]?use/i, /designation/i, /final.*type/i, /sched/i]),
+    lotField: pick([/^lot$/i, /lot.*num/i]),
+    concessionField: pick([/concession/i, /con_?no/i]),
+    townshipField: pick([/township/i, /geo.*town/i]),
+    municipalityField: pick([/municipal/i, /mun_?name/i, /^county$/i])
   };
 }
 
@@ -34,7 +38,9 @@ export function extractArcgisItemIdFromHtml(html) {
   const regexes = [
     /itemId["'\s:=>]+([a-f0-9]{32})/ig,
     /"id"\s*:\s*"([a-f0-9]{32})"/ig,
-    /"item"\s*:\s*\{[^}]*"id"\s*:\s*"([a-f0-9]{32})"/ig
+    /"item"\s*:\s*\{[^}]*"id"\s*:\s*"([a-f0-9]{32})"/ig,
+    /\/items\/([a-f0-9]{32})/ig,
+    /[?&]id=([a-f0-9]{32})/ig
   ];
   for (const re of regexes) {
     for (const match of html.matchAll(re)) {
