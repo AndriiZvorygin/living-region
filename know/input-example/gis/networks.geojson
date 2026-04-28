@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "seg-road-1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-79.602, 44.001], [-79.58, 44.007]]
+      },
+      "properties": {
+        "networkId": "road-main",
+        "type": "collectorRoad",
+        "lengthKm": 3.2,
+        "condition": 0.71,
+        "capacityPassengerKmPerYear": 420000,
+        "capacityTonneKmPerYear": 180000,
+        "maintenanceCostPerKmPerYear": 6300,
+        "maintenanceLabourDaysPerKmPerYear": 10,
+        "maintenanceMaterialsKgPerKmPerYear": 640,
+        "bridgeOrCulvertFactor": 1.1,
+        "winterMaintenanceFactor": 1.25,
+        "climateStressFactor": 1.2,
+        "rightOfWayStatus": "active"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "seg-rail-1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-79.601, 44.0005], [-79.583, 44.0065]]
+      },
+      "properties": {
+        "networkId": "rail-corridor",
+        "type": "traditionalRail",
+        "lengthKm": 4.6,
+        "condition": 0.69,
+        "capacityPassengerKmPerYear": 900000,
+        "capacityTonneKmPerYear": 1500000,
+        "maintenanceCostPerKmPerYear": 13000,
+        "maintenanceLabourDaysPerKmPerYear": 14,
+        "maintenanceMaterialsKgPerKmPerYear": 900,
+        "capitalRenewalCostPerKm": 140000,
+        "bridgeOrCulvertFactor": 1.08,
+        "winterMaintenanceFactor": 1.1,
+        "climateStressFactor": 1.12,
+        "rightOfWayStatus": "protected",
+        "railElectrified": false
+      }
+    }
+  ]
+}

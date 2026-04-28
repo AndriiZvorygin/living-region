@@ -1,0 +1,4 @@
+settlementId,populationUrban,populationRural,households,averageHouseholdSize
+town,1100,120,420,2.9
+village,180,260,150,2.7
+default,0,0,10,2.5

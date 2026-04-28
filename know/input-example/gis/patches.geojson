@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "patch-town",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-79.6, 44.0], [-79.595, 44.0], [-79.595, 44.005], [-79.6, 44.005], [-79.6, 44.0]]]
+      },
+      "properties": {
+        "name": "Town Core",
+        "areaHa": 24,
+        "landUse": "mixed",
+        "zoning": "urbanMixed",
+        "ownershipType": "mixed",
+        "nitrogen": 0.45,
+        "phosphorus": 0.48,
+        "potassium": 0.52,
+        "carbon": 0.4,
+        "moisture": 0.55,
+        "municipalWard": "A"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "patch-farm",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-79.59, 44.0], [-79.58, 44.0], [-79.58, 44.01], [-79.59, 44.01], [-79.59, 44.0]]]
+      },
+      "properties": {
+        "name": "Farm Belt",
+        "areaHa": 120,
+        "landUse": "cropland",
+        "zoning": "agricultural",
+        "ownershipType": "private",
+        "nitrogen": 0.62,
+        "phosphorus": 0.57,
+        "potassium": 0.6,
+        "carbon": 0.5,
+        "moisture": 0.58,
+        "soilClass": "B"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "patch-wood",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-79.605, 43.99], [-79.595, 43.99], [-79.595, 43.998], [-79.605, 43.998], [-79.605, 43.99]]]
+      },
+      "properties": {
+        "name": "Woodlot",
+        "areaHa": 70,
+        "landUse": "woodland",
+        "zoning": "resource",
+        "ownershipType": "mixed",
+        "nitrogen": 0.5,
+        "phosphorus": 0.45,
+        "potassium": 0.55,
+        "carbon": 0.75,
+        "moisture": 0.62
+      }
+    }
+  ]
+}

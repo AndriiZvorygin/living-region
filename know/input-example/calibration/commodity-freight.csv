@@ -1,0 +1,6 @@
+commodity,annualTonnes,averageDistanceKm,railSuitability,perishability,valuePerTonne,essentiality
+foodStaples,3200,42,0.78,0.15,720,0.95
+freshFood,900,35,0.58,0.82,1450,0.9
+woodFuel,1100,28,0.7,0.1,300,0.82
+repairGoods,640,40,0.66,0.2,2100,0.75
+"constructionMaterials",1700,48,0.74,0.06,180,0.72

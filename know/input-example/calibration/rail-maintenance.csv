@@ -1,0 +1,3 @@
+trackType,maintenanceCostPerKmPerYear,electrificationMaintenanceCostPerKmPerYear,capitalRenewalCostPerKm,railFixedCostAnnualOverride
+traditionalRail,12800,0,155000,380000
+electrifiedRail,14800,7200,175000,

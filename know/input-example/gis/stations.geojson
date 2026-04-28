@@ -1,0 +1,57 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "station-town",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.599, 44.002]
+      },
+      "properties": {
+        "type": "railStation",
+        "patchId": "patch-town",
+        "networkId": "rail-corridor",
+        "settlementId": "town",
+        "catchmentRadiusKm": 2.6,
+        "walkCatchmentPeople": 1100,
+        "bicycleCatchmentPeople": 750,
+        "parkAndRideCatchmentPeople": 280,
+        "freightCatchmentHa": 140,
+        "passengerCapacityPerYear": 120000,
+        "freightCapacityTonnePerYear": 9000,
+        "condition": 0.78,
+        "serviceFrequencyPerDay": 4,
+        "localAccessBonus": 0.36,
+        "developmentAttraction": 0.4,
+        "freightAnchorStrength": 0.22
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "station-village",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.585, 44.006]
+      },
+      "properties": {
+        "type": "railHalt",
+        "patchId": "patch-farm",
+        "networkId": "rail-corridor",
+        "settlementId": "village",
+        "catchmentRadiusKm": 2.2,
+        "walkCatchmentPeople": 380,
+        "bicycleCatchmentPeople": 260,
+        "parkAndRideCatchmentPeople": 120,
+        "freightCatchmentHa": 180,
+        "passengerCapacityPerYear": 56000,
+        "freightCapacityTonnePerYear": 6200,
+        "condition": 0.74,
+        "serviceFrequencyPerDay": 3,
+        "localAccessBonus": 0.28,
+        "developmentAttraction": 0.32,
+        "freightAnchorStrength": 0.3
+      }
+    }
+  ]
+}

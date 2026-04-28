@@ -1,0 +1,5 @@
+buildingType,heatDemandKwhPerM2,electricityKwhPerPerson,retrofitCostPerM2
+dwelling,145,2800,85
+apartment,95,2400,95
+shop,120,2600,110
+warehouse,80,900,70

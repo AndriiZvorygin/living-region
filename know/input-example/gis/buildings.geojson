@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "bldg-apt-1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.598, 44.002]
+      },
+      "properties": {
+        "patchId": "patch-town",
+        "settlementId": "town",
+        "type": "apartment",
+        "dwellingUnits": 18,
+        "occupiedUnits": 16,
+        "floorAreaM2": 1600,
+        "condition": 0.78,
+        "rentPerMonth": 1100,
+        "estimatedValue": 690000,
+        "heatDemandKwhPerYear": 120000,
+        "insulationLevel": 0.42,
+        "heatingSystem": "mixed",
+        "retrofitLevel": 0.2,
+        "municipalRoll": "T-100"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bldg-farm-1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.586, 44.006]
+      },
+      "properties": {
+        "patchId": "patch-farm",
+        "settlementId": "village",
+        "type": "dwelling",
+        "dwellingUnits": 1,
+        "occupiedUnits": 1,
+        "floorAreaM2": 140,
+        "condition": 0.74,
+        "rentPerMonth": 820,
+        "estimatedValue": 275000,
+        "heatDemandKwhPerYear": 24000,
+        "insulationLevel": 0.31,
+        "heatingSystem": "wood",
+        "retrofitLevel": 0.1
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bldg-shop-1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.597, 44.003]
+      },
+      "properties": {
+        "patchId": "patch-town",
+        "settlementId": "town",
+        "type": "shop",
+        "dwellingUnits": 0,
+        "occupiedUnits": 0,
+        "floorAreaM2": 300,
+        "condition": 0.8,
+        "rentPerMonth": 1350,
+        "estimatedValue": 420000,
+        "heatDemandKwhPerYear": 26000,
+        "insulationLevel": 0.36,
+        "heatingSystem": "electric",
+        "retrofitLevel": 0.15
+      }
+    }
+  ]
+}

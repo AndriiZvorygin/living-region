@@ -1,0 +1,59 @@
+{
+  "name": "living-region",
+  "version": "0.1.0",
+  "description": "Open-source map-based regional metabolism simulator for land use, housing, roads, food, energy, population, and local services.",
+  "type": "module",
+  "scripts": {
+    "demo": "node command/run_demo.mjs",
+    "demo:no-adaptation": "node command/run_demo_no_adaptation.mjs",
+    "demo:compare": "node command/run_demo_compare.mjs",
+    "demo:inspect": "node command/run_demo_inspect.mjs",
+    "demo:rail": "node command/run_demo_rail.mjs",
+    "demo:grey": "node command/run_grey_county_seed.mjs",
+    "demo:grey:rail": "node command/run_grey_county_seed.mjs --rail=true",
+    "demo:grey:full": "node command/run_grey_county_seed.mjs --scale=full-county",
+    "demo:grey:rail:full": "node command/run_grey_county_seed.mjs --rail=true --scale=full-county",
+    "demo:grey:inspect": "node command/run_grey_county_seed_inspect.mjs",
+    "demo:grey:rail:inspect": "node command/run_grey_county_seed_inspect.mjs --rail=true",
+    "demo:compare-rail": "node command/run_demo_compare_rail.mjs",
+    "demo:compare-calibration": "node command/run_demo_compare_calibration.mjs",
+    "sensitivity:rail": "node command/run_sensitivity.mjs",
+    "scenario:manifest": "node command/run_scenario_manifest.mjs",
+    "export:metrics": "node command/export_metrics.mjs",
+    "export:geojson": "node command/export_demo_geojson.mjs",
+    "import:region": "node command/import_region.mjs",
+    "demo:imported": "node command/run_imported_scenario.mjs",
+    "seed:grey": "node command/generate_grey_county_seed.mjs",
+    "seed:grey:rail": "node command/generate_grey_county_seed.mjs --rail=true",
+    "seed:grey:county-lite": "node command/generate_grey_county_seed.mjs --scale=county-lite",
+    "seed:grey:medium": "node command/generate_grey_county_seed.mjs --scale=medium --rail=true --water=true",
+    "seed:grey:full": "node command/generate_grey_county_seed.mjs --scale=full-county",
+    "seed:grey:full:rail": "node command/generate_grey_county_seed.mjs --scale=full-county --rail=true --water=true",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "regional-planning",
+    "gis",
+    "simulation",
+    "resilience",
+    "land-use",
+    "transportation",
+    "food-systems",
+    "energy",
+    "housing",
+    "open-data",
+    "grey-county"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/liberit/living-region.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/liberit/living-region/-/issues"
+  },
+  "homepage": "https://gitlab.com/liberit/living-region"
+}

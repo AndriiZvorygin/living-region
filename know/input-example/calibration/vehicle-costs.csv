@@ -1,0 +1,3 @@
+vehicleType,fixedCostAnnual,fuelLitresPerKm,electricityKwhPerKm,maintenanceCostPerKm,insuranceAnnual,depreciationAnnual
+privateIceVehicle,3600,0.085,0,0.11,1450,1800
+privateEvVehicle,3900,0,0.16,0.08,1350,2100

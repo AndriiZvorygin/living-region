@@ -1,0 +1,5 @@
+fromLandUse,toLandUse,suitabilityMultiplier,annualMaxHa,labourDaysPerHa,capitalCostPerHa
+vacant,marketGarden,1.25,20,35,2400
+cropland,marketGarden,1.1,10,28,1800
+mixed,compactHousing,1.15,8,22,5200
+woodland,woodFuelDepot,0.9,4,18,3100

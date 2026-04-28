@@ -1,0 +1,59 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "anchor-food",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.5985, 44.0024]
+      },
+      "properties": {
+        "type": "coldStorageDepot",
+        "patchId": "patch-town",
+        "networkId": "rail-corridor",
+        "stationId": "station-town",
+        "settlementId": "town",
+        "commodityTypes": "freshFood|foodStaples",
+        "annualThroughputTonnes": 1800,
+        "railCapturePotential": 0.58,
+        "roadCapturePotential": 0.42,
+        "storageCapacityTonnes": 260,
+        "spoilageReduction": 0.25,
+        "loadingEfficiency": 0.6,
+        "loadingLabourDaysPerTonne": 0.05,
+        "anchorStrength": 0.55,
+        "maintenanceCostPerYear": 22000,
+        "serviceFrequencyRequirement": 3,
+        "condition": 0.8
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "anchor-wood",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.596, 43.996]
+      },
+      "properties": {
+        "type": "woodFuelDepot",
+        "patchId": "patch-wood",
+        "networkId": "rail-corridor",
+        "stationId": "station-village",
+        "settlementId": "village",
+        "commodityTypes": "woodFuel|timber",
+        "annualThroughputTonnes": 1400,
+        "railCapturePotential": 0.62,
+        "roadCapturePotential": 0.38,
+        "storageCapacityTonnes": 310,
+        "spoilageReduction": 0.08,
+        "loadingEfficiency": 0.64,
+        "loadingLabourDaysPerTonne": 0.06,
+        "anchorStrength": 0.61,
+        "maintenanceCostPerYear": 17500,
+        "serviceFrequencyRequirement": 2,
+        "condition": 0.77
+      }
+    }
+  ]
+}
