@@ -3,6 +3,7 @@
 Living Region is an open-source map-based simulator for exploring how land use, housing, roads, food, energy, population, and local services affect each other over time, so communities can test regional planning scenarios more transparently.
 
 It models a region as interdependent systems: settlements, households, land patches, roads, rail corridors, buildings, services, freight, food production, energy demand, infrastructure maintenance, and population movement. The purpose is not to predict the future with false precision, but to make assumptions visible and testable.
+Food, wood, heat, electricity, diesel, and other energy flows are modelled in SI units, with food energy reported mainly in GJ.
 
 ## Quickstart
 
@@ -47,26 +48,25 @@ Example full Grey County seed output:
 Example full Grey County scenario output:
 
 - Final-year population: 110,227
+- `foodCoverage`: 0.724
+- `foodSurplusGJ`: -123,585.32
 - Average monthly rent: $1,253.92
-- Food coverage ratio: 0.697
 - Infrastructure condition: 0.468
 
 Example full Grey County rail scenario output:
 
 - Final-year population: 104,930
-- Food coverage ratio: 0.761
-- Rail passenger-km: 4,063,097
-- Rail freight tonne-km: 268,679
-- Rail utilization ratio: 0.133
-- Transport diesel deficit: 174,480 L
-- Road maintenance backlog: $16,744,204
+- `foodCoverage`: 0.658
+- `foodSurplusGJ`: -395,124.41
+- `railPassengerKm`: 4,723,641
+- `railFreightTonneKm`: 308,416
 
 ### Rural transition and resilience signals
 
 Living Region is designed to expose the pressures that can drive or constrain urban-to-rural transition. The current Grey County census-scale model already reports indicators such as:
 
 - `foodCoverage`: how much local food demand can be met by modelled local production.
-- `foodSurplusCalories`: whether the region has a food surplus or deficit under the scenario.
+- `foodSurplusGJ`: whether the region has a food surplus or deficit under the scenario, expressed in GJ.
 - `averageHouseholdStress`: combined pressure from food, housing, fuel, transport, and service access.
 - `transportDieselDeficitLitre`: unmet diesel demand for passenger and freight movement.
 - `roadMaintenanceBacklogMoney`: accumulated road maintenance pressure.
@@ -79,18 +79,24 @@ These metrics help test questions such as: How much local food capacity would be
 Example full Grey County rural-transition comparison:
 
 - No-rail full Grey scenario:
-  - Food coverage ratio: 0.697
-  - Food deficit: -31,970,274,138 calories
+  - `foodCoverage`: 0.724
+  - `foodSurplusGJ`: -123,585.32
   - Infrastructure condition: 0.468
 
 - Rail freight-corridor full Grey scenario:
-  - Food coverage ratio: 0.761
-  - Food deficit: -23,333,874,138 calories
-  - Rail passenger-km: 4,063,097
-  - Rail freight tonne-km: 268,679
-  - Rail utilization ratio: 0.133
-  - Transport diesel deficit: 174,480 L
-  - Road maintenance backlog: $16,744,204
+  - `foodCoverage`: 0.658
+  - `foodSurplusGJ`: -395,124.41
+  - `railPassengerKm`: 4,723,641
+  - `railFreightTonneKm`: 308,416
+
+Example `npm run demo:grey:inspect` Food Balance output:
+
+- `annualFoodEnergyGJPerPerson`: 3.7656
+- `totalFoodDemandGJ`: 8,152.52
+- `grossFoodProductionGJ`: 7,284.86
+- `netFoodAvailableGJ`: 5,829.71
+- `foodSurplusGJ`: -2,322.81
+- `foodCoverage`: 0.715
 
 These are not forecasts. They are scenario diagnostics. Their purpose is to show which assumptions create food deficits, transport bottlenecks, road maintenance burdens, rural access problems, or settlement patterns that may require adaptation.
 
@@ -115,6 +121,10 @@ npm run demo:grey:rail:full
 ```
 
 The point of the current seed model is to use the best available structured data already in the repository: real municipality population and land-area scale from the 2021 Census, plus transparent generated assumptions for the spatial layers that still need to be replaced.
+
+The current food balance is a scenario diagnostic based on generated land-use/yield/loss assumptions. It is not a measured agricultural capacity assessment.
+Food energy uses SI units internally (joules), so it can be compared directly with wood heat, electricity, diesel, and other regional energy flows.
+Food energy is modelled in joules internally and normally reported as GJ. Older calorie-named fields may appear only as deprecated compatibility aliases during the transition.
 
 What the numbers mean:
 
@@ -152,6 +162,8 @@ The census-scale model is already useful for checking municipal scale, populatio
 - GeoJSON export for map viewing workflows
 - GeoJSON + CSV import scaffolding for real regional inputs
 - Calibration profiles and sensitivity commands for transparent scenario testing
+- Older calorie-named fields are now isolated as deprecated compatibility aliases. Active model fields and new outputs use joules/GJ.
+- `npm run check:food-energy-terms` verifies that active code/docs do not reintroduce unapproved calorie/kcal terminology.
 
 ## Grey County Synthetic Seed Model
 
