@@ -289,6 +289,21 @@ This writes a present-baseline credibility audit that separates real/open-data i
 npm run report:grey:food-calibration
 ```
 
+### Localization access baseline
+
+```bash
+npm run report:grey:localization-access
+```
+
+This report identifies candidate settlement/service nodes for local food hubs, storage, processing, tool libraries, repair shops, animal-power depots, and wood-energy depots using Grey County open data. It is a spatial/access diagnostic, not a feasibility or capital plan.
+
+Outputs:
+
+- `know/produce/grey-localization-access.md`
+- `know/produce/grey-localization-access.json`
+- `know/produce/grey-localization-access-municipal.csv`
+- `know/produce/grey-localization-access-candidate-nodes.csv`
+
 ## Real-data priority
 
 Minimum real GIS layers to replace generated geometry:
