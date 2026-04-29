@@ -5,6 +5,7 @@ import { describe, expect, test } from 'vitest';
 import { importGreyCensusPopulation } from '../program/data/grey_census_population_import.mjs';
 import { buildGreyPopulationDistributionReport } from '../program/report/grey_population_distribution_report.mjs';
 import { buildGreyLandAccessReport } from '../program/report/grey_land_access_report.mjs';
+import { extractDownloadLinksFromHtml, extractCkanResourceLinks } from '../command/download_canada_census_2021.mjs';
 
 function fc(features) {
   return { type: 'FeatureCollection', features };
@@ -92,6 +93,93 @@ describe('grey census population distribution', () => {
       const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
       expect(result.summary.totalPopulationMatched).toBe(0);
       expect(result.summary.warnings.length).toBeGreaterThan(0);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('download link parser extracts candidate file URLs from StatCan-like HTML', () => {
+    const html = [
+      '<html><body>',
+      '<a href="/files/census/gaf_2021.csv">GAF CSV</a>',
+      '<a href="https://example.ca/guide/reference-guide.pdf">Guide</a>',
+      '<a href="/files/census/db_boundaries_2021.zip">DB ZIP</a>',
+      '</body></html>'
+    ].join('');
+    const links = extractDownloadLinksFromHtml(html, 'https://www12.statcan.gc.ca/example/page.html');
+    expect(links.some((l) => l.url.includes('gaf_2021.csv'))).toBe(true);
+    expect(links.some((l) => l.url.includes('db_boundaries_2021.zip'))).toBe(true);
+  });
+
+  test('CKAN package_show parser extracts resource links', () => {
+    const payload = {
+      success: true,
+      result: {
+        resources: [
+          { name: 'GAF CSV', url: 'https://example.ca/92-151-X2021001_eng.csv' },
+          { name: 'Guide', url: 'https://example.ca/92-151-g2021001-eng.htm' }
+        ]
+      }
+    };
+    const links = extractCkanResourceLinks(payload);
+    expect(links.some((l) => l.url.includes('.csv'))).toBe(true);
+    expect(links.some((l) => l.url.includes('92-151-X2021001'))).toBe(true);
+  });
+
+  test('imports GAF-only table and filters Grey rows by municipality/CSD hints', () => {
+    const root = path.resolve('know/produce/census-gaf-only');
+    const inputGisDir = path.join(root, 'gis');
+    const censusDir = path.join(root, 'census');
+    const produceDir = path.join(root, 'produce');
+    fs.mkdirSync(inputGisDir, { recursive: true });
+    fs.mkdirSync(censusDir, { recursive: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+
+    fs.writeFileSync(path.join(inputGisDir, 'municipality-boundaries.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { MUN_NAME: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-81,44],[-80.7,44],[-80.7,44.3],[-81,44.3],[-81,44]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputGisDir, 'settlement-boundaries.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputGisDir, 'official-plan-schedule-a-land-use.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputGisDir, 'road-centrelines-grey.geojson'), JSON.stringify(fc([])));
+
+    fs.writeFileSync(path.join(censusDir, 'gaf_2021.csv'), [
+      'DbUid,pOp,dWeLLings,Csd_Name,Cd_name',
+      '2001,50,20,Owen Sound,Grey',
+      '2002,80,30,West Grey,Grey',
+      '2003,900,300,Toronto,Toronto'
+    ].join('\n'));
+
+    try {
+      const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
+      expect(result.summary.geographicLevel).toBe('gafTableOnly');
+      expect(result.summary.totalPopulationMatched).toBe(130);
+      expect(result.summary.totalDwellingsMatched).toBe(50);
+      expect(result.summary.warnings.some((w) => w.includes('No Census geometry GeoJSON found'))).toBe(true);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('zero-match import writes GAF header diagnostics', () => {
+    const root = path.resolve('know/produce/census-gaf-zero-match');
+    const inputGisDir = path.join(root, 'gis');
+    const censusDir = path.join(root, 'census');
+    const produceDir = path.join(root, 'produce');
+    fs.mkdirSync(inputGisDir, { recursive: true });
+    fs.mkdirSync(censusDir, { recursive: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+    fs.writeFileSync(path.join(inputGisDir, 'municipality-boundaries.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(censusDir, 'gaf_2021.csv'), [
+      'DBUID,POP,DWELLINGS,CSD_NAME,CD_NAME',
+      '1,10,5,Toronto,Toronto'
+    ].join('\n'));
+    try {
+      const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
+      expect(result.summary.totalPopulationMatched).toBe(0);
+      const diagnosticsPath = path.join(produceDir, 'grey-census-gaf-header-diagnostics.json');
+      expect(fs.existsSync(diagnosticsPath)).toBe(true);
+      const parsed = JSON.parse(fs.readFileSync(diagnosticsPath, 'utf8'));
+      expect(Array.isArray(parsed.diagnostics.headers)).toBe(true);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
