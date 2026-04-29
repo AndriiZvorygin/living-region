@@ -5,6 +5,7 @@ import { greyOpenDataManifest } from '../program/data/grey_open_data_manifest.mj
 import { discoverLayerDownloadInfo } from '../program/gis/arcgis_hub_discovery.mjs';
 import { downloadHubItemGeoJson } from '../program/gis/arcgis_hub_download.mjs';
 import { downloadFeatureLayerAsGeoJson } from '../program/gis/arcgis_rest_download.mjs';
+import { isValidGeoJsonFeatureCollection } from '../program/gis/download_cache.mjs';
 
 function parseArgs(argv) {
   const args = {};
@@ -53,6 +54,8 @@ const secondaryOnly = toBool(args.secondary, false);
 const allUseful = toBool(args['all-useful'], false);
 const explicitWhere = args.where ?? null;
 const explicitBbox = args.bbox ?? null;
+const force = toBool(args.force, false);
+const refreshMetadata = toBool(args['refresh-metadata'], false);
 const all = sourceId ? false : toBool(args.all, true);
 const overridesPath = path.resolve('know/input/gis/source-overrides.json');
 const overrides = fs.existsSync(overridesPath) ? JSON.parse(fs.readFileSync(overridesPath, 'utf8')) : {};
@@ -85,7 +88,7 @@ for (const source of selected) {
     ...(overrides[source.id] ?? {})
   };
 
-  const discovered = (sourceWithOverride.itemId || sourceWithOverride.serviceUrl || dryRun)
+  const discovered = (sourceWithOverride.itemId || sourceWithOverride.serviceUrl || dryRun) && !refreshMetadata
     ? { ...sourceWithOverride, layers: [], warnings: dryRun ? ['dry-run: discovery skipped'] : [] }
     : await discoverLayerDownloadInfo({ ...sourceWithOverride });
 
@@ -123,6 +126,31 @@ for (const source of selected) {
     continue;
   }
 
+  const outPath = path.join(outDir, `${source.id}.geojson`);
+  const cacheCheck = isValidGeoJsonFeatureCollection(outPath);
+  if (!force && cacheCheck.valid) {
+    console.log(`${source.id}: Using cached file: ${outPath}`);
+    manifestRows.push({
+      id: source.id,
+      ok: true,
+      mode: 'cached',
+      itemId: itemId ?? null,
+      serviceUrl: serviceUrl ?? null,
+      layerId,
+      outputPath: outPath,
+      featureCount: cacheCheck.featureCount ?? 0,
+      geometrySummary: {},
+      warnings: []
+    });
+    continue;
+  }
+  if (force && cacheCheck.valid) {
+    console.log(`${source.id}: Force re-downloading…`);
+  }
+  if (!cacheCheck.valid && cacheCheck.reason && cacheCheck.reason !== 'missing') {
+    console.log(`${source.id}: cached file invalid (${cacheCheck.reason}); re-downloading`);
+  }
+
   let downloadResult = null;
   if (itemId) {
     downloadResult = await downloadHubItemGeoJson({ hubBaseUrl: source.sourcePageUrl, itemId, layerId, serviceUrl });
@@ -136,7 +164,6 @@ for (const source of selected) {
   }
 
   const featureCollection = normalizeFeatureCollection(downloadResult.featureCollection);
-  const outPath = path.join(outDir, `${source.id}.geojson`);
   fs.writeFileSync(outPath, JSON.stringify(featureCollection, null, 2));
 
   const geometrySummary = featureCollection.features

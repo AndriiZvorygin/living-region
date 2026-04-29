@@ -5,6 +5,7 @@ import { manifestById } from '../program/data/grey_open_data_manifest.mjs';
 import { discoverLayerDownloadInfo } from '../program/gis/arcgis_hub_discovery.mjs';
 import { downloadFeatureLayerAsGeoJson } from '../program/gis/arcgis_rest_download.mjs';
 import { downloadHubItemGeoJson } from '../program/gis/arcgis_hub_download.mjs';
+import { isValidGeoJsonFeatureCollection } from '../program/gis/download_cache.mjs';
 
 function parseArgs(argv) {
   const args = {};
@@ -23,6 +24,7 @@ function toBool(v, d = false) {
 
 const args = parseArgs(process.argv.slice(2));
 const allowLarge = toBool(args['allow-large-download'], false);
+const force = toBool(args.force, false);
 const outDir = path.resolve('know/input/gis');
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -40,6 +42,18 @@ async function downloadBySource(sourceId, outputFile) {
   const serviceUrl = discovered.serviceUrl ?? source.serviceUrl;
   const layerId = discovered.layerId ?? source.layerId ?? 0;
 
+  const outputPath = path.join(outDir, outputFile);
+  const cacheCheck = isValidGeoJsonFeatureCollection(outputPath);
+  if (!force && cacheCheck.valid) {
+    return { ok: true, sourceId, output: outputPath, featureCount: cacheCheck.featureCount ?? 0, itemId, serviceUrl, layerId, mode: 'cached' };
+  }
+  if (force && cacheCheck.valid) {
+    console.log(`${sourceId}: Force re-downloading…`);
+  }
+  if (!cacheCheck.valid && cacheCheck.reason && cacheCheck.reason !== 'missing') {
+    console.log(`${sourceId}: cached file invalid (${cacheCheck.reason}); re-downloading`);
+  }
+
   let result;
   if (itemId) {
     result = await downloadHubItemGeoJson({ hubBaseUrl: source.sourcePageUrl, itemId, layerId, serviceUrl });
@@ -50,8 +64,8 @@ async function downloadBySource(sourceId, outputFile) {
   }
 
   const fc = result.featureCollection ?? { type: 'FeatureCollection', features: [] };
-  fs.writeFileSync(path.join(outDir, outputFile), JSON.stringify(fc, null, 2));
-  return { ok: true, sourceId, output: path.join(outDir, outputFile), featureCount: fc.features?.length ?? 0, itemId, serviceUrl, layerId };
+  fs.writeFileSync(outputPath, JSON.stringify(fc, null, 2));
+  return { ok: true, sourceId, output: outputPath, featureCount: fc.features?.length ?? 0, itemId, serviceUrl, layerId, mode: 'downloaded' };
 }
 
 let primary = await downloadBySource('road-centrelines-grey', 'road-centrelines-grey.geojson');
@@ -67,6 +81,7 @@ if (!primary.ok) {
 
 console.log(`downloaded: ${primary.output}`);
 console.log(`featureCount: ${primary.featureCount}`);
+console.log(`mode: ${primary.mode ?? 'downloaded'}`);
 console.log(`itemId: ${primary.itemId ?? 'n/a'}`);
 console.log(`serviceUrl: ${primary.serviceUrl ?? 'n/a'}`);
 console.log(`layerId: ${primary.layerId ?? 'n/a'}`);

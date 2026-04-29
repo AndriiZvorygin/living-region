@@ -43,6 +43,16 @@ npm run grey:discover-data -- --dry-run
 npm run grey:download-data -- --dry-run
 ```
 
+Cached download behavior:
+
+- Downloads are cached by default.
+- If a target `know/input/gis/<source>.geojson` exists, has nonzero size, and parses as a `FeatureCollection`, downloader reuses it.
+- Use `--force` to re-download:
+
+```bash
+npm run grey:download-data -- --source=lots-and-concessions-grey --force
+```
+
 ## File locations
 
 - Downloaded GIS files are written to `know/input/gis/` and are ignored by git.
@@ -52,6 +62,7 @@ npm run grey:download-data -- --dry-run
 
 - Discovery attempts to extract ArcGIS item IDs and service URLs from Hub dataset pages.
 - If Hub direct download fails, downloader falls back to REST feature-layer queries.
+- Cached files are reused by default; `--force` re-downloads.
 - Large dataset safeguards block provincewide downloads unless filtered or explicitly allowed (`--allow-large-download`).
 - Manual overrides are supported through `know/input/gis/source-overrides.json`.
 - Source-provider licence and terms remain in force for downloaded data.

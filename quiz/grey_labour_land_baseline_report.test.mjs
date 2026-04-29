@@ -73,7 +73,10 @@ describe('grey labour-land baseline report', () => {
     expect(maturePermaculture.recurringNonHarvestLabourDaysPerHa).toBeLessThan(lowFuelHand.recurringNonHarvestLabourDaysPerHa);
     expect(maturePermacultureHarvestIntensive.harvestLabourDaysPerHa).toBeGreaterThan(0);
     expect(perennialStapleBulkLowCare.harvestLabourDaysPerGJ).toBeLessThan(maturePermacultureHarvestIntensive.harvestLabourDaysPerGJ);
-    expect(perennialStapleBulkLowCare.manageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelHand.manageableHaPerWorkerAtMaturity);
+    expect(perennialStapleBulkLowCare.onLandLabourDaysPerHaAtMaturity).toBeLessThan(perennialStapleBulkLowCare.totalSystemLabourDaysPerHaAtMaturity);
+    expect(perennialStapleBulkLowCare.regionalProcessingLabourDaysPerHaAtMaturity).toBeGreaterThan(0);
+    expect(perennialStapleBulkLowCare.onLandManageableHaPerWorkerAtMaturity).toBeGreaterThan(perennialStapleBulkLowCare.systemManageableHaPerWorkerAtMaturity);
+    expect(perennialStapleBulkLowCare.systemManageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelHand.systemManageableHaPerWorkerAtMaturity);
     expect(perennialStapleBulkLowCare.yearsUntilFoodEnergyMaturity).toBeGreaterThan(0);
     expect(maturePermaculture.peakHarvestShare).toBeLessThan(annualMechanized.peakHarvestShare);
     expect(maturePermaculture.manageableHaMultiplierVsAnnualLowFuelHandScale).toBeGreaterThan(
@@ -92,7 +95,8 @@ describe('grey labour-land baseline report', () => {
     expect(strongTransition.totalLabourDaysAtMaturity).toBeGreaterThan(0);
 
     const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
-    expect(markdown).toContain('System | Soil prep | Planting | Weeding | Harvest | Processing');
+    expect(markdown).toContain('System | Soil prep | Planting | Weeding | Harvest | Processing | On-land labour/ha | Processing labour/ha | Total system labour/ha');
+    expect(markdown).toContain('Post-harvest processing is separated from on-land labour');
     expect(markdown).toContain('Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems');
     expect(markdown).toContain('not magic yield');
     expect(markdown).toContain('requires establishment labour and skill');

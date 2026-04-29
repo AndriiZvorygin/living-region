@@ -16,6 +16,7 @@ import {
 } from '../program/gis/arcgis_rest_download.mjs';
 import { greyOpenDataManifest, validateGreyOpenDataManifest } from '../program/data/grey_open_data_manifest.mjs';
 import { buildGreySecondaryDataReport } from '../program/report/grey_secondary_data_report.mjs';
+import { isValidGeoJsonFeatureCollection } from '../program/gis/download_cache.mjs';
 
 describe('grey open data tools', () => {
   test('extract itemId and serviceUrl from ArcGIS-style html', () => {
@@ -238,6 +239,71 @@ describe('grey open data tools', () => {
     expect(download.status).toBe(0);
     expect(discover.stdout).toContain('written:');
     expect(download.stdout).toContain('written:');
+  });
+
+  test('cache validator recognizes valid and invalid geojson files', () => {
+    const root = path.resolve('know/produce/download-cache-fixture');
+    fs.mkdirSync(root, { recursive: true });
+    const validPath = path.join(root, 'valid.geojson');
+    const invalidPath = path.join(root, 'invalid.geojson');
+    fs.writeFileSync(validPath, JSON.stringify({ type: 'FeatureCollection', features: [] }));
+    fs.writeFileSync(invalidPath, '{not-json');
+    try {
+      const valid = isValidGeoJsonFeatureCollection(validPath);
+      const invalid = isValidGeoJsonFeatureCollection(invalidPath);
+      expect(valid.valid).toBe(true);
+      expect(invalid.valid).toBe(false);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('downloader skips existing valid geojson cache without --force and records cached mode', () => {
+    const outDir = path.resolve('know/produce/download-cache-cmd-fixture');
+    fs.mkdirSync(outDir, { recursive: true });
+    const cachedPath = path.join(outDir, 'lots-and-concessions-grey.geojson');
+    fs.writeFileSync(cachedPath, JSON.stringify({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: null, properties: {} }] }));
+    try {
+      const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--source=lots-and-concessions-grey', `--out=${outDir}`], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('Using cached file');
+      const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'download-manifest.json'), 'utf8'));
+      expect(manifest.sources[0].mode).toBe('cached');
+    } finally {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
+  });
+
+  test('invalid cached file triggers re-download attempt message', () => {
+    const outDir = path.resolve('know/produce/download-cache-invalid-fixture');
+    fs.mkdirSync(outDir, { recursive: true });
+    const cachedPath = path.join(outDir, 'lots-and-concessions-grey.geojson');
+    fs.writeFileSync(cachedPath, '{invalid-json');
+    try {
+      const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--source=lots-and-concessions-grey', `--out=${outDir}`], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('cached file invalid');
+      const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'download-manifest.json'), 'utf8'));
+      expect(manifest.sources[0].mode).toMatch(/hub-download|rest-fallback|rest-only/);
+    } finally {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
+  });
+
+  test('downloader re-downloads with --force even when cache exists', () => {
+    const outDir = path.resolve('know/produce/download-cache-force-fixture');
+    fs.mkdirSync(outDir, { recursive: true });
+    const cachedPath = path.join(outDir, 'lots-and-concessions-grey.geojson');
+    fs.writeFileSync(cachedPath, JSON.stringify({ type: 'FeatureCollection', features: [] }));
+    try {
+      const run = spawnSync('node', ['command/download_grey_open_data.mjs', '--source=lots-and-concessions-grey', '--force', `--out=${outDir}`], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('Force re-downloading');
+      const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'download-manifest.json'), 'utf8'));
+      expect(manifest.sources[0].mode).toMatch(/hub-download|rest-fallback|rest-only/);
+    } finally {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
   });
 
   test('override file wins over search in dry-run command output', () => {
