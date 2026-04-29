@@ -143,9 +143,40 @@ describe('grey land access report', () => {
   });
 
   test('report command writes markdown/json/csv', () => {
-    const run = spawnSync('node', ['command/report_grey_land_access.mjs'], { encoding: 'utf8' });
-    expect(run.status).toBe(0);
-    expect(run.stdout).toContain('total lots/concessions');
+    const root = path.resolve('know/produce/land-access-command-basic');
+    const inputDir = path.join(root, 'input');
+    const outputDir = path.join(root, 'output');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.mkdirSync(outputDir, { recursive: true });
+    fs.writeFileSync(path.join(inputDir, 'municipality-boundaries.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { MUN_NAME: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-81,44],[-80.7,44],[-80.7,44.3],[-81,44.3],[-81,44]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'settlement-boundaries.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'official-plan-schedule-a-land-use.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'road-centrelines-grey.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'lots-and-concessions-grey.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { OBJECTID: 1, MUNICIPALITY: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-80.94,44.06],[-80.93,44.06],[-80.93,44.07],[-80.94,44.07],[-80.94,44.06]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'grey-transit-bus-stops.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'official-road-cycling-routes.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'county-trails.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'cp-rail-trail.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'hiking-trails.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'managed-forest-boundary.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'on-farm-rural-business-listing.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'public-facilities.geojson'), JSON.stringify(fc([])));
+
+    try {
+      const run = spawnSync('node', [
+        'command/report_grey_land_access.mjs',
+        `--input-dir=${inputDir}`,
+        `--output-dir=${outputDir}`
+      ], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('total lots/concessions');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   });
 
   test('missing lots input includes explicit download warning and exits cleanly', () => {
@@ -165,6 +196,45 @@ describe('grey land access report', () => {
       expect(report.warnings.some((w) => w.includes('Missing lots-and-concessions-grey.geojson'))).toBe(true);
       const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
       expect(markdown).toContain('npm run grey:download-data -- --source=lots-and-concessions-grey');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('command supports --input-dir and --output-dir and does not warn when lots exist', () => {
+    const root = path.resolve('know/produce/land-access-command-args');
+    const inputDir = path.join(root, 'input');
+    const outputDir = path.join(root, 'output');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    fs.writeFileSync(path.join(inputDir, 'municipality-boundaries.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { MUN_NAME: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-81,44],[-80.7,44],[-80.7,44.3],[-81,44.3],[-81,44]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'settlement-boundaries.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'official-plan-schedule-a-land-use.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'road-centrelines-grey.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'lots-and-concessions-grey.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { OBJECTID: 1, MUNICIPALITY: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-80.94,44.06],[-80.93,44.06],[-80.93,44.07],[-80.94,44.07],[-80.94,44.06]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'grey-transit-bus-stops.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'official-road-cycling-routes.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'county-trails.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'cp-rail-trail.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'hiking-trails.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'managed-forest-boundary.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'on-farm-rural-business-listing.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'public-facilities.geojson'), JSON.stringify(fc([])));
+
+    try {
+      const run = spawnSync('node', [
+        'command/report_grey_land_access.mjs',
+        `--input-dir=${inputDir}`,
+        `--output-dir=${outputDir}`
+      ], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('total lots/concessions: 1');
+      expect(run.stdout).not.toContain('Missing lots-and-concessions-grey.geojson');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

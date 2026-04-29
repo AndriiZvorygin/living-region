@@ -3,8 +3,26 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { buildGreyLandAccessReport } from '../program/report/grey_land_access_report.mjs';
 
-function readCachedReport() {
-  const jsonPath = path.resolve('know/produce/grey-land-access-baseline.json');
+function parseArgs(argv = process.argv.slice(2)) {
+  const opts = {};
+  for (const arg of argv) {
+    if (arg.startsWith('--input-dir=')) {
+      opts.inputDir = arg.slice('--input-dir='.length);
+    } else if (arg.startsWith('--output-dir=')) {
+      opts.outputDir = arg.slice('--output-dir='.length);
+    } else if (arg.startsWith('--produce-dir=')) {
+      opts.outputDir = arg.slice('--produce-dir='.length);
+    } else if (arg === '--use-cache') {
+      opts.useCache = true;
+    } else if (arg === '--no-cache') {
+      opts.useCache = false;
+    }
+  }
+  return opts;
+}
+
+function readCachedReport(outputDir) {
+  const jsonPath = path.resolve(outputDir, 'grey-land-access-baseline.json');
   if (!fs.existsSync(jsonPath)) return null;
   try {
     const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
@@ -12,10 +30,10 @@ function readCachedReport() {
     return {
       report,
       paths: {
-        markdownPath: path.resolve('know/produce/grey-land-access-baseline.md'),
+        markdownPath: path.resolve(outputDir, 'grey-land-access-baseline.md'),
         jsonPath,
-        municipalityCsvPath: path.resolve('know/produce/grey-land-access-municipality-summary.csv'),
-        detailCsvPath: path.resolve('know/produce/grey-land-access-lot-detail.csv')
+        municipalityCsvPath: path.resolve(outputDir, 'grey-land-access-municipality-summary.csv'),
+        detailCsvPath: path.resolve(outputDir, 'grey-land-access-lot-detail.csv')
       }
     };
   } catch {
@@ -23,9 +41,29 @@ function readCachedReport() {
   }
 }
 
+function shouldUseCachedReport(cachedReport, inputDir) {
+  if (!cachedReport?.report?.assignment) return false;
+  const lotsPath = path.resolve(inputDir, 'lots-and-concessions-grey.geojson');
+  const hasLotsFile = fs.existsSync(lotsPath);
+  const cachedLots = Number(cachedReport.report.assignment.totalLotConcessionFeatures ?? 0);
+  if (hasLotsFile && cachedLots === 0) {
+    // stale cache: lots file now exists but cached report was generated without it
+    return false;
+  }
+  return true;
+}
+
 try {
-  const cached = readCachedReport();
-  const { report, paths } = cached ?? buildGreyLandAccessReport();
+  const options = parseArgs();
+  const inputDir = path.resolve(options.inputDir ?? 'know/input/gis');
+  const outputDir = path.resolve(options.outputDir ?? 'know/produce');
+  const useCache = options.useCache !== false;
+  const cached = useCache ? readCachedReport(outputDir) : null;
+  const cachedOk = useCache && shouldUseCachedReport(cached, inputDir);
+  const { report, paths } = cachedOk ? cached : buildGreyLandAccessReport({
+    inputDir,
+    outputDir
+  });
   const topMunicipalities = Object.entries(report.assignment.lotConcessionCountByMunicipality)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
