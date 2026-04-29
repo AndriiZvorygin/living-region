@@ -37,6 +37,7 @@
     "report:grey:public-baseline": "node command/report_grey_public_baseline.mjs",
     "report:grey:land-access": "node command/report_grey_land_access.mjs",
     "report:grey:labour-land": "node command/report_grey_labour_land_baseline.mjs",
+    "report:model:assessment": "node command/report_living_region_assessment.mjs",
     "grey:open-data": "node command/grey_open_data.mjs",
     "grey:discover-data": "node command/discover_grey_open_data.mjs",
     "grey:discover-all-data": "node command/discover_all_grey_data.mjs",
