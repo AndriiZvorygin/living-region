@@ -61,18 +61,18 @@ const PRODUCTION_SYSTEMS = [
   {
     system: 'annualLowFuelEfficient',
     establishmentYears: 1,
-    designPlanningDaysPerHa: 6,
-    establishmentLabourDaysPerHa: 14,
-    soilPrepTillageDaysPerHa: 10,
-    plantingSeedingDaysPerHa: 9,
-    weedingMulchingDaysPerHa: 14,
-    irrigationWaterDaysPerHa: 5,
-    pestDiseaseMonitoringDaysPerHa: 4,
-    pruningTrainingDaysPerHa: 1,
-    processingStorageDaysPerGJ: 0.45,
-    pathFenceToolMaintenanceDaysPerHa: 4,
-    observationManagementDaysPerHa: 5,
-    harvestLabourDaysPerGJ: 1.05,
+    designPlanningDaysPerHa: 8,
+    establishmentLabourDaysPerHa: 18,
+    soilPrepTillageDaysPerHa: 18,
+    plantingSeedingDaysPerHa: 16,
+    weedingMulchingDaysPerHa: 30,
+    irrigationWaterDaysPerHa: 8,
+    pestDiseaseMonitoringDaysPerHa: 6,
+    pruningTrainingDaysPerHa: 1.5,
+    processingStorageDaysPerGJ: 0.7,
+    pathFenceToolMaintenanceDaysPerHa: 6,
+    observationManagementDaysPerHa: 14,
+    harvestLabourDaysPerGJ: 1.4,
     harvestWindowDays: 55,
     annualFoodEnergyGJPerHaAtMaturity: 22,
     maturityRampYears: 1,
@@ -83,23 +83,23 @@ const PRODUCTION_SYSTEMS = [
     managementComplexityIndex: 0.5,
     seasonalPeakLabourMultiplier: 1.55,
     harvestDistribution: { lateSummer: 0.1, autumn: 0.75, winterStored: 0.15 },
-    notes: 'Optimized low-fuel annual baseline (mulch/bed management).'
+    notes: 'Efficient hand-scale annual field baseline with good layout and tool practice.'
   },
   {
     system: 'annualLowFuelHandScale',
     establishmentYears: 1,
-    designPlanningDaysPerHa: 7,
-    establishmentLabourDaysPerHa: 18,
-    soilPrepTillageDaysPerHa: 16,
-    plantingSeedingDaysPerHa: 13,
-    weedingMulchingDaysPerHa: 28,
-    irrigationWaterDaysPerHa: 6,
-    pestDiseaseMonitoringDaysPerHa: 5,
-    pruningTrainingDaysPerHa: 1,
-    processingStorageDaysPerGJ: 0.52,
-    pathFenceToolMaintenanceDaysPerHa: 4,
-    observationManagementDaysPerHa: 6,
-    harvestLabourDaysPerGJ: 1.15,
+    designPlanningDaysPerHa: 10,
+    establishmentLabourDaysPerHa: 22,
+    soilPrepTillageDaysPerHa: 30,
+    plantingSeedingDaysPerHa: 25,
+    weedingMulchingDaysPerHa: 60,
+    irrigationWaterDaysPerHa: 12,
+    pestDiseaseMonitoringDaysPerHa: 10,
+    pruningTrainingDaysPerHa: 2,
+    processingStorageDaysPerGJ: 0.9,
+    pathFenceToolMaintenanceDaysPerHa: 8,
+    observationManagementDaysPerHa: 12,
+    harvestLabourDaysPerGJ: 1.8,
     harvestWindowDays: 50,
     annualFoodEnergyGJPerHaAtMaturity: 20,
     maturityRampYears: 1,
@@ -111,6 +111,33 @@ const PRODUCTION_SYSTEMS = [
     seasonalPeakLabourMultiplier: 1.62,
     harvestDistribution: { lateSummer: 0.08, autumn: 0.8, winterStored: 0.12 },
     notes: 'Low-fuel hand-scale annual with repeated soil prep/planting/weeding.'
+  },
+  {
+    system: 'annualSmallToolOptimized',
+    establishmentYears: 1,
+    designPlanningDaysPerHa: 8,
+    establishmentLabourDaysPerHa: 16,
+    soilPrepTillageDaysPerHa: 11,
+    plantingSeedingDaysPerHa: 10,
+    weedingMulchingDaysPerHa: 16,
+    irrigationWaterDaysPerHa: 5,
+    pestDiseaseMonitoringDaysPerHa: 4,
+    pruningTrainingDaysPerHa: 1,
+    processingStorageDaysPerGJ: 0.55,
+    pathFenceToolMaintenanceDaysPerHa: 4,
+    observationManagementDaysPerHa: 9,
+    harvestLabourDaysPerGJ: 1.0,
+    harvestWindowDays: 60,
+    annualFoodEnergyGJPerHaAtMaturity: 22,
+    maturityRampYears: 1,
+    maturityCurve: 'flat',
+    inputDependencyIndex: 0.35,
+    machineryDependencyIndex: 0.2,
+    skillRequirementIndex: 0.72,
+    managementComplexityIndex: 0.62,
+    seasonalPeakLabourMultiplier: 1.38,
+    harvestDistribution: { lateSpring: 0.06, earlySummer: 0.14, lateSummer: 0.24, autumn: 0.42, winterStored: 0.14 },
+    notes: 'Upper-end optimized small-tool annual case (excellent layout/tools/skill), not ordinary hand-tool baseline.'
   },
   {
     system: 'marketGardenIntensive',
@@ -464,6 +491,131 @@ const PERMACULTURE_ADOPTION_SCENARIOS = [
     marketGardenShare: 0.1,
     annualStapleShare: 0.2,
     notes: 'Perennial staple-heavy transition over a longer ramp.'
+  }
+];
+
+const DRAFT_ANIMAL_SYSTEMS = [
+  {
+    animalSystem: 'horseTeam',
+    animalsPerTeam: 2,
+    workDaysPerYear: 170,
+    effectiveFieldHoursPerDay: 5.5,
+    hectaresServicedPerYear: 42,
+    humanHandlerDaysPerHa: 1.4,
+    animalCareDaysPerYear: 220,
+    feedEnergyGJPerAnimalYear: 36,
+    hayPastureHaPerAnimal: 0.95,
+    grainFeedHaPerAnimal: 0.2,
+    beddingHaEquivalentPerAnimal: 0.08,
+    waterNeedLitrePerAnimalDay: 35,
+    overwinteringBurdenIndex: 0.62,
+    veterinaryRiskIndex: 0.45,
+    skillRequirementIndex: 0.72,
+    capitalEquipmentIndex: 0.58,
+    suitableTasks: ['hauling', 'cultivation', 'mowing', 'light tillage', 'cartage'],
+    unsuitableOrLimitedTasks: ['deep tillage in wet soils', 'high-speed heavy freight'],
+    notes: 'Balanced draft power; moderate feed and care burden.'
+  },
+  {
+    animalSystem: 'oxenTeam',
+    animalsPerTeam: 2,
+    workDaysPerYear: 155,
+    effectiveFieldHoursPerDay: 5,
+    hectaresServicedPerYear: 36,
+    humanHandlerDaysPerHa: 1.6,
+    animalCareDaysPerYear: 230,
+    feedEnergyGJPerAnimalYear: 32,
+    hayPastureHaPerAnimal: 1.1,
+    grainFeedHaPerAnimal: 0.12,
+    beddingHaEquivalentPerAnimal: 0.1,
+    waterNeedLitrePerAnimalDay: 40,
+    overwinteringBurdenIndex: 0.66,
+    veterinaryRiskIndex: 0.42,
+    skillRequirementIndex: 0.7,
+    capitalEquipmentIndex: 0.54,
+    suitableTasks: ['hauling', 'cultivation', 'logging', 'mowing', 'cartage'],
+    unsuitableOrLimitedTasks: ['fine market-garden cultivation', 'fast transport'],
+    notes: 'Lower grain need, higher pasture and handling burden.'
+  },
+  {
+    animalSystem: 'smallPonyOrMule',
+    animalsPerTeam: 2,
+    workDaysPerYear: 165,
+    effectiveFieldHoursPerDay: 4.8,
+    hectaresServicedPerYear: 28,
+    humanHandlerDaysPerHa: 1.9,
+    animalCareDaysPerYear: 210,
+    feedEnergyGJPerAnimalYear: 24,
+    hayPastureHaPerAnimal: 0.7,
+    grainFeedHaPerAnimal: 0.15,
+    beddingHaEquivalentPerAnimal: 0.06,
+    waterNeedLitrePerAnimalDay: 25,
+    overwinteringBurdenIndex: 0.55,
+    veterinaryRiskIndex: 0.48,
+    skillRequirementIndex: 0.68,
+    capitalEquipmentIndex: 0.5,
+    suitableTasks: ['hauling', 'light tillage', 'cartage', 'mowing'],
+    unsuitableOrLimitedTasks: ['heavy logging', 'deep cultivation'],
+    notes: 'Lower feed demand but lower field capacity.'
+  },
+  {
+    animalSystem: 'mixedAnimalPowerCoop',
+    animalsPerTeam: 2,
+    workDaysPerYear: 180,
+    effectiveFieldHoursPerDay: 5.6,
+    hectaresServicedPerYear: 50,
+    humanHandlerDaysPerHa: 1.25,
+    animalCareDaysPerYear: 200,
+    feedEnergyGJPerAnimalYear: 30,
+    hayPastureHaPerAnimal: 0.9,
+    grainFeedHaPerAnimal: 0.14,
+    beddingHaEquivalentPerAnimal: 0.07,
+    waterNeedLitrePerAnimalDay: 32,
+    overwinteringBurdenIndex: 0.58,
+    veterinaryRiskIndex: 0.43,
+    skillRequirementIndex: 0.78,
+    capitalEquipmentIndex: 0.64,
+    suitableTasks: ['hauling', 'cultivation', 'logging', 'mowing', 'light tillage', 'cartage'],
+    unsuitableOrLimitedTasks: ['continuous heavy tillage'],
+    notes: 'Cooperative rotation improves utilization and handler efficiency.'
+  }
+];
+
+const HAND_TOOL_CAPACITY_REFERENCE = [
+  {
+    system: 'intensiveMarketGardenHandTools',
+    lowHaPerFullTimeWorker: 0.2,
+    baselineHaPerFullTimeWorker: 0.4,
+    highHaPerFullTimeWorker: 0.8,
+    notes: 'High-value vegetables, dense plantings, frequent harvest, high management intensity.'
+  },
+  {
+    system: 'handScaleAnnualStaples',
+    lowHaPerFullTimeWorker: 0.5,
+    baselineHaPerFullTimeWorker: 1.0,
+    highHaPerFullTimeWorker: 1.5,
+    notes: 'Low-fuel annual staple production with significant planting, weeding, and harvest bottlenecks.'
+  },
+  {
+    system: 'efficientSmallScaleAnnualField',
+    lowHaPerFullTimeWorker: 1.0,
+    baselineHaPerFullTimeWorker: 1.5,
+    highHaPerFullTimeWorker: 2.0,
+    notes: 'Simpler crop mix, efficient layout, good hand tools/small tools, lower harvest frequency.'
+  },
+  {
+    system: 'maturePerennialStapleLowCare',
+    lowHaPerFullTimeWorker: 2.0,
+    baselineHaPerFullTimeWorker: 3.5,
+    highHaPerFullTimeWorker: 5.0,
+    notes: 'Established perennial staple/tree-crop systems with processing partly centralized.'
+  },
+  {
+    system: 'managedGrazingSilvopastureWoodlot',
+    lowHaPerFullTimeWorker: 3.0,
+    baselineHaPerFullTimeWorker: 6.0,
+    highHaPerFullTimeWorker: 10.0,
+    notes: 'Lower crop-handling intensity, but includes fencing, rotation, animal care, woodlot work.'
   }
 ];
 
@@ -839,6 +991,103 @@ function maturedHarvestDaysEstimate(components, transitionedHa) {
   }, 0);
 }
 
+function buildAnimalPowerScenarios(args) {
+  const { regional, availableFoodLabourDays, foodWorkerDaysPerYear, lowFuelScenario, systemById } = args;
+  const lowFuelHumanOnly = systemById.get('annualLowFuelHandScale');
+  const perennialStaples = systemById.get('perennialStapleBulkLowCare') ?? systemById.get('perennialStapleLowCare');
+  const productiveHa = regional.estimatedHumanFoodProducingHa;
+  const scenarioDefs = [
+    { scenario: 'lowFuelHumanOnly', animalSystem: null, transitionPerennial: false },
+    { scenario: 'lowFuelWithHorseTeams', animalSystem: 'horseTeam', transitionPerennial: false },
+    { scenario: 'lowFuelWithOxenTeams', animalSystem: 'oxenTeam', transitionPerennial: false },
+    { scenario: 'lowFuelWithMixedAnimalPower', animalSystem: 'mixedAnimalPowerCoop', transitionPerennial: false },
+    { scenario: 'lowFuelWithPerennialStaples', animalSystem: null, transitionPerennial: true },
+    { scenario: 'lowFuelWithPerennialStaplesAndAnimalPower', animalSystem: 'mixedAnimalPowerCoop', transitionPerennial: true }
+  ];
+
+  const rows = [];
+  for (const def of scenarioDefs) {
+    const prodSystem = def.transitionPerennial ? perennialStaples : lowFuelHumanOnly;
+    const baseFoodGJ = productiveHa * n(prodSystem?.annualFoodEnergyGJPerHaAtMaturity, 0);
+    let feedHaRequired = 0;
+    let hayPastureHaRequired = 0;
+    let grainFeedHaRequired = 0;
+    let beddingHaEquivalentRequired = 0;
+    let animalFeedEnergyGJ = 0;
+    let teamsNeeded = 0;
+    let animalsNeeded = 0;
+    let dieselDisplacedLitre = 0;
+    let humanLabourReducedDays = 0;
+    let animalCareLabourDays = 0;
+    let machinerySupportReplacedShare = 0;
+    let animalSystem = null;
+    if (def.animalSystem) {
+      animalSystem = DRAFT_ANIMAL_SYSTEMS.find((s) => s.animalSystem === def.animalSystem);
+      teamsNeeded = Math.max(0, Math.ceil(productiveHa / Math.max(1, n(animalSystem.hectaresServicedPerYear, 1))));
+      animalsNeeded = teamsNeeded * n(animalSystem.animalsPerTeam, 0);
+      hayPastureHaRequired = animalsNeeded * n(animalSystem.hayPastureHaPerAnimal, 0);
+      grainFeedHaRequired = animalsNeeded * n(animalSystem.grainFeedHaPerAnimal, 0);
+      beddingHaEquivalentRequired = animalsNeeded * n(animalSystem.beddingHaEquivalentPerAnimal, 0);
+      feedHaRequired = hayPastureHaRequired + grainFeedHaRequired + beddingHaEquivalentRequired;
+      animalFeedEnergyGJ = animalsNeeded * n(animalSystem.feedEnergyGJPerAnimalYear, 0);
+      machinerySupportReplacedShare = Math.min(0.55, teamsNeeded * 0.01);
+      dieselDisplacedLitre = productiveHa * machinerySupportReplacedShare * 24;
+      humanLabourReducedDays = productiveHa * 9 * machinerySupportReplacedShare;
+      animalCareLabourDays = teamsNeeded * n(animalSystem.animalCareDaysPerYear, 0);
+    }
+    const feedFromPastureFodderHa = hayPastureHaRequired + beddingHaEquivalentRequired;
+    const feedFromHumanFoodCropHa = grainFeedHaRequired;
+    const feedCompetitionWithHumanFoodGJ = feedFromHumanFoodCropHa * n(prodSystem?.annualFoodEnergyGJPerHaAtMaturity, 0);
+    const netHumanFoodHaAfterFeed = Math.max(0, productiveHa - feedFromHumanFoodCropHa);
+    const feedLandShareOfProductiveHa = productiveHa > 0 ? feedHaRequired / productiveHa : 0;
+    const foodEnergyOpportunityCostGJ = feedCompetitionWithHumanFoodGJ;
+    const netFoodEnergyAfterAnimalFeedGJ = Math.max(0, baseFoodGJ - foodEnergyOpportunityCostGJ);
+
+    const requiredHumanFoodLabourDays = netHumanFoodHaAfterFeed * n(prodSystem?.onLandLabourDaysPerHaAtMaturity, 0);
+    const regionalProcessingLabourDays = netHumanFoodHaAfterFeed * n(prodSystem?.regionalProcessingLabourDaysPerHaAtMaturity, 0);
+    const netHumanLabourChangeDays = animalCareLabourDays - humanLabourReducedDays;
+    const totalHumanLabourDays = requiredHumanFoodLabourDays + regionalProcessingLabourDays + animalCareLabourDays - humanLabourReducedDays;
+    const labourDeficitDays = Math.max(0, totalHumanLabourDays - availableFoodLabourDays);
+    const requiredHumanFTE = totalHumanLabourDays / foodWorkerDaysPerYear;
+
+    rows.push({
+      scenario: def.scenario,
+      animalSystem: def.animalSystem ?? 'none',
+      productiveHa,
+      feedHaRequired,
+      hayPastureHaRequired,
+      grainFeedHaRequired,
+      beddingHaEquivalentRequired,
+      feedFromPastureFodderHa,
+      feedFromHumanFoodCropHa,
+      feedCompetitionWithHumanFoodGJ,
+      netHumanFoodHaAfterFeed,
+      feedLandShareOfProductiveHa,
+      foodEnergyOpportunityCostGJ,
+      netFoodEnergyAfterAnimalFeedGJ,
+      requiredHumanFoodLabourDays,
+      animalCareLabourDays,
+      totalHumanLabourDays,
+      availableFoodLabourDays,
+      labourDeficitDays,
+      requiredHumanFTE,
+      animalTeamsNeeded: teamsNeeded,
+      animalsNeeded,
+      animalFeedEnergyGJ,
+      dieselDisplacedLitre,
+      machinerySupportReplacedShare,
+      humanLabourReducedDays,
+      netHumanLabourChangeDays,
+      netLabourDaysPerHaWithAnimalPower: productiveHa > 0 ? totalHumanLabourDays / productiveHa : 0,
+      haManagedPerHumanWorkerWithAnimalPower: requiredHumanFTE > 0 ? productiveHa / requiredHumanFTE : 0,
+      fossilFuelLeverageReplacedByAnimalPower: machinerySupportReplacedShare,
+      animalPowerLeverageRatio: lowFuelScenario.requiredFoodWorkerFTE > 0 ? (lowFuelScenario.requiredFoodWorkerFTE / Math.max(1e-9, requiredHumanFTE)) : 0,
+      notes: animalSystem ? animalSystem.notes : 'Human-only low-fuel baseline'
+    });
+  }
+  return rows;
+}
+
 export function buildGreyLabourLandBaselineReport(options = {}) {
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
   const inputDir = path.resolve(options.inputDir ?? 'know/input/gis');
@@ -1026,6 +1275,9 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   const annualLowFuelHandBase = {
     ...PRODUCTION_SYSTEMS.find((s) => s.system === 'annualLowFuelHandScale')
   };
+  const annualSmallToolOptimizedBase = {
+    ...PRODUCTION_SYSTEMS.find((s) => s.system === 'annualSmallToolOptimized')
+  };
   const baseReferenceLabourDaysPerHa =
     n(annualLowFuelBase.soilPrepTillageDaysPerHa) +
     n(annualLowFuelBase.plantingSeedingDaysPerHa) +
@@ -1064,6 +1316,12 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     annualReferenceLabourDaysPerHa: annualLowFuelEvaluated.labourDaysPerHaAtMaturity,
     annualReferencePeakHarvestShare: annualLowFuelEvaluated.peakHarvestShare
   });
+  const annualSmallToolOptimizedEvaluated = evaluateProductionSystem(annualSmallToolOptimizedBase, {
+    foodWorkerDaysPerYear: defaults.foodWorkerDaysPerYear,
+    lowFuelAnnualBaseline: annualLowFuelEvaluated,
+    annualReferenceLabourDaysPerHa: annualLowFuelEvaluated.labourDaysPerHaAtMaturity,
+    annualReferencePeakHarvestShare: annualLowFuelEvaluated.peakHarvestShare
+  });
   for (const system of productionSystemLeverage) {
     system.manageableHaMultiplierVsAnnualLowFuelEfficient = annualLowFuelEvaluated.manageableHaPerWorkerAtMaturity > 0
       ? system.manageableHaPerWorkerAtMaturity / annualLowFuelEvaluated.manageableHaPerWorkerAtMaturity : 0;
@@ -1077,6 +1335,10 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
       ? system.onLandManageableHaPerWorkerAtMaturity / annualLowFuelHandEvaluated.onLandManageableHaPerWorkerAtMaturity : 0;
     system.totalSystemManageableHaMultiplierVsAnnualLowFuelHandScale = annualLowFuelHandEvaluated.systemManageableHaPerWorkerAtMaturity > 0
       ? system.systemManageableHaPerWorkerAtMaturity / annualLowFuelHandEvaluated.systemManageableHaPerWorkerAtMaturity : 0;
+    system.onLandManageableHaMultiplierVsAnnualSmallToolOptimized = annualSmallToolOptimizedEvaluated.onLandManageableHaPerWorkerAtMaturity > 0
+      ? system.onLandManageableHaPerWorkerAtMaturity / annualSmallToolOptimizedEvaluated.onLandManageableHaPerWorkerAtMaturity : 0;
+    system.totalSystemManageableHaMultiplierVsAnnualSmallToolOptimized = annualSmallToolOptimizedEvaluated.systemManageableHaPerWorkerAtMaturity > 0
+      ? system.systemManageableHaPerWorkerAtMaturity / annualSmallToolOptimizedEvaluated.systemManageableHaPerWorkerAtMaturity : 0;
     system.totalLabourReductionPctVsAnnualLowFuelEfficient = ((annualLowFuelEvaluated.labourDaysPerHaAtMaturity - system.labourDaysPerHaAtMaturity)
       / Math.max(1e-9, annualLowFuelEvaluated.labourDaysPerHaAtMaturity)) * 100;
     system.totalLabourReductionPctVsAnnualLowFuelHandScale = ((annualLowFuelHandEvaluated.labourDaysPerHaAtMaturity - system.labourDaysPerHaAtMaturity)
@@ -1112,11 +1374,28 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     systemById
   });
 
+  const handToolCapacityReference = HAND_TOOL_CAPACITY_REFERENCE.map((r) => ({
+    ...r,
+    lowLabourDaysPerHa: defaults.foodWorkerDaysPerYear / r.highHaPerFullTimeWorker,
+    baselineLabourDaysPerHa: defaults.foodWorkerDaysPerYear / r.baselineHaPerFullTimeWorker,
+    highLabourDaysPerHa: defaults.foodWorkerDaysPerYear / r.lowHaPerFullTimeWorker
+  }));
+
   const harvestWindowDiagnostics = {
     annualLowFuelEfficient: {
       peakHarvestShare: annualLowFuelEvaluated.peakHarvestShare,
       harvestConcentrationIndex: annualLowFuelEvaluated.harvestConcentrationIndex,
       rollingHarvestAdvantage: annualLowFuelEvaluated.rollingHarvestAdvantage
+    },
+    annualSmallToolOptimized: {
+      manageableHaPerWorker: systemById.get('annualSmallToolOptimized')?.systemManageableHaPerWorkerAtMaturity ?? 0,
+      referenceSystem: 'efficientSmallScaleAnnualField',
+      inReferenceRange: (() => {
+        const ref = handToolCapacityReference.find((r) => r.system === 'efficientSmallScaleAnnualField');
+        const x = systemById.get('annualSmallToolOptimized')?.systemManageableHaPerWorkerAtMaturity ?? 0;
+        return x >= ref.lowHaPerFullTimeWorker && x <= ref.highHaPerFullTimeWorker;
+      })(),
+      classification: 'optimizedSmallToolUpperEnd'
     },
     annualLowFuelHandScale: {
       peakHarvestShare: annualLowFuelHandEvaluated.peakHarvestShare,
@@ -1138,6 +1417,61 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   const assumedRegionalProcessingAvailableFTE = Math.max(10, Math.round(regional.availableFoodWorkerFTE * 0.12));
   const regionalProcessingCapacityGapFTE = Math.max(0, regionalProcessingWorkerFTE - assumedRegionalProcessingAvailableFTE);
   const processingInfrastructureNeeded = ['mill', 'sheller', 'dryer', 'coldStorage', 'press', 'foodHub'];
+  const currentModelHandToolComparison = {
+    annualLowFuelHandScale: {
+      manageableHaPerWorker: systemById.get('annualLowFuelHandScale')?.systemManageableHaPerWorkerAtMaturity ?? 0,
+      referenceSystem: 'handScaleAnnualStaples',
+      inReferenceRange: (() => {
+        const ref = handToolCapacityReference.find((r) => r.system === 'handScaleAnnualStaples');
+        const x = systemById.get('annualLowFuelHandScale')?.systemManageableHaPerWorkerAtMaturity ?? 0;
+        return x >= ref.lowHaPerFullTimeWorker && x <= ref.highHaPerFullTimeWorker;
+      })()
+    },
+    annualLowFuelEfficient: {
+      manageableHaPerWorker: systemById.get('annualLowFuelEfficient')?.systemManageableHaPerWorkerAtMaturity ?? 0,
+      referenceSystem: 'efficientSmallScaleAnnualField',
+      inReferenceRange: (() => {
+        const ref = handToolCapacityReference.find((r) => r.system === 'efficientSmallScaleAnnualField');
+        const x = systemById.get('annualLowFuelEfficient')?.systemManageableHaPerWorkerAtMaturity ?? 0;
+        return x >= ref.lowHaPerFullTimeWorker && x <= ref.highHaPerFullTimeWorker;
+      })()
+    },
+    annualSmallToolOptimized: {
+      manageableHaPerWorker: systemById.get('annualSmallToolOptimized')?.systemManageableHaPerWorkerAtMaturity ?? 0,
+      referenceSystem: 'efficientSmallScaleAnnualField',
+      inReferenceRange: (() => {
+        const ref = handToolCapacityReference.find((r) => r.system === 'efficientSmallScaleAnnualField');
+        const x = systemById.get('annualSmallToolOptimized')?.systemManageableHaPerWorkerAtMaturity ?? 0;
+        return x >= ref.lowHaPerFullTimeWorker && x <= ref.highHaPerFullTimeWorker;
+      })(),
+      classification: 'optimizedSmallToolUpperEnd'
+    },
+    perennialStapleBulkLowCareOnLand: {
+      manageableHaPerWorker: systemById.get('perennialStapleBulkLowCare')?.onLandManageableHaPerWorkerAtMaturity ?? 0,
+      referenceSystem: 'maturePerennialStapleLowCare',
+      inReferenceRange: (() => {
+        const ref = handToolCapacityReference.find((r) => r.system === 'maturePerennialStapleLowCare');
+        const x = systemById.get('perennialStapleBulkLowCare')?.onLandManageableHaPerWorkerAtMaturity ?? 0;
+        return x >= ref.lowHaPerFullTimeWorker && x <= ref.highHaPerFullTimeWorker;
+      })()
+    }
+  };
+  const animalPowerSystems = DRAFT_ANIMAL_SYSTEMS;
+  const animalPowerScenarios = buildAnimalPowerScenarios({
+    regional,
+    availableFoodLabourDays: regional.totalAvailableFoodLabourDays,
+    foodWorkerDaysPerYear: defaults.foodWorkerDaysPerYear,
+    lowFuelScenario,
+    systemById
+  });
+  const animalFeedLandTradeoffs = animalPowerScenarios.map((s) => ({
+    scenario: s.scenario,
+    animalSystem: s.animalSystem,
+    feedHaRequired: s.feedHaRequired,
+    feedFromPastureFodderHa: s.feedFromPastureFodderHa,
+    feedFromHumanFoodCropHa: s.feedFromHumanFoodCropHa,
+    feedCompetitionWithHumanFoodGJ: s.feedCompetitionWithHumanFoodGJ
+  }));
 
   const json = {
     generatedAt: new Date().toISOString(),
@@ -1169,6 +1503,11 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
       processingCanBeCentralized: true,
       processingInfrastructureNeeded
     },
+    animalPowerSystems,
+    animalPowerScenarios,
+    animalFeedLandTradeoffs,
+    handToolCapacityReference,
+    currentModelHandToolComparison,
     caveats: [
       'lots/concessions are not ownership parcels',
       'no address-point population distribution yet',
@@ -1188,8 +1527,8 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   ]));
 
   const scenarioCsvPath = path.join(produceDir, 'grey-labour-land-scenarios.csv');
-  fs.writeFileSync(scenarioCsvPath, toCsv(scenarios, [
-    'scenario','machinerySupportFactor','fuelInputIndex','labourDaysPerHumanFoodHa','requiredFoodLabourDays','availableFoodLabourDays','labourDeficitDays','requiredFoodWorkerFTE','availableFoodWorkerFTE','productiveHaPerFoodWorker','foodWorkersNeededPer100Ha','additionalHumansNeededVsCurrent','fossilFuelLeverageRatio','notes'
+  fs.writeFileSync(scenarioCsvPath, toCsv(animalPowerScenarios, [
+    'scenario','productiveHa','feedHaRequired','netHumanFoodHaAfterFeed','requiredHumanFoodLabourDays','animalCareLabourDays','totalHumanLabourDays','availableFoodLabourDays','labourDeficitDays','requiredHumanFTE','animalTeamsNeeded','animalsNeeded','dieselDisplacedLitre','foodEnergyOpportunityCostGJ','netFoodEnergyAfterAnimalFeedGJ','notes'
   ]));
 
   const permacultureSystemsCsvPath = path.join(produceDir, 'grey-labour-land-permaculture-systems.csv');
@@ -1200,6 +1539,16 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   const permacultureScenariosCsvPath = path.join(produceDir, 'grey-labour-land-permaculture-scenarios.csv');
   fs.writeFileSync(permacultureScenariosCsvPath, toCsv(permacultureAdoptionScenarios, [
     'scenario','transitionedHa','establishmentLabourDays','totalLabourDaysAtMaturity','totalFoodEnergyGJAtMaturity','foodWorkerFTEAtMaturity','labourDeficitDaysAtMaturity','effectiveProductiveHaPerWorker','permacultureLeverageMultiplier','yearsUntilMaturity','caveats'
+  ]));
+
+  const animalPowerScenariosCsvPath = path.join(produceDir, 'grey-labour-land-animal-power-scenarios.csv');
+  fs.writeFileSync(animalPowerScenariosCsvPath, toCsv(animalPowerScenarios, [
+    'scenario','animalSystem','animalTeamsNeeded','animalsNeeded','feedHaRequired','hayPastureHaRequired','grainFeedHaRequired','feedLandShareOfProductiveHa','animalFeedEnergyGJ','foodEnergyOpportunityCostGJ','dieselDisplacedLitre','humanLabourReducedDays','animalCareLabourDays','netHumanLabourChangeDays','netHumanFoodHaAfterFeed','netFoodEnergyAfterAnimalFeedGJ','requiredHumanFTE','labourDeficitDays','notes'
+  ]));
+
+  const handToolCapacityCsvPath = path.join(produceDir, 'grey-labour-land-hand-tool-capacity.csv');
+  fs.writeFileSync(handToolCapacityCsvPath, toCsv(handToolCapacityReference, [
+    'system','lowHaPerFullTimeWorker','baselineHaPerFullTimeWorker','highHaPerFullTimeWorker','lowLabourDaysPerHa','baselineLabourDaysPerHa','highLabourDaysPerHa','notes'
   ]));
 
   const markdown = [
@@ -1247,6 +1596,25 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     'The multiplier depends heavily on the annual baseline definition. Gains are usually smaller versus efficient annual systems and larger versus hand-scale annual systems with repeated soil prep and weeding.',
     'Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems, not immediate garden output; establishment time and delayed yields remain significant constraints.',
     '',
+    '## Animal power and feed-land tradeoffs',
+    'Draft animals can substitute for some fuel/machinery work, especially hauling, cultivation, mowing, logging, and cartage. But this is not free energy: animals require feed land, daily care, handling skill, equipment, and overwintering.',
+    '| System | Animals needed | Feed ha required | Feed-land share | Human labour change | Diesel displaced | Net food-energy opportunity cost | Main bottleneck |',
+    '|---|---:|---:|---:|---:|---:|---:|---|',
+    ...animalPowerScenarios.map((s) => `| ${s.scenario} (${s.animalSystem}) | ${s.animalsNeeded.toFixed(0)} | ${s.feedHaRequired.toFixed(2)} | ${s.feedLandShareOfProductiveHa.toFixed(3)} | ${s.netHumanLabourChangeDays.toFixed(2)} | ${s.dieselDisplacedLitre.toFixed(2)} | ${s.foodEnergyOpportunityCostGJ.toFixed(2)} | feed land + care labour + seasonal limits |`),
+    '',
+    '## Hand-tool land-tending capacity',
+    'There is no single correct number. Capacity depends on crop type, intensity, harvest frequency, soil condition, tools, skill, layout, irrigation, weed pressure, processing arrangements, and whether the system is annual or perennial.',
+    '| System | Low ha/person | Baseline ha/person | High ha/person | Baseline labour days/ha | Notes |',
+    '|---|---:|---:|---:|---:|---|',
+    ...handToolCapacityReference.map((r) => `| ${r.system} | ${r.lowHaPerFullTimeWorker.toFixed(2)} | ${r.baselineHaPerFullTimeWorker.toFixed(2)} | ${r.highHaPerFullTimeWorker.toFixed(2)} | ${r.baselineLabourDaysPerHa.toFixed(2)} | ${r.notes} |`),
+    '',
+    'Model annual baselines are calibrated to these hand-tool reference ranges. `annualSmallToolOptimized` is an upper-end optimized small-tool case, not ordinary hand-tool production.',
+    `Current annualLowFuelHandScale manageable ha/worker: ${currentModelHandToolComparison.annualLowFuelHandScale.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.annualLowFuelHandScale.inReferenceRange ? 'inside' : 'outside'} handScaleAnnualStaples range)`,
+    `Current annualLowFuelEfficient manageable ha/worker: ${currentModelHandToolComparison.annualLowFuelEfficient.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.annualLowFuelEfficient.inReferenceRange ? 'inside' : 'outside'} efficientSmallScaleAnnualField range)`,
+    `Current annualSmallToolOptimized manageable ha/worker: ${currentModelHandToolComparison.annualSmallToolOptimized.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.annualSmallToolOptimized.inReferenceRange ? 'inside' : 'outside'} efficientSmallScaleAnnualField range; optimized upper-end case)`,
+    `Current perennialStapleBulkLowCare on-land manageable ha/worker: ${currentModelHandToolComparison.perennialStapleBulkLowCareOnLand.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.perennialStapleBulkLowCareOnLand.inReferenceRange ? 'inside' : 'outside'} maturePerennialStapleLowCare range)`,
+    `perennialStapleBulkLowCare on-land multipliers: vs annualLowFuelHandScale ${((systemById.get('perennialStapleBulkLowCare')?.onLandManageableHaMultiplierVsAnnualLowFuelHandScale) ?? 0).toFixed(3)}, vs annualLowFuelEfficient ${((systemById.get('perennialStapleBulkLowCare')?.onLandManageableHaMultiplierVsAnnualLowFuelEfficient) ?? 0).toFixed(3)}, vs annualSmallToolOptimized ${((systemById.get('perennialStapleBulkLowCare')?.onLandManageableHaMultiplierVsAnnualSmallToolOptimized) ?? 0).toFixed(3)}`,
+    '',
     '## Caveats',
     '- lots/concessions are not ownership parcels',
     '- no address-point population distribution yet',
@@ -1255,6 +1623,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     '- labour assumptions are coarse scenario diagnostics',
     '- output is a scenario baseline, not a farm-capacity study',
     '- perennial/permaculture requires establishment labour and skill; this is not magic yield',
+    '- animal power is not free energy: feed land, care labour, and overwintering burdens are explicit',
     ...(warnings.length > 0 ? ['', '## Warnings', ...warnings.map((w) => `- ${w}`)] : [])
   ].join('\n');
 
@@ -1263,6 +1632,6 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
 
   return {
     report: json,
-    paths: { markdownPath, jsonPath, municipalityCsvPath, scenarioCsvPath, permacultureSystemsCsvPath, permacultureScenariosCsvPath }
+    paths: { markdownPath, jsonPath, municipalityCsvPath, scenarioCsvPath, permacultureSystemsCsvPath, permacultureScenariosCsvPath, animalPowerScenariosCsvPath, handToolCapacityCsvPath }
   };
 }

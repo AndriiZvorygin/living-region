@@ -59,9 +59,12 @@ describe('grey labour-land baseline report', () => {
     expect(fs.existsSync(paths.scenarioCsvPath)).toBe(true);
     expect(fs.existsSync(paths.permacultureSystemsCsvPath)).toBe(true);
     expect(fs.existsSync(paths.permacultureScenariosCsvPath)).toBe(true);
+    expect(fs.existsSync(paths.animalPowerScenariosCsvPath)).toBe(true);
+    expect(fs.existsSync(paths.handToolCapacityCsvPath)).toBe(true);
 
     const lowFuelEfficient = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuelEfficient');
     const lowFuelHand = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuelHandScale');
+    const annualSmallToolOptimized = report.productionSystemLeverage.find((s) => s.system === 'annualSmallToolOptimized');
     const maturePermaculture = report.productionSystemLeverage.find((s) => s.system === 'maturePermacultureLowCare');
     const maturePermacultureHarvestIntensive = report.productionSystemLeverage.find((s) => s.system === 'maturePermacultureHarvestIntensive');
     const perennialStapleBulkLowCare = report.productionSystemLeverage.find((s) => s.system === 'perennialStapleBulkLowCare');
@@ -78,6 +81,16 @@ describe('grey labour-land baseline report', () => {
     expect(perennialStapleBulkLowCare.onLandManageableHaPerWorkerAtMaturity).toBeGreaterThan(perennialStapleBulkLowCare.systemManageableHaPerWorkerAtMaturity);
     expect(perennialStapleBulkLowCare.systemManageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelHand.systemManageableHaPerWorkerAtMaturity);
     expect(perennialStapleBulkLowCare.yearsUntilFoodEnergyMaturity).toBeGreaterThan(0);
+    const horseScenario = report.animalPowerScenarios.find((s) => s.scenario === 'lowFuelWithHorseTeams');
+    const mixedScenario = report.animalPowerScenarios.find((s) => s.scenario === 'lowFuelWithMixedAnimalPower');
+    const comboScenario = report.animalPowerScenarios.find((s) => s.scenario === 'lowFuelWithPerennialStaplesAndAnimalPower');
+    expect(horseScenario.feedHaRequired).toBeGreaterThan(0);
+    expect(horseScenario.dieselDisplacedLitre).toBeGreaterThan(0);
+    expect(horseScenario.animalCareLabourDays).toBeGreaterThan(0);
+    expect(horseScenario.netHumanFoodHaAfterFeed).toBeLessThanOrEqual(horseScenario.productiveHa);
+    expect(comboScenario.feedLandShareOfProductiveHa).toBeGreaterThan(0);
+    expect(comboScenario.netFoodEnergyAfterAnimalFeedGJ).toBeLessThanOrEqual(comboScenario.netHumanFoodHaAfterFeed * perennialStapleBulkLowCare.annualFoodEnergyGJPerHaAtMaturity + 1e-6);
+    expect(mixedScenario.netHumanLabourChangeDays).not.toBeNaN();
     expect(maturePermaculture.peakHarvestShare).toBeLessThan(annualMechanized.peakHarvestShare);
     expect(maturePermaculture.manageableHaMultiplierVsAnnualLowFuelHandScale).toBeGreaterThan(
       maturePermaculture.manageableHaMultiplierVsAnnualLowFuelEfficient
@@ -97,9 +110,36 @@ describe('grey labour-land baseline report', () => {
     const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
     expect(markdown).toContain('System | Soil prep | Planting | Weeding | Harvest | Processing | On-land labour/ha | Processing labour/ha | Total system labour/ha');
     expect(markdown).toContain('Post-harvest processing is separated from on-land labour');
+    expect(markdown).toContain('not free energy');
+    expect(markdown).toContain('feed land');
     expect(markdown).toContain('Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems');
     expect(markdown).toContain('not magic yield');
     expect(markdown).toContain('requires establishment labour and skill');
+
+    const animalCsv = fs.readFileSync(paths.animalPowerScenariosCsvPath, 'utf8');
+    expect(animalCsv).toContain('feedHaRequired');
+    expect(animalCsv).toContain('dieselDisplacedLitre');
+    const handToolCsv = fs.readFileSync(paths.handToolCapacityCsvPath, 'utf8');
+    expect(handToolCsv).toContain('baselineLabourDaysPerHa');
+    expect(handToolCsv).toContain('intensiveMarketGardenHandTools');
+
+    const refs = report.handToolCapacityReference;
+    const market = refs.find((r) => r.system === 'intensiveMarketGardenHandTools');
+    const annual = refs.find((r) => r.system === 'efficientSmallScaleAnnualField');
+    const perennial = refs.find((r) => r.system === 'maturePerennialStapleLowCare');
+    const handAnnual = refs.find((r) => r.system === 'handScaleAnnualStaples');
+    expect(market.baselineLabourDaysPerHa).toBeCloseTo(220 / market.baselineHaPerFullTimeWorker, 6);
+    expect(market.baselineHaPerFullTimeWorker).toBeLessThan(annual.baselineHaPerFullTimeWorker);
+    expect(perennial.baselineHaPerFullTimeWorker).toBeGreaterThan(handAnnual.baselineHaPerFullTimeWorker);
+    expect(report.currentModelHandToolComparison.annualLowFuelHandScale.manageableHaPerWorker).toBeGreaterThan(0);
+    expect(report.currentModelHandToolComparison.annualLowFuelHandScale.inReferenceRange).toBe(true);
+    expect(report.currentModelHandToolComparison.annualLowFuelEfficient.inReferenceRange).toBe(true);
+    expect(report.currentModelHandToolComparison.annualSmallToolOptimized.classification).toBe('optimizedSmallToolUpperEnd');
+    expect(annualSmallToolOptimized.systemManageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelEfficient.systemManageableHaPerWorkerAtMaturity);
+    expect(perennialStapleBulkLowCare.onLandManageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelHand.onLandManageableHaPerWorkerAtMaturity);
+    expect(perennialStapleBulkLowCare.onLandManageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelEfficient.onLandManageableHaPerWorkerAtMaturity);
+    expect(markdown).toContain('There is no single correct number');
+    expect(markdown).toContain('annualSmallToolOptimized');
   });
 
   test('missing lots file emits clear warning', () => {

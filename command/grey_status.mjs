@@ -19,6 +19,7 @@ function readLatestMetrics() {
 try {
   const { report, paths } = buildGreyPublicBaselineReport();
   const latest = readLatestMetrics();
+  const maxWarningLines = 25;
 
   console.log('Grey Model Status');
   console.log('Core real layers loaded:');
@@ -53,7 +54,12 @@ try {
 
   if (report.warnings.length > 0) {
     console.log('Warnings:');
-    for (const warning of report.warnings) console.log(`  - ${warning}`);
+    for (const warning of report.warnings.slice(0, maxWarningLines)) {
+      console.log(`  - ${warning}`);
+    }
+    if (report.warnings.length > maxWarningLines) {
+      console.log(`  - ... ${report.warnings.length - maxWarningLines} more warnings suppressed`);
+    }
   }
 } catch (error) {
   console.error(`grey:status failed: ${error.message}`);
