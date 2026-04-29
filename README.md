@@ -237,6 +237,21 @@ Outputs:
 
 This report summarizes the real Grey County Open Data currently loaded and separates real spatial inputs from modelled assumptions.
 
+### Land-access baseline
+
+```bash
+npm run report:grey:land-access
+```
+
+Outputs:
+
+- `know/produce/grey-land-access-baseline.md`
+- `know/produce/grey-land-access-baseline.json`
+- `know/produce/grey-land-access-municipality-summary.csv`
+- `know/produce/grey-land-access-lot-detail.csv`
+
+This report uses the real Grey Lots and Concessions layer as a land-structure reference and explicitly does not treat it as parcel ownership.
+
 ## Real-data priority
 
 Minimum real GIS layers to replace generated geometry:

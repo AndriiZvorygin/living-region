@@ -35,6 +35,7 @@
     "report:grey:baseline": "node command/report_grey_baseline.mjs",
     "report:grey:secondary": "node command/report_grey_secondary.mjs",
     "report:grey:public-baseline": "node command/report_grey_public_baseline.mjs",
+    "report:grey:land-access": "node command/report_grey_land_access.mjs",
     "grey:open-data": "node command/grey_open_data.mjs",
     "grey:discover-data": "node command/discover_grey_open_data.mjs",
     "grey:discover-all-data": "node command/discover_all_grey_data.mjs",
