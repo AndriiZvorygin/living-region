@@ -94,24 +94,98 @@ function buildSensitivityRows(context) {
     annualStapleCandidateHa,
     perennialStapleCandidateHa,
     marketGardenCandidateHa,
-    labourAvailableFTE
+    labourAvailableFTE,
+    estimatedAgriculturalHa,
+    estimatedRuralFoodPotentialHa
   } = context;
   const totalPopulation = greyCountySeedNodes.reduce((s, m) => s + n(m.population2021), 0);
   const totalFoodDemandGJ = totalPopulation * ANNUAL_FOOD_ENERGY_GJ_PER_PERSON;
   const rows = [];
   const profiles = new Map(YIELD_PROFILES.map((p) => [p.profile, p]));
   const defs = [
-    { scenario: 'currentModelAssumption', profile: 'baselineAnnualStaples', candidateShare: 0.55, lossFactor: 1, labourFactor: 1, perennialShare: 0 },
-    { scenario: 'conservativeAnnualStaples', profile: 'conservativeAnnualStaples', candidateShare: 0.5, lossFactor: 1.05, labourFactor: 1.05, perennialShare: 0 },
-    { scenario: 'baselineAnnualStaples', profile: 'baselineAnnualStaples', candidateShare: 0.58, lossFactor: 1, labourFactor: 1, perennialShare: 0 },
-    { scenario: 'perennialTransitionMature', profile: 'perennialStapleMature', candidateShare: 0.52, lossFactor: 0.95, labourFactor: 0.85, perennialShare: 0.5 },
-    { scenario: 'mixedResilienceFoodSystem', profile: 'mixedPermacultureMature', candidateShare: 0.62, lossFactor: 0.95, labourFactor: 0.9, perennialShare: 0.45 },
-    { scenario: 'highLocalProduction', profile: 'highAnnualStaples', candidateShare: 0.75, lossFactor: 0.9, labourFactor: 1.15, perennialShare: 0.25 }
+    {
+      scenario: 'presentIndustrialFossilBaseline',
+      profile: 'highAnnualStaples',
+      candidateShare: 1,
+      candidateLandHaOverride: estimatedAgriculturalHa + estimatedRuralFoodPotentialHa * 0.82,
+      lossFactor: 0.92,
+      labourFactor: 0.92,
+      perennialShare: 0.06,
+      fossilInputSupport: 'high',
+      supplyChainDependence: 'high',
+      mainBottleneck: 'localCropMixAndSupplyChainOrientation',
+      interpretation: 'Gross land-base potential under present industrial inputs; not actual local self-reliance.'
+    },
+    {
+      scenario: 'localizedPresentTechBaseline',
+      profile: 'baselineAnnualStaples',
+      candidateShare: 0.86,
+      candidateLandHaOverride: humanFoodPriorityHa * 0.86,
+      lossFactor: 0.95,
+      labourFactor: 0.95,
+      perennialShare: 0.22,
+      fossilInputSupport: 'high',
+      supplyChainDependence: 'moderate-high',
+      mainBottleneck: 'processingStorageAndCropMixRedirection',
+      interpretation: 'Current technology with local/regional food orientation and stronger local processing.'
+    },
+    {
+      scenario: 'constrainedLocalFoodBaseline',
+      profile: 'baselineAnnualStaples',
+      candidateShare: 0.55,
+      candidateLandHaOverride: humanFoodPriorityHa * 0.55,
+      lossFactor: 1,
+      labourFactor: 1,
+      perennialShare: 0,
+      fossilInputSupport: 'reduced',
+      supplyChainDependence: 'moderate',
+      mainBottleneck: 'candidateLandAndLabourAccess',
+      interpretation: 'Constrained local resilience assumption; diagnostic for transition pressure, not measured present production.'
+    },
+    {
+      scenario: 'lowFuelTransitionBaseline',
+      profile: 'conservativeAnnualStaples',
+      candidateShare: 0.5,
+      candidateLandHaOverride: humanFoodPriorityHa * 0.5,
+      lossFactor: 1.07,
+      labourFactor: 1.1,
+      perennialShare: 0.1,
+      fossilInputSupport: 'low',
+      supplyChainDependence: 'low-moderate',
+      mainBottleneck: 'labourInputsAndMachineryConstraints',
+      interpretation: 'Low-fuel transition with tighter diesel/input/machinery support and higher labour burden.'
+    },
+    {
+      scenario: 'perennialLowFuelTransition',
+      profile: 'perennialStapleMature',
+      candidateShare: 0.52,
+      candidateLandHaOverride: humanFoodPriorityHa * 0.52,
+      lossFactor: 0.96,
+      labourFactor: 0.88,
+      perennialShare: 0.55,
+      fossilInputSupport: 'low',
+      supplyChainDependence: 'low-moderate',
+      mainBottleneck: 'maturityDelayAndProcessingBuildout',
+      interpretation: 'Low-fuel transition with mature perennial share partially easing recurring labour.'
+    },
+    {
+      scenario: 'foodResilienceMaximumPlausible',
+      profile: 'highAnnualStaples',
+      candidateShare: 0.92,
+      candidateLandHaOverride: humanFoodPriorityHa * 0.92,
+      lossFactor: 0.88,
+      labourFactor: 1.02,
+      perennialShare: 0.45,
+      fossilInputSupport: 'moderate',
+      supplyChainDependence: 'moderate',
+      mainBottleneck: 'coordinationAndInfrastructureScaleup',
+      interpretation: 'Upper-bound local resilience envelope assuming strong land, labour, and processing coordination.'
+    }
   ];
 
   for (const d of defs) {
     const p = profiles.get(d.profile);
-    const candidateFoodHa = humanFoodPriorityHa * d.candidateShare;
+    const candidateFoodHa = n(d.candidateLandHaOverride, humanFoodPriorityHa * d.candidateShare);
     const profileNet = p.netFoodEnergyGJPerHa / d.lossFactor;
     const perennialAdj = d.perennialShare > 0 ? (perennialStapleCandidateHa / Math.max(1, candidateFoodHa)) * 0.08 : 0;
     const marketAdj = (marketGardenCandidateHa / Math.max(1, candidateFoodHa)) * 0.03;
@@ -129,6 +203,7 @@ function buildSensitivityRows(context) {
       yieldProfile: d.profile,
       candidateFoodHa,
       netFoodEnergyGJ,
+      netGJPerHa: profileNet,
       foodCoverage,
       foodSurplusGJ,
       requiredHaForSelfCoverage,
@@ -139,10 +214,88 @@ function buildSensitivityRows(context) {
       candidateLandShare: d.candidateShare,
       perennialMaturityShare: d.perennialShare,
       fossilInputConstraintFactor: d.lossFactor,
+      machinerySupportFactor: d.labourFactor <= 1 ? 1 : 1 / d.labourFactor,
+      inputConstraintFactor: 1 / d.lossFactor,
+      labourConstraintFactor: d.labourFactor,
+      candidateLandBasis: d.scenario === 'presentIndustrialFossilBaseline'
+        ? 'agricultural + suitable rural land under present industrial input assumptions'
+        : 'human-food-priority and transition candidate land',
+      fossilInputSupport: d.fossilInputSupport,
+      supplyChainDependence: d.supplyChainDependence,
+      mainBottleneck: d.mainBottleneck,
+      interpretation: d.interpretation,
       limitingFactor
     });
   }
   return { rows, totalFoodDemandGJ, totalPopulation };
+}
+
+function buildSensitivityDriverAnalysis(sensitivityRows) {
+  const baseline = sensitivityRows.find((r) => r.scenario === 'constrainedLocalFoodBaseline') ?? sensitivityRows[0];
+  const deltas = sensitivityRows
+    .filter((r) => r !== baseline)
+    .map((r) => ({
+      scenario: r.scenario,
+      foodCoverageDelta: r.foodCoverage - baseline.foodCoverage,
+      foodSurplusGJDelta: r.foodSurplusGJ - baseline.foodSurplusGJ,
+      netFoodEnergyGJDelta: r.netFoodEnergyGJ - baseline.netFoodEnergyGJ,
+      limitingFactorChange: `${baseline.limitingFactor} -> ${r.limitingFactor}`,
+      candidateLandHaDelta: r.candidateFoodHa - baseline.candidateFoodHa,
+      yieldGJPerHaDelta: (r.netFoodEnergyGJ / Math.max(1, r.candidateFoodHa)) - (baseline.netFoodEnergyGJ / Math.max(1, baseline.candidateFoodHa)),
+      lossShareDelta: r.lossShare - baseline.lossShare,
+      labourConstraintDelta: r.labourRequiredFTE - baseline.labourRequiredFTE,
+      maturityConstraintDelta: r.perennialMaturityShare - baseline.perennialMaturityShare
+    }));
+
+  const driverCandidates = [
+    { driver: 'candidate land share', baselineValue: baseline.candidateLandShare, changedValue: Math.max(...sensitivityRows.map((r) => r.candidateLandShare)), scenario: sensitivityRows.find((r) => r.candidateLandShare === Math.max(...sensitivityRows.map((x) => x.candidateLandShare)))?.scenario ?? baseline.scenario },
+    { driver: 'yield profile', baselineValue: baseline.yieldProfile, changedValue: sensitivityRows.find((r) => r.yieldProfile !== baseline.yieldProfile)?.yieldProfile ?? baseline.yieldProfile, scenario: sensitivityRows.find((r) => r.yieldProfile !== baseline.yieldProfile)?.scenario ?? baseline.scenario },
+    { driver: 'loss share', baselineValue: baseline.lossShare, changedValue: Math.min(...sensitivityRows.map((r) => r.lossShare)), scenario: sensitivityRows.find((r) => r.lossShare === Math.min(...sensitivityRows.map((x) => x.lossShare)))?.scenario ?? baseline.scenario },
+    { driver: 'perennial maturity share', baselineValue: baseline.perennialMaturityShare, changedValue: Math.max(...sensitivityRows.map((r) => r.perennialMaturityShare)), scenario: sensitivityRows.find((r) => r.perennialMaturityShare === Math.max(...sensitivityRows.map((x) => x.perennialMaturityShare)))?.scenario ?? baseline.scenario },
+    { driver: 'labour availability', baselineValue: baseline.labourAvailableFTE, changedValue: baseline.labourAvailableFTE, scenario: baseline.scenario },
+    { driver: 'input/fossil constraint factor', baselineValue: baseline.fossilInputConstraintFactor, changedValue: Math.max(...sensitivityRows.map((r) => r.fossilInputConstraintFactor)), scenario: sensitivityRows.find((r) => r.fossilInputConstraintFactor === Math.max(...sensitivityRows.map((x) => x.fossilInputConstraintFactor)))?.scenario ?? baseline.scenario }
+  ];
+
+  const drivers = driverCandidates.map((d) => {
+    const scenario = sensitivityRows.find((r) => r.scenario === d.scenario) ?? baseline;
+    const foodCoverageDelta = scenario.foodCoverage - baseline.foodCoverage;
+    const foodSurplusGJDelta = scenario.foodSurplusGJ - baseline.foodSurplusGJ;
+    return {
+      driver: d.driver,
+      baselineValue: d.baselineValue,
+      changedValue: d.changedValue,
+      scenario: scenario.scenario,
+      foodCoverageDelta,
+      foodSurplusGJDelta,
+      interpretation: foodCoverageDelta >= 0
+        ? `Increases coverage by ${foodCoverageDelta.toFixed(3)}`
+        : `Decreases coverage by ${Math.abs(foodCoverageDelta).toFixed(3)}`
+    };
+  }).sort((a, b) => Math.abs(b.foodCoverageDelta) - Math.abs(a.foodCoverageDelta));
+
+  return { baseline, deltas, drivers };
+}
+
+function buildSelfCoverageThresholds({ baselineScenario, totalFoodDemandGJ, humanFoodPriorityHa }) {
+  const baselineNetPerHa = baselineScenario.netFoodEnergyGJ / Math.max(1, baselineScenario.candidateFoodHa);
+  const requiredNetFoodEnergyGJForSelfCoverage = totalFoodDemandGJ;
+  const additionalNetFoodEnergyGJNeeded = Math.max(0, requiredNetFoodEnergyGJForSelfCoverage - baselineScenario.netFoodEnergyGJ);
+  const requiredNetGJPerHumanFoodPriorityHa = requiredNetFoodEnergyGJForSelfCoverage / Math.max(1, humanFoodPriorityHa);
+  const requiredHumanFoodPriorityHaAtCurrentYield = requiredNetFoodEnergyGJForSelfCoverage / Math.max(0.0001, baselineNetPerHa);
+  const requiredCandidateLandShareAtCurrentYield = requiredHumanFoodPriorityHaAtCurrentYield / Math.max(1, humanFoodPriorityHa);
+  const requiredYieldMultiplierAtCurrentLand = requiredNetFoodEnergyGJForSelfCoverage / Math.max(1, baselineScenario.netFoodEnergyGJ);
+  const requiredLossReductionForSelfCoverage = 1 - (baselineScenario.lossShare / Math.max(0.0001, requiredYieldMultiplierAtCurrentLand));
+  const requiredPerennialMatureShareForSelfCoverage = Math.min(1, Math.max(0, baselineScenario.perennialMaturityShare + (requiredYieldMultiplierAtCurrentLand - 1) * 0.7));
+  return {
+    requiredNetFoodEnergyGJForSelfCoverage,
+    additionalNetFoodEnergyGJNeeded,
+    requiredNetGJPerHumanFoodPriorityHa,
+    requiredHumanFoodPriorityHaAtCurrentYield,
+    requiredCandidateLandShareAtCurrentYield,
+    requiredYieldMultiplierAtCurrentLand,
+    requiredLossReductionForSelfCoverage,
+    requiredPerennialMatureShareForSelfCoverage
+  };
 }
 
 export function buildGreyFoodSystemCalibration(options = {}) {
@@ -209,10 +362,41 @@ export function buildGreyFoodSystemCalibration(options = {}) {
     ...landSummary,
     labourAvailableFTE
   });
+  const sensitivityDriverAnalysis = buildSensitivityDriverAnalysis(sensitivityRows);
+  const selfCoverageThresholds = buildSelfCoverageThresholds({
+    baselineScenario: sensitivityDriverAnalysis.baseline,
+    totalFoodDemandGJ,
+    humanFoodPriorityHa
+  });
+  const reachesSelfCoverageScenarios = sensitivityRows.filter((r) => r.foodCoverage >= 1).map((r) => r.scenario);
 
   const coverageByScenario = Object.fromEntries(sensitivityRows.map((r) => [r.scenario, r.foodCoverage]));
   const currentMetricsYear = Array.isArray(metrics?.years) ? metrics.years.at(-1) : null;
-  const currentModelAssumption = sensitivityRows.find((r) => r.scenario === 'currentModelAssumption');
+  const constrainedLocalFoodBaseline = sensitivityRows.find((r) => r.scenario === 'constrainedLocalFoodBaseline');
+  const presentIndustrialFossilBaseline = sensitivityRows.find((r) => r.scenario === 'presentIndustrialFossilBaseline');
+  const localizedPresentTechBaseline = sensitivityRows.find((r) => r.scenario === 'localizedPresentTechBaseline');
+  const lowFuelTransitionBaseline = sensitivityRows.find((r) => r.scenario === 'lowFuelTransitionBaseline');
+
+  const grossLandBaseFoodPotentialGJ = n(presentIndustrialFossilBaseline?.netFoodEnergyGJ);
+  const grossLandBaseFoodCoverage = totalFoodDemandGJ > 0 ? grossLandBaseFoodPotentialGJ / totalFoodDemandGJ : 0;
+  const localSustainabilityFoodCoverage = n(localizedPresentTechBaseline?.foodCoverage);
+  const lowFuelFoodCoverage = n(lowFuelTransitionBaseline?.foodCoverage);
+  const landEnoughDiagnostic = {
+    grossLandBaseFoodPotentialGJ,
+    grossLandBaseFoodCoverage,
+    localSustainabilityFoodCoverage,
+    lowFuelFoodCoverage,
+    landBaseEnoughUnderPresentInputs: grossLandBaseFoodCoverage >= 1,
+    transitionConstrainedByLabourOrInputs: lowFuelFoodCoverage < localSustainabilityFoodCoverage,
+    currentSystemLocalSelfRelianceGap: Math.max(0, grossLandBaseFoodCoverage - localSustainabilityFoodCoverage),
+    interpretation: [
+      grossLandBaseFoodCoverage >= 1
+        ? 'land base appears sufficient under present industrial input assumptions'
+        : 'land base appears insufficient for full self-coverage even under present industrial input assumptions',
+      'local self-reliance remains lower when crop mix, storage, processing, and distribution are not redirected',
+      'low-fuel transition capacity is lower because labour, inputs, and maturity constraints become binding'
+    ]
+  };
 
   const diagnostics = {
     landSufficientButLabourConstrained: sensitivityRows.some((r) => r.limitingFactor === 'labourConstrained'),
@@ -235,7 +419,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
     assumptions: {
       annualFoodEnergyGJPerPerson: ANNUAL_FOOD_ENERGY_GJ_PER_PERSON,
       areaMethod,
-      caveat: 'This is calibration scaffolding, not a farm production forecast.'
+      caveat: 'This is calibration scaffolding, not a measured food-capacity claim and not a farm production forecast.'
     },
     sourcePaths: {
       publicBaselinePath,
@@ -260,6 +444,39 @@ export function buildGreyFoodSystemCalibration(options = {}) {
       demandByMunicipality
     },
     plausibilityScenarios: sensitivityRows,
+    foodBaselineComparison: sensitivityRows.map((r) => ({
+      scenario: r.scenario,
+      fossilInputSupport: r.fossilInputSupport,
+      supplyChainDependence: r.supplyChainDependence,
+      candidateLandHa: r.candidateFoodHa,
+      netGJPerHa: r.netGJPerHa,
+      netFoodEnergyGJ: r.netFoodEnergyGJ,
+      foodCoverage: r.foodCoverage,
+      foodSurplusGJ: r.foodSurplusGJ,
+      mainBottleneck: r.mainBottleneck,
+      interpretation: r.interpretation
+    })),
+    landEnoughDiagnostic,
+    presentPotentialVsTransitionConstraints: {
+      presentIndustrialFossilBaseline: presentIndustrialFossilBaseline ?? null,
+      localizedPresentTechBaseline: localizedPresentTechBaseline ?? null,
+      constrainedLocalFoodBaseline: constrainedLocalFoodBaseline ?? null,
+      lowFuelTransitionBaseline: lowFuelTransitionBaseline ?? null
+    },
+    sensitivityDeltasVsCurrent: sensitivityDriverAnalysis.deltas,
+    sensitivityDrivers: sensitivityDriverAnalysis.drivers,
+    selfCoverageThresholds,
+    foodCoverageInterpretation: {
+      whyCurrentLow: [
+        'candidate food-priority land is a subset of total county land',
+        'net GJ/ha assumptions are conservative in baseline',
+        'loss/input/labour/maturity factors reduce usable output'
+      ],
+      reachesSelfCoverageScenarios,
+      statement: reachesSelfCoverageScenarios.length > 0
+        ? `Some scenarios reach self-coverage: ${reachesSelfCoverageScenarios.join(', ')}`
+        : 'No current sensitivity scenario reaches foodCoverage >= 1.0.'
+    },
     coverageByScenario,
     labourCrossCheck: {
       availableFoodWorkerFTE: labourAvailableFTE,
@@ -274,7 +491,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
     },
     comparisonToCurrentModel: {
       currentScenarioFoodCoverage: currentMetricsYear?.localFoodCoverageRatio ?? null,
-      calibratedCurrentAssumptionFoodCoverage: currentModelAssumption?.foodCoverage ?? null
+      calibratedConstrainedLocalFoodBaselineCoverage: constrainedLocalFoodBaseline?.foodCoverage ?? null
     },
     majorUncertainties: [
       'soil capability not yet included',
@@ -320,7 +537,17 @@ export function buildGreyFoodSystemCalibration(options = {}) {
   fs.writeFileSync(sensitivityCsvPath, toCsv(sensitivityRows, [
     'scenario','yieldProfile','candidateFoodHa','netFoodEnergyGJ','foodCoverage','foodSurplusGJ','requiredHaForSelfCoverage',
     'shareOfCandidateLandRequired','labourRequiredFTE','labourAvailableFTE','lossShare','candidateLandShare',
-    'perennialMaturityShare','fossilInputConstraintFactor','limitingFactor'
+    'perennialMaturityShare','fossilInputConstraintFactor','fossilInputSupport','supplyChainDependence','mainBottleneck','limitingFactor'
+  ]));
+
+  const baselineComparisonCsvPath = path.join(produceDir, 'grey-food-calibration-baseline-comparison.csv');
+  fs.writeFileSync(baselineComparisonCsvPath, toCsv(report.foodBaselineComparison, [
+    'scenario','fossilInputSupport','supplyChainDependence','candidateLandHa','netGJPerHa','netFoodEnergyGJ','foodCoverage','foodSurplusGJ','mainBottleneck','interpretation'
+  ]));
+
+  const driversCsvPath = path.join(produceDir, 'grey-food-calibration-drivers.csv');
+  fs.writeFileSync(driversCsvPath, toCsv(sensitivityDriverAnalysis.drivers, [
+    'driver','baselineValue','changedValue','foodCoverageDelta','foodSurplusGJDelta','interpretation'
   ]));
 
   const markdown = [
@@ -356,6 +583,37 @@ export function buildGreyFoodSystemCalibration(options = {}) {
     '|---|---:|---:|---:|---:|---:|---:|---:|---:|---|',
     ...sensitivityRows.map((r) => `| ${r.scenario} | ${r.candidateFoodHa.toFixed(2)} | ${r.netFoodEnergyGJ.toFixed(2)} | ${r.foodCoverage.toFixed(3)} | ${r.foodSurplusGJ.toFixed(2)} | ${r.requiredHaForSelfCoverage.toFixed(2)} | ${r.shareOfCandidateLandRequired.toFixed(3)} | ${r.labourRequiredFTE.toFixed(2)} | ${r.labourAvailableFTE.toFixed(2)} | ${r.limitingFactor} |`),
     '',
+    '## Present potential versus transition constraints',
+    'A county can have enough land in a gross present-industrial sense while still lacking local food self-reliance when crop mix, processing, storage, and distribution are not locally aligned.',
+    '| Scenario | Fossil/input support | Supply-chain dependence | Candidate land ha | Net GJ/ha | Food coverage | Main bottleneck | Interpretation |',
+    '|---|---|---|---:|---:|---:|---|---|',
+    ...report.foodBaselineComparison.map((r) => `| ${r.scenario} | ${r.fossilInputSupport} | ${r.supplyChainDependence} | ${r.candidateLandHa.toFixed(2)} | ${r.netGJPerHa.toFixed(2)} | ${r.foodCoverage.toFixed(3)} | ${r.mainBottleneck} | ${r.interpretation} |`),
+    `- grossLandBaseFoodCoverage: ${landEnoughDiagnostic.grossLandBaseFoodCoverage.toFixed(3)}`,
+    `- localSustainabilityFoodCoverage: ${landEnoughDiagnostic.localSustainabilityFoodCoverage.toFixed(3)}`,
+    `- lowFuelFoodCoverage: ${landEnoughDiagnostic.lowFuelFoodCoverage.toFixed(3)}`,
+    `- landBaseEnoughUnderPresentInputs: ${landEnoughDiagnostic.landBaseEnoughUnderPresentInputs}`,
+    '',
+    '## Why current food coverage is low',
+    '- Candidate food-priority land is much smaller than total county land.',
+    '- Baseline net food-energy yield assumptions are conservative and losses matter.',
+    '- Labour/maturity/input constraints reduce usable output in practical scenarios.',
+    '- This is a scenario diagnostic, not a measured food-capacity claim.',
+    '',
+    '## What would move the number most?',
+    '| Driver | Food coverage delta | Food surplus delta GJ | Interpretation |',
+    '|---|---:|---:|---|',
+    ...sensitivityDriverAnalysis.drivers.map((d) => `| ${d.driver} | ${d.foodCoverageDelta.toFixed(3)} | ${d.foodSurplusGJDelta.toFixed(2)} | ${d.interpretation} |`),
+    '',
+    `- requiredNetFoodEnergyGJForSelfCoverage: ${selfCoverageThresholds.requiredNetFoodEnergyGJForSelfCoverage.toFixed(2)}`,
+    `- additionalNetFoodEnergyGJNeeded: ${selfCoverageThresholds.additionalNetFoodEnergyGJNeeded.toFixed(2)}`,
+    `- requiredNetGJPerHumanFoodPriorityHa: ${selfCoverageThresholds.requiredNetGJPerHumanFoodPriorityHa.toFixed(3)}`,
+    `- requiredHumanFoodPriorityHaAtCurrentYield: ${selfCoverageThresholds.requiredHumanFoodPriorityHaAtCurrentYield.toFixed(2)}`,
+    `- requiredCandidateLandShareAtCurrentYield: ${selfCoverageThresholds.requiredCandidateLandShareAtCurrentYield.toFixed(3)}`,
+    `- requiredYieldMultiplierAtCurrentLand: ${selfCoverageThresholds.requiredYieldMultiplierAtCurrentLand.toFixed(3)}`,
+    reachesSelfCoverageScenarios.length > 0
+      ? `- Scenarios reaching foodCoverage >= 1.0: ${reachesSelfCoverageScenarios.join(', ')}`
+      : '- No current scenario reaches foodCoverage >= 1.0.',
+    '',
     '## Labour cross-check',
     `- availableFoodWorkerFTE: ${labourAvailableFTE.toFixed(2)}`,
     `- lowFuelFoodWorkersNeeded: ${lowFuelFoodWorkersNeeded.toFixed(2)}`,
@@ -381,7 +639,9 @@ export function buildGreyFoodSystemCalibration(options = {}) {
       markdownPath,
       jsonPath,
       landSummaryCsvPath,
-      sensitivityCsvPath
+      sensitivityCsvPath,
+      driversCsvPath,
+      baselineComparisonCsvPath
     }
   };
 }

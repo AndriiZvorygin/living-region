@@ -41,6 +41,8 @@ describe('grey food system calibration', () => {
       expect(fs.existsSync(paths.jsonPath)).toBe(true);
       expect(fs.existsSync(paths.landSummaryCsvPath)).toBe(true);
       expect(fs.existsSync(paths.sensitivityCsvPath)).toBe(true);
+      expect(fs.existsSync(paths.driversCsvPath)).toBe(true);
+      expect(fs.existsSync(paths.baselineComparisonCsvPath)).toBe(true);
 
       for (const p of report.yieldProfiles) {
         expect(Number.isFinite(p.grossFoodEnergyGJPerHa)).toBe(true);
@@ -50,16 +52,38 @@ describe('grey food system calibration', () => {
       const demand = report.foodDemandBaseline.totalPopulation * report.foodDemandBaseline.annualFoodEnergyGJPerPerson;
       expect(report.foodDemandBaseline.totalFoodDemandGJ).toBeCloseTo(demand, 6);
 
-      const current = report.plausibilityScenarios.find((x) => x.scenario === 'currentModelAssumption');
+      const current = report.plausibilityScenarios.find((x) => x.scenario === 'constrainedLocalFoodBaseline');
       expect(current.foodCoverage).toBeCloseTo(current.netFoodEnergyGJ / report.foodDemandBaseline.totalFoodDemandGJ, 6);
+      expect(report.selfCoverageThresholds.additionalNetFoodEnergyGJNeeded).toBeCloseTo(
+        Math.max(0, report.selfCoverageThresholds.requiredNetFoodEnergyGJForSelfCoverage - current.netFoodEnergyGJ),
+        6
+      );
 
       const scenarios = report.plausibilityScenarios.map((s) => s.scenario);
-      expect(scenarios).toContain('conservativeAnnualStaples');
-      expect(scenarios).toContain('baselineAnnualStaples');
-      expect(scenarios).toContain('perennialTransitionMature');
+      expect(scenarios).toContain('presentIndustrialFossilBaseline');
+      expect(scenarios).toContain('localizedPresentTechBaseline');
+      expect(scenarios).toContain('constrainedLocalFoodBaseline');
+      expect(scenarios).toContain('lowFuelTransitionBaseline');
 
       const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
       expect(markdown).toContain('not a farm production forecast');
+      expect(markdown).toContain('not a measured food-capacity claim');
+      expect(markdown).toContain('Present potential versus transition constraints');
+      expect(typeof report.landEnoughDiagnostic.landBaseEnoughUnderPresentInputs).toBe('boolean');
+      expect(report.plausibilityScenarios.some((s) => s.scenario === 'currentModelAssumption')).toBe(false);
+      const constrained = report.plausibilityScenarios.find((s) => s.scenario === 'constrainedLocalFoodBaseline');
+      expect(String(constrained?.interpretation ?? '').toLowerCase()).toContain('not measured');
+
+      expect(Number.isFinite(report.selfCoverageThresholds.requiredYieldMultiplierAtCurrentLand)).toBe(true);
+      const drivers = report.sensitivityDrivers;
+      expect(drivers.length).toBeGreaterThan(0);
+      for (let i = 1; i < drivers.length; i += 1) {
+        expect(Math.abs(drivers[i - 1].foodCoverageDelta)).toBeGreaterThanOrEqual(Math.abs(drivers[i].foodCoverageDelta));
+      }
+
+      const baselineComparisonCsv = fs.readFileSync(paths.baselineComparisonCsvPath, 'utf8').split('\n')[0];
+      expect(baselineComparisonCsv).toContain('fossilInputSupport');
+      expect(baselineComparisonCsv).toContain('supplyChainDependence');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -102,6 +126,8 @@ describe('grey food system calibration', () => {
       );
       expect(run.status).toBe(0);
       expect(run.stdout).toContain('totalFoodDemandGJ');
+      expect(run.stdout).toContain('drivers csv');
+      expect(run.stdout).toContain('presentIndustrialFossilBaseline foodCoverage');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

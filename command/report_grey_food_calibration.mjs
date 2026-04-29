@@ -17,19 +17,30 @@ try {
   const options = parseArgs();
   const { report, paths } = buildGreyFoodSystemCalibration(options);
   const baseline = report.foodDemandBaseline;
-  const current = report.plausibilityScenarios.find((x) => x.scenario === 'currentModelAssumption');
+  const presentIndustrial = report.plausibilityScenarios.find((x) => x.scenario === 'presentIndustrialFossilBaseline');
+  const localizedPresentTech = report.plausibilityScenarios.find((x) => x.scenario === 'localizedPresentTechBaseline');
+  const constrainedLocal = report.plausibilityScenarios.find((x) => x.scenario === 'constrainedLocalFoodBaseline');
   console.log(`totalFoodDemandGJ: ${baseline.totalFoodDemandGJ.toFixed(2)}`);
   console.log(`foodRelevantLandHa: ${report.landBaseSummary.foodRelevantLandHa.toFixed(2)}`);
   console.log(`humanFoodPriorityHa: ${report.landBaseSummary.humanFoodPriorityHa.toFixed(2)}`);
-  if (current) {
-    console.log(`currentModelAssumption foodCoverage: ${current.foodCoverage.toFixed(3)}`);
-    console.log(`currentModelAssumption foodSurplusGJ: ${current.foodSurplusGJ.toFixed(2)}`);
+  if (presentIndustrial) {
+    console.log(`presentIndustrialFossilBaseline foodCoverage: ${presentIndustrial.foodCoverage.toFixed(3)}`);
   }
+  if (localizedPresentTech) {
+    console.log(`localizedPresentTechBaseline foodCoverage: ${localizedPresentTech.foodCoverage.toFixed(3)}`);
+  }
+  if (constrainedLocal) {
+    console.log(`constrainedLocalFoodBaseline foodCoverage: ${constrainedLocal.foodCoverage.toFixed(3)}`);
+    console.log(`constrainedLocalFoodBaseline foodSurplusGJ: ${constrainedLocal.foodSurplusGJ.toFixed(2)}`);
+  }
+  console.log(`requiredYieldMultiplierAtCurrentLand: ${report.selfCoverageThresholds.requiredYieldMultiplierAtCurrentLand.toFixed(3)}`);
   console.log(`warnings: ${report.warnings.length}`);
   console.log(`markdown: ${paths.markdownPath}`);
   console.log(`json: ${paths.jsonPath}`);
   console.log(`land summary csv: ${paths.landSummaryCsvPath}`);
   console.log(`sensitivity csv: ${paths.sensitivityCsvPath}`);
+  console.log(`drivers csv: ${paths.driversCsvPath}`);
+  console.log(`baseline comparison csv: ${paths.baselineComparisonCsvPath}`);
 } catch (error) {
   console.error(`food calibration report failed: ${error.message}`);
   process.exit(1);
