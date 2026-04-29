@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { getGeometryCentroid, assignFeatureToPolygonByCentroid } from '../gis/spatial_assignment.mjs';
 import { mapOfficialPlanLandUseCategory } from './grey_land_use_mapping.mjs';
 
@@ -32,6 +33,18 @@ function pickCaseInsensitive(props, keys) {
   const all = Object.keys(p);
   for (const key of keys) {
     const hit = all.find((k) => k.toLowerCase() === key.toLowerCase());
+    if (!hit) continue;
+    const value = p[hit];
+    if (value !== undefined && value !== null && String(value).trim() !== '') return value;
+  }
+  return null;
+}
+
+function pickFieldContaining(props, fragments) {
+  const p = props ?? {};
+  const all = Object.keys(p);
+  for (const fragment of fragments) {
+    const hit = all.find((k) => k.toLowerCase().includes(fragment.toLowerCase()));
     if (!hit) continue;
     const value = p[hit];
     if (value !== undefined && value !== null && String(value).trim() !== '') return value;
@@ -133,6 +146,53 @@ function readDelimitedRows(filePath, warnings, label) {
   }
 }
 
+function readDelimitedRowsFromZip(zipPath, warnings, label) {
+  if (!zipPath || !fs.existsSync(zipPath)) {
+    warnings.push(`Missing ${label} ZIP: ${zipPath}`);
+    return [];
+  }
+  try {
+    let csvName = '2021_92-151_X.csv';
+    try {
+      const listing = execSync(`unzip -Z1 ${JSON.stringify(zipPath)}`, { encoding: 'utf8' })
+        .split('\n')
+        .map((x) => x.trim())
+        .filter(Boolean);
+      const exact = listing.find((n) => /2021_92-151_X\.csv$/i.test(n));
+      const anyCsv = listing.find((n) => /\.csv$/i.test(n));
+      csvName = exact ?? anyCsv ?? csvName;
+    } catch {
+      // keep default name
+    }
+    // Stream-filter to Grey-relevant rows before parsing to avoid loading the full ~300MB file into memory.
+    const greyNeedles = [
+      'grey',
+      'owen sound',
+      'west grey',
+      'meaford',
+      'georgian bluffs',
+      'grey highlands',
+      'the blue mountains',
+      'southgate',
+      'hanover',
+      'chatsworth'
+    ];
+    const pattern = greyNeedles.map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    const cmd = [
+      `header=$(unzip -p ${JSON.stringify(zipPath)} ${JSON.stringify(csvName)} | head -n 1)`,
+      `body=$(unzip -p ${JSON.stringify(zipPath)} ${JSON.stringify(csvName)} | tail -n +2 | LC_ALL=C grep -aEi '${pattern}' || true)`,
+      `printf \"%s\\n%s\\n\" \"$header\" \"$body\"`
+    ].join('; ');
+    const raw = execSync(cmd, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, shell: '/bin/bash' });
+    const tabRows = parseDelimited(raw, '\t');
+    if (tabRows.length > 0 && Object.keys(tabRows[0]).length > 1) return tabRows;
+    return parseDelimited(raw, ',');
+  } catch (error) {
+    warnings.push(`Failed to parse ${label} ZIP: ${zipPath} (${error.message})`);
+    return [];
+  }
+}
+
 function pointInPolygon(point, polygonCoordinates) {
   const [x, y] = point;
   let inside = false;
@@ -179,15 +239,23 @@ function nearAny(point, features, thresholdKm) {
 }
 
 function findId(row, keys) {
-  return String(pickCaseInsensitive(row, keys) ?? '').trim();
+  const exact = pickCaseInsensitive(row, keys);
+  if (exact !== undefined && exact !== null && String(exact).trim() !== '') return String(exact).trim();
+  return String(pickFieldContaining(row, ['dbuid', 'dauid', 'dguid']) ?? '').trim();
 }
 
 function findPopulation(row) {
-  return n(pickCaseInsensitive(row, ['POP', 'POP2021', 'Population', 'C1_COUNT_TOTAL', 'TOT_POP', 'P0010001']));
+  return n(
+    pickCaseInsensitive(row, ['POP', 'POP2021', 'Population', 'C1_COUNT_TOTAL', 'TOT_POP', 'P0010001'])
+    ?? pickFieldContaining(row, ['dbpop2021', 'pop2021', '_pop_'])
+  );
 }
 
 function findDwellings(row) {
-  return n(pickCaseInsensitive(row, ['DWELLINGS', 'DWELL', 'TOTAL_DWELLINGS', 'C2_COUNT_TOTAL', 'DWELLS']));
+  return n(
+    pickCaseInsensitive(row, ['DWELLINGS', 'DWELL', 'TOTAL_DWELLINGS', 'C2_COUNT_TOTAL', 'DWELLS'])
+    ?? pickFieldContaining(row, ['dbtdwell2021', 'dwell2021', 'dwelling'])
+  );
 }
 
 function isOntarioGreyDguid(dguid) {
@@ -203,7 +271,8 @@ function isLikelyGreyRow(row) {
 }
 
 function guessMunicipalityNameFromRow(row) {
-  const explicit = pickCaseInsensitive(row, ['MUNICIPALITY', 'MUN_NAME', 'CSDNAME', 'CSD_NAME', 'CSDNAME_ENG', 'MUNICIPAL']);
+  const explicit = pickCaseInsensitive(row, ['MUNICIPALITY', 'MUN_NAME', 'CSDNAME', 'CSD_NAME', 'CSDNAME_ENG', 'MUNICIPAL'])
+    ?? pickFieldContaining(row, ['csdname', 'municipal']);
   if (explicit) return String(explicit).trim();
   const values = Object.values(row ?? {}).map((v) => String(v ?? '').trim()).filter(Boolean);
   const byHint = values.find((v) => GREY_MUNICIPALITY_NAME_HINTS.some((m) => normalizeName(v).includes(m)));
@@ -259,6 +328,9 @@ export function discoverCensusInputFiles(options = {}) {
       ?? findByPatternsWithExt(censusDir, ['geographic', 'attribute'], ['.csv', '.txt'])
       ?? findByPatternsWithExt(censusDir, ['gaf'], ['.csv', '.txt'])
       ?? findByPatternsWithExt(censusDir, ['attribute'], ['.csv', '.txt']),
+    geographicAttributeZip: findByPatternsWithExt(censusDir, ['geographic', 'attribute'], ['.zip'])
+      ?? findByPatternsWithExt(censusDir, ['gaf'], ['.zip'])
+      ?? findByPatternsWithExt(censusDir, ['92-151'], ['.zip']),
     disseminationBlockBoundaryGeoJson: explicit.boundaries ?? explicit.dbBoundaries ?? findByPatterns(censusDir, ['dissemination', 'block', '.geojson']) ?? findByPatterns(censusDir, ['db', '.geojson']),
     disseminationAreaBoundaryGeoJson: explicit.daBoundaries ?? findByPatterns(censusDir, ['dissemination', 'area', '.geojson']) ?? findByPatterns(censusDir, ['da', '.geojson']),
     relationshipFile: explicit.relationship
@@ -288,13 +360,18 @@ function buildGafRows(attrRows, relById, municipalityFeatures, warnings) {
     const dwellings = findDwellings(row);
     const dguid = pickCaseInsensitive(row, ['DGUID', 'DGUID_2021']);
     const municipalityName = guessMunicipalityNameFromRow(row) ?? guessMunicipalityNameFromRow(rel);
-    const cdName = String(pickCaseInsensitive(row, ['CDNAME', 'CD_NAME']) ?? pickCaseInsensitive(rel ?? {}, ['CDNAME', 'CD_NAME']) ?? '');
-    const csdName = String(pickCaseInsensitive(row, ['CSDNAME', 'CSD_NAME']) ?? pickCaseInsensitive(rel ?? {}, ['CSDNAME', 'CSD_NAME']) ?? '');
-    const isGrey = isOntarioGreyDguid(dguid)
-      || normalizeName(cdName) === 'grey'
-      || GREY_MUNICIPALITY_NAME_HINTS.some((m) => normalizeName(csdName).includes(m))
-      || isLikelyGreyRow(row)
-      || isLikelyGreyRow(rel);
+    const cdName = String(
+      pickCaseInsensitive(row, ['CDNAME', 'CD_NAME']) ?? pickFieldContaining(row, ['cdname'])
+      ?? pickCaseInsensitive(rel ?? {}, ['CDNAME', 'CD_NAME']) ?? pickFieldContaining(rel ?? {}, ['cdname']) ?? ''
+    );
+    const csdName = String(
+      pickCaseInsensitive(row, ['CSDNAME', 'CSD_NAME']) ?? pickFieldContaining(row, ['csdname'])
+      ?? pickCaseInsensitive(rel ?? {}, ['CSDNAME', 'CSD_NAME']) ?? pickFieldContaining(rel ?? {}, ['csdname']) ?? ''
+    );
+    const cdIsGrey = normalizeName(cdName) === 'grey';
+    const muniMatchesGrey = GREY_MUNICIPALITY_NAME_HINTS.some((m) => normalizeName(csdName).includes(m))
+      || (municipalityName ? GREY_MUNICIPALITY_NAME_HINTS.some((m) => normalizeName(municipalityName).includes(m)) : false);
+    const isGrey = cdIsGrey || ((!cdName || normalizeName(cdName) === '') && (muniMatchesGrey || isOntarioGreyDguid(dguid)));
     if (!isGrey) continue;
 
     const mappedMunicipality = municipalityName
@@ -374,13 +451,14 @@ export function importGreyCensusPopulation(options = {}) {
   const relPath = files.relationshipFile;
 
   discoveredMessages.push(`gaf: ${attrPath ?? 'missing'}`);
+  discoveredMessages.push(`gaf zip: ${files.geographicAttributeZip ?? 'missing'}`);
   discoveredMessages.push(`db boundaries: ${blockPath ?? 'missing'}`);
   discoveredMessages.push(`da boundaries: ${daPath ?? 'missing'}`);
   discoveredMessages.push(`relationship: ${relPath ?? 'missing'}`);
   if (files.shapefileZip) discoveredMessages.push(`shapefile zip detected (not auto-parsed): ${files.shapefileZip}`);
   if (files.shapefileDirectory) discoveredMessages.push(`shapefile directory detected (not auto-parsed): ${files.shapefileDirectory}`);
 
-  if (!attrPath) warnings.push(`Missing Census attribute CSV/TXT in ${censusDir}. Add a GAF file (name containing "gaf" or "attribute").`);
+  if (!attrPath && !files.geographicAttributeZip) warnings.push(`Missing Census attribute CSV/TXT/ZIP in ${censusDir}. Add a GAF file (name containing "gaf" or "attribute").`);
   if (!blockPath && !daPath) {
     warnings.push(`No Census geometry GeoJSON found in ${censusDir}. Add DB/DA GeoJSON. If you only have SHP/ZIP, convert with ogr2ogr first.`);
     if (files.shapefileZip || files.shapefileDirectory) {
@@ -388,7 +466,9 @@ export function importGreyCensusPopulation(options = {}) {
     }
   }
 
-  const attrRows = attrPath ? readDelimitedRows(attrPath, warnings, 'geographic attribute file') : [];
+  const attrRows = attrPath
+    ? readDelimitedRows(attrPath, warnings, 'geographic attribute file')
+    : readDelimitedRowsFromZip(files.geographicAttributeZip, warnings, 'geographic attribute file');
   const gafDiagnostics = rowFieldDiagnostics(attrRows);
   const relRows = relPath ? readDelimitedRows(relPath, warnings, 'relationship file') : [];
   const relById = new Map();
@@ -461,12 +541,13 @@ export function importGreyCensusPopulation(options = {}) {
       const nearPublicFacility = nearAny(centroid, facilities, 5);
       const nearAgriculturalRuralLand = ['agricultural', 'rural'].includes(landUseCategory);
 
+      const cdName = String(pickCaseInsensitive(attr ?? {}, ['CDNAME', 'CD_NAME']) ?? pickFieldContaining(attr ?? {}, ['cdname']) ?? '');
+      const csdName = String(pickCaseInsensitive(attr ?? {}, ['CSDNAME', 'CSD_NAME']) ?? pickFieldContaining(attr ?? {}, ['csdname']) ?? '');
+      const cdIsGrey = normalizeName(cdName) === 'grey';
+      const muniMatchesGrey = GREY_MUNICIPALITY_NAME_HINTS.some((m) => normalizeName(csdName).includes(m));
       const isGrey = Boolean(muniHit?.polygon)
-        || isOntarioGreyDguid(pickCaseInsensitive(attr ?? feature.properties ?? {}, ['DGUID', 'DGUID_2021']))
-        || normalizeName(String(pickCaseInsensitive(attr ?? {}, ['CDNAME', 'CD_NAME']) ?? '')) === 'grey'
-        || GREY_MUNICIPALITY_NAME_HINTS.some((m) => normalizeName(String(pickCaseInsensitive(attr ?? {}, ['CSDNAME', 'CSD_NAME']) ?? '')).includes(m))
-        || isLikelyGreyRow(attr)
-        || isLikelyGreyRow(rel);
+        || cdIsGrey
+        || ((!cdName || normalizeName(cdName) === '') && (muniMatchesGrey || isOntarioGreyDguid(pickCaseInsensitive(attr ?? feature.properties ?? {}, ['DGUID', 'DGUID_2021']))));
       if (!isGrey) continue;
 
       if (!municipalityName) unassignedBlocks += 1;
