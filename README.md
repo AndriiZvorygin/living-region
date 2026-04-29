@@ -283,6 +283,12 @@ npm run report:model:assessment
 
 This writes a present-baseline credibility audit that separates real/open-data inputs from assumption-heavy model layers and identifies priority calibration gaps.
 
+### Food-system calibration
+
+```bash
+npm run report:grey:food-calibration
+```
+
 ## Real-data priority
 
 Minimum real GIS layers to replace generated geometry:

@@ -19,6 +19,24 @@ function readJsonIfExists(filePath, warnings, label) {
   }
 }
 
+function readJsonIfExistsWithSizeGuard(filePath, warnings, label, maxBytes = 8 * 1024 * 1024) {
+  if (!exists(filePath)) {
+    warnings.push(`Missing ${label}: ${filePath}`);
+    return null;
+  }
+  try {
+    const stat = fs.statSync(filePath);
+    if (stat.size > maxBytes) {
+      warnings.push(`Skipped parsing ${label} (file too large for assessment pass): ${filePath}`);
+      return null;
+    }
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (error) {
+    warnings.push(`Failed to parse ${label}: ${filePath} (${error.message})`);
+    return null;
+  }
+}
+
 function esc(v) {
   const s = String(v ?? '');
   return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
@@ -71,7 +89,8 @@ export function buildLivingRegionModelAssessment(options = {}) {
     metrics: path.join(produceDir, 'grey-county-open-data-metrics.json'),
     openDataWorld: path.join(produceDir, 'grey-open-data-world.json'),
     gisSummary: path.join(produceDir, 'grey-gis-summary.json'),
-    fieldInventory: path.join(produceDir, 'grey-field-inventory.json')
+    fieldInventory: path.join(produceDir, 'grey-field-inventory.json'),
+    foodCalibration: path.join(produceDir, 'grey-food-calibration.json')
   };
 
   const publicBaseline = readJsonIfExists(sourceFiles.publicBaseline, warnings, 'public baseline');
@@ -80,9 +99,10 @@ export function buildLivingRegionModelAssessment(options = {}) {
   const landAccess = readJsonIfExists(sourceFiles.landAccess, warnings, 'land access baseline');
   const labourLand = readJsonIfExists(sourceFiles.labourLand, warnings, 'labour-land baseline');
   const metrics = readJsonIfExists(sourceFiles.metrics, warnings, 'open-data metrics');
-  const openDataWorld = readJsonIfExists(sourceFiles.openDataWorld, warnings, 'open-data world');
-  const gisSummary = readJsonIfExists(sourceFiles.gisSummary, warnings, 'GIS summary');
+  const openDataWorld = readJsonIfExistsWithSizeGuard(sourceFiles.openDataWorld, warnings, 'open-data world');
+  const gisSummary = readJsonIfExistsWithSizeGuard(sourceFiles.gisSummary, warnings, 'GIS summary');
   const fieldInventory = readJsonIfExists(sourceFiles.fieldInventory, warnings, 'field inventory');
+  const foodCalibration = readJsonIfExists(sourceFiles.foodCalibration, warnings, 'food calibration');
 
   const observedAnchors = {
     population: 100905,
@@ -180,6 +200,13 @@ export function buildLivingRegionModelAssessment(options = {}) {
       observedValue: true,
       modelValue: (labourLand?.communityAnimalPowerScenarios ?? []).some((s) => String(s.winterServiceNotEquivalentTo ?? '').includes('municipal plow truck')),
       tolerance: 0
+    }),
+    checkRow({
+      checkName: 'food calibration report exists',
+      observedValue: true,
+      modelValue: !!foodCalibration,
+      tolerance: 0,
+      notes: 'Food calibration scaffold should exist to support present food-system diagnostics.'
     })
   ];
 
@@ -194,7 +221,7 @@ export function buildLivingRegionModelAssessment(options = {}) {
     ['Public facilities / service access', 0.62, 'Facilities baseline present.', 'Coverage/access quality incomplete.'],
     ['Rural businesses / local economic nodes', 0.66, 'Rural business nodes loaded.', 'No economic throughput or sector calibration.'],
     ['Housing / rents / dwellings', 0.45, 'Stress diagnostics exist.', 'No real income/rent distribution calibration.'],
-    ['Food energy production', 0.41, 'Food-energy balance scaffold in place.', 'No calibrated crop/yield/soil capability baseline.'],
+    ['Food energy production', foodCalibration ? 0.5 : 0.41, foodCalibration ? 'Food calibration scaffold added with sensitivity diagnostics.' : 'Food-energy balance scaffold in place.', 'No calibrated crop/yield/soil capability baseline.'],
     ['Food affordability / food insecurity pressure', 0.52, 'Affordability pressure diagnostics included.', 'Not anchored to survey/income microdata.'],
     ['Human food labour', 0.47, 'Labour-land diagnostics and scenarios available.', 'No empirical farm labour baseline calibration.'],
     ['Perennial/permaculture labour leverage', 0.38, 'Transparent scenario scaffolds present.', 'Assumption-heavy; needs empirical calibration.'],
@@ -226,7 +253,7 @@ export function buildLivingRegionModelAssessment(options = {}) {
     presentInfrastructureScore: 0.73,
     presentPopulationScore: 0.76,
     presentLandAccessScore: 0.79,
-    presentFoodSystemScore: 0.46,
+    presentFoodSystemScore: foodCalibration ? 0.52 : 0.46,
     presentHousingScore: 0.45,
     presentTransportScore: 0.56,
     presentEnergyScore: 0.44,
@@ -285,6 +312,11 @@ export function buildLivingRegionModelAssessment(options = {}) {
         lotsAndConcessions: modelAnchors.lotsAndConcessions
       }
     },
+    foodCalibration: foodCalibration ? {
+      path: sourceFiles.foodCalibration,
+      sensitivityScenarioCount: Array.isArray(foodCalibration?.plausibilityScenarios) ? foodCalibration.plausibilityScenarios.length : 0,
+      caveat: foodCalibration?.assumptions?.caveat ?? null
+    } : null,
     scorecard,
     presentBaselineChecks: checks,
     domainAssessment: domainRows,
