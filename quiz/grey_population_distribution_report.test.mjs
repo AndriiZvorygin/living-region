@@ -12,7 +12,7 @@ function fc(features) {
 }
 
 describe('grey census population distribution', () => {
-  test('imports fixture census blocks and totals population', () => {
+  test('imports fixture census blocks and totals population', async () => {
     const root = path.resolve('know/produce/census-fixture');
     const inputGisDir = path.join(root, 'gis');
     const censusDir = path.join(root, 'census');
@@ -55,7 +55,7 @@ describe('grey census population distribution', () => {
     ].join('\n'));
 
     try {
-      const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
+      const result = await importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
       expect(result.summary.totalPopulationMatched).toBe(200);
       expect(result.summary.totalDwellingsMatched).toBe(100);
       expect(result.summary.disseminationBlockCount).toBe(2);
@@ -75,7 +75,7 @@ describe('grey census population distribution', () => {
     }
   });
 
-  test('missing census files produce warnings and fallback status', () => {
+  test('missing census files produce warnings and fallback status', async () => {
     const root = path.resolve('know/produce/census-fixture-missing');
     const inputGisDir = path.join(root, 'gis');
     const censusDir = path.join(root, 'census');
@@ -90,7 +90,7 @@ describe('grey census population distribution', () => {
     fs.writeFileSync(path.join(inputGisDir, 'road-centrelines-grey.geojson'), JSON.stringify(fc([])));
 
     try {
-      const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
+      const result = await importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
       expect(result.summary.totalPopulationMatched).toBe(0);
       expect(result.summary.warnings.length).toBeGreaterThan(0);
     } finally {
@@ -126,7 +126,7 @@ describe('grey census population distribution', () => {
     expect(links.some((l) => l.url.includes('92-151-X2021001'))).toBe(true);
   });
 
-  test('imports GAF-only table and filters Grey rows by municipality/CSD hints', () => {
+  test('imports GAF-only table and filters Grey rows by municipality/CSD hints', async () => {
     const root = path.resolve('know/produce/census-gaf-only');
     const inputGisDir = path.join(root, 'gis');
     const censusDir = path.join(root, 'census');
@@ -150,7 +150,7 @@ describe('grey census population distribution', () => {
     ].join('\n'));
 
     try {
-      const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
+      const result = await importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
       expect(result.summary.geographicLevel).toBe('gafTableOnly');
       expect(result.summary.totalPopulationMatched).toBe(130);
       expect(result.summary.totalDwellingsMatched).toBe(50);
@@ -160,7 +160,7 @@ describe('grey census population distribution', () => {
     }
   });
 
-  test('zero-match import writes GAF header diagnostics', () => {
+  test('zero-match import writes GAF header diagnostics', async () => {
     const root = path.resolve('know/produce/census-gaf-zero-match');
     const inputGisDir = path.join(root, 'gis');
     const censusDir = path.join(root, 'census');
@@ -174,7 +174,7 @@ describe('grey census population distribution', () => {
       '1,10,5,Toronto,Toronto'
     ].join('\n'));
     try {
-      const result = importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
+      const result = await importGreyCensusPopulation({ censusDir, inputGisDir, produceDir });
       expect(result.summary.totalPopulationMatched).toBe(0);
       const diagnosticsPath = path.join(produceDir, 'grey-census-gaf-header-diagnostics.json');
       expect(fs.existsSync(diagnosticsPath)).toBe(true);

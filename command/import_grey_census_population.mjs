@@ -23,7 +23,7 @@ function parseArgs(argv) {
 
 try {
   const args = parseArgs(process.argv.slice(2));
-  const result = importGreyCensusPopulation({
+  const result = await importGreyCensusPopulation({
     censusDir: path.resolve(args.censusDir),
     inputGisDir: path.resolve(args.inputGisDir),
     produceDir: path.resolve(args.produceDir),

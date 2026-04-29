@@ -167,6 +167,7 @@ function readDelimitedRowsFromZip(zipPath, warnings, label) {
     // Stream-filter to Grey-relevant rows before parsing to avoid loading the full ~300MB file into memory.
     const greyNeedles = [
       'grey',
+      '3542',
       'owen sound',
       'west grey',
       'meaford',
@@ -298,6 +299,32 @@ function toCsv(rows, headers) {
   return [headers.join(','), ...rows.map((r) => headers.map((h) => esc(r[h])).join(','))].join('\n');
 }
 
+async function fetchJson(url) {
+  const response = await fetch(url, { headers: { 'User-Agent': 'living-region-census-import/1.0' } });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+async function fetchArcgisFeaturesByField({ serviceUrl, fieldName, values, outFields = '*' }) {
+  const uniqueValues = [...new Set(values.filter(Boolean).map((v) => String(v).trim()).filter(Boolean))];
+  if (uniqueValues.length === 0) return [];
+  const batchSize = 80;
+  const all = [];
+  for (let i = 0; i < uniqueValues.length; i += batchSize) {
+    const batch = uniqueValues.slice(i, i + batchSize);
+    const where = `${fieldName} IN (${batch.map((v) => `'${v.replaceAll("'", "''")}'`).join(',')})`;
+    const u = new URL(`${serviceUrl}/query`);
+    u.searchParams.set('where', where);
+    u.searchParams.set('outFields', outFields);
+    u.searchParams.set('returnGeometry', 'true');
+    u.searchParams.set('f', 'geojson');
+    const parsed = await fetchJson(u.toString());
+    const features = Array.isArray(parsed?.features) ? parsed.features : [];
+    all.push(...features);
+  }
+  return all;
+}
+
 function findByPatterns(dir, patterns) {
   if (!fs.existsSync(dir)) return null;
   const files = fs.readdirSync(dir).map((f) => path.join(dir, f));
@@ -412,7 +439,7 @@ function buildGafRows(attrRows, relById, municipalityFeatures, warnings) {
   return { rows, totalPopulationMatched, totalDwellingsMatched, unassigned };
 }
 
-export function importGreyCensusPopulation(options = {}) {
+export async function importGreyCensusPopulation(options = {}) {
   const censusDir = path.resolve(options.censusDir ?? 'know/input/census/2021');
   const inputGisDir = path.resolve(options.inputGisDir ?? 'know/input/gis');
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
@@ -477,16 +504,64 @@ export function importGreyCensusPopulation(options = {}) {
     if (key) relById.set(key, row);
   }
 
-  const geometries = blockPath
+  let geometries = blockPath
     ? readGeoJsonFeatures(blockPath, warnings, 'dissemination block boundaries')
     : readGeoJsonFeatures(daPath, warnings, 'dissemination area boundaries');
-  const geographicLevel = blockPath ? 'disseminationBlock' : (daPath ? 'disseminationArea' : 'gafTableOnly');
+  let geographicLevel = blockPath ? 'disseminationBlock' : (daPath ? 'disseminationArea' : 'gafTableOnly');
 
   const attrById = new Map();
+  const attrByDguid = new Map();
+  const attrByDauid = new Map();
+  const attrByDbuid = new Map();
   for (const row of attrRows) {
     const key = findId(row, ['DBUID', 'DBUID_2021', 'DBUID2021', 'UID', 'DGUID', 'DB_UID', 'DAUID', 'DAUID_2021']);
     if (!key) continue;
     attrById.set(key, row);
+    const dguid = String(pickCaseInsensitive(row, ['DGUID', 'DGUID_2021']) ?? pickFieldContaining(row, ['idugd']) ?? '').trim();
+    const dauid = String(pickCaseInsensitive(row, ['DAUID', 'DAUID_2021']) ?? pickFieldContaining(row, ['dauid']) ?? '').trim();
+    const dbuid = String(pickCaseInsensitive(row, ['DBUID', 'DBUID_2021', 'DB_UID']) ?? pickFieldContaining(row, ['dbuid']) ?? '').trim();
+    if (dguid) attrByDguid.set(dguid, row);
+    if (dauid) attrByDauid.set(dauid, row);
+    if (dbuid) attrByDbuid.set(dbuid, row);
+  }
+
+  if (geometries.length === 0 && attrRows.length > 0) {
+    try {
+      const daDguids = attrRows
+        .map((r) => String(pickCaseInsensitive(r, ['DADGUID', 'DADGUID_ADIDUGD']) ?? pickFieldContaining(r, ['dadguid']) ?? '').trim())
+        .filter(Boolean);
+      const dbDguids = attrRows
+        .map((r) => String(pickCaseInsensitive(r, ['DBDGUID', 'DBDGUID_IDIDUGD']) ?? pickFieldContaining(r, ['dbdguid']) ?? '').trim())
+        .filter(Boolean);
+      if (dbDguids.length > 0) {
+        const dbService = 'https://geo.statcan.gc.ca/geo_wa/rest/services/2021/Digital_boundary_files/MapServer/13';
+        geometries = await fetchArcgisFeaturesByField({
+          serviceUrl: dbService,
+          fieldName: 'DGUID',
+          values: dbDguids,
+          outFields: 'DBUID,DGUID,LANDAREA,PRUID'
+        });
+        if (geometries.length > 0) {
+          geographicLevel = 'disseminationBlock';
+          warnings.push(`Loaded DB geometry from StatCan ArcGIS REST: ${geometries.length} features.`);
+        }
+      }
+      if (geometries.length === 0 && daDguids.length > 0) {
+        const daService = 'https://geo.statcan.gc.ca/geo_wa/rest/services/2021/Digital_boundary_files/MapServer/12';
+        geometries = await fetchArcgisFeaturesByField({
+          serviceUrl: daService,
+          fieldName: 'DGUID',
+          values: daDguids,
+          outFields: 'DAUID,DGUID,LANDAREA,PRUID'
+        });
+        if (geometries.length > 0) {
+          geographicLevel = 'disseminationArea';
+          warnings.push(`Loaded DA geometry from StatCan ArcGIS REST: ${geometries.length} features.`);
+        }
+      }
+    } catch (error) {
+      warnings.push(`Failed to load DA/DB geometry from StatCan ArcGIS REST: ${error.message}`);
+    }
   }
 
   const muniGeom = municipalityFeatures.map((f) => {
@@ -516,8 +591,15 @@ export function importGreyCensusPopulation(options = {}) {
     for (const feature of geometries) {
       const centroid = getGeometryCentroid(feature.geometry);
       if (!centroid) continue;
-      const geoId = String(pickCaseInsensitive(feature.properties, ['DBUID', 'DBUID_2021', 'DBUID2021', 'UID', 'DGUID', 'DAUID']) ?? '');
-      const attr = attrById.get(geoId) ?? null;
+      const geoId = String(pickCaseInsensitive(feature.properties, ['DBUID', 'DBUID_2021', 'DBUID2021', 'DAUID', 'DAUID_2021', 'UID', 'DGUID']) ?? '');
+      const geomDguid = String(pickCaseInsensitive(feature.properties, ['DGUID', 'DGUID_2021']) ?? '').trim();
+      const geomDauid = String(pickCaseInsensitive(feature.properties, ['DAUID', 'DAUID_2021']) ?? '').trim();
+      const geomDbuid = String(pickCaseInsensitive(feature.properties, ['DBUID', 'DBUID_2021']) ?? '').trim();
+      const attr = attrById.get(geoId)
+        ?? (geomDguid ? attrByDguid.get(geomDguid) : null)
+        ?? (geomDauid ? attrByDauid.get(geomDauid) : null)
+        ?? (geomDbuid ? attrByDbuid.get(geomDbuid) : null)
+        ?? null;
       const rel = relById.get(geoId) ?? null;
       const pop = findPopulation(attr ?? feature.properties ?? {});
       const dwellings = findDwellings(attr ?? feature.properties ?? {});
