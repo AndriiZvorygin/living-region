@@ -102,6 +102,19 @@ describe('grey labour-land baseline report', () => {
     expect(community60.animalPowerFavourabilityIndex).toBeGreaterThanOrEqual(0);
     expect(community60.animalPowerFavourabilityIndex).toBeLessThanOrEqual(1);
     expect(community60.netFoodEnergyBenefitGJ).toBeDefined();
+    expect(community60.produceToDepotTonneKm).toBeGreaterThan(0);
+    expect(community60.depotToMarketTonneKm).toBeGreaterThan(0);
+    expect(community60.returnSuppliesTonneKm).toBeGreaterThan(0);
+    expect(community60.winterWorkDaysUsed).toBeGreaterThan(0);
+    expect(community60.winterUtilizationShare).toBeGreaterThan(0);
+    expect(community60.winterLaneAccessKmSupported).toBeGreaterThan(0);
+    expect(community60.packedSledRouteKmSupported).toBeGreaterThan(0);
+    expect(community60.winterFeedWaterFirewoodTonneKmSupported).toBeGreaterThan(0);
+    expect(community60.winterEmergencyAccessHouseholdsServed).toBeGreaterThan(0);
+    expect(community60.winterServiceConfidence).toBe('low_to_moderate');
+    expect(community60.winterServiceScope).toContain('farm lanes');
+    expect(community60.winterServiceNotEquivalentTo).toContain('municipal plow truck');
+    expect(community60).toHaveProperty('snowClearingLaneKmSupportedDeprecated');
     expect(communityMixed.netBenefitScoreAllocated).toBeGreaterThan(communityMixed.netBenefitScoreDraftOnly);
     expect(seasonalCustom.ownedAnimalsNeeded).toBeLessThan(community60.ownedAnimalsNeeded);
     expect(seasonalCustom.serviceTeamsNeeded).toBeGreaterThan(0);
@@ -123,6 +136,7 @@ describe('grey labour-land baseline report', () => {
     const favLow = 0.8 * (1 - lowCompetition.feedCompetitionWithHumanFoodShare);
     const favHigh = 0.8 * (1 - highCompetition.feedCompetitionWithHumanFoodShare);
     expect(favLow).toBeGreaterThan(favHigh);
+    expect(communityMixed.netBenefitScoreAllocated).toBeGreaterThanOrEqual(communityMixed.netBenefitScoreDraftOnly);
     expect(maturePermaculture.peakHarvestShare).toBeLessThan(annualMechanized.peakHarvestShare);
     expect(maturePermaculture.manageableHaMultiplierVsAnnualLowFuelHandScale).toBeGreaterThan(
       maturePermaculture.manageableHaMultiplierVsAnnualLowFuelEfficient
@@ -146,6 +160,7 @@ describe('grey labour-land baseline report', () => {
     expect(markdown).toContain('feed land');
     expect(markdown).toContain('## Community-scale animal power');
     expect(markdown).toContain('### Multi-purpose and seasonal animal power');
+    expect(markdown).toContain('not modelled as replacement for municipal plow trucks');
     expect(markdown).toContain('Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems');
     expect(markdown).toContain('not magic yield');
     expect(markdown).toContain('requires establishment labour and skill');
@@ -159,6 +174,10 @@ describe('grey labour-land baseline report', () => {
     expect(communityAnimalCsv).toContain('animalPowerFavourabilityIndex');
     expect(communityAnimalCsv).toContain('animalPurposeMode');
     expect(communityAnimalCsv).toContain('netBenefitScoreAllocated');
+    expect(communityAnimalCsv).toContain('produceToDepotTonneKm');
+    expect(communityAnimalCsv).toContain('winterWorkDaysUsed');
+    expect(communityAnimalCsv).toContain('winterLaneAccessKmSupported');
+    expect(communityAnimalCsv).toContain('snowClearingLaneKmSupportedDeprecated');
     const handToolCsv = fs.readFileSync(paths.handToolCapacityCsvPath, 'utf8');
     expect(handToolCsv).toContain('baselineLabourDaysPerHa');
     expect(handToolCsv).toContain('intensiveMarketGardenHandTools');

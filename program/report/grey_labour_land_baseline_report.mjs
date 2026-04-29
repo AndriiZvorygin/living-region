@@ -1160,7 +1160,14 @@ function buildHeavyWorkTaskBreakdown(productiveHa, coverage) {
     { task: 'firewoodLogHauling', humanOnlyDaysPerHa: 1.2, animalAssistFactor: 0.45, tonneKmPerHa: 0.28, seasonalWindow: 'autumn-winter' },
     { task: 'waterHauling', humanOnlyDaysPerHa: 0.7, animalAssistFactor: 0.5, tonneKmPerHa: 0.05, seasonalWindow: 'summer' },
     { task: 'hayMowingRaking', humanOnlyDaysPerHa: 1.6, animalAssistFactor: 0.44, tonneKmPerHa: 0.14, seasonalWindow: 'summer' },
-    { task: 'localFreightCartage', humanOnlyDaysPerHa: 1.3, animalAssistFactor: 0.47, tonneKmPerHa: 0.22, seasonalWindow: 'year-round' }
+    { task: 'localFreightCartage', humanOnlyDaysPerHa: 1.0, animalAssistFactor: 0.47, tonneKmPerHa: 0.15, seasonalWindow: 'year-round' },
+    { task: 'farmToVillageDepotProduceHauling', humanOnlyDaysPerHa: 0.85, animalAssistFactor: 0.56, tonneKmPerHa: 0.3, seasonalWindow: 'summer-autumn', notes: 'Produce from farms/gardens to village depots.' },
+    { task: 'villageDepotToMarketHauling', humanOnlyDaysPerHa: 0.75, animalAssistFactor: 0.5, tonneKmPerHa: 0.34, seasonalWindow: 'summer-autumn', notes: 'Village depot loads to market nodes.' },
+    { task: 'returnTripSupplyHauling', humanOnlyDaysPerHa: 0.65, animalAssistFactor: 0.5, tonneKmPerHa: 0.24, seasonalWindow: 'year-round', notes: 'Return hauling of tools, seed, feed, supplies.' },
+    { task: 'farmLaneAndYardClearing', humanOnlyDaysPerHa: 0.55, animalAssistFactor: 0.54, tonneKmPerHa: 0.04, seasonalWindow: 'winter', notes: 'Farm lane and yard access clearing support.' },
+    { task: 'packedSledRouteMaintenance', humanOnlyDaysPerHa: 0.6, animalAssistFactor: 0.58, tonneKmPerHa: 0.22, seasonalWindow: 'winter', notes: 'Packed sled/cart route maintenance during winter conditions.' },
+    { task: 'emergencyWinterAccessHauling', humanOnlyDaysPerHa: 0.35, animalAssistFactor: 0.52, tonneKmPerHa: 0.1, seasonalWindow: 'winter', notes: 'Emergency winter hauling and access support.' },
+    { task: 'winterFeedWaterFirewoodHauling', humanOnlyDaysPerHa: 0.45, animalAssistFactor: 0.46, tonneKmPerHa: 0.08, seasonalWindow: 'winter', notes: 'Winter feed/water/firewood hauling support.' }
   ];
   return tasks.map((t) => {
     const humanOnlyLabourDays = productiveHa * t.humanOnlyDaysPerHa;
@@ -1203,6 +1210,38 @@ function buildCommunityAnimalPowerScenarios(args) {
     const heavyWorkCoverage = clamp01(baseHeavyWorkDemandDays > 0 ? heavyWorkCapacityDays / baseHeavyWorkDemandDays : 0);
     const taskBreakdown = buildHeavyWorkTaskBreakdown(productiveHa, heavyWorkCoverage);
     const heavyWorkLabourSavedDays = taskBreakdown.reduce((s, t) => s + t.labourSavedDays, 0);
+    const marketTasks = new Set(['farmToVillageDepotProduceHauling', 'villageDepotToMarketHauling', 'returnTripSupplyHauling']);
+    const winterTasks = new Set(['farmLaneAndYardClearing', 'packedSledRouteMaintenance', 'emergencyWinterAccessHauling', 'winterFeedWaterFirewoodHauling']);
+    const produceToDepotTonneKm = taskBreakdown
+      .filter((t) => t.task === 'farmToVillageDepotProduceHauling')
+      .reduce((s, t) => s + t.tonneKmSupported, 0);
+    const depotToMarketTonneKm = taskBreakdown
+      .filter((t) => t.task === 'villageDepotToMarketHauling')
+      .reduce((s, t) => s + t.tonneKmSupported, 0);
+    const returnSuppliesTonneKm = taskBreakdown
+      .filter((t) => t.task === 'returnTripSupplyHauling')
+      .reduce((s, t) => s + t.tonneKmSupported, 0);
+    const marketHaulingLabourSavedDays = taskBreakdown
+      .filter((t) => marketTasks.has(t.task))
+      .reduce((s, t) => s + t.labourSavedDays, 0);
+    const winterLabourSavedDays = taskBreakdown
+      .filter((t) => winterTasks.has(t.task))
+      .reduce((s, t) => s + t.labourSavedDays, 0);
+    const winterHaulingTonneKmSupported = taskBreakdown
+      .filter((t) => winterTasks.has(t.task))
+      .reduce((s, t) => s + t.tonneKmSupported, 0);
+    const winterWorkDaysAvailable = teamsNeeded * n(animalSystem?.workDaysPerYear, 0) * 0.35;
+    const winterWorkDaysUsed = Math.min(winterWorkDaysAvailable, winterLabourSavedDays * 1.2);
+    const winterUtilizationShare = winterWorkDaysAvailable > 0 ? winterWorkDaysUsed / winterWorkDaysAvailable : 0;
+    const winterLaneAccessKmSupported = teamsNeeded * heavyWorkCoverage * 3.2;
+    const packedSledRouteKmSupported = teamsNeeded * heavyWorkCoverage * 2.4;
+    const winterFeedWaterFirewoodTonneKmSupported = taskBreakdown
+      .filter((t) => t.task === 'winterFeedWaterFirewoodHauling')
+      .reduce((s, t) => s + t.tonneKmSupported, 0);
+    const winterEmergencyAccessHouseholdsServed = Math.max(0, Math.round((people / 2.4) * heavyWorkCoverage * 0.22));
+    const winterServiceConfidence = 'low_to_moderate';
+    const winterServiceScope = 'farm lanes, yards, sled routes, feed/water/firewood hauling, emergency access';
+    const winterServiceNotEquivalentTo = 'modern municipal plow truck road clearing';
     const heavyWorkWithAnimalPowerDays = Math.max(0, baseHumanHeavyWorkOnlyDays - heavyWorkLabourSavedDays);
     const heavyWorkBottleneckReductionPct = baseHumanHeavyWorkOnlyDays > 0
       ? ((baseHumanHeavyWorkOnlyDays - heavyWorkWithAnimalPowerDays) / baseHumanHeavyWorkOnlyDays) * 100 : 0;
@@ -1216,7 +1255,7 @@ function buildCommunityAnimalPowerScenarios(args) {
     const additionalProductiveHaEnabled = productiveHa * 0.045 * heavyWorkCoverage;
     const additionalFoodEnergyEnabledGJ = additionalProductiveHaEnabled * baseFoodGJPerHa * (1 - 0.3 * feedCompetitionWithHumanFoodShare);
     const animalCareLabourDays = teamsNeeded * n(animalSystem?.animalCareDaysPerYear, 0);
-    const humanLabourSavedDays = heavyWorkLabourSavedDays + (additionalProductiveHaEnabled * 4.5);
+    const humanLabourSavedDays = heavyWorkLabourSavedDays + (additionalProductiveHaEnabled * 4.5) + (marketHaulingLabourSavedDays * 0.18) + (winterLabourSavedDays * 0.22);
     const netLabourBenefitDays = humanLabourSavedDays - animalCareLabourDays;
     const netHumanLabourChangeDays = animalCareLabourDays - humanLabourSavedDays;
 
@@ -1250,6 +1289,7 @@ function buildCommunityAnimalPowerScenarios(args) {
       (0.45 * clamp01((netLabourBenefitDaysAllocated + 2000) / 5000))
       + (0.35 * clamp01((netFoodEnergyBenefitGJAllocated + 500) / 2000))
       + (0.2 * (1 - feedCompetitionWithHumanFoodShare))
+      + (0.08 * winterUtilizationShare)
     );
     const peopleServed = animalsNeeded * n(def.peoplePerAnimal, 0);
 
@@ -1282,6 +1322,23 @@ function buildCommunityAnimalPowerScenarios(args) {
       heavyWorkBottleneckReductionPct,
       heavyWorkLabourSavedDays,
       heavyWorkTasks: taskBreakdown,
+      produceToDepotTonneKm,
+      depotToMarketTonneKm,
+      returnSuppliesTonneKm,
+      marketHaulingLabourSavedDays,
+      winterWorkDaysAvailable,
+      winterWorkDaysUsed,
+      winterUtilizationShare,
+      winterLaneAccessKmSupported,
+      packedSledRouteKmSupported,
+      snowClearingLaneKmSupportedDeprecated: winterLaneAccessKmSupported,
+      winterFeedWaterFirewoodTonneKmSupported,
+      winterHaulingTonneKmSupported,
+      winterEmergencyAccessHouseholdsServed,
+      winterLabourSavedDays,
+      winterServiceConfidence,
+      winterServiceScope,
+      winterServiceNotEquivalentTo,
       humanLabourSavedDays,
       netLabourBenefitDays,
       netHumanLabourChangeDays,
@@ -1857,7 +1914,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
 
   const communityAnimalPowerCsvPath = path.join(produceDir, 'grey-labour-land-community-animal-power.csv');
   fs.writeFileSync(communityAnimalPowerCsvPath, toCsv(communityAnimalPowerScenarios, [
-    'scenario','animalPurposeMode','peoplePerAnimal','animalsNeeded','ownedAnimalsNeeded','serviceTeamsNeeded','teamsNeeded','feedHaRequired','feedCompetitionWithHumanFoodShare','draftCostAllocationShare','coProductCreditGJEquivalent','humanLabourSavedDays','animalCareLabourDays','netLabourBenefitDaysDraftOnly','netFoodEnergyBenefitGJDraftOnly','netBenefitScoreDraftOnly','netLabourBenefitDaysAllocated','netFoodEnergyBenefitGJAllocated','netBenefitScoreAllocated','additionalProductiveHaEnabled','additionalFoodEnergyEnabledGJ','foodEnergyOpportunityCostGJ','animalPowerFavourabilityIndex','peakSeasonWorkDays','careBurdenPerHousehold','notes'
+    'scenario','animalPurposeMode','peoplePerAnimal','animalsNeeded','ownedAnimalsNeeded','serviceTeamsNeeded','teamsNeeded','feedHaRequired','feedCompetitionWithHumanFoodShare','draftCostAllocationShare','coProductCreditGJEquivalent','humanLabourSavedDays','animalCareLabourDays','netLabourBenefitDaysDraftOnly','netFoodEnergyBenefitGJDraftOnly','netBenefitScoreDraftOnly','netLabourBenefitDaysAllocated','netFoodEnergyBenefitGJAllocated','netBenefitScoreAllocated','additionalProductiveHaEnabled','additionalFoodEnergyEnabledGJ','foodEnergyOpportunityCostGJ','animalPowerFavourabilityIndex','peakSeasonWorkDays','careBurdenPerHousehold','produceToDepotTonneKm','depotToMarketTonneKm','returnSuppliesTonneKm','marketHaulingLabourSavedDays','winterWorkDaysUsed','winterUtilizationShare','winterLaneAccessKmSupported','packedSledRouteKmSupported','winterFeedWaterFirewoodTonneKmSupported','winterHaulingTonneKmSupported','winterEmergencyAccessHouseholdsServed','winterLabourSavedDays','winterServiceConfidence','snowClearingLaneKmSupportedDeprecated','notes'
   ]));
 
   const handToolCapacityCsvPath = path.join(produceDir, 'grey-labour-land-hand-tool-capacity.csv');
@@ -1925,6 +1982,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     `Recommended ratio by allocated multi-purpose accounting: 1 animal per ${(recommendedAnimalPowerRatioAllocated?.peoplePerAnimal ?? 0)} people (score ${(recommendedAnimalPowerRatioAllocated?.netBenefitScoreAllocated ?? 0).toFixed(2)}).`,
     '### Multi-purpose and seasonal animal power',
     'Draft animals are not free energy. But in some rural systems they may also provide manure/fertility, milk/meat, pasture cycling, and resilience. This report shows both strict draft-only accounting and allocated multi-purpose accounting. Seasonal/custom team service can reduce the need for every village/church/co-op to carry year-round animal care.',
+    'Shared animal teams may be most useful when they are not idle outside plowing season. The model now credits explicit market hauling, return-trip supplies, farm-lane and yard clearing, packed sled-route maintenance, winter feed/water/firewood hauling, and emergency winter access. This is not modelled as replacement for municipal plow trucks or modern road maintenance. These benefits improve year-round utilization but still have to overcome feed land and daily care costs.',
     '',
     '## Hand-tool land-tending capacity',
     'There is no single correct number. Capacity depends on crop type, intensity, harvest frequency, soil condition, tools, skill, layout, irrigation, weed pressure, processing arrangements, and whether the system is annual or perennial.',
