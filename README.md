@@ -252,6 +252,21 @@ Outputs:
 
 This report uses the real Grey Lots and Concessions layer as a land-structure reference and explicitly does not treat it as parcel ownership.
 
+### Labour-to-productive-land baseline
+
+```bash
+npm run report:grey:labour-land
+```
+
+This estimates how people are distributed relative to productive land access and how human food-labour requirements change as machinery/fuel support declines. It uses Census population, settlement boundaries, Official Plan land use, and lots/concessions. It is an estimate, not a parcel-ownership or farm-capacity claim.
+
+Outputs:
+
+- `know/produce/grey-labour-land-baseline.md`
+- `know/produce/grey-labour-land-baseline.json`
+- `know/produce/grey-labour-land-municipality-summary.csv`
+- `know/produce/grey-labour-land-scenarios.csv`
+
 ## Real-data priority
 
 Minimum real GIS layers to replace generated geometry:
