@@ -51,7 +51,7 @@ describe('grey labour-land baseline report', () => {
     );
   });
 
-  test('permaculture leverage and rolling harvest diagnostics are present', () => {
+  test('task-level permaculture leverage diagnostics are present', () => {
     const { report, paths } = buildGreyLabourLandBaselineReport();
     expect(fs.existsSync(paths.markdownPath)).toBe(true);
     expect(fs.existsSync(paths.jsonPath)).toBe(true);
@@ -60,22 +60,40 @@ describe('grey labour-land baseline report', () => {
     expect(fs.existsSync(paths.permacultureSystemsCsvPath)).toBe(true);
     expect(fs.existsSync(paths.permacultureScenariosCsvPath)).toBe(true);
 
-    const lowFuelAnnual = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuel');
-    const maturePermaculture = report.productionSystemLeverage.find((s) => s.system === 'maturePermaculture');
+    const lowFuelEfficient = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuelEfficient');
+    const lowFuelHand = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuelHandScale');
+    const maturePermaculture = report.productionSystemLeverage.find((s) => s.system === 'maturePermacultureLowCare');
+    const maturePermacultureHarvestIntensive = report.productionSystemLeverage.find((s) => s.system === 'maturePermacultureHarvestIntensive');
+    const perennialStapleBulkLowCare = report.productionSystemLeverage.find((s) => s.system === 'perennialStapleBulkLowCare');
     const youngPermaculture = report.productionSystemLeverage.find((s) => s.system === 'youngPermaculture');
     const annualMechanized = report.productionSystemLeverage.find((s) => s.system === 'annualMechanized');
 
-    expect(maturePermaculture.labourDaysPerHaAtMaturity).toBeLessThan(lowFuelAnnual.labourDaysPerHaAtMaturity);
-    expect(youngPermaculture.establishmentLabourDaysPerHa).toBeGreaterThan(youngPermaculture.maintenanceLabourDaysPerHa);
+    expect(maturePermaculture.soilPrepTillageDaysPerHa).toBeLessThan(lowFuelEfficient.soilPrepTillageDaysPerHa);
+    expect(maturePermaculture.plantingSeedingDaysPerHa).toBeLessThan(lowFuelEfficient.plantingSeedingDaysPerHa);
+    expect(maturePermaculture.recurringNonHarvestLabourDaysPerHa).toBeLessThan(lowFuelHand.recurringNonHarvestLabourDaysPerHa);
+    expect(maturePermacultureHarvestIntensive.harvestLabourDaysPerHa).toBeGreaterThan(0);
+    expect(perennialStapleBulkLowCare.harvestLabourDaysPerGJ).toBeLessThan(maturePermacultureHarvestIntensive.harvestLabourDaysPerGJ);
+    expect(perennialStapleBulkLowCare.manageableHaPerWorkerAtMaturity).toBeGreaterThan(lowFuelHand.manageableHaPerWorkerAtMaturity);
+    expect(perennialStapleBulkLowCare.yearsUntilFoodEnergyMaturity).toBeGreaterThan(0);
     expect(maturePermaculture.peakHarvestShare).toBeLessThan(annualMechanized.peakHarvestShare);
-    expect(maturePermaculture.manageableHaMultiplierVsLowFuelAnnual).toBeGreaterThan(1);
+    expect(maturePermaculture.manageableHaMultiplierVsAnnualLowFuelHandScale).toBeGreaterThan(
+      maturePermaculture.manageableHaMultiplierVsAnnualLowFuelEfficient
+    );
     expect(maturePermaculture.yearsUntilNetLabourAdvantage).toBeGreaterThan(0);
+    expect(report.maturePermacultureSensitivity.manageableHaPerWorkerLow).toBeLessThanOrEqual(
+      report.maturePermacultureSensitivity.manageableHaPerWorkerBase
+    );
+    expect(report.maturePermacultureSensitivity.manageableHaPerWorkerBase).toBeLessThanOrEqual(
+      report.maturePermacultureSensitivity.manageableHaPerWorkerHigh
+    );
 
     const strongTransition = report.permacultureAdoptionScenarios.find((s) => s.scenario === 'strongPermacultureTransition');
     expect(strongTransition.establishmentLabourDays).toBeGreaterThan(0);
     expect(strongTransition.totalLabourDaysAtMaturity).toBeGreaterThan(0);
 
     const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
+    expect(markdown).toContain('System | Soil prep | Planting | Weeding | Harvest | Processing');
+    expect(markdown).toContain('Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems');
     expect(markdown).toContain('not magic yield');
     expect(markdown).toContain('requires establishment labour and skill');
   });

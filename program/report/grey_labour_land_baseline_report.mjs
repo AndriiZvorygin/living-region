@@ -34,8 +34,17 @@ const PRODUCTION_SYSTEMS = [
   {
     system: 'annualMechanized',
     establishmentYears: 1,
+    designPlanningDaysPerHa: 2,
     establishmentLabourDaysPerHa: 6,
-    maintenanceLabourDaysPerHa: 12,
+    soilPrepTillageDaysPerHa: 3,
+    plantingSeedingDaysPerHa: 2,
+    weedingMulchingDaysPerHa: 2,
+    irrigationWaterDaysPerHa: 1,
+    pestDiseaseMonitoringDaysPerHa: 1,
+    pruningTrainingDaysPerHa: 0.5,
+    processingStorageDaysPerGJ: 0.2,
+    pathFenceToolMaintenanceDaysPerHa: 1,
+    observationManagementDaysPerHa: 1.5,
     harvestLabourDaysPerGJ: 0.45,
     harvestWindowDays: 45,
     annualFoodEnergyGJPerHaAtMaturity: 28,
@@ -50,11 +59,20 @@ const PRODUCTION_SYSTEMS = [
     notes: 'High machinery/input dependence; narrow harvest peak.'
   },
   {
-    system: 'annualLowFuel',
+    system: 'annualLowFuelEfficient',
     establishmentYears: 1,
-    establishmentLabourDaysPerHa: 12,
-    maintenanceLabourDaysPerHa: 42,
-    harvestLabourDaysPerGJ: 0.9,
+    designPlanningDaysPerHa: 6,
+    establishmentLabourDaysPerHa: 14,
+    soilPrepTillageDaysPerHa: 10,
+    plantingSeedingDaysPerHa: 9,
+    weedingMulchingDaysPerHa: 14,
+    irrigationWaterDaysPerHa: 5,
+    pestDiseaseMonitoringDaysPerHa: 4,
+    pruningTrainingDaysPerHa: 1,
+    processingStorageDaysPerGJ: 0.45,
+    pathFenceToolMaintenanceDaysPerHa: 4,
+    observationManagementDaysPerHa: 5,
+    harvestLabourDaysPerGJ: 1.05,
     harvestWindowDays: 55,
     annualFoodEnergyGJPerHaAtMaturity: 22,
     maturityRampYears: 1,
@@ -65,7 +83,34 @@ const PRODUCTION_SYSTEMS = [
     managementComplexityIndex: 0.5,
     seasonalPeakLabourMultiplier: 1.55,
     harvestDistribution: { lateSummer: 0.1, autumn: 0.75, winterStored: 0.15 },
-    notes: 'Low-fuel annual reference baseline.'
+    notes: 'Optimized low-fuel annual baseline (mulch/bed management).'
+  },
+  {
+    system: 'annualLowFuelHandScale',
+    establishmentYears: 1,
+    designPlanningDaysPerHa: 7,
+    establishmentLabourDaysPerHa: 18,
+    soilPrepTillageDaysPerHa: 16,
+    plantingSeedingDaysPerHa: 13,
+    weedingMulchingDaysPerHa: 28,
+    irrigationWaterDaysPerHa: 6,
+    pestDiseaseMonitoringDaysPerHa: 5,
+    pruningTrainingDaysPerHa: 1,
+    processingStorageDaysPerGJ: 0.52,
+    pathFenceToolMaintenanceDaysPerHa: 4,
+    observationManagementDaysPerHa: 6,
+    harvestLabourDaysPerGJ: 1.15,
+    harvestWindowDays: 50,
+    annualFoodEnergyGJPerHaAtMaturity: 20,
+    maturityRampYears: 1,
+    maturityCurve: 'flat',
+    inputDependencyIndex: 0.42,
+    machineryDependencyIndex: 0.25,
+    skillRequirementIndex: 0.55,
+    managementComplexityIndex: 0.56,
+    seasonalPeakLabourMultiplier: 1.62,
+    harvestDistribution: { lateSummer: 0.08, autumn: 0.8, winterStored: 0.12 },
+    notes: 'Low-fuel hand-scale annual with repeated soil prep/planting/weeding.'
   },
   {
     system: 'marketGardenIntensive',
@@ -106,8 +151,17 @@ const PRODUCTION_SYSTEMS = [
   {
     system: 'youngPermaculture',
     establishmentYears: 4,
+    designPlanningDaysPerHa: 28,
     establishmentLabourDaysPerHa: 180,
-    maintenanceLabourDaysPerHa: 52,
+    soilPrepTillageDaysPerHa: 4,
+    plantingSeedingDaysPerHa: 14,
+    weedingMulchingDaysPerHa: 15,
+    irrigationWaterDaysPerHa: 7,
+    pestDiseaseMonitoringDaysPerHa: 8,
+    pruningTrainingDaysPerHa: 10,
+    processingStorageDaysPerGJ: 0.62,
+    pathFenceToolMaintenanceDaysPerHa: 7,
+    observationManagementDaysPerHa: 10,
     harvestLabourDaysPerGJ: 1.4,
     harvestWindowDays: 160,
     annualFoodEnergyGJPerHaAtMaturity: 20,
@@ -122,13 +176,22 @@ const PRODUCTION_SYSTEMS = [
     notes: 'Front-loaded design/establishment burden before maturity.'
   },
   {
-    system: 'maturePermaculture',
+    system: 'maturePermacultureConservative',
     establishmentYears: 6,
+    designPlanningDaysPerHa: 26,
     establishmentLabourDaysPerHa: 210,
-    maintenanceLabourDaysPerHa: 24,
-    harvestLabourDaysPerGJ: 0.95,
+    soilPrepTillageDaysPerHa: 1.5,
+    plantingSeedingDaysPerHa: 3.5,
+    weedingMulchingDaysPerHa: 7,
+    irrigationWaterDaysPerHa: 4,
+    pestDiseaseMonitoringDaysPerHa: 8,
+    pruningTrainingDaysPerHa: 10,
+    processingStorageDaysPerGJ: 0.68,
+    pathFenceToolMaintenanceDaysPerHa: 8,
+    observationManagementDaysPerHa: 10,
+    harvestLabourDaysPerGJ: 1.2,
     harvestWindowDays: 185,
-    annualFoodEnergyGJPerHaAtMaturity: 23,
+    annualFoodEnergyGJPerHaAtMaturity: 22,
     maturityRampYears: 8,
     maturityCurve: 'sigmoid',
     inputDependencyIndex: 0.22,
@@ -137,7 +200,88 @@ const PRODUCTION_SYSTEMS = [
     managementComplexityIndex: 0.88,
     seasonalPeakLabourMultiplier: 1.08,
     harvestDistribution: { earlySummer: 0.1, lateSummer: 0.25, autumn: 0.4, lateAutumn: 0.15, winterStored: 0.1 },
-    notes: 'Lower recurring labour after establishment; requires management skill.'
+    notes: 'Conservative mature perennial case with high management demand.'
+  },
+  {
+    system: 'maturePermacultureLowCare',
+    establishmentYears: 6,
+    designPlanningDaysPerHa: 24,
+    establishmentLabourDaysPerHa: 190,
+    soilPrepTillageDaysPerHa: 1,
+    plantingSeedingDaysPerHa: 2.5,
+    weedingMulchingDaysPerHa: 5,
+    irrigationWaterDaysPerHa: 3,
+    pestDiseaseMonitoringDaysPerHa: 7,
+    pruningTrainingDaysPerHa: 8,
+    processingStorageDaysPerGJ: 0.55,
+    pathFenceToolMaintenanceDaysPerHa: 6,
+    observationManagementDaysPerHa: 8,
+    harvestLabourDaysPerGJ: 1.0,
+    harvestWindowDays: 190,
+    annualFoodEnergyGJPerHaAtMaturity: 23,
+    maturityRampYears: 8,
+    maturityCurve: 'sigmoid',
+    inputDependencyIndex: 0.2,
+    machineryDependencyIndex: 0.12,
+    skillRequirementIndex: 0.83,
+    managementComplexityIndex: 0.84,
+    seasonalPeakLabourMultiplier: 1.06,
+    harvestDistribution: { earlySummer: 0.1, lateSummer: 0.24, autumn: 0.38, lateAutumn: 0.16, winterStored: 0.12 },
+    notes: 'Established perennial polyculture with reduced recurring soil/weed labour.'
+  },
+  {
+    system: 'maturePermacultureHarvestIntensive',
+    establishmentYears: 6,
+    designPlanningDaysPerHa: 24,
+    establishmentLabourDaysPerHa: 200,
+    soilPrepTillageDaysPerHa: 1,
+    plantingSeedingDaysPerHa: 2.5,
+    weedingMulchingDaysPerHa: 5.5,
+    irrigationWaterDaysPerHa: 3,
+    pestDiseaseMonitoringDaysPerHa: 8,
+    pruningTrainingDaysPerHa: 9,
+    processingStorageDaysPerGJ: 0.8,
+    pathFenceToolMaintenanceDaysPerHa: 6.5,
+    observationManagementDaysPerHa: 8,
+    harvestLabourDaysPerGJ: 1.35,
+    harvestWindowDays: 175,
+    annualFoodEnergyGJPerHaAtMaturity: 28,
+    maturityRampYears: 8,
+    maturityCurve: 'sigmoid',
+    inputDependencyIndex: 0.22,
+    machineryDependencyIndex: 0.14,
+    skillRequirementIndex: 0.85,
+    managementComplexityIndex: 0.87,
+    seasonalPeakLabourMultiplier: 1.11,
+    harvestDistribution: { earlySummer: 0.08, lateSummer: 0.24, autumn: 0.42, lateAutumn: 0.17, winterStored: 0.09 },
+    notes: 'Mature perennial system where harvest and processing dominate labour.'
+  },
+  {
+    system: 'maturePermacultureOptimisticEstablished',
+    establishmentYears: 6,
+    designPlanningDaysPerHa: 22,
+    establishmentLabourDaysPerHa: 175,
+    soilPrepTillageDaysPerHa: 0.8,
+    plantingSeedingDaysPerHa: 2,
+    weedingMulchingDaysPerHa: 3.5,
+    irrigationWaterDaysPerHa: 2.5,
+    pestDiseaseMonitoringDaysPerHa: 6,
+    pruningTrainingDaysPerHa: 7,
+    processingStorageDaysPerGJ: 0.48,
+    pathFenceToolMaintenanceDaysPerHa: 5,
+    observationManagementDaysPerHa: 7,
+    harvestLabourDaysPerGJ: 0.9,
+    harvestWindowDays: 195,
+    annualFoodEnergyGJPerHaAtMaturity: 24,
+    maturityRampYears: 7,
+    maturityCurve: 'sigmoid',
+    inputDependencyIndex: 0.18,
+    machineryDependencyIndex: 0.1,
+    skillRequirementIndex: 0.8,
+    managementComplexityIndex: 0.8,
+    seasonalPeakLabourMultiplier: 1.04,
+    harvestDistribution: { lateSpring: 0.06, earlySummer: 0.12, lateSummer: 0.24, autumn: 0.34, lateAutumn: 0.16, winterStored: 0.08 },
+    notes: 'Optimistic established mature perennial case.'
   },
   {
     system: 'orchardNutPolyculture',
@@ -196,8 +340,17 @@ const PRODUCTION_SYSTEMS = [
   {
     system: 'mixedPerennialStapleSystem',
     establishmentYears: 7,
+    designPlanningDaysPerHa: 20,
     establishmentLabourDaysPerHa: 165,
-    maintenanceLabourDaysPerHa: 22,
+    soilPrepTillageDaysPerHa: 1.2,
+    plantingSeedingDaysPerHa: 3,
+    weedingMulchingDaysPerHa: 4.5,
+    irrigationWaterDaysPerHa: 2.5,
+    pestDiseaseMonitoringDaysPerHa: 6.5,
+    pruningTrainingDaysPerHa: 8.5,
+    processingStorageDaysPerGJ: 0.56,
+    pathFenceToolMaintenanceDaysPerHa: 5.5,
+    observationManagementDaysPerHa: 7.5,
     harvestLabourDaysPerGJ: 0.9,
     harvestWindowDays: 175,
     annualFoodEnergyGJPerHaAtMaturity: 21,
@@ -210,6 +363,60 @@ const PRODUCTION_SYSTEMS = [
     seasonalPeakLabourMultiplier: 1.1,
     harvestDistribution: { earlySummer: 0.09, lateSummer: 0.23, autumn: 0.36, lateAutumn: 0.2, winterStored: 0.12 },
     notes: 'Perennial staple-focused mixed system.'
+  },
+  {
+    system: 'perennialStapleLowCare',
+    establishmentYears: 8,
+    designPlanningDaysPerHa: 18,
+    establishmentLabourDaysPerHa: 155,
+    soilPrepTillageDaysPerHa: 1,
+    plantingSeedingDaysPerHa: 2.2,
+    weedingMulchingDaysPerHa: 4,
+    irrigationWaterDaysPerHa: 2.2,
+    pestDiseaseMonitoringDaysPerHa: 6,
+    pruningTrainingDaysPerHa: 7.5,
+    processingStorageDaysPerGJ: 0.5,
+    pathFenceToolMaintenanceDaysPerHa: 5,
+    observationManagementDaysPerHa: 7,
+    harvestLabourDaysPerGJ: 0.82,
+    harvestWindowDays: 185,
+    annualFoodEnergyGJPerHaAtMaturity: 20,
+    maturityRampYears: 10,
+    maturityCurve: 'sigmoid',
+    inputDependencyIndex: 0.2,
+    machineryDependencyIndex: 0.12,
+    skillRequirementIndex: 0.78,
+    managementComplexityIndex: 0.79,
+    seasonalPeakLabourMultiplier: 1.08,
+    harvestDistribution: { earlySummer: 0.09, lateSummer: 0.22, autumn: 0.38, lateAutumn: 0.18, winterStored: 0.13 },
+    notes: 'Perennial staple mix with lower recurring care and delayed maturity.'
+  },
+  {
+    system: 'perennialStapleBulkLowCare',
+    establishmentYears: 10,
+    designPlanningDaysPerHa: 20,
+    establishmentLabourDaysPerHa: 170,
+    soilPrepTillageDaysPerHa: 0.8,
+    plantingSeedingDaysPerHa: 1.8,
+    weedingMulchingDaysPerHa: 3.2,
+    irrigationWaterDaysPerHa: 2.0,
+    pestDiseaseMonitoringDaysPerHa: 5.5,
+    pruningTrainingDaysPerHa: 7.0,
+    processingStorageDaysPerGJ: 0.42,
+    pathFenceToolMaintenanceDaysPerHa: 5.2,
+    observationManagementDaysPerHa: 7.0,
+    harvestLabourDaysPerGJ: 0.62,
+    harvestWindowDays: 170,
+    annualFoodEnergyGJPerHaAtMaturity: 24,
+    maturityRampYears: 12,
+    maturityCurve: 'sigmoid',
+    inputDependencyIndex: 0.18,
+    machineryDependencyIndex: 0.1,
+    skillRequirementIndex: 0.82,
+    managementComplexityIndex: 0.76,
+    seasonalPeakLabourMultiplier: 1.05,
+    harvestDistribution: { earlySummer: 0.07, lateSummer: 0.2, autumn: 0.41, lateAutumn: 0.2, winterStored: 0.12 },
+    notes: 'Mature staple/perennial bulk food and wood-energy orientation; delayed maturity with lower fiddly harvest labour.'
   }
 ];
 
@@ -437,17 +644,27 @@ function evaluateProductionSystem(system, context) {
   const rollingHarvestAdvantage = clamp01(1 - peakHarvestShare);
   const seasonalLabourSmoothingFactor = clamp01(1 - (peakHarvestShare - (1 / Math.max(nonZero, 1)) * 0.5));
 
-  const labourDaysPerHaAtYear1 = system.establishmentLabourDaysPerHa + system.maintenanceLabourDaysPerHa
-    + (system.annualFoodEnergyGJPerHaAtMaturity * 0.25 * system.harvestLabourDaysPerGJ);
-  const labourDaysPerHaAtMaturity = system.maintenanceLabourDaysPerHa
-    + (system.annualFoodEnergyGJPerHaAtMaturity * system.harvestLabourDaysPerGJ);
+  const recurringNonHarvestLabourDaysPerHa =
+    n(system.soilPrepTillageDaysPerHa) +
+    n(system.plantingSeedingDaysPerHa) +
+    n(system.weedingMulchingDaysPerHa) +
+    n(system.irrigationWaterDaysPerHa) +
+    n(system.pestDiseaseMonitoringDaysPerHa) +
+    n(system.pruningTrainingDaysPerHa) +
+    n(system.pathFenceToolMaintenanceDaysPerHa) +
+    n(system.observationManagementDaysPerHa);
+  const harvestLabourDaysPerHa = n(system.annualFoodEnergyGJPerHaAtMaturity) * n(system.harvestLabourDaysPerGJ);
+  const processingStorageLabourDaysPerHa = n(system.annualFoodEnergyGJPerHaAtMaturity) * n(system.processingStorageDaysPerGJ);
+  const labourDaysPerHaAtYear1 = n(system.designPlanningDaysPerHa) + n(system.establishmentLabourDaysPerHa)
+    + recurringNonHarvestLabourDaysPerHa + (harvestLabourDaysPerHa * 0.25) + (processingStorageLabourDaysPerHa * 0.2);
+  const labourDaysPerHaAtMaturity = recurringNonHarvestLabourDaysPerHa + harvestLabourDaysPerHa + processingStorageLabourDaysPerHa;
 
   const foodEnergyGJPerLabourDayAtMaturity = labourDaysPerHaAtMaturity > 0
     ? system.annualFoodEnergyGJPerHaAtMaturity / labourDaysPerHaAtMaturity : 0;
   const manageableHaPerWorkerAtMaturity = labourDaysPerHaAtMaturity > 0 ? foodWorkerDaysPerYear / labourDaysPerHaAtMaturity : 0;
 
   const peakLabourDaysPerHarvestWindow = labourDaysPerHaAtMaturity * peakHarvestShare * system.seasonalPeakLabourMultiplier;
-  const establishmentLabourDeficitDays = Math.max(0, system.establishmentLabourDaysPerHa - annualReferenceLabourDaysPerHa);
+  const establishmentLabourDeficitDays = Math.max(0, n(system.establishmentLabourDaysPerHa) - annualReferenceLabourDaysPerHa);
 
   const labourReductionAtMaturity = annualReferenceLabourDaysPerHa - labourDaysPerHaAtMaturity;
   const manageableHaMultiplierVsLowFuelAnnual = lowFuelAnnualBaseline.manageableHaPerWorkerAtMaturity > 0
@@ -460,16 +677,30 @@ function evaluateProductionSystem(system, context) {
     ? foodEnergyGJPerLabourDayAtMaturity / lowFuelAnnualBaseline.foodEnergyGJPerLabourDayAtMaturity : 0;
 
   const yearsUntilNetLabourAdvantage = labourReductionAtMaturity > 0
-    ? Math.max(1, Math.ceil(system.establishmentLabourDaysPerHa / labourReductionAtMaturity))
+    ? Math.max(1, Math.ceil(n(system.establishmentLabourDaysPerHa) / labourReductionAtMaturity))
     : null;
   const yearsUntilFoodEnergyMaturity = system.maturityRampYears;
   const transitionDipGJ = Math.max(0, lowFuelAnnualBaseline.annualFoodEnergyGJPerHaAtMaturity * 0.2 * Math.min(1, system.establishmentYears / 8));
-  const establishmentBottleneckWarning = system.establishmentLabourDaysPerHa > 120 || system.skillRequirementIndex > 0.75;
+  const establishmentBottleneckWarning = n(system.establishmentLabourDaysPerHa) > 120 || system.skillRequirementIndex > 0.75;
+
+  const soilPrepReductionPct = annualReferenceLabourDaysPerHa > 0
+    ? ((n(lowFuelAnnualBaseline.soilPrepTillageDaysPerHa) - n(system.soilPrepTillageDaysPerHa)) / Math.max(1e-9, n(lowFuelAnnualBaseline.soilPrepTillageDaysPerHa))) * 100 : 0;
+  const plantingSeedingReductionPct = annualReferenceLabourDaysPerHa > 0
+    ? ((n(lowFuelAnnualBaseline.plantingSeedingDaysPerHa) - n(system.plantingSeedingDaysPerHa)) / Math.max(1e-9, n(lowFuelAnnualBaseline.plantingSeedingDaysPerHa))) * 100 : 0;
+  const weedingMulchingReductionPct = annualReferenceLabourDaysPerHa > 0
+    ? ((n(lowFuelAnnualBaseline.weedingMulchingDaysPerHa) - n(system.weedingMulchingDaysPerHa)) / Math.max(1e-9, n(lowFuelAnnualBaseline.weedingMulchingDaysPerHa))) * 100 : 0;
+  const harvestLabourChangePct = ((harvestLabourDaysPerHa - n(lowFuelAnnualBaseline.harvestLabourDaysPerHa)) / Math.max(1e-9, n(lowFuelAnnualBaseline.harvestLabourDaysPerHa))) * 100;
+  const processingStorageChangePct = ((processingStorageLabourDaysPerHa - n(lowFuelAnnualBaseline.processingStorageLabourDaysPerHa)) / Math.max(1e-9, n(lowFuelAnnualBaseline.processingStorageLabourDaysPerHa))) * 100;
+  const recurringNonHarvestReductionPct = ((n(lowFuelAnnualBaseline.recurringNonHarvestLabourDaysPerHa) - recurringNonHarvestLabourDaysPerHa) / Math.max(1e-9, n(lowFuelAnnualBaseline.recurringNonHarvestLabourDaysPerHa))) * 100;
+  const totalLabourReductionPct = ((annualReferenceLabourDaysPerHa - labourDaysPerHaAtMaturity) / Math.max(1e-9, annualReferenceLabourDaysPerHa)) * 100;
 
   return {
     ...system,
     labourDaysPerHaAtYear1,
     labourDaysPerHaAtMaturity,
+    recurringNonHarvestLabourDaysPerHa,
+    harvestLabourDaysPerHa,
+    processingStorageLabourDaysPerHa,
     foodEnergyGJPerLabourDayAtMaturity,
     manageableHaPerWorkerAtMaturity,
     peakLabourDaysPerHarvestWindow,
@@ -491,6 +722,13 @@ function evaluateProductionSystem(system, context) {
     inputDependencyReductionVsAnnual,
     foodEnergyGJPerHaRatioVsAnnual,
     foodEnergyGJPerLabourDayRatioVsAnnual,
+    soilPrepReductionPct,
+    plantingSeedingReductionPct,
+    weedingMulchingReductionPct,
+    harvestLabourChangePct,
+    processingStorageChangePct,
+    recurringNonHarvestReductionPct,
+    totalLabourReductionPct,
     harvestDistribution
   };
 }
@@ -504,11 +742,11 @@ function buildPermacultureScenarioRows(args) {
     systemById
   } = args;
 
-  const maturePermaculture = systemById.get('maturePermaculture');
+  const maturePermaculture = systemById.get('maturePermacultureLowCare');
   const orchardNutPolyculture = systemById.get('orchardNutPolyculture');
   const coppiceWoodFuel = systemById.get('coppiceWoodFuel');
   const marketGardenIntensive = systemById.get('marketGardenIntensive');
-  const annualLowFuel = systemById.get('annualLowFuel');
+  const annualLowFuel = systemById.get('annualLowFuelEfficient');
 
   return PERMACULTURE_ADOPTION_SCENARIOS.map((scenario) => {
     const transitionedHa = regional.estimatedHumanFoodProducingHa * scenario.shareOfHumanFoodProducingHaTransitioned;
@@ -765,18 +1003,34 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   }
 
   const annualLowFuelBase = {
-    ...PRODUCTION_SYSTEMS.find((s) => s.system === 'annualLowFuel')
+    ...PRODUCTION_SYSTEMS.find((s) => s.system === 'annualLowFuelEfficient')
   };
+  const annualLowFuelHandBase = {
+    ...PRODUCTION_SYSTEMS.find((s) => s.system === 'annualLowFuelHandScale')
+  };
+  const baseReferenceLabourDaysPerHa =
+    n(annualLowFuelBase.soilPrepTillageDaysPerHa) +
+    n(annualLowFuelBase.plantingSeedingDaysPerHa) +
+    n(annualLowFuelBase.weedingMulchingDaysPerHa) +
+    n(annualLowFuelBase.irrigationWaterDaysPerHa) +
+    n(annualLowFuelBase.pestDiseaseMonitoringDaysPerHa) +
+    n(annualLowFuelBase.pruningTrainingDaysPerHa) +
+    n(annualLowFuelBase.pathFenceToolMaintenanceDaysPerHa) +
+    n(annualLowFuelBase.observationManagementDaysPerHa) +
+    n(annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity) * (n(annualLowFuelBase.harvestLabourDaysPerGJ) + n(annualLowFuelBase.processingStorageDaysPerGJ));
   const annualLowFuelEvaluated = evaluateProductionSystem(annualLowFuelBase, {
     foodWorkerDaysPerYear: defaults.foodWorkerDaysPerYear,
     lowFuelAnnualBaseline: {
       ...annualLowFuelBase,
-      manageableHaPerWorkerAtMaturity: defaults.foodWorkerDaysPerYear / (annualLowFuelBase.maintenanceLabourDaysPerHa + annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity * annualLowFuelBase.harvestLabourDaysPerGJ),
-      foodEnergyGJPerLabourDayAtMaturity: annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity / (annualLowFuelBase.maintenanceLabourDaysPerHa + annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity * annualLowFuelBase.harvestLabourDaysPerGJ),
+      recurringNonHarvestLabourDaysPerHa: baseReferenceLabourDaysPerHa - n(annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity) * (n(annualLowFuelBase.harvestLabourDaysPerGJ) + n(annualLowFuelBase.processingStorageDaysPerGJ)),
+      harvestLabourDaysPerHa: n(annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity) * n(annualLowFuelBase.harvestLabourDaysPerGJ),
+      processingStorageLabourDaysPerHa: n(annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity) * n(annualLowFuelBase.processingStorageDaysPerGJ),
+      manageableHaPerWorkerAtMaturity: defaults.foodWorkerDaysPerYear / baseReferenceLabourDaysPerHa,
+      foodEnergyGJPerLabourDayAtMaturity: annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity / baseReferenceLabourDaysPerHa,
       inputDependencyIndex: annualLowFuelBase.inputDependencyIndex,
       annualFoodEnergyGJPerHaAtMaturity: annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity
     },
-    annualReferenceLabourDaysPerHa: annualLowFuelBase.maintenanceLabourDaysPerHa + annualLowFuelBase.annualFoodEnergyGJPerHaAtMaturity * annualLowFuelBase.harvestLabourDaysPerGJ,
+    annualReferenceLabourDaysPerHa: baseReferenceLabourDaysPerHa,
     annualReferencePeakHarvestShare: Math.max(...Object.values(normalizeHarvestDistribution(annualLowFuelBase.harvestDistribution)))
   });
 
@@ -786,6 +1040,40 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     annualReferenceLabourDaysPerHa: annualLowFuelEvaluated.labourDaysPerHaAtMaturity,
     annualReferencePeakHarvestShare: annualLowFuelEvaluated.peakHarvestShare
   }));
+  const annualLowFuelHandEvaluated = evaluateProductionSystem(annualLowFuelHandBase, {
+    foodWorkerDaysPerYear: defaults.foodWorkerDaysPerYear,
+    lowFuelAnnualBaseline: annualLowFuelEvaluated,
+    annualReferenceLabourDaysPerHa: annualLowFuelEvaluated.labourDaysPerHaAtMaturity,
+    annualReferencePeakHarvestShare: annualLowFuelEvaluated.peakHarvestShare
+  });
+  for (const system of productionSystemLeverage) {
+    system.manageableHaMultiplierVsAnnualLowFuelEfficient = annualLowFuelEvaluated.manageableHaPerWorkerAtMaturity > 0
+      ? system.manageableHaPerWorkerAtMaturity / annualLowFuelEvaluated.manageableHaPerWorkerAtMaturity : 0;
+    system.manageableHaMultiplierVsAnnualLowFuelHandScale = annualLowFuelHandEvaluated.manageableHaPerWorkerAtMaturity > 0
+      ? system.manageableHaPerWorkerAtMaturity / annualLowFuelHandEvaluated.manageableHaPerWorkerAtMaturity : 0;
+    system.totalLabourReductionPctVsAnnualLowFuelEfficient = ((annualLowFuelEvaluated.labourDaysPerHaAtMaturity - system.labourDaysPerHaAtMaturity)
+      / Math.max(1e-9, annualLowFuelEvaluated.labourDaysPerHaAtMaturity)) * 100;
+    system.totalLabourReductionPctVsAnnualLowFuelHandScale = ((annualLowFuelHandEvaluated.labourDaysPerHaAtMaturity - system.labourDaysPerHaAtMaturity)
+      / Math.max(1e-9, annualLowFuelHandEvaluated.labourDaysPerHaAtMaturity)) * 100;
+  }
+  const matureConservative = productionSystemLeverage.find((s) => s.system === 'maturePermacultureConservative');
+  const matureBaseline = productionSystemLeverage.find((s) => s.system === 'maturePermacultureLowCare');
+  const matureOptimistic = productionSystemLeverage.find((s) => s.system === 'maturePermacultureOptimisticEstablished');
+  const maturePermacultureSensitivity = {
+    manageableHaPerWorkerLow: matureConservative?.manageableHaPerWorkerAtMaturity ?? 0,
+    manageableHaPerWorkerBase: matureBaseline?.manageableHaPerWorkerAtMaturity ?? 0,
+    manageableHaPerWorkerHigh: matureOptimistic?.manageableHaPerWorkerAtMaturity ?? 0,
+    multiplierRangeVsAnnualLowFuelHandScale: [
+      matureConservative?.manageableHaMultiplierVsAnnualLowFuelHandScale ?? 0,
+      matureBaseline?.manageableHaMultiplierVsAnnualLowFuelHandScale ?? 0,
+      matureOptimistic?.manageableHaMultiplierVsAnnualLowFuelHandScale ?? 0
+    ],
+    multiplierRangeVsAnnualLowFuelEfficient: [
+      matureConservative?.manageableHaMultiplierVsAnnualLowFuelEfficient ?? 0,
+      matureBaseline?.manageableHaMultiplierVsAnnualLowFuelEfficient ?? 0,
+      matureOptimistic?.manageableHaMultiplierVsAnnualLowFuelEfficient ?? 0
+    ]
+  };
 
   const systemById = new Map(productionSystemLeverage.map((s) => [s.system, s]));
 
@@ -798,15 +1086,20 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   });
 
   const harvestWindowDiagnostics = {
-    annualLowFuel: {
+    annualLowFuelEfficient: {
       peakHarvestShare: annualLowFuelEvaluated.peakHarvestShare,
       harvestConcentrationIndex: annualLowFuelEvaluated.harvestConcentrationIndex,
       rollingHarvestAdvantage: annualLowFuelEvaluated.rollingHarvestAdvantage
     },
-    maturePermaculture: {
-      peakHarvestShare: systemById.get('maturePermaculture')?.peakHarvestShare ?? 0,
-      harvestConcentrationIndex: systemById.get('maturePermaculture')?.harvestConcentrationIndex ?? 0,
-      rollingHarvestAdvantage: systemById.get('maturePermaculture')?.rollingHarvestAdvantage ?? 0
+    annualLowFuelHandScale: {
+      peakHarvestShare: annualLowFuelHandEvaluated.peakHarvestShare,
+      harvestConcentrationIndex: annualLowFuelHandEvaluated.harvestConcentrationIndex,
+      rollingHarvestAdvantage: annualLowFuelHandEvaluated.rollingHarvestAdvantage
+    },
+    maturePermacultureLowCare: {
+      peakHarvestShare: systemById.get('maturePermacultureLowCare')?.peakHarvestShare ?? 0,
+      harvestConcentrationIndex: systemById.get('maturePermacultureLowCare')?.harvestConcentrationIndex ?? 0,
+      rollingHarvestAdvantage: systemById.get('maturePermacultureLowCare')?.rollingHarvestAdvantage ?? 0
     }
   };
 
@@ -831,6 +1124,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     productionSystemLeverage,
     permacultureAdoptionScenarios,
     harvestWindowDiagnostics,
+    maturePermacultureSensitivity,
     caveats: [
       'lots/concessions are not ownership parcels',
       'no address-point population distribution yet',
@@ -856,7 +1150,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
 
   const permacultureSystemsCsvPath = path.join(produceDir, 'grey-labour-land-permaculture-systems.csv');
   fs.writeFileSync(permacultureSystemsCsvPath, toCsv(productionSystemLeverage, [
-    'system','establishmentYears','establishmentLabourDaysPerHa','labourDaysPerHaAtMaturity','annualFoodEnergyGJPerHaAtMaturity','foodEnergyGJPerLabourDayAtMaturity','manageableHaPerWorkerAtMaturity','harvestWindowDays','peakHarvestShare','rollingHarvestAdvantage','manageableHaMultiplierVsLowFuelAnnual','yearsUntilNetLabourAdvantage','notes'
+    'system','establishmentYears','establishmentLabourDaysPerHa','soilPrepTillageDaysPerHa','plantingSeedingDaysPerHa','weedingMulchingDaysPerHa','harvestLabourDaysPerHa','processingStorageLabourDaysPerHa','labourDaysPerHaAtMaturity','annualFoodEnergyGJPerHaAtMaturity','foodEnergyGJPerLabourDayAtMaturity','manageableHaPerWorkerAtMaturity','harvestWindowDays','peakHarvestShare','rollingHarvestAdvantage','manageableHaMultiplierVsAnnualLowFuelEfficient','manageableHaMultiplierVsAnnualLowFuelHandScale','yearsUntilNetLabourAdvantage','notes'
   ]));
 
   const permacultureScenariosCsvPath = path.join(produceDir, 'grey-labour-land-permaculture-scenarios.csv');
@@ -898,9 +1192,15 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     '## Perennial and permaculture labour leverage',
     'Perennial systems can reduce recurring labour and smooth seasonal peaks once established, but require design, establishment labour, time to maturity, and skill. This is a labour-profile change model, not magic yield.',
     '',
-    '| Production system | Establishment years | Labour days/ha at maturity | GJ/ha at maturity | Manageable ha/worker | Harvest window | Leverage vs low-fuel annual | Main bottleneck |',
-    '|---|---:|---:|---:|---:|---:|---:|---|',
-    ...productionSystemLeverage.map((s) => `| ${s.system} | ${s.establishmentYears} | ${s.labourDaysPerHaAtMaturity.toFixed(2)} | ${s.annualFoodEnergyGJPerHaAtMaturity.toFixed(2)} | ${s.manageableHaPerWorkerAtMaturity.toFixed(3)} | ${s.harvestWindowDays} | ${s.manageableHaMultiplierVsLowFuelAnnual.toFixed(3)} | ${s.establishmentBottleneckWarning ? 'Establishment labour and skill' : 'Seasonal harvest concentration'} |`),
+    '| System | Soil prep | Planting | Weeding | Harvest | Processing | Total labour/ha | Manageable ha/worker | Multiplier vs hand-scale annual | Main caveat |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---|',
+    ...productionSystemLeverage.map((s) => `| ${s.system} | ${n(s.soilPrepTillageDaysPerHa).toFixed(2)} | ${n(s.plantingSeedingDaysPerHa).toFixed(2)} | ${n(s.weedingMulchingDaysPerHa).toFixed(2)} | ${s.harvestLabourDaysPerHa.toFixed(2)} | ${s.processingStorageLabourDaysPerHa.toFixed(2)} | ${s.labourDaysPerHaAtMaturity.toFixed(2)} | ${s.manageableHaPerWorkerAtMaturity.toFixed(3)} | ${s.manageableHaMultiplierVsAnnualLowFuelHandScale.toFixed(3)} | ${s.establishmentBottleneckWarning ? 'Establishment labour and skill' : 'Harvest concentration and processing'} |`),
+    '',
+    `Sensitivity (mature permaculture manageable ha/worker low/base/high): ${maturePermacultureSensitivity.manageableHaPerWorkerLow.toFixed(3)} / ${maturePermacultureSensitivity.manageableHaPerWorkerBase.toFixed(3)} / ${maturePermacultureSensitivity.manageableHaPerWorkerHigh.toFixed(3)}`,
+    `Multiplier vs annualLowFuelEfficient (low/base/high): ${maturePermacultureSensitivity.multiplierRangeVsAnnualLowFuelEfficient.map((x) => x.toFixed(3)).join(' / ')}`,
+    `Multiplier vs annualLowFuelHandScale (low/base/high): ${maturePermacultureSensitivity.multiplierRangeVsAnnualLowFuelHandScale.map((x) => x.toFixed(3)).join(' / ')}`,
+    'The multiplier depends heavily on the annual baseline definition. Gains are usually smaller versus efficient annual systems and larger versus hand-scale annual systems with repeated soil prep and weeding.',
+    'Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems, not immediate garden output; establishment time and delayed yields remain significant constraints.',
     '',
     '## Caveats',
     '- lots/concessions are not ownership parcels',

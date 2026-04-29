@@ -261,6 +261,7 @@ npm run report:grey:labour-land
 This estimates how people are distributed relative to productive land access and how human food-labour requirements change as machinery/fuel support declines. It uses Census population, settlement boundaries, Official Plan land use, and lots/concessions. It is an estimate, not a parcel-ownership or farm-capacity claim.
 
 The report also compares annual, low-fuel, and perennial/permaculture production systems. Perennial systems are modelled as labour-profile changes: high establishment work up front, lower recurring maintenance at maturity, and a wider harvest window that can reduce seasonal labour bottlenecks.
+It includes a mature perennial staple bulk scenario to test lower-fiddly harvest systems (for example nut/staple tree-crop belts), with explicit maturity delay and establishment burden.
 
 Outputs:
 
