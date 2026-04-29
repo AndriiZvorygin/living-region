@@ -43,11 +43,18 @@ function readCachedReport(outputDir) {
 
 function shouldUseCachedReport(cachedReport, inputDir) {
   if (!cachedReport?.report?.assignment) return false;
+  if (!cachedReport.report.opportunityCategoryCounts || !cachedReport.report.constraintCounts) return false;
+  if (!cachedReport.report.assignment.lotConcessionCountByMunicipality) return false;
   const lotsPath = path.resolve(inputDir, 'lots-and-concessions-grey.geojson');
   const hasLotsFile = fs.existsSync(lotsPath);
   const cachedLots = Number(cachedReport.report.assignment.totalLotConcessionFeatures ?? 0);
+  const assignedCount = Number(cachedReport.report.assignment.assignedToMunicipalityCount ?? 0);
   if (hasLotsFile && cachedLots === 0) {
     // stale cache: lots file now exists but cached report was generated without it
+    return false;
+  }
+  if (hasLotsFile && cachedLots > 0 && assignedCount === 0) {
+    // likely incomplete or incompatible cached structure
     return false;
   }
   return true;
@@ -64,15 +71,17 @@ try {
     inputDir,
     outputDir
   });
-  const topMunicipalities = Object.entries(report.assignment.lotConcessionCountByMunicipality)
+  const assignment = report.assignment ?? {};
+  const lotByMunicipality = assignment.lotConcessionCountByMunicipality ?? {};
+  const topMunicipalities = Object.entries(lotByMunicipality)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([name, count]) => `${name}:${count}`)
     .join(', ');
 
-  console.log(`total lots/concessions: ${report.assignment.totalLotConcessionFeatures}`);
-  console.log(`assigned count: ${report.assignment.assignedToMunicipalityCount}`);
-  console.log(`unassigned count: ${report.assignment.unassignedLotConcessionCount}`);
+  console.log(`total lots/concessions: ${assignment.totalLotConcessionFeatures ?? 0}`);
+  console.log(`assigned count: ${assignment.assignedToMunicipalityCount ?? 0}`);
+  console.log(`unassigned count: ${assignment.unassignedLotConcessionCount ?? 0}`);
   console.log(`top municipalities by lot count: ${topMunicipalities || 'none'}`);
   console.log(`opportunity category counts: ${JSON.stringify(report.opportunityCategoryCounts)}`);
   console.log(`constraint counts: ${JSON.stringify(report.constraintCounts)}`);
@@ -80,7 +89,7 @@ try {
   console.log(`json: ${paths.jsonPath}`);
   console.log(`municipality csv: ${paths.municipalityCsvPath}`);
   console.log(`lot detail csv: ${paths.detailCsvPath}`);
-  if (report.assignment.totalLotConcessionFeatures === 0) {
+  if ((assignment.totalLotConcessionFeatures ?? 0) === 0) {
     console.log('Missing lots-and-concessions-grey.geojson. Run:');
     console.log('npm run grey:download-data -- --source=lots-and-concessions-grey');
   }

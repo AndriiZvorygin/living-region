@@ -304,6 +304,25 @@ Outputs:
 - `know/produce/grey-localization-access-municipal.csv`
 - `know/produce/grey-localization-access-candidate-nodes.csv`
 
+### Run all Grey reports
+
+```bash
+npm run report:grey:all
+```
+
+Options:
+
+```bash
+npm run report:grey:all -- --quick
+npm run report:grey:all -- --skip-download
+npm run report:grey:all -- --force-download
+```
+
+Outputs:
+
+- `know/produce/grey-report-suite-summary.md`
+- `know/produce/grey-report-suite-summary.json`
+
 ## Real-data priority
 
 Minimum real GIS layers to replace generated geometry:
