@@ -304,6 +304,16 @@ Outputs:
 - `know/produce/grey-localization-access-municipal.csv`
 - `know/produce/grey-localization-access-candidate-nodes.csv`
 
+### Census small-area population distribution
+
+```bash
+npm run census:download-2021
+npm run census:import-grey-population
+npm run report:grey:population-distribution
+```
+
+This uses aggregate 2021 Census dissemination geography to improve Grey population distribution diagnostics inside municipalities and settlement/rural contexts. It does not represent individual-level address or personal data.
+
 ### Run all Grey reports
 
 ```bash

@@ -320,6 +320,7 @@ export function buildGreyLocalizationAccessReport(options = {}) {
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
   fs.mkdirSync(produceDir, { recursive: true });
   const warnings = [];
+  let populationDistributionSource = 'municipalHeuristic';
 
   const sourceFiles = {
     municipalityBoundaries: path.join(inputDir, 'municipality-boundaries.geojson'),
@@ -364,6 +365,16 @@ export function buildGreyLocalizationAccessReport(options = {}) {
   const landAccess = readJsonIfExists(sourceFiles.landAccessBaseline, warnings, 'land-access baseline', {});
   const labourLand = readJsonIfExists(sourceFiles.labourLandBaseline, warnings, 'labour-land baseline', {});
   const foodCalibration = readJsonIfExists(sourceFiles.foodCalibration, warnings, 'food calibration', {});
+  const censusPopulationDistribution = readJsonIfExists(
+    path.join(produceDir, 'grey-census-population-distribution.json'),
+    warnings,
+    'census population distribution',
+    {}
+  );
+  if (censusPopulationDistribution?.populationDistributionSource === 'censusSmallArea'
+    || n(censusPopulationDistribution?.totalPopulationMatched) > 0) {
+    populationDistributionSource = 'censusSmallArea';
+  }
   readJsonIfExists(sourceFiles.openDataWorld, warnings, 'open-data world', {});
 
   const roadByMunicipality = roadByMunicipalityFromCsv(produceDir, warnings);
@@ -648,6 +659,7 @@ export function buildGreyLocalizationAccessReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    populationDistributionSource,
     warnings,
     sourceFiles,
     regionalSummary,

@@ -1449,6 +1449,20 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   fs.mkdirSync(produceDir, { recursive: true });
 
   const warnings = [];
+  const censusPopulationDistributionPath = path.join(produceDir, 'grey-census-population-distribution.json');
+  let censusDistribution = null;
+  let populationDistributionSource = 'municipalHeuristic';
+  if (fs.existsSync(censusPopulationDistributionPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(censusPopulationDistributionPath, 'utf8'));
+      censusDistribution = parsed;
+      if (parsed?.populationDistributionSource === 'censusSmallArea' || Number(parsed?.totalPopulationMatched) > 0) {
+        populationDistributionSource = 'censusSmallArea';
+      }
+    } catch (error) {
+      warnings.push(`Failed to parse census population distribution: ${error.message}`);
+    }
+  }
 
   const landAccessJsonPath = path.join(produceDir, 'grey-land-access-baseline.json');
   const landAccessMunicipalCsvPath = path.join(produceDir, 'grey-land-access-municipality-summary.csv');
@@ -1579,6 +1593,17 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   regional.productiveHaPerRuralAccessPerson = regional.estimatedRuralProductiveLandAccessPopulation > 0
     ? regional.estimatedProductiveLandHa / regional.estimatedRuralProductiveLandAccessPopulation : 0;
   regional.availableFoodWorkerFTE = regional.totalAvailableFoodLabourDays / defaults.foodWorkerDaysPerYear;
+
+  if (populationDistributionSource === 'censusSmallArea') {
+    const censusNoDirect = n(censusDistribution?.populationInsideSettlementBoundaries);
+    const censusRuralAccess = n(censusDistribution?.populationOutsideSettlementBoundaries);
+    if (censusNoDirect + censusRuralAccess > 0) {
+      regional.estimatedNoDirectLandAccessPopulation = censusNoDirect;
+      regional.estimatedRuralProductiveLandAccessPopulation = censusRuralAccess;
+      regional.productiveHaPerRuralAccessPerson = regional.estimatedRuralProductiveLandAccessPopulation > 0
+        ? regional.estimatedProductiveLandHa / regional.estimatedRuralProductiveLandAccessPopulation : 0;
+    }
+  }
 
   const scenarios = defaults.scenarios.map((s) => {
     const requiredFoodLabourDays = regional.estimatedHumanFoodProducingHa * s.labourDaysPerHumanFoodHa * s.humanLabourMultiplier;
@@ -1835,7 +1860,8 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   const json = {
     generatedAt: new Date().toISOString(),
     assumptions: {
-      populationDistributionMethod: 'heuristicEstimate',
+      populationDistributionMethod: populationDistributionSource === 'censusSmallArea' ? 'censusSmallAreaAggregate' : 'heuristicEstimate',
+      populationDistributionSource,
       areaMethod: 'censusAreaWeightedByLotOpportunityShare',
       labourDaysByCategory: defaults.labourDaysByCategory,
       foodWorkerDaysPerYear: defaults.foodWorkerDaysPerYear,

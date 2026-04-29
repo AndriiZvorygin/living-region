@@ -201,6 +201,18 @@ export function buildGreyLandAccessReport(options = {}) {
   const outputDir = path.resolve(options.outputDir ?? 'know/produce');
   fs.mkdirSync(outputDir, { recursive: true });
   const warnings = [];
+  const censusPopulationDistributionPath = path.join(outputDir, 'grey-census-population-distribution.json');
+  let populationDistributionSource = 'municipalHeuristic';
+  if (fs.existsSync(censusPopulationDistributionPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(censusPopulationDistributionPath, 'utf8'));
+      if (parsed?.populationDistributionSource === 'censusSmallArea' || Number(parsed?.totalPopulationMatched) > 0) {
+        populationDistributionSource = 'censusSmallArea';
+      }
+    } catch (error) {
+      warnings.push(`Failed to parse census population distribution: ${error.message}`);
+    }
+  }
 
   const lotFeatures = readGeoJsonFeaturesSafe(path.join(inputDir, 'lots-and-concessions-grey.geojson'), warnings);
   if (lotFeatures.length === 0) {
@@ -414,6 +426,7 @@ export function buildGreyLandAccessReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    populationDistributionSource,
     caveat: 'Lots and Concessions is a land-structure reference layer, not parcel ownership or legal access.',
     dataUsed: {
       municipalityFeatures: municipalityFeatures.length,

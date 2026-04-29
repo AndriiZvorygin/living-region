@@ -90,7 +90,8 @@ export function buildLivingRegionModelAssessment(options = {}) {
     openDataWorld: path.join(produceDir, 'grey-open-data-world.json'),
     gisSummary: path.join(produceDir, 'grey-gis-summary.json'),
     fieldInventory: path.join(produceDir, 'grey-field-inventory.json'),
-    foodCalibration: path.join(produceDir, 'grey-food-calibration.json')
+    foodCalibration: path.join(produceDir, 'grey-food-calibration.json'),
+    censusPopulationDistribution: path.join(produceDir, 'grey-census-population-distribution.json')
   };
 
   const publicBaseline = readJsonIfExists(sourceFiles.publicBaseline, warnings, 'public baseline');
@@ -103,6 +104,7 @@ export function buildLivingRegionModelAssessment(options = {}) {
   const gisSummary = readJsonIfExistsWithSizeGuard(sourceFiles.gisSummary, warnings, 'GIS summary');
   const fieldInventory = readJsonIfExists(sourceFiles.fieldInventory, warnings, 'field inventory');
   const foodCalibration = readJsonIfExists(sourceFiles.foodCalibration, warnings, 'food calibration');
+  const censusPopulationDistribution = readJsonIfExists(sourceFiles.censusPopulationDistribution, warnings, 'census population distribution');
 
   const observedAnchors = {
     population: 100905,
@@ -207,6 +209,26 @@ export function buildLivingRegionModelAssessment(options = {}) {
       modelValue: !!foodCalibration,
       tolerance: 0,
       notes: 'Food calibration scaffold should exist to support present food-system diagnostics.'
+    }),
+    checkRow({
+      checkName: 'census small-area population loaded',
+      observedValue: true,
+      modelValue: !!censusPopulationDistribution && (asNumber(censusPopulationDistribution?.totalPopulationMatched, 0) > 0),
+      tolerance: 0
+    }),
+    checkRow({
+      checkName: 'census small-area population close to known total',
+      observedValue: observedAnchors.population,
+      modelValue: asNumber(censusPopulationDistribution?.totalPopulationMatched, NaN),
+      tolerance: 5000,
+      notes: 'Small-area import should be reasonably close to known Grey population (allows partial coverage tolerance).'
+    }),
+    checkRow({
+      checkName: 'settlement/rural split available from census small-area',
+      observedValue: true,
+      modelValue: asNumber(censusPopulationDistribution?.populationInsideSettlementBoundaries, 0)
+        + asNumber(censusPopulationDistribution?.populationOutsideSettlementBoundaries, 0) > 0,
+      tolerance: 0
     })
   ];
 
@@ -251,7 +273,7 @@ export function buildLivingRegionModelAssessment(options = {}) {
   const scorecard = {
     presentGeographyScore: 0.9,
     presentInfrastructureScore: 0.73,
-    presentPopulationScore: 0.76,
+    presentPopulationScore: censusPopulationDistribution ? 0.82 : 0.76,
     presentLandAccessScore: 0.79,
     presentFoodSystemScore: foodCalibration ? 0.52 : 0.46,
     presentHousingScore: 0.45,
