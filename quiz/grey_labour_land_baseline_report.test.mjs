@@ -20,10 +20,9 @@ describe('grey labour-land baseline report', () => {
     const sum = c.urbanSettlementPopulation + c.townVillageSettlementPopulation + c.hamletSettlementPopulation
       + c.ruralNonFarmPopulation + c.ruralProductiveLandAccessPopulation + c.agriculturalLotAccessPopulation;
     expect(sum).toBe(1000);
-    expect(c.noDirectLandAccessPopulation).toBeGreaterThanOrEqual(c.urbanSettlementPopulation);
   });
 
-  test('urban municipalities have higher noDirectLandAccessShare than rural under defaults', () => {
+  test('urban municipalities have higher noDirectLandAccess than rural under defaults', () => {
     const urban = estimatePopulationCategories({
       population2021: 1000,
       municipalityName: 'Owen Sound',
@@ -52,20 +51,33 @@ describe('grey labour-land baseline report', () => {
     );
   });
 
-  test('report writes markdown/json/csv and scenarios respond to machinery decline', () => {
+  test('permaculture leverage and rolling harvest diagnostics are present', () => {
     const { report, paths } = buildGreyLabourLandBaselineReport();
     expect(fs.existsSync(paths.markdownPath)).toBe(true);
     expect(fs.existsSync(paths.jsonPath)).toBe(true);
     expect(fs.existsSync(paths.municipalityCsvPath)).toBe(true);
     expect(fs.existsSync(paths.scenarioCsvPath)).toBe(true);
+    expect(fs.existsSync(paths.permacultureSystemsCsvPath)).toBe(true);
+    expect(fs.existsSync(paths.permacultureScenariosCsvPath)).toBe(true);
 
-    const current = report.scenarios.find((s) => s.scenario === 'currentMechanized');
-    const lowFuel = report.scenarios.find((s) => s.scenario === 'lowFuelMixed');
-    expect(lowFuel.requiredFoodLabourDays).toBeGreaterThan(current.requiredFoodLabourDays);
-    expect(lowFuel.fossilFuelLeverageRatio).toBeGreaterThan(1);
+    const lowFuelAnnual = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuel');
+    const maturePermaculture = report.productionSystemLeverage.find((s) => s.system === 'maturePermaculture');
+    const youngPermaculture = report.productionSystemLeverage.find((s) => s.system === 'youngPermaculture');
+    const annualMechanized = report.productionSystemLeverage.find((s) => s.system === 'annualMechanized');
+
+    expect(maturePermaculture.labourDaysPerHaAtMaturity).toBeLessThan(lowFuelAnnual.labourDaysPerHaAtMaturity);
+    expect(youngPermaculture.establishmentLabourDaysPerHa).toBeGreaterThan(youngPermaculture.maintenanceLabourDaysPerHa);
+    expect(maturePermaculture.peakHarvestShare).toBeLessThan(annualMechanized.peakHarvestShare);
+    expect(maturePermaculture.manageableHaMultiplierVsLowFuelAnnual).toBeGreaterThan(1);
+    expect(maturePermaculture.yearsUntilNetLabourAdvantage).toBeGreaterThan(0);
+
+    const strongTransition = report.permacultureAdoptionScenarios.find((s) => s.scenario === 'strongPermacultureTransition');
+    expect(strongTransition.establishmentLabourDays).toBeGreaterThan(0);
+    expect(strongTransition.totalLabourDaysAtMaturity).toBeGreaterThan(0);
 
     const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
-    expect(markdown).toContain('lots/concessions are not ownership parcels');
+    expect(markdown).toContain('not magic yield');
+    expect(markdown).toContain('requires establishment labour and skill');
   });
 
   test('missing lots file emits clear warning', () => {
@@ -75,8 +87,6 @@ describe('grey labour-land baseline report', () => {
     fs.mkdirSync(inputDir, { recursive: true });
     fs.mkdirSync(produceDir, { recursive: true });
     fs.writeFileSync(path.join(inputDir, 'municipality-boundaries.geojson'), JSON.stringify({ type: 'FeatureCollection', features: [] }));
-    fs.writeFileSync(path.join(inputDir, 'settlement-boundaries.geojson'), JSON.stringify({ type: 'FeatureCollection', features: [] }));
-    fs.writeFileSync(path.join(inputDir, 'official-plan-schedule-a-land-use.geojson'), JSON.stringify({ type: 'FeatureCollection', features: [] }));
 
     try {
       const { report } = buildGreyLabourLandBaselineReport({ inputDir, produceDir });

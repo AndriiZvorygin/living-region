@@ -20,6 +20,8 @@ try {
   console.log(`json: ${paths.jsonPath}`);
   console.log(`municipality csv: ${paths.municipalityCsvPath}`);
   console.log(`scenario csv: ${paths.scenarioCsvPath}`);
+  if (paths.permacultureSystemsCsvPath) console.log(`permaculture systems csv: ${paths.permacultureSystemsCsvPath}`);
+  if (paths.permacultureScenariosCsvPath) console.log(`permaculture scenarios csv: ${paths.permacultureScenariosCsvPath}`);
   if ((report.warnings ?? []).length > 0) {
     console.log('warnings:');
     for (const w of report.warnings) console.log(`  - ${w}`);

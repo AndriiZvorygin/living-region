@@ -260,12 +260,16 @@ npm run report:grey:labour-land
 
 This estimates how people are distributed relative to productive land access and how human food-labour requirements change as machinery/fuel support declines. It uses Census population, settlement boundaries, Official Plan land use, and lots/concessions. It is an estimate, not a parcel-ownership or farm-capacity claim.
 
+The report also compares annual, low-fuel, and perennial/permaculture production systems. Perennial systems are modelled as labour-profile changes: high establishment work up front, lower recurring maintenance at maturity, and a wider harvest window that can reduce seasonal labour bottlenecks.
+
 Outputs:
 
 - `know/produce/grey-labour-land-baseline.md`
 - `know/produce/grey-labour-land-baseline.json`
 - `know/produce/grey-labour-land-municipality-summary.csv`
 - `know/produce/grey-labour-land-scenarios.csv`
+- `know/produce/grey-labour-land-permaculture-systems.csv`
+- `know/produce/grey-labour-land-permaculture-scenarios.csv`
 
 ## Real-data priority
 
