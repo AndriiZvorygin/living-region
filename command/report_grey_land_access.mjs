@@ -1,8 +1,31 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+import fs from 'node:fs';
+import path from 'node:path';
 import { buildGreyLandAccessReport } from '../program/report/grey_land_access_report.mjs';
 
+function readCachedReport() {
+  const jsonPath = path.resolve('know/produce/grey-land-access-baseline.json');
+  if (!fs.existsSync(jsonPath)) return null;
+  try {
+    const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    if (!report?.assignment) return null;
+    return {
+      report,
+      paths: {
+        markdownPath: path.resolve('know/produce/grey-land-access-baseline.md'),
+        jsonPath,
+        municipalityCsvPath: path.resolve('know/produce/grey-land-access-municipality-summary.csv'),
+        detailCsvPath: path.resolve('know/produce/grey-land-access-lot-detail.csv')
+      }
+    };
+  } catch {
+    return null;
+  }
+}
+
 try {
-  const { report, paths } = buildGreyLandAccessReport();
+  const cached = readCachedReport();
+  const { report, paths } = cached ?? buildGreyLandAccessReport();
   const topMunicipalities = Object.entries(report.assignment.lotConcessionCountByMunicipality)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)

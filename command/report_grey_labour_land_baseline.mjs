@@ -23,6 +23,7 @@ try {
   if (paths.permacultureSystemsCsvPath) console.log(`permaculture systems csv: ${paths.permacultureSystemsCsvPath}`);
   if (paths.permacultureScenariosCsvPath) console.log(`permaculture scenarios csv: ${paths.permacultureScenariosCsvPath}`);
   if (paths.animalPowerScenariosCsvPath) console.log(`animal power scenarios csv: ${paths.animalPowerScenariosCsvPath}`);
+  if (paths.communityAnimalPowerCsvPath) console.log(`community animal power csv: ${paths.communityAnimalPowerCsvPath}`);
   if (paths.handToolCapacityCsvPath) console.log(`hand-tool capacity csv: ${paths.handToolCapacityCsvPath}`);
   if ((report.warnings ?? []).length > 0) {
     console.log('warnings:');

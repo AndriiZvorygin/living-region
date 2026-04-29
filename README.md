@@ -262,6 +262,7 @@ This estimates how people are distributed relative to productive land access and
 
 The report also compares annual, low-fuel, and perennial/permaculture production systems. Perennial systems are modelled as labour-profile changes: high establishment work up front, lower recurring maintenance at maturity, and a wider harvest window that can reduce seasonal labour bottlenecks.
 It includes a mature perennial staple bulk scenario to test lower-fiddly harvest systems (for example nut/staple tree-crop belts), with explicit maturity delay and establishment burden.
+`annualSmallToolOptimized` is explicitly defined as a human-scale optimized small-tool case (wheel hoes, broadforks, seeders, carts, tarps, drip irrigation, scythes, hand trucks, shared tool libraries), not ordinary hand hoeing and not tractor mechanization.
 The report also compares draft animal power as a fossil-fuel substitute. Animal power is modelled as a land-and-labour tradeoff: it can reduce diesel/machinery dependence, but requires feed land, care labour, skill, and overwintering.
 The report includes a hand-tool land-tending capacity table, showing rough ranges from intensive market gardening to hand-scale annual staples, mature perennial systems, and silvopasture/woodlot systems.
 

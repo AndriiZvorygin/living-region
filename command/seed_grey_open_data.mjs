@@ -22,6 +22,41 @@ const settlementsPath = path.join(outputDir, 'grey-county-open-data-settlements.
 const landUsePath = path.join(outputDir, 'grey-county-open-data-land-use.geojson');
 const summaryPath = path.join(outputDir, 'grey-county-open-data-summary.json');
 
+if (fs.existsSync(summaryPath) && fs.existsSync(worldPath)) {
+  try {
+    const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+    console.log(`world: ${worldPath}`);
+    console.log(`municipalities geojson: ${municipalitiesPath}`);
+    console.log(`settlements geojson: ${settlementsPath}`);
+    console.log(`land-use geojson: ${landUsePath}`);
+    console.log(`summary: ${summaryPath}`);
+    console.log(`municipality features matched: ${summary.municipalityFeaturesMatched ?? 0}`);
+    console.log(`settlement features imported: ${summary.settlementFeaturesImported ?? 0}`);
+    console.log(`land-use features imported: ${summary.landUseFeaturesImported ?? 0}`);
+    console.log(`land-use category counts: ${JSON.stringify(summary.landUseCategoryCounts ?? {})}`);
+    console.log(`roadSource: ${summary.roadSource ?? 'synthetic'}`);
+    console.log(`roadFeatureCount: ${summary.roadFeatureCount ?? 0}`);
+    console.log(`totalRoadKm: ${Number(summary.totalRoadKm ?? 0).toFixed(2)}`);
+    console.log(`roadClassCounts: ${JSON.stringify(summary.roadClassCounts ?? {})}`);
+    console.log(`roadJurisdictionCounts: ${JSON.stringify(summary.roadJurisdictionCounts ?? {})}`);
+    console.log(`roadFieldsDetected: ${JSON.stringify(summary.roadFieldsDetected ?? {})}`);
+    console.log(`transitStopCount: ${summary.transitStopCount ?? 0}`);
+    console.log(`trailFeatureCount: ${summary.trailFeatureCount ?? 0}`);
+    console.log(`cyclingRouteFeatureCount: ${summary.cyclingRouteFeatureCount ?? 0}`);
+    console.log(`managedForestFeatureCount: ${summary.managedForestFeatureCount ?? 0}`);
+    console.log(`ruralBusinessCount: ${summary.ruralBusinessCount ?? 0}`);
+    console.log(`facilityCount: ${summary.facilityCount ?? 0}`);
+    console.log(`roadStructureCount: ${summary.roadStructureCount ?? 0}`);
+    console.log(`secondaryDataCoverageScore: ${(summary.secondaryDataCoverageScore ?? 0).toFixed(3)}`);
+    console.log(`warnings: ${(summary.warnings ?? []).length}`);
+    for (const warning of (summary.warnings ?? [])) console.log(`  - ${warning}`);
+    console.log(`road source note: ${summary.note ?? ''}`);
+    process.exit(0);
+  } catch {
+    // fall through to full regeneration
+  }
+}
+
 const municipalityFeatures = (world.seedMeta.openDataGeometry?.municipalityBoundaries ?? []).map((item) => ({
   type: 'Feature',
   geometry: item.geometry,

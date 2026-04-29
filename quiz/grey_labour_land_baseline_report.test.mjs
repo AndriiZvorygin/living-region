@@ -60,6 +60,7 @@ describe('grey labour-land baseline report', () => {
     expect(fs.existsSync(paths.permacultureSystemsCsvPath)).toBe(true);
     expect(fs.existsSync(paths.permacultureScenariosCsvPath)).toBe(true);
     expect(fs.existsSync(paths.animalPowerScenariosCsvPath)).toBe(true);
+    expect(fs.existsSync(paths.communityAnimalPowerCsvPath)).toBe(true);
     expect(fs.existsSync(paths.handToolCapacityCsvPath)).toBe(true);
 
     const lowFuelEfficient = report.productionSystemLeverage.find((s) => s.system === 'annualLowFuelEfficient');
@@ -91,6 +92,37 @@ describe('grey labour-land baseline report', () => {
     expect(comboScenario.feedLandShareOfProductiveHa).toBeGreaterThan(0);
     expect(comboScenario.netFoodEnergyAfterAnimalFeedGJ).toBeLessThanOrEqual(comboScenario.netHumanFoodHaAfterFeed * perennialStapleBulkLowCare.annualFoodEnergyGJPerHaAtMaturity + 1e-6);
     expect(mixedScenario.netHumanLabourChangeDays).not.toBeNaN();
+    const community60 = report.communityAnimalPowerScenarios.find((s) => s.scenario === 'oneDraftAnimalPer60People');
+    const community60DraftOnly = { ...community60, animalPurposeMode: 'dedicatedDraftOnly' };
+    const communityMixed = report.communityAnimalPowerScenarios.find((s) => s.scenario === 'churchOrVillageAnimalPowerCommons');
+    const seasonalCustom = report.communityAnimalPowerScenarios.find((s) => s.scenario === 'customDraftServicePeakSeason');
+    const broadSubstitution = report.animalPowerScenarios.find((s) => s.scenario === 'lowFuelWithMixedAnimalPower');
+    expect(community60.animalsNeeded).toBeLessThan(broadSubstitution.animalsNeeded);
+    expect(community60.feedHaRequired).toBeLessThan(broadSubstitution.feedHaRequired);
+    expect(community60.animalPowerFavourabilityIndex).toBeGreaterThanOrEqual(0);
+    expect(community60.animalPowerFavourabilityIndex).toBeLessThanOrEqual(1);
+    expect(community60.netFoodEnergyBenefitGJ).toBeDefined();
+    expect(communityMixed.netBenefitScoreAllocated).toBeGreaterThan(communityMixed.netBenefitScoreDraftOnly);
+    expect(seasonalCustom.ownedAnimalsNeeded).toBeLessThan(community60.ownedAnimalsNeeded);
+    expect(seasonalCustom.serviceTeamsNeeded).toBeGreaterThan(0);
+    expect(communityMixed.coProductCreditGJEquivalent).toBeLessThanOrEqual(communityMixed.animalFeedEnergyGJ * 0.85 + 1e-6);
+    expect(communityMixed.netLabourBenefitDaysDraftOnly).toBeDefined();
+    expect(communityMixed.netLabourBenefitDaysAllocated).toBeDefined();
+    const recommendedRatio = report.recommendedAnimalPowerRatio;
+    const recommendedRatioAllocated = report.recommendedAnimalPowerRatioAllocated;
+    expect(Number.isFinite(recommendedRatio.peoplePerAnimal)).toBe(true);
+    expect(recommendedRatio.peoplePerAnimal).toBeGreaterThan(0);
+    expect(Number.isFinite(recommendedRatioAllocated.peoplePerAnimal)).toBe(true);
+    expect(recommendedRatioAllocated.peoplePerAnimal).toBeGreaterThan(0);
+    const ratioRows = report.animalPowerOptimumSearch;
+    const lowRatio = ratioRows.find((r) => r.peoplePerAnimal === 30);
+    const highRatio = ratioRows.find((r) => r.peoplePerAnimal === 180);
+    expect(lowRatio.feedHaRequired).toBeGreaterThan(highRatio.feedHaRequired);
+    const lowCompetition = { ...community60, feedCompetitionWithHumanFoodShare: 0.1 };
+    const highCompetition = { ...community60, feedCompetitionWithHumanFoodShare: 0.5 };
+    const favLow = 0.8 * (1 - lowCompetition.feedCompetitionWithHumanFoodShare);
+    const favHigh = 0.8 * (1 - highCompetition.feedCompetitionWithHumanFoodShare);
+    expect(favLow).toBeGreaterThan(favHigh);
     expect(maturePermaculture.peakHarvestShare).toBeLessThan(annualMechanized.peakHarvestShare);
     expect(maturePermaculture.manageableHaMultiplierVsAnnualLowFuelHandScale).toBeGreaterThan(
       maturePermaculture.manageableHaMultiplierVsAnnualLowFuelEfficient
@@ -112,13 +144,21 @@ describe('grey labour-land baseline report', () => {
     expect(markdown).toContain('Post-harvest processing is separated from on-land labour');
     expect(markdown).toContain('not free energy');
     expect(markdown).toContain('feed land');
+    expect(markdown).toContain('## Community-scale animal power');
+    expect(markdown).toContain('### Multi-purpose and seasonal animal power');
     expect(markdown).toContain('Perennial staple bulk scenarios represent mature tree-crop/storage-oriented systems');
     expect(markdown).toContain('not magic yield');
     expect(markdown).toContain('requires establishment labour and skill');
+    expect(markdown).toContain('not ordinary hand hoeing and not tractor mechanization');
 
     const animalCsv = fs.readFileSync(paths.animalPowerScenariosCsvPath, 'utf8');
     expect(animalCsv).toContain('feedHaRequired');
     expect(animalCsv).toContain('dieselDisplacedLitre');
+    const communityAnimalCsv = fs.readFileSync(paths.communityAnimalPowerCsvPath, 'utf8');
+    expect(communityAnimalCsv).toContain('peoplePerAnimal');
+    expect(communityAnimalCsv).toContain('animalPowerFavourabilityIndex');
+    expect(communityAnimalCsv).toContain('animalPurposeMode');
+    expect(communityAnimalCsv).toContain('netBenefitScoreAllocated');
     const handToolCsv = fs.readFileSync(paths.handToolCapacityCsvPath, 'utf8');
     expect(handToolCsv).toContain('baselineLabourDaysPerHa');
     expect(handToolCsv).toContain('intensiveMarketGardenHandTools');

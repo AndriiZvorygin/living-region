@@ -5,6 +5,7 @@ import { buildGreyPublicBaselineReport } from '../program/report/grey_public_bas
 
 const produceDir = path.resolve('know/produce');
 const metricsPath = path.join(produceDir, 'grey-county-open-data-metrics.json');
+const cachedPublicBaselinePath = path.join(produceDir, 'grey-public-baseline.json');
 
 function readLatestMetrics() {
   if (!fs.existsSync(metricsPath)) return null;
@@ -17,7 +18,18 @@ function readLatestMetrics() {
 }
 
 try {
-  const { report, paths } = buildGreyPublicBaselineReport();
+  let report;
+  let paths;
+  if (fs.existsSync(cachedPublicBaselinePath)) {
+    report = JSON.parse(fs.readFileSync(cachedPublicBaselinePath, 'utf8'));
+    paths = {
+      markdownPath: path.join(produceDir, 'grey-public-baseline.md'),
+      jsonPath: cachedPublicBaselinePath,
+      municipalCsvPath: path.join(produceDir, 'grey-public-baseline-municipal.csv')
+    };
+  } else {
+    ({ report, paths } = buildGreyPublicBaselineReport());
+  }
   const latest = readLatestMetrics();
   const maxWarningLines = 25;
 

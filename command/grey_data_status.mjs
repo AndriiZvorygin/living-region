@@ -17,9 +17,7 @@ function hasFileForSource(sourceId) {
   for (const file of candidates) {
     const p = path.join(inputDir, file);
     if (fs.existsSync(p)) {
-      const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
-      const features = Array.isArray(parsed?.features) ? parsed.features.length : 0;
-      return { found: true, file: p, featureCount: features };
+      return { found: true, file: p, featureCount: null };
     }
   }
   return { found: false, file: null, featureCount: 0 };
@@ -36,7 +34,7 @@ console.log('Core layers:');
 for (const id of coreIds) {
   const source = greyOpenDataManifest.find((s) => s.id === id);
   const file = hasFileForSource(id);
-  console.log(`  - ${id}: ${file.found ? `downloaded (${file.featureCount})` : 'missing'} | targetLayer=${source?.targetLayer ?? 'n/a'} | impact=${file.found ? 'real' : 'synthetic'}`);
+  console.log(`  - ${id}: ${file.found ? 'downloaded' : 'missing'} | targetLayer=${source?.targetLayer ?? 'n/a'} | impact=${file.found ? 'real' : 'synthetic'}`);
 }
 
 for (const source of greyOpenDataManifest.filter((s) => !coreIds.has(s.id))) {
@@ -51,7 +49,7 @@ for (const source of greyOpenDataManifest.filter((s) => !coreIds.has(s.id))) {
 
 console.log('Useful secondary layers downloaded:');
 for (const item of downloadedSecondary) {
-  console.log(`  - ${item.source.id}: ${item.file.featureCount} | targetLayer=${item.source.targetLayer} | impact=real-input-available`);
+  console.log(`  - ${item.source.id}: downloaded | targetLayer=${item.source.targetLayer} | impact=real-input-available`);
 }
 console.log('Useful secondary layers discovered but not downloaded:');
 for (const item of discoveredNotDownloaded) {

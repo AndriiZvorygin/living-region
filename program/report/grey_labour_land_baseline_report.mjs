@@ -619,6 +619,66 @@ const HAND_TOOL_CAPACITY_REFERENCE = [
   }
 ];
 
+const COMMUNITY_ANIMAL_POWER_SCENARIOS = [
+  { scenario: 'oneDraftAnimalPer60People', peoplePerAnimal: 60, animalSystem: 'smallPonyOrMule', animalPurposeMode: 'dedicatedDraftOnly', notes: 'Small shared draft capacity per village-scale population.' },
+  { scenario: 'oneDraftTeamPer120People', peoplePerAnimal: 60, animalSystem: 'horseTeam', animalPurposeMode: 'multiPurposeDairyOx', notes: 'Roughly one 2-animal draft team per 120 people.' },
+  { scenario: 'churchOrVillageAnimalPowerCommons', peoplePerAnimal: 90, animalSystem: 'mixedAnimalPowerCoop', animalPurposeMode: 'multiPurposeMixedFarmAnimal', notes: 'Commons-based animal service for heavy seasonal tasks.' },
+  { scenario: 'cooperativeHeavyWorkAnimalPool', peoplePerAnimal: 120, animalSystem: 'mixedAnimalPowerCoop', animalPurposeMode: 'multiPurposeBeefOx', notes: 'Co-op pool focused on bottleneck heavy work, not universal substitution.' },
+  { scenario: 'oneSharedTeamPerVillageCluster', peoplePerAnimal: 150, animalSystem: 'horseTeam', animalPurposeMode: 'seasonalCustomTeamService', notes: 'One shared team serves a village cluster for peak bottlenecks.' },
+  { scenario: 'customDraftServicePeakSeason', peoplePerAnimal: 220, animalSystem: 'mixedAnimalPowerCoop', animalPurposeMode: 'seasonalCustomTeamService', notes: 'Custom peak-season service with low owned-animal burden.' },
+  { scenario: 'cooperativeSeasonalHeavyWorkPool', peoplePerAnimal: 180, animalSystem: 'mixedAnimalPowerCoop', animalPurposeMode: 'seasonalCustomTeamService', notes: 'Co-op seasonal heavy-work pool with mobile teams.' }
+];
+
+const COMMUNITY_ANIMAL_RATIO_SEARCH = [30, 45, 60, 90, 120, 180];
+
+const ANIMAL_PURPOSE_MODES = {
+  dedicatedDraftOnly: {
+    draftCostAllocationShare: 1.0,
+    manureFertilityCreditGJEquivalentPerAnimal: 0.0,
+    milkOrMeatFoodEnergyCreditGJPerAnimal: 0.0,
+    pastureManagementCreditPerAnimal: 0.0,
+    fertilityInputDisplacementValuePerAnimal: 0.0,
+    seasonalServiceOwnedAnimalShare: 1.0,
+    seasonalServiceAccessConstraint: 0.05
+  },
+  multiPurposeDairyOx: {
+    draftCostAllocationShare: 0.55,
+    manureFertilityCreditGJEquivalentPerAnimal: 3.0,
+    milkOrMeatFoodEnergyCreditGJPerAnimal: 6.0,
+    pastureManagementCreditPerAnimal: 1.2,
+    fertilityInputDisplacementValuePerAnimal: 1.8,
+    seasonalServiceOwnedAnimalShare: 0.9,
+    seasonalServiceAccessConstraint: 0.08
+  },
+  multiPurposeBeefOx: {
+    draftCostAllocationShare: 0.68,
+    manureFertilityCreditGJEquivalentPerAnimal: 2.5,
+    milkOrMeatFoodEnergyCreditGJPerAnimal: 4.5,
+    pastureManagementCreditPerAnimal: 1.0,
+    fertilityInputDisplacementValuePerAnimal: 1.4,
+    seasonalServiceOwnedAnimalShare: 0.9,
+    seasonalServiceAccessConstraint: 0.09
+  },
+  multiPurposeMixedFarmAnimal: {
+    draftCostAllocationShare: 0.6,
+    manureFertilityCreditGJEquivalentPerAnimal: 2.8,
+    milkOrMeatFoodEnergyCreditGJPerAnimal: 5.0,
+    pastureManagementCreditPerAnimal: 1.3,
+    fertilityInputDisplacementValuePerAnimal: 1.5,
+    seasonalServiceOwnedAnimalShare: 0.85,
+    seasonalServiceAccessConstraint: 0.07
+  },
+  seasonalCustomTeamService: {
+    draftCostAllocationShare: 0.48,
+    manureFertilityCreditGJEquivalentPerAnimal: 1.8,
+    milkOrMeatFoodEnergyCreditGJPerAnimal: 2.0,
+    pastureManagementCreditPerAnimal: 0.8,
+    fertilityInputDisplacementValuePerAnimal: 1.0,
+    seasonalServiceOwnedAnimalShare: 0.35,
+    seasonalServiceAccessConstraint: 0.16
+  }
+};
+
 function readJson(filePath, warnings) {
   if (!fs.existsSync(filePath)) {
     warnings.push(`Missing file: ${filePath}`);
@@ -1088,6 +1148,243 @@ function buildAnimalPowerScenarios(args) {
   return rows;
 }
 
+function estimateHeavyWorkDemandDays(productiveHa) {
+  return productiveHa * 11.5;
+}
+
+function buildHeavyWorkTaskBreakdown(productiveHa, coverage) {
+  const tasks = [
+    { task: 'primaryTillageOrBedPrep', humanOnlyDaysPerHa: 2.3, animalAssistFactor: 0.42, tonneKmPerHa: 0.08, seasonalWindow: 'spring' },
+    { task: 'compostManureHauling', humanOnlyDaysPerHa: 1.8, animalAssistFactor: 0.48, tonneKmPerHa: 0.2, seasonalWindow: 'spring-autumn' },
+    { task: 'harvestDepotHauling', humanOnlyDaysPerHa: 1.6, animalAssistFactor: 0.52, tonneKmPerHa: 0.18, seasonalWindow: 'summer-autumn' },
+    { task: 'firewoodLogHauling', humanOnlyDaysPerHa: 1.2, animalAssistFactor: 0.45, tonneKmPerHa: 0.28, seasonalWindow: 'autumn-winter' },
+    { task: 'waterHauling', humanOnlyDaysPerHa: 0.7, animalAssistFactor: 0.5, tonneKmPerHa: 0.05, seasonalWindow: 'summer' },
+    { task: 'hayMowingRaking', humanOnlyDaysPerHa: 1.6, animalAssistFactor: 0.44, tonneKmPerHa: 0.14, seasonalWindow: 'summer' },
+    { task: 'localFreightCartage', humanOnlyDaysPerHa: 1.3, animalAssistFactor: 0.47, tonneKmPerHa: 0.22, seasonalWindow: 'year-round' }
+  ];
+  return tasks.map((t) => {
+    const humanOnlyLabourDays = productiveHa * t.humanOnlyDaysPerHa;
+    const labourSavedDays = humanOnlyLabourDays * t.animalAssistFactor * coverage;
+    const animalAssistedLabourDays = Math.max(0, humanOnlyLabourDays - labourSavedDays);
+    const tonneKmSupported = productiveHa * t.tonneKmPerHa * coverage * 100;
+    return { ...t, humanOnlyLabourDays, animalAssistedLabourDays, labourSavedDays, tonneKmSupported };
+  });
+}
+
+function buildCommunityAnimalPowerScenarios(args) {
+  const { regional, systemById } = args;
+  const productiveHa = regional.estimatedHumanFoodProducingHa;
+  const people = regional.totalPopulation2021;
+  const lowFuelHand = systemById.get('annualLowFuelHandScale');
+  const baseFoodGJPerHa = n(lowFuelHand?.annualFoodEnergyGJPerHaAtMaturity, 0);
+  const baseHeavyWorkDemandDays = estimateHeavyWorkDemandDays(productiveHa);
+  const baseHumanHeavyWorkOnlyDays = baseHeavyWorkDemandDays * 1.15;
+  const baseHumanLabourDays = productiveHa * n(lowFuelHand?.onLandLabourDaysPerHaAtMaturity, 0);
+
+  const rows = COMMUNITY_ANIMAL_POWER_SCENARIOS.map((def) => {
+    const animalSystem = DRAFT_ANIMAL_SYSTEMS.find((s) => s.animalSystem === def.animalSystem);
+    const mode = ANIMAL_PURPOSE_MODES[def.animalPurposeMode] ?? ANIMAL_PURPOSE_MODES.dedicatedDraftOnly;
+    const animalsNeededGross = Math.max(1, Math.round(people / Math.max(1, n(def.peoplePerAnimal, 60))));
+    const ownedAnimalsNeeded = Math.max(1, Math.round(animalsNeededGross * n(mode.seasonalServiceOwnedAnimalShare, 1)));
+    const serviceTeamsNeeded = Math.max(1, Math.ceil((animalsNeededGross - ownedAnimalsNeeded) / Math.max(1, n(animalSystem?.animalsPerTeam, 2))));
+    const teamsNeeded = Math.max(1, Math.ceil(ownedAnimalsNeeded / Math.max(1, n(animalSystem?.animalsPerTeam, 2)))) + serviceTeamsNeeded;
+    const animalsNeeded = ownedAnimalsNeeded + (serviceTeamsNeeded * n(animalSystem?.animalsPerTeam, 2));
+
+    const hayPastureHaRequired = animalsNeeded * n(animalSystem?.hayPastureHaPerAnimal, 0);
+    const grainFeedHaRequired = animalsNeeded * n(animalSystem?.grainFeedHaPerAnimal, 0);
+    const beddingHaEquivalentRequired = animalsNeeded * n(animalSystem?.beddingHaEquivalentPerAnimal, 0);
+    const feedHaRequired = hayPastureHaRequired + grainFeedHaRequired + beddingHaEquivalentRequired;
+    const feedFromPastureFodderHa = hayPastureHaRequired + beddingHaEquivalentRequired;
+    const feedFromHumanFoodCropHa = grainFeedHaRequired;
+    const feedFromMarginalOrNonHumanFoodLandHa = feedFromPastureFodderHa * 0.7;
+    const feedCompetitionWithHumanFoodShare = feedHaRequired > 0 ? feedFromHumanFoodCropHa / feedHaRequired : 0;
+
+    const heavyWorkCapacityDays = teamsNeeded * n(animalSystem?.workDaysPerYear, 0) * 0.78;
+    const heavyWorkCoverage = clamp01(baseHeavyWorkDemandDays > 0 ? heavyWorkCapacityDays / baseHeavyWorkDemandDays : 0);
+    const taskBreakdown = buildHeavyWorkTaskBreakdown(productiveHa, heavyWorkCoverage);
+    const heavyWorkLabourSavedDays = taskBreakdown.reduce((s, t) => s + t.labourSavedDays, 0);
+    const heavyWorkWithAnimalPowerDays = Math.max(0, baseHumanHeavyWorkOnlyDays - heavyWorkLabourSavedDays);
+    const heavyWorkBottleneckReductionPct = baseHumanHeavyWorkOnlyDays > 0
+      ? ((baseHumanHeavyWorkOnlyDays - heavyWorkWithAnimalPowerDays) / baseHumanHeavyWorkOnlyDays) * 100 : 0;
+
+    const transportHeavyLoadsEnabledTonneKm = teamsNeeded * n(animalSystem?.workDaysPerYear, 0) * 2.4;
+    const plowingOrBedPrepHaEnabled = teamsNeeded * n(animalSystem?.hectaresServicedPerYear, 0) * 0.45;
+    const firewoodHaulingBenefit = teamsNeeded * 85;
+    const manureHaulingBenefit = teamsNeeded * 110;
+    const heavyLoadsTonneKmSupported = transportHeavyLoadsEnabledTonneKm + firewoodHaulingBenefit + manureHaulingBenefit;
+
+    const additionalProductiveHaEnabled = productiveHa * 0.045 * heavyWorkCoverage;
+    const additionalFoodEnergyEnabledGJ = additionalProductiveHaEnabled * baseFoodGJPerHa * (1 - 0.3 * feedCompetitionWithHumanFoodShare);
+    const animalCareLabourDays = teamsNeeded * n(animalSystem?.animalCareDaysPerYear, 0);
+    const humanLabourSavedDays = heavyWorkLabourSavedDays + (additionalProductiveHaEnabled * 4.5);
+    const netLabourBenefitDays = humanLabourSavedDays - animalCareLabourDays;
+    const netHumanLabourChangeDays = animalCareLabourDays - humanLabourSavedDays;
+
+    const animalFeedEnergyGJ = animalsNeeded * n(animalSystem?.feedEnergyGJPerAnimalYear, 0);
+    const foodEnergyOpportunityCostGJ = feedFromHumanFoodCropHa * baseFoodGJPerHa;
+    const netFoodEnergyAfterAnimalFeedGJ = (productiveHa * baseFoodGJPerHa) + additionalFoodEnergyEnabledGJ - foodEnergyOpportunityCostGJ;
+    const netFoodEnergyBenefitGJ = additionalFoodEnergyEnabledGJ - foodEnergyOpportunityCostGJ;
+    const manureFertilityCreditGJEquivalent = animalsNeeded * n(mode.manureFertilityCreditGJEquivalentPerAnimal, 0);
+    const milkOrMeatFoodEnergyCreditGJ = animalsNeeded * n(mode.milkOrMeatFoodEnergyCreditGJPerAnimal, 0);
+    const pastureManagementCredit = animalsNeeded * n(mode.pastureManagementCreditPerAnimal, 0);
+    const fertilityInputDisplacementValue = animalsNeeded * n(mode.fertilityInputDisplacementValuePerAnimal, 0);
+    const coProductCreditGJEquivalent = manureFertilityCreditGJEquivalent + milkOrMeatFoodEnergyCreditGJ + pastureManagementCredit + fertilityInputDisplacementValue;
+    const draftCostAllocationShare = n(mode.draftCostAllocationShare, 1);
+    const cappedCredit = Math.min(coProductCreditGJEquivalent, animalFeedEnergyGJ * 0.85);
+    const netLabourBenefitDaysDraftOnly = netLabourBenefitDays;
+    const netFoodEnergyBenefitGJDraftOnly = netFoodEnergyBenefitGJ;
+    const netBenefitScoreDraftOnly = netLabourBenefitDaysDraftOnly * 0.5 + netFoodEnergyBenefitGJDraftOnly * 0.5;
+    const allocatedCareBurden = animalCareLabourDays * draftCostAllocationShare;
+    const allocatedFeedPenaltyGJ = foodEnergyOpportunityCostGJ * draftCostAllocationShare;
+    const netLabourBenefitDaysAllocated = humanLabourSavedDays - allocatedCareBurden;
+    const netFoodEnergyBenefitGJAllocated = additionalFoodEnergyEnabledGJ - allocatedFeedPenaltyGJ + cappedCredit;
+    const netBenefitScoreAllocated = netLabourBenefitDaysAllocated * 0.5 + netFoodEnergyBenefitGJAllocated * 0.5;
+    const peakSeasonWorkDays = teamsNeeded * n(animalSystem?.workDaysPerYear, 0) * (0.35 + n(mode.seasonalServiceAccessConstraint, 0.1));
+    const heavyWorkServedHa = plowingOrBedPrepHaEnabled + (additionalProductiveHaEnabled * 0.5);
+    const heavyWorkServedHouseholds = Math.max(1, Math.round(people / 2.4 * (0.18 + 0.45 * heavyWorkCoverage)));
+    const annualCareBurdenChargedToCommunity = allocatedCareBurden;
+    const careBurdenPerHousehold = annualCareBurdenChargedToCommunity / Math.max(1, people / 2.4);
+    const serviceAccessConstraint = n(mode.seasonalServiceAccessConstraint, 0.1);
+    const dieselDisplacedLitre = teamsNeeded * n(animalSystem?.workDaysPerYear, 0) * 7.8;
+    const animalPowerFavourabilityIndex = clamp01(
+      (0.45 * clamp01((netLabourBenefitDaysAllocated + 2000) / 5000))
+      + (0.35 * clamp01((netFoodEnergyBenefitGJAllocated + 500) / 2000))
+      + (0.2 * (1 - feedCompetitionWithHumanFoodShare))
+    );
+    const peopleServed = animalsNeeded * n(def.peoplePerAnimal, 0);
+
+    return {
+      scenario: def.scenario,
+      animalPurposeMode: def.animalPurposeMode ?? 'dedicatedDraftOnly',
+      peoplePerAnimal: n(def.peoplePerAnimal, 0),
+      peopleServed,
+      animalSystem: def.animalSystem,
+      animalsNeeded,
+      ownedAnimalsNeeded,
+      serviceTeamsNeeded,
+      teamsNeeded,
+      feedHaRequired,
+      hayPastureHaRequired,
+      grainFeedHaRequired,
+      beddingHaEquivalentRequired,
+      feedFromPastureFodderHa,
+      feedFromMarginalOrNonHumanFoodLandHa,
+      feedFromHumanFoodCropHa,
+      feedCompetitionWithHumanFoodShare,
+      animalPowerFavourabilityIndex,
+      animalCareLabourDays,
+      annualCareBurdenChargedToCommunity,
+      careBurdenPerHousehold,
+      serviceAccessConstraint,
+      heavyWorkDemandDays: baseHeavyWorkDemandDays,
+      heavyWorkHumanOnlyDays: baseHumanHeavyWorkOnlyDays,
+      heavyWorkWithAnimalPowerDays,
+      heavyWorkBottleneckReductionPct,
+      heavyWorkLabourSavedDays,
+      heavyWorkTasks: taskBreakdown,
+      humanLabourSavedDays,
+      netLabourBenefitDays,
+      netHumanLabourChangeDays,
+      transportHeavyLoadsEnabledTonneKm,
+      heavyLoadsTonneKmSupported,
+      peakSeasonWorkDays,
+      plowingOrBedPrepHaEnabled,
+      heavyWorkServedHa,
+      heavyWorkServedHouseholds,
+      firewoodHaulingBenefit,
+      manureHaulingBenefit,
+      additionalProductiveHaEnabled,
+      additionalFoodEnergyEnabledGJ,
+      foodEnergyOpportunityCostGJ,
+      netFoodEnergyAfterAnimalFeedGJ,
+      netFoodEnergyBenefitGJ,
+      manureFertilityCreditGJEquivalent,
+      milkOrMeatFoodEnergyCreditGJ,
+      pastureManagementCredit,
+      fertilityInputDisplacementValue,
+      coProductCreditGJEquivalent: cappedCredit,
+      draftCostAllocationShare,
+      netLabourBenefitDaysDraftOnly,
+      netFoodEnergyBenefitGJDraftOnly,
+      netBenefitScoreDraftOnly,
+      netLabourBenefitDaysAllocated,
+      netFoodEnergyBenefitGJAllocated,
+      netBenefitScoreAllocated,
+      animalFeedEnergyGJ,
+      dieselDisplacedLitre,
+      netBenefitScore: netBenefitScoreAllocated,
+      haManagedPerHumanWorkerWithAnimalPower: Math.max(0, productiveHa + additionalProductiveHaEnabled) / Math.max(1e-9, (baseHumanLabourDays + netHumanLabourChangeDays) / 220),
+      notes: def.notes
+    };
+  });
+
+  return rows;
+}
+
+function buildAnimalPowerOptimumSearch(args) {
+  const { regional, systemById } = args;
+  const productiveHa = regional.estimatedHumanFoodProducingHa;
+  const people = regional.totalPopulation2021;
+  const baseSystem = DRAFT_ANIMAL_SYSTEMS.find((s) => s.animalSystem === 'mixedAnimalPowerCoop');
+  const lowFuelHand = systemById.get('annualLowFuelHandScale');
+  const baseFoodGJPerHa = n(lowFuelHand?.annualFoodEnergyGJPerHaAtMaturity, 0);
+  const heavyWorkDemandDays = estimateHeavyWorkDemandDays(productiveHa);
+
+  const rows = COMMUNITY_ANIMAL_RATIO_SEARCH.map((ratio) => {
+    const mode = ANIMAL_PURPOSE_MODES.multiPurposeMixedFarmAnimal;
+    const animalsNeeded = Math.max(1, Math.round(people / Math.max(1, ratio)));
+    const teamsNeeded = Math.max(1, Math.ceil(animalsNeeded / Math.max(1, n(baseSystem?.animalsPerTeam, 2))));
+    const hayPastureHaRequired = animalsNeeded * n(baseSystem?.hayPastureHaPerAnimal, 0);
+    const grainFeedHaRequired = animalsNeeded * n(baseSystem?.grainFeedHaPerAnimal, 0);
+    const beddingHaEquivalentRequired = animalsNeeded * n(baseSystem?.beddingHaEquivalentPerAnimal, 0);
+    const feedHaRequired = hayPastureHaRequired + grainFeedHaRequired + beddingHaEquivalentRequired;
+    const heavyWorkCoverage = clamp01((teamsNeeded * n(baseSystem?.workDaysPerYear, 0) * 0.78) / Math.max(1e-9, heavyWorkDemandDays));
+    const humanLabourSavedDays = heavyWorkDemandDays * 0.62 * heavyWorkCoverage;
+    const animalCareLabourDays = teamsNeeded * n(baseSystem?.animalCareDaysPerYear, 0);
+    const netLabourBenefitDays = humanLabourSavedDays - animalCareLabourDays;
+    const additionalProductiveHaEnabled = productiveHa * 0.045 * heavyWorkCoverage;
+    const additionalFoodEnergyEnabledGJ = additionalProductiveHaEnabled * baseFoodGJPerHa;
+    const foodEnergyOpportunityCostGJ = grainFeedHaRequired * baseFoodGJPerHa;
+    const netFoodEnergyBenefitGJ = additionalFoodEnergyEnabledGJ - foodEnergyOpportunityCostGJ;
+    const netBenefitScore = netLabourBenefitDays * 0.5 + netFoodEnergyBenefitGJ * 0.5;
+    const allocatedCare = animalCareLabourDays * n(mode.draftCostAllocationShare, 0.6);
+    const allocatedFeedPenalty = foodEnergyOpportunityCostGJ * n(mode.draftCostAllocationShare, 0.6);
+    const credit = Math.min(
+      animalsNeeded * (
+        n(mode.manureFertilityCreditGJEquivalentPerAnimal, 0)
+        + n(mode.milkOrMeatFoodEnergyCreditGJPerAnimal, 0)
+        + n(mode.pastureManagementCreditPerAnimal, 0)
+        + n(mode.fertilityInputDisplacementValuePerAnimal, 0)
+      ),
+      (animalsNeeded * n(baseSystem?.feedEnergyGJPerAnimalYear, 0)) * 0.85
+    );
+    const netLabourBenefitDaysAllocated = humanLabourSavedDays - allocatedCare;
+    const netFoodEnergyBenefitGJAllocated = additionalFoodEnergyEnabledGJ - allocatedFeedPenalty + credit;
+    const netBenefitScoreAllocated = netLabourBenefitDaysAllocated * 0.5 + netFoodEnergyBenefitGJAllocated * 0.5;
+    return {
+      peoplePerAnimal: ratio,
+      animalsNeeded,
+      teamsNeeded,
+      feedHaRequired,
+      additionalProductiveHaEnabled,
+      humanLabourSavedDays,
+      animalCareLabourDays,
+      netLabourBenefitDays,
+      foodEnergyOpportunityCostGJ,
+      additionalFoodEnergyEnabledGJ,
+      netFoodEnergyBenefitGJ,
+      netBenefitScore,
+      netLabourBenefitDaysAllocated,
+      netFoodEnergyBenefitGJAllocated,
+      netBenefitScoreAllocated
+    };
+  });
+
+  const recommended = rows.reduce((best, row) => (best && best.netBenefitScore >= row.netBenefitScore ? best : row), null);
+  const recommendedAllocated = rows.reduce((best, row) => (best && best.netBenefitScoreAllocated >= row.netBenefitScoreAllocated ? best : row), null);
+  return { rows, recommended, recommendedAllocated };
+}
+
 export function buildGreyLabourLandBaselineReport(options = {}) {
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
   const inputDir = path.resolve(options.inputDir ?? 'know/input/gis');
@@ -1472,6 +1769,11 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     feedFromHumanFoodCropHa: s.feedFromHumanFoodCropHa,
     feedCompetitionWithHumanFoodGJ: s.feedCompetitionWithHumanFoodGJ
   }));
+  const communityAnimalPowerScenarios = buildCommunityAnimalPowerScenarios({ regional, systemById });
+  const animalPowerOptimumSearch = buildAnimalPowerOptimumSearch({ regional, systemById });
+  const recommendedAnimalPowerRatio = animalPowerOptimumSearch.recommended;
+  const recommendedAnimalPowerRatioAllocated = animalPowerOptimumSearch.recommendedAllocated;
+  const animalPowerFavourabilityNotes = 'Animal power is most favourable when feed competition with human-food land is low and usage is focused on heavy-work bottlenecks.';
 
   const json = {
     generatedAt: new Date().toISOString(),
@@ -1480,7 +1782,8 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
       areaMethod: 'censusAreaWeightedByLotOpportunityShare',
       labourDaysByCategory: defaults.labourDaysByCategory,
       foodWorkerDaysPerYear: defaults.foodWorkerDaysPerYear,
-      caveat: 'Lots and concessions are not ownership parcels; this is a coarse baseline estimate.'
+      caveat: 'Lots and concessions are not ownership parcels; this is a coarse baseline estimate.',
+      annualSmallToolOptimizedDefinition: 'Human-scale production with excellent layout and tools (wheel hoes, broadforks, seeders, carts, tarps, drip irrigation, scythes, hand trucks, shared tool libraries), strong skill, and low weed pressure; not ordinary hand hoeing and not tractor mechanization.'
     },
     warnings,
     regionalIndicators: {
@@ -1506,6 +1809,11 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     animalPowerSystems,
     animalPowerScenarios,
     animalFeedLandTradeoffs,
+    communityAnimalPowerScenarios,
+    animalPowerOptimumSearch: animalPowerOptimumSearch.rows,
+    recommendedAnimalPowerRatio,
+    recommendedAnimalPowerRatioAllocated,
+    animalPowerFavourabilityNotes,
     handToolCapacityReference,
     currentModelHandToolComparison,
     caveats: [
@@ -1514,7 +1822,8 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
       'population distribution is heuristic',
       'productive hectares are estimated from census area and lot opportunity shares',
       'labour assumptions are coarse scenario diagnostics',
-      'perennial/permaculture is modelled as labour-profile change, not magic yield'
+      'perennial/permaculture is modelled as labour-profile change, not magic yield',
+      'annualSmallToolOptimized is a human-scale, highly optimized small-tool case (not ordinary hand hoeing, not tractor mechanization)'
     ]
   };
 
@@ -1544,6 +1853,11 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   const animalPowerScenariosCsvPath = path.join(produceDir, 'grey-labour-land-animal-power-scenarios.csv');
   fs.writeFileSync(animalPowerScenariosCsvPath, toCsv(animalPowerScenarios, [
     'scenario','animalSystem','animalTeamsNeeded','animalsNeeded','feedHaRequired','hayPastureHaRequired','grainFeedHaRequired','feedLandShareOfProductiveHa','animalFeedEnergyGJ','foodEnergyOpportunityCostGJ','dieselDisplacedLitre','humanLabourReducedDays','animalCareLabourDays','netHumanLabourChangeDays','netHumanFoodHaAfterFeed','netFoodEnergyAfterAnimalFeedGJ','requiredHumanFTE','labourDeficitDays','notes'
+  ]));
+
+  const communityAnimalPowerCsvPath = path.join(produceDir, 'grey-labour-land-community-animal-power.csv');
+  fs.writeFileSync(communityAnimalPowerCsvPath, toCsv(communityAnimalPowerScenarios, [
+    'scenario','animalPurposeMode','peoplePerAnimal','animalsNeeded','ownedAnimalsNeeded','serviceTeamsNeeded','teamsNeeded','feedHaRequired','feedCompetitionWithHumanFoodShare','draftCostAllocationShare','coProductCreditGJEquivalent','humanLabourSavedDays','animalCareLabourDays','netLabourBenefitDaysDraftOnly','netFoodEnergyBenefitGJDraftOnly','netBenefitScoreDraftOnly','netLabourBenefitDaysAllocated','netFoodEnergyBenefitGJAllocated','netBenefitScoreAllocated','additionalProductiveHaEnabled','additionalFoodEnergyEnabledGJ','foodEnergyOpportunityCostGJ','animalPowerFavourabilityIndex','peakSeasonWorkDays','careBurdenPerHousehold','notes'
   ]));
 
   const handToolCapacityCsvPath = path.join(produceDir, 'grey-labour-land-hand-tool-capacity.csv');
@@ -1602,6 +1916,16 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     '|---|---:|---:|---:|---:|---:|---:|---|',
     ...animalPowerScenarios.map((s) => `| ${s.scenario} (${s.animalSystem}) | ${s.animalsNeeded.toFixed(0)} | ${s.feedHaRequired.toFixed(2)} | ${s.feedLandShareOfProductiveHa.toFixed(3)} | ${s.netHumanLabourChangeDays.toFixed(2)} | ${s.dieselDisplacedLitre.toFixed(2)} | ${s.foodEnergyOpportunityCostGJ.toFixed(2)} | feed land + care labour + seasonal limits |`),
     '',
+    '## Community-scale animal power',
+    'A shared animal-power model may be more realistic than full tractor replacement. One animal or team serving a church, village, or co-op can handle heavy work while keeping feed-land burden moderate. The optimum depends on feed source, labour saved, land enabled, and care burden.',
+    '| Scenario | People served/animal | Animals | Feed ha | Labour saved | Animal care labour | Net food-energy benefit | Favourability |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|',
+    ...communityAnimalPowerScenarios.map((s) => `| ${s.scenario} (${s.animalPurposeMode}) | ${s.peoplePerAnimal.toFixed(0)} | ${s.animalsNeeded.toFixed(0)} | ${s.feedHaRequired.toFixed(2)} | ${s.humanLabourSavedDays.toFixed(2)} | ${s.animalCareLabourDays.toFixed(2)} | ${s.netFoodEnergyBenefitGJAllocated.toFixed(2)} | ${s.animalPowerFavourabilityIndex.toFixed(3)} |`),
+    `Recommended ratio by draft-only accounting: 1 animal per ${(recommendedAnimalPowerRatio?.peoplePerAnimal ?? 0)} people (score ${(recommendedAnimalPowerRatio?.netBenefitScore ?? 0).toFixed(2)}).`,
+    `Recommended ratio by allocated multi-purpose accounting: 1 animal per ${(recommendedAnimalPowerRatioAllocated?.peoplePerAnimal ?? 0)} people (score ${(recommendedAnimalPowerRatioAllocated?.netBenefitScoreAllocated ?? 0).toFixed(2)}).`,
+    '### Multi-purpose and seasonal animal power',
+    'Draft animals are not free energy. But in some rural systems they may also provide manure/fertility, milk/meat, pasture cycling, and resilience. This report shows both strict draft-only accounting and allocated multi-purpose accounting. Seasonal/custom team service can reduce the need for every village/church/co-op to carry year-round animal care.',
+    '',
     '## Hand-tool land-tending capacity',
     'There is no single correct number. Capacity depends on crop type, intensity, harvest frequency, soil condition, tools, skill, layout, irrigation, weed pressure, processing arrangements, and whether the system is annual or perennial.',
     '| System | Low ha/person | Baseline ha/person | High ha/person | Baseline labour days/ha | Notes |',
@@ -1609,6 +1933,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     ...handToolCapacityReference.map((r) => `| ${r.system} | ${r.lowHaPerFullTimeWorker.toFixed(2)} | ${r.baselineHaPerFullTimeWorker.toFixed(2)} | ${r.highHaPerFullTimeWorker.toFixed(2)} | ${r.baselineLabourDaysPerHa.toFixed(2)} | ${r.notes} |`),
     '',
     'Model annual baselines are calibrated to these hand-tool reference ranges. `annualSmallToolOptimized` is an upper-end optimized small-tool case, not ordinary hand-tool production.',
+    '`annualSmallToolOptimized` means human-scale production with excellent layout and tools (wheel hoes, broadforks, seeders, carts, tarps, drip irrigation, scythes, hand trucks, shared tool libraries), skilled labour, and low weed pressure; not ordinary hand hoeing and not tractor mechanization.',
     `Current annualLowFuelHandScale manageable ha/worker: ${currentModelHandToolComparison.annualLowFuelHandScale.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.annualLowFuelHandScale.inReferenceRange ? 'inside' : 'outside'} handScaleAnnualStaples range)`,
     `Current annualLowFuelEfficient manageable ha/worker: ${currentModelHandToolComparison.annualLowFuelEfficient.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.annualLowFuelEfficient.inReferenceRange ? 'inside' : 'outside'} efficientSmallScaleAnnualField range)`,
     `Current annualSmallToolOptimized manageable ha/worker: ${currentModelHandToolComparison.annualSmallToolOptimized.manageableHaPerWorker.toFixed(3)} (${currentModelHandToolComparison.annualSmallToolOptimized.inReferenceRange ? 'inside' : 'outside'} efficientSmallScaleAnnualField range; optimized upper-end case)`,
@@ -1632,6 +1957,6 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
 
   return {
     report: json,
-    paths: { markdownPath, jsonPath, municipalityCsvPath, scenarioCsvPath, permacultureSystemsCsvPath, permacultureScenariosCsvPath, animalPowerScenariosCsvPath, handToolCapacityCsvPath }
+    paths: { markdownPath, jsonPath, municipalityCsvPath, scenarioCsvPath, permacultureSystemsCsvPath, permacultureScenariosCsvPath, animalPowerScenariosCsvPath, communityAnimalPowerCsvPath, handToolCapacityCsvPath }
   };
 }
