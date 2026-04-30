@@ -1450,7 +1450,9 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
 
   const warnings = [];
   const censusPopulationDistributionPath = path.join(produceDir, 'grey-census-population-distribution.json');
+  const dwellingLandAccessPath = path.join(produceDir, 'grey-dwelling-land-access.json');
   let censusDistribution = null;
+  let dwellingLandAccess = null;
   let populationDistributionSource = 'municipalHeuristic';
   if (fs.existsSync(censusPopulationDistributionPath)) {
     try {
@@ -1463,13 +1465,27 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
       warnings.push(`Failed to parse census population distribution: ${error.message}`);
     }
   }
+  if (fs.existsSync(dwellingLandAccessPath)) {
+    try {
+      dwellingLandAccess = JSON.parse(fs.readFileSync(dwellingLandAccessPath, 'utf8'));
+      if ((n(dwellingLandAccess?.estimatedPopulationNoDirectLandAccess) + n(dwellingLandAccess?.estimatedPopulationWithGardenScaleAccess)
+        + n(dwellingLandAccess?.estimatedPopulationWithSubsistencePotential) + n(dwellingLandAccess?.estimatedPopulationWithSmallholdingPotential)
+        + n(dwellingLandAccess?.estimatedPopulationWithFarmScalePotential)) > 0) {
+        populationDistributionSource = 'censusSmallAreaWithDwellingLandAccessProxy';
+      }
+    } catch (error) {
+      warnings.push(`Failed to parse dwelling-land-access baseline: ${error.message}`);
+    }
+  }
 
   const landAccessJsonPath = path.join(produceDir, 'grey-land-access-baseline.json');
   const landAccessMunicipalCsvPath = path.join(produceDir, 'grey-land-access-municipality-summary.csv');
+  const farmLabourBaselinePath = path.join(produceDir, 'grey-census-agriculture-baseline.json');
   const lotsPath = path.join(inputDir, 'lots-and-concessions-grey.geojson');
 
   const landAccess = readJson(landAccessJsonPath, warnings);
   const landAccessMunicipalRows = readCsv(landAccessMunicipalCsvPath, warnings);
+  const farmLabourBaseline = readJson(farmLabourBaselinePath, warnings);
   const lotsGeo = readJson(lotsPath, warnings);
 
   if (!lotsGeo || !Array.isArray(lotsGeo.features) || lotsGeo.features.length === 0) {
@@ -1593,8 +1609,22 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   regional.productiveHaPerRuralAccessPerson = regional.estimatedRuralProductiveLandAccessPopulation > 0
     ? regional.estimatedProductiveLandHa / regional.estimatedRuralProductiveLandAccessPopulation : 0;
   regional.availableFoodWorkerFTE = regional.totalAvailableFoodLabourDays / defaults.foodWorkerDaysPerYear;
+  regional.currentFarmOperatorBaseline = n(farmLabourBaseline?.numberOfFarmOperators);
+  regional.currentFarmLabourDataStatus = regional.currentFarmOperatorBaseline > 0 ? 'available' : 'missing';
 
-  if (populationDistributionSource === 'censusSmallArea') {
+  if (populationDistributionSource === 'censusSmallAreaWithDwellingLandAccessProxy') {
+    const noDirect = n(dwellingLandAccess?.estimatedPopulationNoDirectLandAccess);
+    const ruralAccess = n(dwellingLandAccess?.estimatedPopulationWithGardenScaleAccess)
+      + n(dwellingLandAccess?.estimatedPopulationWithSubsistencePotential)
+      + n(dwellingLandAccess?.estimatedPopulationWithSmallholdingPotential)
+      + n(dwellingLandAccess?.estimatedPopulationWithFarmScalePotential);
+    if (noDirect + ruralAccess > 0) {
+      regional.estimatedNoDirectLandAccessPopulation = noDirect;
+      regional.estimatedRuralProductiveLandAccessPopulation = ruralAccess;
+      regional.productiveHaPerRuralAccessPerson = regional.estimatedRuralProductiveLandAccessPopulation > 0
+        ? regional.estimatedProductiveLandHa / regional.estimatedRuralProductiveLandAccessPopulation : 0;
+    }
+  } else if (populationDistributionSource === 'censusSmallArea') {
     const censusNoDirect = n(censusDistribution?.populationInsideSettlementBoundaries);
     const censusRuralAccess = n(censusDistribution?.populationOutsideSettlementBoundaries);
     if (censusNoDirect + censusRuralAccess > 0) {
@@ -1632,6 +1662,7 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
 
   const current = scenarios.find((s) => s.scenario === 'currentMechanized') ?? scenarios[0];
   const lowFuelScenario = scenarios.find((s) => s.scenario === 'lowFuelMixed') ?? scenarios[2] ?? scenarios[0];
+  regional.farmLabourGapVsLowFuelScenarios = Math.max(0, lowFuelScenario.requiredFoodWorkerFTE - regional.currentFarmOperatorBaseline);
 
   for (const s of scenarios) {
     s.additionalFoodLabourDaysNeededVsCurrent = Math.max(0, s.requiredFoodLabourDays - current.requiredFoodLabourDays);
@@ -1860,7 +1891,11 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
   const json = {
     generatedAt: new Date().toISOString(),
     assumptions: {
-      populationDistributionMethod: populationDistributionSource === 'censusSmallArea' ? 'censusSmallAreaAggregate' : 'heuristicEstimate',
+      populationDistributionMethod: populationDistributionSource === 'censusSmallAreaWithDwellingLandAccessProxy'
+        ? 'censusSmallAreaDwellingLandAccessProxy'
+        : populationDistributionSource === 'censusSmallArea'
+          ? 'censusSmallAreaAggregate'
+          : 'heuristicEstimate',
       populationDistributionSource,
       areaMethod: 'censusAreaWeightedByLotOpportunityShare',
       labourDaysByCategory: defaults.labourDaysByCategory,
@@ -1965,7 +2000,10 @@ export function buildGreyLabourLandBaselineReport(options = {}) {
     `- productiveHaPerPerson: ${regional.productiveHaPerPerson.toFixed(4)}`,
     `- productiveHaPerRuralAccessPerson: ${regional.productiveHaPerRuralAccessPerson.toFixed(4)}`,
     `- availableFoodWorkerFTE: ${regional.availableFoodWorkerFTE.toFixed(2)}`,
+    `- currentFarmOperatorBaseline: ${regional.currentFarmOperatorBaseline}`,
+    `- currentFarmLabourDataStatus: ${regional.currentFarmLabourDataStatus}`,
     `- lowFuelFoodWorkersNeeded: ${lowFuelScenario.requiredFoodWorkerFTE.toFixed(2)}`,
+    `- farmLabourGapVsLowFuelScenarios: ${regional.farmLabourGapVsLowFuelScenarios.toFixed(2)}`,
     `- lowFuelLabourDeficitDays: ${lowFuelScenario.labourDeficitDays.toFixed(2)}`,
     `- fossilFuelLeverageRatio: ${lowFuelScenario.fossilFuelLeverageRatio.toFixed(3)}`,
     '',

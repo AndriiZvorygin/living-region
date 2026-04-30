@@ -91,7 +91,10 @@ export function buildLivingRegionModelAssessment(options = {}) {
     gisSummary: path.join(produceDir, 'grey-gis-summary.json'),
     fieldInventory: path.join(produceDir, 'grey-field-inventory.json'),
     foodCalibration: path.join(produceDir, 'grey-food-calibration.json'),
-    censusPopulationDistribution: path.join(produceDir, 'grey-census-population-distribution.json')
+    censusPopulationDistribution: path.join(produceDir, 'grey-census-population-distribution.json'),
+    dwellingLandAccess: path.join(produceDir, 'grey-dwelling-land-access.json'),
+    farmLabourBaseline: path.join(produceDir, 'grey-census-agriculture-baseline.json'),
+    agLabourBaseline: path.join(produceDir, 'grey-ag-labour-baseline.json')
   };
 
   const publicBaseline = readJsonIfExists(sourceFiles.publicBaseline, warnings, 'public baseline');
@@ -105,6 +108,9 @@ export function buildLivingRegionModelAssessment(options = {}) {
   const fieldInventory = readJsonIfExists(sourceFiles.fieldInventory, warnings, 'field inventory');
   const foodCalibration = readJsonIfExists(sourceFiles.foodCalibration, warnings, 'food calibration');
   const censusPopulationDistribution = readJsonIfExists(sourceFiles.censusPopulationDistribution, warnings, 'census population distribution');
+  const dwellingLandAccess = readJsonIfExists(sourceFiles.dwellingLandAccess, warnings, 'dwelling-land-access baseline');
+  const farmLabourBaseline = readJsonIfExists(sourceFiles.farmLabourBaseline, warnings, 'farm-labour baseline');
+  const agLabourBaseline = readJsonIfExists(sourceFiles.agLabourBaseline, warnings, 'ag-labour baseline');
 
   const observedAnchors = {
     population: 100905,
@@ -229,6 +235,35 @@ export function buildLivingRegionModelAssessment(options = {}) {
       modelValue: asNumber(censusPopulationDistribution?.populationInsideSettlementBoundaries, 0)
         + asNumber(censusPopulationDistribution?.populationOutsideSettlementBoundaries, 0) > 0,
       tolerance: 0
+    }),
+    checkRow({
+      checkName: 'dwelling-land-access threshold report exists',
+      observedValue: true,
+      modelValue: !!dwellingLandAccess,
+      tolerance: 0
+    }),
+    checkRow({
+      checkName: 'dwelling-land-access population proxy totals available',
+      observedValue: true,
+      modelValue: asNumber(dwellingLandAccess?.estimatedPopulationNoDirectLandAccess, 0)
+        + asNumber(dwellingLandAccess?.estimatedPopulationWithGardenScaleAccess, 0)
+        + asNumber(dwellingLandAccess?.estimatedPopulationWithSubsistencePotential, 0)
+        + asNumber(dwellingLandAccess?.estimatedPopulationWithSmallholdingPotential, 0)
+        + asNumber(dwellingLandAccess?.estimatedPopulationWithFarmScalePotential, 0) > 0,
+      tolerance: 0,
+      notes: 'Threshold proxy should provide nonzero population allocation when census/lots are loaded.'
+    }),
+    checkRow({
+      checkName: 'farm labour baseline loaded',
+      observedValue: true,
+      modelValue: asNumber(farmLabourBaseline?.numberOfFarmOperators, 0) > 0,
+      tolerance: 0
+    }),
+    checkRow({
+      checkName: 'ag-labour baseline loaded',
+      observedValue: true,
+      modelValue: asNumber(agLabourBaseline?.currentAgRelatedWorkers, 0) > 0,
+      tolerance: 0
     })
   ];
 
@@ -236,7 +271,11 @@ export function buildLivingRegionModelAssessment(options = {}) {
     ['Population and settlement form', 0.76, 'Census totals and settlement geometry present; distribution still heuristic.', 'No address-point/building population distribution.'],
     ['Municipal boundaries / geography', 0.93, 'Real municipal boundaries loaded and used.', 'Geometry quality/provider cadence only.'],
     ['Land use', 0.88, 'Official Plan polygons loaded and mapped.', 'Designation-to-function calibration remains coarse.'],
-    ['Lots/concessions / land access', 0.79, 'Real lot/concession structure with assignment diagnostics.', 'Not parcel ownership/legal access fabric.'],
+    ['Lots/concessions / land access', dwellingLandAccess ? 0.81 : 0.79,
+      dwellingLandAccess
+        ? 'Real lot/concession structure plus dwelling-threshold proxy diagnostics.'
+        : 'Real lot/concession structure with assignment diagnostics.',
+      'Not parcel ownership/legal access fabric.'],
     ['Roads and road condition', 0.83, 'Real road centrelines + road condition layer.', 'Cost calibration by class/condition incomplete.'],
     ['Bridges/culverts/structures', 0.63, 'Structures layer loaded.', 'No lifecycle replacement cost calibration.'],
     ['Transit, trails, cycling, active transport', 0.7, 'Stops/routes/trails/cycling layers loaded.', 'No travel-time network calibration.'],
@@ -270,12 +309,15 @@ export function buildLivingRegionModelAssessment(options = {}) {
     };
   });
 
+  const dwellingCalibrationBonus = dwellingLandAccess ? 0.04 : 0;
+  const farmLabourBonus = asNumber(farmLabourBaseline?.numberOfFarmOperators, 0) > 0 ? 0.02 : 0;
+  const agLabourBonus = asNumber(agLabourBaseline?.currentAgRelatedWorkers, 0) > 0 ? 0.01 : 0;
   const scorecard = {
     presentGeographyScore: 0.9,
     presentInfrastructureScore: 0.73,
-    presentPopulationScore: censusPopulationDistribution ? 0.82 : 0.76,
-    presentLandAccessScore: 0.79,
-    presentFoodSystemScore: foodCalibration ? 0.52 : 0.46,
+    presentPopulationScore: censusPopulationDistribution ? Math.min(0.9, 0.82 + dwellingCalibrationBonus) : 0.76,
+    presentLandAccessScore: Math.min(0.9, 0.79 + dwellingCalibrationBonus),
+    presentFoodSystemScore: foodCalibration ? Math.min(0.63, 0.52 + farmLabourBonus + agLabourBonus) : 0.46,
     presentHousingScore: 0.45,
     presentTransportScore: 0.56,
     presentEnergyScore: 0.44,
@@ -338,6 +380,11 @@ export function buildLivingRegionModelAssessment(options = {}) {
       path: sourceFiles.foodCalibration,
       sensitivityScenarioCount: Array.isArray(foodCalibration?.plausibilityScenarios) ? foodCalibration.plausibilityScenarios.length : 0,
       caveat: foodCalibration?.assumptions?.caveat ?? null
+    } : null,
+    farmLabourBaseline: farmLabourBaseline ? {
+      path: sourceFiles.farmLabourBaseline,
+      numberOfFarmOperators: asNumber(farmLabourBaseline?.numberOfFarmOperators, 0),
+      operatorsWithOffFarmWork: asNumber(farmLabourBaseline?.operatorsWithOffFarmWork, 0)
     } : null,
     scorecard,
     presentBaselineChecks: checks,

@@ -308,6 +308,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
   const landAccessPath = path.join(produceDir, 'grey-land-access-baseline.json');
   const labourLandPath = path.join(produceDir, 'grey-labour-land-baseline.json');
   const metricsPath = path.join(produceDir, 'grey-county-open-data-metrics.json');
+  const farmLabourPath = path.join(produceDir, 'grey-census-agriculture-baseline.json');
   const officialLandUsePath = path.join(inputDir, 'official-plan-schedule-a-land-use.geojson');
   const managedForestPath = path.join(inputDir, 'managed-forest-boundary.geojson');
   const ruralBusinessPath = path.join(inputDir, 'on-farm-rural-business-listing.geojson');
@@ -315,6 +316,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
   const publicBaseline = readJsonIfExists(publicBaselinePath, warnings, 'public baseline');
   const landAccess = readJsonIfExists(landAccessPath, warnings, 'land-access baseline');
   const labourLand = readJsonIfExists(labourLandPath, warnings, 'labour-land baseline');
+  const farmLabour = readJsonIfExists(farmLabourPath, warnings, 'farm-labour baseline');
   const metrics = readJsonIfExists(metricsPath, warnings, 'open-data metrics');
   const landUseFeatures = readGeoJsonFeatures(officialLandUsePath, warnings, 'Official Plan land use');
   const managedForestFeatures = readGeoJsonFeatures(managedForestPath, warnings, 'managed forest');
@@ -357,6 +359,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
   const lowFuelFoodWorkersNeeded = n(labourLand?.regionalIndicators?.lowFuelFoodWorkersNeeded, 0);
   const productiveHaPerRuralAccessPerson = n(labourLand?.regionalIndicators?.productiveHaPerRuralAccessPerson, 0);
   const handToolReference = labourLand?.handToolCapacityReference ?? [];
+  const currentFarmOperators = n(farmLabour?.numberOfFarmOperators, 0);
 
   const { rows: sensitivityRows, totalFoodDemandGJ, totalPopulation } = buildSensitivityRows({
     ...landSummary,
@@ -425,6 +428,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
       publicBaselinePath,
       landAccessPath,
       labourLandPath,
+      farmLabourPath,
       metricsPath,
       officialLandUsePath,
       managedForestPath,
@@ -480,7 +484,9 @@ export function buildGreyFoodSystemCalibration(options = {}) {
     coverageByScenario,
     labourCrossCheck: {
       availableFoodWorkerFTE: labourAvailableFTE,
+      currentFarmOperators,
       lowFuelFoodWorkersNeeded,
+      farmLabourGapVsLowFuel: Math.max(0, lowFuelFoodWorkersNeeded - currentFarmOperators),
       productiveHaPerRuralAccessPerson,
       handToolCapacityReferenceCount: handToolReference.length,
       landSufficientButLabourConstrained: diagnostics.landSufficientButLabourConstrained,
@@ -616,7 +622,9 @@ export function buildGreyFoodSystemCalibration(options = {}) {
     '',
     '## Labour cross-check',
     `- availableFoodWorkerFTE: ${labourAvailableFTE.toFixed(2)}`,
+    `- currentFarmOperators (Census Ag baseline): ${currentFarmOperators.toFixed(2)}`,
     `- lowFuelFoodWorkersNeeded: ${lowFuelFoodWorkersNeeded.toFixed(2)}`,
+    `- farmLabourGapVsLowFuel: ${Math.max(0, lowFuelFoodWorkersNeeded - currentFarmOperators).toFixed(2)}`,
     `- productiveHaPerRuralAccessPerson: ${productiveHaPerRuralAccessPerson.toFixed(3)}`,
     `- landSufficientButLabourConstrained: ${diagnostics.landSufficientButLabourConstrained}`,
     `- labourSufficientButLandConstrained: ${diagnostics.labourSufficientButLandConstrained}`,

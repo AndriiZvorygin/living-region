@@ -13,7 +13,10 @@ try {
   console.log(`productiveHaPerPerson: ${regional.productiveHaPerPerson.toFixed(4)}`);
   console.log(`productiveHaPerRuralAccessPerson: ${regional.productiveHaPerRuralAccessPerson.toFixed(4)}`);
   console.log(`availableFoodWorkerFTE: ${regional.availableFoodWorkerFTE.toFixed(2)}`);
+  console.log(`currentFarmOperatorBaseline: ${regional.currentFarmOperatorBaseline ?? 0}`);
+  console.log(`currentFarmLabourDataStatus: ${regional.currentFarmLabourDataStatus ?? 'missing'}`);
   console.log(`lowFuelFoodWorkersNeeded: ${lowFuel.requiredFoodWorkerFTE.toFixed(2)}`);
+  console.log(`farmLabourGapVsLowFuelScenarios: ${(regional.farmLabourGapVsLowFuelScenarios ?? 0).toFixed(2)}`);
   console.log(`lowFuelLabourDeficitDays: ${lowFuel.labourDeficitDays.toFixed(2)}`);
   console.log(`fossilFuelLeverageRatio: ${lowFuel.fossilFuelLeverageRatio.toFixed(3)}`);
   console.log(`markdown: ${paths.markdownPath}`);

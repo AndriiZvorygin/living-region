@@ -144,9 +144,27 @@ describe('grey localization access report', () => {
   });
 
   test('command exits successfully', () => {
-    const run = spawnSync('node', ['command/report_grey_localization_access.mjs'], { encoding: 'utf8' });
-    expect(run.status).toBe(0);
-    expect(run.stdout).toContain('candidate nodes');
+    const root = path.resolve('know/produce/localization-access-command-fixture');
+    const inputDir = path.join(root, 'input');
+    const produceDir = path.join(root, 'produce');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+    writeGeo(path.join(inputDir, 'municipality-boundaries.geojson'), [polyFeature(1, -81.2, 44.4, -80.8, 44.8, { MUNICIPAL: 'Owen Sound' })]);
+    writeGeo(path.join(inputDir, 'settlement-boundaries.geojson'), [polyFeature(1, -81.1, 44.5, -81.0, 44.6, { SETTL_NAME: 'Core' })]);
+    writeGeo(path.join(inputDir, 'official-plan-schedule-a-land-use.geojson'), [polyFeature(1, -81.2, 44.45, -80.9, 44.7, { LANDUSE: 'Agricultural' })]);
+    writeGeo(path.join(inputDir, 'road-centrelines-grey.geojson'), [pointFeature(1, -81.05, 44.55)]);
+    writeGeo(path.join(inputDir, 'public-facilities.geojson'), [pointFeature(1, -81.04, 44.56, { NAME: 'Community Centre', TYPE: 'Community Centre' })]);
+    try {
+      const run = spawnSync(
+        'node',
+        ['command/report_grey_localization_access.mjs', `--input-dir=${inputDir}`, `--produce-dir=${produceDir}`],
+        { encoding: 'utf8' }
+      );
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('candidate nodes');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   });
 });
 

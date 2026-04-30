@@ -55,7 +55,11 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   plan.push(cmd('report:grey:secondary'));
   plan.push(cmd('report:grey:public-baseline'));
   plan.push(cmd('report:grey:land-access'));
+  plan.push(cmd('report:grey:population-distribution'));
+  plan.push(cmd('report:grey:dwelling-land-access'));
   plan.push(cmd('report:grey:labour-land'));
+  plan.push(cmd('report:grey:farm-labour'));
+  plan.push(cmd('report:grey:ag-labour'));
   plan.push(cmd('report:grey:food-calibration'));
   plan.push(cmd('report:grey:localization-access'));
   plan.push(cmd('report:model:assessment'));
@@ -87,7 +91,10 @@ export function extractKeyIndicators(data = {}) {
   const assessment = data.assessment ?? {};
   const publicBaseline = data.publicBaseline ?? {};
   const landAccess = data.landAccess ?? {};
+  const dwellingLandAccess = data.dwellingLandAccess ?? {};
   const labourLand = data.labourLand ?? {};
+  const farmLabour = data.farmLabour ?? {};
+  const agLabour = data.agLabour ?? {};
   const foodCal = data.foodCalibration ?? {};
   const localization = data.localization ?? {};
 
@@ -106,6 +113,16 @@ export function extractKeyIndicators(data = {}) {
     estimatedNoDirectLandAccessPopulation: Number(labourLand.regionalIndicators?.estimatedNoDirectLandAccessPopulation ?? 0),
     estimatedRuralProductiveLandAccessPopulation: Number(labourLand.regionalIndicators?.estimatedRuralProductiveLandAccessPopulation ?? 0),
     productiveHaPerRuralAccessPerson: Number(labourLand.regionalIndicators?.productiveHaPerRuralAccessPerson ?? 0),
+    estimatedPopulationNoDirectLandAccess: Number(dwellingLandAccess.estimatedPopulationNoDirectLandAccess ?? 0),
+    estimatedPopulationWithSubsistencePotential: Number(dwellingLandAccess.estimatedPopulationWithSubsistencePotential ?? 0),
+    dwellingsAtOrAboveSubsistence: Number((dwellingLandAccess.thresholdSensitivity ?? []).find((x) => x.thresholdScenario === 'baseline')?.dwellingsAtOrAboveSubsistence ?? 0),
+    currentFarmOperators: Number(farmLabour.currentFarmOperators ?? 0),
+    currentFarmLabourDataStatus: String(farmLabour.currentFarmLabourDataStatus ?? 'missing'),
+    currentFarmLabourFTEEstimate: Number(farmLabour.currentFarmLabourFTEEstimate ?? 0),
+    farmLabourScaleUpFactorLowFuel: Number(farmLabour.farmLabourScaleUpFactorLowFuel ?? 0),
+    currentAgRelatedFTEEstimate: Number(agLabour.currentAgRelatedFTEEstimate ?? 0),
+    agLabourDataStatus: String(agLabour.agLabourDataStatus ?? 'missing'),
+    agLabourScaleUpFactorLowFuel: Number(agLabour.agLabourScaleUpFactorLowFuel ?? 0),
     topReadinessMunicipality: localization.regionalSummary?.highestReadinessMunicipalities?.[0]?.municipalityName ?? null,
     candidateNodeCount: Number((localization.candidateNodes ?? []).length)
   };
@@ -155,6 +172,16 @@ function buildSuiteSummaryMarkdown(summary) {
     `- estimatedNoDirectLandAccessPopulation: ${k.estimatedNoDirectLandAccessPopulation}`,
     `- estimatedRuralProductiveLandAccessPopulation: ${k.estimatedRuralProductiveLandAccessPopulation}`,
     `- productiveHaPerRuralAccessPerson: ${k.productiveHaPerRuralAccessPerson?.toFixed?.(3) ?? k.productiveHaPerRuralAccessPerson}`,
+    `- estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${k.estimatedPopulationNoDirectLandAccess}`,
+    `- estimatedPopulationWithSubsistencePotential: ${k.estimatedPopulationWithSubsistencePotential}`,
+    `- dwellingsAtOrAboveSubsistence: ${k.dwellingsAtOrAboveSubsistence}`,
+    `- currentFarmOperators: ${k.currentFarmOperators}`,
+    `- currentFarmLabourDataStatus: ${k.currentFarmLabourDataStatus}`,
+    `- currentFarmLabourFTEEstimate: ${k.currentFarmLabourFTEEstimate}`,
+    `- farmLabourScaleUpFactorLowFuel: ${k.farmLabourScaleUpFactorLowFuel?.toFixed?.(2) ?? k.farmLabourScaleUpFactorLowFuel}`,
+    `- currentAgRelatedFTEEstimate: ${k.currentAgRelatedFTEEstimate}`,
+    `- agLabourDataStatus: ${k.agLabourDataStatus}`,
+    `- agLabourScaleUpFactorLowFuel: ${k.agLabourScaleUpFactorLowFuel?.toFixed?.(2) ?? k.agLabourScaleUpFactorLowFuel}`,
     `- top readiness municipality: ${k.topReadinessMunicipality ?? 'unknown'}`,
     `- candidate node count: ${k.candidateNodeCount}`,
     '',
@@ -201,7 +228,10 @@ export function runGreyReportSuite(options = {}) {
   const publicBaseline = readJsonIfExists(path.join(produceDir, 'grey-public-baseline.json'), warnings, 'public baseline');
   const assessment = readJsonIfExists(path.join(produceDir, 'living-region-model-assessment.json'), warnings, 'model assessment');
   const landAccess = readJsonIfExists(path.join(produceDir, 'grey-land-access-baseline.json'), warnings, 'land access baseline');
+  const dwellingLandAccess = readJsonIfExists(path.join(produceDir, 'grey-dwelling-land-access.json'), warnings, 'dwelling-land-access baseline');
   const labourLand = readJsonIfExists(path.join(produceDir, 'grey-labour-land-baseline.json'), warnings, 'labour-land baseline');
+  const farmLabour = readJsonIfExists(path.join(produceDir, 'grey-farm-labour-baseline.json'), warnings, 'farm-labour baseline');
+  const agLabour = readJsonIfExists(path.join(produceDir, 'grey-ag-labour-baseline.json'), warnings, 'ag-labour baseline');
   const foodCalibration = readJsonIfExists(path.join(produceDir, 'grey-food-calibration.json'), warnings, 'food calibration');
   const localization = readJsonIfExists(path.join(produceDir, 'grey-localization-access.json'), warnings, 'localization access');
   const secondary = readJsonIfExists(path.join(produceDir, 'grey-secondary-data-summary.json'), warnings, 'secondary data summary');
@@ -210,7 +240,10 @@ export function runGreyReportSuite(options = {}) {
     ...(publicBaseline?.warnings ?? []),
     ...(assessment?.warnings ?? []),
     ...(landAccess?.warnings ?? []),
+    ...(dwellingLandAccess?.warnings ?? []),
     ...(labourLand?.warnings ?? []),
+    ...(farmLabour?.warnings ?? []),
+    ...(agLabour?.warnings ?? []),
     ...(foodCalibration?.warnings ?? []),
     ...(localization?.warnings ?? [])
   ];
@@ -220,7 +253,10 @@ export function runGreyReportSuite(options = {}) {
     publicBaseline,
     assessment,
     landAccess,
+    dwellingLandAccess,
     labourLand,
+    farmLabour,
+    agLabour,
     foodCalibration,
     localization,
     secondary
@@ -273,6 +309,16 @@ function printSummary(summary) {
   console.log(`  - estimatedNoDirectLandAccessPopulation: ${coreFromPublic.estimatedNoDirectLandAccessPopulation}`);
   console.log(`  - estimatedRuralProductiveLandAccessPopulation: ${coreFromPublic.estimatedRuralProductiveLandAccessPopulation}`);
   console.log(`  - productiveHaPerRuralAccessPerson: ${Number(coreFromPublic.productiveHaPerRuralAccessPerson).toFixed(3)}`);
+  console.log(`  - estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${coreFromPublic.estimatedPopulationNoDirectLandAccess}`);
+  console.log(`  - estimatedPopulationWithSubsistencePotential: ${coreFromPublic.estimatedPopulationWithSubsistencePotential}`);
+  console.log(`  - dwellingsAtOrAboveSubsistence: ${coreFromPublic.dwellingsAtOrAboveSubsistence}`);
+  console.log(`  - currentFarmOperators: ${coreFromPublic.currentFarmOperators}`);
+  console.log(`  - currentFarmLabourDataStatus: ${coreFromPublic.currentFarmLabourDataStatus}`);
+  console.log(`  - currentFarmLabourFTEEstimate: ${coreFromPublic.currentFarmLabourFTEEstimate}`);
+  console.log(`  - farmLabourScaleUpFactorLowFuel: ${Number(coreFromPublic.farmLabourScaleUpFactorLowFuel).toFixed(2)}`);
+  console.log(`  - currentAgRelatedFTEEstimate: ${coreFromPublic.currentAgRelatedFTEEstimate}`);
+  console.log(`  - agLabourDataStatus: ${coreFromPublic.agLabourDataStatus}`);
+  console.log(`  - agLabourScaleUpFactorLowFuel: ${Number(coreFromPublic.agLabourScaleUpFactorLowFuel).toFixed(2)}`);
   console.log(`  - top readiness municipality: ${coreFromPublic.topReadinessMunicipality ?? 'unknown'}`);
   console.log(`  - candidate node count: ${coreFromPublic.candidateNodeCount}`);
   console.log(`- summary markdown: ${summary.outputPaths.suiteMarkdown}`);

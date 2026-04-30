@@ -314,6 +314,53 @@ npm run report:grey:population-distribution
 
 This uses aggregate 2021 Census dissemination geography to improve Grey population distribution diagnostics inside municipalities and settlement/rural contexts. It does not represent individual-level address or personal data.
 
+### Census of Agriculture baseline
+
+```bash
+npm run census-ag:download-2021
+npm run census-ag:import-grey
+npm run report:grey:farm-labour
+```
+
+This adds Census of Agriculture operator/farm-labour calibration plumbing for Grey baseline diagnostics. It supports manual URL/file workflows when direct table download links are not automatically resolved.
+
+Outputs:
+
+- `know/produce/grey-census-agriculture-baseline.json`
+- `know/produce/grey-farm-labour-baseline.md`
+- `know/produce/grey-farm-labour-baseline.csv`
+
+### Census Population agricultural labour baseline
+
+```bash
+npm run census-pop-labour:download-2021
+npm run census-pop-labour:import-grey
+npm run report:grey:ag-labour
+```
+
+This uses Census of Population occupation and industry tables to estimate current agriculture-related workers/FTE in Grey and compare them to low-fuel/perennial food-labour scenarios.
+
+Outputs:
+
+- `know/produce/grey-census-population-labour-baseline.json`
+- `know/produce/grey-ag-labour-baseline.md`
+- `know/produce/grey-ag-labour-baseline.csv`
+
+### Dwelling-to-land-access threshold baseline
+
+```bash
+npm run report:grey:dwelling-land-access
+```
+
+This estimates how aggregate Census dwellings/population relate to lot/concession land-access proxies and threshold classes. It does not identify ownership, legal access, or exact household locations.
+
+Outputs:
+
+- `know/produce/grey-dwelling-land-access.md`
+- `know/produce/grey-dwelling-land-access.json`
+- `know/produce/grey-dwelling-land-access-municipal.csv`
+- `know/produce/grey-dwelling-land-access-thresholds.csv`
+
 ### Run all Grey reports
 
 ```bash

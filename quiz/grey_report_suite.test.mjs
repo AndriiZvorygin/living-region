@@ -18,6 +18,10 @@ describe('grey report suite command', () => {
     const def = buildCommandPlan({});
     expect(def[0].script).toBe('grey:download-data');
     expect(def.some((x) => x.script === 'grey:import-data')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:population-distribution')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:dwelling-land-access')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:farm-labour')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:ag-labour')).toBe(true);
 
     const quick = buildCommandPlan({ quick: true }, { worldExists: true });
     expect(quick.some((x) => x.script === 'grey:download-data')).toBe(false);
@@ -37,6 +41,9 @@ describe('grey report suite command', () => {
       publicBaseline: { regionalIndicators: { totalRoadKm: 4700 } },
       landAccess: { assignment: { totalLotConcessionFeatures: 10137 } },
       labourLand: { regionalIndicators: { estimatedNoDirectLandAccessPopulation: 20000, estimatedRuralProductiveLandAccessPopulation: 30000, productiveHaPerRuralAccessPerson: 3.2 } },
+      dwellingLandAccess: { estimatedPopulationNoDirectLandAccess: 21000, estimatedPopulationWithSubsistencePotential: 12000, thresholdSensitivity: [{ thresholdScenario: 'baseline', dwellingsAtOrAboveSubsistence: 5000 }] },
+      farmLabour: { currentFarmOperators: 1200, currentFarmLabourDataStatus: 'available', currentFarmLabourFTEEstimate: 980, farmLabourScaleUpFactorLowFuel: 4.2 },
+      agLabour: { currentAgRelatedFTEEstimate: 640, agLabourScaleUpFactorLowFuel: 1.9, agLabourDataStatus: 'available' },
       foodCalibration: { landEnoughDiagnostic: { lowFuelFoodCoverage: 0.16 }, plausibilityScenarios: [
         { scenario: 'presentIndustrialFossilBaseline', foodCoverage: 4.5 },
         { scenario: 'localizedPresentTechBaseline', foodCoverage: 0.47 },
@@ -48,6 +55,15 @@ describe('grey report suite command', () => {
     expect(k.foodCoverageLocalizedPresentTechBaseline).toBeCloseTo(0.47, 6);
     expect(k.topReadinessMunicipality).toBe('Meaford');
     expect(k.candidateNodeCount).toBe(2);
+    expect(k.estimatedPopulationNoDirectLandAccess).toBe(21000);
+    expect(k.dwellingsAtOrAboveSubsistence).toBe(5000);
+    expect(k.currentFarmOperators).toBe(1200);
+    expect(k.currentFarmLabourDataStatus).toBe('available');
+    expect(k.currentFarmLabourFTEEstimate).toBe(980);
+    expect(k.farmLabourScaleUpFactorLowFuel).toBeCloseTo(4.2, 6);
+    expect(k.currentAgRelatedFTEEstimate).toBe(640);
+    expect(k.agLabourScaleUpFactorLowFuel).toBeCloseTo(1.9, 6);
+    expect(k.agLabourDataStatus).toBe('available');
   });
 
   test('continue-on-error records failures and exits nonzero at end logic', () => {
