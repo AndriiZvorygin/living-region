@@ -21,10 +21,38 @@ function readJsonIfExists(filePath, warnings, label, fallback = null) {
 
 const SHOCK_PCTS = [0, 5, 10, 15, 20, 25, 30, 40, 50];
 const MEALS_PER_GJ = 571.0; // approx 700 kcal meal equivalent
+const TREND_YEARS = [2026, 2027, 2030];
+
+const OIL_TO_FUEL_PRICE_PROFILES = {
+  linearConservative: [[0, 0], [5, 6], [10, 13], [20, 25], [40, 50], [50, 65]],
+  tightMarketNonlinear: [[0, 0], [5, 50], [10, 100], [20, 175], [40, 300], [50, 380]],
+  policyBuffered: [[0, 0], [5, 20], [10, 40], [20, 80], [40, 150], [50, 190]]
+};
+
+const FOOD_PASS_THROUGH_PROFILES = {
+  conservativeFoodPassThrough: [[0, 0], [5, 4], [10, 8], [20, 16], [40, 33], [50, 45]],
+  centralFoodPassThrough: [[0, 0], [5, 10], [10, 20], [20, 35], [40, 65], [50, 85]],
+  severeFoodPassThrough: [[0, 0], [5, 14], [10, 28], [20, 50], [40, 90], [50, 120]]
+};
 
 function thresholdAt(rows, fn) {
   const hit = rows.find(fn);
   return hit ? hit.scenario : null;
+}
+
+function interpolateFromPoints(points, x) {
+  const sorted = [...points].sort((a, b) => a[0] - b[0]);
+  if (x <= sorted[0][0]) return sorted[0][1];
+  if (x >= sorted[sorted.length - 1][0]) return sorted[sorted.length - 1][1];
+  for (let i = 0; i < sorted.length - 1; i += 1) {
+    const [x0, y0] = sorted[i];
+    const [x1, y1] = sorted[i + 1];
+    if (x >= x0 && x <= x1) {
+      const t = (x - x0) / (x1 - x0);
+      return y0 + (y1 - y0) * t;
+    }
+  }
+  return sorted[sorted.length - 1][1];
 }
 
 export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
@@ -47,6 +75,8 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
   const baseNetGJ = n(localizedScenario.netFoodEnergyGJ, baseCoverage * totalDemandGJ);
   const currentAgIndustryFTE = n(agLabour.currentAgIndustryFTEEstimate, 3918.43);
   const baseFoodInsecurityShare = n(transition.assumptions?.currentFoodInsecurityShare, 0.25);
+  const defaultMeasuredFoodInsecurityShare = n(options.defaultMeasuredFoodInsecurityShare, 0.25);
+  const vulnerabilityToMeasuredFoodInsecurityConversionFactor = n(options.vulnerabilityToMeasuredFoodInsecurityConversionFactor, 0.5);
   const noDirectLandAccessPopulation = n(dwelling.estimatedPopulationNoDirectLandAccess, 7990);
   const subsistencePotentialPopulation = n(dwelling.estimatedPopulationWithSubsistencePotential, 54949);
   const importDependencyIndex = 0.86;
@@ -60,6 +90,50 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     foodBankHouseholdStressImpactMonths: '1-6',
     municipalBudgetServiceImpactMonths: '3-12'
   };
+
+  const measuredFoodInsecurityAnchor = {
+    defaultMeasuredFoodInsecurityShare,
+    sourceStatus: 'Canada/Ontario external anchor unless local Grey data loaded',
+    measuredFoodInsecurityEstimate: totalPopulation * defaultMeasuredFoodInsecurityShare
+  };
+  const localSoupKitchenMealsPerDay = options.localSoupKitchenMealsPerDay ?? null;
+  const localFoodBankUsageIndex = options.localFoodBankUsageIndex ?? null;
+  const emergencyFoodDemandStatus = options.emergencyFoodDemandStatus ?? null;
+  const localContext = {
+    localSoupKitchenMealsPerDay,
+    localFoodBankUsageIndex,
+    emergencyFoodDemandStatus,
+    sourceStatus: localSoupKitchenMealsPerDay == null
+      ? 'local service-demand baseline not loaded'
+      : 'local observation, needs validation',
+    baselineStressAlreadyHigh: localSoupKitchenMealsPerDay != null ? localSoupKitchenMealsPerDay >= 1000 : false
+  };
+  const foodInsecurityTrendBaseline = {
+    trendSourceStatus: 'external Canada/Ontario anchor, not Grey-specific',
+    notForecast: true,
+    trendDataPoints: {
+      tenProvinces2019HouseholdShare: { value: 0.168, sourceLabel: 'Ten provinces 2019', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' },
+      tenProvinces2022HouseholdShare: { value: 0.184, sourceLabel: 'Ten provinces 2022', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' },
+      tenProvinces2023PeopleShare: { value: 0.229, sourceLabel: 'Ten provinces 2023', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' },
+      tenProvinces2024PeopleShare: { value: 0.255, sourceLabel: 'Ten provinces 2024', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' },
+      canada2025PeopleShare: { value: 0.240, sourceLabel: 'Canada 2025 people share', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' },
+      ontario2019HouseholdShare: { value: 0.171, sourceLabel: 'Ontario 2019 household share', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' },
+      ontario2023HouseholdShare: { value: 0.242, sourceLabel: 'Ontario 2023 household share', sourceUrl: 'https://proof.utoronto.ca/food-insecurity/' }
+    },
+    baselineTrendScenario: ['conservative', 'central', 'severe']
+  };
+
+  const trendProjection = [
+    { trendScenario: 'conservative', year: 2026, projectedMeasuredFoodInsecurityShareWithoutShock: 0.245, notes: 'flat to slight increase' },
+    { trendScenario: 'conservative', year: 2027, projectedMeasuredFoodInsecurityShareWithoutShock: 0.248, notes: 'flat to slight increase' },
+    { trendScenario: 'conservative', year: 2030, projectedMeasuredFoodInsecurityShareWithoutShock: 0.255, notes: 'slow increase' },
+    { trendScenario: 'central', year: 2026, projectedMeasuredFoodInsecurityShareWithoutShock: 0.278, notes: 'rising pre-shock trajectory' },
+    { trendScenario: 'central', year: 2027, projectedMeasuredFoodInsecurityShareWithoutShock: 0.300, notes: 'about 30% by 2027' },
+    { trendScenario: 'central', year: 2030, projectedMeasuredFoodInsecurityShareWithoutShock: 0.325, notes: 'continued trend stress' },
+    { trendScenario: 'severe', year: 2026, projectedMeasuredFoodInsecurityShareWithoutShock: 0.295, notes: 'high-stress trend' },
+    { trendScenario: 'severe', year: 2027, projectedMeasuredFoodInsecurityShareWithoutShock: 0.330, notes: 'above 30% by 2027' },
+    { trendScenario: 'severe', year: 2030, projectedMeasuredFoodInsecurityShareWithoutShock: 0.370, notes: 'sustained severe trend' }
+  ].map((r) => ({ ...r, projectedFoodInsecurePeopleWithoutShock: r.projectedMeasuredFoodInsecurityShareWithoutShock * totalPopulation }));
 
   const shockScenarios = SHOCK_PCTS.map((pct) => {
     const s = pct / 100;
@@ -91,7 +165,7 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     const foodInsecurityRiskShare = clamp(baseFoodInsecurityShare + (1 - foodCoverage) * 0.45 + (averageFoodCostBurdenIndex - 0.3) * 0.22 + (transportCostBurdenIndex - 0.28) * 0.12 + (noDirectLandAccessPopulation / Math.max(1, totalPopulation)) * 0.1, 0.05, 0.95);
     const severeFoodStressShare = clamp(foodInsecurityRiskShare * 0.33 + s * 0.08, 0.01, 0.65);
     const foodStressRiskPopulation = foodStressRiskShare * totalPopulation;
-    const foodInsecurityRiskExposurePopulation = foodInsecurityRiskShare * totalPopulation;
+    const foodInsecurityVulnerabilityPopulation = foodInsecurityRiskShare * totalPopulation;
     const severeFoodStressPopulation = severeFoodStressShare * totalPopulation;
 
     const foodBankPressureIndex = clamp((foodInsecurityRiskShare - baseFoodInsecurityShare) * 1.8 + s * 0.35, 0, 1);
@@ -120,7 +194,8 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
       householdStressIndex: combinedHouseholdStressIndex,
       combinedHouseholdStressIndex,
       foodStressRiskPopulation,
-      foodInsecurityRiskExposurePopulation,
+      foodInsecurityVulnerabilityPopulation,
+      foodInsecurityRiskExposurePopulation: foodInsecurityVulnerabilityPopulation, // backward-compatible alias
       severeFoodStressPopulation,
       additionalFoodAidNeedGJ,
       additionalFoodAidNeedMealsEquivalent,
@@ -139,16 +214,151 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
   for (const row of shockScenarios) {
     row.baselineFoodStressRiskPopulation = baseline.foodStressRiskPopulation;
     row.addedFoodStressRiskPopulationVsFuelShock0 = row.foodStressRiskPopulation - baseline.foodStressRiskPopulation;
-    row.baselineFoodInsecurityRiskExposurePopulation = baseline.foodInsecurityRiskExposurePopulation;
-    row.addedFoodInsecurityRiskExposureVsFuelShock0 = row.foodInsecurityRiskExposurePopulation - baseline.foodInsecurityRiskExposurePopulation;
+    row.baselineFoodInsecurityVulnerabilityPopulation = baseline.foodInsecurityVulnerabilityPopulation;
+    row.addedFoodInsecurityVulnerabilityVsFuelShock0 = row.foodInsecurityVulnerabilityPopulation - baseline.foodInsecurityVulnerabilityPopulation;
     row.baselineSevereFoodStressPopulation = baseline.severeFoodStressPopulation;
     row.addedSevereFoodStressVsFuelShock0 = row.severeFoodStressPopulation - baseline.severeFoodStressPopulation;
+    row.measuredFoodInsecurityBaselineEstimate = measuredFoodInsecurityAnchor.measuredFoodInsecurityEstimate;
+    row.modelVulnerabilityBaselineEstimate = baseline.foodInsecurityVulnerabilityPopulation;
+    row.shockAddedFoodInsecurityRiskExposure = row.addedFoodInsecurityVulnerabilityVsFuelShock0;
+    row.shockAddedSevereFoodStressRisk = row.addedSevereFoodStressVsFuelShock0;
+    row.calibratedFoodInsecurityEstimateUnderShock = measuredFoodInsecurityAnchor.measuredFoodInsecurityEstimate + (row.shockAddedFoodInsecurityRiskExposure * vulnerabilityToMeasuredFoodInsecurityConversionFactor);
+    row.broaderThanMeasuredFoodInsecurity = true;
+  }
+  const centralTrend = trendProjection.filter((r) => r.trendScenario === 'central');
+  const yearToCentralShare = new Map(centralTrend.map((r) => [r.year, r.projectedMeasuredFoodInsecurityShareWithoutShock]));
+  const shockOverlayOnTrend = [];
+  for (const trendRow of trendProjection) {
+    for (const shockRow of shockScenarios) {
+      const shockAddedMeasuredFoodInsecurityShare = (shockRow.shockAddedFoodInsecurityRiskExposure / Math.max(1, totalPopulation)) * vulnerabilityToMeasuredFoodInsecurityConversionFactor;
+      const projectedMeasuredFoodInsecurityShareWithShock = clamp(
+        trendRow.projectedMeasuredFoodInsecurityShareWithoutShock + shockAddedMeasuredFoodInsecurityShare,
+        0,
+        0.98
+      );
+      const projectedFoodInsecurePeopleWithShock = projectedMeasuredFoodInsecurityShareWithShock * totalPopulation;
+      const addedPeopleVsTrendBaseline = projectedFoodInsecurePeopleWithShock - trendRow.projectedFoodInsecurePeopleWithoutShock;
+      let yearsOfTrendAccelerationEquivalent = 0;
+      if (trendRow.trendScenario === 'central') {
+        const centralNow = trendRow.projectedMeasuredFoodInsecurityShareWithoutShock;
+        const centralWithShock = projectedMeasuredFoodInsecurityShareWithShock;
+        const future = centralTrend.find((r) => r.year > trendRow.year && r.projectedMeasuredFoodInsecurityShareWithoutShock >= centralWithShock);
+        yearsOfTrendAccelerationEquivalent = future ? Math.max(0, future.year - trendRow.year) : (centralWithShock > centralNow ? (2030 - trendRow.year) : 0);
+      }
+      shockOverlayOnTrend.push({
+        trendScenario: trendRow.trendScenario,
+        year: trendRow.year,
+        projectedMeasuredFoodInsecurityShareWithoutShock: trendRow.projectedMeasuredFoodInsecurityShareWithoutShock,
+        projectedFoodInsecurePeopleWithoutShock: trendRow.projectedFoodInsecurePeopleWithoutShock,
+        fuelShockScenario: shockRow.scenario,
+        shockAddedMeasuredFoodInsecurityShare,
+        projectedMeasuredFoodInsecurityShareWithShock,
+        projectedFoodInsecurePeopleWithShock,
+        addedPeopleVsTrendBaseline,
+        yearsOfTrendAccelerationEquivalent,
+        caveat: 'Trend scenario diagnostic, not a forecast.'
+      });
+    }
   }
 
+  const passThroughRows = [];
+  for (const [profileName, fuelPoints] of Object.entries(OIL_TO_FUEL_PRICE_PROFILES)) {
+    const foodProfileName = profileName === 'linearConservative'
+      ? 'conservativeFoodPassThrough'
+      : (profileName === 'policyBuffered' ? 'centralFoodPassThrough' : 'severeFoodPassThrough');
+    const foodPoints = FOOD_PASS_THROUGH_PROFILES[foodProfileName];
+    for (const shockRow of shockScenarios) {
+      const physicalFuelShockPct = shockRow.fuelShockPct;
+      const fuelPriceIncreasePct = interpolateFromPoints(fuelPoints, physicalFuelShockPct);
+      const fertilizerPriceIncreasePct = clamp(fuelPriceIncreasePct * (profileName === 'tightMarketNonlinear' ? 0.65 : 0.5), 0, 400);
+      const foodPriceIncreasePctFromProfile = interpolateFromPoints(foodPoints, physicalFuelShockPct);
+      const fertilizerChannelPct = fertilizerPriceIncreasePct * 0.12;
+      const foodPriceIncreasePct = profileName === 'linearConservative'
+        ? (0.15 * fuelPriceIncreasePct + fertilizerChannelPct)
+        : (foodPriceIncreasePctFromProfile + fertilizerChannelPct);
+      const dieselPriceMultiplier = 1 + (fuelPriceIncreasePct / 100);
+      const fertilizerPriceMultiplier = 1 + (fertilizerPriceIncreasePct / 100);
+      const householdFoodPriceMultiplier = 1 + (foodPriceIncreasePct / 100);
+      const transportCostMultiplier = 1 + (fuelPriceIncreasePct * 0.72 / 100);
+      const lagMonthsToAcutePain = clamp(shockRow.lagMonthsToAcutePain + (profileName === 'tightMarketNonlinear' ? -0.6 : (profileName === 'policyBuffered' ? 0.4 : 0)), 1, 12);
+
+      const trend2027Central = trendProjection.find((r) => r.trendScenario === 'central' && r.year === 2027);
+      const calibratedFoodInsecurityEstimateUnderShock = clamp(
+        measuredFoodInsecurityAnchor.measuredFoodInsecurityEstimate
+        + (shockRow.shockAddedFoodInsecurityRiskExposure * vulnerabilityToMeasuredFoodInsecurityConversionFactor)
+        + ((foodPriceIncreasePct / 100) * totalPopulation * 0.10),
+        0,
+        totalPopulation
+      );
+      const projectedMeasuredFoodInsecurityShareWithShock2027 = trend2027Central
+        ? clamp(trend2027Central.projectedMeasuredFoodInsecurityShareWithoutShock + ((calibratedFoodInsecurityEstimateUnderShock - measuredFoodInsecurityAnchor.measuredFoodInsecurityEstimate) / Math.max(1, totalPopulation)), 0, 0.98)
+        : null;
+      const addedPeopleVsTrendBaseline = trend2027Central
+        ? (projectedMeasuredFoodInsecurityShareWithShock2027 * totalPopulation) - trend2027Central.projectedFoodInsecurePeopleWithoutShock
+        : 0;
+
+      const foodInsecurityVulnerabilityPopulation = clamp(
+        shockRow.foodInsecurityVulnerabilityPopulation * (1 + (foodPriceIncreasePct / 100) * 0.35),
+        0,
+        totalPopulation
+      );
+      const severeFoodStressPopulation = clamp(
+        shockRow.severeFoodStressPopulation * (1 + (foodPriceIncreasePct / 100) * 0.40),
+        0,
+        totalPopulation
+      );
+      const foodBankPressureIndex = clamp(shockRow.foodBankPressureIndex + (foodPriceIncreasePct / 100) * 0.18, 0, 1);
+      const municipalEmergencyPressureIndex = clamp(shockRow.municipalEmergencyPressureIndex + (foodPriceIncreasePct / 100) * 0.12, 0, 1);
+
+      let mainThresholdCrossed = 'none';
+      if (projectedMeasuredFoodInsecurityShareWithShock2027 != null) {
+        if (projectedMeasuredFoodInsecurityShareWithShock2027 >= 0.40) mainThresholdCrossed = 'food_insecurity_above_40pct';
+        else if (projectedMeasuredFoodInsecurityShareWithShock2027 >= 0.35) mainThresholdCrossed = 'food_insecurity_above_35pct';
+        else if (projectedMeasuredFoodInsecurityShareWithShock2027 >= 0.30) mainThresholdCrossed = 'food_insecurity_above_30pct';
+      }
+      passThroughRows.push({
+        profile: profileName,
+        foodPassThroughProfile: foodProfileName,
+        shockScenario: shockRow.scenario,
+        physicalFuelShockPct,
+        fuelPriceIncreasePct,
+        dieselPriceMultiplier,
+        fertilizerPriceIncreasePct,
+        fertilizerPriceMultiplier,
+        foodPriceIncreasePct,
+        householdFoodPriceMultiplier,
+        transportCostMultiplier,
+        calibratedFoodInsecurityEstimateUnderShock,
+        addedPeopleVsTrendBaseline,
+        projectedMeasuredFoodInsecurityShareWithShock2027,
+        foodInsecurityVulnerabilityPopulation,
+        severeFoodStressPopulation,
+        foodBankPressureIndex,
+        municipalEmergencyPressureIndex,
+        lagMonthsToAcutePain,
+        mainThresholdCrossed
+      });
+    }
+  }
+
+  const thresholdFindingsByProfile = Object.fromEntries(Object.keys(OIL_TO_FUEL_PRICE_PROFILES).map((profileName) => {
+    const rows = passThroughRows.filter((r) => r.profile === profileName).sort((a, b) => a.physicalFuelShockPct - b.physicalFuelShockPct);
+    const findShock = (fn) => (rows.find(fn)?.shockScenario ?? null);
+    return [profileName, {
+      firstModerateStressShockLevel: findShock((r) => r.foodBankPressureIndex >= 0.5 || r.municipalEmergencyPressureIndex >= 0.5),
+      firstSevereStressShockLevel: findShock((r) => r.foodBankPressureIndex >= 0.7 || r.municipalEmergencyPressureIndex >= 0.7),
+      firstFoodBankCrisisShockLevel: findShock((r) => r.foodBankPressureIndex >= 0.7),
+      firstMunicipalEmergencyShockLevel: findShock((r) => r.municipalEmergencyPressureIndex >= 0.7),
+      firstFoodInsecurityAbove30Pct: findShock((r) => n(r.projectedMeasuredFoodInsecurityShareWithShock2027) >= 0.30),
+      firstFoodInsecurityAbove35Pct: findShock((r) => n(r.projectedMeasuredFoodInsecurityShareWithShock2027) >= 0.35),
+      firstFoodInsecurityAbove40Pct: findShock((r) => n(r.projectedMeasuredFoodInsecurityShareWithShock2027) >= 0.40)
+    }];
+  }));
+
   const isShockNotBaseline = (r) => r.fuelShockPct > 0;
-  const firstFoodInsecurityPlus10PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.10);
-  const firstFoodInsecurityPlus25PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.25);
-  const firstFoodInsecurityPlus50PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.50);
+  const firstFoodInsecurityPlus10PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.10);
+  const firstFoodInsecurityPlus25PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.25);
+  const firstFoodInsecurityPlus50PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.50);
   const firstSevereStressPlus10PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.severeFoodStressPopulation >= baseline.severeFoodStressPopulation * 1.10);
   const firstSevereStressPlus25PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.severeFoodStressPopulation >= baseline.severeFoodStressPopulation * 1.25);
   const firstSevereStressPlus50PctVsBaseline = thresholdAt(shockScenarios, (r) => isShockNotBaseline(r) && r.severeFoodStressPopulation >= baseline.severeFoodStressPopulation * 1.50);
@@ -162,14 +372,14 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
       else if (row.severeFoodStressPopulation >= baseline.severeFoodStressPopulation * 1.50) mainThresholdCrossed = 'severe_stress_plus_50pct_vs_baseline';
       else if (row.severeFoodStressPopulation >= baseline.severeFoodStressPopulation * 1.25) mainThresholdCrossed = 'severe_stress_plus_25pct_vs_baseline';
       else if (row.severeFoodStressPopulation >= baseline.severeFoodStressPopulation * 1.10) mainThresholdCrossed = 'severe_stress_plus_10pct_vs_baseline';
-      else if (row.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.50) mainThresholdCrossed = 'food_insecurity_plus_50pct_vs_baseline';
-      else if (row.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.25) mainThresholdCrossed = 'food_insecurity_plus_25pct_vs_baseline';
-      else if (row.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.10) mainThresholdCrossed = 'food_insecurity_plus_10pct_vs_baseline';
+      else if (row.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.50) mainThresholdCrossed = 'food_insecurity_plus_50pct_vs_baseline';
+      else if (row.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.25) mainThresholdCrossed = 'food_insecurity_plus_25pct_vs_baseline';
+      else if (row.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.10) mainThresholdCrossed = 'food_insecurity_plus_10pct_vs_baseline';
     }
     row.mainThresholdCrossed = mainThresholdCrossed;
   }
-  const firstModerateStressShockLevel = thresholdAt(shockScenarios, (r) => r.householdStressIndex >= 0.5 || r.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.1);
-  const firstSevereStressShockLevel = thresholdAt(shockScenarios, (r) => r.householdStressIndex >= 0.7 || r.foodInsecurityRiskExposurePopulation >= baseline.foodInsecurityRiskExposurePopulation * 1.25);
+  const firstModerateStressShockLevel = thresholdAt(shockScenarios, (r) => r.householdStressIndex >= 0.5 || r.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.1);
+  const firstSevereStressShockLevel = thresholdAt(shockScenarios, (r) => r.householdStressIndex >= 0.7 || r.foodInsecurityVulnerabilityPopulation >= baseline.foodInsecurityVulnerabilityPopulation * 1.25);
   const firstFoodBankCrisisShockLevel = thresholdAt(shockScenarios, (r) => r.foodBankPressureIndex >= 0.7);
   const firstMunicipalEmergencyShockLevel = thresholdAt(shockScenarios, (r) => r.municipalEmergencyPressureIndex >= 0.7);
   const firstLabourMobilizationShockLevel = thresholdAt(shockScenarios, (r) => r.agLabourGapExceedsCurrent);
@@ -186,10 +396,10 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
 
   const shock20 = shockScenarios.find((s) => s.scenario === 'fuelShock20') ?? baseline;
   const secondaryAdaptationComparison = [
-    { adaptation: 'noAdaptation', foodInsecurityRiskExposurePopulation: shock20.foodInsecurityRiskExposurePopulation, severeFoodStressPopulation: shock20.severeFoodStressPopulation, householdStressIndex: shock20.householdStressIndex },
-    { adaptation: 'emergencyFoodAidOnly', foodInsecurityRiskExposurePopulation: shock20.foodInsecurityRiskExposurePopulation * 0.93, severeFoodStressPopulation: shock20.severeFoodStressPopulation * 0.9, householdStressIndex: clamp(shock20.householdStressIndex - 0.04, 0, 1) },
-    { adaptation: 'storageAndDistributionStabilization', foodInsecurityRiskExposurePopulation: shock20.foodInsecurityRiskExposurePopulation * 0.86, severeFoodStressPopulation: shock20.severeFoodStressPopulation * 0.82, householdStressIndex: clamp(shock20.householdStressIndex - 0.09, 0, 1) },
-    { adaptation: 'localResiliencePackage', foodInsecurityRiskExposurePopulation: shock20.foodInsecurityRiskExposurePopulation * 0.74, severeFoodStressPopulation: shock20.severeFoodStressPopulation * 0.68, householdStressIndex: clamp(shock20.householdStressIndex - 0.16, 0, 1) }
+    { adaptation: 'noAdaptation', foodInsecurityVulnerabilityPopulation: shock20.foodInsecurityVulnerabilityPopulation, severeFoodStressPopulation: shock20.severeFoodStressPopulation, householdStressIndex: shock20.householdStressIndex },
+    { adaptation: 'emergencyFoodAidOnly', foodInsecurityVulnerabilityPopulation: shock20.foodInsecurityVulnerabilityPopulation * 0.93, severeFoodStressPopulation: shock20.severeFoodStressPopulation * 0.9, householdStressIndex: clamp(shock20.householdStressIndex - 0.04, 0, 1) },
+    { adaptation: 'storageAndDistributionStabilization', foodInsecurityVulnerabilityPopulation: shock20.foodInsecurityVulnerabilityPopulation * 0.86, severeFoodStressPopulation: shock20.severeFoodStressPopulation * 0.82, householdStressIndex: clamp(shock20.householdStressIndex - 0.09, 0, 1) },
+    { adaptation: 'localResiliencePackage', foodInsecurityVulnerabilityPopulation: shock20.foodInsecurityVulnerabilityPopulation * 0.74, severeFoodStressPopulation: shock20.severeFoodStressPopulation * 0.68, householdStressIndex: clamp(shock20.householdStressIndex - 0.16, 0, 1) }
   ];
 
   const report = {
@@ -197,13 +407,20 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     assumptions: {
       currentSystemPrimary: true,
       baseFoodInsecurityShareAssumption: baseFoodInsecurityShare,
-      lagModelConfigurableAssumption: true
+      lagModelConfigurableAssumption: true,
+      vulnerabilityToMeasuredFoodInsecurityConversionFactor
     },
+    measuredFoodInsecurityAnchor,
+    foodInsecurityTrendBaseline,
+    foodInsecurityTrendProjection: trendProjection,
+    shockOverlayOnTrend,
     lagModel,
     shockScenarios,
+    thresholdFindingsByProfile,
     thresholdFindings: {
       baselineFoodStressRiskPopulation: baseline.foodStressRiskPopulation,
-      baselineFoodInsecurityRiskExposurePopulation: baseline.foodInsecurityRiskExposurePopulation,
+      baselineFoodInsecurityVulnerabilityPopulation: baseline.foodInsecurityVulnerabilityPopulation,
+      measuredFoodInsecurityBaselineEstimate: measuredFoodInsecurityAnchor.measuredFoodInsecurityEstimate,
       baselineSevereFoodStressPopulation: baseline.severeFoodStressPopulation,
       firstFoodInsecurityPlus10PctVsBaseline,
       firstFoodInsecurityPlus25PctVsBaseline,
@@ -219,7 +436,14 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
       firstFertilizerPlantingSeasonRiskLevel
     },
     currentSystemVulnerability,
+    passThroughProfiles: {
+      oilToFuelPrice: OIL_TO_FUEL_PRICE_PROFILES,
+      foodPrice: FOOD_PASS_THROUGH_PROFILES,
+      currentOutputProfile: 'linearConservative'
+    },
+    passThroughScenarios: passThroughRows,
     secondaryAdaptationComparison,
+    localEmergencyFoodDemandContext: localContext,
     caveats: [
       'This report models the current supply-chain-dependent system and does not assume local resilience already exists.',
       'Not a price forecast.',
@@ -246,13 +470,16 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     '## Current-system shock table',
     '| Scenario | Fuel shock | Food price pressure | Transport pressure | Food-stress exposure proxy | Severe stress proxy | Added food-insecurity exposure vs baseline | Lag to acute household impact | Main shock threshold crossed |',
     '|---|---:|---:|---:|---:|---:|---:|---|',
-    ...shockScenarios.map((s) => `| ${s.scenario} | ${s.fuelShockPct}% | ${s.householdFoodPriceMultiplier.toFixed(2)}x | ${s.householdTransportCostMultiplier.toFixed(2)}x | ${s.foodInsecurityRiskExposurePopulation.toFixed(0)} | ${s.severeFoodStressPopulation.toFixed(0)} | ${s.addedFoodInsecurityRiskExposureVsFuelShock0.toFixed(0)} | ${s.lagMonthsToAcutePain.toFixed(1)} months | ${s.mainThresholdCrossed} |`),
+    ...shockScenarios.map((s) => `| ${s.scenario} | ${s.fuelShockPct}% | ${s.householdFoodPriceMultiplier.toFixed(2)}x | ${s.householdTransportCostMultiplier.toFixed(2)}x | ${s.foodInsecurityVulnerabilityPopulation.toFixed(0)} | ${s.severeFoodStressPopulation.toFixed(0)} | ${s.addedFoodInsecurityVulnerabilityVsFuelShock0.toFixed(0)} | ${s.lagMonthsToAcutePain.toFixed(1)} months | ${s.mainThresholdCrossed} |`),
     '',
     'Baseline stress is already present before any new fuel/input shock. The shock thresholds below measure additional stress relative to the fuelShock0 baseline.',
+    `Measured food insecurity is around one quarter of people in recent Canada/Ontario data (anchor share ${(defaultMeasuredFoodInsecurityShare * 100).toFixed(1)}%).`,
+    'The model vulnerability exposure is a broader vulnerability band than measured food insecurity. Use shock deltas for comparison; do not treat the broad vulnerability baseline as measured food insecurity.',
     '',
     '## Threshold findings',
     `- baseline food-stress exposure: ${baseline.foodStressRiskPopulation.toFixed(0)}`,
-    `- baseline food-insecurity exposure: ${baseline.foodInsecurityRiskExposurePopulation.toFixed(0)}`,
+    `- measured food-insecurity baseline estimate: ${measuredFoodInsecurityAnchor.measuredFoodInsecurityEstimate.toFixed(0)}`,
+    `- model vulnerability baseline estimate (broader band): ${baseline.foodInsecurityVulnerabilityPopulation.toFixed(0)}`,
     `- baseline severe stress: ${baseline.severeFoodStressPopulation.toFixed(0)}`,
     `- first +10% food-insecurity exposure threshold vs baseline: ${firstFoodInsecurityPlus10PctVsBaseline}`,
     `- first +25% food-insecurity exposure threshold vs baseline: ${firstFoodInsecurityPlus25PctVsBaseline}`,
@@ -265,6 +492,43 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     `- first food bank pressure level: ${firstFoodBankCrisisShockLevel}`,
     `- first municipal pressure level: ${firstMunicipalEmergencyShockLevel}`,
     `- first farm input/planting risk level: ${firstFertilizerPlantingSeasonRiskLevel}`,
+    '',
+    '## Nonlinear price pass-through sensitivity',
+    'Physical supply decline and retail price impact are not the same. In tight markets, small physical shortages can produce large price increases. This report compares conservative, policy-buffered, and tight-market nonlinear pass-through assumptions.',
+    '| Profile | 5% physical shock fuel price | 5% food price | 20% fuel price | 20% food price | 2027 calibrated food insecurity under shock20 | Main threshold |',
+    '|---|---:|---:|---:|---:|---:|---|',
+    ...Object.keys(OIL_TO_FUEL_PRICE_PROFILES).map((profile) => {
+      const s5 = passThroughRows.find((r) => r.profile === profile && r.shockScenario === 'fuelShock5');
+      const s20 = passThroughRows.find((r) => r.profile === profile && r.shockScenario === 'fuelShock20');
+      const t = thresholdFindingsByProfile[profile];
+      return `| ${profile} | ${n(s5?.fuelPriceIncreasePct).toFixed(1)}% | ${n(s5?.foodPriceIncreasePct).toFixed(1)}% | ${n(s20?.fuelPriceIncreasePct).toFixed(1)}% | ${n(s20?.foodPriceIncreasePct).toFixed(1)}% | ${(n(s20?.projectedMeasuredFoodInsecurityShareWithShock2027) * 100).toFixed(1)}% | ${t.firstSevereStressShockLevel ?? t.firstFoodInsecurityAbove35Pct ?? 'none'} |`;
+    }),
+    '',
+    '## Existing food-insecurity trend before new shock',
+    'Food insecurity was already rising before any new fuel/input disruption. This report separates baseline trend from shock-added stress.',
+    '| Year | Conservative | Central | Severe | Notes |',
+    '|---|---:|---:|---:|---|',
+    ...TREND_YEARS.map((year) => {
+      const c = trendProjection.find((r) => r.year === year && r.trendScenario === 'conservative');
+      const m = trendProjection.find((r) => r.year === year && r.trendScenario === 'central');
+      const s = trendProjection.find((r) => r.year === year && r.trendScenario === 'severe');
+      return `| ${year} | ${(n(c?.projectedMeasuredFoodInsecurityShareWithoutShock) * 100).toFixed(1)}% | ${(n(m?.projectedMeasuredFoodInsecurityShareWithoutShock) * 100).toFixed(1)}% | ${(n(s?.projectedMeasuredFoodInsecurityShareWithoutShock) * 100).toFixed(1)}% | trend scenario, not forecast |`;
+    }),
+    '',
+    '## Shock on top of trend',
+    '| Scenario | Year | Trend-only estimate | With shock | Added people | Acceleration equivalent |',
+    '|---|---:|---:|---:|---:|---:|',
+    ...shockOverlayOnTrend
+      .filter((r) => r.trendScenario === 'central' && ['fuelShock0', 'fuelShock20', 'fuelShock30', 'fuelShock40'].includes(r.fuelShockScenario))
+      .map((r) => `| ${r.fuelShockScenario} | ${r.year} | ${(r.projectedMeasuredFoodInsecurityShareWithoutShock * 100).toFixed(1)}% | ${(r.projectedMeasuredFoodInsecurityShareWithShock * 100).toFixed(1)}% | ${r.addedPeopleVsTrendBaseline.toFixed(0)} | ${r.yearsOfTrendAccelerationEquivalent.toFixed(1)} |`),
+    '',
+    '## Local emergency food demand context',
+    ...(localContext.localSoupKitchenMealsPerDay != null
+      ? [
+        `Local emergency food demand baseline includes a reported soup kitchen load of about ${localContext.localSoupKitchenMealsPerDay} meals/day.`,
+        'A reported soup kitchen load above 1,000 meals/day should be treated as a local warning signal and validated with local service providers before being used as a calibration input.'
+      ]
+      : ['Local food bank/soup kitchen service data is not yet loaded.']),
     '',
     '## Lag timeline',
     `- Month 0-1: immediate market price signal (${lagModel.immediateMarketPriceSignalMonths})`,
@@ -288,9 +552,9 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     'Local resilience is the response. First we need to identify when and where the current system becomes stressed.',
     '',
     '## Secondary adaptation comparison',
-    '| Adaptation | Shock20 risk exposure | Shock20 severe stress | Shock20 household stress index |',
+    '| Adaptation | Shock20 vulnerability exposure | Shock20 severe stress | Shock20 household stress index |',
     '|---|---:|---:|---:|',
-    ...secondaryAdaptationComparison.map((r) => `| ${r.adaptation} | ${r.foodInsecurityRiskExposurePopulation.toFixed(0)} | ${r.severeFoodStressPopulation.toFixed(0)} | ${r.householdStressIndex.toFixed(3)} |`)
+    ...secondaryAdaptationComparison.map((r) => `| ${r.adaptation} | ${r.foodInsecurityVulnerabilityPopulation.toFixed(0)} | ${r.severeFoodStressPopulation.toFixed(0)} | ${r.householdStressIndex.toFixed(3)} |`)
   ].join('\n');
 
   const scenariosCsvRows = shockScenarios.map((s) => ({
@@ -306,9 +570,14 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     foodStressRiskPopulation: s.foodStressRiskPopulation,
     baselineFoodStressRiskPopulation: s.baselineFoodStressRiskPopulation,
     addedFoodStressRiskPopulationVsFuelShock0: s.addedFoodStressRiskPopulationVsFuelShock0,
-    foodInsecurityRiskExposurePopulation: s.foodInsecurityRiskExposurePopulation,
-    baselineFoodInsecurityRiskExposurePopulation: s.baselineFoodInsecurityRiskExposurePopulation,
-    addedFoodInsecurityRiskExposureVsFuelShock0: s.addedFoodInsecurityRiskExposureVsFuelShock0,
+    foodInsecurityVulnerabilityPopulation: s.foodInsecurityVulnerabilityPopulation,
+    baselineFoodInsecurityVulnerabilityPopulation: s.baselineFoodInsecurityVulnerabilityPopulation,
+    addedFoodInsecurityVulnerabilityVsFuelShock0: s.addedFoodInsecurityVulnerabilityVsFuelShock0,
+    measuredFoodInsecurityBaselineEstimate: s.measuredFoodInsecurityBaselineEstimate,
+    modelVulnerabilityBaselineEstimate: s.modelVulnerabilityBaselineEstimate,
+    shockAddedFoodInsecurityRiskExposure: s.shockAddedFoodInsecurityRiskExposure,
+    shockAddedSevereFoodStressRisk: s.shockAddedSevereFoodStressRisk,
+    calibratedFoodInsecurityEstimateUnderShock: s.calibratedFoodInsecurityEstimateUnderShock,
     severeFoodStressPopulation: s.severeFoodStressPopulation,
     baselineSevereFoodStressPopulation: s.baselineSevereFoodStressPopulation,
     addedSevereFoodStressVsFuelShock0: s.addedSevereFoodStressVsFuelShock0,
@@ -325,9 +594,14 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     foodStressRiskPopulation: s.foodStressRiskPopulation,
     baselineFoodStressRiskPopulation: s.baselineFoodStressRiskPopulation,
     addedFoodStressRiskPopulationVsFuelShock0: s.addedFoodStressRiskPopulationVsFuelShock0,
-    foodInsecurityRiskExposurePopulation: s.foodInsecurityRiskExposurePopulation,
-    baselineFoodInsecurityRiskExposurePopulation: s.baselineFoodInsecurityRiskExposurePopulation,
-    addedFoodInsecurityRiskExposureVsFuelShock0: s.addedFoodInsecurityRiskExposureVsFuelShock0,
+    foodInsecurityVulnerabilityPopulation: s.foodInsecurityVulnerabilityPopulation,
+    baselineFoodInsecurityVulnerabilityPopulation: s.baselineFoodInsecurityVulnerabilityPopulation,
+    addedFoodInsecurityVulnerabilityVsFuelShock0: s.addedFoodInsecurityVulnerabilityVsFuelShock0,
+    measuredFoodInsecurityBaselineEstimate: s.measuredFoodInsecurityBaselineEstimate,
+    modelVulnerabilityBaselineEstimate: s.modelVulnerabilityBaselineEstimate,
+    shockAddedFoodInsecurityRiskExposure: s.shockAddedFoodInsecurityRiskExposure,
+    shockAddedSevereFoodStressRisk: s.shockAddedSevereFoodStressRisk,
+    calibratedFoodInsecurityEstimateUnderShock: s.calibratedFoodInsecurityEstimateUnderShock,
     severeFoodStressPopulation: s.severeFoodStressPopulation,
     baselineSevereFoodStressPopulation: s.baselineSevereFoodStressPopulation,
     addedSevereFoodStressVsFuelShock0: s.addedSevereFoodStressVsFuelShock0,
@@ -343,7 +617,9 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     markdownPath: path.join(produceDir, 'grey-current-system-shock-threshold.md'),
     jsonPath: path.join(produceDir, 'grey-current-system-shock-threshold.json'),
     scenariosCsvPath: path.join(produceDir, 'grey-current-system-shock-threshold-scenarios.csv'),
-    householdsCsvPath: path.join(produceDir, 'grey-current-system-shock-threshold-households.csv')
+    householdsCsvPath: path.join(produceDir, 'grey-current-system-shock-threshold-households.csv'),
+    trendCsvPath: path.join(produceDir, 'grey-current-system-shock-threshold-trend.csv'),
+    passThroughCsvPath: path.join(produceDir, 'grey-current-system-shock-threshold-pass-through.csv')
   };
 
   fs.writeFileSync(paths.markdownPath, md);
@@ -352,17 +628,33 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     'scenario', 'fuelShockPct', 'fuelAvailabilityIndex', 'dieselPriceMultiplier', 'fertilizerPriceMultiplier',
     'transportCostMultiplier', 'foodImportCostMultiplier', 'householdFoodPriceMultiplier',
     'householdTransportCostMultiplier', 'foodStressRiskPopulation', 'baselineFoodStressRiskPopulation',
-    'addedFoodStressRiskPopulationVsFuelShock0', 'foodInsecurityRiskExposurePopulation', 'baselineFoodInsecurityRiskExposurePopulation',
-    'addedFoodInsecurityRiskExposureVsFuelShock0', 'severeFoodStressPopulation', 'baselineSevereFoodStressPopulation',
+    'addedFoodStressRiskPopulationVsFuelShock0', 'foodInsecurityVulnerabilityPopulation', 'baselineFoodInsecurityVulnerabilityPopulation',
+    'addedFoodInsecurityVulnerabilityVsFuelShock0', 'measuredFoodInsecurityBaselineEstimate', 'modelVulnerabilityBaselineEstimate',
+    'shockAddedFoodInsecurityRiskExposure', 'shockAddedSevereFoodStressRisk', 'calibratedFoodInsecurityEstimateUnderShock',
+    'severeFoodStressPopulation', 'baselineSevereFoodStressPopulation',
     'addedSevereFoodStressVsFuelShock0', 'householdStressIndex', 'foodBankPressureIndex',
     'municipalEmergencyPressureIndex', 'mainThresholdCrossed', 'lagMonthsToHouseholdImpact', 'notes'
   ]));
   fs.writeFileSync(paths.householdsCsvPath, toCsv(householdsCsvRows, [
     'scenario', 'foodStressRiskPopulation', 'baselineFoodStressRiskPopulation', 'addedFoodStressRiskPopulationVsFuelShock0',
-    'foodInsecurityRiskExposurePopulation', 'baselineFoodInsecurityRiskExposurePopulation', 'addedFoodInsecurityRiskExposureVsFuelShock0',
-    'severeFoodStressPopulation', 'baselineSevereFoodStressPopulation', 'addedSevereFoodStressVsFuelShock0',
+    'foodInsecurityVulnerabilityPopulation', 'baselineFoodInsecurityVulnerabilityPopulation', 'addedFoodInsecurityVulnerabilityVsFuelShock0',
+    'measuredFoodInsecurityBaselineEstimate', 'modelVulnerabilityBaselineEstimate', 'shockAddedFoodInsecurityRiskExposure',
+    'shockAddedSevereFoodStressRisk', 'calibratedFoodInsecurityEstimateUnderShock', 'severeFoodStressPopulation',
+    'baselineSevereFoodStressPopulation', 'addedSevereFoodStressVsFuelShock0',
     'additionalFoodAidNeedGJ', 'additionalFoodAidNeedMealsEquivalent', 'foodBankPressureIndex',
     'municipalEmergencyPressureIndex', 'lagMonthsToAcutePain', 'caveat'
+  ]));
+  fs.writeFileSync(paths.trendCsvPath, toCsv(shockOverlayOnTrend, [
+    'trendScenario', 'year', 'projectedMeasuredFoodInsecurityShareWithoutShock',
+    'projectedFoodInsecurePeopleWithoutShock', 'fuelShockScenario', 'shockAddedMeasuredFoodInsecurityShare',
+    'projectedMeasuredFoodInsecurityShareWithShock', 'projectedFoodInsecurePeopleWithShock',
+    'addedPeopleVsTrendBaseline', 'yearsOfTrendAccelerationEquivalent', 'caveat'
+  ]));
+  fs.writeFileSync(paths.passThroughCsvPath, toCsv(passThroughRows, [
+    'profile', 'shockScenario', 'physicalFuelShockPct', 'fuelPriceIncreasePct', 'fertilizerPriceIncreasePct',
+    'foodPriceIncreasePct', 'calibratedFoodInsecurityEstimateUnderShock', 'addedPeopleVsTrendBaseline',
+    'severeFoodStressPopulation', 'foodBankPressureIndex', 'municipalEmergencyPressureIndex',
+    'lagMonthsToAcutePain', 'mainThresholdCrossed'
   ]));
 
   return { report, paths };
