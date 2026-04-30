@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const produceDirDefault = path.resolve('know/produce');
+const inputDirDefault = path.resolve('know/input/gis');
 
 export function parseArgs(argv = process.argv.slice(2)) {
   const opts = {
@@ -39,6 +40,7 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   const skipDownload = Boolean(options.skipDownload || quick);
   const forceDownload = Boolean(options.forceDownload);
   const worldExists = fsState.worldExists ?? exists(path.join(produceDirDefault, 'grey-open-data-world.json'));
+  const lotsExists = fsState.lotsExists ?? exists(path.join(inputDirDefault, 'lots-and-concessions-grey.geojson'));
 
   const plan = [];
   if (!skipDownload) {
@@ -54,6 +56,12 @@ export function buildCommandPlan(options = {}, fsState = {}) {
     plan.push(cmd('grey:import-data'));
   }
 
+  if (quick && !lotsExists) {
+    const lotArgs = ['--source=lots-and-concessions-grey'];
+    if (forceDownload) lotArgs.push('--force');
+    plan.push(cmd('grey:download-data', lotArgs));
+  }
+
   plan.push(cmd('report:grey:baseline'));
   plan.push(cmd('report:grey:secondary'));
   plan.push(cmd('report:grey:public-baseline'));
@@ -64,6 +72,7 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   plan.push(cmd('report:grey:farm-labour'));
   plan.push(cmd('report:grey:ag-labour'));
   plan.push(cmd('report:grey:food-calibration'));
+  plan.push(cmd('report:grey:fuel-shock'));
   plan.push(cmd('report:grey:localization-access'));
   plan.push(cmd('report:model:assessment'));
   plan.push(cmd('grey:status'));
@@ -100,6 +109,7 @@ export function extractKeyIndicators(data = {}) {
   const farmLabour = data.farmLabour ?? {};
   const agLabour = data.agLabour ?? {};
   const foodCal = data.foodCalibration ?? {};
+  const fuelShock = data.fuelShock ?? {};
   const localization = data.localization ?? {};
 
   const scenarios = new Map((foodCal.plausibilityScenarios ?? []).map((s) => [s.scenario, s]));
@@ -128,6 +138,10 @@ export function extractKeyIndicators(data = {}) {
     currentAgRelatedFTEEstimate: Number(agLabour.currentAgRelatedFTEEstimate ?? 0),
     agLabourDataStatus: String(agLabour.agLabourDataStatus ?? 'missing'),
     agLabourScaleUpFactorLowFuel: Number(agLabour.agLabourScaleUpFactorLowFuel ?? 0),
+    shock20FoodCoverage: Number(fuelShock.keyResults?.shock20FoodCoverage ?? 0),
+    shock20AddedFoodWorkersNeeded: Number(fuelShock.keyResults?.shock20AddedFoodWorkersNeeded ?? 0),
+    shock20AgLabourScaleUpFactor: Number(fuelShock.keyResults?.shock20AgLabourScaleUpFactor ?? 0),
+    shock20CombinedResiliencePackageFoodCoverage: Number(fuelShock.keyResults?.shock20CombinedResiliencePackageFoodCoverage ?? 0),
     topReadinessMunicipality: localization.regionalSummary?.highestReadinessMunicipalities?.[0]?.municipalityName ?? null,
     candidateNodeCount: Number((localization.candidateNodes ?? []).length)
   };
@@ -162,6 +176,8 @@ function buildSuiteSummaryMarkdown(summary) {
     `- Commands passed: ${summary.commandResults.filter((r) => r.ok).length}`,
     `- Commands failed: ${summary.failedCount}`,
     `- Warnings detected: ${summary.warningCount}`,
+    `- Required input downloads run: ${summary.requiredInputDownloadsRun ?? 0}`,
+    `- lotsConcessionsInputStatus: ${summary.lotsConcessionsInputStatus ?? 'unknown'}`,
     '',
     '## Key Indicators',
     `- presentOverallCredibilityScore: ${k.presentOverallCredibilityScore?.toFixed?.(3) ?? k.presentOverallCredibilityScore}`,
@@ -188,6 +204,10 @@ function buildSuiteSummaryMarkdown(summary) {
     `- currentAgRelatedFTEEstimate: ${k.currentAgRelatedFTEEstimate}`,
     `- agLabourDataStatus: ${k.agLabourDataStatus}`,
     `- agLabourScaleUpFactorLowFuel: ${k.agLabourScaleUpFactorLowFuel?.toFixed?.(2) ?? k.agLabourScaleUpFactorLowFuel}`,
+    `- shock20 foodCoverage: ${k.shock20FoodCoverage?.toFixed?.(3) ?? k.shock20FoodCoverage}`,
+    `- shock20 addedFoodWorkersNeeded: ${k.shock20AddedFoodWorkersNeeded?.toFixed?.(2) ?? k.shock20AddedFoodWorkersNeeded}`,
+    `- shock20 agLabourScaleUpFactor: ${k.shock20AgLabourScaleUpFactor?.toFixed?.(2) ?? k.shock20AgLabourScaleUpFactor}`,
+    `- combinedResiliencePackage shock20 foodCoverage: ${k.shock20CombinedResiliencePackageFoodCoverage?.toFixed?.(3) ?? k.shock20CombinedResiliencePackageFoodCoverage}`,
     `- top readiness municipality: ${k.topReadinessMunicipality ?? 'unknown'}`,
     `- candidate node count: ${k.candidateNodeCount}`,
     '',
@@ -199,12 +219,18 @@ function buildSuiteSummaryMarkdown(summary) {
 
 export function runGreyReportSuite(options = {}) {
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
+  const inputDir = path.resolve(options.inputDir ?? 'know/input/gis');
   fs.mkdirSync(produceDir, { recursive: true });
 
   const commandResults = [];
   const warnings = [];
+  const lotsPath = path.join(inputDir, 'lots-and-concessions-grey.geojson');
 
-  const plan = buildCommandPlan(options);
+  const plan = buildCommandPlan(options, {
+    worldExists: exists(path.join(produceDir, 'grey-open-data-world.json')),
+    lotsExists: exists(lotsPath)
+  });
+
   if (Array.isArray(options.mockCommandResults)) {
     commandResults.push(...options.mockCommandResults);
   } else {
@@ -239,6 +265,7 @@ export function runGreyReportSuite(options = {}) {
   const farmLabour = readJsonIfExists(path.join(produceDir, 'grey-farm-labour-baseline.json'), warnings, 'farm-labour baseline');
   const agLabour = readJsonIfExists(path.join(produceDir, 'grey-ag-labour-baseline.json'), warnings, 'ag-labour baseline');
   const foodCalibration = readJsonIfExists(path.join(produceDir, 'grey-food-calibration.json'), warnings, 'food calibration');
+  const fuelShock = readJsonIfExists(path.join(produceDir, 'grey-fuel-fertilizer-shock.json'), warnings, 'fuel/fertilizer shock report');
   const localization = readJsonIfExists(path.join(produceDir, 'grey-localization-access.json'), warnings, 'localization access');
   const secondary = readJsonIfExists(path.join(produceDir, 'grey-secondary-data-summary.json'), warnings, 'secondary data summary');
 
@@ -251,6 +278,7 @@ export function runGreyReportSuite(options = {}) {
     ...(farmLabour?.warnings ?? []),
     ...(agLabour?.warnings ?? []),
     ...(foodCalibration?.warnings ?? []),
+    ...(fuelShock?.warnings ?? []),
     ...(localization?.warnings ?? [])
   ];
   warnings.push(...fileWarnings);
@@ -267,12 +295,23 @@ export function runGreyReportSuite(options = {}) {
     farmLabour,
     agLabour,
     foodCalibration,
+    fuelShock,
     localization,
     secondary
   });
 
   const failedCount = commandResults.filter((r) => !r.ok).length;
   const warningCount = warnings.length;
+  const requiredInputDownloadsRun = commandResults.filter(
+    (r) => r.script === 'grey:download-data' && Array.isArray(r.args) && r.args.includes('--source=lots-and-concessions-grey')
+  ).length;
+  const requiredLotsDownloadsFailed = commandResults.some(
+    (r) => r.script === 'grey:download-data' && Array.isArray(r.args) && r.args.includes('--source=lots-and-concessions-grey') && !r.ok
+  );
+  const lotsConcessionsInputStatus = exists(lotsPath)
+    ? (requiredInputDownloadsRun > 0 ? 'downloaded' : 'present')
+    : (requiredLotsDownloadsFailed ? 'failed' : 'missing');
+
   const nextRecommendedActions = recommendNextActions(keyIndicators, { assessment }, produceDir);
 
   const summary = {
@@ -280,6 +319,8 @@ export function runGreyReportSuite(options = {}) {
     commandResults,
     warningCount,
     failedCount,
+    requiredInputDownloadsRun,
+    lotsConcessionsInputStatus,
     keyIndicators,
     outputPaths: {
       suiteMarkdown: path.join(produceDir, 'grey-report-suite-summary.md'),
@@ -296,41 +337,47 @@ export function runGreyReportSuite(options = {}) {
 }
 
 function printSummary(summary) {
-  const coreFromPublic = summary.keyIndicators;
+  const k = summary.keyIndicators;
   console.log('Grey Report Suite Summary');
   console.log(`- Commands run: ${summary.commandResults.length}`);
   console.log(`- Commands passed: ${summary.commandResults.filter((r) => r.ok).length}`);
   console.log(`- Commands failed: ${summary.failedCount}`);
   console.log(`- Warnings detected: ${summary.warningCount}`);
+  console.log(`- Required input downloads run: ${summary.requiredInputDownloadsRun ?? 0}`);
+  console.log(`- lotsConcessionsInputStatus: ${summary.lotsConcessionsInputStatus ?? 'unknown'}`);
   console.log('- Core real layers loaded: municipal boundaries, settlement boundaries, land use, roads, lots/concessions');
   console.log('- Secondary layers loaded: transit, trails/cycling, managed forests, rural businesses, public facilities, structures, road condition');
   console.log('- Key indicators:');
-  console.log(`  - presentOverallCredibilityScore: ${Number(coreFromPublic.presentOverallCredibilityScore).toFixed(3)}`);
-  console.log(`  - presentGeographyScore: ${Number(coreFromPublic.presentGeographyScore).toFixed(3)}`);
-  console.log(`  - presentInfrastructureScore: ${Number(coreFromPublic.presentInfrastructureScore).toFixed(3)}`);
-  console.log(`  - presentFoodSystemScore: ${Number(coreFromPublic.presentFoodSystemScore).toFixed(3)}`);
-  console.log(`  - totalRoadKm: ${Number(coreFromPublic.totalRoadKm).toFixed(2)}`);
-  console.log(`  - total lots/concessions: ${coreFromPublic.totalLotsConcessions}`);
-  console.log(`  - presentIndustrialFossilBaseline foodCoverage: ${Number(coreFromPublic.foodCoveragePresentIndustrialFossilBaseline).toFixed(3)}`);
-  console.log(`  - localizedPresentTechBaseline foodCoverage: ${Number(coreFromPublic.foodCoverageLocalizedPresentTechBaseline).toFixed(3)}`);
-  console.log(`  - constrainedLocalFoodBaseline foodCoverage: ${Number(coreFromPublic.foodCoverageConstrainedLocalFoodBaseline).toFixed(3)}`);
-  console.log(`  - lowFuelFoodCoverage: ${Number(coreFromPublic.lowFuelFoodCoverage).toFixed(3)}`);
-  console.log(`  - estimatedNoDirectLandAccessPopulation: ${coreFromPublic.estimatedNoDirectLandAccessPopulation}`);
-  console.log(`  - estimatedRuralProductiveLandAccessPopulation: ${coreFromPublic.estimatedRuralProductiveLandAccessPopulation}`);
-  console.log(`  - productiveHaPerRuralAccessPerson: ${Number(coreFromPublic.productiveHaPerRuralAccessPerson).toFixed(3)}`);
-  console.log(`  - dwelling land access: ${coreFromPublic.dwellingLandAccessStatus ?? 'unknown'}`);
-  console.log(`  - estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${coreFromPublic.estimatedPopulationNoDirectLandAccess ?? 'invalid'}`);
-  console.log(`  - estimatedPopulationWithSubsistencePotential: ${coreFromPublic.estimatedPopulationWithSubsistencePotential ?? 'invalid'}`);
-  console.log(`  - dwellingsAtOrAboveSubsistence: ${coreFromPublic.dwellingsAtOrAboveSubsistence ?? 'invalid'}`);
-  console.log(`  - currentFarmOperators: ${coreFromPublic.currentFarmOperators}`);
-  console.log(`  - currentFarmLabourDataStatus: ${coreFromPublic.currentFarmLabourDataStatus}`);
-  console.log(`  - currentFarmLabourFTEEstimate: ${coreFromPublic.currentFarmLabourFTEEstimate}`);
-  console.log(`  - farmLabourScaleUpFactorLowFuel: ${Number(coreFromPublic.farmLabourScaleUpFactorLowFuel).toFixed(2)}`);
-  console.log(`  - currentAgRelatedFTEEstimate: ${coreFromPublic.currentAgRelatedFTEEstimate}`);
-  console.log(`  - agLabourDataStatus: ${coreFromPublic.agLabourDataStatus}`);
-  console.log(`  - agLabourScaleUpFactorLowFuel: ${Number(coreFromPublic.agLabourScaleUpFactorLowFuel).toFixed(2)}`);
-  console.log(`  - top readiness municipality: ${coreFromPublic.topReadinessMunicipality ?? 'unknown'}`);
-  console.log(`  - candidate node count: ${coreFromPublic.candidateNodeCount}`);
+  console.log(`  - presentOverallCredibilityScore: ${Number(k.presentOverallCredibilityScore).toFixed(3)}`);
+  console.log(`  - presentGeographyScore: ${Number(k.presentGeographyScore).toFixed(3)}`);
+  console.log(`  - presentInfrastructureScore: ${Number(k.presentInfrastructureScore).toFixed(3)}`);
+  console.log(`  - presentFoodSystemScore: ${Number(k.presentFoodSystemScore).toFixed(3)}`);
+  console.log(`  - totalRoadKm: ${Number(k.totalRoadKm).toFixed(2)}`);
+  console.log(`  - total lots/concessions: ${k.totalLotsConcessions}`);
+  console.log(`  - presentIndustrialFossilBaseline foodCoverage: ${Number(k.foodCoveragePresentIndustrialFossilBaseline).toFixed(3)}`);
+  console.log(`  - localizedPresentTechBaseline foodCoverage: ${Number(k.foodCoverageLocalizedPresentTechBaseline).toFixed(3)}`);
+  console.log(`  - constrainedLocalFoodBaseline foodCoverage: ${Number(k.foodCoverageConstrainedLocalFoodBaseline).toFixed(3)}`);
+  console.log(`  - lowFuelFoodCoverage: ${Number(k.lowFuelFoodCoverage).toFixed(3)}`);
+  console.log(`  - estimatedNoDirectLandAccessPopulation: ${k.estimatedNoDirectLandAccessPopulation}`);
+  console.log(`  - estimatedRuralProductiveLandAccessPopulation: ${k.estimatedRuralProductiveLandAccessPopulation}`);
+  console.log(`  - productiveHaPerRuralAccessPerson: ${Number(k.productiveHaPerRuralAccessPerson).toFixed(3)}`);
+  console.log(`  - dwelling land access: ${k.dwellingLandAccessStatus ?? 'unknown'}`);
+  console.log(`  - estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${k.estimatedPopulationNoDirectLandAccess ?? 'invalid'}`);
+  console.log(`  - estimatedPopulationWithSubsistencePotential: ${k.estimatedPopulationWithSubsistencePotential ?? 'invalid'}`);
+  console.log(`  - dwellingsAtOrAboveSubsistence: ${k.dwellingsAtOrAboveSubsistence ?? 'invalid'}`);
+  console.log(`  - currentFarmOperators: ${k.currentFarmOperators}`);
+  console.log(`  - currentFarmLabourDataStatus: ${k.currentFarmLabourDataStatus}`);
+  console.log(`  - currentFarmLabourFTEEstimate: ${k.currentFarmLabourFTEEstimate}`);
+  console.log(`  - farmLabourScaleUpFactorLowFuel: ${Number(k.farmLabourScaleUpFactorLowFuel).toFixed(2)}`);
+  console.log(`  - currentAgRelatedFTEEstimate: ${k.currentAgRelatedFTEEstimate}`);
+  console.log(`  - agLabourDataStatus: ${k.agLabourDataStatus}`);
+  console.log(`  - agLabourScaleUpFactorLowFuel: ${Number(k.agLabourScaleUpFactorLowFuel).toFixed(2)}`);
+  console.log(`  - shock20 foodCoverage: ${Number(k.shock20FoodCoverage).toFixed(3)}`);
+  console.log(`  - shock20 addedFoodWorkersNeeded: ${Number(k.shock20AddedFoodWorkersNeeded).toFixed(2)}`);
+  console.log(`  - shock20 agLabourScaleUpFactor: ${Number(k.shock20AgLabourScaleUpFactor).toFixed(2)}`);
+  console.log(`  - combinedResiliencePackage shock20 foodCoverage: ${Number(k.shock20CombinedResiliencePackageFoodCoverage).toFixed(3)}`);
+  console.log(`  - top readiness municipality: ${k.topReadinessMunicipality ?? 'unknown'}`);
+  console.log(`  - candidate node count: ${k.candidateNodeCount}`);
   console.log(`- summary markdown: ${summary.outputPaths.suiteMarkdown}`);
   console.log(`- summary json: ${summary.outputPaths.suiteJson}`);
 }

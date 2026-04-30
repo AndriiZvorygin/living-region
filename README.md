@@ -289,6 +289,21 @@ This writes a present-baseline credibility audit that separates real/open-data i
 npm run report:grey:food-calibration
 ```
 
+### Fuel and fertilizer shock gradation
+
+```bash
+npm run report:grey:fuel-shock
+```
+
+This adds gradual and abrupt fuel/fertilizer/input shock diagnostics and adaptation-package comparisons for food coverage and labour mobilization needs.
+
+Outputs:
+
+- `know/produce/grey-fuel-fertilizer-shock.md`
+- `know/produce/grey-fuel-fertilizer-shock.json`
+- `know/produce/grey-fuel-fertilizer-shock-scenarios.csv`
+- `know/produce/grey-fuel-fertilizer-shock-labour.csv`
+
 ### Localization access baseline
 
 ```bash

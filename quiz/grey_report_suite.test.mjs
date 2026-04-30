@@ -24,10 +24,15 @@ describe('grey report suite command', () => {
     expect(def.some((x) => x.script === 'report:grey:dwelling-land-access' && x.args.includes('--no-cache'))).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:farm-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:ag-labour')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:fuel-shock')).toBe(true);
 
-    const quick = buildCommandPlan({ quick: true }, { worldExists: true });
+    const quick = buildCommandPlan({ quick: true }, { worldExists: true, lotsExists: true });
     expect(quick.some((x) => x.script === 'grey:download-data')).toBe(false);
     expect(quick.some((x) => x.script === 'grey:import-data')).toBe(false);
+
+    const quickMissingLots = buildCommandPlan({ quick: true }, { worldExists: true, lotsExists: false });
+    expect(quickMissingLots.some((x) => x.script === 'grey:download-data' && x.args.includes('--source=lots-and-concessions-grey'))).toBe(true);
+    expect(quickMissingLots.some((x) => x.script === 'grey:download-data' && x.args.includes('--all-useful'))).toBe(false);
 
     const skip = buildCommandPlan({ skipDownload: true });
     expect(skip.some((x) => x.script === 'grey:download-data')).toBe(false);
@@ -46,6 +51,7 @@ describe('grey report suite command', () => {
       dwellingLandAccess: { estimatedPopulationNoDirectLandAccess: 21000, estimatedPopulationWithSubsistencePotential: 12000, thresholdSensitivity: [{ thresholdScenario: 'baseline', dwellingsAtOrAboveSubsistence: 5000 }] },
       farmLabour: { currentFarmOperators: 1200, currentFarmLabourDataStatus: 'available', currentFarmLabourFTEEstimate: 980, farmLabourScaleUpFactorLowFuel: 4.2 },
       agLabour: { currentAgRelatedFTEEstimate: 640, agLabourScaleUpFactorLowFuel: 1.9, agLabourDataStatus: 'available' },
+      fuelShock: { keyResults: { shock20FoodCoverage: 0.31, shock20AddedFoodWorkersNeeded: 14000, shock20AgLabourScaleUpFactor: 9.1, shock20CombinedResiliencePackageFoodCoverage: 0.42 } },
       foodCalibration: { landEnoughDiagnostic: { lowFuelFoodCoverage: 0.16 }, plausibilityScenarios: [
         { scenario: 'presentIndustrialFossilBaseline', foodCoverage: 4.5 },
         { scenario: 'localizedPresentTechBaseline', foodCoverage: 0.47 },
@@ -66,6 +72,10 @@ describe('grey report suite command', () => {
     expect(k.currentAgRelatedFTEEstimate).toBe(640);
     expect(k.agLabourScaleUpFactorLowFuel).toBeCloseTo(1.9, 6);
     expect(k.agLabourDataStatus).toBe('available');
+    expect(k.shock20FoodCoverage).toBeCloseTo(0.31, 6);
+    expect(k.shock20AddedFoodWorkersNeeded).toBe(14000);
+    expect(k.shock20AgLabourScaleUpFactor).toBeCloseTo(9.1, 6);
+    expect(k.shock20CombinedResiliencePackageFoodCoverage).toBeCloseTo(0.42, 6);
   });
 
   test('excludes dwelling indicators when dwelling report invalid', () => {
@@ -114,6 +124,7 @@ describe('grey report suite command', () => {
     writeJson(path.join(root, 'grey-land-access-baseline.json'), { assignment: { totalLotConcessionFeatures: 1 }, warnings: [] });
     writeJson(path.join(root, 'grey-labour-land-baseline.json'), { regionalIndicators: {}, warnings: [] });
     writeJson(path.join(root, 'grey-food-calibration.json'), { plausibilityScenarios: [], landEnoughDiagnostic: {}, warnings: [] });
+    writeJson(path.join(root, 'grey-fuel-fertilizer-shock.json'), { keyResults: { shock20FoodCoverage: 0.1 }, warnings: [] });
     writeJson(path.join(root, 'grey-localization-access.json'), { regionalSummary: {}, candidateNodes: [], warnings: [] });
     writeJson(path.join(root, 'living-region-model-assessment.json'), { scorecard: {}, warnings: [] });
 
@@ -126,6 +137,8 @@ describe('grey report suite command', () => {
     });
     expect(fs.existsSync(summary.outputPaths.suiteMarkdown)).toBe(true);
     expect(fs.existsSync(summary.outputPaths.suiteJson)).toBe(true);
+    expect(typeof summary.requiredInputDownloadsRun).toBe('number');
+    expect(['present', 'downloaded', 'missing', 'failed']).toContain(summary.lotsConcessionsInputStatus);
     fs.rmSync(root, { recursive: true, force: true });
   });
 });
