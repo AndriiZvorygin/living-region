@@ -73,6 +73,7 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   plan.push(cmd('report:grey:ag-labour'));
   plan.push(cmd('report:grey:food-calibration'));
   plan.push(cmd('report:grey:fuel-shock'));
+  plan.push(cmd('report:grey:transition-pathways'));
   plan.push(cmd('report:grey:localization-access'));
   plan.push(cmd('report:model:assessment'));
   plan.push(cmd('grey:status'));
@@ -110,6 +111,7 @@ export function extractKeyIndicators(data = {}) {
   const agLabour = data.agLabour ?? {};
   const foodCal = data.foodCalibration ?? {};
   const fuelShock = data.fuelShock ?? {};
+  const transitionPathways = data.transitionPathways ?? {};
   const localization = data.localization ?? {};
 
   const scenarios = new Map((foodCal.plausibilityScenarios ?? []).map((s) => [s.scenario, s]));
@@ -142,6 +144,11 @@ export function extractKeyIndicators(data = {}) {
     shock20AddedFoodWorkersNeeded: Number(fuelShock.keyResults?.shock20AddedFoodWorkersNeeded ?? 0),
     shock20AgLabourScaleUpFactor: Number(fuelShock.keyResults?.shock20AgLabourScaleUpFactor ?? 0),
     shock20CombinedResiliencePackageFoodCoverage: Number(fuelShock.keyResults?.shock20CombinedResiliencePackageFoodCoverage ?? 0),
+    shock20NoChangeFoodInsecureRiskPopulation: Number(transitionPathways.suiteKeyResults?.shock20NoChangeFoodInsecureRiskPopulation2030 ?? 0),
+    shock20StrongAdaptationFoodInsecureRiskPopulation: Number(transitionPathways.suiteKeyResults?.shock20StrongAdaptationFoodInsecureRiskPopulation2030 ?? 0),
+    avoidedFoodInsecureRiskVsNoChange: Number(transitionPathways.suiteKeyResults?.avoidedFoodInsecureRiskVsNoChange2030 ?? 0),
+    severeDecline2050NoChangeQualityOfLifeIndex: Number(transitionPathways.suiteKeyResults?.severeDecline2050NoChangeQualityOfLifeIndex ?? 0),
+    severeDecline2050FullRuralTransitionQualityOfLifeIndex: Number(transitionPathways.suiteKeyResults?.severeDecline2050FullRuralTransitionQualityOfLifeIndex ?? 0),
     topReadinessMunicipality: localization.regionalSummary?.highestReadinessMunicipalities?.[0]?.municipalityName ?? null,
     candidateNodeCount: Number((localization.candidateNodes ?? []).length)
   };
@@ -208,6 +215,11 @@ function buildSuiteSummaryMarkdown(summary) {
     `- shock20 addedFoodWorkersNeeded: ${k.shock20AddedFoodWorkersNeeded?.toFixed?.(2) ?? k.shock20AddedFoodWorkersNeeded}`,
     `- shock20 agLabourScaleUpFactor: ${k.shock20AgLabourScaleUpFactor?.toFixed?.(2) ?? k.shock20AgLabourScaleUpFactor}`,
     `- combinedResiliencePackage shock20 foodCoverage: ${k.shock20CombinedResiliencePackageFoodCoverage?.toFixed?.(3) ?? k.shock20CombinedResiliencePackageFoodCoverage}`,
+    `- shock20 noChange foodInsecureRiskPopulation (2030): ${k.shock20NoChangeFoodInsecureRiskPopulation?.toFixed?.(0) ?? k.shock20NoChangeFoodInsecureRiskPopulation}`,
+    `- shock20 strongAdaptation foodInsecureRiskPopulation (2030): ${k.shock20StrongAdaptationFoodInsecureRiskPopulation?.toFixed?.(0) ?? k.shock20StrongAdaptationFoodInsecureRiskPopulation}`,
+    `- avoidedFoodInsecureRiskVsNoChange (2030): ${k.avoidedFoodInsecureRiskVsNoChange?.toFixed?.(0) ?? k.avoidedFoodInsecureRiskVsNoChange}`,
+    `- severeDecline2050 noChange qualityOfLifeIndex: ${k.severeDecline2050NoChangeQualityOfLifeIndex?.toFixed?.(3) ?? k.severeDecline2050NoChangeQualityOfLifeIndex}`,
+    `- severeDecline2050 fullRuralTransition qualityOfLifeIndex: ${k.severeDecline2050FullRuralTransitionQualityOfLifeIndex?.toFixed?.(3) ?? k.severeDecline2050FullRuralTransitionQualityOfLifeIndex}`,
     `- top readiness municipality: ${k.topReadinessMunicipality ?? 'unknown'}`,
     `- candidate node count: ${k.candidateNodeCount}`,
     '',
@@ -266,6 +278,7 @@ export function runGreyReportSuite(options = {}) {
   const agLabour = readJsonIfExists(path.join(produceDir, 'grey-ag-labour-baseline.json'), warnings, 'ag-labour baseline');
   const foodCalibration = readJsonIfExists(path.join(produceDir, 'grey-food-calibration.json'), warnings, 'food calibration');
   const fuelShock = readJsonIfExists(path.join(produceDir, 'grey-fuel-fertilizer-shock.json'), warnings, 'fuel/fertilizer shock report');
+  const transitionPathways = readJsonIfExists(path.join(produceDir, 'grey-transition-pathways.json'), warnings, 'transition pathways report');
   const localization = readJsonIfExists(path.join(produceDir, 'grey-localization-access.json'), warnings, 'localization access');
   const secondary = readJsonIfExists(path.join(produceDir, 'grey-secondary-data-summary.json'), warnings, 'secondary data summary');
 
@@ -279,6 +292,7 @@ export function runGreyReportSuite(options = {}) {
     ...(agLabour?.warnings ?? []),
     ...(foodCalibration?.warnings ?? []),
     ...(fuelShock?.warnings ?? []),
+    ...(transitionPathways?.warnings ?? []),
     ...(localization?.warnings ?? [])
   ];
   warnings.push(...fileWarnings);
@@ -296,6 +310,7 @@ export function runGreyReportSuite(options = {}) {
     agLabour,
     foodCalibration,
     fuelShock,
+    transitionPathways,
     localization,
     secondary
   });
@@ -376,6 +391,11 @@ function printSummary(summary) {
   console.log(`  - shock20 addedFoodWorkersNeeded: ${Number(k.shock20AddedFoodWorkersNeeded).toFixed(2)}`);
   console.log(`  - shock20 agLabourScaleUpFactor: ${Number(k.shock20AgLabourScaleUpFactor).toFixed(2)}`);
   console.log(`  - combinedResiliencePackage shock20 foodCoverage: ${Number(k.shock20CombinedResiliencePackageFoodCoverage).toFixed(3)}`);
+  console.log(`  - shock20 noChange foodInsecureRiskPopulation (2030): ${Number(k.shock20NoChangeFoodInsecureRiskPopulation).toFixed(0)}`);
+  console.log(`  - shock20 strongAdaptation foodInsecureRiskPopulation (2030): ${Number(k.shock20StrongAdaptationFoodInsecureRiskPopulation).toFixed(0)}`);
+  console.log(`  - avoidedFoodInsecureRiskVsNoChange (2030): ${Number(k.avoidedFoodInsecureRiskVsNoChange).toFixed(0)}`);
+  console.log(`  - severeDecline2050 noChange qualityOfLifeIndex: ${Number(k.severeDecline2050NoChangeQualityOfLifeIndex).toFixed(3)}`);
+  console.log(`  - severeDecline2050 fullRuralTransition qualityOfLifeIndex: ${Number(k.severeDecline2050FullRuralTransitionQualityOfLifeIndex).toFixed(3)}`);
   console.log(`  - top readiness municipality: ${k.topReadinessMunicipality ?? 'unknown'}`);
   console.log(`  - candidate node count: ${k.candidateNodeCount}`);
   console.log(`- summary markdown: ${summary.outputPaths.suiteMarkdown}`);

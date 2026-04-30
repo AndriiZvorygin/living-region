@@ -304,6 +304,22 @@ Outputs:
 - `know/produce/grey-fuel-fertilizer-shock-scenarios.csv`
 - `know/produce/grey-fuel-fertilizer-shock-labour.csv`
 
+### Transition pathway comparison
+
+```bash
+npm run report:grey:transition-pathways
+```
+
+Compares no-change, reactive, moderate, strong, and full-rural-transition adaptation pathways under gradual and abrupt fuel/input decline scenarios from 2025 to 2050.
+
+Outputs:
+
+- `know/produce/grey-transition-pathways.md`
+- `know/produce/grey-transition-pathways.json`
+- `know/produce/grey-transition-pathways-scenarios.csv`
+- `know/produce/grey-transition-pathways-human-impact.csv`
+- `know/produce/grey-transition-pathways-timeline.csv`
+
 ### Localization access baseline
 
 ```bash

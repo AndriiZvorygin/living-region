@@ -25,6 +25,7 @@ describe('grey report suite command', () => {
     expect(def.some((x) => x.script === 'report:grey:farm-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:ag-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:fuel-shock')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:transition-pathways')).toBe(true);
 
     const quick = buildCommandPlan({ quick: true }, { worldExists: true, lotsExists: true });
     expect(quick.some((x) => x.script === 'grey:download-data')).toBe(false);
@@ -52,6 +53,7 @@ describe('grey report suite command', () => {
       farmLabour: { currentFarmOperators: 1200, currentFarmLabourDataStatus: 'available', currentFarmLabourFTEEstimate: 980, farmLabourScaleUpFactorLowFuel: 4.2 },
       agLabour: { currentAgRelatedFTEEstimate: 640, agLabourScaleUpFactorLowFuel: 1.9, agLabourDataStatus: 'available' },
       fuelShock: { keyResults: { shock20FoodCoverage: 0.31, shock20AddedFoodWorkersNeeded: 14000, shock20AgLabourScaleUpFactor: 9.1, shock20CombinedResiliencePackageFoodCoverage: 0.42 } },
+      transitionPathways: { suiteKeyResults: { shock20NoChangeFoodInsecureRiskPopulation2030: 25000, shock20StrongAdaptationFoodInsecureRiskPopulation2030: 18000, avoidedFoodInsecureRiskVsNoChange2030: 7000, severeDecline2050NoChangeQualityOfLifeIndex: 0.2, severeDecline2050FullRuralTransitionQualityOfLifeIndex: 0.45 } },
       foodCalibration: { landEnoughDiagnostic: { lowFuelFoodCoverage: 0.16 }, plausibilityScenarios: [
         { scenario: 'presentIndustrialFossilBaseline', foodCoverage: 4.5 },
         { scenario: 'localizedPresentTechBaseline', foodCoverage: 0.47 },
@@ -76,6 +78,9 @@ describe('grey report suite command', () => {
     expect(k.shock20AddedFoodWorkersNeeded).toBe(14000);
     expect(k.shock20AgLabourScaleUpFactor).toBeCloseTo(9.1, 6);
     expect(k.shock20CombinedResiliencePackageFoodCoverage).toBeCloseTo(0.42, 6);
+    expect(k.shock20NoChangeFoodInsecureRiskPopulation).toBe(25000);
+    expect(k.shock20StrongAdaptationFoodInsecureRiskPopulation).toBe(18000);
+    expect(k.avoidedFoodInsecureRiskVsNoChange).toBe(7000);
   });
 
   test('excludes dwelling indicators when dwelling report invalid', () => {

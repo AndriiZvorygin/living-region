@@ -44,6 +44,7 @@
     "report:grey:farm-labour": "node command/report_grey_farm_labour_baseline.mjs",
     "report:grey:ag-labour": "node command/report_grey_ag_labour_baseline.mjs",
     "report:grey:fuel-shock": "node command/report_grey_fuel_fertilizer_shock.mjs",
+    "report:grey:transition-pathways": "node command/report_grey_transition_pathways.mjs",
     "report:grey:all": "node command/run_grey_report_suite.mjs",
     "report:model:assessment": "node command/report_living_region_assessment.mjs",
     "grey:open-data": "node command/grey_open_data.mjs",
