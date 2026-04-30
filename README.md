@@ -350,6 +350,20 @@ Outputs:
 - `know/produce/grey-food-supply-demand-price-scenarios.csv`
 - `know/produce/grey-food-supply-demand-price-households.csv`
 
+### Food insecurity trend drivers
+
+```bash
+npm run report:grey:food-insecurity-trends
+```
+
+This report separates baseline food-insecurity trend pressure from shock-added pressure and maps candidate drivers (attribution diagnostic, not causal proof).
+
+Outputs:
+
+- `know/produce/grey-food-insecurity-trend-drivers.md`
+- `know/produce/grey-food-insecurity-trend-drivers.json`
+- `know/produce/grey-food-insecurity-trend-drivers.csv`
+
 ### Transition pathway comparison
 
 ```bash
@@ -470,6 +484,207 @@ Outputs:
 
 - `know/produce/grey-report-suite-summary.md`
 - `know/produce/grey-report-suite-summary.json`
+
+## Researcher handoff: global supply-chain diagnosis integration
+
+Living Region currently integrates two linked layers:
+
+1. Global/systemic shock layer
+- oil/fuel availability
+- fuel price pass-through
+- sulfur/phosphate fertilizer pressure
+- nitrogen/natural gas fertilizer pressure
+- shipping/logistics pressure
+- import price pressure
+- global food production loss assumptions
+- global food price pressure
+- trade competition
+- disproportionate impact on poorer countries and lower-income households
+
+2. Grey County local-response layer
+- population/dwellings
+- settlement/rural distribution
+- land-use and lots/concessions proxy
+- food demand
+- local production potential
+- ag labour
+- land access
+- storage/processing/local distribution
+- price-pressure and food-insecurity effects
+
+### Where global assumptions plug in
+
+| Global/systemic input | Current model field | Used in reports | Status | Researcher can improve by |
+|---|---|---|---|---|
+| oil supply loss | `fuelAvailabilityIndex` | `report:grey:current-shock-threshold`, `report:grey:fuel-shock`, `report:grey:food-price` | scenario assumption | calibrate with external oil disruption scenarios and sensitivity ranges |
+| diesel price pass-through | `dieselPriceMultiplier`, `fuelPriceIncreasePct` | `report:grey:current-shock-threshold`, `report:grey:fuel-shock` | proxy + scenario profile | add historical pass-through calibration by shock band |
+| sulfur/phosphate fertilizer shock | currently represented via `fertilizerAvailabilityIndex`, `fertilizerPriceMultiplier`, `inputConstraintFactor` | `report:grey:fuel-shock`, `report:grey:food-price` | proxy | split fertilizer into explicit sulfur/phosphate channel |
+| nitrogen/natural gas fertilizer shock | currently represented via `fertilizerAvailabilityIndex`, `fertilizerPriceMultiplier`, `inputConstraintFactor` | `report:grey:fuel-shock`, `report:grey:food-price` | proxy | split fertilizer into explicit nitrogen/natural-gas channel |
+| shipping/logistics shock | `transportCostMultiplier`, `transportFuelAvailabilityIndex` | `report:grey:current-shock-threshold`, `report:grey:food-price` | proxy | add shipping/freight rate scenario data and lag assumptions |
+| global food production loss | `globalFoodProductionLossShare` | `report:grey:food-gap-replacement`, `report:grey:food-price`, `report:grey:briefing` | severe scenario assumption | calibrate with external production-loss pathways and confidence bands |
+| global food price pressure | `globalFoodPricePressure` driver | `report:grey:food-insecurity-trends` | measured/proxy | load FAO Food Price Index time series into driver attribution |
+| malnutrition/global hunger pressure | trend anchors + `globalFoodPricePressure` notes | `report:grey:food-insecurity-trends` | context anchor, not causal proof | add IHME/OWID malnutrition time-series for correlation diagnostics only |
+| trade competition / export restrictions | `tradeCompetitionIndex` | `report:grey:food-gap-replacement`, `report:grey:food-price` | scenario assumption | add explicit export-restriction/trade-competition model |
+| lower surplus energy / purchasing power | `lowerSurplusEnergyPurchasingPowerProxy` | `report:grey:food-insecurity-trends` | proxy/assumption | calibrate with energy-cost burden and real-disposable-income trend data |
+
+Field meanings, current usage, and data status:
+
+- `globalFoodProductionLossShare`: severe global production-loss assumption used as a global shock channel.
+Current status: scenario assumption.
+Improve with: externally validated global production-loss scenarios.
+- `localFoodAvailabilityLossShare`: local availability shock share used separately from global loss.
+Current status: scenario assumption/proxy.
+Improve with: local crop/input/logistics disruption data.
+- `importPricePressureMultiplier`: import affordability/price pressure transmission factor.
+Current status: scenario assumption.
+Improve with: Ontario/Canada food import price data and pass-through calibration.
+- `localProductionShockShare`: direct local production shock component.
+Current status: scenario assumption.
+Improve with: local input-access and seasonal production disruption datasets.
+- `tradeCompetitionIndex`: proxy for tighter global competition/export constraints.
+Current status: scenario assumption.
+Improve with: trade-flow/restriction scenario inputs.
+- `householdAffordabilityTransmissionShare`: share of global/systemic pressure transmitted to household stress.
+Current status: scenario assumption.
+Improve with: household budget and food affordability microdata.
+- `fuelAvailabilityIndex`: physical fuel availability level relative to baseline.
+Current status: scenario assumption.
+Improve with: scenario-specific energy supply constraints.
+- `dieselPriceMultiplier`: diesel cost multiplier from pass-through logic.
+Current status: proxy.
+Improve with: historical pass-through and regional fuel price series.
+- `fertilizerAvailabilityIndex`: aggregated fertilizer availability pressure.
+Current status: proxy.
+Improve with: split channels (N vs sulfur/phosphate) and supply data.
+- `fertilizerPriceMultiplier`: aggregated fertilizer price pressure.
+Current status: proxy.
+Improve with: commodity-specific fertilizer price series.
+- sulfur/phosphate pressure: represented via aggregate fertilizer/input pressure until channel split.
+Current status: proxy.
+Improve with: dedicated sulfur/phosphate supply-risk channel.
+- nitrogen/natural-gas pressure: represented via aggregate fertilizer/input pressure until channel split.
+Current status: proxy.
+Improve with: dedicated nitrogen/natural-gas supply-risk channel.
+- `foodPriceIncreasePct`: modeled food price pass-through under shock profiles.
+Current status: proxy/scenario profile.
+Improve with: empirical pass-through calibration.
+- `fuelPriceIncreasePct`: modeled fuel price shock pass-through.
+Current status: proxy/scenario profile.
+Improve with: historical shock episodes and non-linear fit.
+- `transportCostMultiplier`: transport cost pressure from fuel/logistics stress.
+Current status: proxy.
+Improve with: freight/trucking/retail distribution cost data.
+- `globalFoodPricePressure` driver: explicit trend driver in attribution diagnostic.
+Current status: measured/proxy.
+Improve with: loaded FAO FPI series and local price-basket linkage.
+- `lowerSurplusEnergyPurchasingPowerProxy`: systems-level pressure hypothesis channel.
+Current status: proxy/assumption.
+Improve with: calibrated energy-cost burden + disposable income metrics.
+
+### Severe systemic input-loss scenario
+
+Current `severeSystemicInputLoss33` values:
+
+- `globalFoodProductionLossShare`: `0.33`
+- `localFoodAvailabilityLossShare`: `0.12`
+- `importPricePressureMultiplier`: `1.55`
+- `localProductionShockShare`: `0.08`
+- `tradeCompetitionIndex`: `0.85`
+- `householdAffordabilityTransmissionShare`: `0.72`
+- `sourceStatus`: `severe global scenario assumption, not forecast`
+- `interpretation`: `global price/availability shock, not direct local crop failure`
+
+Caveat:
+A one-third global food production loss is not the same as Grey County having one-third less local food. In Grey, the near-term channel is price pressure, trade competition, import stress, food-bank pressure, and household affordability.
+
+### Reports most useful for global-system integration
+
+```bash
+npm run report:grey:current-shock-threshold
+npm run report:grey:food-insecurity-trends
+npm run report:grey:food-price
+npm run report:grey:food-gap-replacement
+npm run report:grey:fuel-shock
+npm run report:grey:transition-pathways
+npm run report:grey:briefing
+npm run report:grey:all -- --quick
+```
+
+- `current-shock-threshold`: current supply-chain vulnerability and lag thresholds.
+- `food-insecurity-trends`: baseline trend drivers and global food-price pressure channel.
+- `food-price`: supply/demand, household self-provisioning, surplus, and price-pressure proxy.
+- `food-gap-replacement`: labour/land by production modality for replacing food gaps.
+- `fuel-shock`: fuel/fertilizer shock gradations and adaptation deltas.
+- `transition-pathways`: no-change vs adaptation pathways over time.
+- `briefing`: plain-English summary for collaborator/public handoff.
+- `all`: one-command suite run and summary.
+
+### Data files to inspect
+
+- `know/produce/grey-current-system-shock-threshold.json`
+- `know/produce/grey-current-system-shock-threshold-pass-through.csv`
+- `know/produce/grey-current-system-shock-threshold-trend.csv`
+- `know/produce/grey-food-insecurity-trend-drivers.json`
+- `know/produce/grey-food-supply-demand-price.json`
+- `know/produce/grey-food-supply-demand-price-scenarios.csv`
+- `know/produce/grey-food-gap-replacement.json`
+- `know/produce/grey-food-gap-replacement-modalities.csv`
+- `know/produce/grey-transition-pathways.json`
+- `know/produce/grey-report-suite-summary.json`
+- `know/produce/grey-plain-english-briefing.md`
+
+### Suggested integration workflow
+
+1. Run the suite:
+
+```bash
+npm run report:grey:all -- --quick
+```
+
+2. Inspect current global-shock assumptions:
+
+```bash
+node -e 'const f=require("fs"); const j=JSON.parse(f.readFileSync("know/produce/grey-food-supply-demand-price.json","utf8")); console.log(JSON.stringify(j.assumptions || j.scenarioAssumptions || {}, null, 2));'
+```
+
+3. Adjust scenario fields in the relevant report module or add a configuration input.
+
+4. Re-run:
+
+```bash
+npm test
+npm run report:grey:current-shock-threshold
+npm run report:grey:food-price
+npm run report:grey:food-gap-replacement
+npm run report:grey:briefing
+```
+
+5. Compare:
+
+- food insecurity trend
+- price-pressure proxy
+- food gap replacement labour
+- unmet gap
+- adaptation benefits
+
+### Next integration improvements
+
+- split fertilizer into nitrogen/natural gas and sulfur/phosphate channels
+- add explicit export restriction / trade competition model
+- load FAO Food Price Index time series
+- load global malnutrition/death-rate time series only as context, not simple causal proof
+- add local food bank/soup kitchen time series
+- add food basket price series for Grey/Ontario
+- add Census of Agriculture historical farm count/size/operator trends
+- add configurable scenario YAML/JSON so researcher can edit assumptions without changing code
+
+### Do not overclaim
+
+- scenario diagnostics, not forecasts
+- global food production loss does not equal local food loss
+- price-pressure multiplier is not retail price forecast
+- malnutrition deaths are not a direct food-price index
+- local land access proxy is not ownership/legal access
 
 ## Real-data priority
 
