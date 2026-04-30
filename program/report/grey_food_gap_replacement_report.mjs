@@ -178,6 +178,29 @@ const MODALITIES = [
     bestRole: 'season extension / nutrition'
   },
   {
+    modality: 'managedGrazingBeefPastureComparison',
+    netFoodEnergyGJPerHaAtMaturity: 4.5,
+    directHumanFoodGJPerHaAtMaturity: 4.5,
+    usefulFoodEnergyGJPerHaYear1: 3.5,
+    usefulFoodEnergyGJPerHaYear3: 4.2,
+    usefulFoodEnergyGJPerHaYear5: 4.5,
+    usefulFoodEnergyGJPerHaYear10: 4.5,
+    labourFTEPerHaYear1: 0.20,
+    labourFTEPerHaAtMaturity: 0.16,
+    yearsToMeaningfulYield: 1,
+    yearsToMaturity: 3,
+    inputDependencyIndex: 0.28,
+    skillRequirementIndex: 0.62,
+    storageProcessingRequirementIndex: 0.44,
+    calorieReplacementEfficiency: 0.18,
+    nutritionReplacementValue: 0.45,
+    confidence: 'low',
+    bestRole: 'marginal land use, manure/fertility cycling, mixed beef/dairy support',
+    comparisonOnly: true,
+    notPrimaryCalorieReplacement: true,
+    caveat: 'Useful support system, but weak direct staple-calorie replacement on cropland.'
+  },
+  {
     modality: 'mixedResiliencePackage',
     netFoodEnergyGJPerHaAtMaturity: 17,
     usefulFoodEnergyGJPerHaYear1: 10,
@@ -196,7 +219,17 @@ const MODALITIES = [
     confidence: 'moderate',
     bestRole: 'blended bridge approach'
   }
-].map((m) => ({ ...m, landHaPerWorker: m.labourFTEPerHaAtMaturity > 0 ? 1 / m.labourFTEPerHaAtMaturity : 0 }));
+].map((m) => {
+  const landHaPerWorker = m.labourFTEPerHaAtMaturity > 0 ? 1 / m.labourFTEPerHaAtMaturity : 0;
+  const foodEnergyGJPerWorkerAtMaturity = n(m.netFoodEnergyGJPerHaAtMaturity, 0) * landHaPerWorker;
+  return {
+    ...m,
+    landHaPerWorker,
+    haPerWorker: landHaPerWorker,
+    foodEnergyGJPerWorkerAtMaturity,
+    directHumanFoodGJPerWorkerAtMaturity: n(m.directHumanFoodGJPerHaAtMaturity, n(m.netFoodEnergyGJPerHaAtMaturity, 0)) * landHaPerWorker
+  };
+});
 
 const BLENDED_PACKAGES = [
   {
@@ -512,6 +545,9 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
   const modalityRows = modalityReplacementMatrix.map((r) => ({
     scenario: r.scenario,
     modality: r.modality,
+    GJPerHaAtMaturity: n(MODALITIES.find((m) => m.modality === r.modality)?.netFoodEnergyGJPerHaAtMaturity, 0),
+    haPerWorker: n(MODALITIES.find((m) => m.modality === r.modality)?.landHaPerWorker, 0),
+    GJPerWorkerAtMaturity: n(MODALITIES.find((m) => m.modality === r.modality)?.foodEnergyGJPerWorkerAtMaturity, 0),
     requiredHaYear1: r.requiredHaYear1,
     requiredWorkersYear1: r.requiredWorkersYear1,
     requiredHaYear5: r.requiredHaYear5,
@@ -572,6 +608,16 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     '| --- | --- | ---: | ---: | ---: | ---: | --- |',
     ...MODALITIES.map((m) => `| ${m.modality} | ${m.yearsToMeaningfulYield <= 1 ? 'Yes' : 'Delayed'} | ${m.yearsToMaturity} | ${m.netFoodEnergyGJPerHaAtMaturity.toFixed(2)} | ${m.labourFTEPerHaAtMaturity.toFixed(2)} | ${m.inputDependencyIndex.toFixed(2)} | ${m.bestRole} |`),
     '',
+    '## Calorie replacement efficiency comparison',
+    '| Production mode | ha/worker | GJ/ha/yr | GJ/worker/yr | Main role | Calorie replacement suitability |',
+    '| --- | ---: | ---: | ---: | --- | --- |',
+    ...MODALITIES.map((m) => {
+      const suitability = m.notPrimaryCalorieReplacement
+        ? 'support only'
+        : (m.calorieReplacementEfficiency >= 0.8 ? 'high' : (m.calorieReplacementEfficiency >= 0.5 ? 'moderate' : 'low'));
+      return `| ${m.modality} | ${m.landHaPerWorker.toFixed(4)} | ${m.netFoodEnergyGJPerHaAtMaturity.toFixed(2)} | ${m.foodEnergyGJPerWorkerAtMaturity.toFixed(4)} | ${m.bestRole} | ${suitability} |`;
+    }),
+    '',
     '## Replacement needs by modality',
     '| Scenario | Modality | Required ha (year 1) | Required workers (year 1) | Years to useful yield | Feasibility notes |',
     '| --- | --- | ---: | ---: | ---: | --- |',
@@ -599,6 +645,9 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     '',
     '## Practical interpretation',
     'Market gardens are fast but labour intensive and not enough for staple calories. Perennials are powerful but delayed. Annual staples can fill calories sooner but need labour/tools/storage. The realistic answer is mixed packages over time.'
+    ,
+    '',
+    'Grazing and beef systems can be valuable, especially on marginal land that is unsuitable for crops. But they should not be treated as high-calorie replacement systems. A pasture worker may manage many hectares, yet direct human-food energy per hectare is low compared with annual or perennial staple crops. Grazing is best modelled as a support and marginal-land system, not the main answer to a calorie gap.'
   ];
 
   const markdown = `${markdownLines.join('\n')}\n`;
@@ -622,6 +671,9 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
   fs.writeFileSync(modalitiesCsvPath, `${toCsv(modalityRows, [
     'scenario',
     'modality',
+    'GJPerHaAtMaturity',
+    'haPerWorker',
+    'GJPerWorkerAtMaturity',
     'requiredHaYear1',
     'requiredWorkersYear1',
     'requiredHaYear5',

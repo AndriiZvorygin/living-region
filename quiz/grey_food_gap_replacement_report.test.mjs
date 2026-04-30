@@ -53,6 +53,15 @@ describe('grey food gap replacement report', () => {
       const marketDef = report.productionModalities.find((m) => m.modality === 'marketGardenIntensive');
       const annualDef = report.productionModalities.find((m) => m.modality === 'handToolAnnualStaples');
       expect(marketDef.calorieReplacementEfficiency).toBeLessThan(annualDef.calorieReplacementEfficiency);
+      expect(marketDef.foodEnergyGJPerWorkerAtMaturity).toBeGreaterThan(0);
+      expect(marketDef.landHaPerWorker).toBeGreaterThan(0);
+
+      const grazingDef = report.productionModalities.find((m) => m.modality === 'managedGrazingBeefPastureComparison');
+      expect(grazingDef).toBeTruthy();
+      expect(grazingDef.comparisonOnly).toBe(true);
+      expect(grazingDef.notPrimaryCalorieReplacement).toBe(true);
+      expect(grazingDef.netFoodEnergyGJPerHaAtMaturity).toBeGreaterThan(0);
+      expect(grazingDef.foodEnergyGJPerWorkerAtMaturity).toBeGreaterThan(0);
 
       const pkg = report.mixedReplacementPackages.find((p) => p.scenario === 'foodGap33' && p.package === 'tenYearResiliencePackage');
       expect(pkg.year10CoverageOfGap).toBeGreaterThanOrEqual(pkg.year1CoverageOfGap);
@@ -79,6 +88,8 @@ describe('grey food gap replacement report', () => {
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
       expect(md).toContain('severe scenario assumption, not a forecast');
       expect(md).toContain('not the same as Grey County having one-third less local food');
+      expect(md).toContain('Grazing and beef systems can be valuable');
+      expect(md).toContain('not be treated as high-calorie replacement systems');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
