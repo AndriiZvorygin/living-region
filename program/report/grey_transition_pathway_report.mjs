@@ -320,7 +320,19 @@ export function buildGreyTransitionPathwayReport(options = {}) {
           adaptationPathway,
           year,
           fuelAvailabilityIndex,
+          dieselPriceMultiplier: 1 + (1 - fuelAvailabilityIndex) * 2.4,
           fertilizerAvailabilityIndex,
+          fertilizerPriceMultiplier: 1 + (1 - fertilizerAvailabilityIndex) * 2.8,
+          machinerySupportFactor: clamp(fuelAvailabilityIndex * 0.9, 0.2, 1),
+          transportFuelAvailabilityIndex: clamp(1 - transportFuelStress, 0, 1),
+          inputConstraintFactor: clamp((fuelAvailabilityIndex * 0.55) + (fertilizerAvailabilityIndex * 0.45), 0.2, 1),
+          labourProductivityFactor: clamp(0.45 + fuelAvailabilityIndex * 0.45 + cfg.labourMobilizationCapacity * prog * 0.1, 0.2, 1),
+          yieldMultiplier: clamp(foodCoverage / Math.max(0.001, baseCoverage), 0, 3),
+          yieldPenalty: clamp(1 - (foodCoverage / Math.max(0.001, baseCoverage)), -1, 1),
+          lossShare: clamp(0.24 + transportFuelStress * 0.2 - cfg.lossReduction * prog * 0.12, 0.05, 0.7),
+          candidateFoodHa: n((foodCalibration.scenarioAssumptions ?? {}).localizedPresentTechBaseline?.candidateFoodHa, 0),
+          humanFoodPriorityHa: n((foodCalibration.scenarioAssumptions ?? {}).localizedPresentTechBaseline?.humanFoodPriorityHa, n(foodCalibration.humanFoodPriorityHa, 0)),
+          netGJPerHa: n((foodCalibration.scenarioAssumptions ?? {}).localizedPresentTechBaseline?.netGJPerHa, 0) * clamp(foodCoverage / Math.max(0.001, baseCoverage), 0, 2),
           foodCoverage,
           foodSurplusGJ,
           foodGapGJ,
@@ -419,6 +431,8 @@ export function buildGreyTransitionPathwayReport(options = {}) {
   const shock20Strong2030 = scenarioRows.find((r) => r.declinePath === 'abruptShock20' && r.adaptationPathway === 'strongAdaptation' && r.year === 2030);
   const severe2050NoChange = scenarioRows.find((r) => r.declinePath === 'severeDecline' && r.adaptationPathway === 'noChange' && r.year === 2050);
   const severe2050Full = scenarioRows.find((r) => r.declinePath === 'severeDecline' && r.adaptationPathway === 'fullRuralTransition' && r.year === 2050);
+  const foodScenarioAssumptions = foodCalibration.scenarioAssumptions ?? {};
+  const fuelScenarioAssumptions = fuelShock.scenarioAssumptions ?? {};
 
   const report = {
     generatedAt: new Date().toISOString(),
@@ -446,6 +460,15 @@ export function buildGreyTransitionPathwayReport(options = {}) {
     },
     declinePaths: DECLINE_PATHS,
     adaptationPathways: ADAPTATION_PATHWAYS,
+    scenarioAssumptions: {
+      presentIndustrialFossilBaseline: foodScenarioAssumptions.presentIndustrialFossilBaseline ?? null,
+      localizedPresentTechBaseline: foodScenarioAssumptions.localizedPresentTechBaseline ?? null,
+      constrainedLocalFoodBaseline: foodScenarioAssumptions.constrainedLocalFoodBaseline ?? null,
+      lowFuelTransitionBaseline: foodScenarioAssumptions.lowFuelTransitionBaseline ?? null,
+      shock20: fuelScenarioAssumptions.shock20 ?? null,
+      shock40: fuelScenarioAssumptions.shock40 ?? null,
+      combinedResiliencePackage: fuelScenarioAssumptions.combinedResiliencePackage ?? null
+    },
     scenarioMatrix,
     scenarioRows,
     humanImpactComparison: humanImpactRows,
@@ -497,6 +520,29 @@ export function buildGreyTransitionPathwayReport(options = {}) {
     '|---|---|---:|---:|---:|---:|---|',
     ...scenarioMatrix.map((r) => `| ${r.declinePath} | ${r.adaptationPathway} | ${r.foodCoverage2030.toFixed(3)} | ${r.foodInsecureRiskPopulation2030.toFixed(0)} | ${r.labourGapFTE2030.toFixed(0)} | ${r.qualityOfLife2050.toFixed(3)} | ${r.mainBottleneck} |`),
     '',
+    '## Explicit scenario assumptions',
+    'A named scenario is only meaningful if its assumptions are visible.',
+    '| Scenario | Fuel availability | Fertilizer availability | Machinery support | Transport support | Net GJ/ha | Food coverage | Workers needed | Interpretation |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---|',
+    ...(() => {
+      const rows = [];
+      const add = (name, s, interpretation) => {
+        if (!s) return;
+        rows.push(`| ${name} | ${n(s.fuelAvailabilityIndex).toFixed(2)} | ${n(s.fertilizerAvailabilityIndex).toFixed(2)} | ${n(s.machinerySupportFactor).toFixed(2)} | ${n(s.transportFuelAvailabilityIndex).toFixed(2)} | ${n(s.netGJPerHa ?? s.effectiveNetGJPerHa).toFixed(2)} | ${n(s.foodCoverage).toFixed(3)} | ${n(s.foodWorkersNeededFTE).toFixed(2)} | ${interpretation} |`);
+      };
+      add('presentIndustrialFossilBaseline', foodScenarioAssumptions.presentIndustrialFossilBaseline, 'gross present-input potential');
+      add('localizedPresentTechBaseline', foodScenarioAssumptions.localizedPresentTechBaseline, 'localized present-tech baseline');
+      add('constrainedLocalFoodBaseline', foodScenarioAssumptions.constrainedLocalFoodBaseline, 'constrained local baseline');
+      add('lowFuelTransitionBaseline', foodScenarioAssumptions.lowFuelTransitionBaseline, 'low-fuel transition baseline');
+      add('shock20', fuelScenarioAssumptions.shock20, 'abrupt shock scenario');
+      add('shock40', fuelScenarioAssumptions.shock40, 'deeper abrupt shock scenario');
+      const c = fuelScenarioAssumptions.combinedResiliencePackage;
+      if (c) {
+        rows.push(`| combinedResiliencePackage (shock20) | ${n(fuelScenarioAssumptions.shock20?.fuelAvailabilityIndex).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.fertilizerAvailabilityIndex).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.machinerySupportFactor).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.transportFuelAvailabilityIndex).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.effectiveNetGJPerHa).toFixed(2)} | ${n(c.foodCoverage).toFixed(3)} | ${n(c.requiredNewFoodWorkers + currentAgIndustryFTEEstimate).toFixed(2)} | adaptation package comparator |`);
+      }
+      return rows;
+    })(),
+    '',
     '## Timing matters',
     '- Emergency measures help quickly but have limited ceiling.',
     '- Perennial and deeper structural adaptation has delayed but larger benefit.',
@@ -517,9 +563,12 @@ export function buildGreyTransitionPathwayReport(options = {}) {
   fs.writeFileSync(paths.markdownPath, md);
   fs.writeFileSync(paths.jsonPath, JSON.stringify(report, null, 2));
   fs.writeFileSync(paths.scenariosCsvPath, toCsv(scenarioRows, [
-    'declinePath', 'adaptationPathway', 'year', 'fuelAvailabilityIndex', 'fertilizerAvailabilityIndex',
+    'declinePath', 'adaptationPathway', 'year', 'fuelAvailabilityIndex', 'dieselPriceMultiplier',
+    'fertilizerAvailabilityIndex', 'fertilizerPriceMultiplier', 'machinerySupportFactor', 'transportFuelAvailabilityIndex',
+    'inputConstraintFactor', 'labourProductivityFactor', 'yieldMultiplier', 'yieldPenalty', 'lossShare',
+    'candidateFoodHa', 'humanFoodPriorityHa', 'netGJPerHa',
     'foodCoverage', 'foodSurplusGJ', 'foodStressRiskPopulation', 'foodInsecurityRiskExposurePopulation', 'severeFoodStressPopulation',
-    'addedFoodWorkersNeeded', 'labourGapFTE', 'householdStressIndex', 'localResilienceIndex',
+    'foodWorkersNeededFTE', 'addedFoodWorkersNeeded', 'labourGapFTE', 'householdStressIndex', 'localResilienceIndex',
     'qualityOfLifeIndex', 'mainBottleneck', 'warnings'
   ]));
   fs.writeFileSync(paths.humanImpactCsvPath, toCsv(humanImpactRows, [

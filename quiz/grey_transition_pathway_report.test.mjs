@@ -17,13 +17,24 @@ describe('grey transition pathway report', () => {
 
     writeJson(path.join(root, 'grey-food-calibration.json'), {
       foodDemandBaseline: { totalFoodDemandGJ: 1000 },
+      scenarioAssumptions: {
+        presentIndustrialFossilBaseline: { fuelAvailabilityIndex: 1, fertilizerAvailabilityIndex: 1, machinerySupportFactor: 1, transportFuelAvailabilityIndex: 1, netGJPerHa: 20, foodCoverage: 4, foodWorkersNeededFTE: 5000 },
+        localizedPresentTechBaseline: { fuelAvailabilityIndex: 0.98, fertilizerAvailabilityIndex: 0.98, machinerySupportFactor: 0.98, transportFuelAvailabilityIndex: 0.98, netGJPerHa: 8, foodCoverage: 0.5, foodWorkersNeededFTE: 9000 },
+        constrainedLocalFoodBaseline: { fuelAvailabilityIndex: 0.85, fertilizerAvailabilityIndex: 0.88, machinerySupportFactor: 0.82, transportFuelAvailabilityIndex: 0.86, netGJPerHa: 4, foodCoverage: 0.3, foodWorkersNeededFTE: 12000 },
+        lowFuelTransitionBaseline: { fuelAvailabilityIndex: 0.7, fertilizerAvailabilityIndex: 0.75, machinerySupportFactor: 0.62, transportFuelAvailabilityIndex: 0.72, netGJPerHa: 3, foodCoverage: 0.2, foodWorkersNeededFTE: 15000 }
+      },
       plausibilityScenarios: [
         { scenario: 'localizedPresentTechBaseline', foodCoverage: 0.5 },
         { scenario: 'constrainedLocalFoodBaseline', foodCoverage: 0.3 }
       ]
     });
     writeJson(path.join(root, 'grey-fuel-fertilizer-shock.json'), {
-      shockScenarios: [{ scenario: 'shock20', foodWorkersNeededFTE: 10000 }]
+      shockScenarios: [{ scenario: 'shock20', foodWorkersNeededFTE: 10000 }],
+      scenarioAssumptions: {
+        shock20: { fuelAvailabilityIndex: 0.8, fertilizerAvailabilityIndex: 0.82, machinerySupportFactor: 0.74, transportFuelAvailabilityIndex: 0.78, effectiveNetGJPerHa: 3.6, foodCoverage: 0.355, foodWorkersNeededFTE: 31000 },
+        shock40: { fuelAvailabilityIndex: 0.6, fertilizerAvailabilityIndex: 0.66, machinerySupportFactor: 0.55, transportFuelAvailabilityIndex: 0.58, effectiveNetGJPerHa: 2.9, foodCoverage: 0.289, foodWorkersNeededFTE: 35500 },
+        combinedResiliencePackage: { foodCoverage: 0.441, requiredNewFoodWorkers: 22000 }
+      }
     });
     writeJson(path.join(root, 'grey-labour-land-baseline.json'), { regionalIndicators: {} });
     writeJson(path.join(root, 'grey-ag-labour-baseline.json'), { currentAgIndustryFTEEstimate: 1000, agLabourDataStatus: 'available' });
@@ -69,6 +80,9 @@ describe('grey transition pathway report', () => {
       expect(md).toContain('Decline paths are scenarios, not forecasts');
       expect(md).toContain('not direct hunger forecasts');
       expect(md).toContain('not a utopia/perfect-conditions claim');
+      expect(md).toContain('Explicit scenario assumptions');
+      expect(built.report.scenarioAssumptions.lowFuelTransitionBaseline).toBeTruthy();
+      expect(built.report.scenarioAssumptions.shock20).toBeTruthy();
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

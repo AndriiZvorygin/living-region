@@ -89,6 +89,7 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
   const presentTechCoverage = n(presentTech.foodCoverage, 0.472);
   const constrainedCoverage = n(constrainedBaseline.foodCoverage, 0.277);
   const candidateFoodHaBase = n(presentTech.candidateFoodHa, n(foodCalibration.humanFoodPriorityHa, 18056.83));
+  const humanFoodPriorityHa = n(foodCalibration.humanFoodPriorityHa, candidateFoodHaBase);
   const netGJPerHaBase = n(presentTech.netGJPerHa, 10);
   const presentTechNetGJ = n(presentTech.netFoodEnergyGJ, presentTechCoverage * totalDemand);
   const constrainedNetGJ = n(constrainedBaseline.netFoodEnergyGJ, constrainedCoverage * totalDemand);
@@ -168,8 +169,13 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
       machinerySupportFactor,
       transportFuelAvailabilityIndex,
       inputConstraintFactor,
+      labourProductivityFactor: clamp(machinerySupportFactor * 0.6 + inputConstraintFactor * 0.4, 0.2, 1),
+      yieldMultiplier: netGJPerHaBase > 0 ? effectiveNetGJPerHa / netGJPerHaBase : 0,
+      yieldPenalty: netGJPerHaBase > 0 ? 1 - (effectiveNetGJPerHa / netGJPerHaBase) : 0,
+      lossShare: clamp(0.22 + transportPenalty + (1 - inputConstraintFactor) * 0.12 - adaptationFoodBonus * 0.08, 0.05, 0.65),
       effectiveNetGJPerHa,
       candidateFoodHa,
+      humanFoodPriorityHa,
       netFoodEnergyGJ,
       foodCoverage,
       foodSurplusGJ,
@@ -241,6 +247,11 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
       combinedFuelFertilizerShock: SHOCK_SCENARIOS.filter((x) => x.family === 'combinedFuelFertilizerShock').map((x) => x.scenario)
     },
     shockScenarios,
+    scenarioAssumptions: {
+      shock20: shockScenarios.find((s) => s.scenario === 'shock20') ?? null,
+      shock40: shockScenarios.find((s) => s.scenario === 'shock40') ?? null,
+      combinedResiliencePackage: adaptationComparisons.find((r) => r.scenario === 'shock20' && r.adaptationPackage === 'combinedResiliencePackage') ?? null
+    },
     adaptationComparisons,
     labourMobilizationDiagnostics: shockScenarios.map((s) => ({
       scenario: s.scenario,
@@ -278,13 +289,21 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
     fertilizerAvailabilityIndex: s.fertilizerAvailabilityIndex,
     fertilizerPriceMultiplier: s.fertilizerPriceMultiplier,
     machinerySupportFactor: s.machinerySupportFactor,
+    transportFuelAvailabilityIndex: s.transportFuelAvailabilityIndex,
     inputConstraintFactor: s.inputConstraintFactor,
+    labourProductivityFactor: s.labourProductivityFactor,
+    yieldMultiplier: s.yieldMultiplier,
+    yieldPenalty: s.yieldPenalty,
+    lossShare: s.lossShare,
+    candidateFoodHa: s.candidateFoodHa,
+    humanFoodPriorityHa: s.humanFoodPriorityHa,
+    netGJPerHa: s.effectiveNetGJPerHa,
     foodCoverage: s.foodCoverage,
     foodSurplusGJ: s.foodSurplusGJ,
     foodWorkersNeededFTE: s.foodWorkersNeededFTE,
     addedFoodWorkersNeededVsCurrent: s.addedFoodWorkersNeededVsCurrent,
     agLabourScaleUpFactor: s.agLabourScaleUpFactor,
-    limitingFactor: s.limitingFactor,
+    limitingFactors: [s.limitingFactor, ...s.warnings].join('|'),
     warnings: s.warnings.join('|')
   }));
 
@@ -317,9 +336,22 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
     `- currentAgIndustryFTEEstimate: ${currentAgIndustryFTEEstimate.toFixed(2)}`,
     '',
     '## Shock scenario table',
+    'A named scenario is only meaningful if its assumptions are visible.',
     '| Scenario | Fuel availability | Fertilizer availability | Food coverage | Food surplus/deficit GJ | Food workers needed | Added workers | Scale-up factor | Main constraint |',
     '|---|---:|---:|---:|---:|---:|---:|---:|---|',
     ...shockScenarios.map((s) => `| ${s.scenario} | ${s.fuelAvailabilityIndex.toFixed(2)} | ${s.fertilizerAvailabilityIndex.toFixed(2)} | ${s.foodCoverage.toFixed(3)} | ${s.foodSurplusGJ.toFixed(2)} | ${s.foodWorkersNeededFTE.toFixed(2)} | ${s.addedFoodWorkersNeededVsCurrent.toFixed(2)} | ${(s.agLabourScaleUpFactor ?? 0).toFixed(2)} | ${s.limitingFactor} |`),
+    '',
+    '## Explicit scenario assumptions',
+    '| Scenario | Fuel availability | Fertilizer availability | Machinery support | Transport support | Net GJ/ha | Food coverage | Workers needed | Interpretation |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---|',
+    ...shockScenarios
+      .filter((s) => ['shock20', 'shock40'].includes(s.scenario))
+      .map((s) => `| ${s.scenario} | ${s.fuelAvailabilityIndex.toFixed(2)} | ${s.fertilizerAvailabilityIndex.toFixed(2)} | ${s.machinerySupportFactor.toFixed(2)} | ${s.transportFuelAvailabilityIndex.toFixed(2)} | ${s.effectiveNetGJPerHa.toFixed(2)} | ${s.foodCoverage.toFixed(3)} | ${s.foodWorkersNeededFTE.toFixed(2)} | ${s.limitingFactor} |`),
+    ...(() => {
+      const combo = adaptationComparisons.find((r) => r.scenario === 'shock20' && r.adaptationPackage === 'combinedResiliencePackage');
+      if (!combo) return [];
+      return [`| combinedResiliencePackage (shock20) | ${(shock20?.fuelAvailabilityIndex ?? 0).toFixed(2)} | ${(shock20?.fertilizerAvailabilityIndex ?? 0).toFixed(2)} | ${(shock20?.machinerySupportFactor ?? 0).toFixed(2)} | ${(shock20?.transportFuelAvailabilityIndex ?? 0).toFixed(2)} | ${(shock20?.effectiveNetGJPerHa ?? 0).toFixed(2)} | ${combo.foodCoverage.toFixed(3)} | ${(combo.requiredNewFoodWorkers + currentAgIndustryFTEEstimate).toFixed(2)} | adaptation package comparison row |`];
+    })(),
     '',
     '## Adaptation package comparison',
     '| Scenario | Adaptation package | Food coverage | Labour gap FTE | Required new workers | Demand on subsistence-access population | Years to benefit |',
@@ -350,8 +382,10 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
     scenariosCsvPath,
     toCsv(scenarioCsvRows, [
       'scenario', 'family', 'fuelAvailabilityIndex', 'dieselPriceMultiplier', 'fertilizerAvailabilityIndex', 'fertilizerPriceMultiplier',
-      'machinerySupportFactor', 'inputConstraintFactor', 'foodCoverage', 'foodSurplusGJ',
-      'foodWorkersNeededFTE', 'addedFoodWorkersNeededVsCurrent', 'agLabourScaleUpFactor', 'limitingFactor', 'warnings'
+      'machinerySupportFactor', 'transportFuelAvailabilityIndex', 'inputConstraintFactor', 'labourProductivityFactor',
+      'yieldMultiplier', 'yieldPenalty', 'lossShare', 'candidateFoodHa', 'humanFoodPriorityHa', 'netGJPerHa',
+      'foodCoverage', 'foodSurplusGJ', 'foodWorkersNeededFTE', 'addedFoodWorkersNeededVsCurrent',
+      'agLabourScaleUpFactor', 'limitingFactors', 'warnings'
     ])
   );
   fs.writeFileSync(

@@ -64,6 +64,11 @@ describe('grey food system calibration', () => {
       expect(scenarios).toContain('localizedPresentTechBaseline');
       expect(scenarios).toContain('constrainedLocalFoodBaseline');
       expect(scenarios).toContain('lowFuelTransitionBaseline');
+      const lowFuelAssumptions = report.scenarioAssumptions?.lowFuelTransitionBaseline;
+      expect(Number.isFinite(lowFuelAssumptions?.fuelAvailabilityIndex)).toBe(true);
+      expect(Number.isFinite(lowFuelAssumptions?.fertilizerAvailabilityIndex)).toBe(true);
+      expect(Number.isFinite(lowFuelAssumptions?.machinerySupportFactor)).toBe(true);
+      expect(Number.isFinite(lowFuelAssumptions?.inputConstraintFactor)).toBe(true);
 
       const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
       expect(markdown).toContain('not a farm production forecast');

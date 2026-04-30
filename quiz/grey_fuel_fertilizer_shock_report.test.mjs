@@ -60,6 +60,9 @@ describe('grey fuel/fertilizer shock report', () => {
       const s20combo = built.report.adaptationComparisons.find((r) => r.scenario === 'shock20' && r.adaptationPackage === 'combinedResiliencePackage');
       expect(s20combo.foodCoverage).toBeGreaterThanOrEqual(s20none.foodCoverage);
       expect(built.report.thresholdWarnings.length).toBeGreaterThan(0);
+      expect(built.report.scenarioAssumptions.shock20).toBeTruthy();
+      expect(Number.isFinite(built.report.scenarioAssumptions.shock20.fuelAvailabilityIndex)).toBe(true);
+      expect(Number.isFinite(built.report.scenarioAssumptions.shock20.machinerySupportFactor)).toBe(true);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
