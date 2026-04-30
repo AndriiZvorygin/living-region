@@ -45,6 +45,9 @@ export function buildCommandPlan(options = {}, fsState = {}) {
     const args = ['--all-useful'];
     if (forceDownload) args.push('--force');
     plan.push(cmd('grey:download-data', args));
+    const lotArgs = ['--source=lots-and-concessions-grey'];
+    if (forceDownload) lotArgs.push('--force');
+    plan.push(cmd('grey:download-data', lotArgs));
   }
 
   if (!(quick && worldExists)) {
@@ -56,7 +59,7 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   plan.push(cmd('report:grey:public-baseline'));
   plan.push(cmd('report:grey:land-access'));
   plan.push(cmd('report:grey:population-distribution'));
-  plan.push(cmd('report:grey:dwelling-land-access'));
+  plan.push(cmd('report:grey:dwelling-land-access', ['--no-cache']));
   plan.push(cmd('report:grey:labour-land'));
   plan.push(cmd('report:grey:farm-labour'));
   plan.push(cmd('report:grey:ag-labour'));
@@ -92,6 +95,7 @@ export function extractKeyIndicators(data = {}) {
   const publicBaseline = data.publicBaseline ?? {};
   const landAccess = data.landAccess ?? {};
   const dwellingLandAccess = data.dwellingLandAccess ?? {};
+  const dwellingValid = dwellingLandAccess.dwellingLandAccessValid !== false;
   const labourLand = data.labourLand ?? {};
   const farmLabour = data.farmLabour ?? {};
   const agLabour = data.agLabour ?? {};
@@ -113,9 +117,10 @@ export function extractKeyIndicators(data = {}) {
     estimatedNoDirectLandAccessPopulation: Number(labourLand.regionalIndicators?.estimatedNoDirectLandAccessPopulation ?? 0),
     estimatedRuralProductiveLandAccessPopulation: Number(labourLand.regionalIndicators?.estimatedRuralProductiveLandAccessPopulation ?? 0),
     productiveHaPerRuralAccessPerson: Number(labourLand.regionalIndicators?.productiveHaPerRuralAccessPerson ?? 0),
-    estimatedPopulationNoDirectLandAccess: Number(dwellingLandAccess.estimatedPopulationNoDirectLandAccess ?? 0),
-    estimatedPopulationWithSubsistencePotential: Number(dwellingLandAccess.estimatedPopulationWithSubsistencePotential ?? 0),
-    dwellingsAtOrAboveSubsistence: Number((dwellingLandAccess.thresholdSensitivity ?? []).find((x) => x.thresholdScenario === 'baseline')?.dwellingsAtOrAboveSubsistence ?? 0),
+    dwellingLandAccessStatus: dwellingLandAccess.confidence ?? (dwellingValid ? 'valid' : 'invalid_missing_lots'),
+    estimatedPopulationNoDirectLandAccess: dwellingValid ? Number(dwellingLandAccess.estimatedPopulationNoDirectLandAccess ?? 0) : null,
+    estimatedPopulationWithSubsistencePotential: dwellingValid ? Number(dwellingLandAccess.estimatedPopulationWithSubsistencePotential ?? 0) : null,
+    dwellingsAtOrAboveSubsistence: dwellingValid ? Number((dwellingLandAccess.thresholdSensitivity ?? []).find((x) => x.thresholdScenario === 'baseline')?.dwellingsAtOrAboveSubsistence ?? 0) : null,
     currentFarmOperators: Number(farmLabour.currentFarmOperators ?? 0),
     currentFarmLabourDataStatus: String(farmLabour.currentFarmLabourDataStatus ?? 'missing'),
     currentFarmLabourFTEEstimate: Number(farmLabour.currentFarmLabourFTEEstimate ?? 0),
@@ -172,9 +177,10 @@ function buildSuiteSummaryMarkdown(summary) {
     `- estimatedNoDirectLandAccessPopulation: ${k.estimatedNoDirectLandAccessPopulation}`,
     `- estimatedRuralProductiveLandAccessPopulation: ${k.estimatedRuralProductiveLandAccessPopulation}`,
     `- productiveHaPerRuralAccessPerson: ${k.productiveHaPerRuralAccessPerson?.toFixed?.(3) ?? k.productiveHaPerRuralAccessPerson}`,
-    `- estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${k.estimatedPopulationNoDirectLandAccess}`,
-    `- estimatedPopulationWithSubsistencePotential: ${k.estimatedPopulationWithSubsistencePotential}`,
-    `- dwellingsAtOrAboveSubsistence: ${k.dwellingsAtOrAboveSubsistence}`,
+    `- dwelling land access: ${k.dwellingLandAccessStatus ?? 'unknown'}`,
+    `- estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${k.estimatedPopulationNoDirectLandAccess ?? 'invalid'}`,
+    `- estimatedPopulationWithSubsistencePotential: ${k.estimatedPopulationWithSubsistencePotential ?? 'invalid'}`,
+    `- dwellingsAtOrAboveSubsistence: ${k.dwellingsAtOrAboveSubsistence ?? 'invalid'}`,
     `- currentFarmOperators: ${k.currentFarmOperators}`,
     `- currentFarmLabourDataStatus: ${k.currentFarmLabourDataStatus}`,
     `- currentFarmLabourFTEEstimate: ${k.currentFarmLabourFTEEstimate}`,
@@ -248,6 +254,9 @@ export function runGreyReportSuite(options = {}) {
     ...(localization?.warnings ?? [])
   ];
   warnings.push(...fileWarnings);
+  if (dwellingLandAccess && dwellingLandAccess.dwellingLandAccessValid === false) {
+    warnings.push('dwelling land access: invalid_missing_lots');
+  }
 
   const keyIndicators = extractKeyIndicators({
     publicBaseline,
@@ -309,9 +318,10 @@ function printSummary(summary) {
   console.log(`  - estimatedNoDirectLandAccessPopulation: ${coreFromPublic.estimatedNoDirectLandAccessPopulation}`);
   console.log(`  - estimatedRuralProductiveLandAccessPopulation: ${coreFromPublic.estimatedRuralProductiveLandAccessPopulation}`);
   console.log(`  - productiveHaPerRuralAccessPerson: ${Number(coreFromPublic.productiveHaPerRuralAccessPerson).toFixed(3)}`);
-  console.log(`  - estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${coreFromPublic.estimatedPopulationNoDirectLandAccess}`);
-  console.log(`  - estimatedPopulationWithSubsistencePotential: ${coreFromPublic.estimatedPopulationWithSubsistencePotential}`);
-  console.log(`  - dwellingsAtOrAboveSubsistence: ${coreFromPublic.dwellingsAtOrAboveSubsistence}`);
+  console.log(`  - dwelling land access: ${coreFromPublic.dwellingLandAccessStatus ?? 'unknown'}`);
+  console.log(`  - estimatedPopulationNoDirectLandAccess (dwelling-threshold proxy): ${coreFromPublic.estimatedPopulationNoDirectLandAccess ?? 'invalid'}`);
+  console.log(`  - estimatedPopulationWithSubsistencePotential: ${coreFromPublic.estimatedPopulationWithSubsistencePotential ?? 'invalid'}`);
+  console.log(`  - dwellingsAtOrAboveSubsistence: ${coreFromPublic.dwellingsAtOrAboveSubsistence ?? 'invalid'}`);
   console.log(`  - currentFarmOperators: ${coreFromPublic.currentFarmOperators}`);
   console.log(`  - currentFarmLabourDataStatus: ${coreFromPublic.currentFarmLabourDataStatus}`);
   console.log(`  - currentFarmLabourFTEEstimate: ${coreFromPublic.currentFarmLabourFTEEstimate}`);

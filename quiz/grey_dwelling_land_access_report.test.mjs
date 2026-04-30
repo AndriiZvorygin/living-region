@@ -89,10 +89,13 @@ describe('grey dwelling land access report', () => {
 
     try {
       const built = buildGreyDwellingLandAccessReport({ inputDir, produceDir });
+      expect(built.report.dwellingLandAccessValid).toBe(false);
+      expect(built.report.dataStatus).toBe('missing_required_lots');
+      expect(built.report.estimatedPopulationNoDirectLandAccess).toBeNull();
       expect(built.report.warnings.some((w) => w.includes('Missing lots-and-concessions-grey.geojson'))).toBe(true);
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
-      expect(md).toContain('not address-level population');
-      expect(md).toContain('modern parcel/address/building data would improve this greatly');
+      expect(md).toContain('invalid until lots-and-concessions-grey.geojson');
+      expect(md).toContain('npm run grey:download-data -- --source=lots-and-concessions-grey');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -149,6 +152,66 @@ describe('grey dwelling land access report', () => {
       ], { encoding: 'utf8' });
       expect(run.status).toBe(0);
       expect(run.stdout).toContain('population distribution source');
+      expect(run.stderr).toContain('invalid until lots-and-concessions-grey.geojson');
+
+      const strictRun = spawnSync('node', [
+        'command/report_grey_dwelling_land_access.mjs',
+        '--strict',
+        `--input-dir=${inputDir}`,
+        `--produce-dir=${produceDir}`
+      ], { encoding: 'utf8' });
+      expect(strictRun.status).not.toBe(0);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('stale invalid cache is rebuilt when lots now exist and --use-cache is set', () => {
+    const root = path.resolve('know/produce/dwelling-land-access-cache-guard');
+    const inputDir = path.join(root, 'input');
+    const produceDir = path.join(root, 'produce');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+
+    fs.writeFileSync(path.join(inputDir, 'municipality-boundaries.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { MUN_NAME: 'West Grey' }, geometry: { type: 'Polygon', coordinates: [[[-81,44],[-80.5,44],[-80.5,44.6],[-81,44.6],[-81,44]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'settlement-boundaries.geojson'), JSON.stringify(fc([])));
+    fs.writeFileSync(path.join(inputDir, 'official-plan-schedule-a-land-use.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { Final_Type: 'Agricultural' }, geometry: { type: 'Polygon', coordinates: [[[-80.95,44.16],[-80.84,44.16],[-80.84,44.3],[-80.95,44.3],[-80.95,44.16]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'lots-and-concessions-grey.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { OBJECTID: 1, MUNICIPALITY: 'West Grey' }, geometry: { type: 'Polygon', coordinates: [[[-80.94,44.18],[-80.90,44.18],[-80.90,44.22],[-80.94,44.22],[-80.94,44.18]]] } }
+    ])));
+    fs.writeFileSync(path.join(produceDir, 'grey-census-population-distribution.json'), JSON.stringify({
+      totalPopulationMatched: 50,
+      totalDwellingsMatched: 20,
+      populationInsideSettlementBoundaries: 10,
+      populationOutsideSettlementBoundaries: 40
+    }));
+    fs.writeFileSync(path.join(produceDir, 'grey-census-population-blocks.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { geographyId: 'db1', municipalityName: 'West Grey', population: 50, dwellings: 20, insideSettlementBoundary: false }, geometry: { type: 'Polygon', coordinates: [[[-80.95,44.17],[-80.89,44.17],[-80.89,44.25],[-80.95,44.25],[-80.95,44.17]]] } }
+    ])));
+
+    fs.writeFileSync(path.join(produceDir, 'grey-dwelling-land-access.json'), JSON.stringify({
+      dwellingLandAccessValid: false,
+      confidence: 'invalid_missing_lots',
+      estimatedPopulationNoDirectLandAccess: 50
+    }));
+
+    try {
+      const run = spawnSync('node', [
+        'command/report_grey_dwelling_land_access.mjs',
+        '--use-cache',
+        `--input-dir=${inputDir}`,
+        `--produce-dir=${produceDir}`
+      ], { encoding: 'utf8' });
+      expect(run.status).toBe(0);
+      expect(run.stdout).toContain('cache mode: rebuilt');
+
+      const saved = JSON.parse(fs.readFileSync(path.join(produceDir, 'grey-dwelling-land-access.json'), 'utf8'));
+      expect(saved.dwellingLandAccessValid).toBe(true);
+      expect(saved.estimatedPopulationWithSubsistencePotential).not.toBeNull();
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

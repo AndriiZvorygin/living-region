@@ -227,8 +227,102 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
   const municipalityFeatures = readGeoFeaturesIfExists(path.join(inputDir, 'municipality-boundaries.geojson'), warnings, 'municipalities');
   const landAccess = readJsonIfExists(path.join(produceDir, 'grey-land-access-baseline.json'), warnings, 'land-access baseline', null);
 
-  if (lots.length === 0) warnings.push('Missing lots-and-concessions-grey.geojson. Run: npm run grey:download-data -- --source=lots-and-concessions-grey');
+  const missingLots = lots.length === 0;
+  if (missingLots) warnings.push('Missing lots-and-concessions-grey.geojson. Run: npm run grey:download-data -- --source=lots-and-concessions-grey');
   if (censusBlocks.length === 0) warnings.push('Missing census blocks. Run: npm run census:import-grey-population');
+
+  if (missingLots) {
+    const invalidReport = {
+      generatedAt: new Date().toISOString(),
+      dataStatus: 'missing_required_lots',
+      dwellingLandAccessValid: false,
+      confidence: 'invalid_missing_lots',
+      populationDistributionSource: n(censusDistribution.totalPopulationMatched) > 0 ? 'censusSmallAreaWithDwellingLandAccessProxy' : 'municipalHeuristic',
+      areaMethod: 'unavailable_missing_lots',
+      totalPopulation: n(censusDistribution.totalPopulationMatched),
+      totalDwellings: n(censusDistribution.totalDwellingsMatched),
+      insideSettlementPopulation: n(censusDistribution.populationInsideSettlementBoundaries),
+      outsideSettlementPopulation: n(censusDistribution.populationOutsideSettlementBoundaries),
+      insideSettlementDwellings: null,
+      outsideSettlementDwellings: null,
+      estimatedDwellingsWithGardenScaleAccess: null,
+      estimatedDwellingsWithSubsistencePotential: null,
+      estimatedDwellingsWithSmallholdingPotential: null,
+      estimatedDwellingsWithFarmScalePotential: null,
+      estimatedPopulationWithGardenScaleAccess: null,
+      estimatedPopulationWithSubsistencePotential: null,
+      estimatedPopulationWithSmallholdingPotential: null,
+      estimatedPopulationWithFarmScalePotential: null,
+      estimatedPopulationNoDirectLandAccess: null,
+      thresholdSensitivity: [],
+      municipalitySummary: [],
+      landAccessBaselineOpportunityCounts: landAccess?.opportunityCategoryCounts ?? {},
+      warnings: [
+        ...warnings,
+        'Dwelling-land-access report is invalid until lots-and-concessions-grey.geojson is downloaded.',
+        'Recovery command: npm run grey:download-data -- --source=lots-and-concessions-grey'
+      ]
+    };
+
+    const markdownInvalid = [
+      '# Grey Dwelling-to-Land-Access Threshold Baseline',
+      '',
+      '## What this is',
+      'This estimates how Census dwellings/population relate to lot/concession land-access proxies.',
+      '',
+      '## Key warning',
+      'Outside settlement is not the same as land access.',
+      '',
+      '## Report status',
+      '- dataStatus: missing_required_lots',
+      '- dwellingLandAccessValid: false',
+      '- confidence: invalid_missing_lots',
+      '',
+      'Dwelling-land-access report is invalid until lots-and-concessions-grey.geojson is downloaded.',
+      '',
+      'Run:',
+      '```bash',
+      'npm run grey:download-data -- --source=lots-and-concessions-grey',
+      '```',
+      '',
+      '## Caveats',
+      '- not ownership parcels',
+      '- not legal access',
+      '- not address-level population',
+      '- not exact dwelling-to-lot matching',
+      '- lots/concessions are historical fabric, not assessment parcels',
+      '- modern parcel/address/building data would improve this greatly',
+      '',
+      '## Warnings',
+      ...invalidReport.warnings.map((w) => `- ${w}`)
+    ].join('\n');
+
+    const municipalCsvHeaders = [
+      'municipalityName', 'population', 'dwellings', 'insideSettlementPopulation', 'outsideSettlementPopulation',
+      'outsideSettlementDwellings', 'dwellingsGardenScale', 'dwellingsSubsistencePotential',
+      'dwellingsSmallholdingPotential', 'dwellingsFarmScalePotential', 'productiveHaPerDwellingMedianEstimate',
+      'constrainedLotShare', 'notes'
+    ];
+    const thresholdCsvHeaders = [
+      'thresholdScenario', 'gardenThresholdHa', 'subsistenceThresholdHa', 'smallholdingThresholdHa',
+      'farmScaleThresholdHa', 'dwellingsAtOrAboveSubsistence', 'populationAtOrAboveSubsistence',
+      'dwellingsAtOrAboveSmallholding', 'populationAtOrAboveSmallholding', 'noDirectLandAccessPopulation'
+    ];
+
+    const jsonPath = path.join(produceDir, 'grey-dwelling-land-access.json');
+    const mdPath = path.join(produceDir, 'grey-dwelling-land-access.md');
+    const municipalCsvPath = path.join(produceDir, 'grey-dwelling-land-access-municipal.csv');
+    const thresholdsCsvPath = path.join(produceDir, 'grey-dwelling-land-access-thresholds.csv');
+
+    fs.writeFileSync(jsonPath, JSON.stringify(invalidReport, null, 2));
+    fs.writeFileSync(mdPath, markdownInvalid);
+    fs.writeFileSync(municipalCsvPath, toCsv([], municipalCsvHeaders));
+    fs.writeFileSync(thresholdsCsvPath, toCsv([], thresholdCsvHeaders));
+    return {
+      report: invalidReport,
+      paths: { markdownPath: mdPath, jsonPath, municipalCsvPath, thresholdsCsvPath }
+    };
+  }
 
   const lotsByMunicipality = new Map();
   for (const lot of lots) {
@@ -340,6 +434,8 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    dataStatus: 'ok',
+    dwellingLandAccessValid: true,
     confidence: 'low_to_moderate',
     populationDistributionSource: population > 0 ? 'censusSmallAreaWithDwellingLandAccessProxy' : 'municipalHeuristic',
     areaMethod: 'polygonAreaHaApproxFromWGS84WithMunicipalFallback',

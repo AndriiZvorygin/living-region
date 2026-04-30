@@ -17,9 +17,11 @@ describe('grey report suite command', () => {
   test('builds correct command plan for default/quick/skip-download/force-download', () => {
     const def = buildCommandPlan({});
     expect(def[0].script).toBe('grey:download-data');
+    expect(def.some((x) => x.script === 'grey:download-data' && x.args.includes('--source=lots-and-concessions-grey'))).toBe(true);
     expect(def.some((x) => x.script === 'grey:import-data')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:population-distribution')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:dwelling-land-access')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:dwelling-land-access' && x.args.includes('--no-cache'))).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:farm-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:ag-labour')).toBe(true);
 
@@ -64,6 +66,22 @@ describe('grey report suite command', () => {
     expect(k.currentAgRelatedFTEEstimate).toBe(640);
     expect(k.agLabourScaleUpFactorLowFuel).toBeCloseTo(1.9, 6);
     expect(k.agLabourDataStatus).toBe('available');
+  });
+
+  test('excludes dwelling indicators when dwelling report invalid', () => {
+    const k = extractKeyIndicators({
+      dwellingLandAccess: {
+        dwellingLandAccessValid: false,
+        confidence: 'invalid_missing_lots',
+        estimatedPopulationNoDirectLandAccess: 100905,
+        estimatedPopulationWithSubsistencePotential: 0,
+        thresholdSensitivity: [{ thresholdScenario: 'baseline', dwellingsAtOrAboveSubsistence: 0 }]
+      }
+    });
+    expect(k.dwellingLandAccessStatus).toBe('invalid_missing_lots');
+    expect(k.estimatedPopulationNoDirectLandAccess).toBeNull();
+    expect(k.estimatedPopulationWithSubsistencePotential).toBeNull();
+    expect(k.dwellingsAtOrAboveSubsistence).toBeNull();
   });
 
   test('continue-on-error records failures and exits nonzero at end logic', () => {
