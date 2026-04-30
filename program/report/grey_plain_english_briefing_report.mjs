@@ -102,6 +102,10 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
       details: `Shock20 foodCoverage is ${numbers.shock20Coverage.toFixed(3)} with ${numbers.shock20AddedWorkers.toFixed(0)} added workers needed; combined resilience package raises shock20 coverage to ${numbers.shock20CombinedCoverage.toFixed(3)}.`
     },
     {
+      title: 'Global shock assumptions are not the same as direct local crop loss.',
+      details: 'A one-third global food production loss scenario is treated as global price/import competition and affordability stress pressure, not automatic one-third local production loss in Grey.'
+    },
+    {
       title: 'Adaptation pathways reduce risk exposure and can improve quality of life.',
       details: `Shock20 no-change risk exposure (2030): ${numbers.shock20NoChangeRisk.toLocaleString('en-CA')}; strong adaptation: ${numbers.shock20StrongRisk.toLocaleString('en-CA')}; avoided exposure: ${numbers.shock20AvoidedRisk.toLocaleString('en-CA')}. Severe-decline 2050 quality-of-life index: no-change ${numbers.severeNoChangeQol.toFixed(3)} vs full rural transition ${numbers.severeFullQol.toFixed(3)}.`
     }
@@ -199,6 +203,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     findings,
     whatThisMeansInPlainLanguage: [
       'The land base itself is probably not the main limiting factor.',
+      'A severe global food shock does not automatically mean the same percent loss in local Grey production; near-term pressure is mostly price/import affordability.',
       'The current food system is organized around long supply chains and external market orientation.',
       'Local resilience depends on storage, processing, distribution, labour, tools/repair, land access, and training capacity.',
       'Starting earlier lowers the chance of a disruptive transition.',
@@ -223,7 +228,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     biggestDataGaps: [
       'current parcel/assessment fabric',
       'address points/building footprints and dwelling units by parcel',
-      'core occupation-unit agriculture data',
+      'CD-level agriculture occupation minor-group rows (98-10-0594-01) and related class-of-worker tables',
       'Census of Agriculture farm-operator rows',
       'soil/crop/ag capability calibration',
       'measured local processing/storage capacity',
@@ -233,7 +238,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     ],
     recommendedNextSteps: [
       'Validate parcel and land-access assumptions with improved parcel/assessment datasets.',
-      'Load core agricultural occupation-unit rows and Census of Agriculture tables.',
+      'Load CD-level minor-group occupation rows (98-10-0594-01) with 98-10-0591-01/98-10-0592-01 and Census of Agriculture tables.',
       'Improve soil/crop/yield calibration.',
       'Review candidate food hub/storage/tool/depot nodes with local expertise.',
       'Use transition pathways to compare no-change, moderate adaptation, and strong adaptation choices.'

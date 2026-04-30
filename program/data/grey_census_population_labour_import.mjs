@@ -34,6 +34,21 @@ const OCC_EXCLUDE_TOTALS = [
   'total occupation'
 ];
 
+const OCC_MINOR_KEYWORDS = {
+  coreAgOccupationWorkers: [
+    'managers in agriculture',
+    'agriculture managers',
+    'contractors and supervisors in agriculture',
+    'farm supervisors',
+    'general farm workers',
+    'harvesting labourers',
+    'livestock labourers',
+    'nursery and greenhouse labourers',
+    'nursery workers',
+    'greenhouse workers'
+  ]
+};
+
 function n(v, fallback = 0) {
   const x = Number(String(v ?? '').replace(/,/g, '').trim());
   return Number.isFinite(x) ? x : fallback;
@@ -167,7 +182,10 @@ function discoverFiles(root, explicit = {}) {
     root: dir,
     occupationTable: explicit.occupationTable ?? pick(['98100449']) ?? pick(['0449']) ?? pick(['occupation', 'unit', 'group']),
     industryTable: explicit.industryTable ?? pick(['98100456']) ?? pick(['0456']) ?? pick(['industry', 'occupation']),
-    workActivityTable: explicit.workActivityTable ?? pick(['98100471']) ?? pick(['0471']) ?? pick(['work', 'activity'])
+    workActivityTable: explicit.workActivityTable ?? pick(['98100471']) ?? pick(['0471']) ?? pick(['work', 'activity']),
+    occupationMinorIndustryTable: explicit.occupationMinorIndustryTable ?? pick(['98100594']) ?? pick(['0594']) ?? pick(['occupation', 'minor', 'industry']),
+    classWorkerOccupationMinorTable: explicit.classWorkerOccupationMinorTable ?? pick(['98100591']) ?? pick(['0591']) ?? pick(['class', 'worker', 'occupation', 'minor']),
+    classWorkerIndustryTable: explicit.classWorkerIndustryTable ?? pick(['98100592']) ?? pick(['0592']) ?? pick(['class', 'worker', 'industry'])
   };
 }
 
@@ -302,24 +320,39 @@ export function importGreyCensusPopulationLabour(options = {}) {
   const discovered = discoverFiles(inputDir, {
     occupationTable: options.occupationTable,
     industryTable: options.industryTable,
-    workActivityTable: options.workActivityTable
+    workActivityTable: options.workActivityTable,
+    occupationMinorIndustryTable: options.occupationMinorIndustryTable,
+    classWorkerOccupationMinorTable: options.classWorkerOccupationMinorTable,
+    classWorkerIndustryTable: options.classWorkerIndustryTable
   });
 
   const occupationRowsAll = readRows(discovered.occupationTable, warnings, 'occupation table');
   const industryRowsAll = readRows(discovered.industryTable, warnings, 'industry table');
   const workActivityRowsAll = readRows(discovered.workActivityTable, warnings, 'work activity table');
+  const occupationMinorRowsAll = readRows(discovered.occupationMinorIndustryTable, warnings, 'occupation minor industry table');
+  const classWorkerOccupationMinorRowsAll = readRows(discovered.classWorkerOccupationMinorTable, warnings, 'class worker occupation minor table');
+  const classWorkerIndustryRowsAll = readRows(discovered.classWorkerIndustryTable, warnings, 'class worker industry table');
 
   const occupationRows = occupationRowsAll.filter(rowMatchesGrey);
   const industryRows = industryRowsAll.filter(rowMatchesGrey);
   const workActivityRows = workActivityRowsAll.filter(rowMatchesGrey);
+  const occupationMinorRows = occupationMinorRowsAll.filter(rowMatchesGrey);
+  const classWorkerOccupationMinorRows = classWorkerOccupationMinorRowsAll.filter(rowMatchesGrey);
+  const classWorkerIndustryRows = classWorkerIndustryRowsAll.filter(rowMatchesGrey);
 
   const preferredOccupationRows = occupationRows.filter(isGreyCdRow);
   const preferredIndustryRows = industryRows.filter(isGreyCdRow);
   const preferredWorkActivityRows = workActivityRows.filter(isGreyCdRow);
+  const preferredOccupationMinorRows = occupationMinorRows.filter(isGreyCdRow);
+  const preferredClassWorkerOccupationMinorRows = classWorkerOccupationMinorRows.filter(isGreyCdRow);
+  const preferredClassWorkerIndustryRows = classWorkerIndustryRows.filter(isGreyCdRow);
 
   const occSourceRows = preferredOccupationRows.length > 0 ? preferredOccupationRows : occupationRows;
   const industrySourceRows = preferredIndustryRows.length > 0 ? preferredIndustryRows : industryRows;
   const workActivitySourceRows = preferredWorkActivityRows.length > 0 ? preferredWorkActivityRows : workActivityRows;
+  const occupationMinorSourceRows = preferredOccupationMinorRows.length > 0 ? preferredOccupationMinorRows : occupationMinorRows;
+  const classWorkerOccupationMinorSourceRows = preferredClassWorkerOccupationMinorRows.length > 0 ? preferredClassWorkerOccupationMinorRows : classWorkerOccupationMinorRows;
+  const classWorkerIndustrySourceRows = preferredClassWorkerIndustryRows.length > 0 ? preferredClassWorkerIndustryRows : classWorkerIndustryRows;
 
   const occCounts = countFromRows(occSourceRows, OCC_KEYWORDS, [
     'Occupation unit group',
@@ -369,7 +402,28 @@ export function importGreyCensusPopulationLabour(options = {}) {
   const landscapingGroundsWorkers = n(occNarrowCounts.adjacentLandBasedWorkers);
   const forestryWorkers = n(occNarrowCounts.forestryWorkers);
 
-  const coreAgriculturalWorkers = farmManagersOperatorsOccupation + farmLabourersOccupation + greenhouseNurseryWorkers;
+  const occupationMinorRowsNarrow = occupationMinorSourceRows.filter((row) => {
+    const label = norm(normalizeOccupationLabel(row));
+    if (!label || isTotalOrAllCategoryLabel(label)) return false;
+    const gender = pickValue(row, ['Gender (3)', 'Gender', 'gender']);
+    const age = pickValue(row, ['Age (15A)', 'Age', 'age']);
+    const status = pickValue(row, ['Labour force status', 'Labour force status (5)', 'labour force status']);
+    const classWorker = pickValue(row, ['Class of worker', 'Class of worker (11)', 'class of worker']);
+    if (gender && !isTotalDimension(gender)) return false;
+    if (age && !isTotalDimension(age)) return false;
+    if (status && !isTotalDimension(status)) return false;
+    if (classWorker && !isTotalDimension(classWorker)) return false;
+    return true;
+  });
+  const occMinorCounts = countFromRows(occupationMinorRowsNarrow, OCC_MINOR_KEYWORDS, [
+    'Occupation - Minor group - National Occupational Classification (NOC) 2021 (45)',
+    'Occupation - Minor group - National Occupational Classification (NOC) 2021',
+    'Occupation'
+  ]);
+  const minorGroupCoreAgProxyWorkers = n(occMinorCounts.coreAgOccupationWorkers);
+
+  const coreAgOccupationWorkers = farmManagersOperatorsOccupation + farmLabourersOccupation + greenhouseNurseryWorkers;
+  const coreAgriculturalWorkers = coreAgOccupationWorkers > 0 ? coreAgOccupationWorkers : minorGroupCoreAgProxyWorkers;
   const agricultureIndustryWorkers = n(indCounts.agricultureIndustryWorkers);
   const adjacentLandBasedWorkers = landscapingGroundsWorkers;
   const totalAgRelatedBroadWorkers = Math.max(agricultureIndustryWorkers, coreAgriculturalWorkers) + adjacentLandBasedWorkers + forestryWorkers;
@@ -400,6 +454,15 @@ export function importGreyCensusPopulationLabour(options = {}) {
     sanityFlags.push('core_ag_labour_missing_using_broad_proxy');
   }
 
+  let occupationSourceStatus = 'missing';
+  if (coreAgOccupationWorkers > 0) occupationSourceStatus = 'unitGroupLoaded';
+  else if (minorGroupCoreAgProxyWorkers > 0) occupationSourceStatus = 'minorGroupProxyLoaded';
+  else if (occupationRowsAll.length > 0 || occupationMinorRowsAll.length > 0) occupationSourceStatus = 'unitGroupUnavailableForCD';
+
+  let currentAgLabourPreferredBasis = 'industryProxy';
+  if (coreAgOccupationWorkers > 0) currentAgLabourPreferredBasis = 'coreOccupation';
+  else if (minorGroupCoreAgProxyWorkers > 0) currentAgLabourPreferredBasis = 'minorGroupCoreAgProxy';
+
   const diagnostics = {
     generatedAt: new Date().toISOString(),
     sourceTablesUsed: discovered,
@@ -412,13 +475,20 @@ export function importGreyCensusPopulationLabour(options = {}) {
       occupationRowsAll: occupationRowsAll.length,
       industryRowsAll: industryRowsAll.length,
       workActivityRowsAll: workActivityRowsAll.length,
+      occupationMinorRowsAll: occupationMinorRowsAll.length,
+      classWorkerOccupationMinorRowsAll: classWorkerOccupationMinorRowsAll.length,
+      classWorkerIndustryRowsAll: classWorkerIndustryRowsAll.length,
       occupationRowsGrey: occupationRows.length,
       industryRowsGrey: industryRows.length,
       workActivityRowsGrey: workActivityRows.length,
+      occupationMinorRowsGrey: occupationMinorRows.length,
+      classWorkerOccupationMinorRowsGrey: classWorkerOccupationMinorRows.length,
+      classWorkerIndustryRowsGrey: classWorkerIndustryRows.length,
       usingGreyCdOnly: preferredIndustryRows.length > 0 || preferredOccupationRows.length > 0 || preferredWorkActivityRows.length > 0
     },
     rowInclusion: {
       occupationRowsIncludedCore: occupationRowsNarrow.length,
+      occupationMinorRowsIncludedCore: occupationMinorRowsNarrow.length,
       industryRowsIncludedCore: industryRowsNarrow.length,
       workActivityRowsIncluded: workActivityRollupRows.length,
       rowsExcludedTotalsSubtotals: Math.max(0, occSourceRows.length - occupationRowsNarrow.length) + Math.max(0, industryRollupRows.length - industryRowsNarrow.length),
@@ -432,6 +502,8 @@ export function importGreyCensusPopulationLabour(options = {}) {
     geographyLevel: (occupationRows.length > 0 || industryRows.length > 0) ? 'CD_or_CSD' : 'unknown',
     coverage: (occupationRows.length > 0 || industryRows.length > 0) ? 'Grey rows matched' : 'No Grey rows matched',
     coreAgriculturalWorkers,
+    coreAgOccupationWorkers,
+    minorGroupCoreAgProxyWorkers,
     agricultureIndustryWorkers,
     farmManagersOperatorsOccupation,
     farmLabourersOccupation,
@@ -445,12 +517,20 @@ export function importGreyCensusPopulationLabour(options = {}) {
     currentAgRelatedFTEEstimate,
     currentCoreAgFTEEstimate,
     currentAgIndustryFTEEstimate,
+    coreAgOccupationFTEEstimate: coreAgriculturalWorkers * workActivityFactor,
+    agIndustryFTEEstimate: currentAgIndustryFTEEstimate,
+    broadAdjacentFTEEstimate: currentBroadAgAdjacentFTEEstimate,
     currentBroadAgAdjacentFTEEstimate,
     currentAdjacentLandBasedFTEEstimate,
+    occupationSourceStatus,
+    currentAgLabourPreferredBasis,
     fullTimeEquivalenceFactor: workActivityFactor,
     sanityFlags,
     dataStatus: {
       occupationRows: occSourceRows.length,
+      occupationMinorRows: occupationMinorSourceRows.length,
+      classWorkerOccupationMinorRows: classWorkerOccupationMinorSourceRows.length,
+      classWorkerIndustryRows: classWorkerIndustrySourceRows.length,
       industryRows: industrySourceRows.length,
       workActivityRows: workActivitySourceRows.length,
       agLabourDataStatus: (coreAgriculturalWorkers > 0 || agricultureIndustryWorkers > 0) ? 'available' : 'missing'

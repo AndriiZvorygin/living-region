@@ -13,6 +13,9 @@ function parseArgs(argv) {
     else if (arg.startsWith('--occupation-url=')) out.urls.occupationUnitGroup9810044901 = arg.split('=').slice(1).join('=');
     else if (arg.startsWith('--industry-url=')) out.urls.industryOccupation9810045601 = arg.split('=').slice(1).join('=');
     else if (arg.startsWith('--work-activity-url=')) out.urls.occupationWorkActivity9810047101 = arg.split('=').slice(1).join('=');
+    else if (arg.startsWith('--occupation-minor-industry-url=')) out.urls.occupationMinorIndustry9810059401 = arg.split('=').slice(1).join('=');
+    else if (arg.startsWith('--class-worker-occupation-minor-url=')) out.urls.classWorkerOccupationMinor9810059101 = arg.split('=').slice(1).join('=');
+    else if (arg.startsWith('--class-worker-industry-url=')) out.urls.classWorkerIndustry9810059201 = arg.split('=').slice(1).join('=');
     else if (arg.startsWith('--url=')) out.allUrls.push(arg.split('=').slice(1).join('='));
   }
   return out;
@@ -187,6 +190,9 @@ async function run() {
       'npm run census-pop-labour:download-2021 -- --occupation-url="<direct-csv-url>"',
       'npm run census-pop-labour:download-2021 -- --industry-url="<direct-csv-url>"',
       'npm run census-pop-labour:download-2021 -- --work-activity-url="<direct-csv-url>"',
+      'npm run census-pop-labour:download-2021 -- --occupation-minor-industry-url="<direct-csv-url>"',
+      'npm run census-pop-labour:download-2021 -- --class-worker-occupation-minor-url="<direct-csv-url>"',
+      'npm run census-pop-labour:download-2021 -- --class-worker-industry-url="<direct-csv-url>"',
       'npm run census-pop-labour:import-grey -- --occupation-table=<path> --industry-table=<path> --work-activity-table=<path>',
       '```',
       '',

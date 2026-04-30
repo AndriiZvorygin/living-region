@@ -65,8 +65,8 @@ npm run report:grey:briefing
 
 4. Labour is a major constraint.
 - agriculture-industry FTE estimate: about `3,918`
-- current core ag occupation table still incomplete/missing
-- industry proxy only
+- current preferred basis is industry proxy
+- next target is CD-level minor-group occupation import (`98-10-0594-01`, plus `98-10-0591-01` / `98-10-0592-01`) because `98-10-0449-01` unit-group coverage may not be available for Grey CD
 
 5. Current-system shock thresholds now separate:
 - measured food insecurity anchor
@@ -353,7 +353,7 @@ Missing / weak:
 
 - modern parcel/assessment fabric
 - address points/building footprints/dwelling units by parcel
-- core occupation-unit agriculture rows
+- CD-level agriculture occupation minor-group rows (`98-10-0594-01`) and related class-of-worker tables (`98-10-0591-01`, `98-10-0592-01`)
 - Census of Agriculture farm-operator historical rows
 - soil/crop/ag capability calibration
 - local processing/storage capacity
@@ -382,7 +382,7 @@ Missing / weak:
 - lots/concessions are historical reference fabric, not modern parcel ownership
 - Census DB population is aggregate geography, not address-level persons
 - land-access proxy is not legal access
-- current ag labour is industry proxy until occupation rows improve
+- current ag labour may use industry proxy when CD-level occupation rows are unavailable; preferred upgrade path is `98-10-0594-01` minor-group core-ag proxy
 - food insecurity trend drivers are attribution diagnostics, not causal proof
 - no web UI yet
 
