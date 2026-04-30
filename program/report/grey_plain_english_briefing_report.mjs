@@ -41,6 +41,8 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
   const shock20 = (fuelShock.shockScenarios ?? []).find((s) => s.scenario === 'shock20') ?? {};
   const shock40 = (fuelShock.shockScenarios ?? []).find((s) => s.scenario === 'shock40') ?? {};
   const shock20Combined = (fuelShock.adaptationComparisons ?? []).find((s) => s.scenario === 'shock20' && s.adaptationPackage === 'combinedResiliencePackage') ?? {};
+  const lowFuelFoodWorkersNeeded = n(labourLand.regionalIndicators?.lowFuelFoodWorkersNeeded, 0);
+  const currentAgIndustryFTEEstimate = n(agLabour.currentAgIndustryFTEEstimate, 3918.43);
 
   const numbers = {
     population2021: n(publicBaseline.regionalIndicators?.population2021, 100905),
@@ -59,7 +61,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     constrainedCoverage: n(scenarios.get('constrainedLocalFoodBaseline')?.foodCoverage, 0.277),
     lowFuelCoverage: n(foodCal.landEnoughDiagnostic?.lowFuelFoodCoverage, 0.167),
     agricultureIndustryWorkers: n(agLabour.agricultureIndustryWorkers, 4721),
-    currentAgIndustryFTEEstimate: n(agLabour.currentAgIndustryFTEEstimate, 3918.43),
+    currentAgIndustryFTEEstimate,
     lowFuelLabourScaleUpFactor: n(agLabour.agLabourScaleUpFactorLowFuelIndustry, 10.42),
     shock20Coverage: n(shock20.foodCoverage, 0.355),
     shock20AddedWorkers: n(shock20.addedFoodWorkersNeededVsCurrent, 26930.46),
@@ -105,6 +107,67 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     }
   ];
 
+  const scenarioLabourRows = [
+    {
+      scenario: 'lowFuelTransitionBaseline',
+      source: 'labourLandBaselineFTE',
+      fuelAvailabilityIndex: n(foodScenarioAssumptions.lowFuelTransitionBaseline?.fuelAvailabilityIndex),
+      fertilizerAvailabilityIndex: n(foodScenarioAssumptions.lowFuelTransitionBaseline?.fertilizerAvailabilityIndex),
+      machinerySupportFactor: n(foodScenarioAssumptions.lowFuelTransitionBaseline?.machinerySupportFactor),
+      transportFuelAvailabilityIndex: n(foodScenarioAssumptions.lowFuelTransitionBaseline?.transportFuelAvailabilityIndex),
+      netGJPerHa: n(foodScenarioAssumptions.lowFuelTransitionBaseline?.netGJPerHa),
+      foodCoverage: n(foodScenarioAssumptions.lowFuelTransitionBaseline?.foodCoverage),
+      foodWorkersNeededFTE: lowFuelFoodWorkersNeeded > 0 ? lowFuelFoodWorkersNeeded : n(foodScenarioAssumptions.lowFuelTransitionBaseline?.foodWorkersNeededFTE),
+      addedFoodWorkersNeeded: Math.max(0, (lowFuelFoodWorkersNeeded > 0 ? lowFuelFoodWorkersNeeded : n(foodScenarioAssumptions.lowFuelTransitionBaseline?.foodWorkersNeededFTE)) - currentAgIndustryFTEEstimate),
+      currentAgIndustryFTEEstimate,
+      agLabourScaleUpFactor: n(agLabour.agLabourScaleUpFactorLowFuelIndustry)
+    },
+    {
+      scenario: 'shock20',
+      source: 'fuelShockFTE',
+      fuelAvailabilityIndex: n(fuelScenarioAssumptions.shock20?.fuelAvailabilityIndex),
+      fertilizerAvailabilityIndex: n(fuelScenarioAssumptions.shock20?.fertilizerAvailabilityIndex),
+      machinerySupportFactor: n(fuelScenarioAssumptions.shock20?.machinerySupportFactor),
+      transportFuelAvailabilityIndex: n(fuelScenarioAssumptions.shock20?.transportFuelAvailabilityIndex),
+      netGJPerHa: n(fuelScenarioAssumptions.shock20?.effectiveNetGJPerHa),
+      foodCoverage: n(fuelScenarioAssumptions.shock20?.foodCoverage),
+      foodWorkersNeededFTE: n(fuelScenarioAssumptions.shock20?.foodWorkersNeededFTE),
+      addedFoodWorkersNeeded: n(shock20.addedFoodWorkersNeededVsCurrent),
+      currentAgIndustryFTEEstimate,
+      agLabourScaleUpFactor: n(shock20.agLabourScaleUpFactor)
+    },
+    {
+      scenario: 'shock40',
+      source: 'fuelShockFTE',
+      fuelAvailabilityIndex: n(fuelScenarioAssumptions.shock40?.fuelAvailabilityIndex),
+      fertilizerAvailabilityIndex: n(fuelScenarioAssumptions.shock40?.fertilizerAvailabilityIndex),
+      machinerySupportFactor: n(fuelScenarioAssumptions.shock40?.machinerySupportFactor),
+      transportFuelAvailabilityIndex: n(fuelScenarioAssumptions.shock40?.transportFuelAvailabilityIndex),
+      netGJPerHa: n(fuelScenarioAssumptions.shock40?.effectiveNetGJPerHa),
+      foodCoverage: n(fuelScenarioAssumptions.shock40?.foodCoverage),
+      foodWorkersNeededFTE: n(fuelScenarioAssumptions.shock40?.foodWorkersNeededFTE),
+      addedFoodWorkersNeeded: n(shock40.addedFoodWorkersNeededVsCurrent),
+      currentAgIndustryFTEEstimate,
+      agLabourScaleUpFactor: n(shock40.agLabourScaleUpFactor)
+    },
+    {
+      scenario: 'combinedResiliencePackage (shock20)',
+      source: 'fuelShockAdaptationDelta',
+      fuelAvailabilityIndex: n(fuelScenarioAssumptions.shock20?.fuelAvailabilityIndex),
+      fertilizerAvailabilityIndex: n(fuelScenarioAssumptions.shock20?.fertilizerAvailabilityIndex),
+      machinerySupportFactor: n(fuelScenarioAssumptions.shock20?.machinerySupportFactor),
+      transportFuelAvailabilityIndex: n(fuelScenarioAssumptions.shock20?.transportFuelAvailabilityIndex),
+      netGJPerHa: n(fuelScenarioAssumptions.shock20?.effectiveNetGJPerHa),
+      foodCoverage: n(fuelScenarioAssumptions.combinedResiliencePackage?.foodCoverage),
+      foodWorkersNeededFTE: n(fuelScenarioAssumptions.combinedResiliencePackage?.requiredNewFoodWorkers) + currentAgIndustryFTEEstimate,
+      addedFoodWorkersNeeded: n(fuelScenarioAssumptions.combinedResiliencePackage?.requiredNewFoodWorkers),
+      currentAgIndustryFTEEstimate,
+      agLabourScaleUpFactor: currentAgIndustryFTEEstimate > 0
+        ? (n(fuelScenarioAssumptions.combinedResiliencePackage?.requiredNewFoodWorkers) + currentAgIndustryFTEEstimate) / currentAgIndustryFTEEstimate
+        : 0
+    }
+  ];
+
   const report = {
     generatedAt: new Date().toISOString(),
     title: 'Living Region Grey County: Early Findings from the First Real-Data Baseline',
@@ -123,6 +186,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
       supportingLayersStatus: 'Transit, trails, cycling, facilities, rural businesses, managed forest, road condition, and related layers are loaded where available.'
     },
     keyNumbers: numbers,
+    scenarioLabourRows,
     scenarioAssumptions: {
       presentIndustrialFossilBaseline: foodScenarioAssumptions.presentIndustrialFossilBaseline ?? null,
       localizedPresentTechBaseline: foodScenarioAssumptions.localizedPresentTechBaseline ?? null,
@@ -219,24 +283,10 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     ...findings.flatMap((f, idx) => [`### Finding ${idx + 1}`, f.title, f.details, '']),
     '## Scenario assumption snapshot',
     'A named scenario is only meaningful if its assumptions are visible.',
-    '| Scenario | Fuel availability | Fertilizer availability | Machinery support | Transport support | Net GJ/ha | Food coverage | Workers needed | Interpretation |',
-    '|---|---:|---:|---:|---:|---:|---:|---:|---|',
-    ...(() => {
-      const rows = [];
-      const add = (name, s, interpretation) => {
-        if (!s) return;
-        rows.push(`| ${name} | ${n(s.fuelAvailabilityIndex).toFixed(2)} | ${n(s.fertilizerAvailabilityIndex).toFixed(2)} | ${n(s.machinerySupportFactor).toFixed(2)} | ${n(s.transportFuelAvailabilityIndex).toFixed(2)} | ${n(s.netGJPerHa ?? s.effectiveNetGJPerHa).toFixed(2)} | ${n(s.foodCoverage).toFixed(3)} | ${n(s.foodWorkersNeededFTE).toFixed(2)} | ${interpretation} |`);
-      };
-      add('presentIndustrialFossilBaseline', foodScenarioAssumptions.presentIndustrialFossilBaseline, 'gross present-input potential');
-      add('localizedPresentTechBaseline', foodScenarioAssumptions.localizedPresentTechBaseline, 'localized present-tech baseline');
-      add('constrainedLocalFoodBaseline', foodScenarioAssumptions.constrainedLocalFoodBaseline, 'constrained local baseline');
-      add('lowFuelTransitionBaseline', foodScenarioAssumptions.lowFuelTransitionBaseline, 'low-fuel transition baseline');
-      add('shock20', fuelScenarioAssumptions.shock20, 'abrupt shock scenario');
-      add('shock40', fuelScenarioAssumptions.shock40, 'deeper shock scenario');
-      const c = fuelScenarioAssumptions.combinedResiliencePackage;
-      if (c) rows.push(`| combinedResiliencePackage (shock20) | ${n(fuelScenarioAssumptions.shock20?.fuelAvailabilityIndex).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.fertilizerAvailabilityIndex).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.machinerySupportFactor).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.transportFuelAvailabilityIndex).toFixed(2)} | ${n(fuelScenarioAssumptions.shock20?.effectiveNetGJPerHa).toFixed(2)} | ${n(c.foodCoverage).toFixed(3)} | ${n(c.requiredNewFoodWorkers + numbers.currentAgIndustryFTEEstimate).toFixed(2)} | adaptation package comparator |`);
-      return rows;
-    })(),
+    '| Scenario | Fuel availability | Fertilizer availability | Machinery support | Transport support | Net GJ/ha | Food coverage | foodWorkersNeededFTE | addedFoodWorkersNeeded | currentAgIndustryFTEEstimate | agLabourScaleUpFactor | Interpretation |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|',
+    ...scenarioLabourRows.map((r) => `| ${r.scenario} | ${r.fuelAvailabilityIndex.toFixed(2)} | ${r.fertilizerAvailabilityIndex.toFixed(2)} | ${r.machinerySupportFactor.toFixed(2)} | ${r.transportFuelAvailabilityIndex.toFixed(2)} | ${r.netGJPerHa.toFixed(2)} | ${r.foodCoverage.toFixed(3)} | ${r.foodWorkersNeededFTE.toFixed(2)} | ${r.addedFoodWorkersNeeded.toFixed(2)} | ${r.currentAgIndustryFTEEstimate.toFixed(2)} | ${r.agLabourScaleUpFactor.toFixed(2)} | ${r.source} |`,
+    ),
     '',
     '## What this means in plain language',
     ...report.whatThisMeansInPlainLanguage.map((x) => `- ${x}`),
@@ -273,7 +323,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
     '',
     `Population distribution is now grounded in Census dissemination blocks: ${numbers.insideSettlementPopulation.toLocaleString('en-CA')} inside settlement boundaries and ${numbers.outsideSettlementPopulation.toLocaleString('en-CA')} outside. The new dwelling-land proxy also shows outside-settlement does not automatically mean land access: about ${numbers.noDirectLandAccessPopulation.toLocaleString('en-CA')} people are still estimated as no-direct-access, while about ${numbers.subsistencePotentialPopulation.toLocaleString('en-CA')} are in a subsistence-potential band (proxy estimate, not parcel ownership).`,
     '',
-    `Labour remains a major issue. Current agriculture-industry labour is about ${numbers.currentAgIndustryFTEEstimate.toFixed(0)} FTE-equivalent (industry proxy), while low-fuel pathways imply much higher labour demand. In the fuel shock diagnostics, shock20 yields food coverage around ${numbers.shock20Coverage.toFixed(3)} with roughly ${numbers.shock20AddedWorkers.toFixed(0)} added workers needed; adaptation packages help but do not eliminate the gap.`,
+    `Labour remains a major issue. Current agriculture-industry labour is about ${numbers.currentAgIndustryFTEEstimate.toFixed(0)} FTE-equivalent (industry proxy). The low-fuel transition baseline uses the labour-land value of about ${scenarioLabourRows.find((r) => r.scenario === 'lowFuelTransitionBaseline')?.foodWorkersNeededFTE.toFixed(0)} total food workers needed FTE, with about ${scenarioLabourRows.find((r) => r.scenario === 'lowFuelTransitionBaseline')?.addedFoodWorkersNeeded.toFixed(0)} added workers versus current ag-industry FTE. In the fuel shock diagnostics, shock20 is about ${scenarioLabourRows.find((r) => r.scenario === 'shock20')?.foodWorkersNeededFTE.toFixed(0)} total food workers needed FTE and about ${scenarioLabourRows.find((r) => r.scenario === 'shock20')?.addedFoodWorkersNeeded.toFixed(0)} added workers needed.`,
     '',
     `Transition pathways now compare no-change vs stronger adaptation over time. For shock20 in 2030, no-change risk exposure is about ${numbers.shock20NoChangeRisk.toLocaleString('en-CA')} versus ${numbers.shock20StrongRisk.toLocaleString('en-CA')} under strong adaptation (about ${numbers.shock20AvoidedRisk.toLocaleString('en-CA')} avoided exposure in this model). Under severe decline by 2050, quality-of-life index is much higher under full transition (${numbers.severeFullQol.toFixed(3)}) than no-change (${numbers.severeNoChangeQol.toFixed(3)}), while still explicitly not treated as a perfect outcome.`,
     '',

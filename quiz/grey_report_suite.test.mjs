@@ -24,6 +24,9 @@ describe('grey report suite command', () => {
     expect(def.some((x) => x.script === 'report:grey:dwelling-land-access' && x.args.includes('--no-cache'))).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:farm-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:ag-labour')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:current-shock-threshold')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:food-gap-replacement')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:food-price')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:fuel-shock')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:transition-pathways')).toBe(true);
 
@@ -52,6 +55,28 @@ describe('grey report suite command', () => {
       dwellingLandAccess: { estimatedPopulationNoDirectLandAccess: 21000, estimatedPopulationWithSubsistencePotential: 12000, thresholdSensitivity: [{ thresholdScenario: 'baseline', dwellingsAtOrAboveSubsistence: 5000 }] },
       farmLabour: { currentFarmOperators: 1200, currentFarmLabourDataStatus: 'available', currentFarmLabourFTEEstimate: 980, farmLabourScaleUpFactorLowFuel: 4.2 },
       agLabour: { currentAgRelatedFTEEstimate: 640, agLabourScaleUpFactorLowFuel: 1.9, agLabourDataStatus: 'available' },
+      currentShockThreshold: {
+        thresholdFindings: {
+          firstModerateStressShockLevel: 'fuelShock10',
+          firstSevereStressShockLevel: 'fuelShock20',
+          firstFoodBankCrisisShockLevel: 'fuelShock25'
+        },
+        shockScenarios: [{ scenario: 'fuelShock20', foodInsecurityRiskExposurePopulation: 32000, lagMonthsToAcutePain: 3.5 }]
+      },
+      foodGapReplacement: {
+        keyResults: {
+          foodGap33EmergencyYear1Package: { byYear: { 1: { blendedRequiredWorkers: 9000 } }, year1CoverageOfGap: 0.2 },
+          foodGap33TenYearResiliencePackage: { byYear: { 10: { blendedRequiredWorkers: 7000 } }, year10CoverageOfGap: 0.7 },
+          severeSystemicInputLoss33MainBottleneck: 'labour'
+        }
+      },
+      foodPrice: {
+        keyResults: {
+          shock20NoAdaptation: { foodPriceMultiplierEstimate: 1.8 },
+          shock20CombinedLocalResponse: { foodPriceMultiplierEstimate: 1.5, foodInsecurityAvoidedVsNoAdaptation: 1200, noDirectLandAccessRemainingVulnerable: 7990 },
+          severeSystemicInputLoss33CombinedResponse: { supplyDemandRatio: 0.94 }
+        }
+      },
       fuelShock: { keyResults: { shock20FoodCoverage: 0.31, shock20AddedFoodWorkersNeeded: 14000, shock20AgLabourScaleUpFactor: 9.1, shock20CombinedResiliencePackageFoodCoverage: 0.42 } },
       transitionPathways: { suiteKeyResults: { shock20NoChangeFoodInsecureRiskPopulation2030: 25000, shock20StrongAdaptationFoodInsecureRiskPopulation2030: 18000, avoidedFoodInsecureRiskVsNoChange2030: 7000, severeDecline2050NoChangeQualityOfLifeIndex: 0.2, severeDecline2050FullRuralTransitionQualityOfLifeIndex: 0.45 } },
       foodCalibration: { landEnoughDiagnostic: { lowFuelFoodCoverage: 0.16 }, plausibilityScenarios: [
@@ -74,6 +99,21 @@ describe('grey report suite command', () => {
     expect(k.currentAgRelatedFTEEstimate).toBe(640);
     expect(k.agLabourScaleUpFactorLowFuel).toBeCloseTo(1.9, 6);
     expect(k.agLabourDataStatus).toBe('available');
+    expect(k.firstModerateStressShockLevel).toBe('fuelShock10');
+    expect(k.firstSevereStressShockLevel).toBe('fuelShock20');
+    expect(k.firstFoodBankCrisisShockLevel).toBe('fuelShock25');
+    expect(k.shock20CurrentSystemFoodInsecurityRiskExposurePopulation).toBe(32000);
+    expect(k.shock20CurrentSystemLagMonthsToAcutePain).toBeCloseTo(3.5, 6);
+    expect(k.foodGap33EmergencyYear1Workers).toBe(9000);
+    expect(k.foodGap33TenYearResilienceWorkers).toBe(7000);
+    expect(k.foodGap33Year1GapCovered).toBeCloseTo(0.2, 6);
+    expect(k.foodGap33Year10GapCovered).toBeCloseTo(0.7, 6);
+    expect(k.severeSystemicInputLoss33MainBottleneck).toBe('labour');
+    expect(k.shock20NoAdaptationFoodPriceMultiplierEstimate).toBeCloseTo(1.8, 6);
+    expect(k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate).toBeCloseTo(1.5, 6);
+    expect(k.shock20FoodInsecurityAvoidedVsNoAdaptation).toBe(1200);
+    expect(k.severeSystemicInputLoss33CombinedResponseSupplyDemandRatio).toBeCloseTo(0.94, 6);
+    expect(k.noDirectLandAccessRemainingVulnerable).toBe(7990);
     expect(k.shock20FoodCoverage).toBeCloseTo(0.31, 6);
     expect(k.shock20AddedFoodWorkersNeeded).toBe(14000);
     expect(k.shock20AgLabourScaleUpFactor).toBeCloseTo(9.1, 6);

@@ -43,8 +43,10 @@
     "report:grey:dwelling-land-access": "node command/report_grey_dwelling_land_access.mjs",
     "report:grey:farm-labour": "node command/report_grey_farm_labour_baseline.mjs",
     "report:grey:ag-labour": "node command/report_grey_ag_labour_baseline.mjs",
+    "report:grey:current-shock-threshold": "node command/report_grey_current_system_shock_threshold.mjs",
     "report:grey:fuel-shock": "node command/report_grey_fuel_fertilizer_shock.mjs",
     "report:grey:transition-pathways": "node command/report_grey_transition_pathways.mjs",
+    "report:grey:briefing": "node command/report_grey_briefing.mjs",
     "report:grey:all": "node command/run_grey_report_suite.mjs",
     "report:model:assessment": "node command/report_living_region_assessment.mjs",
     "grey:open-data": "node command/grey_open_data.mjs",
@@ -64,7 +66,9 @@
     "grey:data-status": "node command/grey_data_status.mjs",
     "grey:status": "node command/grey_status.mjs",
     "check:food-energy-terms": "node command/check_food_energy_terms.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "report:grey:food-gap-replacement": "node command/report_grey_food_gap_replacement.mjs",
+    "report:grey:food-price": "node command/report_grey_food_supply_demand_price.mjs"
   },
   "keywords": [
     "regional-planning",

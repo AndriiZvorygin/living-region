@@ -72,6 +72,9 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   plan.push(cmd('report:grey:farm-labour'));
   plan.push(cmd('report:grey:ag-labour'));
   plan.push(cmd('report:grey:food-calibration'));
+  plan.push(cmd('report:grey:current-shock-threshold'));
+  plan.push(cmd('report:grey:food-gap-replacement'));
+  plan.push(cmd('report:grey:food-price'));
   plan.push(cmd('report:grey:fuel-shock'));
   plan.push(cmd('report:grey:transition-pathways'));
   plan.push(cmd('report:grey:localization-access'));
@@ -111,7 +114,10 @@ export function extractKeyIndicators(data = {}) {
   const agLabour = data.agLabour ?? {};
   const foodCal = data.foodCalibration ?? {};
   const fuelShock = data.fuelShock ?? {};
+  const foodGapReplacement = data.foodGapReplacement ?? {};
+  const foodPrice = data.foodPrice ?? {};
   const transitionPathways = data.transitionPathways ?? {};
+  const currentShockThreshold = data.currentShockThreshold ?? {};
   const localization = data.localization ?? {};
 
   const scenarios = new Map((foodCal.plausibilityScenarios ?? []).map((s) => [s.scenario, s]));
@@ -140,6 +146,21 @@ export function extractKeyIndicators(data = {}) {
     currentAgRelatedFTEEstimate: Number(agLabour.currentAgRelatedFTEEstimate ?? 0),
     agLabourDataStatus: String(agLabour.agLabourDataStatus ?? 'missing'),
     agLabourScaleUpFactorLowFuel: Number(agLabour.agLabourScaleUpFactorLowFuel ?? 0),
+    firstModerateStressShockLevel: currentShockThreshold.thresholdFindings?.firstModerateStressShockLevel ?? null,
+    firstSevereStressShockLevel: currentShockThreshold.thresholdFindings?.firstSevereStressShockLevel ?? null,
+    firstFoodBankCrisisShockLevel: currentShockThreshold.thresholdFindings?.firstFoodBankCrisisShockLevel ?? null,
+    shock20CurrentSystemFoodInsecurityRiskExposurePopulation: Number((currentShockThreshold.shockScenarios ?? []).find((s) => s.scenario === 'fuelShock20')?.foodInsecurityRiskExposurePopulation ?? 0),
+    shock20CurrentSystemLagMonthsToAcutePain: Number((currentShockThreshold.shockScenarios ?? []).find((s) => s.scenario === 'fuelShock20')?.lagMonthsToAcutePain ?? 0),
+    foodGap33EmergencyYear1Workers: Number(foodGapReplacement.keyResults?.foodGap33EmergencyYear1Package?.byYear?.[1]?.blendedRequiredWorkers ?? 0),
+    foodGap33TenYearResilienceWorkers: Number(foodGapReplacement.keyResults?.foodGap33TenYearResiliencePackage?.byYear?.[10]?.blendedRequiredWorkers ?? 0),
+    foodGap33Year1GapCovered: Number(foodGapReplacement.keyResults?.foodGap33EmergencyYear1Package?.year1CoverageOfGap ?? 0),
+    foodGap33Year10GapCovered: Number(foodGapReplacement.keyResults?.foodGap33TenYearResiliencePackage?.year10CoverageOfGap ?? 0),
+    severeSystemicInputLoss33MainBottleneck: foodGapReplacement.keyResults?.severeSystemicInputLoss33MainBottleneck ?? null,
+    shock20NoAdaptationFoodPriceMultiplierEstimate: Number(foodPrice.keyResults?.shock20NoAdaptation?.foodPriceMultiplierEstimate ?? 0),
+    shock20CombinedLocalResponseFoodPriceMultiplierEstimate: Number(foodPrice.keyResults?.shock20CombinedLocalResponse?.foodPriceMultiplierEstimate ?? 0),
+    shock20FoodInsecurityAvoidedVsNoAdaptation: Number(foodPrice.keyResults?.shock20CombinedLocalResponse?.foodInsecurityAvoidedVsNoAdaptation ?? 0),
+    severeSystemicInputLoss33CombinedResponseSupplyDemandRatio: Number(foodPrice.keyResults?.severeSystemicInputLoss33CombinedResponse?.supplyDemandRatio ?? 0),
+    noDirectLandAccessRemainingVulnerable: Number(foodPrice.keyResults?.shock20CombinedLocalResponse?.noDirectLandAccessRemainingVulnerable ?? 0),
     shock20FoodCoverage: Number(fuelShock.keyResults?.shock20FoodCoverage ?? 0),
     shock20AddedFoodWorkersNeeded: Number(fuelShock.keyResults?.shock20AddedFoodWorkersNeeded ?? 0),
     shock20AgLabourScaleUpFactor: Number(fuelShock.keyResults?.shock20AgLabourScaleUpFactor ?? 0),
@@ -211,6 +232,21 @@ function buildSuiteSummaryMarkdown(summary) {
     `- currentAgRelatedFTEEstimate: ${k.currentAgRelatedFTEEstimate}`,
     `- agLabourDataStatus: ${k.agLabourDataStatus}`,
     `- agLabourScaleUpFactorLowFuel: ${k.agLabourScaleUpFactorLowFuel?.toFixed?.(2) ?? k.agLabourScaleUpFactorLowFuel}`,
+    `- firstModerateStressShockLevel: ${k.firstModerateStressShockLevel ?? 'unknown'}`,
+    `- firstSevereStressShockLevel: ${k.firstSevereStressShockLevel ?? 'unknown'}`,
+    `- firstFoodBankCrisisShockLevel: ${k.firstFoodBankCrisisShockLevel ?? 'unknown'}`,
+    `- shock20 current-system foodInsecurityRiskExposurePopulation: ${k.shock20CurrentSystemFoodInsecurityRiskExposurePopulation?.toFixed?.(0) ?? k.shock20CurrentSystemFoodInsecurityRiskExposurePopulation}`,
+    `- shock20 current-system lagMonthsToAcutePain: ${k.shock20CurrentSystemLagMonthsToAcutePain?.toFixed?.(2) ?? k.shock20CurrentSystemLagMonthsToAcutePain}`,
+    `- foodGap33 emergencyYear1 workers: ${k.foodGap33EmergencyYear1Workers?.toFixed?.(2) ?? k.foodGap33EmergencyYear1Workers}`,
+    `- foodGap33 tenYearResilience workers: ${k.foodGap33TenYearResilienceWorkers?.toFixed?.(2) ?? k.foodGap33TenYearResilienceWorkers}`,
+    `- foodGap33 year1 gap covered: ${k.foodGap33Year1GapCovered?.toFixed?.(3) ?? k.foodGap33Year1GapCovered}`,
+    `- foodGap33 year10 gap covered: ${k.foodGap33Year10GapCovered?.toFixed?.(3) ?? k.foodGap33Year10GapCovered}`,
+    `- severeSystemicInputLoss33 main bottleneck: ${k.severeSystemicInputLoss33MainBottleneck ?? 'unknown'}`,
+    `- shock20 no-adaptation foodPriceMultiplierEstimate: ${k.shock20NoAdaptationFoodPriceMultiplierEstimate?.toFixed?.(3) ?? k.shock20NoAdaptationFoodPriceMultiplierEstimate}`,
+    `- shock20 combined local response foodPriceMultiplierEstimate: ${k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate?.toFixed?.(3) ?? k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate}`,
+    `- shock20 foodInsecurityAvoidedVsNoAdaptation: ${k.shock20FoodInsecurityAvoidedVsNoAdaptation?.toFixed?.(0) ?? k.shock20FoodInsecurityAvoidedVsNoAdaptation}`,
+    `- severeSystemicInputLoss33 combined response supplyDemandRatio: ${k.severeSystemicInputLoss33CombinedResponseSupplyDemandRatio?.toFixed?.(3) ?? k.severeSystemicInputLoss33CombinedResponseSupplyDemandRatio}`,
+    `- noDirectLandAccessRemainingVulnerable: ${k.noDirectLandAccessRemainingVulnerable?.toFixed?.(0) ?? k.noDirectLandAccessRemainingVulnerable}`,
     `- shock20 foodCoverage: ${k.shock20FoodCoverage?.toFixed?.(3) ?? k.shock20FoodCoverage}`,
     `- shock20 addedFoodWorkersNeeded: ${k.shock20AddedFoodWorkersNeeded?.toFixed?.(2) ?? k.shock20AddedFoodWorkersNeeded}`,
     `- shock20 agLabourScaleUpFactor: ${k.shock20AgLabourScaleUpFactor?.toFixed?.(2) ?? k.shock20AgLabourScaleUpFactor}`,
@@ -278,6 +314,9 @@ export function runGreyReportSuite(options = {}) {
   const agLabour = readJsonIfExists(path.join(produceDir, 'grey-ag-labour-baseline.json'), warnings, 'ag-labour baseline');
   const foodCalibration = readJsonIfExists(path.join(produceDir, 'grey-food-calibration.json'), warnings, 'food calibration');
   const fuelShock = readJsonIfExists(path.join(produceDir, 'grey-fuel-fertilizer-shock.json'), warnings, 'fuel/fertilizer shock report');
+  const foodGapReplacement = readJsonIfExists(path.join(produceDir, 'grey-food-gap-replacement.json'), warnings, 'food gap replacement report');
+  const foodPrice = readJsonIfExists(path.join(produceDir, 'grey-food-supply-demand-price.json'), warnings, 'food supply-demand-price report');
+  const currentShockThreshold = readJsonIfExists(path.join(produceDir, 'grey-current-system-shock-threshold.json'), warnings, 'current shock threshold report');
   const transitionPathways = readJsonIfExists(path.join(produceDir, 'grey-transition-pathways.json'), warnings, 'transition pathways report');
   const localization = readJsonIfExists(path.join(produceDir, 'grey-localization-access.json'), warnings, 'localization access');
   const secondary = readJsonIfExists(path.join(produceDir, 'grey-secondary-data-summary.json'), warnings, 'secondary data summary');
@@ -291,6 +330,9 @@ export function runGreyReportSuite(options = {}) {
     ...(farmLabour?.warnings ?? []),
     ...(agLabour?.warnings ?? []),
     ...(foodCalibration?.warnings ?? []),
+    ...(currentShockThreshold?.warnings ?? []),
+    ...(foodGapReplacement?.warnings ?? []),
+    ...(foodPrice?.warnings ?? []),
     ...(fuelShock?.warnings ?? []),
     ...(transitionPathways?.warnings ?? []),
     ...(localization?.warnings ?? [])
@@ -309,6 +351,9 @@ export function runGreyReportSuite(options = {}) {
     farmLabour,
     agLabour,
     foodCalibration,
+    currentShockThreshold,
+    foodGapReplacement,
+    foodPrice,
     fuelShock,
     transitionPathways,
     localization,
@@ -387,6 +432,21 @@ function printSummary(summary) {
   console.log(`  - currentAgRelatedFTEEstimate: ${k.currentAgRelatedFTEEstimate}`);
   console.log(`  - agLabourDataStatus: ${k.agLabourDataStatus}`);
   console.log(`  - agLabourScaleUpFactorLowFuel: ${Number(k.agLabourScaleUpFactorLowFuel).toFixed(2)}`);
+  console.log(`  - firstModerateStressShockLevel: ${k.firstModerateStressShockLevel ?? 'unknown'}`);
+  console.log(`  - firstSevereStressShockLevel: ${k.firstSevereStressShockLevel ?? 'unknown'}`);
+  console.log(`  - firstFoodBankCrisisShockLevel: ${k.firstFoodBankCrisisShockLevel ?? 'unknown'}`);
+  console.log(`  - shock20 current-system foodInsecurityRiskExposurePopulation: ${Number(k.shock20CurrentSystemFoodInsecurityRiskExposurePopulation).toFixed(0)}`);
+  console.log(`  - shock20 current-system lagMonthsToAcutePain: ${Number(k.shock20CurrentSystemLagMonthsToAcutePain).toFixed(2)}`);
+  console.log(`  - foodGap33 emergencyYear1 workers: ${Number(k.foodGap33EmergencyYear1Workers).toFixed(2)}`);
+  console.log(`  - foodGap33 tenYearResilience workers: ${Number(k.foodGap33TenYearResilienceWorkers).toFixed(2)}`);
+  console.log(`  - foodGap33 year1 gap covered: ${Number(k.foodGap33Year1GapCovered).toFixed(3)}`);
+  console.log(`  - foodGap33 year10 gap covered: ${Number(k.foodGap33Year10GapCovered).toFixed(3)}`);
+  console.log(`  - severeSystemicInputLoss33 main bottleneck: ${k.severeSystemicInputLoss33MainBottleneck ?? 'unknown'}`);
+  console.log(`  - shock20 no-adaptation foodPriceMultiplierEstimate: ${Number(k.shock20NoAdaptationFoodPriceMultiplierEstimate).toFixed(3)}`);
+  console.log(`  - shock20 combined local response foodPriceMultiplierEstimate: ${Number(k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate).toFixed(3)}`);
+  console.log(`  - shock20 foodInsecurityAvoidedVsNoAdaptation: ${Number(k.shock20FoodInsecurityAvoidedVsNoAdaptation).toFixed(0)}`);
+  console.log(`  - severeSystemicInputLoss33 combined response supplyDemandRatio: ${Number(k.severeSystemicInputLoss33CombinedResponseSupplyDemandRatio).toFixed(3)}`);
+  console.log(`  - noDirectLandAccessRemainingVulnerable: ${Number(k.noDirectLandAccessRemainingVulnerable).toFixed(0)}`);
   console.log(`  - shock20 foodCoverage: ${Number(k.shock20FoodCoverage).toFixed(3)}`);
   console.log(`  - shock20 addedFoodWorkersNeeded: ${Number(k.shock20AddedFoodWorkersNeeded).toFixed(2)}`);
   console.log(`  - shock20 agLabourScaleUpFactor: ${Number(k.shock20AgLabourScaleUpFactor).toFixed(2)}`);

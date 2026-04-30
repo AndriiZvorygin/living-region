@@ -75,7 +75,11 @@ describe('grey plain english briefing report', () => {
     });
     writeJson(path.join(root, 'grey-localization-access.json'), {});
     writeJson(path.join(root, 'grey-land-access-baseline.json'), { assignment: { totalLotConcessionFeatures: 10137 } });
-    writeJson(path.join(root, 'grey-labour-land-baseline.json'), {});
+    writeJson(path.join(root, 'grey-labour-land-baseline.json'), {
+      regionalIndicators: {
+        lowFuelFoodWorkersNeeded: 40836.74
+      }
+    });
 
     try {
       const built = buildGreyPlainEnglishBriefingReport({ produceDir: root });
@@ -97,6 +101,12 @@ describe('grey plain english briefing report', () => {
       expect(md).toContain('What is real data-backed now');
       expect(md).toContain('Main findings so far');
       expect(md).toContain('Scenario assumption snapshot');
+      expect(md).toContain('foodWorkersNeededFTE');
+      expect(md).toContain('addedFoodWorkersNeeded');
+      expect(md).toContain('currentAgIndustryFTEEstimate');
+      expect(md).toContain('agLabourScaleUpFactor');
+      expect(md).toContain('| lowFuelTransitionBaseline |');
+      expect(md).toContain('40836.74');
       expect(md).toMatch(/low-fuel transition baseline.*0\.70|0\.7/i);
 
       const email = fs.readFileSync(built.paths.emailSummaryPath, 'utf8');

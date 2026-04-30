@@ -304,6 +304,52 @@ Outputs:
 - `know/produce/grey-fuel-fertilizer-shock-scenarios.csv`
 - `know/produce/grey-fuel-fertilizer-shock-labour.csv`
 
+### Current-system shock thresholds
+
+```bash
+npm run report:grey:current-shock-threshold
+```
+
+This report estimates when fuel/input shocks begin to create serious stress in the current supply-chain-dependent system, before assuming local resilience adaptations are in place.
+
+Outputs:
+
+- `know/produce/grey-current-system-shock-threshold.md`
+- `know/produce/grey-current-system-shock-threshold.json`
+- `know/produce/grey-current-system-shock-threshold-scenarios.csv`
+- `know/produce/grey-current-system-shock-threshold-households.csv`
+
+### Food gap replacement by production modality
+
+```bash
+npm run report:grey:food-gap-replacement
+```
+
+This report estimates how much land and labour would be needed to replace food losses under input-shock scenarios, comparing market gardens, hand-tool systems, low-input annuals, greenhouses, and perennial/permaculture systems.
+
+Outputs:
+
+- `know/produce/grey-food-gap-replacement.md`
+- `know/produce/grey-food-gap-replacement.json`
+- `know/produce/grey-food-gap-replacement-scenarios.csv`
+- `know/produce/grey-food-gap-replacement-modalities.csv`
+- `know/produce/grey-food-gap-replacement-timeline.csv`
+
+### Food supply-demand and price pressure
+
+```bash
+npm run report:grey:food-price
+```
+
+This report estimates how household self-provisioning, surplus local production, storage/loss reduction, and food shocks affect market demand, local supply, price pressure, and food insecurity risk.
+
+Outputs:
+
+- `know/produce/grey-food-supply-demand-price.md`
+- `know/produce/grey-food-supply-demand-price.json`
+- `know/produce/grey-food-supply-demand-price-scenarios.csv`
+- `know/produce/grey-food-supply-demand-price-households.csv`
+
 ### Transition pathway comparison
 
 ```bash
@@ -319,6 +365,20 @@ Outputs:
 - `know/produce/grey-transition-pathways-scenarios.csv`
 - `know/produce/grey-transition-pathways-human-impact.csv`
 - `know/produce/grey-transition-pathways-timeline.csv`
+
+### Plain-English briefing
+
+```bash
+npm run report:grey:briefing
+```
+
+Generates a plain-English briefing and email-ready summary using current Grey report outputs. It is a civic planning diagnostic summary, not an official forecast.
+
+Outputs:
+
+- `know/produce/grey-plain-english-briefing.md`
+- `know/produce/grey-plain-english-briefing.json`
+- `know/produce/grey-plain-english-email-summary.md`
 
 ### Localization access baseline
 
