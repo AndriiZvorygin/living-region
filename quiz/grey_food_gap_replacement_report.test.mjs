@@ -72,9 +72,13 @@ describe('grey food gap replacement report', () => {
 
       const severe = report.foodGapScenarios.find((s) => s.scenario === 'severeSystemicInputLoss33');
       expect(severe.sourceStatus).toContain('assumption');
+      expect(severe.globalFoodProductionLossShare).toBeCloseTo(0.33, 6);
+      expect(severe.localFoodAvailabilityLossShare).toBeLessThan(0.33);
+      expect(String(severe.interpretation)).toContain('global');
 
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
       expect(md).toContain('severe scenario assumption, not a forecast');
+      expect(md).toContain('not the same as Grey County having one-third less local food');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

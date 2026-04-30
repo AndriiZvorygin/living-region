@@ -96,6 +96,17 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     sourceStatus: 'Canada/Ontario external anchor unless local Grey data loaded',
     measuredFoodInsecurityEstimate: totalPopulation * defaultMeasuredFoodInsecurityShare
   };
+  const severeSystemicInputLoss33Framing = {
+    globalFoodProductionLossShare: 0.33,
+    localFoodAvailabilityLossShare: 0.12,
+    importPricePressureMultiplier: 1.55,
+    localProductionShockShare: 0.08,
+    tradeCompetitionIndex: 0.85,
+    poorCountryDisproportionateImpactNote: 'Global shock harms poorer countries and lower-income households first and hardest.',
+    householdAffordabilityTransmissionShare: 0.72,
+    sourceStatus: 'severe global scenario assumption, not forecast',
+    interpretation: 'global price/availability shock, not direct local crop failure'
+  };
   const localSoupKitchenMealsPerDay = options.localSoupKitchenMealsPerDay ?? null;
   const localFoodBankUsageIndex = options.localFoodBankUsageIndex ?? null;
   const emergencyFoodDemandStatus = options.emergencyFoodDemandStatus ?? null;
@@ -410,6 +421,7 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
       lagModelConfigurableAssumption: true,
       vulnerabilityToMeasuredFoodInsecurityConversionFactor
     },
+    severeSystemicInputLoss33Framing,
     measuredFoodInsecurityAnchor,
     foodInsecurityTrendBaseline,
     foodInsecurityTrendProjection: trendProjection,
@@ -446,6 +458,7 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     localEmergencyFoodDemandContext: localContext,
     caveats: [
       'This report models the current supply-chain-dependent system and does not assume local resilience already exists.',
+      'A one-third global food production loss is not the same as Grey County having one-third less local food. In Grey, the main near-term channel is higher prices, tighter trade, import competition, and household affordability stress.',
       'Not a price forecast.',
       'Not an exact hunger forecast.',
       'Lag timing is scenario-based and configurable.'

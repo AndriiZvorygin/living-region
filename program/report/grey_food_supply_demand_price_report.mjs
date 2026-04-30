@@ -45,9 +45,50 @@ const SCENARIO_MATRIX = [
   { scenario: 'shock20CombinedLocalResponse', shockProfile: 'fuelShock20', householdProductionScenario: 'fullLandAccessMobilization' },
   { scenario: 'shock40NoAdaptation', shockProfile: 'fuelShock40', householdProductionScenario: 'noHouseholdProduction' },
   { scenario: 'shock40CombinedLocalResponse', shockProfile: 'fuelShock40', householdProductionScenario: 'fullLandAccessMobilization' },
-  { scenario: 'severeSystemicInputLoss33NoAdaptation', shockProfile: 'fuelShock33', householdProductionScenario: 'noHouseholdProduction' },
-  { scenario: 'severeSystemicInputLoss33CombinedResponse', shockProfile: 'fuelShock33', householdProductionScenario: 'fullLandAccessMobilization' }
+  {
+    scenario: 'severeSystemicInputLoss33NoAdaptation',
+    shockProfile: 'fuelShock33',
+    householdProductionScenario: 'noHouseholdProduction',
+    globalFoodProductionLossShare: 0.33,
+    localFoodAvailabilityLossShare: 0.12,
+    importPricePressureMultiplier: 1.55,
+    localProductionShockShare: 0.08,
+    tradeCompetitionIndex: 0.85,
+    householdAffordabilityTransmissionShare: 0.72,
+    poorCountryDisproportionateImpactNote: 'Global shock harms poorer countries and lower-income households first and hardest.',
+    sourceStatus: 'severe global scenario assumption, not forecast',
+    interpretation: 'global price/availability shock, not direct local crop failure'
+  },
+  {
+    scenario: 'severeSystemicInputLoss33CombinedResponse',
+    shockProfile: 'fuelShock33',
+    householdProductionScenario: 'fullLandAccessMobilization',
+    globalFoodProductionLossShare: 0.33,
+    localFoodAvailabilityLossShare: 0.12,
+    importPricePressureMultiplier: 1.55,
+    localProductionShockShare: 0.08,
+    tradeCompetitionIndex: 0.85,
+    householdAffordabilityTransmissionShare: 0.72,
+    poorCountryDisproportionateImpactNote: 'Global shock harms poorer countries and lower-income households first and hardest.',
+    sourceStatus: 'severe global scenario assumption, not forecast',
+    interpretation: 'global price/availability shock, not direct local crop failure'
+  },
+  { scenario: 'trend2027NoNewShockNoLocalResponse', shockProfile: 'fuelShock0', householdProductionScenario: 'noHouseholdProduction', baselineTrendYear: 2027, trendOnly: true },
+  { scenario: 'trend2027NoNewShockGardenContribution', shockProfile: 'fuelShock0', householdProductionScenario: 'gardenContribution', baselineTrendYear: 2027, trendOnly: true },
+  { scenario: 'trend2027NoNewShockSubsistenceMobilization25Pct', shockProfile: 'fuelShock0', householdProductionScenario: 'subsistenceMobilization25Pct', baselineTrendYear: 2027, trendOnly: true },
+  { scenario: 'trend2027NoNewShockCombinedLocalResponse', shockProfile: 'fuelShock0', householdProductionScenario: 'fullLandAccessMobilization', baselineTrendYear: 2027, trendOnly: true }
 ];
+
+function trendBaselineShareForYear(currentShock, year) {
+  const projection = currentShock.foodInsecurityTrendProjection ?? {};
+  const centralRows = Array.isArray(projection.central) ? projection.central : [];
+  const byYear = centralRows.find((r) => n(r.year) === n(year));
+  if (byYear) {
+    const share = n(byYear.projectedMeasuredFoodInsecurityShareWithoutShock, NaN);
+    if (Number.isFinite(share) && share > 0) return share;
+  }
+  return year >= 2027 ? 0.30 : 0.25;
+}
 
 export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
@@ -67,6 +108,8 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
   const currentAgIndustryFTEEstimate = n(agLabour.currentAgIndustryFTEEstimate, 3918.43);
   const measuredFoodInsecurityShare = n(currentShock.measuredFoodInsecurityAnchor?.defaultMeasuredFoodInsecurityShare, 0.25);
   const measuredFoodInsecurityBaselineEstimate = population * measuredFoodInsecurityShare;
+  const baselineTrendFoodInsecurityShare2027 = trendBaselineShareForYear(currentShock, 2027);
+  const baselineTrendFoodInsecurityEstimate2027 = population * baselineTrendFoodInsecurityShare2027;
   const subsistencePopulation = n(dwelling.estimatedPopulationWithSubsistencePotential, 54949);
   const noDirectLandAccessPopulation = n(dwelling.estimatedPopulationNoDirectLandAccess, 7990);
   const totalDwellings = n(dwelling.totalDwellings, n((dwelling.thresholdSensitivity ?? []).find((x) => x.thresholdScenario === 'baseline')?.populationAtOrAboveSubsistence, 50183));
@@ -240,12 +283,44 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     }
 
     const central = profileResults.centralPriceResponse;
-    const baselineComp = scenarioResults.find((x) => x.shockProfile === row.shockProfile && x.householdProductionScenario === 'noHouseholdProduction');
+    const baselineComp = scenarioResults.find((x) => x.shockProfile === row.shockProfile && x.householdProductionScenario === 'noHouseholdProduction' && !x.trendOnly);
     const foodInsecurityAvoidedVsNoAdaptation = baselineComp ? Math.max(0, baselineComp.calibratedFoodInsecurityEstimate - central.calibratedFoodInsecurityEstimate) : 0;
     const severeFoodStressAvoidedVsNoAdaptation = foodInsecurityAvoidedVsNoAdaptation * 0.35;
+    const trendOnly = row.trendOnly === true;
+    const baselineTrendYear = n(row.baselineTrendYear, 2027);
+    const baselineTrendFoodInsecurityEstimate = population * trendBaselineShareForYear(currentShock, baselineTrendYear);
+    const adjustedCalibratedEstimate = trendOnly
+      ? clamp(
+        baselineTrendFoodInsecurityEstimate
+          + (central.foodPricePressureIndex * population * 0.03)
+          - (hp.reducedMarketDemandGJ / Math.max(1, totalFoodDemandGJ)) * population * 0.08
+          - (hp.addedLocalSupplyGJ / Math.max(1, totalFoodDemandGJ)) * population * 0.06,
+        measuredFoodInsecurityBaselineEstimate * 0.9,
+        population * 0.9
+      )
+      : central.calibratedFoodInsecurityEstimate;
+    const trendBaselineComp = trendOnly
+      ? scenarioResults.find((x) => x.trendOnly && n(x.baselineTrendYear) === baselineTrendYear && x.householdProductionScenario === 'noHouseholdProduction')
+      : null;
+    const foodInsecurityAvoidedVsTrendNoResponse = trendOnly && trendBaselineComp
+      ? Math.max(0, trendBaselineComp.calibratedFoodInsecurityEstimate - adjustedCalibratedEstimate)
+      : 0;
 
     const scenarioOut = {
       scenario: row.scenario,
+      trendOnly,
+      baselineTrendYear,
+      baselineTrendFoodInsecurityEstimate2027,
+      baselineTrendFoodInsecurityEstimate,
+      globalFoodProductionLossShare: n(row.globalFoodProductionLossShare, 0),
+      localFoodAvailabilityLossShare: n(row.localFoodAvailabilityLossShare, n(shock.fuelShockPct, 0) / 100),
+      importPricePressureMultiplier: n(row.importPricePressureMultiplier, 1 + (n(shock.fuelShockPct, 0) / 100)),
+      localProductionShockShare: n(row.localProductionShockShare, n(shock.fuelShockPct, 0) / 300),
+      tradeCompetitionIndex: n(row.tradeCompetitionIndex, 0.5),
+      householdAffordabilityTransmissionShare: n(row.householdAffordabilityTransmissionShare, 0.6),
+      poorCountryDisproportionateImpactNote: row.poorCountryDisproportionateImpactNote ?? null,
+      sourceStatus: row.sourceStatus ?? 'model scenario',
+      interpretation: row.interpretation ?? 'local+external mixed pressure',
       shockProfile: row.shockProfile,
       householdProductionScenario: row.householdProductionScenario,
       totalFoodDemandGJ,
@@ -266,13 +341,19 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
       foodPricePressureIndex: central.foodPricePressureIndex,
       foodPriceMultiplierEstimate: central.foodPriceMultiplierEstimate,
       affordabilityStressIndex: central.affordabilityStressIndex,
-      calibratedFoodInsecurityEstimate: central.calibratedFoodInsecurityEstimate,
-      additionalFoodInsecurePeopleVsTrend: Math.max(0, central.calibratedFoodInsecurityEstimate - measuredFoodInsecurityBaselineEstimate),
+      calibratedFoodInsecurityEstimate: adjustedCalibratedEstimate,
+      additionalFoodInsecurePeopleVsTrend: Math.max(0, adjustedCalibratedEstimate - measuredFoodInsecurityBaselineEstimate),
       foodInsecurityAvoidedVsNoAdaptation,
+      foodInsecurityAvoidedVsTrendNoResponse,
       severeFoodStressAvoidedVsNoAdaptation,
       householdsMarketDemandReduced: hp.householdsParticipating,
       populationMarketDemandReduced: hp.householdsParticipating * 2.05,
       householdsProducingSurplus: hp.householdsParticipating * hp.surplusShare,
+      householdsParticipating: hp.householdsParticipating,
+      additionalFoodWorkersNeeded: hp.workersOrHouseholdLabourNeeded,
+      workerModeNotes: trendOnly
+        ? 'Trend-only local response: mixed household growers, surplus growers, and market-oriented local producers.'
+        : 'Shock response: additional growers plus distribution and storage coordination.',
       localSupplyAddedGJ: hp.addedLocalSupplyGJ + storageLossReductionEffectiveSupply,
       noDirectLandAccessRemainingVulnerable: noDirectLandAccessPopulation,
       mainBottleneck: supplyDemandRatio < 0.9 ? 'external_supply_gap' : (hp.workersOrHouseholdLabourNeeded > currentAgIndustryFTEEstimate * 2 ? 'labour_coordination' : 'distribution_storage'),
@@ -320,6 +401,8 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     population,
     totalFoodDemandGJ,
     measuredFoodInsecurityBaselineEstimate,
+    baselineTrendFoodInsecurityEstimate2027,
+    baselineTrendFoodInsecurityShare2027,
     measuredFoodInsecurityShare,
     currentAgIndustryFTEEstimate,
     subsistencePopulation,
@@ -329,6 +412,7 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
   };
 
   const caveats = [
+    'A one-third global food production loss is not the same as Grey County having one-third less local food. In Grey, the main near-term channel is higher prices, tighter trade, import competition, and household affordability stress.',
     'foodPriceMultiplierEstimate is a modelled price-pressure proxy. It is not a retail food price forecast.',
     'Price-pressure model is a proxy, not a price forecast.',
     'Household production does not replace full diet immediately.',
@@ -365,7 +449,9 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     keyResults: {
       shock20NoAdaptation: scenarioResults.find((s) => s.scenario === 'shock20NoAdaptation') ?? null,
       shock20CombinedLocalResponse: scenarioResults.find((s) => s.scenario === 'shock20CombinedLocalResponse') ?? null,
-      severeSystemicInputLoss33CombinedResponse: scenarioResults.find((s) => s.scenario === 'severeSystemicInputLoss33CombinedResponse') ?? null
+      severeSystemicInputLoss33CombinedResponse: scenarioResults.find((s) => s.scenario === 'severeSystemicInputLoss33CombinedResponse') ?? null,
+      trend2027NoNewShockNoLocalResponse: scenarioResults.find((s) => s.scenario === 'trend2027NoNewShockNoLocalResponse') ?? null,
+      trend2027NoNewShockCombinedLocalResponse: scenarioResults.find((s) => s.scenario === 'trend2027NoNewShockCombinedLocalResponse') ?? null
     }
   };
 
@@ -374,6 +460,7 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     '',
     '## Bottom line',
     'Food prices are affected by both supply and demand. Local production can help two ways: households growing for themselves reduce market demand, while surplus growers and farms increase local supply.',
+    'A one-third global food production loss is not the same as Grey County having one-third less local food. In Grey, the main near-term channel is higher prices, tighter trade, import competition, and household affordability stress.',
     '',
     '## Current-system exposure',
     `About ${(scenarioResults.find((s) => s.scenario === 'currentSystemBaseline')?.importDependencyShare * 100 || 0).toFixed(1)}% of effective supply remains import-exposed in this baseline model.`,
@@ -393,6 +480,12 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     '| --- | --- | ---: | ---: | ---: | ---: |',
     ...scenarioResults.filter((s) => ['shock20NoAdaptation', 'shock20CombinedLocalResponse', 'shock40NoAdaptation', 'shock40CombinedLocalResponse', 'severeSystemicInputLoss33NoAdaptation', 'severeSystemicInputLoss33CombinedResponse'].includes(s.scenario)).map((s) => `| ${s.shockProfile} | ${s.householdProductionScenario} | ${s.supplyDemandRatio.toFixed(3)} | ${s.foodPricePressureIndex.toFixed(3)} | ${s.calibratedFoodInsecurityEstimate.toFixed(0)} | ${s.foodInsecurityAvoidedVsNoAdaptation.toFixed(0)} |`),
     '',
+    '## Trend-only local response',
+    'This is the no-new-shock case. It asks how much local production/storage/distribution could reduce food insecurity under the existing trend-only baseline.',
+    '| Scenario | Baseline trend food insecurity (2027) | Reduced market demand (GJ) | Added local supply (GJ) | Food price pressure | Calibrated food insecurity | Avoided vs trend no-response | Households participating | Additional food workers needed |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
+    ...scenarioResults.filter((s) => s.trendOnly).map((s) => `| ${s.scenario} | ${s.baselineTrendFoodInsecurityEstimate2027.toFixed(0)} | ${s.reducedMarketDemandGJ.toFixed(0)} | ${s.addedLocalSupplyGJ.toFixed(0)} | ${s.foodPricePressureIndex.toFixed(3)} | ${s.calibratedFoodInsecurityEstimate.toFixed(0)} | ${s.foodInsecurityAvoidedVsTrendNoResponse.toFixed(0)} | ${s.householdsParticipating.toFixed(0)} | ${s.additionalFoodWorkersNeeded.toFixed(0)} |`),
+    '',
     '## Who remains vulnerable',
     'No-direct-land-access households remain most exposed unless food aid, public kitchens, co-ops, or local distribution bridges the gap.',
     '',
@@ -411,6 +504,9 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     scenario: s.scenario,
     shockProfile: s.shockProfile,
     householdProductionScenario: s.householdProductionScenario,
+    trendOnly: s.trendOnly,
+    baselineTrendYear: s.baselineTrendYear,
+    baselineTrendFoodInsecurityEstimate2027: s.baselineTrendFoodInsecurityEstimate2027,
     totalFoodDemandGJ: s.totalFoodDemandGJ,
     reducedMarketDemandGJ: s.reducedMarketDemandGJ,
     addedLocalSupplyGJ: s.addedLocalSupplyGJ,
@@ -424,13 +520,17 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     foodPriceMultiplierEstimate: s.foodPriceMultiplierEstimate,
     calibratedFoodInsecurityEstimate: s.calibratedFoodInsecurityEstimate,
     foodInsecurityAvoidedVsNoAdaptation: s.foodInsecurityAvoidedVsNoAdaptation,
+    foodInsecurityAvoidedVsTrendNoResponse: s.foodInsecurityAvoidedVsTrendNoResponse,
+    householdsParticipating: s.householdsParticipating,
+    additionalFoodWorkersNeeded: s.additionalFoodWorkersNeeded,
+    workerModeNotes: s.workerModeNotes,
     mainBottleneck: s.mainBottleneck,
     confidence: s.confidence
   })), [
-    'scenario', 'shockProfile', 'householdProductionScenario', 'totalFoodDemandGJ', 'reducedMarketDemandGJ', 'addedLocalSupplyGJ',
+    'scenario', 'shockProfile', 'householdProductionScenario', 'trendOnly', 'baselineTrendYear', 'baselineTrendFoodInsecurityEstimate2027', 'totalFoodDemandGJ', 'reducedMarketDemandGJ', 'addedLocalSupplyGJ',
     'remainingMarketDemandGJ', 'externalSupplyGJ', 'effectiveSupplyGJ', 'supplyDemandRatio', 'localSupplyShare', 'exposedDemandShare',
-    'foodPricePressureIndex', 'foodPriceMultiplierEstimate', 'calibratedFoodInsecurityEstimate', 'foodInsecurityAvoidedVsNoAdaptation',
-    'mainBottleneck', 'confidence'
+    'foodPricePressureIndex', 'foodPriceMultiplierEstimate', 'calibratedFoodInsecurityEstimate', 'foodInsecurityAvoidedVsNoAdaptation', 'foodInsecurityAvoidedVsTrendNoResponse',
+    'householdsParticipating', 'additionalFoodWorkersNeeded', 'workerModeNotes', 'mainBottleneck', 'confidence'
   ])}\n`);
   fs.writeFileSync(householdsCsvPath, `${toCsv(householdRows, [
     'scenario', 'demandSegment', 'population', 'dwellings', 'marketDemandShare', 'selfProvisionPotentialShare',

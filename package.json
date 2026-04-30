@@ -68,7 +68,8 @@
     "check:food-energy-terms": "node command/check_food_energy_terms.mjs",
     "test": "vitest run",
     "report:grey:food-gap-replacement": "node command/report_grey_food_gap_replacement.mjs",
-    "report:grey:food-price": "node command/report_grey_food_supply_demand_price.mjs"
+    "report:grey:food-price": "node command/report_grey_food_supply_demand_price.mjs",
+    "report:grey:food-insecurity-trends": "node command/report_grey_food_insecurity_trends.mjs"
   },
   "keywords": [
     "regional-planning",

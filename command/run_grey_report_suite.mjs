@@ -73,6 +73,7 @@ export function buildCommandPlan(options = {}, fsState = {}) {
   plan.push(cmd('report:grey:ag-labour'));
   plan.push(cmd('report:grey:food-calibration'));
   plan.push(cmd('report:grey:current-shock-threshold'));
+  plan.push(cmd('report:grey:food-insecurity-trends'));
   plan.push(cmd('report:grey:food-gap-replacement'));
   plan.push(cmd('report:grey:food-price'));
   plan.push(cmd('report:grey:fuel-shock'));
@@ -115,6 +116,7 @@ export function extractKeyIndicators(data = {}) {
   const foodCal = data.foodCalibration ?? {};
   const fuelShock = data.fuelShock ?? {};
   const foodGapReplacement = data.foodGapReplacement ?? {};
+  const foodInsecurityTrends = data.foodInsecurityTrends ?? {};
   const foodPrice = data.foodPrice ?? {};
   const transitionPathways = data.transitionPathways ?? {};
   const currentShockThreshold = data.currentShockThreshold ?? {};
@@ -156,6 +158,10 @@ export function extractKeyIndicators(data = {}) {
     foodGap33Year1GapCovered: Number(foodGapReplacement.keyResults?.foodGap33EmergencyYear1Package?.year1CoverageOfGap ?? 0),
     foodGap33Year10GapCovered: Number(foodGapReplacement.keyResults?.foodGap33TenYearResiliencePackage?.year10CoverageOfGap ?? 0),
     severeSystemicInputLoss33MainBottleneck: foodGapReplacement.keyResults?.severeSystemicInputLoss33MainBottleneck ?? null,
+    projected2027TrendCentral: Number(foodInsecurityTrends.projected2027TrendCentral ?? 0),
+    topTrendDrivers: Array.isArray(foodInsecurityTrends.topDrivers) ? foodInsecurityTrends.topDrivers.join('; ') : null,
+    landConsolidationDataStatus: foodInsecurityTrends.landConsolidationDataStatus ?? null,
+    unexplainedTrendShare: Number(foodInsecurityTrends.unexplainedTrendShare ?? 0),
     shock20NoAdaptationFoodPriceMultiplierEstimate: Number(foodPrice.keyResults?.shock20NoAdaptation?.foodPriceMultiplierEstimate ?? 0),
     shock20CombinedLocalResponseFoodPriceMultiplierEstimate: Number(foodPrice.keyResults?.shock20CombinedLocalResponse?.foodPriceMultiplierEstimate ?? 0),
     shock20FoodInsecurityAvoidedVsNoAdaptation: Number(foodPrice.keyResults?.shock20CombinedLocalResponse?.foodInsecurityAvoidedVsNoAdaptation ?? 0),
@@ -242,6 +248,10 @@ function buildSuiteSummaryMarkdown(summary) {
     `- foodGap33 year1 gap covered: ${k.foodGap33Year1GapCovered?.toFixed?.(3) ?? k.foodGap33Year1GapCovered}`,
     `- foodGap33 year10 gap covered: ${k.foodGap33Year10GapCovered?.toFixed?.(3) ?? k.foodGap33Year10GapCovered}`,
     `- severeSystemicInputLoss33 main bottleneck: ${k.severeSystemicInputLoss33MainBottleneck ?? 'unknown'}`,
+    `- projected2027TrendCentral: ${k.projected2027TrendCentral?.toFixed?.(3) ?? k.projected2027TrendCentral}`,
+    `- topTrendDrivers: ${k.topTrendDrivers ?? 'unknown'}`,
+    `- landConsolidationDataStatus: ${k.landConsolidationDataStatus ?? 'unknown'}`,
+    `- unexplainedTrendShare: ${k.unexplainedTrendShare?.toFixed?.(3) ?? k.unexplainedTrendShare}`,
     `- shock20 no-adaptation foodPriceMultiplierEstimate: ${k.shock20NoAdaptationFoodPriceMultiplierEstimate?.toFixed?.(3) ?? k.shock20NoAdaptationFoodPriceMultiplierEstimate}`,
     `- shock20 combined local response foodPriceMultiplierEstimate: ${k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate?.toFixed?.(3) ?? k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate}`,
     `- shock20 foodInsecurityAvoidedVsNoAdaptation: ${k.shock20FoodInsecurityAvoidedVsNoAdaptation?.toFixed?.(0) ?? k.shock20FoodInsecurityAvoidedVsNoAdaptation}`,
@@ -315,6 +325,7 @@ export function runGreyReportSuite(options = {}) {
   const foodCalibration = readJsonIfExists(path.join(produceDir, 'grey-food-calibration.json'), warnings, 'food calibration');
   const fuelShock = readJsonIfExists(path.join(produceDir, 'grey-fuel-fertilizer-shock.json'), warnings, 'fuel/fertilizer shock report');
   const foodGapReplacement = readJsonIfExists(path.join(produceDir, 'grey-food-gap-replacement.json'), warnings, 'food gap replacement report');
+  const foodInsecurityTrends = readJsonIfExists(path.join(produceDir, 'grey-food-insecurity-trend-drivers.json'), warnings, 'food insecurity trend drivers report');
   const foodPrice = readJsonIfExists(path.join(produceDir, 'grey-food-supply-demand-price.json'), warnings, 'food supply-demand-price report');
   const currentShockThreshold = readJsonIfExists(path.join(produceDir, 'grey-current-system-shock-threshold.json'), warnings, 'current shock threshold report');
   const transitionPathways = readJsonIfExists(path.join(produceDir, 'grey-transition-pathways.json'), warnings, 'transition pathways report');
@@ -332,6 +343,7 @@ export function runGreyReportSuite(options = {}) {
     ...(foodCalibration?.warnings ?? []),
     ...(currentShockThreshold?.warnings ?? []),
     ...(foodGapReplacement?.warnings ?? []),
+    ...(foodInsecurityTrends?.warnings ?? []),
     ...(foodPrice?.warnings ?? []),
     ...(fuelShock?.warnings ?? []),
     ...(transitionPathways?.warnings ?? []),
@@ -352,6 +364,7 @@ export function runGreyReportSuite(options = {}) {
     agLabour,
     foodCalibration,
     currentShockThreshold,
+    foodInsecurityTrends,
     foodGapReplacement,
     foodPrice,
     fuelShock,
@@ -442,6 +455,10 @@ function printSummary(summary) {
   console.log(`  - foodGap33 year1 gap covered: ${Number(k.foodGap33Year1GapCovered).toFixed(3)}`);
   console.log(`  - foodGap33 year10 gap covered: ${Number(k.foodGap33Year10GapCovered).toFixed(3)}`);
   console.log(`  - severeSystemicInputLoss33 main bottleneck: ${k.severeSystemicInputLoss33MainBottleneck ?? 'unknown'}`);
+  console.log(`  - projected2027TrendCentral: ${Number(k.projected2027TrendCentral).toFixed(3)}`);
+  console.log(`  - topTrendDrivers: ${k.topTrendDrivers ?? 'unknown'}`);
+  console.log(`  - landConsolidationDataStatus: ${k.landConsolidationDataStatus ?? 'unknown'}`);
+  console.log(`  - unexplainedTrendShare: ${Number(k.unexplainedTrendShare).toFixed(3)}`);
   console.log(`  - shock20 no-adaptation foodPriceMultiplierEstimate: ${Number(k.shock20NoAdaptationFoodPriceMultiplierEstimate).toFixed(3)}`);
   console.log(`  - shock20 combined local response foodPriceMultiplierEstimate: ${Number(k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate).toFixed(3)}`);
   console.log(`  - shock20 foodInsecurityAvoidedVsNoAdaptation: ${Number(k.shock20FoodInsecurityAvoidedVsNoAdaptation).toFixed(0)}`);

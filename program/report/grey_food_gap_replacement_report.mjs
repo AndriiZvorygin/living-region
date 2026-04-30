@@ -29,8 +29,16 @@ const FOOD_GAP_SCENARIOS = [
   {
     scenario: 'severeSystemicInputLoss33',
     foodAvailabilityLossShare: 0.33,
+    globalFoodProductionLossShare: 0.33,
+    localFoodAvailabilityLossShare: 0.12,
+    importPricePressureMultiplier: 1.55,
+    localProductionShockShare: 0.08,
+    tradeCompetitionIndex: 0.85,
+    householdAffordabilityTransmissionShare: 0.72,
+    poorCountryDisproportionateImpactNote: 'Global shock harms poorer countries and lower-income households first and hardest.',
     assumedCause: 'fuel+fertilizer+sulfur/phosphate+nitrogen/logistics combined disruption',
-    sourceStatus: 'user-provided/systemic diagnosis assumption, needs external calibration'
+    sourceStatus: 'severe global scenario assumption, not forecast',
+    interpretation: 'global price/availability shock, not direct local crop failure'
   },
   { scenario: 'extremeFoodGap50', foodAvailabilityLossShare: 0.50, assumedCause: 'extreme multi-input loss', sourceStatus: 'model scenario' }
 ];
@@ -274,9 +282,11 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
   const candidateLandHa = n(foodCalibration.humanFoodPriorityHa, n(foodCalibration.foodRelevantLandHa, 18056.83));
 
   const scenarios = FOOD_GAP_SCENARIOS.map((s) => {
-    const foodGapGJ = totalDemandGJ * s.foodAvailabilityLossShare;
+    const localLossShare = s.localFoodAvailabilityLossShare ?? s.foodAvailabilityLossShare;
+    const foodGapGJ = totalDemandGJ * localLossShare;
     return {
       ...s,
+      localFoodAvailabilityLossShare: localLossShare,
       foodGapGJ,
       foodGapMealsEquivalent: foodGapGJ * MEALS_PER_GJ,
       foodGapPopulationEquivalent: annualFoodEnergyGJPerPerson > 0 ? (foodGapGJ / annualFoodEnergyGJPerPerson) : 0
@@ -478,11 +488,13 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     candidateLandHa,
     year1RampConstraints: YEAR1_RAMP_CONSTRAINTS,
     severeSystemicInputLoss33: 'Scenario assumption only; not a forecast.',
+    severeSystemicInputLoss33Interpretation: 'Global price/import shock channel dominates near-term local impact; not automatic one-third local production loss.',
     sourceStatus: 'user-provided/systemic diagnosis assumption, needs external calibration'
   };
 
   const caveats = [
     'A one-third global food/input loss scenario is a severe assumption, not a forecast.',
+    'A one-third global food production loss is not the same as Grey County having one-third less local food; near-term impact is mainly price/import/affordability stress.',
     'Labour and land replacement numbers are scenario diagnostics, not implementation plans.',
     'Modalities differ by calorie replacement speed; fast nutrition systems are not always fast staple systems.',
     'Storage, processing, logistics, and skills can bind before land area.'
@@ -548,6 +560,7 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     '',
     '## Important caveat',
     'A one-third global food production loss is a severe scenario assumption, not a forecast. It is included because systemic input disruption can affect oil, nitrogen, sulfur/phosphate fertilizer, shipping, processing, and packaging at the same time.',
+    'A one-third global food production loss is not the same as Grey County having one-third less local food. In Grey, the main near-term channel is higher prices, tighter trade, import competition, and household affordability stress.',
     '',
     '## Food gap scenarios',
     '| Scenario | Food availability loss | GJ gap | Population-equivalent gap | Source status |',

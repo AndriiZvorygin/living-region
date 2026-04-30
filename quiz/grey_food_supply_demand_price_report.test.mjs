@@ -40,6 +40,10 @@ describe('grey food supply-demand-price report', () => {
       const s20Garden = rows.find((r) => r.scenario === 'shock20GardenContribution');
       const s20Combined = rows.find((r) => r.scenario === 'shock20CombinedLocalResponse');
       const s40No = rows.find((r) => r.scenario === 'shock40NoAdaptation');
+      const severeCombined = rows.find((r) => r.scenario === 'severeSystemicInputLoss33CombinedResponse');
+      const trendNo = rows.find((r) => r.scenario === 'trend2027NoNewShockNoLocalResponse');
+      const trend25 = rows.find((r) => r.scenario === 'trend2027NoNewShockSubsistenceMobilization25Pct');
+      const trendCombined = rows.find((r) => r.scenario === 'trend2027NoNewShockCombinedLocalResponse');
       expect(s20Garden.reducedMarketDemandGJ).toBeGreaterThan(s20No.reducedMarketDemandGJ);
       expect(s20Garden.addedLocalSupplyGJ).toBeGreaterThan(s20No.addedLocalSupplyGJ);
       expect(s20Garden.foodPricePressureIndex).toBeLessThan(s20No.foodPricePressureIndex);
@@ -48,9 +52,17 @@ describe('grey food supply-demand-price report', () => {
       expect(s40No.foodPricePressureIndex).toBeGreaterThan(s20No.foodPricePressureIndex);
       expect(s20No.noDirectLandAccessRemainingVulnerable).toBeGreaterThan(0);
       expect(s20No.tightMarketFoodPriceMultiplierEstimate).toBeGreaterThan(s20No.conservativeFoodPriceMultiplierEstimate);
+      expect(severeCombined.globalFoodProductionLossShare).toBeCloseTo(0.33, 6);
+      expect(severeCombined.localFoodAvailabilityLossShare).toBeLessThan(0.33);
+      expect(String(severeCombined.interpretation)).toContain('global');
+      expect(trendCombined.calibratedFoodInsecurityEstimate).toBeLessThan(trendNo.calibratedFoodInsecurityEstimate);
+      expect(trendCombined.foodInsecurityAvoidedVsTrendNoResponse).toBeGreaterThan(0);
+      expect(trend25.additionalFoodWorkersNeeded).toBeGreaterThan(0);
+      expect(trendCombined.additionalFoodWorkersNeeded).toBeGreaterThan(trendNo.additionalFoodWorkersNeeded);
 
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
       expect(md).toContain('proxy, not a price forecast');
+      expect(md.toLowerCase()).toContain('trend-only');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

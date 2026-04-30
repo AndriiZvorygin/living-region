@@ -25,6 +25,7 @@ describe('grey report suite command', () => {
     expect(def.some((x) => x.script === 'report:grey:farm-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:ag-labour')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:current-shock-threshold')).toBe(true);
+    expect(def.some((x) => x.script === 'report:grey:food-insecurity-trends')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:food-gap-replacement')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:food-price')).toBe(true);
     expect(def.some((x) => x.script === 'report:grey:fuel-shock')).toBe(true);
@@ -70,6 +71,12 @@ describe('grey report suite command', () => {
           severeSystemicInputLoss33MainBottleneck: 'labour'
         }
       },
+      foodInsecurityTrends: {
+        projected2027TrendCentral: 0.30,
+        topDrivers: ['foodPriceInflationPressure', 'globalFoodPricePressure'],
+        landConsolidationDataStatus: 'missingData',
+        unexplainedTrendShare: 0.12
+      },
       foodPrice: {
         keyResults: {
           shock20NoAdaptation: { foodPriceMultiplierEstimate: 1.8 },
@@ -109,6 +116,10 @@ describe('grey report suite command', () => {
     expect(k.foodGap33Year1GapCovered).toBeCloseTo(0.2, 6);
     expect(k.foodGap33Year10GapCovered).toBeCloseTo(0.7, 6);
     expect(k.severeSystemicInputLoss33MainBottleneck).toBe('labour');
+    expect(k.projected2027TrendCentral).toBeCloseTo(0.30, 6);
+    expect(String(k.topTrendDrivers)).toContain('globalFoodPricePressure');
+    expect(k.landConsolidationDataStatus).toBe('missingData');
+    expect(k.unexplainedTrendShare).toBeCloseTo(0.12, 6);
     expect(k.shock20NoAdaptationFoodPriceMultiplierEstimate).toBeCloseTo(1.8, 6);
     expect(k.shock20CombinedLocalResponseFoodPriceMultiplierEstimate).toBeCloseTo(1.5, 6);
     expect(k.shock20FoodInsecurityAvoidedVsNoAdaptation).toBe(1200);
