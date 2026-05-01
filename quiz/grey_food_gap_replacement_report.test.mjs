@@ -45,6 +45,12 @@ describe('grey food gap replacement report', () => {
       const fg33 = report.foodGapScenarios.find((s) => s.scenario === 'foodGap33');
       expect(fg33.foodGapGJ).toBeCloseTo(330, 6);
 
+      const fg10 = report.foodGapScenarios.find((s) => s.scenario === 'foodGap10');
+      const hh10 = report.modalityReplacementMatrix.find((r) => r.scenario === 'foodGap10' && r.modality === 'handToolHouseholdGarden');
+      const hhDef = report.productionModalities.find((m) => m.modality === 'handToolHouseholdGarden');
+      const expectedWorkers = fg10.foodGapGJ / (hhDef.usefulFoodEnergyGJPerHaYear1 * hhDef.landHaPerWorker);
+      expect(hh10.requiredWorkersYear1).toBeCloseTo(expectedWorkers, 6);
+
       const hand = report.modalityReplacementMatrix.find((r) => r.scenario === 'foodGap20' && r.modality === 'handToolHouseholdGarden');
       const lowInput = report.modalityReplacementMatrix.find((r) => r.scenario === 'foodGap20' && r.modality === 'lowInputAnnualField');
       expect(hand.requiredWorkersYear1).toBeGreaterThan(lowInput.requiredWorkersYear1);
@@ -87,6 +93,24 @@ describe('grey food gap replacement report', () => {
       const timelineY1 = report.timelineDiagnostics.find((r) => r.scenario === 'foodGap33' && r.package === 'emergencyYear1Package' && r.year === 1);
       expect(timelineY1.localProductionCoverageShare).toBeGreaterThan(0);
       expect(timelineY1.emergencyAidOrRationingCoverageShare).toBeGreaterThan(0);
+
+      for (const row of report.modalityReplacementMatrix) {
+        const def = report.productionModalities.find((m) => m.modality === row.modality);
+        const landPerWorker = def.landHaPerWorker;
+        const byTime = [
+          ['Year1', def.usefulFoodEnergyGJPerHaYear1, row.requiredHaYear1, row.requiredWorkersYear1],
+          ['Year3', def.usefulFoodEnergyGJPerHaYear3, row.requiredHaYear3, row.requiredWorkersYear3],
+          ['Year5', def.usefulFoodEnergyGJPerHaYear5, row.requiredHaYear5, row.requiredWorkersYear5],
+          ['Year10', def.usefulFoodEnergyGJPerHaYear10, row.requiredHaYear10, row.requiredWorkersYear10],
+          ['AtMaturity', def.netFoodEnergyGJPerHaAtMaturity, row.requiredHaAtMaturity, row.requiredWorkersAtMaturity]
+        ];
+        const scenario = report.foodGapScenarios.find((s) => s.scenario === row.scenario);
+        for (const [_label, gjPerHa, landRequired, workersRequired] of byTime) {
+          const workersFromFormula = scenario.foodGapGJ / (gjPerHa * landPerWorker);
+          expect(Math.abs((workersRequired * landPerWorker) - landRequired)).toBeLessThan(1e-6);
+          expect(Math.abs(workersRequired - workersFromFormula)).toBeLessThan(1e-6);
+        }
+      }
 
       const severe = report.foodGapScenarios.find((s) => s.scenario === 'severeSystemicInputLoss33');
       expect(severe.sourceStatus).toContain('assumption');

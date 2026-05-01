@@ -291,12 +291,6 @@ function usefulGjPerHa(modality, year) {
   return modality.netFoodEnergyGJPerHaAtMaturity;
 }
 
-function labourFtePerHa(modality, year) {
-  if (year <= 1) return modality.labourFTEPerHaYear1;
-  if (year <= 5) return modality.labourFTEPerHaYear1 * 0.75 + modality.labourFTEPerHaAtMaturity * 0.25;
-  return modality.labourFTEPerHaAtMaturity;
-}
-
 export function buildGreyFoodGapReplacementReport(options = {}) {
   const produceDir = path.resolve(options.produceDir ?? 'know/produce');
   fs.mkdirSync(produceDir, { recursive: true });
@@ -344,11 +338,12 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
       const requiredHaYear10 = scenario.foodGapGJ / gjYear10;
       const requiredHaAtMaturity = scenario.foodGapGJ / gjMaturity;
 
-      const requiredWorkersYear1 = requiredHaYear1 * labourFtePerHa(modality, 1);
-      const requiredWorkersYear3 = requiredHaYear3 * labourFtePerHa(modality, 3);
-      const requiredWorkersYear5 = requiredHaYear5 * labourFtePerHa(modality, 5);
-      const requiredWorkersYear10 = requiredHaYear10 * labourFtePerHa(modality, 10);
-      const requiredWorkersAtMaturity = requiredHaAtMaturity * labourFtePerHa(modality, 99);
+      const landHaPerWorker = Math.max(1e-9, n(modality.landHaPerWorker, 0));
+      const requiredWorkersYear1 = requiredHaYear1 / landHaPerWorker;
+      const requiredWorkersYear3 = requiredHaYear3 / landHaPerWorker;
+      const requiredWorkersYear5 = requiredHaYear5 / landHaPerWorker;
+      const requiredWorkersYear10 = requiredHaYear10 / landHaPerWorker;
+      const requiredWorkersAtMaturity = requiredHaAtMaturity / landHaPerWorker;
 
       const requiredNewWorkersVsCurrentAgIndustry = Math.max(0, requiredWorkersYear1 - currentAgIndustryFTEEstimate);
       const shareOfSubsistencePotentialPopulationNeeded = subsistencePotentialPopulation > 0 ? requiredWorkersYear1 / subsistencePotentialPopulation : null;
@@ -387,21 +382,22 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
       const byYear = {};
       for (const year of years) {
         let blendedGjPerHa = 0;
-        let blendedLabourPerHa = 0;
+        let blendedLandHaPerWorker = 0;
         let perennialContribution = 0;
         for (const [modalityName, share] of Object.entries(pkg.shares)) {
           const modality = MODALITIES.find((m) => m.modality === modalityName);
           if (!modality) continue;
           const gj = usefulGjPerHa(modality, year);
           blendedGjPerHa += gj * share;
-          blendedLabourPerHa += labourFtePerHa(modality, year) * share;
+          blendedLandHaPerWorker += n(modality.landHaPerWorker, 0) * share;
           if (modalityName.includes('perennial') || modalityName.includes('Permaculture')) {
             perennialContribution += gj * share;
           }
         }
         blendedGjPerHa = Math.max(0.001, blendedGjPerHa);
+        blendedLandHaPerWorker = Math.max(1e-9, blendedLandHaPerWorker);
         const blendedRequiredHa = scenario.foodGapGJ / blendedGjPerHa;
-        const blendedRequiredWorkers = blendedRequiredHa * blendedLabourPerHa;
+        const blendedRequiredWorkers = blendedRequiredHa / blendedLandHaPerWorker;
         const theoreticalCoverageShare = clamp((candidateLandHa * blendedGjPerHa) / Math.max(1, scenario.foodGapGJ), 0, 1);
         let localProductionCoverageShare = theoreticalCoverageShare;
         let storageLossReductionCoverageShare = 0;

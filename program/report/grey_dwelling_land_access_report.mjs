@@ -193,6 +193,49 @@ function summarizeThresholds(rows) {
   return out;
 }
 
+function initAccessTiers() {
+  return {
+    noPracticalFoodGrowingLandAccess: { dwellings: 0, population: 0 },
+    supplementalGardenAccess: { dwellings: 0, population: 0 },
+    meaningfulHouseholdFoodAccess: { dwellings: 0, population: 0 },
+    subsistencePotentialAccess: { dwellings: 0, population: 0 },
+    productionScaleAccess: { dwellings: 0, population: 0 }
+  };
+}
+
+function summarizeStrictAccessTiers(rows, thresholds = DEFAULT_THRESHOLDS) {
+  const out = initAccessTiers();
+  for (const row of rows) {
+    const dwellings = n(row.dwellings);
+    const population = n(row.population);
+    const productive = n(row.productiveHaPerDwelling);
+    const insideSettlement = !!row.insideSettlementBoundary;
+
+    let tier = 'noPracticalFoodGrowingLandAccess';
+    if (productive <= 0) {
+      tier = 'noPracticalFoodGrowingLandAccess';
+    } else if (insideSettlement) {
+      // Conservative article-facing rule: settlement residents are not treated as
+      // subsistence-potential without parcel-level usable-area evidence.
+      tier = productive >= thresholds.gardenThresholdHaPerDwelling
+        ? 'supplementalGardenAccess'
+        : 'noPracticalFoodGrowingLandAccess';
+    } else if (productive >= thresholds.smallholdingThresholdHaPerDwelling) {
+      tier = 'productionScaleAccess';
+    } else if (productive >= thresholds.strongSubsistenceThresholdHaPerDwelling) {
+      tier = 'subsistencePotentialAccess';
+    } else if (productive >= thresholds.subsistenceThresholdHaPerDwelling) {
+      tier = 'meaningfulHouseholdFoodAccess';
+    } else if (productive >= thresholds.gardenThresholdHaPerDwelling) {
+      tier = 'supplementalGardenAccess';
+    }
+
+    out[tier].dwellings += dwellings;
+    out[tier].population += population;
+  }
+  return out;
+}
+
 function applyThresholdSensitivity(rows) {
   return Object.entries(SENSITIVITY_SCENARIOS).map(([thresholdScenario, config]) => {
     const recalc = rows.map((r) => ({ ...r, thresholdClass: classifyLandAccessThreshold(r.productiveHaPerDwelling, config) }));
@@ -254,6 +297,19 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
       estimatedPopulationWithSmallholdingPotential: null,
       estimatedPopulationWithFarmScalePotential: null,
       estimatedPopulationNoDirectLandAccess: null,
+      broadParcelOrYardAccessPopulation: null,
+      supplementalGardenAccessPopulation: null,
+      meaningfulHouseholdFoodAccessPopulation: null,
+      subsistencePotentialAccessPopulation: null,
+      noMeaningfulFoodGrowingLandAccessPopulation: null,
+      productionScaleAccessPopulation: null,
+      broadLegacyEstimate: null,
+      strictFoodGrowingAccessEstimate: null,
+      landAccessDefinition: {
+        primaryArticleDefinition: 'meaningful_food_growing_access',
+        availableDefinitions: ['broad_parcel_access', 'meaningful_food_growing_access', 'subsistence_potential_access'],
+        selectedForCurrentSummary: 'meaningful_food_growing_access'
+      },
       thresholdSensitivity: [],
       municipalitySummary: [],
       landAccessBaselineOpportunityCounts: landAccess?.opportunityCategoryCounts ?? {},
@@ -373,6 +429,7 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
   }
 
   const thresholdSummary = summarizeThresholds(rows);
+  const strictTierSummary = summarizeStrictAccessTiers(rows, thresholds);
   const population = n(censusDistribution.totalPopulationMatched);
   const dwellings = n(censusDistribution.totalDwellingsMatched);
 
@@ -454,6 +511,45 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
     estimatedPopulationWithSmallholdingPotential: thresholdSummary.smallholdingPotential.population,
     estimatedPopulationWithFarmScalePotential: thresholdSummary.farmScalePotential.population,
     estimatedPopulationNoDirectLandAccess: thresholdSummary.noDirectLandAccess.population,
+    broadParcelOrYardAccessPopulation:
+      thresholdSummary.gardenScaleAccess.population +
+      thresholdSummary.householdSubsistencePotential.population +
+      thresholdSummary.smallholdingPotential.population +
+      thresholdSummary.farmScalePotential.population,
+    supplementalGardenAccessPopulation: strictTierSummary.supplementalGardenAccess.population,
+    meaningfulHouseholdFoodAccessPopulation: strictTierSummary.meaningfulHouseholdFoodAccess.population,
+    subsistencePotentialAccessPopulation: strictTierSummary.subsistencePotentialAccess.population,
+    productionScaleAccessPopulation: strictTierSummary.productionScaleAccess.population,
+    noMeaningfulFoodGrowingLandAccessPopulation:
+      strictTierSummary.noPracticalFoodGrowingLandAccess.population +
+      strictTierSummary.supplementalGardenAccess.population,
+    broadLegacyEstimate: {
+      landAccessDefinition: 'broad_parcel_access',
+      estimatedPopulationNoDirectLandAccess: thresholdSummary.noDirectLandAccess.population,
+      estimatedPopulationWithGardenScaleAccess: thresholdSummary.gardenScaleAccess.population,
+      estimatedPopulationWithSubsistencePotential:
+        thresholdSummary.householdSubsistencePotential.population +
+        thresholdSummary.smallholdingPotential.population +
+        thresholdSummary.farmScalePotential.population
+    },
+    strictFoodGrowingAccessEstimate: {
+      landAccessDefinition: 'meaningful_food_growing_access',
+      noPracticalFoodGrowingLandAccessPopulation: strictTierSummary.noPracticalFoodGrowingLandAccess.population,
+      supplementalGardenAccessPopulation: strictTierSummary.supplementalGardenAccess.population,
+      meaningfulHouseholdFoodAccessPopulation: strictTierSummary.meaningfulHouseholdFoodAccess.population,
+      subsistencePotentialAccessPopulation: strictTierSummary.subsistencePotentialAccess.population,
+      productionScaleAccessPopulation: strictTierSummary.productionScaleAccess.population,
+      noMeaningfulFoodGrowingLandAccessPopulation:
+        strictTierSummary.noPracticalFoodGrowingLandAccess.population +
+        strictTierSummary.supplementalGardenAccess.population
+    },
+    landAccessDefinition: {
+      primaryArticleDefinition: 'meaningful_food_growing_access',
+      availableDefinitions: ['broad_parcel_access', 'meaningful_food_growing_access', 'subsistence_potential_access'],
+      selectedForCurrentSummary: 'meaningful_food_growing_access',
+      settlementRule:
+        'Settlement-area dwellings are not counted as subsistence-potential access without parcel-level usable-area evidence.'
+    },
     thresholds,
     thresholdSensitivity,
     comparisonToLandAccessBaseline: {
@@ -480,9 +576,12 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
     `- inside settlement dwellings: ${report.insideSettlementDwellings.toFixed(2)}`,
     `- outside settlement dwellings: ${report.outsideSettlementDwellings.toFixed(2)}`,
     `- estimated population no direct land access: ${report.estimatedPopulationNoDirectLandAccess.toFixed(2)}`,
-    `- estimated population with subsistence potential: ${report.estimatedPopulationWithSubsistencePotential.toFixed(2)}`,
-    `- estimated population with smallholding potential: ${report.estimatedPopulationWithSmallholdingPotential.toFixed(2)}`,
-    `- estimated population with farm-scale potential: ${report.estimatedPopulationWithFarmScalePotential.toFixed(2)}`,
+    `- broad parcel/yard access population (legacy broad): ${report.broadParcelOrYardAccessPopulation.toFixed(2)}`,
+    `- supplemental garden access population (strict): ${report.supplementalGardenAccessPopulation.toFixed(2)}`,
+    `- meaningful household food access population (strict): ${report.meaningfulHouseholdFoodAccessPopulation.toFixed(2)}`,
+    `- subsistence-potential access population (strict): ${report.subsistencePotentialAccessPopulation.toFixed(2)}`,
+    `- production-scale access population (strict): ${report.productionScaleAccessPopulation.toFixed(2)}`,
+    `- no meaningful food-growing access population (strict): ${report.noMeaningfulFoodGrowingLandAccessPopulation.toFixed(2)}`,
     '',
     '## Municipality comparison',
     '| Municipality | Population | Dwellings | Outside settlement population | Subsistence potential dwellings | Smallholding potential dwellings | Farm-scale potential dwellings |',
@@ -495,6 +594,7 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
     ...thresholdSensitivity.map((s) => `| ${s.thresholdScenario} | ${s.subsistenceThresholdHa} | ${s.dwellingsAtOrAboveSubsistence.toFixed(2)} | ${s.populationAtOrAboveSubsistence.toFixed(2)} |`),
     '',
     '## Caveats',
+    '- land access in this report means usable area for meaningful food growing, not merely yard/parcel presence',
     '- not ownership parcels',
     '- not legal access',
     '- not address-level population',

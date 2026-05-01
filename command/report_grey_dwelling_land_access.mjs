@@ -68,9 +68,12 @@ try {
   console.log(`inside settlement population: ${report.insideSettlementPopulation}`);
   console.log(`outside settlement population: ${report.outsideSettlementPopulation}`);
   const fmt = (v) => (v === null || v === undefined || Number.isNaN(Number(v)) ? 'invalid' : Number(v).toFixed(2));
-  console.log(`estimated no-direct-land-access population: ${fmt(report.estimatedPopulationNoDirectLandAccess)}`);
-  console.log(`estimated subsistence-potential population: ${fmt(report.estimatedPopulationWithSubsistencePotential)}`);
-  console.log(`estimated smallholding-potential population: ${fmt(report.estimatedPopulationWithSmallholdingPotential)}`);
+  console.log(`broad parcel/yard access population (legacy): ${fmt(report.broadParcelOrYardAccessPopulation)}`);
+  console.log(`no meaningful food-growing land access population (strict): ${fmt(report.noMeaningfulFoodGrowingLandAccessPopulation)}`);
+  console.log(`supplemental garden access population (strict): ${fmt(report.supplementalGardenAccessPopulation)}`);
+  console.log(`meaningful household food access population (strict): ${fmt(report.meaningfulHouseholdFoodAccessPopulation)}`);
+  console.log(`subsistence-potential access population (strict): ${fmt(report.subsistencePotentialAccessPopulation)}`);
+  console.log(`production-scale access population (strict): ${fmt(report.productionScaleAccessPopulation)}`);
   if (report.dwellingLandAccessValid === false) {
     console.warn('Dwelling-land-access report is invalid until lots-and-concessions-grey.geojson is downloaded.');
     console.warn('Run: npm run grey:download-data -- --source=lots-and-concessions-grey');

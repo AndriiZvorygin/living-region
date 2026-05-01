@@ -62,8 +62,13 @@ describe('grey dwelling land access report', () => {
       expect(fs.existsSync(built.paths.municipalCsvPath)).toBe(true);
       expect(fs.existsSync(built.paths.thresholdsCsvPath)).toBe(true);
       expect(built.report.totalPopulation).toBe(100);
-      expect(built.report.estimatedPopulationNoDirectLandAccess).toBeLessThan(100);
+      expect(built.report.broadParcelOrYardAccessPopulation).toBeGreaterThanOrEqual(0);
+      expect(built.report.noMeaningfulFoodGrowingLandAccessPopulation).toBeGreaterThanOrEqual(0);
       expect(built.report.estimatedPopulationWithSubsistencePotential + built.report.estimatedPopulationWithSmallholdingPotential + built.report.estimatedPopulationWithFarmScalePotential).toBeGreaterThan(0);
+      expect(built.report.subsistencePotentialAccessPopulation).toBeLessThanOrEqual(
+        built.report.estimatedPopulationWithSubsistencePotential + built.report.estimatedPopulationWithSmallholdingPotential + built.report.estimatedPopulationWithFarmScalePotential
+      );
+      expect(built.report.landAccessDefinition.primaryArticleDefinition).toBe('meaningful_food_growing_access');
       expect(built.report.thresholdSensitivity.find((x) => x.thresholdScenario === 'permissive').populationAtOrAboveSubsistence)
         .toBeGreaterThanOrEqual(built.report.thresholdSensitivity.find((x) => x.thresholdScenario === 'conservative').populationAtOrAboveSubsistence);
 
@@ -92,6 +97,7 @@ describe('grey dwelling land access report', () => {
       expect(built.report.dwellingLandAccessValid).toBe(false);
       expect(built.report.dataStatus).toBe('missing_required_lots');
       expect(built.report.estimatedPopulationNoDirectLandAccess).toBeNull();
+      expect(built.report.noMeaningfulFoodGrowingLandAccessPopulation).toBeNull();
       expect(built.report.warnings.some((w) => w.includes('Missing lots-and-concessions-grey.geojson'))).toBe(true);
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
       expect(md).toContain('invalid until lots-and-concessions-grey.geojson');
@@ -212,6 +218,46 @@ describe('grey dwelling land access report', () => {
       const saved = JSON.parse(fs.readFileSync(path.join(produceDir, 'grey-dwelling-land-access.json'), 'utf8'));
       expect(saved.dwellingLandAccessValid).toBe(true);
       expect(saved.estimatedPopulationWithSubsistencePotential).not.toBeNull();
+      expect(saved.noMeaningfulFoodGrowingLandAccessPopulation).not.toBeNull();
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('strict definition keeps settlement-heavy areas out of subsistence tier by default', () => {
+    const root = path.resolve('know/produce/dwelling-land-access-strict-settlement');
+    const inputDir = path.join(root, 'input');
+    const produceDir = path.join(root, 'produce');
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+
+    fs.writeFileSync(path.join(inputDir, 'municipality-boundaries.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { MUN_NAME: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-80.99,44.50],[-80.7,44.50],[-80.7,44.7],[-80.99,44.7],[-80.99,44.50]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'settlement-boundaries.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { NAME: 'Core' }, geometry: { type: 'Polygon', coordinates: [[[-80.98,44.52],[-80.72,44.52],[-80.72,44.68],[-80.98,44.68],[-80.98,44.52]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'official-plan-schedule-a-land-use.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { Final_Type: 'Settlement Area' }, geometry: { type: 'Polygon', coordinates: [[[-80.98,44.52],[-80.72,44.52],[-80.72,44.68],[-80.98,44.68],[-80.98,44.52]]] } }
+    ])));
+    fs.writeFileSync(path.join(inputDir, 'lots-and-concessions-grey.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { OBJECTID: 1, MUNICIPALITY: 'Owen Sound' }, geometry: { type: 'Polygon', coordinates: [[[-80.90,44.56],[-80.80,44.56],[-80.80,44.66],[-80.90,44.66],[-80.90,44.56]]] } }
+    ])));
+    fs.writeFileSync(path.join(produceDir, 'grey-census-population-distribution.json'), JSON.stringify({
+      totalPopulationMatched: 120,
+      totalDwellingsMatched: 40,
+      populationInsideSettlementBoundaries: 120,
+      populationOutsideSettlementBoundaries: 0
+    }));
+    fs.writeFileSync(path.join(produceDir, 'grey-census-population-blocks.geojson'), JSON.stringify(fc([
+      { type: 'Feature', properties: { geographyId: 'db1', municipalityName: 'Owen Sound', population: 120, dwellings: 40, insideSettlementBoundary: true }, geometry: { type: 'Polygon', coordinates: [[[-80.95,44.55],[-80.75,44.55],[-80.75,44.67],[-80.95,44.67],[-80.95,44.55]]] } }
+    ])));
+
+    try {
+      const built = buildGreyDwellingLandAccessReport({ inputDir, produceDir });
+      expect(built.report.subsistencePotentialAccessPopulation).toBe(0);
+      expect(built.report.productionScaleAccessPopulation).toBe(0);
+      expect(built.report.noMeaningfulFoodGrowingLandAccessPopulation).toBeGreaterThan(0);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
