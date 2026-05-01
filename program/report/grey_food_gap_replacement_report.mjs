@@ -20,6 +20,8 @@ function readJsonIfExists(filePath, warnings, label, fallback = null) {
 }
 
 const MEALS_PER_GJ = 571.0;
+export const PERSON_FOOD_GJ_PER_YEAR = 900000 * 4184 / 1e9; // 3.7656
+export function kcalToGJ(kcal) { return n(kcal, 0) * 4184 / 1e9; }
 
 const FOOD_GAP_SCENARIOS = [
   { scenario: 'foodGap5', foodAvailabilityLossShare: 0.05, assumedCause: 'fuel/logistics', sourceStatus: 'model scenario' },
@@ -227,6 +229,7 @@ const MODALITIES = [
     landHaPerWorker,
     haPerWorker: landHaPerWorker,
     foodEnergyGJPerWorkerAtMaturity,
+    peopleFedEquivalentPerWorkerAtMaturity: foodEnergyGJPerWorkerAtMaturity / PERSON_FOOD_GJ_PER_YEAR,
     directHumanFoodGJPerWorkerAtMaturity: n(m.directHumanFoodGJPerHaAtMaturity, n(m.netFoodEnergyGJPerHaAtMaturity, 0)) * landHaPerWorker
   };
 });
@@ -548,6 +551,7 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     GJPerHaAtMaturity: n(MODALITIES.find((m) => m.modality === r.modality)?.netFoodEnergyGJPerHaAtMaturity, 0),
     haPerWorker: n(MODALITIES.find((m) => m.modality === r.modality)?.landHaPerWorker, 0),
     GJPerWorkerAtMaturity: n(MODALITIES.find((m) => m.modality === r.modality)?.foodEnergyGJPerWorkerAtMaturity, 0),
+    peopleFedEquivalentPerWorkerAtMaturity: n(MODALITIES.find((m) => m.modality === r.modality)?.peopleFedEquivalentPerWorkerAtMaturity, 0),
     requiredHaYear1: r.requiredHaYear1,
     requiredWorkersYear1: r.requiredWorkersYear1,
     requiredHaYear5: r.requiredHaYear5,
@@ -618,6 +622,18 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
       return `| ${m.modality} | ${m.landHaPerWorker.toFixed(4)} | ${m.netFoodEnergyGJPerHaAtMaturity.toFixed(2)} | ${m.foodEnergyGJPerWorkerAtMaturity.toFixed(4)} | ${m.bestRole} | ${suitability} |`;
     }),
     '',
+    'The table below shows substitution scenarios: if most of the gap were covered by one approach, roughly how many producer-equivalents would be needed? These are comparison cases, not additive totals and not recommendations.',
+    '| Food gap | Low-input annual field | Market gardens | Hand-tool household gardens |',
+    '| --- | ---: | ---: | ---: |',
+    ...['foodGap10', 'foodGap20', 'foodGap33'].map((scenarioName) => {
+      const lowInput = modalityReplacementMatrix.find((r) => r.scenario === scenarioName && r.modality === 'lowInputAnnualField');
+      const market = modalityReplacementMatrix.find((r) => r.scenario === scenarioName && r.modality === 'marketGardenIntensive');
+      const household = modalityReplacementMatrix.find((r) => r.scenario === scenarioName && r.modality === 'handToolHouseholdGarden');
+      const pct = scenarioName.replace('foodGap', '');
+      const round100 = (x) => Math.round(n(x) / 100) * 100;
+      return `| ${pct}% | ~${round100(lowInput?.requiredWorkersYear1).toLocaleString('en-CA')} | ~${round100(market?.requiredWorkersYear1).toLocaleString('en-CA')} | ~${round100(household?.requiredWorkersYear1).toLocaleString('en-CA')} |`;
+    }),
+    '',
     '## Replacement needs by modality',
     '| Scenario | Modality | Required ha (year 1) | Required workers (year 1) | Years to useful yield | Feasibility notes |',
     '| --- | --- | ---: | ---: | ---: | --- |',
@@ -632,9 +648,9 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     '',
     '## What helps fastest',
     '- emergency food aid/import substitution/rationing',
-    '- household gardens for fresh food',
-    '- market gardens for vegetables',
     '- low-input annual staples for calories',
+    '- market gardens for vegetables',
+    '- household gardens for resilience, skill-building, and partial substitution',
     '- storage/loss reduction and local processing',
     '',
     '## What helps long-term',
@@ -674,6 +690,7 @@ export function buildGreyFoodGapReplacementReport(options = {}) {
     'GJPerHaAtMaturity',
     'haPerWorker',
     'GJPerWorkerAtMaturity',
+    'peopleFedEquivalentPerWorkerAtMaturity',
     'requiredHaYear1',
     'requiredWorkersYear1',
     'requiredHaYear5',

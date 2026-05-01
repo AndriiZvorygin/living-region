@@ -4,6 +4,7 @@ import path from 'node:path';
 
 function n(v, fallback = 0) { const x = Number(v); return Number.isFinite(x) ? x : fallback; }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+const PERSON_FOOD_GJ_PER_YEAR = 900000 * 4184 / 1e9; // 3.7656
 function esc(v) { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s; }
 function toCsv(rows, headers) { return [headers.join(','), ...rows.map((r) => headers.map((h) => esc(r[h])).join(','))].join('\n'); }
 
@@ -115,6 +116,9 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
   const totalDwellings = n(dwelling.totalDwellings, n((dwelling.thresholdSensitivity ?? []).find((x) => x.thresholdScenario === 'baseline')?.populationAtOrAboveSubsistence, 50183));
   const dwellingsSubsistence = n((dwelling.thresholdSensitivity ?? []).find((x) => x.thresholdScenario === 'baseline')?.dwellingsAtOrAboveSubsistence, 28310.66);
   const localNodeCount = n((localization.candidateNodes ?? []).length, 0);
+  const modalityDefs = Array.isArray(foodGapReplacement.productionModalities) ? foodGapReplacement.productionModalities : [];
+  const mixedResilienceModality = modalityDefs.find((m) => (m.modality ?? m.id) === 'mixedResiliencePackage') ?? {};
+  const blendedGJPerWorkerYear = n(mixedResilienceModality.foodEnergyGJPerWorkerAtMaturity, 21.25);
 
   const shockRows = currentShock.shockScenarios ?? [];
   function shockByName(name) {
@@ -346,19 +350,33 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
       foodInsecurityAvoidedVsNoAdaptation,
       foodInsecurityAvoidedVsTrendNoResponse,
       severeFoodStressAvoidedVsNoAdaptation,
+      baselineFoodInsecurePeople: trendOnly ? baselineTrendFoodInsecurityEstimate : measuredFoodInsecurityBaselineEstimate,
+      adaptedFoodInsecurePeople: adjustedCalibratedEstimate,
+      peopleKeptOutOfFoodInsecurity: trendOnly ? foodInsecurityAvoidedVsTrendNoResponse : foodInsecurityAvoidedVsNoAdaptation,
       householdsMarketDemandReduced: hp.householdsParticipating,
       populationMarketDemandReduced: hp.householdsParticipating * 2.05,
       householdsProducingSurplus: hp.householdsParticipating * hp.surplusShare,
       householdsParticipating: hp.householdsParticipating,
-      additionalFoodWorkersNeeded: hp.workersOrHouseholdLabourNeeded,
+      producerEquivalentScenarioValue: hp.workersOrHouseholdLabourNeeded,
+      producerEquivalentScenarioBasis: 'household-participation proxy; not direct requirement from food-insecurity headcount',
       workerModeNotes: trendOnly
         ? 'Trend-only local response: mixed household growers, surplus growers, and market-oriented local producers.'
         : 'Shock response: additional growers plus distribution and storage coordination.',
       localSupplyAddedGJ: hp.addedLocalSupplyGJ + storageLossReductionEffectiveSupply,
+      foodGapGJYear: Math.max(0, marketDemandGJ - effectiveSupplyGJ),
+      physicalProductionWorkerEquivalent: blendedGJPerWorkerYear > 0 ? Math.max(0, marketDemandGJ - effectiveSupplyGJ) / blendedGJPerWorkerYear : 0,
+      peopleFedEquivalentFromLocalSupplyShift: (hp.addedLocalSupplyGJ + storageLossReductionEffectiveSupply) / PERSON_FOOD_GJ_PER_YEAR,
       noDirectLandAccessRemainingVulnerable: noDirectLandAccessPopulation,
       mainBottleneck: supplyDemandRatio < 0.9 ? 'external_supply_gap' : (hp.workersOrHouseholdLabourNeeded > currentAgIndustryFTEEstimate * 2 ? 'labour_coordination' : 'distribution_storage'),
       confidence: hp.confidence
     };
+    scenarioOut.peopleFedEquivalentFromProducerProxy = (scenarioOut.producerEquivalentScenarioValue * blendedGJPerWorkerYear) / PERSON_FOOD_GJ_PER_YEAR;
+    scenarioOut.pressureToProductionRatio = scenarioOut.peopleKeptOutOfFoodInsecurity > 0
+      ? scenarioOut.peopleFedEquivalentFromProducerProxy / scenarioOut.peopleKeptOutOfFoodInsecurity
+      : null;
+    scenarioOut.dimensionalSanityWarning = (scenarioOut.pressureToProductionRatio !== null && (scenarioOut.pressureToProductionRatio < 0.5 || scenarioOut.pressureToProductionRatio > 3))
+      ? 'pressure_vs_production_dimension_mismatch_check_labels'
+      : null;
     scenarioResults.push(scenarioOut);
 
     for (const seg of demandSegments) {
@@ -393,6 +411,7 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     foodPriceMultiplierEstimate: s.foodPriceMultiplierEstimate,
     foodInsecurityEstimate: s.calibratedFoodInsecurityEstimate,
     foodInsecurityAvoidedVsNoAdaptation: s.foodInsecurityAvoidedVsNoAdaptation,
+    peopleKeptOutOfFoodInsecurity: s.peopleKeptOutOfFoodInsecurity,
     severeFoodStressAvoidedVsNoAdaptation: s.severeFoodStressAvoidedVsNoAdaptation,
     noDirectLandAccessRemainingVulnerable: s.noDirectLandAccessRemainingVulnerable
   }));
@@ -452,7 +471,23 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
       severeSystemicInputLoss33CombinedResponse: scenarioResults.find((s) => s.scenario === 'severeSystemicInputLoss33CombinedResponse') ?? null,
       trend2027NoNewShockNoLocalResponse: scenarioResults.find((s) => s.scenario === 'trend2027NoNewShockNoLocalResponse') ?? null,
       trend2027NoNewShockCombinedLocalResponse: scenarioResults.find((s) => s.scenario === 'trend2027NoNewShockCombinedLocalResponse') ?? null
-    }
+    },
+    pressureOutputs: scenarioResults.map((s) => ({
+      scenario: s.scenario,
+      baselineFoodInsecurePeople: s.baselineFoodInsecurePeople,
+      adaptedFoodInsecurePeople: s.adaptedFoodInsecurePeople,
+      peopleKeptOutOfFoodInsecurity: s.peopleKeptOutOfFoodInsecurity,
+      foodPricePressureIndex: s.foodPricePressureIndex,
+      foodPriceMultiplierEstimate: s.foodPriceMultiplierEstimate
+    })),
+    physicalProductionOutputs: scenarioResults.map((s) => ({
+      scenario: s.scenario,
+      foodGapGJYear: s.foodGapGJYear,
+      producerEquivalentScenarioValue: s.producerEquivalentScenarioValue,
+      physicalProductionWorkerEquivalent: s.physicalProductionWorkerEquivalent,
+      peopleFedEquivalentFromLocalSupplyShift: s.peopleFedEquivalentFromLocalSupplyShift,
+      peopleFedEquivalentFromProducerProxy: s.peopleFedEquivalentFromProducerProxy
+    }))
   };
 
   const markdown = [
@@ -482,9 +517,12 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     '',
     '## Trend-only local response',
     'This is the no-new-shock case. It asks how much local production/storage/distribution could reduce food insecurity under the existing trend-only baseline.',
-    '| Scenario | Baseline trend food insecurity (2027) | Reduced market demand (GJ) | Added local supply (GJ) | Food price pressure | Calibrated food insecurity | Avoided vs trend no-response | Households participating | Additional food workers needed |',
+    'Food-insecurity pressure and physical production are related but not the same metric. Producer-equivalent values below are scenario proxies, not direct labour requirements derived from food-insecurity headcount.',
+    '| Scenario | Baseline trend food insecurity (2027) | Reduced market demand (GJ) | Added local supply (GJ) | Food price pressure | Calibrated food insecurity | People kept out (vs trend no-response) | Households participating | Producer-equivalent scenario value |',
     '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
-    ...scenarioResults.filter((s) => s.trendOnly).map((s) => `| ${s.scenario} | ${s.baselineTrendFoodInsecurityEstimate2027.toFixed(0)} | ${s.reducedMarketDemandGJ.toFixed(0)} | ${s.addedLocalSupplyGJ.toFixed(0)} | ${s.foodPricePressureIndex.toFixed(3)} | ${s.calibratedFoodInsecurityEstimate.toFixed(0)} | ${s.foodInsecurityAvoidedVsTrendNoResponse.toFixed(0)} | ${s.householdsParticipating.toFixed(0)} | ${s.additionalFoodWorkersNeeded.toFixed(0)} |`),
+    ...scenarioResults.filter((s) => s.trendOnly).map((s) => `| ${s.scenario} | ${s.baselineTrendFoodInsecurityEstimate2027.toFixed(0)} | ${s.reducedMarketDemandGJ.toFixed(0)} | ${s.addedLocalSupplyGJ.toFixed(0)} | ${s.foodPricePressureIndex.toFixed(3)} | ${s.calibratedFoodInsecurityEstimate.toFixed(0)} | ${s.foodInsecurityAvoidedVsTrendNoResponse.toFixed(0)} | ${s.householdsParticipating.toFixed(0)} | ${s.producerEquivalentScenarioValue.toFixed(0)} |`),
+    '',
+    'The food-insecurity scenario estimates how many people are protected from price and access pressure. The physical production model estimates how many producer-equivalents are needed to cover a given food gap. Those are related, but they are not the same number.',
     '',
     '## Who remains vulnerable',
     'No-direct-land-access households remain most exposed unless food aid, public kitchens, co-ops, or local distribution bridges the gap.',
@@ -522,7 +560,12 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     foodInsecurityAvoidedVsNoAdaptation: s.foodInsecurityAvoidedVsNoAdaptation,
     foodInsecurityAvoidedVsTrendNoResponse: s.foodInsecurityAvoidedVsTrendNoResponse,
     householdsParticipating: s.householdsParticipating,
-    additionalFoodWorkersNeeded: s.additionalFoodWorkersNeeded,
+    producerEquivalentScenarioValue: s.producerEquivalentScenarioValue,
+    physicalProductionWorkerEquivalent: s.physicalProductionWorkerEquivalent,
+    peopleFedEquivalentFromLocalSupplyShift: s.peopleFedEquivalentFromLocalSupplyShift,
+    peopleFedEquivalentFromProducerProxy: s.peopleFedEquivalentFromProducerProxy,
+    pressureToProductionRatio: s.pressureToProductionRatio,
+    dimensionalSanityWarning: s.dimensionalSanityWarning,
     workerModeNotes: s.workerModeNotes,
     mainBottleneck: s.mainBottleneck,
     confidence: s.confidence
@@ -530,7 +573,7 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
     'scenario', 'shockProfile', 'householdProductionScenario', 'trendOnly', 'baselineTrendYear', 'baselineTrendFoodInsecurityEstimate2027', 'totalFoodDemandGJ', 'reducedMarketDemandGJ', 'addedLocalSupplyGJ',
     'remainingMarketDemandGJ', 'externalSupplyGJ', 'effectiveSupplyGJ', 'supplyDemandRatio', 'localSupplyShare', 'exposedDemandShare',
     'foodPricePressureIndex', 'foodPriceMultiplierEstimate', 'calibratedFoodInsecurityEstimate', 'foodInsecurityAvoidedVsNoAdaptation', 'foodInsecurityAvoidedVsTrendNoResponse',
-    'householdsParticipating', 'additionalFoodWorkersNeeded', 'workerModeNotes', 'mainBottleneck', 'confidence'
+    'householdsParticipating', 'producerEquivalentScenarioValue', 'physicalProductionWorkerEquivalent', 'peopleFedEquivalentFromLocalSupplyShift', 'peopleFedEquivalentFromProducerProxy', 'pressureToProductionRatio', 'dimensionalSanityWarning', 'workerModeNotes', 'mainBottleneck', 'confidence'
   ])}\n`);
   fs.writeFileSync(householdsCsvPath, `${toCsv(householdRows, [
     'scenario', 'demandSegment', 'population', 'dwellings', 'marketDemandShare', 'selfProvisionPotentialShare',

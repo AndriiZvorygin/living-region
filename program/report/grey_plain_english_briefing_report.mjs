@@ -102,6 +102,10 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
       details: `Shock20 foodCoverage is ${numbers.shock20Coverage.toFixed(3)} with ${numbers.shock20AddedWorkers.toFixed(0)} added workers needed; combined resilience package raises shock20 coverage to ${numbers.shock20CombinedCoverage.toFixed(3)}.`
     },
     {
+      title: 'Food-insecurity pressure and physical production are related but not identical metrics.',
+      details: 'Food-insecurity scenarios estimate people protected from price/access pressure. Production scenarios estimate producer-equivalents and land needed to cover a food-energy gap. Those values should be compared side-by-side, not treated as one direct conversion.'
+    },
+    {
       title: 'Global shock assumptions are not the same as direct local crop loss.',
       details: 'A one-third global food production loss scenario is treated as global price/import competition and affordability stress pressure, not automatic one-third local production loss in Grey.'
     },

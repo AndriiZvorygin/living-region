@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { describe, expect, test } from 'vitest';
-import { buildGreyFoodGapReplacementReport } from '../program/report/grey_food_gap_replacement_report.mjs';
+import { PERSON_FOOD_GJ_PER_YEAR, buildGreyFoodGapReplacementReport, kcalToGJ } from '../program/report/grey_food_gap_replacement_report.mjs';
 
 function writeJson(filePath, data) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -10,6 +10,11 @@ function writeJson(filePath, data) {
 }
 
 describe('grey food gap replacement report', () => {
+  test('dimensional helpers compute expected food-energy conversions', () => {
+    expect(kcalToGJ(900000)).toBeCloseTo(3.7656, 4);
+    expect(PERSON_FOOD_GJ_PER_YEAR).toBeCloseTo(3.7656, 4);
+  });
+
   test('writes outputs and models gap replacement dynamics', () => {
     const root = path.resolve('know/produce/food-gap-fixture');
     fs.rmSync(root, { recursive: true, force: true });
@@ -55,6 +60,10 @@ describe('grey food gap replacement report', () => {
       expect(marketDef.calorieReplacementEfficiency).toBeLessThan(annualDef.calorieReplacementEfficiency);
       expect(marketDef.foodEnergyGJPerWorkerAtMaturity).toBeGreaterThan(0);
       expect(marketDef.landHaPerWorker).toBeGreaterThan(0);
+      expect(marketDef.peopleFedEquivalentPerWorkerAtMaturity).toBeCloseTo(
+        marketDef.foodEnergyGJPerWorkerAtMaturity / PERSON_FOOD_GJ_PER_YEAR,
+        6
+      );
 
       const grazingDef = report.productionModalities.find((m) => m.modality === 'managedGrazingBeefPastureComparison');
       expect(grazingDef).toBeTruthy();
@@ -90,6 +99,7 @@ describe('grey food gap replacement report', () => {
       expect(md).toContain('not the same as Grey County having one-third less local food');
       expect(md).toContain('Grazing and beef systems can be valuable');
       expect(md).toContain('not be treated as high-calorie replacement systems');
+      expect(md).toContain('substitution scenarios');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

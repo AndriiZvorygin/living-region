@@ -57,12 +57,16 @@ describe('grey food supply-demand-price report', () => {
       expect(String(severeCombined.interpretation)).toContain('global');
       expect(trendCombined.calibratedFoodInsecurityEstimate).toBeLessThan(trendNo.calibratedFoodInsecurityEstimate);
       expect(trendCombined.foodInsecurityAvoidedVsTrendNoResponse).toBeGreaterThan(0);
-      expect(trend25.additionalFoodWorkersNeeded).toBeGreaterThan(0);
-      expect(trendCombined.additionalFoodWorkersNeeded).toBeGreaterThan(trendNo.additionalFoodWorkersNeeded);
+      expect(trend25.producerEquivalentScenarioValue).toBeGreaterThan(0);
+      expect(trendCombined.producerEquivalentScenarioValue).toBeGreaterThan(trendNo.producerEquivalentScenarioValue);
+      expect(trendCombined.peopleFedEquivalentFromProducerProxy).toBeGreaterThan(0);
+      expect(trendCombined.pressureToProductionRatio).toBeGreaterThan(0);
 
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
       expect(md).toContain('proxy, not a price forecast');
       expect(md.toLowerCase()).toContain('trend-only');
+      expect(md).toContain('Producer-equivalent scenario value');
+      expect(md).not.toContain('Additional food workers needed');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
