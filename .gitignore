@@ -11,3 +11,8 @@ coverage/
 .idea/
 
 know/input/
+!know/input/
+know/input/*
+!know/input/scenarios/
+!know/input/scenarios/*.json
+output/

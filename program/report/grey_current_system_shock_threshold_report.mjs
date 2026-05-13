@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import { loadScenarioFiles, scenarioById } from '../reliability/scenario_contract.mjs';
 
 function n(v, fallback = 0) { const x = Number(v); return Number.isFinite(x) ? x : fallback; }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -80,6 +81,79 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
   const noDirectLandAccessPopulation = n(dwelling.estimatedPopulationNoDirectLandAccess, 7990);
   const subsistencePotentialPopulation = n(dwelling.estimatedPopulationWithSubsistencePotential, 54949);
   const importDependencyIndex = 0.86;
+  const scenarioLoad = loadScenarioFiles({ scenariosDir: options.scenariosDir ?? 'know/input/scenarios' });
+  if (scenarioLoad.status === 'fail') warnings.push(...scenarioLoad.failures);
+  const lowScenario = scenarioById(scenarioLoad.scenarios, 'hormuz_shock_low');
+  const centralScenario = scenarioById(scenarioLoad.scenarios, 'hormuz_shock_central');
+  const highScenario = scenarioById(scenarioLoad.scenarios, 'hormuz_shock_high');
+  const a = (scn, key, fallback) => n(scn?.assumptions?.[key]?.value, fallback);
+
+  const hormuzCurrentMultiInputDisruption2026 = {
+    scenario: 'hormuzCurrentMultiInputDisruption2026',
+    status: 'active_current_disruption_scenario',
+    description: 'Current Strait of Hormuz disruption modelled as a multi-input food-system chokepoint, not only an oil shock.',
+    oilDieselConstraintPct: a(centralScenario, 'oil_diesel_constraint_pct', 20),
+    lngNaturalGasConstraintPct: a(centralScenario, 'lng_natural_gas_constraint_pct', 20),
+    nitrogenFertilizerConstraintPct: a(centralScenario, 'nitrogen_fertilizer_constraint_pct', 18),
+    sulfurPhosphateConstraintPct: a(centralScenario, 'sulfur_phosphate_constraint_pct', 16),
+    shippingInsuranceReroutingConstraintPct: a(centralScenario, 'shipping_insurance_rerouting_constraint_pct', 25),
+    inputPriceMultiplier: a(centralScenario, 'input_price_multiplier', 1.55),
+    inputAvailabilityMultiplier: a(centralScenario, 'input_availability_multiplier', 0.82),
+    foodPricePressureMultiplier: a(centralScenario, 'food_price_pressure_multiplier', 1.35),
+    foodProductionLossScenarioRangePct: {
+      low: a(lowScenario, 'global_food_production_loss_pct', 5),
+      moderate: a(centralScenario, 'global_food_production_loss_pct', 12),
+      severe: a(centralScenario, 'global_food_production_loss_pct', 20),
+      extreme: a(highScenario, 'global_food_production_loss_pct', 30)
+    },
+    sourceStatus: 'scenario assumptions; calibrate with current market and logistics data'
+  };
+  const currentDisruptionBands = [
+    {
+      scenario: 'currentDisruptionLow',
+      bandLabel: 'low',
+      globalFoodProductionLossPct: a(lowScenario, 'global_food_production_loss_pct', 5),
+      localFoodAvailabilityStressPct: 4,
+      foodPricePressureIndex: 0.42,
+      fertilizerAvailabilityStressPct: a(lowScenario, 'nitrogen_fertilizer_constraint_pct', 8),
+      fuelAvailabilityStressPct: a(lowScenario, 'oil_diesel_constraint_pct', 10),
+      shippingStressPct: a(lowScenario, 'shipping_insurance_rerouting_constraint_pct', 12),
+      notes: 'Current Hormuz disruption band; low stress scenario, not a forecast.'
+    },
+    {
+      scenario: 'currentDisruptionModerate',
+      bandLabel: 'moderate',
+      globalFoodProductionLossPct: a(centralScenario, 'global_food_production_loss_pct', 12),
+      localFoodAvailabilityStressPct: 9,
+      foodPricePressureIndex: 0.56,
+      fertilizerAvailabilityStressPct: a(centralScenario, 'nitrogen_fertilizer_constraint_pct', 15),
+      fuelAvailabilityStressPct: a(centralScenario, 'oil_diesel_constraint_pct', 18),
+      shippingStressPct: 20,
+      notes: 'Current Hormuz disruption band; moderate stress scenario, not a forecast.'
+    },
+    {
+      scenario: 'currentDisruptionSevere',
+      bandLabel: 'severe',
+      globalFoodProductionLossPct: a(centralScenario, 'global_food_production_loss_pct', 20),
+      localFoodAvailabilityStressPct: 14,
+      foodPricePressureIndex: 0.68,
+      fertilizerAvailabilityStressPct: a(centralScenario, 'nitrogen_fertilizer_constraint_pct', 24),
+      fuelAvailabilityStressPct: a(centralScenario, 'oil_diesel_constraint_pct', 26),
+      shippingStressPct: a(centralScenario, 'shipping_insurance_rerouting_constraint_pct', 30),
+      notes: 'Current Hormuz disruption band; severe multi-input stress scenario, not a forecast.'
+    },
+    {
+      scenario: 'currentDisruptionExtreme',
+      bandLabel: 'extreme',
+      globalFoodProductionLossPct: a(highScenario, 'global_food_production_loss_pct', 30),
+      localFoodAvailabilityStressPct: 20,
+      foodPricePressureIndex: 0.80,
+      fertilizerAvailabilityStressPct: a(highScenario, 'nitrogen_fertilizer_constraint_pct', 35),
+      fuelAvailabilityStressPct: a(highScenario, 'oil_diesel_constraint_pct', 38),
+      shippingStressPct: a(highScenario, 'shipping_insurance_rerouting_constraint_pct', 42),
+      notes: 'Current Hormuz disruption band; extreme severe multi-variable scenario, not a forecast.'
+    }
+  ];
 
   const lagModel = {
     immediateMarketPriceSignalMonths: '0-1',
@@ -421,6 +495,8 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
       lagModelConfigurableAssumption: true,
       vulnerabilityToMeasuredFoodInsecurityConversionFactor
     },
+    hormuzCurrentMultiInputDisruption2026,
+    currentDisruptionBands,
     severeSystemicInputLoss33Framing,
     measuredFoodInsecurityAnchor,
     foodInsecurityTrendBaseline,
@@ -458,6 +534,7 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     localEmergencyFoodDemandContext: localContext,
     caveats: [
       'This report models the current supply-chain-dependent system and does not assume local resilience already exists.',
+      'Current Strait of Hormuz disruption is treated as an active multi-input food-system shock, not only an oil shock.',
       'A one-third global food production loss is not the same as Grey County having one-third less local food. In Grey, the main near-term channel is higher prices, tighter trade, import competition, and household affordability stress.',
       'Not a price forecast.',
       'Not an exact hunger forecast.',
@@ -475,10 +552,27 @@ export function buildGreyCurrentSystemShockThresholdReport(options = {}) {
     '# Grey Current-System Fuel/Input Shock Thresholds',
     '',
     '## Bottom line',
-    'This report asks when the current supply-chain-dependent system starts to create serious household and municipal stress. It does not assume local resilience already exists.',
+    'This report asks when the current supply-chain-dependent system starts to create serious household and municipal stress under the current Hormuz disruption. It does not assume local resilience already exists.',
     '',
     '## Why this matters',
     'Oil/fuel shocks do not hit households all at once. Effects move through inventories, shipping, refining, contracts, trucking, fertilizer, farm inputs, food distribution, and retail prices over weeks to months.',
+    'The current Hormuz disruption is not only an oil shock. It affects upstream food-system inputs including oil/diesel, LNG/natural gas, nitrogen fertilizer, sulfur/phosphate fertilizer, shipping, insurance, and rerouting.',
+    '',
+    '## Current Hormuz multi-input profile',
+    `- scenario: ${hormuzCurrentMultiInputDisruption2026.scenario}`,
+    `- oil/diesel constraint: ${hormuzCurrentMultiInputDisruption2026.oilDieselConstraintPct}%`,
+    `- LNG/natural gas constraint: ${hormuzCurrentMultiInputDisruption2026.lngNaturalGasConstraintPct}%`,
+    `- nitrogen fertilizer constraint: ${hormuzCurrentMultiInputDisruption2026.nitrogenFertilizerConstraintPct}%`,
+    `- sulfur/phosphate fertilizer constraint: ${hormuzCurrentMultiInputDisruption2026.sulfurPhosphateConstraintPct}%`,
+    `- shipping/insurance/rerouting constraint: ${hormuzCurrentMultiInputDisruption2026.shippingInsuranceReroutingConstraintPct}%`,
+    `- input-price multiplier: ${hormuzCurrentMultiInputDisruption2026.inputPriceMultiplier.toFixed(2)}x`,
+    `- input-availability multiplier: ${hormuzCurrentMultiInputDisruption2026.inputAvailabilityMultiplier.toFixed(2)}x`,
+    `- food-price pressure multiplier: ${hormuzCurrentMultiInputDisruption2026.foodPricePressureMultiplier.toFixed(2)}x`,
+    '',
+    '## Current disruption scenario bands',
+    '| Scenario | Global food-production loss | Local food-availability stress | Food-price pressure index | Fertilizer stress | Fuel stress | Shipping stress | Notes |',
+    '|---|---:|---:|---:|---:|---:|---:|---|',
+    ...currentDisruptionBands.map((b) => `| ${b.scenario} | ${b.globalFoodProductionLossPct}% | ${b.localFoodAvailabilityStressPct}% | ${b.foodPricePressureIndex.toFixed(2)} | ${b.fertilizerAvailabilityStressPct}% | ${b.fuelAvailabilityStressPct}% | ${b.shippingStressPct}% | ${b.notes} |`),
     '',
     '## Current-system shock table',
     '| Scenario | Fuel shock | Food price pressure | Transport pressure | Food-stress exposure proxy | Severe stress proxy | Added food-insecurity exposure vs baseline | Lag to acute household impact | Main shock threshold crossed |',

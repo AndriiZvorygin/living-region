@@ -1,0 +1,17 @@
+{
+  "scenario_id": "hormuz_shock_central",
+  "label": "Current Hormuz disruption central-band",
+  "status": "scenario_assumption",
+  "not_forecast": true,
+  "assumptions": {
+    "oil_diesel_constraint_pct": { "value": 26, "range": [20, 32], "unit": "%", "confidence": "moderate", "notes": "Current disruption severe central band", "source_refs": ["eia_hormuz_lng_2026", "iea_hormuz_explainer"] },
+    "lng_natural_gas_constraint_pct": { "value": 26, "range": [20, 32], "unit": "%", "confidence": "moderate", "notes": "Current disruption severe central band", "source_refs": ["eia_hormuz_lng_2026", "iea_hormuz_explainer"] },
+    "nitrogen_fertilizer_constraint_pct": { "value": 24, "range": [16, 30], "unit": "%", "confidence": "low_to_moderate", "notes": "Proxy stress from gas-fertilizer channel", "source_refs": ["scenario_proxy"] },
+    "sulfur_phosphate_constraint_pct": { "value": 24, "range": [16, 30], "unit": "%", "confidence": "low_to_moderate", "notes": "Proxy stress from sulfur/phosphate channel", "source_refs": ["scenario_proxy"] },
+    "shipping_insurance_rerouting_constraint_pct": { "value": 30, "range": [24, 38], "unit": "%", "confidence": "moderate", "notes": "Shipping and insurance friction", "source_refs": ["scenario_proxy"] },
+    "input_price_multiplier": { "value": 1.55, "range": [1.35, 1.85], "unit": "x", "confidence": "moderate", "notes": "Current disruption central stress price proxy", "source_refs": ["scenario_proxy"] },
+    "input_availability_multiplier": { "value": 0.82, "range": [0.72, 0.90], "unit": "x", "confidence": "moderate", "notes": "Current disruption central stress availability proxy", "source_refs": ["scenario_proxy"] },
+    "food_price_pressure_multiplier": { "value": 1.35, "range": [1.20, 1.65], "unit": "x", "confidence": "moderate", "notes": "Current disruption central stress food-price proxy", "source_refs": ["scenario_proxy"] },
+    "global_food_production_loss_pct": { "value": 20, "range": [15, 25], "unit": "%", "confidence": "low", "notes": "Severe scenario band", "source_refs": ["scenario_band"] }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "scenario_id": "baseline",
+  "label": "Baseline no-new-shock reference",
+  "status": "scenario_assumption",
+  "not_forecast": true,
+  "assumptions": {
+    "oil_diesel_constraint_pct": { "value": 0, "range": [0, 5], "unit": "%", "confidence": "moderate", "notes": "Reference baseline", "source_refs": [] },
+    "lng_natural_gas_constraint_pct": { "value": 0, "range": [0, 5], "unit": "%", "confidence": "moderate", "notes": "Reference baseline", "source_refs": [] },
+    "nitrogen_fertilizer_constraint_pct": { "value": 0, "range": [0, 8], "unit": "%", "confidence": "low", "notes": "Reference baseline", "source_refs": [] },
+    "sulfur_phosphate_constraint_pct": { "value": 0, "range": [0, 8], "unit": "%", "confidence": "low", "notes": "Reference baseline", "source_refs": [] },
+    "shipping_insurance_rerouting_constraint_pct": { "value": 0, "range": [0, 10], "unit": "%", "confidence": "moderate", "notes": "Reference baseline", "source_refs": [] },
+    "input_price_multiplier": { "value": 1.0, "range": [1.0, 1.1], "unit": "x", "confidence": "moderate", "notes": "Reference baseline", "source_refs": [] },
+    "input_availability_multiplier": { "value": 1.0, "range": [0.95, 1.0], "unit": "x", "confidence": "moderate", "notes": "Reference baseline", "source_refs": [] },
+    "food_price_pressure_multiplier": { "value": 1.0, "range": [1.0, 1.1], "unit": "x", "confidence": "moderate", "notes": "Reference baseline", "source_refs": [] },
+    "global_food_production_loss_pct": { "value": 0, "range": [0, 5], "unit": "%", "confidence": "low", "notes": "Reference baseline", "source_refs": [] }
+  }
+}

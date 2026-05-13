@@ -55,6 +55,15 @@ describe('grey current-system shock threshold report', () => {
       const nonlinear20 = built.report.passThroughScenarios.find((r) => r.profile === 'tightMarketNonlinear' && r.shockScenario === 'fuelShock20');
       expect(nonlinear20.calibratedFoodInsecurityEstimateUnderShock).toBeGreaterThan(linear20.calibratedFoodInsecurityEstimateUnderShock);
       expect(built.report.thresholdFindingsByProfile.tightMarketNonlinear).toBeTruthy();
+      expect(built.report.hormuzCurrentMultiInputDisruption2026).toBeTruthy();
+      expect(built.report.hormuzCurrentMultiInputDisruption2026.oilDieselConstraintPct).toBeGreaterThan(0);
+      expect(built.report.hormuzCurrentMultiInputDisruption2026.lngNaturalGasConstraintPct).toBeGreaterThan(0);
+      expect(built.report.hormuzCurrentMultiInputDisruption2026.nitrogenFertilizerConstraintPct).toBeGreaterThan(0);
+      expect(built.report.hormuzCurrentMultiInputDisruption2026.sulfurPhosphateConstraintPct).toBeGreaterThan(0);
+      expect(built.report.hormuzCurrentMultiInputDisruption2026.shippingInsuranceReroutingConstraintPct).toBeGreaterThan(0);
+      const extremeBand = (built.report.currentDisruptionBands ?? []).find((b) => b.scenario === 'currentDisruptionExtreme');
+      expect(extremeBand.globalFoodProductionLossPct).toBe(30);
+      expect(String(extremeBand.notes).toLowerCase()).toContain('not a forecast');
       expect(built.report.localEmergencyFoodDemandContext.baselineStressAlreadyHigh).toBe(false);
       for (let i = 1; i < rows.length; i += 1) {
         expect(rows[i].foodInsecurityVulnerabilityPopulation).toBeGreaterThanOrEqual(rows[i - 1].foodInsecurityVulnerabilityPopulation);
@@ -74,6 +83,8 @@ describe('grey current-system shock threshold report', () => {
 
       const md = fs.readFileSync(built.paths.markdownPath, 'utf8');
       expect(md).toContain('does not assume local resilience already exists');
+      expect(md).toContain('current Hormuz disruption');
+      expect(md).toContain('not only an oil shock');
       expect(md).toContain('relative to the fuelShock0 baseline');
       expect(md).toContain('broader vulnerability band');
       expect(md).toContain('trend scenario, not forecast');

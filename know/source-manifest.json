@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-05-13T00:00:00Z",
+  "entries": [
+    {
+      "source_id": "example_population_calibration",
+      "title": "Example population calibration CSV",
+      "origin_url": "local-repo://know/input-example/calibration/population.csv",
+      "retrieved_at": "2026-05-13T00:00:00Z",
+      "local_path": "know/input-example/calibration/population.csv",
+      "content_hash": "sha256:56592881634acb2c342bf3b0802b5a2ef2871692d005c4d599b95b73348ebf73",
+      "licence": "AGPL example fixture",
+      "schema_version": "1.0",
+      "notes": "Fixture input used for deterministic pipeline tests"
+    },
+    {
+      "source_id": "example_fuel_prices_calibration",
+      "title": "Example fuel price calibration CSV",
+      "origin_url": "local-repo://know/input-example/calibration/fuel-prices.csv",
+      "retrieved_at": "2026-05-13T00:00:00Z",
+      "local_path": "know/input-example/calibration/fuel-prices.csv",
+      "content_hash": "sha256:d35a00d74e6d9fc699e3dfe9e44c07ad12c6842185fffc40070660c440da21ae",
+      "licence": "AGPL example fixture",
+      "schema_version": "1.0",
+      "notes": "Fixture input used for deterministic pipeline tests"
+    },
+    {
+      "source_id": "example_patches_geojson",
+      "title": "Example patches geometry",
+      "origin_url": "local-repo://know/input-example/gis/patches.geojson",
+      "retrieved_at": "2026-05-13T00:00:00Z",
+      "local_path": "know/input-example/gis/patches.geojson",
+      "content_hash": "sha256:381c037e36bca3e301d280ae613fdbabb25f2f0906eecff0331da19fe19571fd",
+      "licence": "AGPL example fixture",
+      "schema_version": "1.0",
+      "notes": "Fixture geometry source"
+    },
+    {
+      "source_id": "example_networks_geojson",
+      "title": "Example transport networks geometry",
+      "origin_url": "local-repo://know/input-example/gis/networks.geojson",
+      "retrieved_at": "2026-05-13T00:00:00Z",
+      "local_path": "know/input-example/gis/networks.geojson",
+      "content_hash": "sha256:517d3551f4b239c31d7b5db2a57ed93c53d48fe3b415722e56ac23a0ecc2a601",
+      "licence": "AGPL example fixture",
+      "schema_version": "1.0",
+      "notes": "Fixture geometry source"
+    }
+  ]
+}

@@ -69,7 +69,12 @@
     "test": "vitest run",
     "report:grey:food-gap-replacement": "node command/report_grey_food_gap_replacement.mjs",
     "report:grey:food-price": "node command/report_grey_food_supply_demand_price.mjs",
-    "report:grey:food-insecurity-trends": "node command/report_grey_food_insecurity_trends.mjs"
+    "report:grey:food-insecurity-trends": "node command/report_grey_food_insecurity_trends.mjs",
+    "report:grey:food-insecurity-trend": "node command/report_grey_food_insecurity_trend_projection.mjs",
+    "report:grey:hormuz-article-data": "node command/report_grey_hormuz_food_security_article_data.mjs",
+    "qa": "node command/qa_reliability.mjs",
+    "rebuild:all": "node command/rebuild_all.mjs",
+    "release:article-data": "node command/release_article_data.mjs"
   },
   "keywords": [
     "regional-planning",

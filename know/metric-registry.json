@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-05-13T00:00:00Z",
+  "metrics": [
+    {
+      "metric_id": "grey_food_insecurity_2027_baseline_people",
+      "label": "Grey no-new-shock 2027 food insecurity baseline (people)",
+      "unit": "people",
+      "allowed_statuses": ["scenario_output", "proxy"],
+      "requires_method": true,
+      "requires_range": true,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true
+    },
+    {
+      "metric_id": "grey_no_meaningful_food_growing_land_access_population",
+      "label": "Residents without meaningful food-growing land access",
+      "unit": "people",
+      "allowed_statuses": ["proxy", "scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": false
+    },
+    {
+      "metric_id": "food_for_10k_low_input_workers_year1",
+      "label": "Year-1 low-input field growers for food-for-10k",
+      "unit": "workers",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true
+    },
+    {
+      "metric_id": "food_for_10k_market_garden_workers_year1",
+      "label": "Year-1 market-garden growers for food-for-10k",
+      "unit": "workers",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true
+    },
+    {
+      "metric_id": "food_for_10k_household_growers_year1",
+      "label": "Year-1 household growers for food-for-10k",
+      "unit": "workers",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true
+    },
+    {
+      "metric_id": "hormuz_current_disruption_severe_added_food_insecurity_people",
+      "label": "People added to food insecurity in current-disruption severe band",
+      "unit": "people",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true
+    }
+  ]
+}

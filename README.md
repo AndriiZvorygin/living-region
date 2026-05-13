@@ -386,6 +386,26 @@ Missing / weak:
 - food insecurity trend drivers are attribution diagnostics, not causal proof
 - no web UI yet
 
+## Reliability Spine
+
+The repo now includes a first-pass reproducibility and QA contract:
+
+- `know/source-manifest.json`: locked source snapshots + hashes
+- `know/input/scenarios/*.json`: explicit scenario assumptions (`not_forecast: true`)
+- `know/metric-registry.json`: uncertainty/provenance requirements for headline metrics
+- `output/qa/rebuild-summary.json`: machine-readable QA result
+
+Core commands:
+
+```bash
+npm run rebuild:all
+npm run qa
+npm run release:article-data
+```
+
+Interpret output categories using `docs/report-map.md`:
+`measured`, `proxy`, `scenario_assumption`, and `scenario_output`.
+
 ## Legacy/demo commands
 
 These commands are still useful for tests and formula demos, but the current Grey modelling workflow centers on report commands and real-data inputs.
