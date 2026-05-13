@@ -33,7 +33,7 @@ const opts = parseArgs();
 const releaseDir = path.resolve(opts.releaseDir);
 fs.mkdirSync(releaseDir, { recursive: true });
 
-const files = [
+  const files = [
   'know/source-manifest.json',
   'know/metric-registry.json',
   'know/input/scenarios/baseline.json',
@@ -42,9 +42,13 @@ const files = [
   'know/input/scenarios/hormuz_shock_high.json',
   path.join(opts.qaDir, 'rebuild-summary.json'),
   path.join(opts.qaDir, 'rebuild-summary.md'),
-  path.join(opts.produceDir, 'grey-hormuz-food-security-article-data.json'),
-  path.join(opts.produceDir, 'grey-hormuz-food-security-article-data.md'),
-  path.join(opts.produceDir, 'grey-food-insecurity-trend-projection.json'),
+    path.join(opts.produceDir, 'grey-hormuz-food-security-article-data.json'),
+    path.join(opts.produceDir, 'grey-hormuz-food-security-article-data.md'),
+    path.join(opts.produceDir, 'grey-food-insecurity-trend-projection.md'),
+    path.join(opts.produceDir, 'grey-current-system-shock-threshold.md'),
+    path.join(opts.produceDir, 'grey-food-gap-replacement.md'),
+    path.join(opts.produceDir, 'grey-food-supply-demand-price.md'),
+    path.join(opts.produceDir, 'grey-food-insecurity-trend-projection.json'),
   path.join(opts.produceDir, 'grey-food-gap-replacement.json'),
   path.join(opts.produceDir, 'grey-food-supply-demand-price.json')
 ];

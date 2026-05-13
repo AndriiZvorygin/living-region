@@ -10,7 +10,30 @@
       "requires_method": true,
       "requires_range": true,
       "requires_confidence": true,
-      "requires_not_forecast_flag": true
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
+    },
+    {
+      "metric_id": "grey_food_insecurity_2027_baseline_rate_pct",
+      "label": "Grey no-new-shock 2027 food insecurity baseline (rate)",
+      "unit": "%",
+      "allowed_statuses": ["scenario_output", "proxy"],
+      "requires_method": true,
+      "requires_range": true,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
+    },
+    {
+      "metric_id": "grey_population_baseline",
+      "label": "Grey population baseline",
+      "unit": "people",
+      "allowed_statuses": ["measured", "proxy"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": false,
+      "requires_scenario_refs": false
     },
     {
       "metric_id": "grey_no_meaningful_food_growing_land_access_population",
@@ -20,7 +43,8 @@
       "requires_method": true,
       "requires_range": false,
       "requires_confidence": true,
-      "requires_not_forecast_flag": false
+      "requires_not_forecast_flag": false,
+      "requires_scenario_refs": false
     },
     {
       "metric_id": "food_for_10k_low_input_workers_year1",
@@ -30,7 +54,8 @@
       "requires_method": true,
       "requires_range": false,
       "requires_confidence": true,
-      "requires_not_forecast_flag": true
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
     },
     {
       "metric_id": "food_for_10k_market_garden_workers_year1",
@@ -40,7 +65,8 @@
       "requires_method": true,
       "requires_range": false,
       "requires_confidence": true,
-      "requires_not_forecast_flag": true
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
     },
     {
       "metric_id": "food_for_10k_household_growers_year1",
@@ -50,7 +76,41 @@
       "requires_method": true,
       "requires_range": false,
       "requires_confidence": true,
-      "requires_not_forecast_flag": true
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
+    },
+    {
+      "metric_id": "food_for_33k_low_input_workers_year1",
+      "label": "Year-1 low-input field growers for food-for-33k",
+      "unit": "workers",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
+    },
+    {
+      "metric_id": "food_for_33k_market_garden_workers_year1",
+      "label": "Year-1 market-garden growers for food-for-33k",
+      "unit": "workers",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
+    },
+    {
+      "metric_id": "food_for_33k_household_growers_year1",
+      "label": "Year-1 household growers for food-for-33k",
+      "unit": "workers",
+      "allowed_statuses": ["scenario_output"],
+      "requires_method": true,
+      "requires_range": false,
+      "requires_confidence": true,
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
     },
     {
       "metric_id": "hormuz_current_disruption_severe_added_food_insecurity_people",
@@ -60,7 +120,8 @@
       "requires_method": true,
       "requires_range": false,
       "requires_confidence": true,
-      "requires_not_forecast_flag": true
+      "requires_not_forecast_flag": true,
+      "requires_scenario_refs": true
     }
   ]
 }

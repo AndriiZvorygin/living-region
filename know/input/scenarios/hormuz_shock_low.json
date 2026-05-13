@@ -6,12 +6,12 @@
   "assumptions": {
     "oil_diesel_constraint_pct": { "value": 10, "range": [8, 14], "unit": "%", "confidence": "moderate", "notes": "Current disruption low stress band", "source_refs": ["eia_hormuz_lng_2026", "iea_hormuz_explainer"] },
     "lng_natural_gas_constraint_pct": { "value": 10, "range": [8, 14], "unit": "%", "confidence": "moderate", "notes": "Current disruption low stress band", "source_refs": ["eia_hormuz_lng_2026", "iea_hormuz_explainer"] },
-    "nitrogen_fertilizer_constraint_pct": { "value": 8, "range": [5, 12], "unit": "%", "confidence": "low", "notes": "Proxy stress from gas and trade constraints", "source_refs": ["scenario_proxy"] },
-    "sulfur_phosphate_constraint_pct": { "value": 8, "range": [5, 12], "unit": "%", "confidence": "low", "notes": "Proxy stress from sulfur/phosphate channels", "source_refs": ["scenario_proxy"] },
-    "shipping_insurance_rerouting_constraint_pct": { "value": 12, "range": [10, 18], "unit": "%", "confidence": "moderate", "notes": "Shipping and insurance friction", "source_refs": ["scenario_proxy"] },
-    "input_price_multiplier": { "value": 1.20, "range": [1.10, 1.35], "unit": "x", "confidence": "moderate", "notes": "Current disruption low stress price proxy", "source_refs": ["scenario_proxy"] },
-    "input_availability_multiplier": { "value": 0.92, "range": [0.88, 0.96], "unit": "x", "confidence": "moderate", "notes": "Current disruption low stress availability proxy", "source_refs": ["scenario_proxy"] },
-    "food_price_pressure_multiplier": { "value": 1.20, "range": [1.10, 1.35], "unit": "x", "confidence": "moderate", "notes": "Current disruption low stress food-price proxy", "source_refs": ["scenario_proxy"] },
-    "global_food_production_loss_pct": { "value": 5, "range": [3, 8], "unit": "%", "confidence": "low", "notes": "Low severe-band anchor", "source_refs": ["scenario_band"] }
+    "nitrogen_fertilizer_constraint_pct": { "value": 8, "range": [5, 12], "unit": "%", "confidence": "low", "notes": "Proxy stress from gas and trade constraints", "source_refs": ["unsupported_research_assumption"] },
+    "sulfur_phosphate_constraint_pct": { "value": 8, "range": [5, 12], "unit": "%", "confidence": "low", "notes": "Proxy stress from sulfur/phosphate channels", "source_refs": ["unsupported_research_assumption"] },
+    "shipping_insurance_rerouting_constraint_pct": { "value": 12, "range": [10, 18], "unit": "%", "confidence": "moderate", "notes": "Shipping and insurance friction", "source_refs": ["unsupported_research_assumption"] },
+    "input_price_multiplier": { "value": 1.20, "range": [1.10, 1.35], "unit": "x", "confidence": "moderate", "notes": "Current disruption low stress price proxy", "source_refs": ["unsupported_research_assumption"] },
+    "input_availability_multiplier": { "value": 0.92, "range": [0.88, 0.96], "unit": "x", "confidence": "moderate", "notes": "Current disruption low stress availability proxy", "source_refs": ["unsupported_research_assumption"] },
+    "food_price_pressure_multiplier": { "value": 1.20, "range": [1.10, 1.35], "unit": "x", "confidence": "moderate", "notes": "Current disruption low stress food-price proxy", "source_refs": ["unsupported_research_assumption"] },
+    "global_food_production_loss_pct": { "value": 5, "range": [3, 8], "unit": "%", "confidence": "low", "notes": "Low severe-band anchor", "source_refs": ["unsupported_research_assumption"] }
   }
 }

@@ -6,10 +6,12 @@ import crypto from 'node:crypto';
 const REQUIRED_FIELDS = [
   'source_id',
   'title',
+  'source_class',
   'local_path',
   'content_hash',
   'schema_version'
 ];
+const ALLOWED_SOURCE_CLASSES = new Set(['external_snapshot', 'manual_curated_input', 'generated_derived_output']);
 
 function sha256File(filePath) {
   const data = fs.readFileSync(filePath);
@@ -58,6 +60,12 @@ export function validateSourceManifest(options = {}) {
       if (entry[field] == null || String(entry[field]).trim() === '') {
         failures.push(`source ${entry.source_id ?? '(unknown)'} missing required field: ${field}`);
       }
+    }
+    if (!ALLOWED_SOURCE_CLASSES.has(entry.source_class)) {
+      failures.push(`source ${entry.source_id ?? '(unknown)'} has invalid source_class: ${entry.source_class}`);
+    }
+    if (entry.source_class === 'generated_derived_output') {
+      warnings.push(`source ${entry.source_id} is generated_derived_output; avoid circular provenance by validating upstream sources separately`);
     }
 
     const localPath = path.resolve(baseDir, entry.local_path ?? '');

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { buildGreyPopulationDistributionReport } from '../program/report/grey_population_distribution_report.mjs';
 import { buildGreyDwellingLandAccessReport } from '../program/report/grey_dwelling_land_access_report.mjs';
 import { buildGreyAgLabourBaselineReport } from '../program/report/grey_ag_labour_baseline_report.mjs';
@@ -84,6 +85,9 @@ const status = metric.status === 'pass' && invariants.status === 'pass' ? 'pass'
 const summary = {
   status,
   generated_at: new Date().toISOString(),
+  commit_hash: (() => {
+    try { return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim(); } catch { return null; }
+  })(),
   sources_checked: source.checked,
   sources_changed: source.changed,
   schema_failures: [],

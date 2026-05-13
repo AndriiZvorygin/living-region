@@ -5,6 +5,7 @@
     {
       "source_id": "example_population_calibration",
       "title": "Example population calibration CSV",
+      "source_class": "manual_curated_input",
       "origin_url": "local-repo://know/input-example/calibration/population.csv",
       "retrieved_at": "2026-05-13T00:00:00Z",
       "local_path": "know/input-example/calibration/population.csv",
@@ -16,6 +17,7 @@
     {
       "source_id": "example_fuel_prices_calibration",
       "title": "Example fuel price calibration CSV",
+      "source_class": "manual_curated_input",
       "origin_url": "local-repo://know/input-example/calibration/fuel-prices.csv",
       "retrieved_at": "2026-05-13T00:00:00Z",
       "local_path": "know/input-example/calibration/fuel-prices.csv",
@@ -27,6 +29,7 @@
     {
       "source_id": "example_patches_geojson",
       "title": "Example patches geometry",
+      "source_class": "manual_curated_input",
       "origin_url": "local-repo://know/input-example/gis/patches.geojson",
       "retrieved_at": "2026-05-13T00:00:00Z",
       "local_path": "know/input-example/gis/patches.geojson",
@@ -38,6 +41,7 @@
     {
       "source_id": "example_networks_geojson",
       "title": "Example transport networks geometry",
+      "source_class": "manual_curated_input",
       "origin_url": "local-repo://know/input-example/gis/networks.geojson",
       "retrieved_at": "2026-05-13T00:00:00Z",
       "local_path": "know/input-example/gis/networks.geojson",

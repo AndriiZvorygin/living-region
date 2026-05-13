@@ -197,7 +197,7 @@ export function buildGreyFoodInsecurityTrendProjectionReport(options = {}) {
   const md = [
     '# Grey Food-Insecurity Trend Projection (No New Shock Baseline)',
     '',
-    'This report projects a no-new-shock 2027 baseline using recent food-insecurity trend data. It is a trend projection, not a forecast, and excludes the current Hormuz disruption.',
+    'This report provides a no-new-shock 2027 trend-extension estimate using recent food-insecurity data. It is not a forecast and excludes the current Hormuz disruption.',
     '',
     '## Source series',
     '| Year | Geography | Food insecurity rate | Source | Note |',

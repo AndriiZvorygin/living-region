@@ -173,6 +173,18 @@ export function buildGreyHormuzFoodSecurityArticleDataReport(options = {}) {
     articleHeadlineFacts,
     headlineMetrics: [
       {
+        metric_id: 'grey_population_baseline',
+        label: 'Grey population baseline',
+        value: population,
+        unit: 'people',
+        status: 'measured',
+        method: 'census_population_distribution_totalPopulationMatched',
+        confidence: 'high',
+        source_refs: [path.join(produceDir, 'grey-population-distribution.json')],
+        scenario_refs: [],
+        not_forecast: false
+      },
+      {
         metric_id: 'grey_food_insecurity_2027_baseline_people',
         label: 'Grey no-new-shock 2027 food insecurity baseline (people)',
         value: trend2027People,
@@ -181,6 +193,24 @@ export function buildGreyHormuzFoodSecurityArticleDataReport(options = {}) {
         method: preferredTrend ? `trend_projection:${preferredTrend.method}` : 'fallback_current_shock_central_trend',
         range: preferredTrend
           ? { low: n(preferredTrend.rangeLowPeople, 0), high: n(preferredTrend.rangeHighPeople, 0), unit: 'people' }
+          : null,
+        confidence: preferredTrend ? 'moderate' : 'low',
+        source_refs: [
+          path.join(produceDir, 'grey-food-insecurity-trend-projection.json'),
+          path.join(produceDir, 'grey-current-system-shock-threshold.json')
+        ],
+        scenario_refs: ['baseline', 'hormuz_shock_low', 'hormuz_shock_central', 'hormuz_shock_high'],
+        not_forecast: true
+      },
+      {
+        metric_id: 'grey_food_insecurity_2027_baseline_rate_pct',
+        label: 'Grey no-new-shock 2027 food insecurity baseline (rate)',
+        value: trend2027Rate * 100,
+        unit: '%',
+        status: 'scenario_output',
+        method: preferredTrend ? `trend_projection:${preferredTrend.method}` : 'fallback_current_shock_central_trend',
+        range: preferredTrend
+          ? { low: n(preferredTrend.rangeLowRatePct, 0), high: n(preferredTrend.rangeHighRatePct, 0), unit: '%' }
           : null,
         confidence: preferredTrend ? 'moderate' : 'low',
         source_refs: [
@@ -248,6 +278,42 @@ export function buildGreyHormuzFoodSecurityArticleDataReport(options = {}) {
         confidence: 'low_to_moderate',
         source_refs: [path.join(produceDir, 'grey-current-system-shock-threshold.json')],
         scenario_refs: ['hormuz_shock_central'],
+        not_forecast: true
+      },
+      {
+        metric_id: 'food_for_33k_low_input_workers_year1',
+        label: 'Year-1 low-input field growers for food-for-33k',
+        value: n(targets[2]?.modes?.lowInputAnnualField?.requiredGrowers, 0),
+        unit: 'workers',
+        status: 'scenario_output',
+        method: 'requiredGJ/(GJPerHaYear1*landHaPerWorker)',
+        confidence: 'moderate',
+        source_refs: [path.join(produceDir, 'grey-food-gap-replacement.json')],
+        scenario_refs: ['foodGap33'],
+        not_forecast: true
+      },
+      {
+        metric_id: 'food_for_33k_market_garden_workers_year1',
+        label: 'Year-1 market-garden growers for food-for-33k',
+        value: n(targets[2]?.modes?.marketGardenIntensive?.requiredGrowers, 0),
+        unit: 'workers',
+        status: 'scenario_output',
+        method: 'requiredGJ/(GJPerHaYear1*landHaPerWorker)',
+        confidence: 'moderate',
+        source_refs: [path.join(produceDir, 'grey-food-gap-replacement.json')],
+        scenario_refs: ['foodGap33'],
+        not_forecast: true
+      },
+      {
+        metric_id: 'food_for_33k_household_growers_year1',
+        label: 'Year-1 household growers for food-for-33k',
+        value: n(targets[2]?.modes?.handToolHouseholdGarden?.requiredGrowers, 0),
+        unit: 'workers',
+        status: 'scenario_output',
+        method: 'requiredGJ/(GJPerHaYear1*landHaPerWorker)',
+        confidence: 'moderate',
+        source_refs: [path.join(produceDir, 'grey-food-gap-replacement.json')],
+        scenario_refs: ['foodGap33'],
         not_forecast: true
       }
     ],
