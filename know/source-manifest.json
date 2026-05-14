@@ -49,6 +49,42 @@
       "licence": "AGPL example fixture",
       "schema_version": "1.0",
       "notes": "Fixture geometry source"
+    },
+    {
+      "source_id": "feed_ontario_hunger_report_2025",
+      "title": "Feed Ontario Hunger Report 2025 webpage snapshot",
+      "source_class": "external_snapshot",
+      "origin_url": "https://feedontario.ca/hunger-report-2025/",
+      "retrieved_at": "2026-05-14T06:53:00-04:00",
+      "local_path": "know/source/local-calibration/feed-ontario-hunger-report-2025.html",
+      "content_hash": "sha256:fe94f706a2093b26a6df1d3aef4cfb040fa622fffaceec066d734a5860fedee7",
+      "licence": "Feed Ontario website terms",
+      "schema_version": "1.0",
+      "notes": "Used for Ontario food bank clients and visits (Apr 1 2024 to Mar 31 2025)."
+    },
+    {
+      "source_id": "fao_ontario_economic_monitor_2025_q1",
+      "title": "Financial Accountability Office of Ontario Economic Monitor 2025 Q1 snapshot",
+      "source_class": "external_snapshot",
+      "origin_url": "https://fao-on.org/en/report/oem-2025-q1/",
+      "retrieved_at": "2026-05-14T06:53:00-04:00",
+      "local_path": "know/source/local-calibration/fao-ontario-economic-monitor-2025-q1.html",
+      "content_hash": "sha256:cf4832b150af323bf6d45197265dca98c08a73481c339f3146aa109d7e0c6b82",
+      "licence": "FAO Ontario website terms",
+      "schema_version": "1.0",
+      "notes": "Used for Ontario food price year-over-year change in 2025 Q1 (cites StatCan table 18-10-0004-01)."
+    },
+    {
+      "source_id": "ontario_minimum_wage_2026_page",
+      "title": "Ontario minimum wage webpage snapshot",
+      "source_class": "external_snapshot",
+      "origin_url": "https://www.ontario.ca/document/your-guide-employment-standards-act-0/minimum-wage",
+      "retrieved_at": "2026-05-14T06:53:00-04:00",
+      "local_path": "know/source/local-calibration/ontario-minimum-wage.html",
+      "content_hash": "sha256:e1c915781259ac20e0915ae4c3756d1fee4ab2185aabfb6a63b2a5e852e66040",
+      "licence": "Ontario.ca terms",
+      "schema_version": "1.0",
+      "notes": "Used for general minimum wage rate from Oct 1 2025 to Sep 30 2026."
     }
   ]
 }

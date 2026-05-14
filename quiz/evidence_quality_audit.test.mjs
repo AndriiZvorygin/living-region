@@ -147,4 +147,63 @@ describe('evidence quality audit', () => {
     const fi = inv.claims.find((c) => c.claim_id === 'metric:grey_food_insecurity_2027_baseline_people');
     expect(fi.public_use).not.toBe('article_grade');
   });
+
+  test('provincial_proxy calibration does not upgrade scenario claim to article_grade', () => {
+    const root = path.resolve('know/produce/evidence-audit-provincial-proxy');
+    const produceDir = path.join(root, 'produce');
+    const qaDir = path.join(root, 'qa');
+    const inputDir = path.join(root, 'input');
+    const schemaDir = path.join(root, 'schema');
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+
+    writeJson(path.join(root, 'source-manifest.json'), {
+      entries: [{ source_id: 'src_prov', source_class: 'external_snapshot', local_path: 'know/input-example/calibration/population.csv', content_hash: 'sha256:x', schema_version: '1.0', title: 'x' }]
+    });
+    writeJson(path.join(root, 'metric-registry.json'), {
+      metrics: [{ metric_id: 'grey_food_insecurity_2027_baseline_people', allowed_statuses: ['scenario_output'], requires_method: true, requires_range: false, requires_confidence: true, requires_not_forecast_flag: true, requires_scenario_refs: true }]
+    });
+    fs.mkdirSync(schemaDir, { recursive: true });
+    writeJson(path.join(schemaDir, 'food-charity-series.schema.json'), { ok: true });
+    writeJson(path.join(schemaDir, 'food-price-series.schema.json'), { ok: true });
+    writeJson(path.join(schemaDir, 'rent-income-series.schema.json'), { ok: true });
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.writeFileSync(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\nOntario,Feed,visits,2026-01-01,2026-01-31,100,count,src_prov,provincial_proxy,ok\n');
+    fs.writeFileSync(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\nOntario,basket,percent_change,2026-01-01,2026-01-31,1.0,percent,src_prov,provincial_proxy,ok\n');
+    fs.writeFileSync(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\nOntario,minimum_wage_hourly,2026-01-01,2026-01-31,17.6,CAD/hour,src_prov,provincial_proxy,ok\n');
+    buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
+
+    writeJson(path.join(produceDir, 'grey-hormuz-food-security-article-data.json'), {
+      sourceFiles: {},
+      articleHeadlineFacts: [],
+      headlineMetrics: [{
+        metric_id: 'grey_food_insecurity_2027_baseline_people',
+        label: 'fi',
+        value: 200,
+        unit: 'people',
+        status: 'scenario_output',
+        method: 'x',
+        confidence: 'moderate',
+        source_refs: ['know/input-example/calibration/population.csv'],
+        scenario_refs: ['baseline'],
+        not_forecast: true
+      }]
+    });
+    fs.writeFileSync(path.join(produceDir, 'grey-hormuz-food-security-article-data.md'), '# X\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-food-insecurity-trend-projection.md'), '# Y\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-current-system-shock-threshold.md'), '# Z\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-plain-english-briefing.md'), '# Q\n');
+
+    const out = buildEvidenceQualityAudit({
+      produceDir,
+      qaDir,
+      metricRegistryPath: path.join(root, 'metric-registry.json'),
+      sourceManifestPath: path.join(root, 'source-manifest.json')
+    });
+    expect(out.status).toBe('pass');
+    const inv = JSON.parse(fs.readFileSync(path.join(qaDir, 'claim-inventory.json'), 'utf8'));
+    const claim = inv.claims.find((c) => c.claim_id === 'metric:grey_food_insecurity_2027_baseline_people');
+    expect(claim.calibration_quality).toBe('provincial_proxy');
+    expect(claim.public_use).not.toBe('article_grade');
+  });
 });

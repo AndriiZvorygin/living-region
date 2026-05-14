@@ -1,1 +1,2 @@
 geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes
+Ontario,Food component CPI year-over-year,percent_change,2025-01-01,2025-03-31,0.7,percent,fao_ontario_economic_monitor_2025_q1,provincial_proxy,"FAO Ontario Economic Monitor states food prices rose 0.7% in 2025 Q1 (y/y), citing StatCan table 18-10-0004-01."

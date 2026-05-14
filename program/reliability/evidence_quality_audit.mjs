@@ -75,7 +75,7 @@ const CALIBRATION_REQUIREMENTS = {
 
 function calibrationStatusForMetric(metricId, calibrationSummary) {
   const required = CALIBRATION_REQUIREMENTS[metricId] ?? [];
-  if (!required.length) return { calibration_status: 'calibrated', missing_calibration_refs: [] };
+  if (!required.length) return { calibration_status: 'calibrated', missing_calibration_refs: [], calibration_quality: 'none' };
   const categories = calibrationSummary?.categories ?? {};
   const loadedRefs = new Set();
   const qualityByRef = new Map();

@@ -1,1 +1,2 @@
 geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes
+Ontario,minimum_wage_hourly,2025-10-01,2026-09-30,17.60,CAD/hour,ontario_minimum_wage_2026_page,provincial_proxy,"Ontario general minimum wage rate shown for Oct 1 2025 to Sep 30 2026."
