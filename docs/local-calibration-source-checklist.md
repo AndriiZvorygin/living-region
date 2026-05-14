@@ -68,3 +68,67 @@ Example: `ontario_publichealth_foodbasket_2025`
 - Minimum required fields: modality, period, yield basis, labour basis, source_ref, quality_tier.
 - Claims supported: food-gap worker requirements and substitution scenarios.
 
+## Next best direct_local imports
+
+### food_charity_series
+
+Preferred next row pattern:
+
+`geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes`
+
+Example target indicators:
+- `meals_served`
+- `households_served`
+- `unique_clients`
+
+### food_price_series
+
+Preferred next row pattern:
+
+`geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes`
+
+Example target indicators:
+- `nutritious_food_basket_monthly_cost`
+- `item_price`
+- `food_cpi_index` (if only index data is available)
+
+### rent_income_series
+
+Preferred next row pattern:
+
+`geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes`
+
+Example target indicators:
+- `median_rent`
+- `shelter_cost_to_income_ratio`
+- `median_income`
+
+### parcel_address_unit_linkage
+
+Target import package:
+- parcel polygons
+- address points
+- building footprints
+- dwelling-unit count linkage (if available)
+
+Expected claim effect:
+- stronger strict land-access classification confidence
+
+### local_grower_productivity_calibration
+
+Target import rows should support deriving:
+- `GJ_per_ha`
+- `ha_per_worker`
+- `GJ_per_worker`
+
+Expected claim effect:
+- tighter worker-equivalent ranges in food-gap replacement scenarios
+
+### crop_labour_benchmark_source
+
+Target import rows should support:
+- labour hours per hectare by crop type
+- annual yield benchmarks by production modality
+
+Expected claim effect:
+- lower uncertainty for scenario labour assumptions

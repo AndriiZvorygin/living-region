@@ -73,6 +73,166 @@ const CALIBRATION_REQUIREMENTS = {
   food_for_33k_household_growers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source']
 };
 
+const SOURCE_REQUIREMENT_FORECAST = {
+  food_charity_series: {
+    expected_readiness_after_import: 'article_with_caveat',
+    reason: 'Direct local time series can strengthen risk-pressure calibration but still requires model caveats.'
+  },
+  food_price_series: {
+    expected_readiness_after_import: 'article_with_caveat',
+    reason: 'Local basket/CPI evidence improves affordability calibration but remains model-mediated.'
+  },
+  rent_income_series: {
+    expected_readiness_after_import: 'article_with_caveat',
+    reason: 'Household pressure calibration improves with local income/rent series.'
+  },
+  parcel_address_unit_linkage: {
+    expected_readiness_after_import: 'article_with_caveat',
+    reason: 'Direct parcel-address linkage materially improves land-access proxy credibility.'
+  },
+  local_grower_productivity_calibration: {
+    expected_readiness_after_import: 'article_with_caveat',
+    reason: 'Local productivity benchmarks reduce uncertainty in worker equivalents.'
+  },
+  crop_labour_benchmark_source: {
+    expected_readiness_after_import: 'article_with_caveat',
+    reason: 'Independent labour benchmarks reduce modality-labour assumption risk.'
+  }
+};
+
+const LOCAL_SOURCE_CANDIDATES = [
+  {
+    candidate_id: 'gbph_cost_of_eating_well_2024',
+    category: 'food_price_series',
+    title: 'Grey Bruce Public Health Cost of Eating Well report',
+    organization: 'Grey Bruce Public Health',
+    geography: 'Grey-Bruce',
+    likely_quality_tier: 'regional_proxy',
+    likely_indicators: ['nutritious_food_basket_monthly_cost', 'percent_change'],
+    access_method: 'public_download',
+    import_readiness: 'ready_to_import',
+    notes: 'Public report references Ontario Nutritious Food Basket methodology.',
+    expected_claim_impact: 'Improves food insecurity affordability calibration.'
+  },
+  {
+    candidate_id: 'foodbrucegrey_app_timeseries',
+    category: 'food_charity_series',
+    title: 'FoodBruceGrey app program-level aggregate usage',
+    organization: 'United Way of Bruce Grey',
+    geography: 'Grey-Bruce',
+    likely_quality_tier: 'direct_local',
+    likely_indicators: ['meals_served', 'households_served', 'visits'],
+    access_method: 'request_required',
+    import_readiness: 'needs_request',
+    notes: 'Likely strongest local food charity series if extractable as CSV.',
+    expected_claim_impact: 'Can upgrade food insecurity pressure calibration quality.'
+  },
+  {
+    candidate_id: 'owen_sound_hunger_relief_annual_usage',
+    category: 'food_charity_series',
+    title: 'Owen Sound Hunger and Relief Effort annual usage',
+    organization: 'OSHaRE / local meal providers',
+    geography: 'Owen Sound',
+    likely_quality_tier: 'direct_local',
+    likely_indicators: ['meals_served', 'unique_clients'],
+    access_method: 'request_required',
+    import_readiness: 'needs_request',
+    notes: 'Local direct-use statistics likely available via annual reports or direct request.',
+    expected_claim_impact: 'Improves claim specificity for local household food stress.'
+  },
+  {
+    candidate_id: 'cmhc_owen_sound_rent_table',
+    category: 'rent_income_series',
+    title: 'CMHC rental market table for Owen Sound area',
+    organization: 'CMHC',
+    geography: 'Owen Sound / nearby rental market area',
+    likely_quality_tier: 'regional_proxy',
+    likely_indicators: ['average_rent', 'median_rent'],
+    access_method: 'public_download',
+    import_readiness: 'needs_manual_review',
+    notes: 'Requires careful geography mapping to Grey/Owen Sound.',
+    expected_claim_impact: 'Strengthens rent-income pressure calibration.'
+  },
+  {
+    candidate_id: 'statcan_shelter_cost_income_ontario',
+    category: 'rent_income_series',
+    title: 'StatCan shelter-cost-to-income ratio table',
+    organization: 'Statistics Canada',
+    geography: 'Ontario',
+    likely_quality_tier: 'provincial_proxy',
+    likely_indicators: ['shelter_cost_to_income_ratio', 'low_income_measure_rate'],
+    access_method: 'public_download',
+    import_readiness: 'ready_to_import',
+    notes: 'Useful fallback where local series unavailable.',
+    expected_claim_impact: 'Adds policy pressure context; still caveated at provincial level.'
+  },
+  {
+    candidate_id: 'grey_county_parcel_address_export',
+    category: 'parcel_address_unit_linkage',
+    title: 'Grey County parcel-address-building-unit linkage export',
+    organization: 'Grey County GIS / municipalities',
+    geography: 'Grey County',
+    likely_quality_tier: 'direct_local',
+    likely_indicators: ['parcel_area', 'dwelling_units', 'address_points'],
+    access_method: 'request_required',
+    import_readiness: 'needs_request',
+    notes: 'Highest-value upgrade for strict land-access claims.',
+    expected_claim_impact: 'Could materially improve land-access claim readiness.'
+  },
+  {
+    candidate_id: 'municipal_open_data_address_points',
+    category: 'parcel_address_unit_linkage',
+    title: 'Municipal address points + building footprints',
+    organization: 'Owen Sound / lower-tier municipalities',
+    geography: 'Municipal',
+    likely_quality_tier: 'direct_local',
+    likely_indicators: ['address_points', 'building_footprints'],
+    access_method: 'public_download',
+    import_readiness: 'needs_manual_review',
+    notes: 'Requires schema harmonization across municipalities.',
+    expected_claim_impact: 'Improves spatial assignment precision for household land access.'
+  },
+  {
+    candidate_id: 'grey_bruce_public_health_food_affordability_series',
+    category: 'food_price_series',
+    title: 'Grey-Bruce food affordability annual/public-health series',
+    organization: 'Grey Bruce Public Health',
+    geography: 'Grey-Bruce',
+    likely_quality_tier: 'regional_proxy',
+    likely_indicators: ['nutritious_food_basket_monthly_cost'],
+    access_method: 'public_webpage',
+    import_readiness: 'ready_to_import',
+    notes: 'Likely easiest near-term upgrade from provincial to regional proxy.',
+    expected_claim_impact: 'Directly supports food insecurity baseline calibration.'
+  },
+  {
+    candidate_id: 'grey_local_grower_records_pilot',
+    category: 'local_grower_productivity_calibration',
+    title: 'Pilot local grower yield/labour logs',
+    organization: 'Local growers / extension partners',
+    geography: 'Grey County',
+    likely_quality_tier: 'direct_local',
+    likely_indicators: ['GJ_per_ha', 'ha_per_worker', 'GJ_per_worker'],
+    access_method: 'internal_manual_entry',
+    import_readiness: 'needs_request',
+    notes: 'Requires data-sharing agreements and normalization protocol.',
+    expected_claim_impact: 'High impact for food-gap worker estimates.'
+  },
+  {
+    candidate_id: 'omafra_or_extension_crop_labour_benchmarks',
+    category: 'crop_labour_benchmark_source',
+    title: 'Ontario crop labour benchmark datasets',
+    organization: 'OMAFRA / extension sources',
+    geography: 'Ontario',
+    likely_quality_tier: 'provincial_proxy',
+    likely_indicators: ['labour_hours_per_ha', 'yield_per_ha'],
+    access_method: 'public_download',
+    import_readiness: 'needs_manual_review',
+    notes: 'Can anchor modality assumptions until direct local benchmarks are available.',
+    expected_claim_impact: 'Reduces worker-equivalent uncertainty with caveat.'
+  }
+];
+
 function calibrationStatusForMetric(metricId, calibrationSummary) {
   const required = CALIBRATION_REQUIREMENTS[metricId] ?? [];
   if (!required.length) return { calibration_status: 'calibrated', missing_calibration_refs: [], calibration_quality: 'none' };
@@ -147,6 +307,13 @@ function applyCalibrationQualityRule(claim) {
       claim.public_use = 'article_with_caveat';
     }
   }
+}
+
+function candidateScore(c) {
+  const tierScore = { direct_local: 5, regional_proxy: 4, provincial_proxy: 3, national_proxy: 2, scenario_only: 1, unknown: 1 }[c.likely_quality_tier] ?? 1;
+  const importScore = { ready_to_import: 4, needs_manual_review: 3, needs_request: 2, unsuitable: 0 }[c.import_readiness] ?? 0;
+  const accessScore = { public_download: 4, public_webpage: 3, request_required: 2, internal_manual_entry: 1 }[c.access_method] ?? 0;
+  return tierScore * 2 + importScore + accessScore;
 }
 
 export function buildEvidenceQualityAudit(options = {}) {
@@ -353,6 +520,13 @@ export function buildEvidenceQualityAudit(options = {}) {
 
   const readinessPath = path.join(qaDir, 'article-readiness-summary.md');
   const calibrationRows = Object.values(calibrationSummary?.categories ?? {});
+  const missingToClaims = new Map();
+  for (const claim of claims) {
+    for (const ref of claim.missing_calibration_refs ?? []) {
+      if (!missingToClaims.has(ref)) missingToClaims.set(ref, []);
+      missingToClaims.get(ref).push(claim.claim_id);
+    }
+  }
   fs.writeFileSync(readinessPath, [
     '# Article Readiness Summary',
     '',
@@ -367,6 +541,25 @@ export function buildEvidenceQualityAudit(options = {}) {
     '',
     '## Specific calibration gaps',
     ...(specificCalibrationGaps.length ? specificCalibrationGaps.map((g) => `- ${g}`) : ['- none']),
+    '',
+    '## Highest-impact missing sources',
+    '| Missing source | Affected claims | Current readiness | Expected readiness after import | Reason |',
+    '|---|---|---|---|---|',
+    ...(specificCalibrationGaps.length
+      ? specificCalibrationGaps.map((g) => {
+        const claimIds = [...new Set((missingToClaims.get(g) ?? []))];
+        const currentReadiness = [...new Set(
+          claims
+            .filter((c) => claimIds.includes(c.claim_id))
+            .map((c) => c.public_use)
+        )].join('; ') || 'n/a';
+        const forecast = SOURCE_REQUIREMENT_FORECAST[g] ?? {
+          expected_readiness_after_import: 'article_with_caveat',
+          reason: 'Additional calibration expected to improve caveated readiness.'
+        };
+        return `| ${g} | ${claimIds.join(', ') || 'n/a'} | ${currentReadiness} | ${forecast.expected_readiness_after_import} | ${forecast.reason} |`;
+      })
+      : ['| none | n/a | n/a | n/a | n/a |']),
     '',
     '## Local calibration status',
     '| Category | Data points | Strongest quality tier | Claim impact | Remaining gap |',
@@ -391,6 +584,57 @@ export function buildEvidenceQualityAudit(options = {}) {
   const wordingPath = path.join(qaDir, 'wording-risk-report.json');
   fs.writeFileSync(wordingPath, JSON.stringify({ generated_at: new Date().toISOString(), risks: wordingRisks }, null, 2));
 
+  const candidatesByCategory = {};
+  for (const c of LOCAL_SOURCE_CANDIDATES) {
+    if (!candidatesByCategory[c.category]) candidatesByCategory[c.category] = [];
+    candidatesByCategory[c.category].push(c);
+  }
+  const candidateJsonPath = path.join(qaDir, 'local-source-candidates.json');
+  fs.writeFileSync(candidateJsonPath, JSON.stringify({
+    generated_at: new Date().toISOString(),
+    categories: candidatesByCategory,
+    candidates: LOCAL_SOURCE_CANDIDATES
+  }, null, 2));
+  const candidateMdPath = path.join(qaDir, 'local-source-candidates.md');
+  const categoryOrder = [
+    'food_charity_series',
+    'food_price_series',
+    'rent_income_series',
+    'parcel_address_unit_linkage',
+    'local_grower_productivity_calibration',
+    'crop_labour_benchmark_source'
+  ];
+  fs.writeFileSync(candidateMdPath, [
+    '# Local Source Candidates',
+    '',
+    ...categoryOrder.flatMap((category) => {
+      const rows = candidatesByCategory[category] ?? [];
+      return [
+        `## ${category}`,
+        '',
+        '| Candidate | Organization | Geography | Tier | Access | Readiness | Impact |',
+        '|---|---|---|---|---|---|---|',
+        ...(rows.length
+          ? rows.map((r) => `| ${r.candidate_id} | ${r.organization} | ${r.geography} | ${r.likely_quality_tier} | ${r.access_method} | ${r.import_readiness} | ${r.expected_claim_impact} |`)
+          : ['| none | n/a | n/a | n/a | n/a | n/a | n/a |']),
+        ''
+      ];
+    })
+  ].join('\n'));
+
+  const priority = [...LOCAL_SOURCE_CANDIDATES]
+    .map((c) => ({ ...c, priority_score: candidateScore(c) }))
+    .sort((a, b) => b.priority_score - a.priority_score)
+    .slice(0, 10);
+  const priorityPath = path.join(qaDir, 'local-source-priority.md');
+  fs.writeFileSync(priorityPath, [
+    '# Local Source Priority',
+    '',
+    '| Rank | Candidate | Category | Tier | Import readiness | Access | Score | Why now |',
+    '|---:|---|---|---|---|---|---:|---|',
+    ...priority.map((r, i) => `| ${i + 1} | ${r.title} | ${r.category} | ${r.likely_quality_tier} | ${r.import_readiness} | ${r.access_method} | ${r.priority_score} | ${r.expected_claim_impact} |`)
+  ].join('\n'));
+
   return {
     status: failures.length ? 'fail' : 'pass',
     failures,
@@ -400,7 +644,10 @@ export function buildEvidenceQualityAudit(options = {}) {
       claimInventoryMd: invMdPath,
       redTeamMd: redTeamPath,
       articleReadinessMd: readinessPath,
-      wordingRiskJson: wordingPath
+      wordingRiskJson: wordingPath,
+      localSourceCandidatesJson: candidateJsonPath,
+      localSourceCandidatesMd: candidateMdPath,
+      localSourcePriorityMd: priorityPath
     },
     claimCount: claims.length
   };
