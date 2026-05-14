@@ -7,6 +7,7 @@ import { loadScenarioFiles } from '../program/reliability/scenario_contract.mjs'
 import { validateMetricContract } from '../program/reliability/metric_contract.mjs';
 import { runInvariantChecks } from '../program/reliability/invariants.mjs';
 import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
+import { buildLocalCalibrationSummary } from '../program/reliability/local_calibration_intake.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -39,6 +40,12 @@ fs.mkdirSync(qaDir, { recursive: true });
 
 const source = validateSourceManifest({ manifestPath: opts.manifestPath });
 const scenarios = loadScenarioFiles({ scenariosDir: opts.scenariosDir });
+const calibration = buildLocalCalibrationSummary({
+  inputDir: 'know/input/local-calibration',
+  schemaDir: 'know/schema/local-calibration',
+  produceDir: opts.produceDir,
+  sourceManifestPath: opts.manifestPath
+});
 const metric = validateMetricContract({ registryPath: opts.metricRegistryPath, reportPath: opts.articleReportPath, scenariosDir: opts.scenariosDir });
 const invariants = runInvariantChecks({ produceDir: opts.produceDir });
 const evidence = buildEvidenceQualityAudit({
@@ -48,7 +55,7 @@ const evidence = buildEvidenceQualityAudit({
   sourceManifestPath: opts.manifestPath
 });
 
-const status = [source.status, scenarios.status, metric.status, invariants.status, evidence.status].every((s) => s === 'pass') ? 'pass' : 'fail';
+const status = [source.status, scenarios.status, calibration.status, metric.status, invariants.status, evidence.status].every((s) => s === 'pass') ? 'pass' : 'fail';
 
 const summary = {
   status,
@@ -57,6 +64,7 @@ const summary = {
   sources_checked: source.checked ?? 0,
   sources_changed: source.changed ?? 0,
   schema_failures: [...(source.failures ?? []), ...(scenarios.failures ?? [])],
+  calibration_failures: calibration.failures ?? [],
   scenario_failures: scenarios.failures ?? [],
   metric_contract_failures: metric.failures ?? [],
   invariant_failures: invariants.failures ?? [],
@@ -71,6 +79,7 @@ const summary = {
   warnings: [
     ...(source.warnings ?? []),
     ...(scenarios.warnings ?? []),
+    ...(calibration.warnings ?? []),
     ...(metric.warnings ?? []),
     ...(invariants.warnings ?? []),
     ...(evidence.warnings ?? [])
@@ -78,6 +87,7 @@ const summary = {
   details: {
     source,
     scenarios: { status: scenarios.status, checked: scenarios.scenarios.length },
+    calibration: { status: calibration.status, dataPoints: calibration.summary?.totalDataPoints ?? 0 },
     metric,
     invariants,
     evidence
@@ -98,6 +108,7 @@ const md = [
   `- sources_changed: ${summary.sources_changed}`,
   `- schema_failures: ${summary.schema_failures.length}`,
   `- scenario_failures: ${summary.scenario_failures.length}`,
+  `- calibration_failures: ${summary.calibration_failures.length}`,
   `- metric_contract_failures: ${summary.metric_contract_failures.length}`,
   `- invariant_failures: ${summary.invariant_failures.length}`,
   `- evidence_failures: ${summary.evidence_failures.length}`,
@@ -108,6 +119,7 @@ const md = [
   ...[
     ...summary.schema_failures,
     ...summary.scenario_failures,
+    ...summary.calibration_failures,
     ...summary.metric_contract_failures,
     ...summary.invariant_failures,
     ...summary.evidence_failures

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "title": "Local Calibration Rent Income Series",
+  "required_headers": [
+    "geography",
+    "indicator",
+    "period_start",
+    "period_end",
+    "value",
+    "unit",
+    "source_ref",
+    "notes"
+  ],
+  "indicator_examples": [
+    "median_rent",
+    "average_rent",
+    "shelter_cost_to_income_ratio",
+    "median_income",
+    "low_income_measure_rate",
+    "odsp_single_shelter_allowance",
+    "minimum_wage_hourly"
+  ]
+}
+

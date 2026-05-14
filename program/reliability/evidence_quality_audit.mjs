@@ -21,6 +21,11 @@ function readText(filePath) {
   if (!fs.existsSync(p)) return null;
   try { return fs.readFileSync(p, 'utf8'); } catch { return null; }
 }
+function readJsonIfExists(filePath, fallback = null) {
+  const p = path.resolve(filePath);
+  if (!fs.existsSync(p)) return fallback;
+  try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fallback; }
+}
 
 function classifySourceRef(ref, sourceManifestMap) {
   const abs = path.resolve(ref);
@@ -55,6 +60,32 @@ function recommendedWording(claim) {
   return 'Interpretive statement; keep conditional wording and caveats.';
 }
 
+const CALIBRATION_REQUIREMENTS = {
+  grey_food_insecurity_2027_baseline_people: ['food_charity_series', 'food_price_series', 'rent_income_series'],
+  grey_food_insecurity_2027_baseline_rate_pct: ['food_charity_series', 'food_price_series', 'rent_income_series'],
+  hormuz_current_disruption_severe_added_food_insecurity_people: ['food_charity_series', 'food_price_series', 'rent_income_series'],
+  grey_no_meaningful_food_growing_land_access_population: ['parcel_address_unit_linkage'],
+  food_for_10k_low_input_workers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source'],
+  food_for_10k_market_garden_workers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source'],
+  food_for_10k_household_growers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source'],
+  food_for_33k_low_input_workers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source'],
+  food_for_33k_market_garden_workers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source'],
+  food_for_33k_household_growers_year1: ['local_grower_productivity_calibration', 'crop_labour_benchmark_source']
+};
+
+function calibrationStatusForMetric(metricId, calibrationSummary) {
+  const required = CALIBRATION_REQUIREMENTS[metricId] ?? [];
+  if (!required.length) return { calibration_status: 'calibrated', missing_calibration_refs: [] };
+  const categories = calibrationSummary?.categories ?? {};
+  const loadedRefs = new Set();
+  if ((categories.food_charity?.data_points ?? 0) > 0) loadedRefs.add('food_charity_series');
+  if ((categories.food_price?.data_points ?? 0) > 0) loadedRefs.add('food_price_series');
+  if ((categories.rent_income?.data_points ?? 0) > 0) loadedRefs.add('rent_income_series');
+  const missing = required.filter((x) => !loadedRefs.has(x));
+  const status = missing.length === 0 ? 'calibrated' : (missing.length === required.length ? 'uncalibrated' : 'partially_calibrated');
+  return { calibration_status: status, missing_calibration_refs: missing };
+}
+
 const RISKY_PHRASES = [
   /\bwill rise\b/i,
   /\bwill cause\b/i,
@@ -85,6 +116,7 @@ export function buildEvidenceQualityAudit(options = {}) {
 
   const articlePath = path.join(produceDir, 'grey-hormuz-food-security-article-data.json');
   const article = readJson(articlePath, failures, 'article report', null);
+  const calibrationSummary = readJsonIfExists(path.join(produceDir, 'local-calibration-summary.json'), { categories: {} });
   const metricRegistry = readJson(options.metricRegistryPath ?? 'know/metric-registry.json', failures, 'metric registry', { metrics: [] });
   const sourceManifest = readJson(options.sourceManifestPath ?? 'know/source-manifest.json', failures, 'source manifest', { entries: [] });
   if (!article) {
@@ -112,6 +144,9 @@ export function buildEvidenceQualityAudit(options = {}) {
       caveat: metric.not_forecast === true ? 'not a forecast' : (metric.status === 'proxy' ? 'proxy estimate with uncertainty bounds' : ''),
       recommended_wording: ''
     };
+    const calibration = calibrationStatusForMetric(metric.metric_id, calibrationSummary);
+    claim.calibration_status = calibration.calibration_status;
+    claim.missing_calibration_refs = calibration.missing_calibration_refs;
 
     // Guard against circular confidence.
     const hasStrongSource = sourceClasses.includes('external_snapshot') || sourceClasses.includes('manual_curated_input');
@@ -165,7 +200,9 @@ export function buildEvidenceQualityAudit(options = {}) {
       evidence_strength: 'medium',
       public_use: 'article_with_caveat',
       caveat: 'Interpretive summary statement.',
-      recommended_wording: 'Use conditional language and keep uncertainty visible.'
+      recommended_wording: 'Use conditional language and keep uncertainty visible.',
+      calibration_status: 'partially_calibrated',
+      missing_calibration_refs: []
     });
   }
 
@@ -203,7 +240,7 @@ export function buildEvidenceQualityAudit(options = {}) {
     needsCaveats: claims.filter((c) => c.public_use === 'article_with_caveat'),
     proxyDependent: claims.filter((c) => c.claim_status === 'proxy'),
     scenarioDependent: claims.filter((c) => c.claim_status === 'scenario_output' || c.claim_status === 'scenario_assumption'),
-    needsLocalCalibration: claims.filter((c) => c.claim_status === 'proxy' || c.claim_status === 'scenario_output'),
+    needsLocalCalibration: claims.filter((c) => c.calibration_status === 'uncalibrated' || c.calibration_status === 'partially_calibrated'),
     softenBeforePublication: claims.filter((c) => c.claim_status === 'interpretation' || c.evidence_strength === 'low'),
     avoidUntilBetterEvidence: claims.filter((c) => c.public_use === 'do_not_publish' || c.evidence_strength === 'unsupported')
   };
@@ -215,6 +252,7 @@ export function buildEvidenceQualityAudit(options = {}) {
     'Parcel/address-level land-access ground truth still proxy-based.',
     'Scenario channel weights for fertilizer/sulfur/phosphate remain assumption-heavy.'
   ];
+  const specificCalibrationGaps = [...new Set(claims.flatMap((c) => c.missing_calibration_refs ?? []))].sort();
   const topWordingChanges = [
     'Prefer "trend-extension estimate" over "projected" in public summary bullets.',
     'Use "scenario output" explicitly for all shock-band outcomes.',
@@ -236,9 +274,9 @@ export function buildEvidenceQualityAudit(options = {}) {
     '',
     `- claims: ${claims.length}`,
     '',
-    '| Claim ID | Status | Evidence | Public use | Caveat |',
-    '|---|---|---|---|---|',
-    ...claims.map((c) => `| ${c.claim_id} | ${c.claim_status} | ${c.evidence_strength} | ${c.public_use} | ${c.caveat || ''} |`)
+    '| Claim ID | Status | Evidence | Public use | Calibration | Caveat |',
+    '|---|---|---|---|---|---|',
+    ...claims.map((c) => `| ${c.claim_id} | ${c.claim_status} | ${c.evidence_strength} | ${c.public_use} | ${c.calibration_status ?? 'n/a'} | ${c.caveat || ''} |`)
   ].join('\n'));
 
   const redTeamPath = path.join(qaDir, 'red-team-claims.md');
@@ -258,7 +296,7 @@ export function buildEvidenceQualityAudit(options = {}) {
     ...grouped.scenarioDependent.map((c) => `- ${c.claim_text}`),
     '',
     '## Claims that need local calibration data',
-    ...grouped.needsLocalCalibration.map((c) => `- ${c.claim_text}`),
+    ...grouped.needsLocalCalibration.map((c) => `- ${c.claim_text} (missing: ${(c.missing_calibration_refs ?? []).join(', ') || 'n/a'})`),
     '',
     '## Claims that should be softened before publication',
     ...grouped.softenBeforePublication.map((c) => `- ${c.claim_text}`),
@@ -278,7 +316,10 @@ export function buildEvidenceQualityAudit(options = {}) {
     ...claims.filter((c) => c.public_use === 'article_with_caveat').map((c) => `- ${c.claim_text}`),
     '',
     '## Needs better local data',
-    ...grouped.needsLocalCalibration.map((c) => `- ${c.claim_text}`),
+    ...grouped.needsLocalCalibration.map((c) => `- ${c.claim_text} (missing: ${(c.missing_calibration_refs ?? []).join(', ') || 'n/a'})`),
+    '',
+    '## Specific calibration gaps',
+    ...(specificCalibrationGaps.length ? specificCalibrationGaps.map((g) => `- ${g}`) : ['- none']),
     '',
     '## Top 5 evidence gaps',
     ...topEvidenceGaps.map((g) => `- ${g}`),

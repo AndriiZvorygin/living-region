@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "title": "Local Calibration Food Price Series",
+  "required_headers": [
+    "geography",
+    "basket_or_item",
+    "indicator",
+    "period_start",
+    "period_end",
+    "value",
+    "unit",
+    "source_ref",
+    "notes"
+  ],
+  "indicator_examples": [
+    "nutritious_food_basket_monthly_cost",
+    "grocery_cpi_index",
+    "food_cpi_index",
+    "item_price",
+    "percent_change"
+  ]
+}
+

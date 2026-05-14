@@ -47,6 +47,8 @@ describe('evidence quality audit', () => {
     const metricClaim = inv.claims.find((c) => c.claim_id === 'metric:m1');
     expect(metricClaim.public_use).not.toBe('article_grade');
     expect(metricClaim.caveat.toLowerCase()).toContain('not a forecast');
+    expect(metricClaim).toHaveProperty('calibration_status');
+    expect(Array.isArray(metricClaim.missing_calibration_refs)).toBe(true);
 
     fs.rmSync(root, { recursive: true, force: true });
   });

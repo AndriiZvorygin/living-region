@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "title": "Local Calibration Food Charity Series",
+  "required_headers": [
+    "geography",
+    "organization_or_source",
+    "indicator",
+    "period_start",
+    "period_end",
+    "value",
+    "unit",
+    "source_ref",
+    "notes"
+  ],
+  "indicator_examples": [
+    "visits",
+    "unique_clients",
+    "households_served",
+    "meals_served",
+    "hamper_count",
+    "percent_change",
+    "unknown_indicator"
+  ]
+}
+

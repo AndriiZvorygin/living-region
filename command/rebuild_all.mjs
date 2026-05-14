@@ -16,6 +16,7 @@ import { loadScenarioFiles } from '../program/reliability/scenario_contract.mjs'
 import { validateMetricContract } from '../program/reliability/metric_contract.mjs';
 import { runInvariantChecks } from '../program/reliability/invariants.mjs';
 import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
+import { buildLocalCalibrationSummary } from '../program/reliability/local_calibration_intake.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -41,6 +42,16 @@ const canonicalProduceDir = path.resolve('know/produce');
 fs.rmSync(produceDir, { recursive: true, force: true });
 fs.mkdirSync(produceDir, { recursive: true });
 fs.mkdirSync(qaDir, { recursive: true });
+
+const lotsPath = path.resolve('know/input/gis/lots-and-concessions-grey.geojson');
+if (!fs.existsSync(lotsPath)) {
+  try {
+    execSync('npm run grey:download-data -- --source=lots-and-concessions-grey', { stdio: 'inherit' });
+  } catch (error) {
+    console.error(`required lots input download failed: ${error.message}`);
+    process.exit(1);
+  }
+}
 
 // Seed required upstream derived artifacts that are not rebuilt from raw data in this command.
 // This prevents false-zero outputs when reports depend on prior census/import outputs.
@@ -69,6 +80,17 @@ const scenarios = loadScenarioFiles({ scenariosDir: opts.scenariosDir });
 if (scenarios.status !== 'pass') {
   console.error('scenario validation failed');
   console.error(scenarios.failures.join('\n'));
+  process.exit(1);
+}
+const calibration = buildLocalCalibrationSummary({
+  inputDir: 'know/input/local-calibration',
+  schemaDir: 'know/schema/local-calibration',
+  produceDir,
+  sourceManifestPath: opts.manifestPath
+});
+if (calibration.status !== 'pass') {
+  console.error('local calibration intake validation failed');
+  console.error(calibration.failures.join('\n'));
   process.exit(1);
 }
 
@@ -117,12 +139,13 @@ const summary = {
   sources_checked: source.checked,
   sources_changed: source.changed,
   schema_failures: [],
+  calibration_failures: calibration.failures,
   scenario_failures: scenarios.failures,
   metric_contract_failures: metric.failures,
   invariant_failures: invariants.failures,
   evidence_failures: evidence.failures,
   reports_built: built,
-  warnings: [...(source.warnings ?? []), ...(scenarios.warnings ?? []), ...(metric.warnings ?? []), ...(invariants.warnings ?? []), ...(evidence.warnings ?? [])]
+  warnings: [...(source.warnings ?? []), ...(scenarios.warnings ?? []), ...(calibration.warnings ?? []), ...(metric.warnings ?? []), ...(invariants.warnings ?? []), ...(evidence.warnings ?? [])]
 };
 
 const jsonPath = path.join(qaDir, 'rebuild-summary.json');
@@ -134,13 +157,14 @@ fs.writeFileSync(mdPath, [
   `- status: ${summary.status}`,
   `- reports built: ${summary.reports_built.length}`,
   `- metric failures: ${summary.metric_contract_failures.length}`,
+  `- calibration failures: ${summary.calibration_failures.length}`,
   `- invariant failures: ${summary.invariant_failures.length}`,
   '',
   '## Reports built',
   ...summary.reports_built.map((x) => `- ${x}`),
   '',
   '## Failures',
-  ...[...summary.metric_contract_failures, ...summary.invariant_failures].map((f) => `- ${f}`),
+  ...[...summary.calibration_failures, ...summary.metric_contract_failures, ...summary.invariant_failures, ...summary.evidence_failures].map((f) => `- ${f}`),
   '',
   '## Warnings',
   ...(summary.warnings.length ? summary.warnings.map((w) => `- ${w}`) : ['- none'])
