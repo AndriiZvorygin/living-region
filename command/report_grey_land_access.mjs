@@ -33,7 +33,9 @@ function readCachedReport(outputDir) {
         markdownPath: path.resolve(outputDir, 'grey-land-access-baseline.md'),
         jsonPath,
         municipalityCsvPath: path.resolve(outputDir, 'grey-land-access-municipality-summary.csv'),
-        detailCsvPath: path.resolve(outputDir, 'grey-land-access-lot-detail.csv')
+        detailCsvPath: path.resolve(outputDir, 'grey-land-access-lot-detail.csv'),
+        overlayJsonPath: path.resolve(outputDir, 'grey-land-access-gis-overlay-summary.json'),
+        overlayMarkdownPath: path.resolve(outputDir, 'grey-land-access-gis-overlay-summary.md')
       }
     };
   } catch {
@@ -44,6 +46,7 @@ function readCachedReport(outputDir) {
 function shouldUseCachedReport(cachedReport, inputDir) {
   if (!cachedReport?.report?.assignment) return false;
   if (!cachedReport.report.opportunityCategoryCounts || !cachedReport.report.constraintCounts) return false;
+  if (!cachedReport.report.evidenceTiers) return false;
   if (!cachedReport.report.assignment.lotConcessionCountByMunicipality) return false;
   const lotsPath = path.resolve(inputDir, 'lots-and-concessions-grey.geojson');
   const hasLotsFile = fs.existsSync(lotsPath);
@@ -89,6 +92,8 @@ try {
   console.log(`json: ${paths.jsonPath}`);
   console.log(`municipality csv: ${paths.municipalityCsvPath}`);
   console.log(`lot detail csv: ${paths.detailCsvPath}`);
+  if (paths.overlayJsonPath) console.log(`overlay json: ${paths.overlayJsonPath}`);
+  if (paths.overlayMarkdownPath) console.log(`overlay markdown: ${paths.overlayMarkdownPath}`);
   if ((assignment.totalLotConcessionFeatures ?? 0) === 0) {
     console.log('Missing lots-and-concessions-grey.geojson. Run:');
     console.log('npm run grey:download-data -- --source=lots-and-concessions-grey');

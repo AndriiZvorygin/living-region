@@ -279,6 +279,12 @@ export function buildGreyLandAccessReport(options = {}) {
   let assignedByGeometryCount = 0;
 
   const detailRows = [];
+  const lotFabricAreaByMunicipalityM2 = {};
+  const lotFabricAreaByLandUseClassM2 = {};
+  let lotsInsideSettlementCount = 0;
+  let lotsOutsideSettlementCount = 0;
+  let lotFabricAreaInsideSettlementM2 = 0;
+  let lotFabricAreaOutsideSettlementM2 = 0;
 
   const safePointFeatures = (features) => features.filter((f) => Array.isArray(getGeometryCentroid(f.geometry)));
   const transitPoints = safePointFeatures(transitStops).map((f) => ({ ...f, __centroid: getGeometryCentroid(f.geometry) }));
@@ -294,6 +300,7 @@ export function buildGreyLandAccessReport(options = {}) {
     const lot = pickCaseInsensitive(props, ['LOT', 'LOT_NO', 'LOT_NUMBER', 'LOTNUM']);
     const concession = pickCaseInsensitive(props, ['CONCESSION', 'CON_NO', 'CONCESSION_NO', 'SHORT_CON']);
     const township = pickCaseInsensitive(props, ['TOWNSHIP', 'GEOGRAPHIC_TOWNSHIP']);
+    const lotAreaM2 = toNumber(pickCaseInsensitive(props, ['ShapeSTArea', 'SHAPESTArea', 'area', 'AREA']), 0);
 
     townshipCounts[township ?? 'unknown'] = (townshipCounts[township ?? 'unknown'] ?? 0) + 1;
 
@@ -370,6 +377,14 @@ export function buildGreyLandAccessReport(options = {}) {
     });
 
     opportunityCounts[opportunityCategory] = (opportunityCounts[opportunityCategory] ?? 0) + 1;
+    lotFabricAreaByLandUseClassM2[landUseCategory] = (lotFabricAreaByLandUseClassM2[landUseCategory] ?? 0) + lotAreaM2;
+    if (settlementAdjacent) {
+      lotsInsideSettlementCount += 1;
+      lotFabricAreaInsideSettlementM2 += lotAreaM2;
+    } else {
+      lotsOutsideSettlementCount += 1;
+      lotFabricAreaOutsideSettlementM2 += lotAreaM2;
+    }
 
     const muniRow = municipalityName ? municipalityRows.get(municipalityName) : null;
     if (muniRow) {
@@ -386,6 +401,7 @@ export function buildGreyLandAccessReport(options = {}) {
       if (publicFacilityNearby) muniRow.publicFacilityNearbyLots += 1;
       if (Object.hasOwn(muniRow, opportunityCategory)) muniRow[opportunityCategory] += 1;
       else muniRow.unknown += 1;
+      lotFabricAreaByMunicipalityM2[municipalityName] = (lotFabricAreaByMunicipalityM2[municipalityName] ?? 0) + lotAreaM2;
     }
 
     detailRows.push({
@@ -394,7 +410,9 @@ export function buildGreyLandAccessReport(options = {}) {
       township: township ?? '',
       concession: concession ?? '',
       lot: lot ?? '',
+      lotAreaM2,
       landUseCategory,
+      settlementAdjacent,
       opportunityCategory,
       roadAccessible,
       trailOrCyclingAccessible,
@@ -427,7 +445,29 @@ export function buildGreyLandAccessReport(options = {}) {
   const report = {
     generatedAt: new Date().toISOString(),
     populationDistributionSource,
-    caveat: 'Lots and Concessions is a land-structure reference layer, not parcel ownership or legal access.',
+    caveat: 'Lots and Concessions is a lot-fabric grounded proxy layer, not parcel ownership, household-level access, title, or legal access rights.',
+    evidenceTiers: {
+      measuredGroundedLotFabric: {
+        status: 'measured',
+        basis: 'lots-and-concessions-grey.geojson feature and area counts',
+        caveat: 'Partial ground-truth layer; does not identify household-level access.'
+      },
+      overlayDerived: {
+        status: 'overlay',
+        basis: 'lot centroid overlay with settlement boundaries and Official Plan land-use classes',
+        caveat: 'Overlay outputs are spatial diagnostics, not parcel-address-building linkage.'
+      },
+      populationProxy: {
+        status: 'proxy',
+        basis: 'Census/dwelling proxy reports outside this module',
+        caveat: 'Population-level land-access inference remains proxy until parcel-address-building linkage exists.'
+      },
+      scenarioAssumptions: {
+        status: 'scenario_assumption',
+        basis: 'thresholds/proximity rules',
+        caveat: 'Deterministic access thresholds are model assumptions.'
+      }
+    },
     dataUsed: {
       municipalityFeatures: municipalityFeatures.length,
       settlementFeatures: settlementFeatures.length,
@@ -453,6 +493,11 @@ export function buildGreyLandAccessReport(options = {}) {
     opportunityCategoryCounts: opportunityCounts,
     constraintCounts,
     thresholdsKm: ACCESS_THRESHOLDS_KM,
+    landAccessClaimReadiness: {
+      status: 'partial_groundtruth',
+      rationale: 'Lot-fabric and overlays are grounded, but address points, building footprints, parcel-address linkage, household/unit counts, and tenure/access rights are not linked.',
+      householdLevelClaimAllowed: false
+    },
     warnings
   };
 
@@ -466,8 +511,55 @@ export function buildGreyLandAccessReport(options = {}) {
 
   const detailCsvPath = path.join(outputDir, 'grey-land-access-lot-detail.csv');
   fs.writeFileSync(detailCsvPath, toCsv(detailRows, [
-    'id','municipalityName','township','concession','lot','landUseCategory','opportunityCategory','roadAccessible','trailOrCyclingAccessible','transitAccessible','ruralBusinessNearby','publicFacilityNearby','managedForestAdjacent','limitingFactors','assignmentMethod'
+    'id','municipalityName','township','concession','lot','lotAreaM2','landUseCategory','settlementAdjacent','opportunityCategory','roadAccessible','trailOrCyclingAccessible','transitAccessible','ruralBusinessNearby','publicFacilityNearby','managedForestAdjacent','limitingFactors','assignmentMethod'
   ]));
+
+  const overlaySummary = {
+    generatedAt: new Date().toISOString(),
+    sourceStatus: 'lot_fabric_grounded_proxy_overlay',
+    lotFabricFeatureCount: lotFeatures.length,
+    lotFabricAreaByMunicipalityM2,
+    lotFabricAreaByLandUseClassM2,
+    lotsInsideSettlementCount,
+    lotsOutsideSettlementCount,
+    lotFabricAreaInsideSettlementM2,
+    lotFabricAreaOutsideSettlementM2,
+    lotsByLandUseClassCount: Object.fromEntries(
+      Object.entries(detailRows.reduce((acc, r) => {
+        acc[r.landUseCategory] = (acc[r.landUseCategory] ?? 0) + 1;
+        return acc;
+      }, {}))
+    ),
+    lotsByOpportunityCategoryCount: opportunityCounts,
+    limitations: [
+      'Lot-fabric grounded proxy only; not parcel ownership or legal access.',
+      'No parcel-address-building linkage in this overlay summary.',
+      'No household/unit counts linked to lot features.',
+      'Do not treat these overlays as household-level access proof.'
+    ]
+  };
+  const overlayJsonPath = path.join(outputDir, 'grey-land-access-gis-overlay-summary.json');
+  const overlayMarkdownPath = path.join(outputDir, 'grey-land-access-gis-overlay-summary.md');
+  fs.writeFileSync(overlayJsonPath, JSON.stringify(overlaySummary, null, 2));
+  fs.writeFileSync(overlayMarkdownPath, [
+    '# Grey Land-Access GIS Overlay Summary',
+    '',
+    '## What this is',
+    '- Lot-fabric grounded proxy summary from existing Grey GIS layers.',
+    '- Partial ground-truth layer: does not yet identify household-level access.',
+    '',
+    '## Core counts',
+    `- lot-fabric feature count: ${overlaySummary.lotFabricFeatureCount}`,
+    `- lots inside settlement boundaries: ${overlaySummary.lotsInsideSettlementCount}`,
+    `- lots outside settlement boundaries: ${overlaySummary.lotsOutsideSettlementCount}`,
+    `- lot-fabric area inside settlement (m2): ${overlaySummary.lotFabricAreaInsideSettlementM2.toFixed(2)}`,
+    `- lot-fabric area outside settlement (m2): ${overlaySummary.lotFabricAreaOutsideSettlementM2.toFixed(2)}`,
+    '',
+    '## Evidence tier caveat',
+    '- This is a lot-fabric grounded proxy and overlay diagnostic.',
+    '- It does not prove household-level land access.',
+    '- Parcel-address-building linkage is still required before article-grade household access claims.'
+  ].join('\n'));
 
   const topMunicipalities = [...municipalitySummaryRows]
     .sort((a, b) => b.lotConcessionFeatures - a.lotConcessionFeatures)
@@ -483,7 +575,8 @@ export function buildGreyLandAccessReport(options = {}) {
     '- Intended for rural-transition land-access diagnostics, not ownership interpretation.',
     '',
     '## Important limitation',
-    '- Lots and Concessions is not ownership parcels, not title, and not legal access rights.',
+    '- Lots and Concessions is a lot-fabric grounded proxy, not ownership parcels, not title, and not legal access rights.',
+    '- This layer is partial ground-truth and does not yet identify household-level access.',
     ...(lotFeatures.length === 0 ? ['- Missing lots-and-concessions-grey.geojson. Run: `npm run grey:download-data -- --source=lots-and-concessions-grey`'] : []),
     '',
     '## Data used',
@@ -507,6 +600,7 @@ export function buildGreyLandAccessReport(options = {}) {
     '',
     '## Municipality summary',
     'See: `know/produce/grey-land-access-municipality-summary.csv`',
+    'See also: `know/produce/grey-land-access-gis-overlay-summary.json`',
     '',
     '## Opportunity categories',
     ...Object.entries(opportunityCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `- ${k}: ${v}`),
@@ -525,6 +619,8 @@ export function buildGreyLandAccessReport(options = {}) {
     '## Caveats and next data needed',
     '- This is centroid/proximity-based, coarse, and deterministic.',
     '- Overlay quality depends on source geometry and naming consistency.',
+    '- This report does not identify households with/without land; it is not parcel-address-building linkage.',
+    '- Requires parcel-address-building linkage before article-grade household land-access claims.',
     '- Add parcel ownership/access rights data separately if available.',
     '- Add calibrated access/travel impedance for stronger accessibility diagnostics.'
   ].join('\n');
@@ -538,7 +634,9 @@ export function buildGreyLandAccessReport(options = {}) {
       markdownPath,
       jsonPath,
       municipalityCsvPath,
-      detailCsvPath
+      detailCsvPath,
+      overlayJsonPath,
+      overlayMarkdownPath
     }
   };
 }

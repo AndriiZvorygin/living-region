@@ -254,6 +254,7 @@ describe('evidence quality audit', () => {
     const inv = JSON.parse(fs.readFileSync(path.join(qaDir, 'claim-inventory.json'), 'utf8'));
     const claim = inv.claims.find((c) => c.claim_id === 'metric:grey_no_meaningful_food_growing_land_access_population');
     expect(claim.land_access_groundtruth_status).toBe('no_groundtruth');
+    expect(claim.evidence_basis).toContain('lot_fabric_proxy');
     expect(claim.public_use).toBe('exploratory_only');
   });
 
@@ -307,5 +308,57 @@ describe('evidence quality audit', () => {
     const claim = inv.claims.find((c) => c.claim_id === 'metric:grey_no_meaningful_food_growing_land_access_population');
     expect(claim.land_access_groundtruth_status).toBe('direct_groundtruth');
     expect(['article_with_caveat', 'exploratory_only']).toContain(claim.public_use);
+  });
+
+  test('partial_groundtruth land-access remains caveated/exploratory without address-building linkage', () => {
+    const root = path.resolve('know/produce/evidence-audit-land-groundtruth-partial');
+    const produceDir = path.join(root, 'produce');
+    const qaDir = path.join(root, 'qa');
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+
+    writeJson(path.join(root, 'source-manifest.json'), {
+      entries: [{ source_id: 'src_land', source_class: 'external_snapshot', local_path: 'know/input/gis/lots-and-concessions-grey.geojson', content_hash: 'sha256:x', schema_version: '1.0', title: 'land source' }]
+    });
+    writeJson(path.join(root, 'metric-registry.json'), {
+      metrics: [{ metric_id: 'grey_no_meaningful_food_growing_land_access_population', allowed_statuses: ['proxy'], requires_method: true, requires_range: false, requires_confidence: true, requires_not_forecast_flag: false, requires_scenario_refs: false }]
+    });
+    writeJson(path.join(produceDir, 'land-access-groundtruth-summary.json'), {
+      landAccessGroundtruthStatus: 'partial_groundtruth',
+      inferred_only_linkage: false,
+      all_linkage_rows_source_backed: true,
+      limitations: ['No address/building linkage']
+    });
+    writeJson(path.join(produceDir, 'grey-hormuz-food-security-article-data.json'), {
+      sourceFiles: {},
+      articleHeadlineFacts: [],
+      headlineMetrics: [{
+        metric_id: 'grey_no_meaningful_food_growing_land_access_population',
+        label: 'land',
+        value: 1000,
+        unit: 'people',
+        status: 'proxy',
+        method: 'x',
+        confidence: 'low',
+        source_refs: ['know/input/gis/lots-and-concessions-grey.geojson'],
+        scenario_refs: []
+      }]
+    });
+    fs.writeFileSync(path.join(produceDir, 'grey-hormuz-food-security-article-data.md'), '# X\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-food-insecurity-trend-projection.md'), '# Y\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-current-system-shock-threshold.md'), '# Z\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-plain-english-briefing.md'), '# Q\n');
+
+    const out = buildEvidenceQualityAudit({
+      produceDir,
+      qaDir,
+      metricRegistryPath: path.join(root, 'metric-registry.json'),
+      sourceManifestPath: path.join(root, 'source-manifest.json')
+    });
+    expect(out.status).toBe('pass');
+    const inv = JSON.parse(fs.readFileSync(path.join(qaDir, 'claim-inventory.json'), 'utf8'));
+    const claim = inv.claims.find((c) => c.claim_id === 'metric:grey_no_meaningful_food_growing_land_access_population');
+    expect(claim.land_access_groundtruth_status).toBe('partial_groundtruth');
+    expect(claim.public_use).toBe('exploratory_only');
   });
 });

@@ -135,8 +135,13 @@ describe('grey land access report', () => {
 
       const detail = fs.readFileSync(paths.detailCsvPath, 'utf8');
       expect(detail).toContain('limitingFactors');
+      expect(detail).toContain('settlementAdjacent');
       const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
-      expect(markdown).toContain('not ownership parcels');
+      expect(markdown).toContain('partial ground-truth');
+      expect(markdown).toContain('does not yet identify household-level access');
+      const overlay = JSON.parse(fs.readFileSync(paths.overlayJsonPath, 'utf8'));
+      expect(overlay.lotFabricFeatureCount).toBe(3);
+      expect(typeof overlay.lotFabricAreaByMunicipalityM2).toBe('object');
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -196,6 +201,9 @@ describe('grey land access report', () => {
       expect(report.warnings.some((w) => w.includes('Missing lots-and-concessions-grey.geojson'))).toBe(true);
       const markdown = fs.readFileSync(paths.markdownPath, 'utf8');
       expect(markdown).toContain('npm run grey:download-data -- --source=lots-and-concessions-grey');
+      const overlay = JSON.parse(fs.readFileSync(paths.overlayJsonPath, 'utf8'));
+      expect(overlay.lotFabricFeatureCount).toBe(0);
+      expect(Array.isArray(overlay.limitations)).toBe(true);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }

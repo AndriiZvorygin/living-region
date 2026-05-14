@@ -278,6 +278,13 @@ function landAccessGroundtruthForMetric(metricId, groundtruthSummary) {
   };
 }
 
+function evidenceBasisForMetric(metricId) {
+  if (metricId === 'grey_no_meaningful_food_growing_land_access_population') {
+    return ['lot_fabric_proxy', 'settlement_overlay', 'land_use_overlay', 'population_proxy'];
+  }
+  return [];
+}
+
 const RISKY_PHRASES = [
   /\bwill rise\b/i,
   /\bwill cause\b/i,
@@ -379,6 +386,7 @@ export function buildEvidenceQualityAudit(options = {}) {
     const groundtruth = landAccessGroundtruthForMetric(metric.metric_id, landGroundtruthSummary);
     claim.land_access_groundtruth_status = groundtruth.land_access_groundtruth_status;
     claim.land_access_groundtruth_limitations = groundtruth.land_access_groundtruth_limitations;
+    claim.evidence_basis = evidenceBasisForMetric(metric.metric_id);
 
     // Guard against circular confidence.
     const hasStrongSource = sourceClasses.includes('external_snapshot') || sourceClasses.includes('manual_curated_input');
@@ -397,8 +405,8 @@ export function buildEvidenceQualityAudit(options = {}) {
     applyCalibrationQualityRule(claim);
     if (claim.land_access_groundtruth_status === 'no_groundtruth') {
       claim.public_use = 'exploratory_only';
-    } else if (claim.land_access_groundtruth_status === 'partial_groundtruth' && claim.public_use === 'article_grade') {
-      claim.public_use = 'article_with_caveat';
+    } else if (claim.land_access_groundtruth_status === 'partial_groundtruth') {
+      claim.public_use = 'exploratory_only';
     } else if (
       claim.land_access_groundtruth_status === 'direct_groundtruth'
       && (landGroundtruthSummary?.inferred_only_linkage || !landGroundtruthSummary?.all_linkage_rows_source_backed)
@@ -608,6 +616,11 @@ export function buildEvidenceQualityAudit(options = {}) {
         return `| ${c.category} | ${c.data_points} | ${c.strongest_quality_tier ?? 'none'} | ${impact} | ${gap} |`;
       })
       : ['| none | 0 | none | no claim impact yet | collect source-backed rows |']),
+    '',
+    '## Land-Access Groundtruth Distinction',
+    `- Current achieved: ${landGroundtruthSummary?.landAccessGroundtruthStatus ?? 'no_groundtruth'} from ${(landGroundtruthSummary?.parcel_count ?? 0)} lot/concession features`,
+    '- Still missing: address points, building footprints, parcel-address linkage, household/unit counts, tenure/access rights',
+    '- Interpretation: lot-fabric overlays are useful partial ground-truth diagnostics, but not household-level access proof.',
     '',
     '## Top 5 evidence gaps',
     ...topEvidenceGaps.map((g) => `- ${g}`),
