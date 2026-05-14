@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
+import { buildLocalCalibrationSummary } from '../program/reliability/local_calibration_intake.mjs';
 
 function writeJson(filePath, data) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -87,5 +88,63 @@ describe('evidence quality audit', () => {
     expect(inventory.claims.some((c) => c.claim_id === 'metric:m2')).toBe(true);
 
     fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test('scenario_only calibration never upgrades and direct_local can improve readiness with strong provenance', () => {
+    const root = path.resolve('know/produce/evidence-audit-calibration-quality');
+    const produceDir = path.join(root, 'produce');
+    const qaDir = path.join(root, 'qa');
+    const inputDir = path.join(root, 'input');
+    const schemaDir = path.join(root, 'schema');
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.mkdirSync(produceDir, { recursive: true });
+
+    writeJson(path.join(root, 'source-manifest.json'), {
+      entries: [
+        { source_id: 'src_local', source_class: 'manual_curated_input', local_path: 'know/input-example/calibration/population.csv', content_hash: 'sha256:x', schema_version: '1.0', title: 'x' }
+      ]
+    });
+    writeJson(path.join(root, 'metric-registry.json'), {
+      metrics: [
+        { metric_id: 'grey_population_baseline', allowed_statuses: ['measured'], requires_method: true, requires_range: false, requires_confidence: true, requires_not_forecast_flag: false, requires_scenario_refs: false },
+        { metric_id: 'grey_food_insecurity_2027_baseline_people', allowed_statuses: ['scenario_output'], requires_method: true, requires_range: false, requires_confidence: true, requires_not_forecast_flag: true, requires_scenario_refs: true }
+      ]
+    });
+
+    fs.mkdirSync(schemaDir, { recursive: true });
+    writeJson(path.join(schemaDir, 'food-charity-series.schema.json'), { ok: true });
+    writeJson(path.join(schemaDir, 'food-price-series.schema.json'), { ok: true });
+    writeJson(path.join(schemaDir, 'rent-income-series.schema.json'), { ok: true });
+    fs.mkdirSync(inputDir, { recursive: true });
+    fs.writeFileSync(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\nGrey,Org,visits,2026-01-01,2026-01-31,100,count,src_local,direct_local,ok\n');
+    fs.writeFileSync(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    fs.writeFileSync(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
+
+    writeJson(path.join(produceDir, 'grey-hormuz-food-security-article-data.json'), {
+      sourceFiles: {},
+      articleHeadlineFacts: [],
+      headlineMetrics: [
+        { metric_id: 'grey_population_baseline', label: 'pop', value: 100, unit: 'people', status: 'measured', method: 'x', confidence: 'high', source_refs: ['know/input-example/calibration/population.csv'], scenario_refs: [], not_forecast: false },
+        { metric_id: 'grey_food_insecurity_2027_baseline_people', label: 'fi', value: 10, unit: 'people', status: 'scenario_output', method: 'x', confidence: 'low', source_refs: ['know/input-example/calibration/population.csv'], scenario_refs: ['baseline'], not_forecast: true }
+      ]
+    });
+    writeJson(path.join(produceDir, 'grey-hormuz-food-security-article-data.md'), {});
+    fs.writeFileSync(path.join(produceDir, 'grey-food-insecurity-trend-projection.md'), '# Y\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-current-system-shock-threshold.md'), '# Z\n');
+    fs.writeFileSync(path.join(produceDir, 'grey-plain-english-briefing.md'), '# Q\n');
+
+    const out = buildEvidenceQualityAudit({
+      produceDir,
+      qaDir,
+      metricRegistryPath: path.join(root, 'metric-registry.json'),
+      sourceManifestPath: path.join(root, 'source-manifest.json')
+    });
+    expect(out.status).toBe('pass');
+    const inv = JSON.parse(fs.readFileSync(path.join(qaDir, 'claim-inventory.json'), 'utf8'));
+    const pop = inv.claims.find((c) => c.claim_id === 'metric:grey_population_baseline');
+    expect(pop.public_use).toBe('article_grade');
+    const fi = inv.claims.find((c) => c.claim_id === 'metric:grey_food_insecurity_2027_baseline_people');
+    expect(fi.public_use).not.toBe('article_grade');
   });
 });

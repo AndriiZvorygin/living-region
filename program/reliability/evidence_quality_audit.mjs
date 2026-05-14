@@ -78,12 +78,30 @@ function calibrationStatusForMetric(metricId, calibrationSummary) {
   if (!required.length) return { calibration_status: 'calibrated', missing_calibration_refs: [] };
   const categories = calibrationSummary?.categories ?? {};
   const loadedRefs = new Set();
-  if ((categories.food_charity?.data_points ?? 0) > 0) loadedRefs.add('food_charity_series');
-  if ((categories.food_price?.data_points ?? 0) > 0) loadedRefs.add('food_price_series');
-  if ((categories.rent_income?.data_points ?? 0) > 0) loadedRefs.add('rent_income_series');
+  const qualityByRef = new Map();
+  if ((categories.food_charity?.data_points ?? 0) > 0) {
+    loadedRefs.add('food_charity_series');
+    qualityByRef.set('food_charity_series', categories.food_charity.strongest_quality_tier ?? 'unknown');
+  }
+  if ((categories.food_price?.data_points ?? 0) > 0) {
+    loadedRefs.add('food_price_series');
+    qualityByRef.set('food_price_series', categories.food_price.strongest_quality_tier ?? 'unknown');
+  }
+  if ((categories.rent_income?.data_points ?? 0) > 0) {
+    loadedRefs.add('rent_income_series');
+    qualityByRef.set('rent_income_series', categories.rent_income.strongest_quality_tier ?? 'unknown');
+  }
   const missing = required.filter((x) => !loadedRefs.has(x));
   const status = missing.length === 0 ? 'calibrated' : (missing.length === required.length ? 'uncalibrated' : 'partially_calibrated');
-  return { calibration_status: status, missing_calibration_refs: missing };
+  const tierOrder = ['none', 'scenario_only', 'national_proxy', 'provincial_proxy', 'regional_proxy', 'direct_local'];
+  const presentTiers = required
+    .filter((x) => loadedRefs.has(x))
+    .map((x) => qualityByRef.get(x) ?? 'unknown')
+    .map((t) => (t === 'unknown' ? 'none' : t));
+  const bestTier = presentTiers.length
+    ? presentTiers.sort((a, b) => tierOrder.indexOf(a) - tierOrder.indexOf(b)).at(-1)
+    : 'none';
+  return { calibration_status: status, missing_calibration_refs: missing, calibration_quality: bestTier };
 }
 
 const RISKY_PHRASES = [
@@ -104,6 +122,31 @@ function isSafeForecastContext(line) {
     || text.includes('scenario, not forecast')
     || text.includes('trend scenario, not forecast')
     || text.includes('trend projection, not forecast');
+}
+
+function applyCalibrationQualityRule(claim) {
+  const q = claim.calibration_quality ?? 'none';
+  if (q === 'none') return;
+  if (q === 'scenario_only') {
+    if (claim.public_use === 'article_grade') claim.public_use = 'article_with_caveat';
+    return;
+  }
+  if (q === 'national_proxy' || q === 'provincial_proxy') {
+    if (claim.public_use === 'article_grade') claim.public_use = 'article_with_caveat';
+    return;
+  }
+  if (q === 'regional_proxy') {
+    if (claim.public_use === 'do_not_publish') return;
+    if (claim.public_use === 'exploratory_only') claim.public_use = 'article_with_caveat';
+    return;
+  }
+  if (q === 'direct_local') {
+    if (claim.claim_status === 'measured' && claim.evidence_strength === 'high') {
+      claim.public_use = 'article_grade';
+    } else if (claim.public_use === 'exploratory_only') {
+      claim.public_use = 'article_with_caveat';
+    }
+  }
 }
 
 export function buildEvidenceQualityAudit(options = {}) {
@@ -147,6 +190,7 @@ export function buildEvidenceQualityAudit(options = {}) {
     const calibration = calibrationStatusForMetric(metric.metric_id, calibrationSummary);
     claim.calibration_status = calibration.calibration_status;
     claim.missing_calibration_refs = calibration.missing_calibration_refs;
+    claim.calibration_quality = calibration.calibration_quality;
 
     // Guard against circular confidence.
     const hasStrongSource = sourceClasses.includes('external_snapshot') || sourceClasses.includes('manual_curated_input');
@@ -162,6 +206,7 @@ export function buildEvidenceQualityAudit(options = {}) {
 
     claim.public_use = publicUseForClaim(claim);
     if (!hasStrongSource && claim.public_use === 'article_grade') claim.public_use = 'article_with_caveat';
+    applyCalibrationQualityRule(claim);
     claim.recommended_wording = recommendedWording(claim);
 
     // Guard against obviously implausible zero headline values for baseline-style public metrics.
@@ -202,7 +247,8 @@ export function buildEvidenceQualityAudit(options = {}) {
       caveat: 'Interpretive summary statement.',
       recommended_wording: 'Use conditional language and keep uncertainty visible.',
       calibration_status: 'partially_calibrated',
-      missing_calibration_refs: []
+      missing_calibration_refs: [],
+      calibration_quality: 'none'
     });
   }
 
@@ -274,9 +320,9 @@ export function buildEvidenceQualityAudit(options = {}) {
     '',
     `- claims: ${claims.length}`,
     '',
-    '| Claim ID | Status | Evidence | Public use | Calibration | Caveat |',
-    '|---|---|---|---|---|---|',
-    ...claims.map((c) => `| ${c.claim_id} | ${c.claim_status} | ${c.evidence_strength} | ${c.public_use} | ${c.calibration_status ?? 'n/a'} | ${c.caveat || ''} |`)
+    '| Claim ID | Status | Evidence | Public use | Calibration | Quality | Caveat |',
+    '|---|---|---|---|---|---|---|',
+    ...claims.map((c) => `| ${c.claim_id} | ${c.claim_status} | ${c.evidence_strength} | ${c.public_use} | ${c.calibration_status ?? 'n/a'} | ${c.calibration_quality ?? 'none'} | ${c.caveat || ''} |`)
   ].join('\n'));
 
   const redTeamPath = path.join(qaDir, 'red-team-claims.md');
@@ -306,6 +352,7 @@ export function buildEvidenceQualityAudit(options = {}) {
   ].join('\n'));
 
   const readinessPath = path.join(qaDir, 'article-readiness-summary.md');
+  const calibrationRows = Object.values(calibrationSummary?.categories ?? {});
   fs.writeFileSync(readinessPath, [
     '# Article Readiness Summary',
     '',
@@ -320,6 +367,19 @@ export function buildEvidenceQualityAudit(options = {}) {
     '',
     '## Specific calibration gaps',
     ...(specificCalibrationGaps.length ? specificCalibrationGaps.map((g) => `- ${g}`) : ['- none']),
+    '',
+    '## Local calibration status',
+    '| Category | Data points | Strongest quality tier | Claim impact | Remaining gap |',
+    '|---|---:|---|---|---|',
+    ...(calibrationRows.length
+      ? calibrationRows.map((c) => {
+        const impact = c.data_points > 0
+          ? (c.strongest_quality_tier === 'direct_local' ? 'can strengthen local claims' : 'supports caveated calibration only')
+          : 'no claim impact yet';
+        const gap = c.data_points > 0 ? `upgrade toward direct_local where possible` : 'collect source-backed rows';
+        return `| ${c.category} | ${c.data_points} | ${c.strongest_quality_tier ?? 'none'} | ${impact} | ${gap} |`;
+      })
+      : ['| none | 0 | none | no claim impact yet | collect source-backed rows |']),
     '',
     '## Top 5 evidence gaps',
     ...topEvidenceGaps.map((g) => `- ${g}`),

@@ -10,6 +10,7 @@
     "value",
     "unit",
     "source_ref",
+    "quality_tier",
     "notes"
   ],
   "indicator_examples": [
@@ -22,4 +23,3 @@
     "unknown_indicator"
   ]
 }
-

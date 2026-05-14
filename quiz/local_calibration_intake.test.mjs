@@ -28,9 +28,9 @@ describe('local calibration intake contracts', () => {
     const inputDir = path.join(root, 'input');
     const schemaDir = setupSchemas(root);
     const produceDir = path.join(root, 'produce');
-    write(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,notes\nGrey,Org,visits,2026-01-01,2026-01-31,100,count,,missing source ref\n');
-    write(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,notes\n');
-    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,notes\n');
+    write(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\nGrey,Org,visits,2026-01-01,2026-01-31,100,count,,direct_local,missing source ref\n');
+    write(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
     writeJson(path.join(root, 'source-manifest.json'), { entries: [] });
 
     const out = buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
@@ -46,12 +46,13 @@ describe('local calibration intake contracts', () => {
     const produceDir = path.join(root, 'produce');
     write(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,notes\n');
     write(path.join(inputDir, 'food-price-series.csv'), [
-      'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,notes',
-      'Ontario,basket,nutritious_food_basket_monthly_cost,2026-01-01,2026-01-31,400,$,src_food_price,ok',
-      'Ontario,index,food_cpi_index,2026-01-01,2026-01-31,150,index,src_food_price,ok',
-      'Ontario,delta,percent_change,2026-01-01,2026-01-31,4.2,%,src_food_price,ok'
+      'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes',
+      'Ontario,basket,nutritious_food_basket_monthly_cost,2026-01-01,2026-01-31,400,$,src_food_price,provincial_proxy,ok',
+      'Ontario,index,food_cpi_index,2026-01-01,2026-01-31,150,index,src_food_price,provincial_proxy,ok',
+      'Ontario,delta,percent_change,2026-01-01,2026-01-31,4.2,%,src_food_price,provincial_proxy,ok'
     ].join('\n'));
-    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,notes\n');
+    write(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
     writeJson(path.join(root, 'source-manifest.json'), { entries: [{ source_id: 'src_food_price', local_path: 'x', source_class: 'manual_curated_input' }] });
 
     const out = buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
@@ -67,9 +68,9 @@ describe('local calibration intake contracts', () => {
     const produceDir = path.join(root, 'produce');
     const qaDir = path.join(root, 'qa');
 
-    write(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,notes\n');
-    write(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,notes\n');
-    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,notes\n');
+    write(path.join(inputDir, 'food-charity-series.csv'), 'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    write(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
     writeJson(path.join(root, 'source-manifest.json'), { entries: [] });
 
     const calibration = buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
@@ -117,5 +118,34 @@ describe('local calibration intake contracts', () => {
     expect(claim.calibration_status).toBe('uncalibrated');
     expect(claim.missing_calibration_refs).toContain('food_charity_series');
     expect(claim.public_use).not.toBe('article_grade');
+  });
+
+  test('quality tier validation accepts known, warns unknown, fails invalid', () => {
+    const root = path.resolve('know/produce/calibration-fixture-quality-tier');
+    fs.rmSync(root, { recursive: true, force: true });
+    const inputDir = path.join(root, 'input');
+    const schemaDir = setupSchemas(root);
+    const produceDir = path.join(root, 'produce');
+    write(path.join(inputDir, 'food-charity-series.csv'), [
+      'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes',
+      'Grey,Org,visits,2026-01-01,2026-01-31,10,count,src1,direct_local,ok',
+      'Grey,Org,visits,2026-02-01,2026-02-28,12,count,src1,unknown,unknown tier'
+    ].join('\n'));
+    write(path.join(inputDir, 'food-price-series.csv'), 'geography,basket_or_item,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    write(path.join(inputDir, 'rent-income-series.csv'), 'geography,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes\n');
+    writeJson(path.join(root, 'source-manifest.json'), { entries: [{ source_id: 'src1', local_path: 'x', source_class: 'manual_curated_input' }] });
+
+    const pass = buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
+    expect(pass.status).toBe('pass');
+    expect(pass.warnings.some((w) => w.includes('quality_tier is unknown'))).toBe(true);
+    expect(pass.summary.categories.food_charity.strongest_quality_tier).toBe('direct_local');
+
+    write(path.join(inputDir, 'food-charity-series.csv'), [
+      'geography,organization_or_source,indicator,period_start,period_end,value,unit,source_ref,quality_tier,notes',
+      'Grey,Org,visits,2026-01-01,2026-01-31,10,count,src1,planetary_proxy,bad tier'
+    ].join('\n'));
+    const fail = buildLocalCalibrationSummary({ inputDir, schemaDir, produceDir, sourceManifestPath: path.join(root, 'source-manifest.json') });
+    expect(fail.status).toBe('fail');
+    expect(fail.failures.some((f) => f.includes('invalid quality_tier'))).toBe(true);
   });
 });

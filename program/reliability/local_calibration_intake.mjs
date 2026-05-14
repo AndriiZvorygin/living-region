@@ -81,6 +81,24 @@ function validateRows({ records, category, requiredHeaders, allowedIndicators, f
     if (!row.source_ref) failures.push(`${rowLabel} source_ref required`);
     if (!row.geography) failures.push(`${rowLabel} geography required`);
 
+    const qualityTier = String(row.quality_tier ?? '').trim();
+    const allowedQualityTiers = new Set([
+      'direct_local',
+      'regional_proxy',
+      'provincial_proxy',
+      'national_proxy',
+      'scenario_only',
+      'unknown'
+    ]);
+    if (!qualityTier) {
+      warnings.push(`${rowLabel} missing quality_tier; defaulting to unknown`);
+      row.quality_tier = 'unknown';
+    } else if (!allowedQualityTiers.has(qualityTier)) {
+      failures.push(`${rowLabel} invalid quality_tier '${qualityTier}'`);
+    } else if (qualityTier === 'unknown') {
+      warnings.push(`${rowLabel} quality_tier is unknown`);
+    }
+
     if (row.source_ref && sourceManifestRefs && !sourceManifestRefs.has(row.source_ref)) {
       warnings.push(`${rowLabel} source_ref not found in source manifest: ${row.source_ref}`);
     }
@@ -89,7 +107,7 @@ function validateRows({ records, category, requiredHeaders, allowedIndicators, f
       unknownIndicatorRows += 1;
       warnings.push(`${rowLabel} unknown indicator '${row.indicator}'`);
     }
-    parsed.push({ ...row, value_numeric: n(row.value) });
+    parsed.push({ ...row, value_numeric: n(row.value), quality_tier: row.quality_tier });
   }
   return { parsed, unknownIndicatorRows };
 }
@@ -102,6 +120,9 @@ function summarizeCategory(name, rows) {
       date_range: null,
       geographies: [],
       strongest_sources: [],
+      strongest_quality_tier: 'none',
+      weakest_quality_tier: 'none',
+      quality_tier_counts: {},
       limitations: ['No rows loaded yet.'],
       usable_for_claims: 'exploratory_only'
     };
@@ -110,6 +131,12 @@ function summarizeCategory(name, rows) {
   const ends = rows.map((r) => new Date(r.period_end).getTime()).filter((x) => Number.isFinite(x));
   const geos = [...new Set(rows.map((r) => r.geography).filter(Boolean))].sort();
   const src = [...new Set(rows.map((r) => r.source_ref).filter(Boolean))].sort();
+  const tierOrder = ['direct_local', 'regional_proxy', 'provincial_proxy', 'national_proxy', 'scenario_only', 'unknown'];
+  const counts = {};
+  for (const r of rows) counts[r.quality_tier] = (counts[r.quality_tier] ?? 0) + 1;
+  const present = tierOrder.filter((t) => counts[t] > 0);
+  const strongest = present[0] ?? 'unknown';
+  const weakest = present[present.length - 1] ?? 'unknown';
   return {
     category: name,
     data_points: rows.length,
@@ -119,6 +146,9 @@ function summarizeCategory(name, rows) {
     },
     geographies: geos,
     strongest_sources: src.slice(0, 5),
+    strongest_quality_tier: strongest,
+    weakest_quality_tier: weakest,
+    quality_tier_counts: counts,
     limitations: [
       'Mixed indicators must not be aggregated unless explicitly normalized in a derived stage.',
       'Coverage and representativeness depend on source quality and continuity.'
@@ -202,7 +232,7 @@ export function buildLocalCalibrationSummary(options = {}) {
     }
   ];
 
-  const requiredBaseHeaders = ['geography', 'indicator', 'period_start', 'period_end', 'value', 'unit', 'source_ref', 'notes'];
+  const requiredBaseHeaders = ['geography', 'indicator', 'period_start', 'period_end', 'value', 'unit', 'source_ref', 'quality_tier', 'notes'];
   const rowsByCategory = {};
 
   for (const spec of csvSpecs) {
@@ -273,9 +303,9 @@ export function buildLocalCalibrationSummary(options = {}) {
     '## What this is',
     'Structured intake summary for local calibration rows. This does not invent data and does not normalize mixed indicator families.',
     '',
-    '| Category | Data points | Date range | Geographies | Usable for claims |',
-    '|---|---:|---|---|---|',
-    ...Object.values(categories).map((c) => `| ${c.category} | ${c.data_points} | ${c.date_range ? `${c.date_range.start} to ${c.date_range.end}` : 'n/a'} | ${c.geographies.join('; ') || 'n/a'} | ${c.usable_for_claims} |`),
+    '| Category | Data points | Date range | Geographies | Strongest tier | Weakest tier | Usable for claims |',
+    '|---|---:|---|---|---|---|---|',
+    ...Object.values(categories).map((c) => `| ${c.category} | ${c.data_points} | ${c.date_range ? `${c.date_range.start} to ${c.date_range.end}` : 'n/a'} | ${c.geographies.join('; ') || 'n/a'} | ${c.strongest_quality_tier} | ${c.weakest_quality_tier} | ${c.usable_for_claims} |`),
     '',
     '## Limitations',
     ...Object.values(categories).flatMap((c) => c.limitations.map((l) => `- ${c.category}: ${l}`)),

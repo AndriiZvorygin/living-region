@@ -25,6 +25,7 @@ All intake rows must include:
 - `value` (numeric)
 - `unit`
 - `source_ref`
+- `quality_tier`
 - `notes`
 
 Category-specific optional fields:
@@ -48,6 +49,7 @@ Missing `source_ref` fails validation. Unknown `source_ref` values are warned so
 
 - Invalid rows fail closed in `qa` and `rebuild:all`.
 - Empty files are allowed and produce a summary with limitations.
+- `quality_tier` must be one of: `direct_local`, `regional_proxy`, `provincial_proxy`, `national_proxy`, `scenario_only`, `unknown`.
 - Food price aggregation across incompatible families (index/currency/percent) is blocked unless explicitly normalized in a derived stage.
 - Unknown indicators are allowed with warnings.
 
@@ -66,4 +68,3 @@ Claim inventory includes:
 - `missing_calibration_refs`: explicit missing calibration rails per claim
 
 This makes evidence gaps visible without changing headline conclusions unless real calibration data is loaded.
-

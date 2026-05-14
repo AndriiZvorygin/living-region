@@ -10,6 +10,7 @@
     "value",
     "unit",
     "source_ref",
+    "quality_tier",
     "notes"
   ],
   "indicator_examples": [
@@ -20,4 +21,3 @@
     "percent_change"
   ]
 }
-

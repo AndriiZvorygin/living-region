@@ -9,6 +9,7 @@
     "value",
     "unit",
     "source_ref",
+    "quality_tier",
     "notes"
   ],
   "indicator_examples": [
@@ -21,4 +22,3 @@
     "minimum_wage_hourly"
   ]
 }
-
