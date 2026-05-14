@@ -6,6 +6,7 @@ import { validateSourceManifest } from '../program/reliability/source_manifest.m
 import { loadScenarioFiles } from '../program/reliability/scenario_contract.mjs';
 import { validateMetricContract } from '../program/reliability/metric_contract.mjs';
 import { runInvariantChecks } from '../program/reliability/invariants.mjs';
+import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -38,10 +39,16 @@ fs.mkdirSync(qaDir, { recursive: true });
 
 const source = validateSourceManifest({ manifestPath: opts.manifestPath });
 const scenarios = loadScenarioFiles({ scenariosDir: opts.scenariosDir });
-const metric = validateMetricContract({ registryPath: opts.metricRegistryPath, reportPath: opts.articleReportPath });
+const metric = validateMetricContract({ registryPath: opts.metricRegistryPath, reportPath: opts.articleReportPath, scenariosDir: opts.scenariosDir });
 const invariants = runInvariantChecks({ produceDir: opts.produceDir });
+const evidence = buildEvidenceQualityAudit({
+  produceDir: opts.produceDir,
+  qaDir,
+  metricRegistryPath: opts.metricRegistryPath,
+  sourceManifestPath: opts.manifestPath
+});
 
-const status = [source.status, scenarios.status, metric.status, invariants.status].every((s) => s === 'pass') ? 'pass' : 'fail';
+const status = [source.status, scenarios.status, metric.status, invariants.status, evidence.status].every((s) => s === 'pass') ? 'pass' : 'fail';
 
 const summary = {
   status,
@@ -53,6 +60,7 @@ const summary = {
   scenario_failures: scenarios.failures ?? [],
   metric_contract_failures: metric.failures ?? [],
   invariant_failures: invariants.failures ?? [],
+  evidence_failures: evidence.failures ?? [],
   reports_built: [
     path.resolve(opts.produceDir, 'grey-current-system-shock-threshold.json'),
     path.resolve(opts.produceDir, 'grey-food-gap-replacement.json'),
@@ -64,13 +72,15 @@ const summary = {
     ...(source.warnings ?? []),
     ...(scenarios.warnings ?? []),
     ...(metric.warnings ?? []),
-    ...(invariants.warnings ?? [])
+    ...(invariants.warnings ?? []),
+    ...(evidence.warnings ?? [])
   ],
   details: {
     source,
     scenarios: { status: scenarios.status, checked: scenarios.scenarios.length },
     metric,
-    invariants
+    invariants,
+    evidence
   }
 };
 
@@ -90,6 +100,7 @@ const md = [
   `- scenario_failures: ${summary.scenario_failures.length}`,
   `- metric_contract_failures: ${summary.metric_contract_failures.length}`,
   `- invariant_failures: ${summary.invariant_failures.length}`,
+  `- evidence_failures: ${summary.evidence_failures.length}`,
   `- reports_built: ${summary.reports_built.length}`,
   `- warnings: ${summary.warnings.length}`,
   '',
@@ -98,7 +109,8 @@ const md = [
     ...summary.schema_failures,
     ...summary.scenario_failures,
     ...summary.metric_contract_failures,
-    ...summary.invariant_failures
+    ...summary.invariant_failures,
+    ...summary.evidence_failures
   ].map((f) => `- ${f}`),
   '',
   '## Warnings',

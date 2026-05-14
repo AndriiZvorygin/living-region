@@ -15,6 +15,7 @@ import { validateSourceManifest } from '../program/reliability/source_manifest.m
 import { loadScenarioFiles } from '../program/reliability/scenario_contract.mjs';
 import { validateMetricContract } from '../program/reliability/metric_contract.mjs';
 import { runInvariantChecks } from '../program/reliability/invariants.mjs';
+import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -36,9 +37,27 @@ function parseArgs(argv = process.argv.slice(2)) {
 const opts = parseArgs();
 const produceDir = path.resolve(opts.produceDir);
 const qaDir = path.resolve(opts.qaDir);
+const canonicalProduceDir = path.resolve('know/produce');
 fs.rmSync(produceDir, { recursive: true, force: true });
 fs.mkdirSync(produceDir, { recursive: true });
 fs.mkdirSync(qaDir, { recursive: true });
+
+// Seed required upstream derived artifacts that are not rebuilt from raw data in this command.
+// This prevents false-zero outputs when reports depend on prior census/import outputs.
+const seedFiles = [
+  'grey-census-population-distribution.json',
+  'grey-census-population-blocks.geojson',
+  'grey-labour-land-baseline.json',
+  'grey-ag-labour-baseline.json',
+  'grey-dwelling-land-access.json'
+];
+for (const rel of seedFiles) {
+  const src = path.join(canonicalProduceDir, rel);
+  const dst = path.join(produceDir, rel);
+  if (fs.existsSync(src) && !fs.existsSync(dst)) {
+    fs.copyFileSync(src, dst);
+  }
+}
 
 const source = validateSourceManifest({ manifestPath: opts.manifestPath });
 if (source.status !== 'pass') {
@@ -77,11 +96,18 @@ built.push('grey-hormuz-food-security-article-data');
 
 const metric = validateMetricContract({
   registryPath: opts.metricRegistryPath,
-  reportPath: path.join(produceDir, 'grey-hormuz-food-security-article-data.json')
+  reportPath: path.join(produceDir, 'grey-hormuz-food-security-article-data.json'),
+  scenariosDir: opts.scenariosDir
 });
 const invariants = runInvariantChecks({ produceDir });
+const evidence = buildEvidenceQualityAudit({
+  produceDir,
+  qaDir,
+  metricRegistryPath: opts.metricRegistryPath,
+  sourceManifestPath: opts.manifestPath
+});
 
-const status = metric.status === 'pass' && invariants.status === 'pass' ? 'pass' : 'fail';
+const status = metric.status === 'pass' && invariants.status === 'pass' && evidence.status === 'pass' ? 'pass' : 'fail';
 const summary = {
   status,
   generated_at: new Date().toISOString(),
@@ -94,8 +120,9 @@ const summary = {
   scenario_failures: scenarios.failures,
   metric_contract_failures: metric.failures,
   invariant_failures: invariants.failures,
+  evidence_failures: evidence.failures,
   reports_built: built,
-  warnings: [...(source.warnings ?? []), ...(scenarios.warnings ?? []), ...(metric.warnings ?? []), ...(invariants.warnings ?? [])]
+  warnings: [...(source.warnings ?? []), ...(scenarios.warnings ?? []), ...(metric.warnings ?? []), ...(invariants.warnings ?? []), ...(evidence.warnings ?? [])]
 };
 
 const jsonPath = path.join(qaDir, 'rebuild-summary.json');
