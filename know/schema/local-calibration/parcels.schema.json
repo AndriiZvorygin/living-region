@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Land Access Parcels Calibration",
+  "type": "object",
+  "required": [
+    "parcel_id",
+    "municipality",
+    "land_area_m2",
+    "zoning_or_land_use",
+    "assessment_class",
+    "has_residential_use",
+    "source_ref",
+    "quality_tier",
+    "notes"
+  ],
+  "properties": {
+    "parcel_id": { "type": "string", "minLength": 1 },
+    "municipality": { "type": "string", "minLength": 1 },
+    "land_area_m2": { "type": "number", "exclusiveMinimum": 0 },
+    "zoning_or_land_use": { "type": "string", "minLength": 1 },
+    "assessment_class": { "type": "string", "minLength": 1 },
+    "has_residential_use": {
+      "type": "string",
+      "enum": ["true", "false", "yes", "no", "1", "0"]
+    },
+    "source_ref": { "type": "string", "minLength": 1 },
+    "quality_tier": {
+      "type": "string",
+      "enum": [
+        "direct_local",
+        "regional_proxy",
+        "provincial_proxy",
+        "national_proxy",
+        "scenario_only",
+        "unknown"
+      ]
+    },
+    "notes": { "type": "string" }
+  }
+}

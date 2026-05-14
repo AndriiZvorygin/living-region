@@ -264,6 +264,20 @@ function calibrationStatusForMetric(metricId, calibrationSummary) {
   return { calibration_status: status, missing_calibration_refs: missing, calibration_quality: bestTier };
 }
 
+function landAccessGroundtruthForMetric(metricId, groundtruthSummary) {
+  if (metricId !== 'grey_no_meaningful_food_growing_land_access_population') {
+    return {
+      land_access_groundtruth_status: 'not_applicable',
+      land_access_groundtruth_limitations: []
+    };
+  }
+  const status = groundtruthSummary?.landAccessGroundtruthStatus ?? 'no_groundtruth';
+  return {
+    land_access_groundtruth_status: status,
+    land_access_groundtruth_limitations: groundtruthSummary?.limitations ?? []
+  };
+}
+
 const RISKY_PHRASES = [
   /\bwill rise\b/i,
   /\bwill cause\b/i,
@@ -327,6 +341,10 @@ export function buildEvidenceQualityAudit(options = {}) {
   const articlePath = path.join(produceDir, 'grey-hormuz-food-security-article-data.json');
   const article = readJson(articlePath, failures, 'article report', null);
   const calibrationSummary = readJsonIfExists(path.join(produceDir, 'local-calibration-summary.json'), { categories: {} });
+  const landGroundtruthSummary = readJsonIfExists(path.join(produceDir, 'land-access-groundtruth-summary.json'), {
+    landAccessGroundtruthStatus: 'no_groundtruth',
+    limitations: ['No land-access groundtruth summary available.']
+  });
   const metricRegistry = readJson(options.metricRegistryPath ?? 'know/metric-registry.json', failures, 'metric registry', { metrics: [] });
   const sourceManifest = readJson(options.sourceManifestPath ?? 'know/source-manifest.json', failures, 'source manifest', { entries: [] });
   if (!article) {
@@ -358,6 +376,9 @@ export function buildEvidenceQualityAudit(options = {}) {
     claim.calibration_status = calibration.calibration_status;
     claim.missing_calibration_refs = calibration.missing_calibration_refs;
     claim.calibration_quality = calibration.calibration_quality;
+    const groundtruth = landAccessGroundtruthForMetric(metric.metric_id, landGroundtruthSummary);
+    claim.land_access_groundtruth_status = groundtruth.land_access_groundtruth_status;
+    claim.land_access_groundtruth_limitations = groundtruth.land_access_groundtruth_limitations;
 
     // Guard against circular confidence.
     const hasStrongSource = sourceClasses.includes('external_snapshot') || sourceClasses.includes('manual_curated_input');
@@ -374,6 +395,20 @@ export function buildEvidenceQualityAudit(options = {}) {
     claim.public_use = publicUseForClaim(claim);
     if (!hasStrongSource && claim.public_use === 'article_grade') claim.public_use = 'article_with_caveat';
     applyCalibrationQualityRule(claim);
+    if (claim.land_access_groundtruth_status === 'no_groundtruth') {
+      claim.public_use = 'exploratory_only';
+    } else if (claim.land_access_groundtruth_status === 'partial_groundtruth' && claim.public_use === 'article_grade') {
+      claim.public_use = 'article_with_caveat';
+    } else if (
+      claim.land_access_groundtruth_status === 'direct_groundtruth'
+      && (landGroundtruthSummary?.inferred_only_linkage || !landGroundtruthSummary?.all_linkage_rows_source_backed)
+    ) {
+      claim.public_use = 'exploratory_only';
+      claim.land_access_groundtruth_limitations = [
+        ...(claim.land_access_groundtruth_limitations ?? []),
+        'Generated-only or inferred-only linkage cannot upgrade land-access claims.'
+      ];
+    }
     claim.recommended_wording = recommendedWording(claim);
 
     // Guard against obviously implausible zero headline values for baseline-style public metrics.

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Land Access Parcel Address Linkage Calibration",
+  "type": "object",
+  "required": [
+    "parcel_id",
+    "address_id",
+    "building_id",
+    "linkage_method",
+    "linkage_confidence",
+    "source_ref",
+    "quality_tier",
+    "notes"
+  ],
+  "properties": {
+    "parcel_id": { "type": "string", "minLength": 1 },
+    "address_id": { "type": "string", "minLength": 1 },
+    "building_id": { "type": "string", "minLength": 1 },
+    "linkage_method": {
+      "type": "string",
+      "enum": ["source_provided", "spatial_join", "manual_review", "inferred", "unknown"]
+    },
+    "linkage_confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low", "unknown"]
+    },
+    "source_ref": { "type": "string", "minLength": 1 },
+    "quality_tier": {
+      "type": "string",
+      "enum": [
+        "direct_local",
+        "regional_proxy",
+        "provincial_proxy",
+        "national_proxy",
+        "scenario_only",
+        "unknown"
+      ]
+    },
+    "notes": { "type": "string" }
+  }
+}

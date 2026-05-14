@@ -49,7 +49,13 @@ Example: `ontario_publichealth_foodbasket_2025`
 - Preferred source types: parcel fabric, address points, dwelling-unit linkage, assessment rolls.
 - Acceptable geographies: Grey parcel/address-level preferred.
 - Ideal indicators: parcel area usable-for-food, dwelling units per parcel, tenure/access constraints.
-- Minimum required fields: source-manifested files plus explicit processing notes.
+- Minimum required fields:
+  - `address-points.csv`: `address_id,civic_address,municipality,latitude,longitude,source_ref,quality_tier,notes`
+  - `building-footprints.csv`: `building_id,municipality,centroid_latitude,centroid_longitude,footprint_area_m2,building_type,source_ref,quality_tier,notes`
+  - `parcels.csv`: `parcel_id,municipality,land_area_m2,zoning_or_land_use,assessment_class,has_residential_use,source_ref,quality_tier,notes`
+  - `parcel-address-linkage.csv`: `parcel_id,address_id,building_id,linkage_method,linkage_confidence,source_ref,quality_tier,notes`
+  - Allowed linkage methods: `source_provided|spatial_join|manual_review|inferred|unknown`
+  - Allowed linkage confidence: `high|medium|low|unknown`
 - Claims supported: upgrade proxy land-access claims toward measured local estimates.
 
 ## agriculture_labour
@@ -110,6 +116,10 @@ Target import package:
 - address points
 - building footprints
 - dwelling-unit count linkage (if available)
+- stable IDs for parcel/address/building records
+- assessment class and land-use/zoning fields
+- coordinate system / CRS metadata
+- licence and redistribution terms
 
 Expected claim effect:
 - stronger strict land-access classification confidence

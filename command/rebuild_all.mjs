@@ -17,6 +17,7 @@ import { validateMetricContract } from '../program/reliability/metric_contract.m
 import { runInvariantChecks } from '../program/reliability/invariants.mjs';
 import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
 import { buildLocalCalibrationSummary } from '../program/reliability/local_calibration_intake.mjs';
+import { buildLandAccessGroundtruthSummary } from '../program/reliability/land_access_groundtruth_intake.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -39,6 +40,7 @@ const opts = parseArgs();
 const produceDir = path.resolve(opts.produceDir);
 const qaDir = path.resolve(opts.qaDir);
 const canonicalProduceDir = path.resolve('know/produce');
+const built = [];
 fs.rmSync(produceDir, { recursive: true, force: true });
 fs.mkdirSync(produceDir, { recursive: true });
 fs.mkdirSync(qaDir, { recursive: true });
@@ -93,8 +95,18 @@ if (calibration.status !== 'pass') {
   console.error(calibration.failures.join('\n'));
   process.exit(1);
 }
-
-const built = [];
+const landGroundtruth = buildLandAccessGroundtruthSummary({
+  inputDir: 'know/input/local-calibration',
+  schemaDir: 'know/schema/local-calibration',
+  produceDir,
+  sourceManifestPath: opts.manifestPath
+});
+if (landGroundtruth.status !== 'pass') {
+  console.error('land-access groundtruth intake validation failed');
+  console.error(landGroundtruth.failures.join('\n'));
+  process.exit(1);
+}
+built.push('land-access-groundtruth-summary');
 const inputDir = path.resolve(opts.inputDir);
 
 buildGreyPopulationDistributionReport({ produceDir, inputDir });
@@ -139,13 +151,13 @@ const summary = {
   sources_checked: source.checked,
   sources_changed: source.changed,
   schema_failures: [],
-  calibration_failures: calibration.failures,
+  calibration_failures: [...calibration.failures, ...landGroundtruth.failures],
   scenario_failures: scenarios.failures,
   metric_contract_failures: metric.failures,
   invariant_failures: invariants.failures,
   evidence_failures: evidence.failures,
   reports_built: built,
-  warnings: [...(source.warnings ?? []), ...(scenarios.warnings ?? []), ...(calibration.warnings ?? []), ...(metric.warnings ?? []), ...(invariants.warnings ?? []), ...(evidence.warnings ?? [])]
+  warnings: [...(source.warnings ?? []), ...(scenarios.warnings ?? []), ...(calibration.warnings ?? []), ...(landGroundtruth.warnings ?? []), ...(metric.warnings ?? []), ...(invariants.warnings ?? []), ...(evidence.warnings ?? [])]
 };
 
 const jsonPath = path.join(qaDir, 'rebuild-summary.json');

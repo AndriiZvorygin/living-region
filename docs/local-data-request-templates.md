@@ -65,10 +65,19 @@ Preferred machine-readable layers:
 - dwelling-unit counts by parcel/building (if available)
 
 Preferred metadata:
+- stable IDs (`parcel_id`, `address_id`, `building_id`)
+- linkage file between parcel/address/building where available
+- assessment class and zoning/land-use fields
+- residential/non-residential flag
+- coordinate system / CRS and units
 - projection
 - update date
 - licence/terms
 - known completeness limits
+
+Preferred delivery format:
+- CSV or GeoJSON exports are acceptable.
+- Intake into this repo is CSV-first for validation and QA.
 
 We can work with partial coverage and clearly label uncertainty.
 
@@ -125,4 +134,3 @@ We will keep attribution and caveats explicit in outputs.
 
 Thank you,
 [Name]
-

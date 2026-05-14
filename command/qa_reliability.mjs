@@ -8,6 +8,7 @@ import { validateMetricContract } from '../program/reliability/metric_contract.m
 import { runInvariantChecks } from '../program/reliability/invariants.mjs';
 import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
 import { buildLocalCalibrationSummary } from '../program/reliability/local_calibration_intake.mjs';
+import { buildLandAccessGroundtruthSummary } from '../program/reliability/land_access_groundtruth_intake.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -46,6 +47,12 @@ const calibration = buildLocalCalibrationSummary({
   produceDir: opts.produceDir,
   sourceManifestPath: opts.manifestPath
 });
+const landGroundtruth = buildLandAccessGroundtruthSummary({
+  inputDir: 'know/input/local-calibration',
+  schemaDir: 'know/schema/local-calibration',
+  produceDir: opts.produceDir,
+  sourceManifestPath: opts.manifestPath
+});
 const metric = validateMetricContract({ registryPath: opts.metricRegistryPath, reportPath: opts.articleReportPath, scenariosDir: opts.scenariosDir });
 const invariants = runInvariantChecks({ produceDir: opts.produceDir });
 const evidence = buildEvidenceQualityAudit({
@@ -55,7 +62,7 @@ const evidence = buildEvidenceQualityAudit({
   sourceManifestPath: opts.manifestPath
 });
 
-const status = [source.status, scenarios.status, calibration.status, metric.status, invariants.status, evidence.status].every((s) => s === 'pass') ? 'pass' : 'fail';
+const status = [source.status, scenarios.status, calibration.status, landGroundtruth.status, metric.status, invariants.status, evidence.status].every((s) => s === 'pass') ? 'pass' : 'fail';
 
 const summary = {
   status,
@@ -64,7 +71,7 @@ const summary = {
   sources_checked: source.checked ?? 0,
   sources_changed: source.changed ?? 0,
   schema_failures: [...(source.failures ?? []), ...(scenarios.failures ?? [])],
-  calibration_failures: calibration.failures ?? [],
+  calibration_failures: [...(calibration.failures ?? []), ...(landGroundtruth.failures ?? [])],
   scenario_failures: scenarios.failures ?? [],
   metric_contract_failures: metric.failures ?? [],
   invariant_failures: invariants.failures ?? [],
@@ -74,12 +81,14 @@ const summary = {
     path.resolve(opts.produceDir, 'grey-food-gap-replacement.json'),
     path.resolve(opts.produceDir, 'grey-food-supply-demand-price.json'),
     path.resolve(opts.produceDir, 'grey-food-insecurity-trend-projection.json'),
-    path.resolve(opts.produceDir, 'grey-hormuz-food-security-article-data.json')
+    path.resolve(opts.produceDir, 'grey-hormuz-food-security-article-data.json'),
+    path.resolve(opts.produceDir, 'land-access-groundtruth-summary.json')
   ].filter((p) => fs.existsSync(p)),
   warnings: [
     ...(source.warnings ?? []),
     ...(scenarios.warnings ?? []),
     ...(calibration.warnings ?? []),
+    ...(landGroundtruth.warnings ?? []),
     ...(metric.warnings ?? []),
     ...(invariants.warnings ?? []),
     ...(evidence.warnings ?? [])
@@ -88,6 +97,7 @@ const summary = {
     source,
     scenarios: { status: scenarios.status, checked: scenarios.scenarios.length },
     calibration: { status: calibration.status, dataPoints: calibration.summary?.totalDataPoints ?? 0 },
+    landGroundtruth: { status: landGroundtruth.status, rows: landGroundtruth.summary?.address_count ?? 0 },
     metric,
     invariants,
     evidence
