@@ -21,7 +21,7 @@
     "assessment_class": { "type": "string", "minLength": 1 },
     "has_residential_use": {
       "type": "string",
-      "enum": ["true", "false", "yes", "no", "1", "0"]
+      "enum": ["true", "false", "yes", "no", "1", "0", "unknown"]
     },
     "source_ref": { "type": "string", "minLength": 1 },
     "quality_tier": {

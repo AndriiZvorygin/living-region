@@ -74,6 +74,7 @@
     "report:grey:hormuz-article-data": "node command/report_grey_hormuz_food_security_article_data.mjs",
     "report:local-calibration": "node command/report_local_calibration_summary.mjs",
     "report:land-access-groundtruth": "node command/report_land_access_groundtruth.mjs",
+    "report:gis-inventory-bridge": "node command/bridge_existing_gis_to_land_access_contracts.mjs",
     "qa": "node command/qa_reliability.mjs",
     "rebuild:all": "node command/rebuild_all.mjs",
     "release:article-data": "node command/release_article_data.mjs"

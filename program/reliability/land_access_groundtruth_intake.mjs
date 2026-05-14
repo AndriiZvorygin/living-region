@@ -82,6 +82,7 @@ function boolLike(v) {
   const s = String(v ?? '').trim().toLowerCase();
   if (['true', 'yes', '1'].includes(s)) return true;
   if (['false', 'no', '0'].includes(s)) return false;
+  if (s === 'unknown') return 'unknown';
   return null;
 }
 
