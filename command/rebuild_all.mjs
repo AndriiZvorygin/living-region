@@ -18,6 +18,7 @@ import { runInvariantChecks } from '../program/reliability/invariants.mjs';
 import { buildEvidenceQualityAudit } from '../program/reliability/evidence_quality_audit.mjs';
 import { buildLocalCalibrationSummary } from '../program/reliability/local_calibration_intake.mjs';
 import { buildLandAccessGroundtruthSummary } from '../program/reliability/land_access_groundtruth_intake.mjs';
+import { buildArticleSupportEvidencePacket } from '../program/reliability/article_support_evidence_packet.mjs';
 
 function parseArgs(argv = process.argv.slice(2)) {
   const out = {
@@ -140,6 +141,18 @@ const evidence = buildEvidenceQualityAudit({
   metricRegistryPath: opts.metricRegistryPath,
   sourceManifestPath: opts.manifestPath
 });
+const articleSupport = buildArticleSupportEvidencePacket({
+  produceDir,
+  qaDir,
+  outputDir: 'output/article-support',
+  calibrationDir: 'know/input/local-calibration'
+});
+if (articleSupport.status !== 'pass') {
+  console.error('article support evidence packet failed');
+  console.error(articleSupport.failures.join('\n'));
+  process.exit(1);
+}
+built.push('article-support-evidence-packet');
 
 const status = metric.status === 'pass' && invariants.status === 'pass' && evidence.status === 'pass' ? 'pass' : 'fail';
 const summary = {

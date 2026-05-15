@@ -72,6 +72,7 @@
     "report:grey:food-insecurity-trends": "node command/report_grey_food_insecurity_trends.mjs",
     "report:grey:food-insecurity-trend": "node command/report_grey_food_insecurity_trend_projection.mjs",
     "report:grey:hormuz-article-data": "node command/report_grey_hormuz_food_security_article_data.mjs",
+    "report:article-support": "node command/report_article_support_evidence_packet.mjs",
     "report:local-calibration": "node command/report_local_calibration_summary.mjs",
     "report:land-access-groundtruth": "node command/report_land_access_groundtruth.mjs",
     "report:gis-inventory-bridge": "node command/bridge_existing_gis_to_land_access_contracts.mjs",
