@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-05-21T00:56:25.921Z",
+  "input_files": {
+    "grey_artifact": "/home/htaf/living-region/artifacts/grey-open-data-intersections-owen-sound.pya",
+    "osm_pbf": "/home/htaf/living-region/data/osm/owen-sound.osm.pbf",
+    "osm_geojson": null,
+    "boundary": "/home/htaf/living-region/data/boundaries/owen-sound.geojson"
+  },
+  "grey_source_count": 393,
+  "grey_source_note": null,
+  "osm_road_node_intersections_municipal_through_street": 476,
+  "osm_road_node_intersections_conservative": 569,
+  "osm_road_node_intersections_inclusive": 760,
+  "osm_road_geometry_crossings_conservative": 0,
+  "osm_road_geometry_crossings_inclusive": 0,
+  "osm_cycleway_intersections": 61,
+  "osm_bicycle_tagged_intersections": 61,
+  "osm_bicycle_route_relation_intersections": null,
+  "difference_absolute_municipal_through_street": 83,
+  "difference_percent_municipal_through_street": 21.119592875318066,
+  "difference_absolute_conservative": 176,
+  "difference_percent_conservative": 44.783715012722645,
+  "difference_absolute_inclusive": 367,
+  "difference_percent_inclusive": 93.38422391857506,
+  "caveats": [
+    "Municipal-through-street excludes service roads and private/internal access classes with additional node-level filtering.",
+    "Conservative excludes service roads, private/no access, and driveway/parking_aisle/alley/emergency_access service types.",
+    "Inclusive includes service roads but still excludes private/no access and driveway/parking_aisle/alley/emergency_access.",
+    "Cycling relation parsing is not yet implemented in this pass."
+  ],
+  "osm_extract_metadata": {
+    "inputMode": "pbf",
+    "inputFile": "/home/htaf/living-region/data/osm/owen-sound.osm.pbf",
+    "tempDir": "/tmp/lr-osm-compare-t8oHJQ"
+  }
+}

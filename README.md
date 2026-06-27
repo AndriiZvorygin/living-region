@@ -422,3 +422,26 @@ npm run demo:grey:rail:full
 ## Licence
 
 Living Region is licensed under GNU Affero General Public License v3.0 or later (`AGPL-3.0-or-later`). See [LICENSE](/home/htaf/living-region/LICENSE) and [NOTICE](/home/htaf/living-region/NOTICE).
+
+## OSM Data For Owen Sound Comparison
+
+Default workflow is local-file based (no Overpass dependency):
+
+```bash
+npm run osm:boundary:owen-sound
+npm run osm:download
+npm run osm:prepare:owen-sound
+npm run osm:compare:owen-sound
+```
+
+One-command wrapper:
+
+```bash
+npm run osm:compare:with-download
+```
+
+Notes:
+- Canonical source is Geofabrik Ontario PBF (`ontario-latest.osm.pbf`) plus MD5 verification.
+- The Owen Sound comparison clips Ontario with a local boundary polygon (`data/boundaries/owen-sound.geojson`).
+- Overpass is optional fallback only and is not required by this pipeline.
+- A boundary validator is provided: `node command/validate_boundary_geojson.mjs --boundary data/boundaries/owen-sound.geojson`.

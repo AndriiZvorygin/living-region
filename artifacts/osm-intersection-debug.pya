@@ -1,0 +1,2122 @@
+{
+  "generated_at": "2026-05-21T00:56:25.921Z",
+  "input_files": {
+    "grey_artifact": "/home/htaf/living-region/artifacts/grey-open-data-intersections-owen-sound.pya",
+    "osm_pbf": "/home/htaf/living-region/data/osm/owen-sound.osm.pbf",
+    "osm_geojson": null,
+    "boundary": "/home/htaf/living-region/data/boundaries/owen-sound.geojson"
+  },
+  "conservative": {
+    "number_of_highway_ways_included": 888,
+    "number_of_osm_nodes_examined": 3344,
+    "number_of_unique_shared_road_nodes": 569,
+    "top_25_intersection_nodes_by_degree": [
+      {
+        "osm_node_id": "-80926898:44573859",
+        "lon": -80.9268984,
+        "lat": 44.5738586,
+        "connected_way_names": [
+          "9th Avenue East",
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential",
+          "primary"
+        ],
+        "degree_raw": 5
+      },
+      {
+        "osm_node_id": "-80949663:44581469",
+        "lon": -80.9496629,
+        "lat": 44.5814687,
+        "connected_way_names": [
+          "4th Avenue West",
+          "20th Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80949259:44582659",
+        "lon": -80.9492588,
+        "lat": 44.5826593,
+        "connected_way_names": [
+          "4th Avenue West",
+          "21st Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80952245:44583158",
+        "lon": -80.9522446,
+        "lat": 44.583158,
+        "connected_way_names": [
+          "6th Avenue West",
+          "21st Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80950056:44580200",
+        "lon": -80.9500564,
+        "lat": 44.5802003,
+        "connected_way_names": [
+          "4th Avenue West",
+          "19th Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80949415:44577500",
+        "lon": -80.9494151,
+        "lat": 44.5775004,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "17th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80947352:44565314",
+        "lon": -80.9473522,
+        "lat": 44.5653142,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "9th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80945264:44563623",
+        "lon": -80.9452645,
+        "lat": 44.563623,
+        "connected_way_names": [
+          "8th Street West",
+          "2nd Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80932229:44565129",
+        "lon": -80.9322289,
+        "lat": 44.5651292,
+        "connected_way_names": [
+          "7th Avenue East",
+          "8th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80950368:44584173",
+        "lon": -80.9503676,
+        "lat": 44.5841734,
+        "connected_way_names": [
+          "5th Avenue West",
+          "22nd Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80930304:44571334",
+        "lon": -80.9303044,
+        "lat": 44.5713341,
+        "connected_way_names": [
+          "15th Street East",
+          "8th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80931706:44572424",
+        "lon": -80.9317055,
+        "lat": 44.5724235,
+        "connected_way_names": [
+          "15th Street East",
+          "7th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80950609:44572059",
+        "lon": -80.9506088,
+        "lat": 44.5720588,
+        "connected_way_names": [
+          "13th Street West",
+          "4th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80946375:44586850",
+        "lon": -80.946375,
+        "lat": 44.5868503,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "24th Street West"
+        ],
+        "connected_highway_tags": [
+          "secondary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80949007:44578720",
+        "lon": -80.9490075,
+        "lat": 44.5787196,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "18th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80943814:44563785",
+        "lon": -80.9438144,
+        "lat": 44.5637849,
+        "connected_way_names": [
+          "8th Street East",
+          "1st Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "unclassified"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80936611:44572659",
+        "lon": -80.9366113,
+        "lat": 44.5726593,
+        "connected_way_names": [
+          "13th Street East",
+          "4th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80949944:44557331",
+        "lon": -80.9499438,
+        "lat": 44.5573309,
+        "connected_way_names": [
+          "4th Street A West",
+          "5th Street West",
+          "5th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80951038:44564884",
+        "lon": -80.9510379,
+        "lat": 44.5648838,
+        "connected_way_names": [
+          "9th Street West",
+          "5th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80953056:44564655",
+        "lon": -80.9530555,
+        "lat": 44.5646551,
+        "connected_way_names": [
+          "9th Street West",
+          "6th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80945546:44589289",
+        "lon": -80.9455464,
+        "lat": 44.5892892,
+        "connected_way_names": [
+          "26th Street West",
+          "3rd Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "secondary"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80936918:44574897",
+        "lon": -80.9369175,
+        "lat": 44.574897,
+        "connected_way_names": [
+          "14th Street East",
+          "3rd Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "secondary"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80954158:44572811",
+        "lon": -80.9541581,
+        "lat": 44.5728107,
+        "connected_way_names": [
+          "13th Street A West",
+          "Alpha Street"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80931791:44563208",
+        "lon": -80.9317908,
+        "lat": 44.5632082,
+        "connected_way_names": [
+          "7th Street East",
+          "7th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      },
+      {
+        "osm_node_id": "-80929152:44563520",
+        "lon": -80.9291522,
+        "lat": 44.5635204,
+        "connected_way_names": [
+          "7th Street East",
+          "8th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4
+      }
+    ],
+    "counts_by_highway_tag": {
+      "service": 628,
+      "residential": 541,
+      "footway": 211,
+      "path": 140,
+      "tertiary": 122,
+      "primary": 81,
+      "secondary": 75,
+      "unclassified": 69,
+      "cycleway": 7,
+      "primary_link": 3,
+      "steps": 2,
+      "secondary_link": 1
+    },
+    "excluded_highway_tag_counts": {
+      "excluded:service_parking_aisle": 372,
+      "excluded:footway": 211,
+      "excluded:service": 163,
+      "excluded:path": 140,
+      "excluded:service_driveway": 79,
+      "excluded:access_private_or_no": 12,
+      "excluded:cycleway": 7,
+      "excluded:primary_link": 3,
+      "excluded:steps": 2,
+      "excluded:service_alley": 2,
+      "excluded:secondary_link": 1
+    },
+    "includes_service_roads": false,
+    "includes_private_or_access_restricted_roads": false,
+    "duplicated_way_segments_count": 0
+  },
+  "inclusive": {
+    "number_of_highway_ways_included": 1051,
+    "number_of_osm_nodes_examined": 4361,
+    "number_of_unique_shared_road_nodes": 760,
+    "counts_by_highway_tag": {
+      "service": 628,
+      "residential": 541,
+      "footway": 211,
+      "path": 140,
+      "tertiary": 122,
+      "primary": 81,
+      "secondary": 75,
+      "unclassified": 69,
+      "cycleway": 7,
+      "primary_link": 3,
+      "steps": 2,
+      "secondary_link": 1
+    },
+    "excluded_highway_tag_counts": {
+      "excluded:service_parking_aisle": 372,
+      "excluded:footway": 211,
+      "excluded:path": 140,
+      "excluded:service_driveway": 79,
+      "excluded:access_private_or_no": 12,
+      "excluded:cycleway": 7,
+      "excluded:primary_link": 3,
+      "excluded:steps": 2,
+      "excluded:service_alley": 2,
+      "excluded:secondary_link": 1
+    },
+    "includes_service_roads": true,
+    "includes_private_or_access_restricted_roads": false,
+    "duplicated_way_segments_count": 0
+  },
+  "municipal_through_street": {
+    "number_of_nodes_retained": 476,
+    "candidate_nodes_dropped_because_same_name_continuation": 1,
+    "candidate_nodes_dropped_because_dead_end_terminal": 92,
+    "candidate_nodes_dropped_because_roundabout_internal": 0,
+    "candidate_nodes_dropped_because_service_private_internal": 0,
+    "candidate_nodes_dropped_other": 0,
+    "top_50_retained_nodes": [
+      {
+        "osm_node_id": "-80926898:44573859",
+        "lon": -80.9268984,
+        "lat": 44.5738586,
+        "connected_way_names": [
+          "9th Avenue East",
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential",
+          "primary"
+        ],
+        "degree_raw": 5,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80949663:44581469",
+        "lon": -80.9496629,
+        "lat": 44.5814687,
+        "connected_way_names": [
+          "4th Avenue West",
+          "20th Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80949259:44582659",
+        "lon": -80.9492588,
+        "lat": 44.5826593,
+        "connected_way_names": [
+          "4th Avenue West",
+          "21st Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80952245:44583158",
+        "lon": -80.9522446,
+        "lat": 44.583158,
+        "connected_way_names": [
+          "6th Avenue West",
+          "21st Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80950056:44580200",
+        "lon": -80.9500564,
+        "lat": 44.5802003,
+        "connected_way_names": [
+          "4th Avenue West",
+          "19th Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80949415:44577500",
+        "lon": -80.9494151,
+        "lat": 44.5775004,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "17th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80947352:44565314",
+        "lon": -80.9473522,
+        "lat": 44.5653142,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "9th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80945264:44563623",
+        "lon": -80.9452645,
+        "lat": 44.563623,
+        "connected_way_names": [
+          "8th Street West",
+          "2nd Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80932229:44565129",
+        "lon": -80.9322289,
+        "lat": 44.5651292,
+        "connected_way_names": [
+          "7th Avenue East",
+          "8th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80950368:44584173",
+        "lon": -80.9503676,
+        "lat": 44.5841734,
+        "connected_way_names": [
+          "5th Avenue West",
+          "22nd Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80930304:44571334",
+        "lon": -80.9303044,
+        "lat": 44.5713341,
+        "connected_way_names": [
+          "15th Street East",
+          "8th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80931706:44572424",
+        "lon": -80.9317055,
+        "lat": 44.5724235,
+        "connected_way_names": [
+          "15th Street East",
+          "7th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80950609:44572059",
+        "lon": -80.9506088,
+        "lat": 44.5720588,
+        "connected_way_names": [
+          "13th Street West",
+          "4th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80946375:44586850",
+        "lon": -80.946375,
+        "lat": 44.5868503,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "24th Street West"
+        ],
+        "connected_highway_tags": [
+          "secondary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80949007:44578720",
+        "lon": -80.9490075,
+        "lat": 44.5787196,
+        "connected_way_names": [
+          "3rd Avenue West",
+          "18th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80943814:44563785",
+        "lon": -80.9438144,
+        "lat": 44.5637849,
+        "connected_way_names": [
+          "8th Street East",
+          "1st Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "unclassified"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80936611:44572659",
+        "lon": -80.9366113,
+        "lat": 44.5726593,
+        "connected_way_names": [
+          "13th Street East",
+          "4th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80949944:44557331",
+        "lon": -80.9499438,
+        "lat": 44.5573309,
+        "connected_way_names": [
+          "4th Street A West",
+          "5th Street West",
+          "5th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 3,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80951038:44564884",
+        "lon": -80.9510379,
+        "lat": 44.5648838,
+        "connected_way_names": [
+          "9th Street West",
+          "5th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80953056:44564655",
+        "lon": -80.9530555,
+        "lat": 44.5646551,
+        "connected_way_names": [
+          "9th Street West",
+          "6th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80945546:44589289",
+        "lon": -80.9455464,
+        "lat": 44.5892892,
+        "connected_way_names": [
+          "26th Street West",
+          "3rd Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "secondary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80936918:44574897",
+        "lon": -80.9369175,
+        "lat": 44.574897,
+        "connected_way_names": [
+          "14th Street East",
+          "3rd Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "secondary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80954158:44572811",
+        "lon": -80.9541581,
+        "lat": 44.5728107,
+        "connected_way_names": [
+          "13th Street A West",
+          "Alpha Street"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80931791:44563208",
+        "lon": -80.9317908,
+        "lat": 44.5632082,
+        "connected_way_names": [
+          "7th Street East",
+          "7th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80929152:44563520",
+        "lon": -80.9291522,
+        "lat": 44.5635204,
+        "connected_way_names": [
+          "7th Street East",
+          "8th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80951069:44574092",
+        "lon": -80.9510693,
+        "lat": 44.5740922,
+        "connected_way_names": [
+          "4th Avenue West",
+          "14th Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80915410:44570903",
+        "lon": -80.9154099,
+        "lat": 44.570903,
+        "connected_way_names": [
+          "16th Avenue East",
+          "18th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 3,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80934741:44578366",
+        "lon": -80.9347409,
+        "lat": 44.5783659,
+        "connected_way_names": [
+          "3rd Avenue East",
+          "18th Street East",
+          "4th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "secondary",
+          "unclassified",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 3,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80941972:44562046",
+        "lon": -80.9419718,
+        "lat": 44.5620464,
+        "connected_way_names": [
+          "2nd Avenue East",
+          "7th Street East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80942407:44563943",
+        "lon": -80.9424071,
+        "lat": 44.5639429,
+        "connected_way_names": [
+          "2nd Avenue East",
+          "8th Street East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80948477:44585159",
+        "lon": -80.9484767,
+        "lat": 44.5851589,
+        "connected_way_names": [
+          "4th Avenue West",
+          "23rd Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80940566:44571928",
+        "lon": -80.9405663,
+        "lat": 44.5719278,
+        "connected_way_names": [
+          "12th Street East",
+          "2nd Avenue East"
+        ],
+        "connected_highway_tags": [
+          "unclassified",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80935112:44575165",
+        "lon": -80.9351119,
+        "lat": 44.5751646,
+        "connected_way_names": [
+          "4th Avenue East",
+          "15th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80938701:44564368",
+        "lon": -80.9387006,
+        "lat": 44.5643679,
+        "connected_way_names": [
+          "8th Street East",
+          "4th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80936862:44564570",
+        "lon": -80.9368619,
+        "lat": 44.56457,
+        "connected_way_names": [
+          "8th Street East",
+          "5th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80937283:44566477",
+        "lon": -80.9372834,
+        "lat": 44.5664771,
+        "connected_way_names": [
+          "5th Avenue East",
+          "9th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80927460:44565648",
+        "lon": -80.9274605,
+        "lat": 44.5656475,
+        "connected_way_names": [
+          "8th Street East",
+          "9th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "secondary",
+          "tertiary",
+          "primary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80930285:44574537",
+        "lon": -80.9302849,
+        "lat": 44.5745368,
+        "connected_way_names": [
+          "16th Street East",
+          "7th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80932026:44574890",
+        "lon": -80.9320258,
+        "lat": 44.5748895,
+        "connected_way_names": [
+          "16th Street East",
+          "6th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80942832:44565833",
+        "lon": -80.9428321,
+        "lat": 44.5658331,
+        "connected_way_names": [
+          "9th Street East",
+          "2nd Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80940966:44566052",
+        "lon": -80.9409664,
+        "lat": 44.5660518,
+        "connected_way_names": [
+          "9th Street East",
+          "3rd Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary",
+          "unclassified",
+          "secondary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80939131:44566263",
+        "lon": -80.939131,
+        "lat": 44.5662627,
+        "connected_way_names": [
+          "9th Street East",
+          "4th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "unclassified",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80939689:44560367",
+        "lon": -80.9396889,
+        "lat": 44.5603665,
+        "connected_way_names": [
+          "3rd Avenue East",
+          "6th Street East"
+        ],
+        "connected_highway_tags": [
+          "secondary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80940119:44562262",
+        "lon": -80.9401188,
+        "lat": 44.5622615,
+        "connected_way_names": [
+          "3rd Avenue East",
+          "7th Street East"
+        ],
+        "connected_highway_tags": [
+          "secondary",
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80916663:44576129",
+        "lon": -80.9166626,
+        "lat": 44.5761289,
+        "connected_way_names": [
+          "17th Street East",
+          "16th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "unclassified",
+          "tertiary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80943931:44567654",
+        "lon": -80.943931,
+        "lat": 44.5676543,
+        "connected_way_names": [
+          "1st Avenue East",
+          "10th Street East",
+          "10th Street West"
+        ],
+        "connected_highway_tags": [
+          "unclassified",
+          "primary"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 3,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80925726:44581644",
+        "lon": -80.9257256,
+        "lat": 44.5816436,
+        "connected_way_names": [
+          "8th Avenue East",
+          "20th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80931309:44576713",
+        "lon": -80.9313087,
+        "lat": 44.5767131,
+        "connected_way_names": [
+          "6th Avenue East",
+          "17th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80930576:44578603",
+        "lon": -80.9305759,
+        "lat": 44.5786032,
+        "connected_way_names": [
+          "6th Avenue East",
+          "18th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      },
+      {
+        "osm_node_id": "-80930265:44568358",
+        "lon": -80.9302653,
+        "lat": 44.5683576,
+        "connected_way_names": [
+          "8th Avenue East",
+          "9th Street A East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 4,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": null
+      }
+    ],
+    "top_50_dropped_nodes": [
+      {
+        "osm_node_id": "-80916206:44574285",
+        "lon": -80.9162056,
+        "lat": 44.5742846,
+        "connected_way_names": [
+          "16th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80930673:44560217",
+        "lon": -80.9306732,
+        "lat": 44.5602167,
+        "connected_way_names": [
+          "5th Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80913212:44575700",
+        "lon": -80.9132123,
+        "lat": 44.5757001,
+        "connected_way_names": [
+          "18th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "unclassified"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80929151:44569377",
+        "lon": -80.9291515,
+        "lat": 44.5693771,
+        "connected_way_names": [
+          "10th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80928444:44557125",
+        "lon": -80.9284438,
+        "lat": 44.5571249,
+        "connected_way_names": [
+          "8th Avenue A East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80951584:44575507",
+        "lon": -80.9515836,
+        "lat": 44.5755066,
+        "connected_way_names": [
+          "4th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "tertiary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80961364:44566196",
+        "lon": -80.9613637,
+        "lat": 44.5661964,
+        "connected_way_names": [
+          "10th Street West"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80916419:44575077",
+        "lon": -80.9164186,
+        "lat": 44.575077,
+        "connected_way_names": [
+          "16th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80953475:44567009",
+        "lon": -80.9534748,
+        "lat": 44.5670091,
+        "connected_way_names": [
+          "10th Street West"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80951996:44566777",
+        "lon": -80.9519957,
+        "lat": 44.5667766,
+        "connected_way_names": [
+          "10th Street West"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80928374:44570038",
+        "lon": -80.9283736,
+        "lat": 44.5700378,
+        "connected_way_names": [
+          "9th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80932415:44569037",
+        "lon": -80.9324146,
+        "lat": 44.5690367,
+        "connected_way_names": [
+          "10th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80928254:44568942",
+        "lon": -80.9282537,
+        "lat": 44.5689417,
+        "connected_way_names": [
+          "9th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80926367:44573744",
+        "lon": -80.9263675,
+        "lat": 44.5737443,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80912691:44575236",
+        "lon": -80.912691,
+        "lat": 44.575236,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80915828:44574869",
+        "lon": -80.9158277,
+        "lat": 44.5748693,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80913674:44575120",
+        "lon": -80.9136736,
+        "lat": 44.5751198,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80916922:44574761",
+        "lon": -80.9169219,
+        "lat": 44.5747605,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80922863:44574027",
+        "lon": -80.9228628,
+        "lat": 44.5740271,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80923874:44573930",
+        "lon": -80.9238744,
+        "lat": 44.5739298,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80912993:44574687",
+        "lon": -80.9129933,
+        "lat": 44.5746873,
+        "connected_way_names": [
+          "18th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80927598:44569551",
+        "lon": -80.9275985,
+        "lat": 44.5695505,
+        "connected_way_names": [
+          "10th Street East"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80905413:44576048",
+        "lon": -80.9054135,
+        "lat": 44.5760475,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80906026:44575975",
+        "lon": -80.9060258,
+        "lat": 44.5759751,
+        "connected_way_names": [
+          "16th Street East"
+        ],
+        "connected_highway_tags": [
+          "primary"
+        ],
+        "degree_raw": 3,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80932756:44553952",
+        "lon": -80.9327561,
+        "lat": 44.5539524,
+        "connected_way_names": [
+          "6th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80943193:44558756",
+        "lon": -80.9431931,
+        "lat": 44.558756,
+        "connected_way_names": [
+          "Sydenham Crescent"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80932584:44556669",
+        "lon": -80.9325843,
+        "lat": 44.5566693,
+        "connected_way_names": [
+          "6th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80934099:44578149",
+        "lon": -80.9340987,
+        "lat": 44.5781494,
+        "connected_way_names": [
+          "4th Avenue East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80944547:44563702",
+        "lon": -80.9445472,
+        "lat": 44.5637022,
+        "connected_way_names": [
+          "8th Street West"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80934249:44579167",
+        "lon": -80.9342487,
+        "lat": 44.5791669,
+        "connected_way_names": [
+          "3rd Avenue East"
+        ],
+        "connected_highway_tags": [
+          "secondary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80953538:44566762",
+        "lon": -80.9535381,
+        "lat": 44.5667618,
+        "connected_way_names": [
+          "6th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80930252:44562419",
+        "lon": -80.9302521,
+        "lat": 44.5624188,
+        "connected_way_names": [
+          "6th Street A East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80945533:44586226",
+        "lon": -80.9455326,
+        "lat": 44.5862264,
+        "connected_way_names": [
+          "24th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential",
+          "unclassified"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 2,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "same_name_continuation"
+      },
+      {
+        "osm_node_id": "-80946113:44586808",
+        "lon": -80.9461128,
+        "lat": 44.5868077,
+        "connected_way_names": [
+          "24th Street West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80947792:44575107",
+        "lon": -80.9477917,
+        "lat": 44.5751068,
+        "connected_way_names": [
+          "Eddy Sargeant Parkway"
+        ],
+        "connected_highway_tags": [
+          "secondary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80947714:44575642",
+        "lon": -80.9477142,
+        "lat": 44.575642,
+        "connected_way_names": [
+          "Eddy Sargeant Parkway"
+        ],
+        "connected_highway_tags": [
+          "secondary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80947121:44578296",
+        "lon": -80.9471211,
+        "lat": 44.5782955,
+        "connected_way_names": [
+          "Eddy Sargeant Parkway"
+        ],
+        "connected_highway_tags": [
+          "secondary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80943500:44564555",
+        "lon": -80.9434998,
+        "lat": 44.564555,
+        "connected_way_names": [
+          "1st Avenue East"
+        ],
+        "connected_highway_tags": [
+          "unclassified"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80894754:44561834",
+        "lon": -80.8947537,
+        "lat": 44.5618342,
+        "connected_way_names": [
+          "Superior Street"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80894426:44561870",
+        "lon": -80.8944262,
+        "lat": 44.56187,
+        "connected_way_names": [
+          "Superior Street"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80951228:44574514",
+        "lon": -80.9512276,
+        "lat": 44.5745135,
+        "connected_way_names": [
+          "4th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80951374:44574777",
+        "lon": -80.9513737,
+        "lat": 44.5747772,
+        "connected_way_names": [
+          "4th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "tertiary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80945901:44576423",
+        "lon": -80.9459006,
+        "lat": 44.5764233,
+        "connected_way_names": [
+          "1st Avenue West"
+        ],
+        "connected_highway_tags": [
+          "unclassified"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80942825:44571921",
+        "lon": -80.9428247,
+        "lat": 44.5719209,
+        "connected_way_names": [
+          "17th Street East"
+        ],
+        "connected_highway_tags": [
+          "unclassified"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80942414:44574254",
+        "lon": -80.9424139,
+        "lat": 44.5742542,
+        "connected_way_names": [
+          "17th Street East"
+        ],
+        "connected_highway_tags": [
+          "unclassified"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80941593:44576409",
+        "lon": -80.9415927,
+        "lat": 44.5764086,
+        "connected_way_names": [
+          "17th Street East"
+        ],
+        "connected_highway_tags": [
+          "unclassified"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80939286:44551404",
+        "lon": -80.9392861,
+        "lat": 44.5514042,
+        "connected_way_names": [
+          "1st Street East"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80908570:44567814",
+        "lon": -80.9085696,
+        "lat": 44.567814,
+        "connected_way_names": [
+          "8th Street East"
+        ],
+        "connected_highway_tags": [
+          "secondary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80894786:44569436",
+        "lon": -80.8947864,
+        "lat": 44.5694357,
+        "connected_way_names": [
+          "8th Street East"
+        ],
+        "connected_highway_tags": [
+          "secondary"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      },
+      {
+        "osm_node_id": "-80950694:44555322",
+        "lon": -80.9506938,
+        "lat": 44.5553224,
+        "connected_way_names": [
+          "6th Avenue West"
+        ],
+        "connected_highway_tags": [
+          "residential"
+        ],
+        "degree_raw": 2,
+        "degree_merged": 1,
+        "has_roundabout": false,
+        "has_excluded_internal": false,
+        "drop_reason": "dead_end_terminal"
+      }
+    ]
+  },
+  "boundary_clip_rural_fringe_check": "boundary filename suggests Owen Sound municipal boundary"
+}

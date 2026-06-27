@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-05-21T00:52:47.094Z",
+  "source": "grey-open-data-road-centrelines",
+  "municipality": "City of Owen Sound",
+  "method": "network node degree>=3 from road centrelines within municipal boundary",
+  "roadSegmentsConsidered": 1818,
+  "intersectionsEstimated": 393
+}

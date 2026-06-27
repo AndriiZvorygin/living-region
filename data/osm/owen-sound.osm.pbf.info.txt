@@ -1,0 +1,13 @@
+File:
+  Name: /home/htaf/living-region/data/osm/owen-sound.osm.pbf
+  Format: PBF
+  Compression: none
+  Size: 345569
+Header:
+  Bounding boxes:
+  With history: no
+  Options:
+    generator=osmium/1.16.0
+    pbf_dense_nodes=true
+    pbf_optional_feature_0=Sort.Type_then_ID
+    sorting=Type_then_ID

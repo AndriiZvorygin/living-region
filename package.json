@@ -86,7 +86,12 @@
     "export:web": "tsx packages/data-pipeline/src/cli/export-web.ts",
     "dev:web": "vite --config packages/web-client/vite.config.ts",
     "build:web": "vite build --config packages/web-client/vite.config.ts",
-    "validate": "tsx packages/data-pipeline/src/cli/validate.ts"
+    "validate": "tsx packages/data-pipeline/src/cli/validate.ts",
+    "osm:download": "node command/download_osm_extract.mjs --region ontario --cache-dir data/osm --out data/osm/ontario-latest.osm.pbf",
+    "osm:prepare:owen-sound": "node command/prepare_osm_extract.mjs --input data/osm/ontario-latest.osm.pbf --boundary data/boundaries/owen-sound.geojson --out data/osm/owen-sound.osm.pbf",
+    "osm:compare:owen-sound": "node command/compare_osm_intersections.mjs --osm-pbf data/osm/owen-sound.osm.pbf --boundary data/boundaries/owen-sound.geojson --out artifacts/osm-intersection-comparison.pya",
+    "osm:compare:with-download": "node command/compare_osm_intersections_with_download.mjs --boundary data/boundaries/owen-sound.geojson --cache-dir data/osm --out artifacts/osm-intersection-comparison.pya",
+    "osm:boundary:owen-sound": "node command/export_owen_sound_boundary.mjs"
   },
   "keywords": [
     "regional-planning",

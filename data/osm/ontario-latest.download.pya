@@ -1,0 +1,12 @@
+{
+  "source_url": "https://download.geofabrik.de/north-america/canada/ontario-latest.osm.pbf",
+  "checksum_url": "https://download.geofabrik.de/north-america/canada/ontario-latest.osm.pbf.md5",
+  "region": "ontario",
+  "downloaded_at": "2026-05-21T00:47:29.618Z",
+  "file_path": "/home/htaf/living-region/data/osm/ontario-latest.osm.pbf",
+  "file_size_bytes": 937957326,
+  "md5_status": "ok",
+  "md5_expected": "3ed461bc28d0f0899a7ed1c4b5d90862",
+  "md5_actual": "3ed461bc28d0f0899a7ed1c4b5d90862",
+  "osmium_fileinfo_status": "ok"
+}
