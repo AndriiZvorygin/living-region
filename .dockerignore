@@ -1,0 +1,9 @@
+node_modules
+packages/*/dist
+.git
+coverage
+output
+know/input
+know/produce
+data/osm/*.pbf
+*.log

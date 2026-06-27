@@ -1,0 +1,10 @@
+services:
+  hamlet-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: living-region-hamlet-web:latest
+    container_name: hamlet-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5174:80"
