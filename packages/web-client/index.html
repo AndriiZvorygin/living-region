@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Owen Sound Yurt Hamlet MVP</title>
+  </head>
+  <body>
+    <div id="app">
+      <aside id="panel">
+        <h1>Owen Sound Yurt Hamlet</h1>
+        <section>
+          <h2>Candidate Ranking</h2>
+          <select id="candidate-select" aria-label="Select candidate property"></select>
+          <div id="candidate-status" aria-live="polite"></div>
+          <ol id="candidates"></ol>
+        </section>
+        <section>
+          <h2>Overlay</h2>
+          <div id="overlay-buttons"></div>
+        </section>
+        <section>
+          <h2>Add-ons</h2>
+          <div id="addon-toggles"></div>
+        </section>
+        <section>
+          <h2>Chore Routes</h2>
+          <div id="route-controls"></div>
+          <dl id="route-summary"></dl>
+        </section>
+        <section>
+          <h2>Cell Inspector</h2>
+          <dl id="inspector"></dl>
+        </section>
+      </aside>
+      <main>
+        <canvas id="scene"></canvas>
+        <div id="hud"></div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

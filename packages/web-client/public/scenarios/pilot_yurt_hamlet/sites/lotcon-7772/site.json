@@ -1,0 +1,19 @@
+{
+  "id": "lotcon-7772",
+  "name": "LOT 41, 1 SOUTH OF DURHAM ROAD",
+  "selected_candidate_id": "lotcon-7772",
+  "origin_lat": 44.58362,
+  "origin_lon": -80.86965,
+  "origin_x_m": 0,
+  "origin_z_m": 0,
+  "projection": "LOCAL_TANGENT_METRES_PLACEHOLDER_EPSG_TBD",
+  "area_ha": 42.28,
+  "distance_to_owen_sound_km": 6.2,
+  "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+  "terrain_source": "procedural_fallback",
+  "notes": [
+    "Grey lot/concession fabric proxy; not a legal parcel, ownership record, or planning approval.",
+    "Terrain source priority is Ontario DTM, Canada DEM, then procedural fallback. This export currently uses procedural fallback unless a DEM adapter supplies elevations.",
+    "Renderer uses local projected metre coordinates, never longitude/latitude as x/z."
+  ]
+}

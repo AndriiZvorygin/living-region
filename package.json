@@ -78,7 +78,15 @@
     "report:gis-inventory-bridge": "node command/bridge_existing_gis_to_land_access_contracts.mjs",
     "qa": "node command/qa_reliability.mjs",
     "rebuild:all": "node command/rebuild_all.mjs",
-    "release:article-data": "node command/release_article_data.mjs"
+    "release:article-data": "node command/release_article_data.mjs",
+    "demo:owen-sound": "tsx packages/data-pipeline/src/cli/demo-owen-sound.ts",
+    "discover:sites": "tsx packages/data-pipeline/src/cli/discover-sites.ts",
+    "score:sites": "tsx packages/data-pipeline/src/cli/score-sites.ts",
+    "prepare:site": "tsx packages/data-pipeline/src/cli/prepare-site.ts",
+    "export:web": "tsx packages/data-pipeline/src/cli/export-web.ts",
+    "dev:web": "vite --config packages/web-client/vite.config.ts",
+    "build:web": "vite build --config packages/web-client/vite.config.ts",
+    "validate": "tsx packages/data-pipeline/src/cli/validate.ts"
   },
   "keywords": [
     "regional-planning",
@@ -95,7 +103,12 @@
   ],
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "@types/node": "^22.10.2",
+    "@types/three": "^0.185.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
   },
   "repository": {
     "type": "git",
@@ -104,5 +117,11 @@
   "bugs": {
     "url": "https://gitlab.com/liberit/living-region/-/issues"
   },
-  "homepage": "https://gitlab.com/liberit/living-region"
+  "homepage": "https://gitlab.com/liberit/living-region",
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "three": "^0.171.0"
+  }
 }

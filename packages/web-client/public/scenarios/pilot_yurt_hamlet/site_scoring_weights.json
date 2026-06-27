@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "weights": {
+    "distance_to_owen_sound": 0.16,
+    "area_fit": 0.14,
+    "gentle_topography": 0.18,
+    "drainage_balance": 0.16,
+    "solar_exposure": 0.14,
+    "access_potential": 0.12,
+    "land_use_compatibility": 0.1
+  }
+}

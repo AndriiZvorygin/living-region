@@ -1,0 +1,140 @@
+{
+  "metadata": {
+    "generated_from": "lot-concession-csv",
+    "centre": "Owen Sound, Ontario",
+    "search_radius_km": 20,
+    "caveat": "lot_fabric_proxy_not_legal_parcel"
+  },
+  "candidates": [
+    {
+      "id": "lotcon-6679",
+      "lotcon_id": "lotcon-6679",
+      "name": "LOT 33, 1 NORTH OF DURHAM ROAD",
+      "municipality": "municipality-7",
+      "approximate_location": {
+        "lat": 44.63347,
+        "lon": -80.95546
+      },
+      "area_ha": 28.24,
+      "source_ref": "grey_gis_lots_and_concessions_grey",
+      "source_quality": "direct_local",
+      "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+      "distance_to_owen_sound_km": 7.4,
+      "score_total": 0.781,
+      "score_breakdown": {
+        "distance_to_owen_sound": 0.6916666666666667,
+        "area_fit": 0.9470168625,
+        "gentle_topography": 0.7503228893782943,
+        "drainage_balance": 0.7803898882912472,
+        "solar_exposure": 0.8556731570698322,
+        "access_potential": 0.8322612013854086,
+        "land_use_compatibility": 0.58
+      },
+      "explanation": "Grey lot/concession fabric proxy ranked for hamlet-scale area, access, drainage, solar exposure, and topography."
+    },
+    {
+      "id": "lotcon-5194",
+      "lotcon_id": "lotcon-5194",
+      "name": "LOT 66, 2 NORTH OF DURHAM ROAD",
+      "municipality": "municipality-7",
+      "approximate_location": {
+        "lat": 44.61288,
+        "lon": -80.95035
+      },
+      "area_ha": 39.76,
+      "source_ref": "grey_gis_lots_and_concessions_grey",
+      "source_quality": "direct_local",
+      "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+      "distance_to_owen_sound_km": 5.1,
+      "score_total": 0.779,
+      "score_breakdown": {
+        "distance_to_owen_sound": 0.7875,
+        "area_fit": 0.8030347250000001,
+        "gentle_topography": 0.8270728750247509,
+        "drainage_balance": 0.75623814124614,
+        "solar_exposure": 0.7930009616725147,
+        "access_potential": 0.8482830656319856,
+        "land_use_compatibility": 0.58
+      },
+      "explanation": "Grey lot/concession fabric proxy ranked for hamlet-scale area, access, drainage, solar exposure, and topography."
+    },
+    {
+      "id": "lotcon-7704",
+      "lotcon_id": "lotcon-7704",
+      "name": "LOT A, 19",
+      "municipality": "municipality-3",
+      "approximate_location": {
+        "lat": 44.51977,
+        "lon": -80.85808
+      },
+      "area_ha": 23.96,
+      "source_ref": "grey_gis_lots_and_concessions_grey",
+      "source_quality": "direct_local",
+      "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+      "distance_to_owen_sound_km": 8.6,
+      "score_total": 0.775,
+      "score_breakdown": {
+        "distance_to_owen_sound": 0.6416666666666666,
+        "area_fit": 0.9995359,
+        "gentle_topography": 0.7347906955657526,
+        "drainage_balance": 0.8299162378767505,
+        "solar_exposure": 0.816731730401516,
+        "access_potential": 0.7878152000904084,
+        "land_use_compatibility": 0.58
+      },
+      "explanation": "Grey lot/concession fabric proxy ranked for hamlet-scale area, access, drainage, solar exposure, and topography."
+    },
+    {
+      "id": "lotcon-1268",
+      "lotcon_id": "lotcon-1268",
+      "name": "LOT 7, 8",
+      "municipality": "municipality-1",
+      "approximate_location": {
+        "lat": 44.64309,
+        "lon": -80.96319
+      },
+      "area_ha": 38.07,
+      "source_ref": "grey_gis_lots_and_concessions_grey",
+      "source_quality": "direct_local",
+      "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+      "distance_to_owen_sound_km": 8.6,
+      "score_total": 0.767,
+      "score_breakdown": {
+        "distance_to_owen_sound": 0.6416666666666666,
+        "area_fit": 0.8241469875,
+        "gentle_topography": 0.8129699655901641,
+        "drainage_balance": 0.8148285759380087,
+        "solar_exposure": 0.8705450427904725,
+        "access_potential": 0.7717466773092747,
+        "land_use_compatibility": 0.58
+      },
+      "explanation": "Grey lot/concession fabric proxy ranked for hamlet-scale area, access, drainage, solar exposure, and topography."
+    },
+    {
+      "id": "lotcon-7772",
+      "lotcon_id": "lotcon-7772",
+      "name": "LOT 41, 1 SOUTH OF DURHAM ROAD",
+      "municipality": "municipality-4",
+      "approximate_location": {
+        "lat": 44.58362,
+        "lon": -80.86965
+      },
+      "area_ha": 42.28,
+      "source_ref": "grey_gis_lots_and_concessions_grey",
+      "source_quality": "direct_local",
+      "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+      "distance_to_owen_sound_km": 6.2,
+      "score_total": 0.765,
+      "score_breakdown": {
+        "distance_to_owen_sound": 0.7416666666666667,
+        "area_fit": 0.7714796125000001,
+        "gentle_topography": 0.7495058829244226,
+        "drainage_balance": 0.8379930670838802,
+        "solar_exposure": 0.8550824165530503,
+        "access_potential": 0.7643395353294908,
+        "land_use_compatibility": 0.58
+      },
+      "explanation": "Grey lot/concession fabric proxy ranked for hamlet-scale area, access, drainage, solar exposure, and topography."
+    }
+  ]
+}

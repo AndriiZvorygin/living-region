@@ -1,0 +1,329 @@
+{
+  "metadata": {
+    "scale": "1 Three.js unit = 1 metre",
+    "coordinate_system": "local_projected_metres",
+    "yurt_siting": "avoid_wet_cells",
+    "warnings": []
+  },
+  "elements": [
+    {
+      "id": "building_envelope_1ha",
+      "type": "building_envelope_1ha",
+      "label": "1 ha building envelope",
+      "x_m": 170,
+      "z_m": 290,
+      "width_m": 100,
+      "length_m": 100
+    },
+    {
+      "id": "yurt_01",
+      "type": "yurt",
+      "label": "Yurt 1",
+      "x_m": 130,
+      "z_m": 270,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_02",
+      "type": "yurt",
+      "label": "Yurt 2",
+      "x_m": 150,
+      "z_m": 270,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_03",
+      "type": "yurt",
+      "label": "Yurt 3",
+      "x_m": 140,
+      "z_m": 250,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_04",
+      "type": "yurt",
+      "label": "Yurt 4",
+      "x_m": 140,
+      "z_m": 290,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_05",
+      "type": "yurt",
+      "label": "Yurt 5",
+      "x_m": 170,
+      "z_m": 270,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_06",
+      "type": "yurt",
+      "label": "Yurt 6",
+      "x_m": 160,
+      "z_m": 250,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_07",
+      "type": "yurt",
+      "label": "Yurt 7",
+      "x_m": 160,
+      "z_m": 290,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_08",
+      "type": "yurt",
+      "label": "Yurt 8",
+      "x_m": 180,
+      "z_m": 310,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_09",
+      "type": "yurt",
+      "label": "Yurt 9",
+      "x_m": 150,
+      "z_m": 310,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_10",
+      "type": "yurt",
+      "label": "Yurt 10",
+      "x_m": 130,
+      "z_m": 310,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_11",
+      "type": "yurt",
+      "label": "Yurt 11",
+      "x_m": 170,
+      "z_m": 330,
+      "radius_m": 4.5
+    },
+    {
+      "id": "yurt_12",
+      "type": "yurt",
+      "label": "Yurt 12",
+      "x_m": 150,
+      "z_m": 330,
+      "radius_m": 4.5
+    },
+    {
+      "id": "common_house",
+      "type": "common_house",
+      "label": "Common house",
+      "x_m": 200,
+      "z_m": 290,
+      "width_m": 16,
+      "length_m": 10
+    },
+    {
+      "id": "shared_kitchen_meeting",
+      "type": "shared_kitchen_meeting",
+      "label": "Shared kitchen / meeting",
+      "x_m": 200,
+      "z_m": 260,
+      "width_m": 12,
+      "length_m": 8
+    },
+    {
+      "id": "root_cellar",
+      "type": "root_cellar",
+      "label": "Root cellar",
+      "x_m": 200,
+      "z_m": 330,
+      "width_m": 8,
+      "length_m": 5
+    },
+    {
+      "id": "tool_shed_workshop",
+      "type": "tool_shed_workshop",
+      "label": "Tool shed / workshop",
+      "x_m": 180,
+      "z_m": 250,
+      "width_m": 12,
+      "length_m": 7
+    },
+    {
+      "id": "chicken_coop",
+      "type": "chicken_coop",
+      "label": "Chicken coop",
+      "x_m": 130,
+      "z_m": 330,
+      "width_m": 12,
+      "length_m": 8
+    },
+    {
+      "id": "woodshed",
+      "type": "woodshed",
+      "label": "Woodshed",
+      "x_m": 140,
+      "z_m": 320,
+      "width_m": 12,
+      "length_m": 6
+    },
+    {
+      "id": "compost",
+      "type": "compost",
+      "label": "Compost",
+      "x_m": 210,
+      "z_m": 310,
+      "radius_m": 7
+    },
+    {
+      "id": "water_storage",
+      "type": "water_storage",
+      "label": "Water storage",
+      "x_m": 180,
+      "z_m": 290,
+      "radius_m": 6
+    },
+    {
+      "id": "pond",
+      "type": "pond",
+      "label": "Pond",
+      "x_m": 590,
+      "z_m": 270,
+      "radius_m": 24
+    },
+    {
+      "id": "swale",
+      "type": "swale",
+      "label": "Drainage swale",
+      "x_m": 590,
+      "z_m": 270,
+      "points": [
+        [
+          590,
+          0
+        ],
+        [
+          590,
+          270
+        ],
+        [
+          570,
+          590
+        ]
+      ]
+    },
+    {
+      "id": "gardens",
+      "type": "gardens",
+      "label": "Market gardens",
+      "x_m": 320,
+      "z_m": 200,
+      "width_m": 105,
+      "length_m": 86
+    },
+    {
+      "id": "fields",
+      "type": "fields",
+      "label": "Small fields",
+      "x_m": 330,
+      "z_m": 385,
+      "width_m": 120,
+      "length_m": 95
+    },
+    {
+      "id": "orchard",
+      "type": "orchard",
+      "label": "Orchard",
+      "x_m": 100,
+      "z_m": 220,
+      "width_m": 86,
+      "length_m": 72
+    },
+    {
+      "id": "shrub_area",
+      "type": "shrub_area",
+      "label": "Shrub harvest area",
+      "x_m": 65,
+      "z_m": 185,
+      "width_m": 68,
+      "length_m": 48
+    },
+    {
+      "id": "woodlot_coppice",
+      "type": "woodlot_coppice",
+      "label": "Woodlot / coppice",
+      "x_m": 10,
+      "z_m": 300,
+      "width_m": 140,
+      "length_m": 300
+    },
+    {
+      "id": "adjacent_road",
+      "type": "adjacent_road",
+      "label": "Adjacent concession road",
+      "x_m": 575,
+      "z_m": 295,
+      "width_m": 8,
+      "points": [
+        [
+          575,
+          0
+        ],
+        [
+          575,
+          590
+        ]
+      ]
+    },
+    {
+      "id": "paths",
+      "type": "paths",
+      "label": "Loop paths",
+      "x_m": 200,
+      "z_m": 290,
+      "width_m": 1.5,
+      "points": [
+        [
+          128,
+          290
+        ],
+        [
+          170,
+          252
+        ],
+        [
+          212,
+          290
+        ],
+        [
+          170,
+          328
+        ],
+        [
+          128,
+          290
+        ]
+      ]
+    },
+    {
+      "id": "road_service_access",
+      "type": "road_service_access",
+      "label": "Road / service access",
+      "x_m": 420,
+      "z_m": 290,
+      "width_m": 4,
+      "points": [
+        [
+          575,
+          290
+        ],
+        [
+          260,
+          290
+        ],
+        [
+          180,
+          250
+        ]
+      ]
+    }
+  ]
+}

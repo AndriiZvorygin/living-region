@@ -1,0 +1,72 @@
+{
+  "overlays": [
+    {
+      "id": "land_use",
+      "label": "Land use",
+      "hotkey": "1",
+      "source_field": "land_use",
+      "mode": "category"
+    },
+    {
+      "id": "elevation",
+      "label": "Elevation",
+      "hotkey": "2",
+      "source_field": "elevation_m",
+      "mode": "ramp"
+    },
+    {
+      "id": "slope",
+      "label": "Slope",
+      "hotkey": "3",
+      "source_field": "slope_degrees",
+      "mode": "ramp"
+    },
+    {
+      "id": "aspect",
+      "label": "Aspect",
+      "hotkey": "4",
+      "source_field": "aspect_degrees",
+      "mode": "wheel"
+    },
+    {
+      "id": "solar",
+      "label": "Solar",
+      "hotkey": "5",
+      "source_field": "solar_score",
+      "mode": "ramp"
+    },
+    {
+      "id": "yurt_suitability",
+      "label": "Yurt suitability",
+      "hotkey": "6",
+      "source_field": "yurt_suitability",
+      "mode": "ramp"
+    },
+    {
+      "id": "crop_suitability",
+      "label": "Crop suitability",
+      "hotkey": "7",
+      "source_field": "garden_suitability",
+      "mode": "ramp"
+    },
+    {
+      "id": "wetness",
+      "label": "Wetness / hydrology",
+      "hotkey": "8",
+      "source_field": "wetness_index",
+      "mode": "ramp"
+    },
+    {
+      "id": "proposed_layout",
+      "label": "Proposed layout",
+      "hotkey": "9",
+      "mode": "layout"
+    },
+    {
+      "id": "constraints",
+      "label": "Constraints placeholder",
+      "hotkey": "0",
+      "mode": "placeholder"
+    }
+  ]
+}

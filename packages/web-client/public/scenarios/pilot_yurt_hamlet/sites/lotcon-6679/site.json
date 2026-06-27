@@ -1,0 +1,19 @@
+{
+  "id": "lotcon-6679",
+  "name": "LOT 33, 1 NORTH OF DURHAM ROAD",
+  "selected_candidate_id": "lotcon-6679",
+  "origin_lat": 44.63347,
+  "origin_lon": -80.95546,
+  "origin_x_m": 0,
+  "origin_z_m": 0,
+  "projection": "LOCAL_TANGENT_METRES_PLACEHOLDER_EPSG_TBD",
+  "area_ha": 28.24,
+  "distance_to_owen_sound_km": 7.4,
+  "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+  "terrain_source": "procedural_fallback",
+  "notes": [
+    "Grey lot/concession fabric proxy; not a legal parcel, ownership record, or planning approval.",
+    "Terrain source priority is Ontario DTM, Canada DEM, then procedural fallback. This export currently uses procedural fallback unless a DEM adapter supplies elevations.",
+    "Renderer uses local projected metre coordinates, never longitude/latitude as x/z."
+  ]
+}

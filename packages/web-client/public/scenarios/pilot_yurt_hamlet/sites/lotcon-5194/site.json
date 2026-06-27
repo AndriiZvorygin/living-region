@@ -1,0 +1,19 @@
+{
+  "id": "lotcon-5194",
+  "name": "LOT 66, 2 NORTH OF DURHAM ROAD",
+  "selected_candidate_id": "lotcon-5194",
+  "origin_lat": 44.61288,
+  "origin_lon": -80.95035,
+  "origin_x_m": 0,
+  "origin_z_m": 0,
+  "projection": "LOCAL_TANGENT_METRES_PLACEHOLDER_EPSG_TBD",
+  "area_ha": 39.76,
+  "distance_to_owen_sound_km": 5.1,
+  "data_caveat": "lot_fabric_proxy_not_legal_parcel",
+  "terrain_source": "procedural_fallback",
+  "notes": [
+    "Grey lot/concession fabric proxy; not a legal parcel, ownership record, or planning approval.",
+    "Terrain source priority is Ontario DTM, Canada DEM, then procedural fallback. This export currently uses procedural fallback unless a DEM adapter supplies elevations.",
+    "Renderer uses local projected metre coordinates, never longitude/latitude as x/z."
+  ]
+}
