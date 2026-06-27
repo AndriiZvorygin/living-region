@@ -1,0 +1,249 @@
+{
+  "generated_at": "2026-05-21T01:30:16.697Z",
+  "source_osm_pbf": "/home/htaf/living-region/data/osm/owen-sound.osm.pbf",
+  "source_ranked_csv": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-deduped.csv",
+  "source_ranked_geojson": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-deduped.geojson",
+  "radius_m": 75,
+  "context_feature_count": 976,
+  "intersections_total": 437,
+  "intersections_downgraded_due_to_parking_commercial_proxy": 13,
+  "top_25_downgraded_intersections": [
+    {
+      "rank": 161,
+      "intersection": "8th Street East & 3rd Avenue East",
+      "commercial_proxy_score": 52,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 155,
+      "intersection": "2nd Avenue West & 10th Street West",
+      "commercial_proxy_score": 50,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 160,
+      "intersection": "9th Avenue East & 16th Street East",
+      "commercial_proxy_score": 49,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 154,
+      "intersection": "1st Avenue West & 10th Street West",
+      "commercial_proxy_score": 48,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 158,
+      "intersection": "10th Street West & 8th Avenue West",
+      "commercial_proxy_score": 48,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 173,
+      "intersection": "9th Street West & 2nd Avenue West",
+      "commercial_proxy_score": 47,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 156,
+      "intersection": "3rd Avenue West & 10th Street West",
+      "commercial_proxy_score": 46,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 172,
+      "intersection": "9th Street East & 2nd Avenue East",
+      "commercial_proxy_score": 46,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 157,
+      "intersection": "10th Street West & 7th Avenue West",
+      "commercial_proxy_score": 44,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 159,
+      "intersection": "15th Street East & 9th Avenue East",
+      "commercial_proxy_score": 43,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 260,
+      "intersection": "1st Avenue East & 17th Street East",
+      "commercial_proxy_score": 41,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 205,
+      "intersection": "1st Avenue East & 11th Street East",
+      "commercial_proxy_score": 40,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    },
+    {
+      "rank": 206,
+      "intersection": "11th Street East & 2nd Avenue East",
+      "commercial_proxy_score": 40,
+      "flag": "medium",
+      "downgrade_reason": "possible commercial/mixed-use context"
+    }
+  ],
+  "new_top_20_residential_first_intersections": [
+    {
+      "rank": 1,
+      "tier": "S",
+      "intersection": "1st Avenue East & 10th Street East & 10th Street West",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 2,
+      "tier": "S",
+      "intersection": "2nd Avenue East & 10th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 3,
+      "tier": "S",
+      "intersection": "3rd Avenue East & 10th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 4,
+      "tier": "S",
+      "intersection": "4th Avenue East & 10th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 5,
+      "tier": "S",
+      "intersection": "5th Avenue East & 10th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 6,
+      "tier": "S",
+      "intersection": "10th Street East & 6th Avenue East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 7,
+      "tier": "S",
+      "intersection": "7th Avenue East & 10th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 8,
+      "tier": "S",
+      "intersection": "8th Avenue East & 10th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 9,
+      "tier": "S",
+      "intersection": "10th Street East & 9th Avenue East & 9th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 10,
+      "tier": "S",
+      "intersection": "4th Avenue West & 10th Street West",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 11,
+      "tier": "S",
+      "intersection": "10th Street West & 6th Avenue West",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 12,
+      "tier": "S",
+      "intersection": "11th Street East & 3rd Avenue East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 13,
+      "tier": "S",
+      "intersection": "12th Avenue East & 16th Street East & 12th Avenue E",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 14,
+      "tier": "S",
+      "intersection": "Eddy Sargeant Parkway & 2nd Avenue West & 14th Street West",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 15,
+      "tier": "S",
+      "intersection": "15th Street A East & 9th Avenue East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 16,
+      "tier": "S",
+      "intersection": "3rd Avenue West & 4th Avenue West & 15th Street West",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 17,
+      "tier": "S",
+      "intersection": "16th Street East & 16th Avenue East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 18,
+      "tier": "S",
+      "intersection": "20th Street East & 23rd Street East & 16th Avenue East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 19,
+      "tier": "S",
+      "intersection": "18th Avenue East & 16th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    },
+    {
+      "rank": 20,
+      "tier": "S",
+      "intersection": "20th Avenue East & 16th Street East",
+      "adjusted_score": 130,
+      "commercial_flag": "low"
+    }
+  ],
+  "output_csv": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-residential-first.csv",
+  "output_geojson": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-residential-first.geojson",
+  "extraction_tmp_dir": "/tmp/lr-osm-context-QfCJM3",
+  "caveat": "OSM parking/commercial context is a field-priority proxy only; not proof of parcel ownership or legal zoning."
+}

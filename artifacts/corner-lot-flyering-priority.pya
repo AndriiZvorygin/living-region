@@ -1,0 +1,280 @@
+{
+  "generated_at": "2026-05-21T01:01:02.233Z",
+  "source": "/home/htaf/living-region/artifacts/osm-intersection-debug.geojson",
+  "output_geojson": "/home/htaf/living-region/artifacts/corner-lot-flyering-priority.geojson",
+  "total_candidates": 476,
+  "priority_counts": {
+    "A": 110,
+    "B": 84,
+    "C": 8,
+    "D": 274
+  },
+  "action_counts": {
+    "door-knock early; possible sign ask later": 194,
+    "flyer only": 24,
+    "skip unless nearby": 258
+  },
+  "caveats": [
+    "Do not place signs without property-owner permission.",
+    "Avoid sightline obstruction.",
+    "Respect election-sign bylaw setbacks and safety rules.",
+    "Corner-lot estimate is for planning only, not a precise household count."
+  ],
+  "top10": [
+    {
+      "node_id": "-80895256:44577267",
+      "lat": 44.577267,
+      "lon": -80.8952565,
+      "connected_way_names": [
+        "28th Avenue East",
+        "16th Street East",
+        "Highway 26"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "secondary",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80898052:44576910",
+      "lat": 44.5769102,
+      "lon": -80.8980521,
+      "connected_way_names": [
+        "16th Street East",
+        "27th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "residential"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80907702:44575784",
+      "lat": 44.5757839,
+      "lon": -80.9077024,
+      "connected_way_names": [
+        "20th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80913024:44575155",
+      "lat": 44.5751546,
+      "lon": -80.9130237,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80913041:44575246",
+      "lat": 44.5752455,
+      "lon": -80.9130408,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80913182:44575143",
+      "lat": 44.5751429,
+      "lon": -80.9131816,
+      "connected_way_names": [
+        "16th Street East",
+        "18th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80913194:44575226",
+      "lat": 44.5752263,
+      "lon": -80.9131942,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80916294:44574780",
+      "lat": 44.5747796,
+      "lon": -80.9162939,
+      "connected_way_names": [
+        "16th Street East",
+        "16th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80916306:44574852",
+      "lat": 44.5748516,
+      "lon": -80.9163064,
+      "connected_way_names": [
+        "16th Street East",
+        "16th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    },
+    {
+      "node_id": "-80916382:44574771",
+      "lat": 44.5747707,
+      "lon": -80.9163821,
+      "connected_way_names": [
+        "16th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary",
+        "unclassified"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "door-knock early; possible sign ask later",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ]
+    }
+  ]
+}

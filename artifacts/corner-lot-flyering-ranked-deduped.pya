@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-05-21T01:15:50.548Z",
+  "input": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked.geojson",
+  "output_geojson": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-deduped.geojson",
+  "output_csv": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-deduped.csv",
+  "raw_candidates": 476,
+  "deduped_physical_intersections": 437,
+  "merged_duplicate_count": 39,
+  "tier_counts": {
+    "S": 20,
+    "A": 50,
+    "B": 100,
+    "C": 267
+  },
+  "validation": {
+    "top50_duplicate_display_intersection_name_count": 0,
+    "top50_same_key_within_40m_count": 0
+  },
+  "top_merged_intersections_by_merged_count": [
+    {
+      "canonical_intersection_name": "10th St E & 9th Ave E & 9th St E",
+      "merged_count": 4,
+      "merged_node_ids": [
+        "-80928281:44569424",
+        "-80928301:44569520",
+        "-80928417:44569410",
+        "-80928439:44569505"
+      ],
+      "representative_lat": 44.569464800000006,
+      "representative_lon": -80.9283597
+    },
+    {
+      "canonical_intersection_name": "16th Ave E & 16th St E",
+      "merged_count": 4,
+      "merged_node_ids": [
+        "-80916294:44574780",
+        "-80916306:44574852",
+        "-80916382:44574771",
+        "-80916407:44574843"
+      ],
+      "representative_lat": 44.57481115,
+      "representative_lon": -80.91634739999999
+    },
+    {
+      "canonical_intersection_name": "16th St E & 18th Ave E",
+      "merged_count": 4,
+      "merged_node_ids": [
+        "-80913024:44575155",
+        "-80913041:44575246",
+        "-80913182:44575143",
+        "-80913194:44575226"
+      ],
+      "representative_lat": 44.575192325,
+      "representative_lon": -80.913110075
+    },
+    {
+      "canonical_intersection_name": "2nd Ave W & 2nd St W",
+      "merged_count": 3,
+      "merged_node_ids": [
+        "-80942747:44552216",
+        "-80942843:44552758",
+        "-80942980:44553291"
+      ],
+      "representative_lat": 44.552755133333335,
+      "representative_lon": -80.9428566
+    },
+    {
+      "canonical_intersection_name": "10th St E & 7th Ave E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80933072:44568910",
+        "-80933093:44569005"
+      ],
+      "representative_lat": 44.56895765,
+      "representative_lon": -80.93308215
+    },
+    {
+      "canonical_intersection_name": "10th St E & 8th Ave E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80930454:44569249",
+        "-80931194:44569172"
+      ],
+      "representative_lat": 44.56921035,
+      "representative_lon": -80.930824
+    },
+    {
+      "canonical_intersection_name": "12th Ave E & 16th St E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80923227:44573943",
+        "-80923245:44574048"
+      ],
+      "representative_lat": 44.5739954,
+      "representative_lon": -80.9232356
+    },
+    {
+      "canonical_intersection_name": "15th St W & 3rd Ave W & 4th Ave W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80951427:44574887",
+        "-80951874:44574799"
+      ],
+      "representative_lat": 44.57484325,
+      "representative_lon": -80.95165080000001
+    },
+    {
+      "canonical_intersection_name": "3rd Ave E & E Bay Shore Rd",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80923885:44592961",
+        "-80924141:44592252"
+      ],
+      "representative_lat": 44.592606700000005,
+      "representative_lon": -80.92401295
+    },
+    {
+      "canonical_intersection_name": "13th St W & 2nd Ave W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80947250:44572445",
+        "-80947289:44572614"
+      ],
+      "representative_lat": 44.5725298,
+      "representative_lon": -80.94726940000001
+    },
+    {
+      "canonical_intersection_name": "2nd Ave E & 5th St E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80941106:44558223",
+        "-80941280:44558913"
+      ],
+      "representative_lat": 44.5585676,
+      "representative_lon": -80.9411929
+    },
+    {
+      "canonical_intersection_name": "6th St E & 7th Ave E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80931376:44561309",
+        "-80931876:44561250"
+      ],
+      "representative_lat": 44.561279299999995,
+      "representative_lon": -80.93162595000001
+    },
+    {
+      "canonical_intersection_name": "10th St E & Lamson Crescent",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80921073:44570273",
+        "-80921947:44570184"
+      ],
+      "representative_lat": 44.57022815,
+      "representative_lon": -80.92151
+    },
+    {
+      "canonical_intersection_name": "1st St W & 4th Ave W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80945358:44548951",
+        "-80945570:44549881"
+      ],
+      "representative_lat": 44.549416,
+      "representative_lon": -80.94546445
+    },
+    {
+      "canonical_intersection_name": "2nd Ave W & 6th St W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80944580:44560148",
+        "-80945340:44559508"
+      ],
+      "representative_lat": 44.5598279,
+      "representative_lon": -80.9449602
+    },
+    {
+      "canonical_intersection_name": "6th Ave W & Alpha St",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80954779:44572287",
+        "-80955667:44571584"
+      ],
+      "representative_lat": 44.571935499999995,
+      "representative_lon": -80.955223
+    },
+    {
+      "canonical_intersection_name": "14th St W & 6th Ave W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80957005:44573775",
+        "-80957911:44573725"
+      ],
+      "representative_lat": 44.57374995,
+      "representative_lon": -80.957458
+    },
+    {
+      "canonical_intersection_name": "22nd St W & 3rd Ave A W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80947913:44583771",
+        "-80948284:44583830"
+      ],
+      "representative_lat": 44.5838007,
+      "representative_lon": -80.9480985
+    },
+    {
+      "canonical_intersection_name": "23rd St W & 5th Ave W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80949793:44586095",
+        "-80949993:44585410"
+      ],
+      "representative_lat": 44.58575245,
+      "representative_lon": -80.94989315000001
+    },
+    {
+      "canonical_intersection_name": "2nd St W & 5th Ave W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80947208:44550721",
+        "-80947369:44551455"
+      ],
+      "representative_lat": 44.55108785,
+      "representative_lon": -80.94728864999999
+    },
+    {
+      "canonical_intersection_name": "3rd Ave W & 8th St W",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80946745:44563448",
+        "-80946900:44563432"
+      ],
+      "representative_lat": 44.5634395,
+      "representative_lon": -80.94682265
+    },
+    {
+      "canonical_intersection_name": "3rd Ave W & Beattie St",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80944401:44553875",
+        "-80945260:44553776"
+      ],
+      "representative_lat": 44.5538255,
+      "representative_lon": -80.94483005000001
+    },
+    {
+      "canonical_intersection_name": "4th Ave E & 5th St E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80937418:44558668",
+        "-80937486:44558660"
+      ],
+      "representative_lat": 44.558664050000004,
+      "representative_lon": -80.9374521
+    },
+    {
+      "canonical_intersection_name": "4th St E & 6th Ave E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80932238:44557459",
+        "-80933309:44557342"
+      ],
+      "representative_lat": 44.55740075,
+      "representative_lon": -80.93277395
+    },
+    {
+      "canonical_intersection_name": "4th St E & 8th Ave A E",
+      "merged_count": 2,
+      "merged_node_ids": [
+        "-80927486:44557971",
+        "-80928621:44557840"
+      ],
+      "representative_lat": 44.5579051,
+      "representative_lon": -80.92805340000001
+    }
+  ]
+}

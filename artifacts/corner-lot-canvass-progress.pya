@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-05-21T01:30:21.192Z",
+  "today": "2026-05-21",
+  "input_ranked": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked-deduped.updated.csv",
+  "input_followups": "/home/htaf/living-region/artifacts/corner-lot-flyering-followups.csv",
+  "total_ranked_stops": 437,
+  "total_tier_counts": {
+    "S": 20,
+    "A": 50,
+    "B": 100,
+    "C": 267
+  },
+  "flyer_delivered_count": 0,
+  "knocked_count": 0,
+  "visited_count": 0,
+  "unvisited_count": 437,
+  "visited_by_tier": {
+    "S": 0,
+    "A": 0,
+    "B": 0,
+    "C": 0
+  },
+  "remaining_by_tier": {
+    "S": 20,
+    "A": 50,
+    "B": 100,
+    "C": 267
+  },
+  "warm_friendly_interested_count": 0,
+  "sign_followup_yes_count": 0,
+  "sign_permission_yes_count": 0,
+  "knock_due_now_count": 0,
+  "top_15_remaining_stops": [
+    {
+      "global_rank": 1,
+      "daily_tier": "S",
+      "intersection_area": "1st Avenue East & 10th Street East & 10th Street West",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 2,
+      "daily_tier": "S",
+      "intersection_area": "2nd Avenue East & 10th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 3,
+      "daily_tier": "S",
+      "intersection_area": "3rd Avenue East & 10th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 4,
+      "daily_tier": "S",
+      "intersection_area": "4th Avenue East & 10th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 5,
+      "daily_tier": "S",
+      "intersection_area": "5th Avenue East & 10th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 6,
+      "daily_tier": "S",
+      "intersection_area": "10th Street East & 6th Avenue East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 7,
+      "daily_tier": "S",
+      "intersection_area": "7th Avenue East & 10th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 8,
+      "daily_tier": "S",
+      "intersection_area": "8th Avenue East & 10th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 9,
+      "daily_tier": "S",
+      "intersection_area": "10th Street East & 9th Avenue East & 9th Street East",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 10,
+      "daily_tier": "S",
+      "intersection_area": "1st Avenue West & 10th Street West",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 11,
+      "daily_tier": "S",
+      "intersection_area": "2nd Avenue West & 10th Street West",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 12,
+      "daily_tier": "S",
+      "intersection_area": "3rd Avenue West & 10th Street West",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 13,
+      "daily_tier": "S",
+      "intersection_area": "4th Avenue West & 10th Street West",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 14,
+      "daily_tier": "S",
+      "intersection_area": "10th Street West & 6th Avenue West",
+      "recommended_action": "visit early; good sign ask potential"
+    },
+    {
+      "global_rank": 15,
+      "daily_tier": "S",
+      "intersection_area": "10th Street West & 7th Avenue West",
+      "recommended_action": "visit early; good sign ask potential"
+    }
+  ],
+  "top_15_followup_stops": [],
+  "next_suggested_sheet_type": "flyer",
+  "next_suggested_daily_sheet": "artifacts/corner-lot-flyering-daily-sheets/flyer-day-001.csv"
+}

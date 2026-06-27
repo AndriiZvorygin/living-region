@@ -1,0 +1,1295 @@
+{
+  "generated_at": "2026-05-21T01:06:28.617Z",
+  "source_geojson": "/home/htaf/living-region/artifacts/corner-lot-flyering-priority.geojson",
+  "source_summary": "/home/htaf/living-region/artifacts/corner-lot-flyering-priority.pya",
+  "output_geojson": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked.geojson",
+  "output_csv": "/home/htaf/living-region/artifacts/corner-lot-flyering-ranked.csv",
+  "total_candidates": 476,
+  "tier_counts": {
+    "S": 20,
+    "A": 50,
+    "B": 100,
+    "C": 306
+  },
+  "top_25": [
+    {
+      "node_id": "-80895256:44577267",
+      "lat": 44.577267,
+      "lon": -80.8952565,
+      "connected_way_names": [
+        "28th Avenue East",
+        "16th Street East",
+        "Highway 26"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "secondary",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 1,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80898052:44576910",
+      "lat": 44.5769102,
+      "lon": -80.8980521,
+      "connected_way_names": [
+        "16th Street East",
+        "27th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "residential"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 2,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80907702:44575784",
+      "lat": 44.5757839,
+      "lon": -80.9077024,
+      "connected_way_names": [
+        "20th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 3,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913024:44575155",
+      "lat": 44.5751546,
+      "lon": -80.9130237,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 4,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913041:44575246",
+      "lat": 44.5752455,
+      "lon": -80.9130408,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 5,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913182:44575143",
+      "lat": 44.5751429,
+      "lon": -80.9131816,
+      "connected_way_names": [
+        "16th Street East",
+        "18th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 6,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913194:44575226",
+      "lat": 44.5752263,
+      "lon": -80.9131942,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 7,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916294:44574780",
+      "lat": 44.5747796,
+      "lon": -80.9162939,
+      "connected_way_names": [
+        "16th Street East",
+        "16th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 8,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916306:44574852",
+      "lat": 44.5748516,
+      "lon": -80.9163064,
+      "connected_way_names": [
+        "16th Street East",
+        "16th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 9,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916382:44574771",
+      "lat": 44.5747707,
+      "lon": -80.9163821,
+      "connected_way_names": [
+        "16th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary",
+        "unclassified"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 10,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916407:44574843",
+      "lat": 44.5748427,
+      "lon": -80.9164072,
+      "connected_way_names": [
+        "16th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary",
+        "unclassified"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 11,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80920123:44601718",
+      "lat": 44.6017183,
+      "lon": -80.9201229,
+      "connected_way_names": [
+        "East Bayshore Road",
+        "32nd Street East",
+        "East Bay Shore Road"
+      ],
+      "connected_highway_tags": [
+        "secondary",
+        "unclassified"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 12,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80923227:44573943",
+      "lat": 44.5739428,
+      "lon": -80.9232266,
+      "connected_way_names": [
+        "12th Avenue East",
+        "16th Street East",
+        "12th Avenue E"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 13,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80923245:44574048",
+      "lat": 44.574048,
+      "lon": -80.9232446,
+      "connected_way_names": [
+        "12th Avenue E",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 14,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80925775:44558404",
+      "lat": 44.558404,
+      "lon": -80.9257748,
+      "connected_way_names": [
+        "Superior Street",
+        "9th Avenue East",
+        "Highway 6/10"
+      ],
+      "connected_highway_tags": [
+        "residential",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 15,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80926579:44561878",
+      "lat": 44.5618779,
+      "lon": -80.9265788,
+      "connected_way_names": [
+        "6th Street East",
+        "9th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "secondary",
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 16,
+      "daily_tier": "S",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80926898:44573859",
+      "lat": 44.5738586,
+      "lon": -80.9268984,
+      "connected_way_names": [
+        "9th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "residential",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 17,
+      "daily_tier": "S",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80927015:44563757",
+      "lat": 44.5637568,
+      "lon": -80.9270151,
+      "connected_way_names": [
+        "7th Street East",
+        "9th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "residential",
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 18,
+      "daily_tier": "S",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80927460:44565648",
+      "lat": 44.5656475,
+      "lon": -80.9274605,
+      "connected_way_names": [
+        "8th Street East",
+        "9th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "secondary",
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 19,
+      "daily_tier": "S",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80927615:44572021",
+      "lat": 44.5720207,
+      "lon": -80.9276148,
+      "connected_way_names": [
+        "15th Street A East",
+        "9th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "residential",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 20,
+      "daily_tier": "S",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80927641:44566396",
+      "lat": 44.5663963,
+      "lon": -80.9276413,
+      "connected_way_names": [
+        "9th Avenue East",
+        "8th Street A East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "residential"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 2,
+      "recommended_action": "visit early; good sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 21,
+      "daily_tier": "A",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80927918:44567541",
+      "lat": 44.5675405,
+      "lon": -80.9279175,
+      "connected_way_names": [
+        "9th Street East",
+        "9th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "residential",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 2,
+      "recommended_action": "visit early; good sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 22,
+      "daily_tier": "A",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80928281:44569424",
+      "lat": 44.5694244,
+      "lon": -80.9282813,
+      "connected_way_names": [
+        "10th Street East",
+        "9th Avenue East",
+        "9th Street East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 2,
+      "recommended_action": "visit early; good sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 23,
+      "daily_tier": "A",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80928301:44569520",
+      "lat": 44.56952,
+      "lon": -80.9283005,
+      "connected_way_names": [
+        "9th Avenue East",
+        "10th Street East",
+        "9th Street East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 2,
+      "recommended_action": "visit early; good sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 24,
+      "daily_tier": "A",
+      "suggested_day": "Day 2"
+    },
+    {
+      "node_id": "-80928444:44569964",
+      "lat": 44.569964,
+      "lon": -80.9284441,
+      "connected_way_names": [
+        "15th Street East",
+        "9th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "residential",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 2,
+      "recommended_action": "visit early; good sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 25,
+      "daily_tier": "A",
+      "suggested_day": "Day 2"
+    }
+  ],
+  "day_1_route_list": [
+    {
+      "node_id": "-80895256:44577267",
+      "lat": 44.577267,
+      "lon": -80.8952565,
+      "connected_way_names": [
+        "28th Avenue East",
+        "16th Street East",
+        "Highway 26"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "secondary",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 1,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80898052:44576910",
+      "lat": 44.5769102,
+      "lon": -80.8980521,
+      "connected_way_names": [
+        "16th Street East",
+        "27th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "residential"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 2,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80907702:44575784",
+      "lat": 44.5757839,
+      "lon": -80.9077024,
+      "connected_way_names": [
+        "20th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 3,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913024:44575155",
+      "lat": 44.5751546,
+      "lon": -80.9130237,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 4,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913041:44575246",
+      "lat": 44.5752455,
+      "lon": -80.9130408,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "tertiary",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 5,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913182:44575143",
+      "lat": 44.5751429,
+      "lon": -80.9131816,
+      "connected_way_names": [
+        "16th Street East",
+        "18th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 6,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80913194:44575226",
+      "lat": 44.5752263,
+      "lon": -80.9131942,
+      "connected_way_names": [
+        "18th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 7,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916294:44574780",
+      "lat": 44.5747796,
+      "lon": -80.9162939,
+      "connected_way_names": [
+        "16th Street East",
+        "16th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 8,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916306:44574852",
+      "lat": 44.5748516,
+      "lon": -80.9163064,
+      "connected_way_names": [
+        "16th Street East",
+        "16th Avenue East"
+      ],
+      "connected_highway_tags": [
+        "primary",
+        "tertiary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 9,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916382:44574771",
+      "lat": 44.5747707,
+      "lon": -80.9163821,
+      "connected_way_names": [
+        "16th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary",
+        "unclassified"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 10,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80916407:44574843",
+      "lat": 44.5748427,
+      "lon": -80.9164072,
+      "connected_way_names": [
+        "16th Avenue East",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "tertiary",
+        "primary",
+        "unclassified"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "two+ higher-order roads; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 11,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80920123:44601718",
+      "lat": 44.6017183,
+      "lon": -80.9201229,
+      "connected_way_names": [
+        "East Bayshore Road",
+        "32nd Street East",
+        "East Bay Shore Road"
+      ],
+      "connected_highway_tags": [
+        "secondary",
+        "unclassified"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 12,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80923227:44573943",
+      "lat": 44.5739428,
+      "lon": -80.9232266,
+      "connected_way_names": [
+        "12th Avenue East",
+        "16th Street East",
+        "12th Avenue E"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 13,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80923245:44574048",
+      "lat": 44.574048,
+      "lon": -80.9232446,
+      "connected_way_names": [
+        "12th Avenue E",
+        "16th Street East"
+      ],
+      "connected_highway_tags": [
+        "unclassified",
+        "primary"
+      ],
+      "degree_merged": 2,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 14,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    },
+    {
+      "node_id": "-80925775:44558404",
+      "lat": 44.558404,
+      "lon": -80.9257748,
+      "connected_way_names": [
+        "Superior Street",
+        "9th Avenue East",
+        "Highway 6/10"
+      ],
+      "connected_highway_tags": [
+        "residential",
+        "primary"
+      ],
+      "degree_merged": 3,
+      "intersection_priority": "A",
+      "visibility_score": 100,
+      "sign_value": "high",
+      "canvass_order": 1,
+      "recommended_action": "visit first; highest sign ask potential",
+      "caveats": [
+        "Do not place signs without property-owner permission.",
+        "Avoid sightline obstruction.",
+        "Respect election-sign bylaw setbacks and safety rules.",
+        "Corner-lot estimate is for planning only, not a precise household count."
+      ],
+      "daily_priority_score": 130,
+      "priority_reason": "higher-order to neighbourhood connector; multiple street-front exposures",
+      "route_bucket": "highest visibility corner",
+      "global_rank": 15,
+      "daily_tier": "S",
+      "suggested_day": "Day 1"
+    }
+  ],
+  "notes": [
+    "Daily tiers are ranked funnel targets: S top 20, A next 50, B next 100, C remaining.",
+    "Road-importance wording uses practical visibility labels, not “major intersection” claims."
+  ],
+  "base_summary_reference": {
+    "previous_total_candidates": 476,
+    "previous_priority_counts": {
+      "A": 110,
+      "B": 84,
+      "C": 8,
+      "D": 274
+    }
+  }
+}
