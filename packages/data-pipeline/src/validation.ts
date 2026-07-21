@@ -52,7 +52,7 @@ const requiredLayoutTypes = [
 ];
 
 const dryFootprintTypes = new Set(["yurt", "common_house", "shared_kitchen_meeting", "root_cellar", "tool_shed_workshop", "chicken_coop", "woodshed", "compost", "water_storage"]);
-const requiredChores = new Set(["feed_chickens", "collect_eggs", "haul_water", "bring_compost", "harvest_shrubs", "bring_firewood"]);
+const requiredChores = new Set(["morning_chickens", "eggs_and_compost", "firewood_loop", "garden_harvest_loop", "haul_water", "harvest_shrubs"]);
 
 function assert(condition: unknown, message: string, errors: string[]): void {
   if (!condition) errors.push(message);
@@ -128,6 +128,66 @@ function validateLayout(hamlet: HamletLayout | undefined, grid: TerrainGrid | un
   }
 }
 
+type ChoreForValidation = {
+  id?: string;
+  task_id?: string;
+  title?: string;
+  assigned_agent_type?: string;
+  recurrence?: { frequency_per_week?: number };
+  priority?: number;
+  distance_m?: number;
+  travel_time_minutes?: number;
+  action_time_minutes?: number;
+  estimated_time_minutes?: number;
+  effort_multiplier?: number;
+  path?: unknown[];
+  stops?: Array<{ location_id?: string; point_id?: string; action?: string; expected_duration_minutes?: number; load?: string; carried_item?: string; produces?: unknown; consumes?: unknown }>;
+  legs?: Array<{ from?: string; to?: string; distance_m?: number; estimated_time_minutes?: number; path?: unknown[] }>;
+};
+
+function validateChores(chores: ChoreForValidation[], errors: string[], label = "chore_routes.json"): void {
+  for (const id of requiredChores) assert(chores.some((chore) => chore.task_id === id || chore.id === id), `${label} missing ${id}`, errors);
+  for (const chore of chores) {
+    const taskId = chore.task_id ?? chore.id ?? "unknown";
+    assert(typeof chore.task_id === "string" && chore.task_id.length > 0, `${label}/${taskId}: missing task_id`, errors);
+    assert(typeof chore.title === "string" && chore.title.length > 0, `${label}/${taskId}: missing title`, errors);
+    assert(typeof chore.assigned_agent_type === "string" && chore.assigned_agent_type.length > 0, `${label}/${taskId}: missing assigned_agent_type`, errors);
+    assert(Number(chore.recurrence?.frequency_per_week) > 0, `${label}/${taskId}: missing recurrence.frequency_per_week`, errors);
+    assert(Number.isFinite(chore.priority), `${label}/${taskId}: missing priority`, errors);
+    assert(
+      Number(chore.distance_m) > 0 &&
+        Number(chore.travel_time_minutes) > 0 &&
+        Number(chore.action_time_minutes) > 0 &&
+        Number(chore.estimated_time_minutes) >= Number(chore.travel_time_minutes) + Number(chore.action_time_minutes) - 0.2 &&
+        Number(chore.effort_multiplier) >= 1,
+      `${label}/${taskId}: invalid task cost`,
+      errors
+    );
+    assert(Array.isArray(chore.path) && chore.path.length >= 2, `${label}/${taskId}: missing route path`, errors);
+    assert(Array.isArray(chore.stops) && chore.stops.length >= 2, `${label}/${taskId}: missing itinerary stops`, errors);
+    for (const [index, stop] of (chore.stops ?? []).entries()) {
+      assert(typeof stop.location_id === "string" && stop.location_id.length > 0, `${label}/${taskId}: stop ${index + 1} missing location_id`, errors);
+      assert(typeof stop.action === "string" && stop.action.length > 0, `${label}/${taskId}: stop ${index + 1} missing action`, errors);
+      assert(Number(stop.expected_duration_minutes) >= 0, `${label}/${taskId}: stop ${index + 1} missing expected_duration_minutes`, errors);
+      assert(!stop.produces || Array.isArray(stop.produces), `${label}/${taskId}: stop ${index + 1} produces must be an array`, errors);
+      assert(!stop.consumes || Array.isArray(stop.consumes), `${label}/${taskId}: stop ${index + 1} consumes must be an array`, errors);
+    }
+    assert(Array.isArray(chore.legs) && chore.legs.length === Math.max(0, (chore.stops?.length ?? 0) - 1), `${label}/${taskId}: leg count must match stop sequence`, errors);
+    for (const [index, leg] of (chore.legs ?? []).entries()) {
+      const from = chore.stops?.[index]?.location_id ?? chore.stops?.[index]?.point_id;
+      const to = chore.stops?.[index + 1]?.location_id ?? chore.stops?.[index + 1]?.point_id;
+      assert(leg.from === from && leg.to === to, `${label}/${taskId}: leg ${index + 1} does not follow stop order`, errors);
+      assert(Number(leg.distance_m) > 0 && Number(leg.estimated_time_minutes) > 0, `${label}/${taskId}: leg ${index + 1} has invalid cost`, errors);
+      assert(Array.isArray(leg.path) && leg.path.length >= 2, `${label}/${taskId}: leg ${index + 1} missing path`, errors);
+    }
+  }
+}
+
+function tasksFromRouteSet(routeSet: unknown): ChoreForValidation[] {
+  const value = routeSet as { tasks?: ChoreForValidation[]; chores?: ChoreForValidation[] } | undefined;
+  return value?.tasks ?? value?.chores ?? [];
+}
+
 export async function validateScenario(dir = scenarioDir): Promise<string[]> {
   const errors: string[] = [];
   const requiredFiles = ["site.json", "candidates.json", "terrain_grid.json", "hamlet_layout.json", "chore_routes.json", "overlays.json", "site_scoring_weights.json"];
@@ -148,12 +208,7 @@ export async function validateScenario(dir = scenarioDir): Promise<string[]> {
   }
   assert((weights as { weights?: unknown })?.weights && typeof (weights as { weights?: unknown }).weights === "object", "site_scoring_weights.json missing weights", errors);
   assert(Array.isArray((overlays as { overlays?: unknown })?.overlays), "overlays.json missing overlays array", errors);
-  const defaultChores = (choreRoutes as { chores?: Array<{ id?: string; distance_m?: number; estimated_time_minutes?: number; effort_multiplier?: number; path?: unknown[] }> } | undefined)?.chores ?? [];
-  for (const id of requiredChores) assert(defaultChores.some((chore) => chore.id === id), `chore_routes.json missing ${id}`, errors);
-  for (const chore of defaultChores) {
-    assert(Number(chore.distance_m) > 0 && Number(chore.estimated_time_minutes) > 0 && Number(chore.effort_multiplier) >= 1, `${chore.id}: invalid chore cost`, errors);
-    assert(Array.isArray(chore.path) && chore.path.length >= 2, `${chore.id}: missing route path`, errors);
-  }
+  validateChores(tasksFromRouteSet(choreRoutes), errors);
 
   validateTerrain(terrain as TerrainGrid | undefined, errors);
   validateLayout(layout as HamletLayout | undefined, terrain as TerrainGrid | undefined, errors);
@@ -170,7 +225,7 @@ export async function validateScenario(dir = scenarioDir): Promise<string[]> {
         errors.push(`${candidate.id}/hamlet_layout.json: ${error.message}`);
         return undefined;
       }),
-      readJson<{ chores: Array<{ id: string; distance_m: number; estimated_time_minutes: number; effort_multiplier: number; path: unknown[] }> }>(join(siteDir, "chore_routes.json")).catch((error) => {
+      readJson<{ tasks?: ChoreForValidation[]; chores?: ChoreForValidation[] }>(join(siteDir, "chore_routes.json")).catch((error) => {
         errors.push(`${candidate.id}/chore_routes.json: ${error.message}`);
         return undefined;
       })
@@ -178,11 +233,7 @@ export async function validateScenario(dir = scenarioDir): Promise<string[]> {
     assert((candidateSite as { selected_candidate_id?: string } | undefined)?.selected_candidate_id === candidate.id, `${candidate.id}: site selected_candidate_id mismatch`, errors);
     validateTerrain(candidateTerrain, errors, candidate.id);
     validateLayout(candidateLayout, candidateTerrain, errors, candidate.id);
-    for (const id of requiredChores) assert(candidateChores?.chores.some((chore) => chore.id === id), `${candidate.id}: missing ${id}`, errors);
-    for (const chore of candidateChores?.chores ?? []) {
-      assert(chore.distance_m > 0 && chore.estimated_time_minutes > 0 && chore.effort_multiplier >= 1, `${candidate.id}/${chore.id}: invalid chore cost`, errors);
-      assert(Array.isArray(chore.path) && chore.path.length >= 2, `${candidate.id}/${chore.id}: missing route path`, errors);
-    }
+    validateChores(tasksFromRouteSet(candidateChores), errors, candidate.id);
   }
   return errors;
 }

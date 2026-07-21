@@ -112,21 +112,26 @@ lotcon-huge,municipality-1,2200000.00,unknown_lot_fabric_proxy,unknown,unknown,g
     expect(loadedWinter.time_minutes).toBeGreaterThan(unloaded.time_minutes);
   });
 
-  test("chore routes export fixed MVP chores with paths and burden summary", () => {
+  test("chore routes export agent-ready task itineraries with paths and burden summary", () => {
     const terrain = generateTerrainGrid();
     const layout = generateHamletLayout(terrain);
     const routes = generateChoreRoutes(terrain, layout);
-    expect(routes.chores.map((chore) => chore.id).sort()).toEqual([
-      "bring_compost",
-      "bring_firewood",
-      "collect_eggs",
-      "feed_chickens",
+    expect(routes.tasks.map((task) => task.task_id).sort()).toEqual([
+      "eggs_and_compost",
+      "firewood_loop",
+      "garden_harvest_loop",
       "harvest_shrubs",
-      "haul_water"
+      "haul_water",
+      "morning_chickens"
     ]);
     expect(routes.summary.daily_walking_time_minutes).toBeGreaterThan(0);
+    expect(routes.summary.daily_task_time_minutes).toBeGreaterThan(routes.summary.daily_walking_time_minutes);
     expect(routes.summary.weekly_chore_distance_m).toBeGreaterThan(0);
-    expect(routes.chores.every((chore) => chore.path.length >= 2)).toBe(true);
+    expect(routes.tasks.every((task) => task.path.length >= 2)).toBe(true);
+    expect(routes.tasks.every((task) => task.stops.length >= 2 && task.legs.length === task.stops.length - 1)).toBe(true);
+    const compostLoop = routes.tasks.find((task) => task.task_id === "eggs_and_compost");
+    expect(compostLoop?.stops.map((stop) => stop.location_id)).toEqual(["shared_kitchen_meeting", "chicken_coop", "compost", "gardens", "shared_kitchen_meeting"]);
+    expect(compostLoop?.estimated_time_minutes).toBeGreaterThan((compostLoop?.travel_time_minutes ?? 0));
   });
 
   test("export writes all scenario files and required fields", async () => {
@@ -142,11 +147,11 @@ lotcon-huge,municipality-1,2200000.00,unknown_lot_fabric_proxy,unknown,unknown,g
       const site = await readJson<{ selected_candidate_id: string }>(join(scenarioDir, "site.json"));
       const candidates = await readJson<{ candidates: Array<{ id: string; data_caveat: string }> }>(join(scenarioDir, "candidates.json"));
       const terrain = await readJson<{ cells: unknown[]; metadata: { grid_width: number; grid_height: number; terrain_source: string } }>(join(scenarioDir, "sites", site.selected_candidate_id, "terrain_grid.json"));
-      const chores = await readJson<{ chores: unknown[] }>(join(scenarioDir, "sites", site.selected_candidate_id, "chore_routes.json"));
+      const chores = await readJson<{ tasks: unknown[]; chores?: unknown[] }>(join(scenarioDir, "sites", site.selected_candidate_id, "chore_routes.json"));
       expect(site.selected_candidate_id).toBe("lotcon-balanced");
       expect(candidates.candidates[0].data_caveat).toBe("lot_fabric_proxy_not_legal_parcel");
       expect(["open_meteo_copernicus_dem90", "procedural_fallback"]).toContain(terrain.metadata.terrain_source);
-      expect(chores.chores.length).toBe(6);
+      expect(chores.tasks.length).toBe(6);
       expect(terrain.cells.length).toBe(terrain.metadata.grid_width * terrain.metadata.grid_height);
       expect(await validateScenario(scenarioDir)).toEqual([]);
     } finally {

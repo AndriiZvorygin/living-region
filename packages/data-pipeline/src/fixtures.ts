@@ -79,13 +79,47 @@ export type Overlays = {
   overlays: Array<{ id: string; label: string; hotkey: string; source_field?: string; mode: string }>;
 };
 
-export type ChoreRoute = {
+export type ChoreTask = {
   id: string;
+  task_id: string;
   label: string;
+  title: string;
+  assigned_agent_type: "adult_resident";
+  recurrence: { frequency_per_week: number };
+  priority: number;
+  stops: ItineraryStop[];
+  legs: RouteLeg[];
   from: string;
   to: string;
   load: "unloaded" | "loaded";
   frequency_per_week: number;
+  distance_m: number;
+  travel_time_minutes: number;
+  action_time_minutes: number;
+  estimated_time_minutes: number;
+  effort_multiplier: number;
+  winter_time_minutes: number;
+  winter_effort_multiplier: number;
+  path: Array<[number, number]>;
+};
+
+export type ItineraryStop = {
+  location_id: string;
+  point_id: string;
+  action: string;
+  expected_duration_minutes: number;
+  load?: "unloaded" | "loaded";
+  carried_item?: string;
+  produces?: string[];
+  consumes?: string[];
+};
+
+export type RouteLeg = {
+  from: string;
+  to: string;
+  label: string;
+  load: "unloaded" | "loaded";
+  carried_item?: string;
   distance_m: number;
   estimated_time_minutes: number;
   effort_multiplier: number;
@@ -96,15 +130,17 @@ export type ChoreRoute = {
 
 export type ChoreRouteSet = {
   metadata: {
-    model: "walking_cost_mvp";
+    model: "agent_task_itinerary_mvp";
     base_walking_speed_mps: number;
     winter_modifier: number;
     caveat: string;
   };
   points: RoutePoint[];
-  chores: ChoreRoute[];
+  tasks: ChoreTask[];
+  chores?: ChoreTask[];
   summary: {
     daily_walking_time_minutes: number;
+    daily_task_time_minutes: number;
     weekly_chore_distance_m: number;
     winter_burden_minutes_per_day: number;
     hardest_chore_id: string;
@@ -613,58 +649,174 @@ export function generateChoreRoutes(grid: TerrainGrid, layout: HamletLayout): Ch
     routePointFromElement(layout, "woodshed", "Woodshed")
   ];
   const pointById = new Map(points.map((point) => [point.id, point]));
-  const definitions = [
-    ["feed_chickens", "Feed chickens", "shared_kitchen_meeting", "chicken_coop", "loaded", 7],
-    ["collect_eggs", "Collect eggs", "chicken_coop", "shared_kitchen_meeting", "unloaded", 7],
-    ["haul_water", "Haul water to yurt cluster", "water_storage", "yurt_cluster", "loaded", 7],
-    ["bring_compost", "Bring compost to garden", "compost", "gardens", "loaded", 3],
-    ["harvest_shrubs", "Harvest shrubs", "shared_kitchen_meeting", "shrub_area", "loaded", 2],
-    ["bring_firewood", "Bring firewood to kitchen", "woodshed", "shared_kitchen_meeting", "loaded", 5]
-  ] as const;
-  const chores = definitions.map(([id, label, from, to, load, frequency]) => {
-    const start = pointById.get(from);
-    const end = pointById.get(to);
-    if (!start || !end) throw new Error(`Missing chore route endpoints for ${id}`);
-    const loadModifier = load === "loaded" ? 1.28 : 1;
-    const normal = calculateRouteTime(grid, start, end, {
-      loadModifier,
-      surfaceAt: (x, z, cell) => surfaceForLayout(layout, x, z, cell)
-    });
-    const winter = calculateRouteTime(grid, start, end, {
-      loadModifier,
-      winterModifier: 1.35,
-      surfaceAt: (x, z, cell) => surfaceForLayout(layout, x, z, cell)
-    });
+  const definitions: Array<{ task_id: string; title: string; assigned_agent_type: "adult_resident"; recurrence: { frequency_per_week: number }; priority: number; stops: ItineraryStop[] }> = [
+    {
+      task_id: "morning_chickens",
+      title: "Morning chickens",
+      assigned_agent_type: "adult_resident",
+      recurrence: { frequency_per_week: 7 },
+      priority: 1,
+      stops: [
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Start from kitchen", expected_duration_minutes: 1, load: "unloaded" },
+        { location_id: "water_storage", point_id: "water_storage", action: "Collect feed and water", expected_duration_minutes: 3, load: "loaded", carried_item: "feed and water", consumes: ["feed", "water"] },
+        { location_id: "chicken_coop", point_id: "chicken_coop", action: "Feed and water chickens", expected_duration_minutes: 8, load: "unloaded", produces: ["fed chickens"] },
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Return to kitchen", expected_duration_minutes: 1 }
+      ]
+    },
+    {
+      task_id: "eggs_and_compost",
+      title: "Eggs and compost",
+      assigned_agent_type: "adult_resident",
+      recurrence: { frequency_per_week: 4 },
+      priority: 2,
+      stops: [
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Take compost pail", expected_duration_minutes: 2, load: "loaded", carried_item: "kitchen scraps", consumes: ["kitchen scraps"] },
+        { location_id: "chicken_coop", point_id: "chicken_coop", action: "Collect eggs and bedding", expected_duration_minutes: 6, load: "loaded", carried_item: "eggs and bedding", produces: ["eggs"], consumes: ["soiled bedding"] },
+        { location_id: "compost", point_id: "compost", action: "Drop compostables", expected_duration_minutes: 3, load: "unloaded", produces: ["compost input"] },
+        { location_id: "gardens", point_id: "gardens", action: "Check garden edge", expected_duration_minutes: 5, load: "unloaded" },
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Return to kitchen", expected_duration_minutes: 2, produces: ["eggs"] }
+      ]
+    },
+    {
+      task_id: "firewood_loop",
+      title: "Firewood",
+      assigned_agent_type: "adult_resident",
+      recurrence: { frequency_per_week: 5 },
+      priority: 2,
+      stops: [
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Take empty carrier", expected_duration_minutes: 1, load: "unloaded" },
+        { location_id: "woodshed", point_id: "woodshed", action: "Load firewood", expected_duration_minutes: 5, load: "loaded", carried_item: "firewood", consumes: ["split firewood"] },
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Stack firewood", expected_duration_minutes: 4, produces: ["kitchen firewood"] }
+      ]
+    },
+    {
+      task_id: "garden_harvest_loop",
+      title: "Garden harvest",
+      assigned_agent_type: "adult_resident",
+      recurrence: { frequency_per_week: 3 },
+      priority: 3,
+      stops: [
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Take harvest basket", expected_duration_minutes: 1, load: "unloaded" },
+        { location_id: "gardens", point_id: "gardens", action: "Harvest and weed", expected_duration_minutes: 20, load: "loaded", carried_item: "harvest basket", produces: ["vegetables"], consumes: ["weeds"] },
+        { location_id: "compost", point_id: "compost", action: "Drop weeds", expected_duration_minutes: 3, load: "loaded", carried_item: "harvest basket", produces: ["compost input"] },
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Return harvest", expected_duration_minutes: 4, produces: ["vegetables"] }
+      ]
+    },
+    {
+      task_id: "haul_water",
+      title: "Haul water to yurt cluster",
+      assigned_agent_type: "adult_resident",
+      recurrence: { frequency_per_week: 7 },
+      priority: 1,
+      stops: [
+        { location_id: "water_storage", point_id: "water_storage", action: "Fill water carrier", expected_duration_minutes: 4, load: "loaded", carried_item: "water", consumes: ["water"] },
+        { location_id: "yurt_cluster", point_id: "yurt_cluster", action: "Drop water", expected_duration_minutes: 3, produces: ["yurt water"] }
+      ]
+    },
+    {
+      task_id: "harvest_shrubs",
+      title: "Harvest shrubs",
+      assigned_agent_type: "adult_resident",
+      recurrence: { frequency_per_week: 2 },
+      priority: 4,
+      stops: [
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Take basket", expected_duration_minutes: 1, load: "unloaded" },
+        { location_id: "shrub_area", point_id: "shrub_area", action: "Harvest shrubs", expected_duration_minutes: 15, load: "loaded", carried_item: "shrub harvest", produces: ["shrub harvest"] },
+        { location_id: "shared_kitchen_meeting", point_id: "shared_kitchen_meeting", action: "Return harvest", expected_duration_minutes: 3, produces: ["shrub harvest"] }
+      ]
+    }
+  ];
+
+  const scoreTask = (definition: (typeof definitions)[number]): ChoreTask => {
+    if (definition.stops.length < 2) throw new Error(`Task itinerary ${definition.task_id} needs at least two stops`);
+    const legs: RouteLeg[] = [];
+    const fullPath: Array<[number, number]> = [];
+    for (let index = 0; index < definition.stops.length - 1; index += 1) {
+      const stop = definition.stops[index];
+      const nextStop = definition.stops[index + 1];
+      const start = pointById.get(stop.point_id);
+      const end = pointById.get(nextStop.point_id);
+      if (!start || !end) throw new Error(`Missing task itinerary point for ${definition.task_id}: ${stop.location_id} -> ${nextStop.location_id}`);
+      const load = stop.load ?? "unloaded";
+      const loadModifier = load === "loaded" ? 1.28 : 1;
+      const normal = calculateRouteTime(grid, start, end, {
+        loadModifier,
+        surfaceAt: (x, z, cell) => surfaceForLayout(layout, x, z, cell)
+      });
+      const winter = calculateRouteTime(grid, start, end, {
+        loadModifier,
+        winterModifier: 1.35,
+        surfaceAt: (x, z, cell) => surfaceForLayout(layout, x, z, cell)
+      });
+      const legPath = index === 0 ? normal.path : normal.path.slice(1);
+      fullPath.push(...legPath);
+      legs.push({
+        from: stop.location_id,
+        to: nextStop.location_id,
+        label: `${start.label} -> ${end.label}`,
+        load,
+        carried_item: stop.carried_item,
+        distance_m: normal.distance_m,
+        estimated_time_minutes: normal.time_minutes,
+        effort_multiplier: normal.effort_multiplier,
+        winter_time_minutes: winter.time_minutes,
+        winter_effort_multiplier: winter.effort_multiplier,
+        path: normal.path
+      });
+    }
+    const distanceM = legs.reduce((sum, leg) => sum + leg.distance_m, 0);
+    const travelMinutes = legs.reduce((sum, leg) => sum + leg.estimated_time_minutes, 0);
+    const actionMinutes = definition.stops.reduce((sum, stop) => sum + stop.expected_duration_minutes, 0);
+    const timeMinutes = travelMinutes + actionMinutes;
+    const winterTravelMinutes = legs.reduce((sum, leg) => sum + leg.winter_time_minutes, 0);
+    const winterMinutes = winterTravelMinutes + actionMinutes;
+    const weightedEffort = legs.reduce((sum, leg) => sum + leg.effort_multiplier * leg.estimated_time_minutes, 0) / Math.max(0.1, travelMinutes);
+    const weightedWinterEffort = legs.reduce((sum, leg) => sum + leg.winter_effort_multiplier * leg.winter_time_minutes, 0) / Math.max(0.1, winterTravelMinutes);
+    const firstStop = definition.stops[0];
+    const lastStop = definition.stops[definition.stops.length - 1];
+    const firstLoadedLeg = legs.find((leg) => leg.load === "loaded");
     return {
-      id,
-      label,
-      from,
-      to,
-      load,
-      frequency_per_week: frequency,
-      distance_m: normal.distance_m,
-      estimated_time_minutes: normal.time_minutes,
-      effort_multiplier: normal.effort_multiplier,
-      winter_time_minutes: winter.time_minutes,
-      winter_effort_multiplier: winter.effort_multiplier,
-      path: normal.path
+      id: definition.task_id,
+      task_id: definition.task_id,
+      label: definition.title,
+      title: definition.title,
+      assigned_agent_type: definition.assigned_agent_type,
+      recurrence: definition.recurrence,
+      priority: definition.priority,
+      stops: definition.stops,
+      legs,
+      from: firstStop.location_id,
+      to: lastStop.location_id,
+      load: firstLoadedLeg ? "loaded" : "unloaded",
+      frequency_per_week: definition.recurrence.frequency_per_week,
+      distance_m: Number(distanceM.toFixed(1)),
+      travel_time_minutes: Number(travelMinutes.toFixed(1)),
+      action_time_minutes: Number(actionMinutes.toFixed(1)),
+      estimated_time_minutes: Number(timeMinutes.toFixed(1)),
+      effort_multiplier: Number(Math.max(1, weightedEffort).toFixed(2)),
+      winter_time_minutes: Number(winterMinutes.toFixed(1)),
+      winter_effort_multiplier: Number(Math.max(1, weightedWinterEffort).toFixed(2)),
+      path: fullPath
     };
-  });
-  const weeklyMinutes = chores.reduce((sum, chore) => sum + chore.estimated_time_minutes * chore.frequency_per_week, 0);
-  const weeklyWinterMinutes = chores.reduce((sum, chore) => sum + chore.winter_time_minutes * chore.frequency_per_week, 0);
-  const weeklyDistance = chores.reduce((sum, chore) => sum + chore.distance_m * chore.frequency_per_week, 0);
-  const hardest = [...chores].sort((a, b) => b.winter_time_minutes * b.effort_multiplier - a.winter_time_minutes * a.effort_multiplier)[0];
+  };
+  const tasks = definitions.map(scoreTask);
+  const weeklyMinutes = tasks.reduce((sum, task) => sum + task.estimated_time_minutes * task.frequency_per_week, 0);
+  const weeklyTravelMinutes = tasks.reduce((sum, task) => sum + task.travel_time_minutes * task.frequency_per_week, 0);
+  const weeklyWinterMinutes = tasks.reduce((sum, task) => sum + task.winter_time_minutes * task.frequency_per_week, 0);
+  const weeklyDistance = tasks.reduce((sum, task) => sum + task.distance_m * task.frequency_per_week, 0);
+  const hardest = [...tasks].sort((a, b) => b.winter_time_minutes * b.effort_multiplier - a.winter_time_minutes * a.effort_multiplier)[0];
   return {
     metadata: {
-      model: "walking_cost_mvp",
+      model: "agent_task_itinerary_mvp",
       base_walking_speed_mps: 1.25,
       winter_modifier: 1.35,
-      caveat: "Deterministic MVP route-cost model using grid slope, path/road surface, distance, and simple load modifiers."
+      caveat: "Agent-ready task itinerary MVP. Stops are ordered as authored; grid routing only estimates travel between adjacent stops."
     },
     points,
-    chores,
+    tasks,
     summary: {
-      daily_walking_time_minutes: Number((weeklyMinutes / 7).toFixed(1)),
+      daily_walking_time_minutes: Number((weeklyTravelMinutes / 7).toFixed(1)),
+      daily_task_time_minutes: Number((weeklyMinutes / 7).toFixed(1)),
       weekly_chore_distance_m: Number(weeklyDistance.toFixed(1)),
       winter_burden_minutes_per_day: Number((weeklyWinterMinutes / 7).toFixed(1)),
       hardest_chore_id: hardest.id

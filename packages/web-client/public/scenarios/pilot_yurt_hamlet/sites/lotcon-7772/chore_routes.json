@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "model": "walking_cost_mvp",
+    "model": "agent_task_itinerary_mvp",
     "base_walking_speed_mps": 1.25,
     "winter_modifier": 1.35,
-    "caveat": "Deterministic MVP route-cost model using grid slope, path/road surface, distance, and simple load modifiers."
+    "caveat": "Agent-ready task itinerary MVP. Stops are ordered as authored; grid routing only estimates travel between adjacent stops."
   },
   "points": [
     {
@@ -55,114 +55,240 @@
       "z_m": 290
     }
   ],
-  "chores": [
+  "tasks": [
     {
-      "id": "feed_chickens",
-      "label": "Feed chickens",
+      "id": "morning_chickens",
+      "task_id": "morning_chickens",
+      "label": "Morning chickens",
+      "title": "Morning chickens",
+      "assigned_agent_type": "adult_resident",
+      "recurrence": {
+        "frequency_per_week": 7
+      },
+      "priority": 1,
+      "stops": [
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Start from kitchen",
+          "expected_duration_minutes": 1,
+          "load": "unloaded"
+        },
+        {
+          "location_id": "water_storage",
+          "point_id": "water_storage",
+          "action": "Collect feed and water",
+          "expected_duration_minutes": 3,
+          "load": "loaded",
+          "carried_item": "feed and water",
+          "consumes": [
+            "feed",
+            "water"
+          ]
+        },
+        {
+          "location_id": "chicken_coop",
+          "point_id": "chicken_coop",
+          "action": "Feed and water chickens",
+          "expected_duration_minutes": 8,
+          "load": "unloaded",
+          "produces": [
+            "fed chickens"
+          ]
+        },
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Return to kitchen",
+          "expected_duration_minutes": 1
+        }
+      ],
+      "legs": [
+        {
+          "from": "shared_kitchen_meeting",
+          "to": "water_storage",
+          "label": "Common kitchen -> Water source / storage",
+          "load": "unloaded",
+          "distance_m": 80,
+          "estimated_time_minutes": 1.2,
+          "effort_multiplier": 1.16,
+          "winter_time_minutes": 1.7,
+          "winter_effort_multiplier": 1.56,
+          "path": [
+            [
+              330,
+              300
+            ],
+            [
+              330,
+              290
+            ],
+            [
+              330,
+              280
+            ],
+            [
+              330,
+              270
+            ],
+            [
+              330,
+              260
+            ],
+            [
+              330,
+              250
+            ],
+            [
+              330,
+              240
+            ],
+            [
+              330,
+              230
+            ],
+            [
+              330,
+              220
+            ]
+          ]
+        },
+        {
+          "from": "water_storage",
+          "to": "chicken_coop",
+          "label": "Water source / storage -> Chicken coop",
+          "load": "loaded",
+          "carried_item": "feed and water",
+          "distance_m": 94.9,
+          "estimated_time_minutes": 2.1,
+          "effort_multiplier": 1.64,
+          "winter_time_minutes": 2.8,
+          "winter_effort_multiplier": 2.21,
+          "path": [
+            [
+              330,
+              220
+            ],
+            [
+              320,
+              230
+            ],
+            [
+              310,
+              240
+            ],
+            [
+              300,
+              250
+            ],
+            [
+              290,
+              260
+            ],
+            [
+              280,
+              270
+            ],
+            [
+              270,
+              270
+            ],
+            [
+              260,
+              280
+            ]
+          ]
+        },
+        {
+          "from": "chicken_coop",
+          "to": "shared_kitchen_meeting",
+          "label": "Chicken coop -> Common kitchen",
+          "load": "unloaded",
+          "distance_m": 78.3,
+          "estimated_time_minutes": 1.2,
+          "effort_multiplier": 1.17,
+          "winter_time_minutes": 1.6,
+          "winter_effort_multiplier": 1.58,
+          "path": [
+            [
+              260,
+              280
+            ],
+            [
+              270,
+              280
+            ],
+            [
+              280,
+              280
+            ],
+            [
+              290,
+              290
+            ],
+            [
+              300,
+              300
+            ],
+            [
+              310,
+              300
+            ],
+            [
+              320,
+              300
+            ],
+            [
+              330,
+              300
+            ]
+          ]
+        }
+      ],
       "from": "shared_kitchen_meeting",
-      "to": "chicken_coop",
-      "load": "loaded",
-      "frequency_per_week": 7,
-      "distance_m": 78.3,
-      "estimated_time_minutes": 1.6,
-      "effort_multiplier": 1.56,
-      "winter_time_minutes": 2.2,
-      "winter_effort_multiplier": 2.11,
-      "path": [
-        [
-          330,
-          300
-        ],
-        [
-          320,
-          300
-        ],
-        [
-          310,
-          290
-        ],
-        [
-          300,
-          290
-        ],
-        [
-          290,
-          290
-        ],
-        [
-          280,
-          280
-        ],
-        [
-          270,
-          280
-        ],
-        [
-          260,
-          280
-        ]
-      ]
-    },
-    {
-      "id": "collect_eggs",
-      "label": "Collect eggs",
-      "from": "chicken_coop",
       "to": "shared_kitchen_meeting",
-      "load": "unloaded",
+      "load": "loaded",
       "frequency_per_week": 7,
-      "distance_m": 78.3,
-      "estimated_time_minutes": 1.2,
-      "effort_multiplier": 1.17,
-      "winter_time_minutes": 1.6,
-      "winter_effort_multiplier": 1.58,
+      "distance_m": 253.2,
+      "travel_time_minutes": 4.5,
+      "action_time_minutes": 13,
+      "estimated_time_minutes": 17.5,
+      "effort_multiplier": 1.39,
+      "winter_time_minutes": 19.1,
+      "winter_effort_multiplier": 1.86,
       "path": [
         [
-          260,
-          280
-        ],
-        [
-          270,
-          280
-        ],
-        [
-          280,
-          280
-        ],
-        [
-          290,
-          290
-        ],
-        [
-          300,
-          300
-        ],
-        [
-          310,
-          300
-        ],
-        [
-          320,
+          330,
           300
         ],
         [
           330,
-          300
-        ]
-      ]
-    },
-    {
-      "id": "haul_water",
-      "label": "Haul water to yurt cluster",
-      "from": "water_storage",
-      "to": "yurt_cluster",
-      "load": "loaded",
-      "frequency_per_week": 7,
-      "distance_m": 38.3,
-      "estimated_time_minutes": 0.7,
-      "effort_multiplier": 1.47,
-      "winter_time_minutes": 1,
-      "winter_effort_multiplier": 1.98,
-      "path": [
+          290
+        ],
+        [
+          330,
+          280
+        ],
+        [
+          330,
+          270
+        ],
+        [
+          330,
+          260
+        ],
+        [
+          330,
+          250
+        ],
+        [
+          330,
+          240
+        ],
+        [
+          330,
+          230
+        ],
         [
           330,
           220
@@ -176,24 +302,390 @@
           240
         ],
         [
-          310,
+          300,
           250
+        ],
+        [
+          290,
+          260
+        ],
+        [
+          280,
+          270
+        ],
+        [
+          270,
+          270
+        ],
+        [
+          260,
+          280
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          280,
+          280
+        ],
+        [
+          290,
+          290
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          310,
+          300
+        ],
+        [
+          320,
+          300
+        ],
+        [
+          330,
+          300
         ]
       ]
     },
     {
-      "id": "bring_compost",
-      "label": "Bring compost to garden",
-      "from": "compost",
-      "to": "gardens",
+      "id": "eggs_and_compost",
+      "task_id": "eggs_and_compost",
+      "label": "Eggs and compost",
+      "title": "Eggs and compost",
+      "assigned_agent_type": "adult_resident",
+      "recurrence": {
+        "frequency_per_week": 4
+      },
+      "priority": 2,
+      "stops": [
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Take compost pail",
+          "expected_duration_minutes": 2,
+          "load": "loaded",
+          "carried_item": "kitchen scraps",
+          "consumes": [
+            "kitchen scraps"
+          ]
+        },
+        {
+          "location_id": "chicken_coop",
+          "point_id": "chicken_coop",
+          "action": "Collect eggs and bedding",
+          "expected_duration_minutes": 6,
+          "load": "loaded",
+          "carried_item": "eggs and bedding",
+          "produces": [
+            "eggs"
+          ],
+          "consumes": [
+            "soiled bedding"
+          ]
+        },
+        {
+          "location_id": "compost",
+          "point_id": "compost",
+          "action": "Drop compostables",
+          "expected_duration_minutes": 3,
+          "load": "unloaded",
+          "produces": [
+            "compost input"
+          ]
+        },
+        {
+          "location_id": "gardens",
+          "point_id": "gardens",
+          "action": "Check garden edge",
+          "expected_duration_minutes": 5,
+          "load": "unloaded"
+        },
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Return to kitchen",
+          "expected_duration_minutes": 2,
+          "produces": [
+            "eggs"
+          ]
+        }
+      ],
+      "legs": [
+        {
+          "from": "shared_kitchen_meeting",
+          "to": "chicken_coop",
+          "label": "Common kitchen -> Chicken coop",
+          "load": "loaded",
+          "carried_item": "kitchen scraps",
+          "distance_m": 78.3,
+          "estimated_time_minutes": 1.6,
+          "effort_multiplier": 1.56,
+          "winter_time_minutes": 2.2,
+          "winter_effort_multiplier": 2.11,
+          "path": [
+            [
+              330,
+              300
+            ],
+            [
+              320,
+              300
+            ],
+            [
+              310,
+              290
+            ],
+            [
+              300,
+              290
+            ],
+            [
+              290,
+              290
+            ],
+            [
+              280,
+              280
+            ],
+            [
+              270,
+              280
+            ],
+            [
+              260,
+              280
+            ]
+          ]
+        },
+        {
+          "from": "chicken_coop",
+          "to": "compost",
+          "label": "Chicken coop -> Compost",
+          "load": "loaded",
+          "carried_item": "eggs and bedding",
+          "distance_m": 84.1,
+          "estimated_time_minutes": 1.7,
+          "effort_multiplier": 1.53,
+          "winter_time_minutes": 2.3,
+          "winter_effort_multiplier": 2.06,
+          "path": [
+            [
+              260,
+              280
+            ],
+            [
+              270,
+              280
+            ],
+            [
+              280,
+              280
+            ],
+            [
+              290,
+              290
+            ],
+            [
+              300,
+              290
+            ],
+            [
+              310,
+              290
+            ],
+            [
+              320,
+              290
+            ],
+            [
+              330,
+              290
+            ],
+            [
+              340,
+              290
+            ]
+          ]
+        },
+        {
+          "from": "compost",
+          "to": "gardens",
+          "label": "Compost -> Garden",
+          "load": "unloaded",
+          "distance_m": 113.1,
+          "estimated_time_minutes": 1.9,
+          "effort_multiplier": 1.24,
+          "winter_time_minutes": 2.5,
+          "winter_effort_multiplier": 1.67,
+          "path": [
+            [
+              340,
+              290
+            ],
+            [
+              350,
+              280
+            ],
+            [
+              360,
+              270
+            ],
+            [
+              370,
+              260
+            ],
+            [
+              380,
+              250
+            ],
+            [
+              390,
+              240
+            ],
+            [
+              400,
+              230
+            ],
+            [
+              410,
+              220
+            ],
+            [
+              420,
+              210
+            ]
+          ]
+        },
+        {
+          "from": "gardens",
+          "to": "shared_kitchen_meeting",
+          "label": "Garden -> Common kitchen",
+          "load": "unloaded",
+          "distance_m": 127.3,
+          "estimated_time_minutes": 2.1,
+          "effort_multiplier": 1.23,
+          "winter_time_minutes": 2.8,
+          "winter_effort_multiplier": 1.66,
+          "path": [
+            [
+              420,
+              210
+            ],
+            [
+              410,
+              220
+            ],
+            [
+              400,
+              230
+            ],
+            [
+              390,
+              240
+            ],
+            [
+              380,
+              250
+            ],
+            [
+              370,
+              260
+            ],
+            [
+              360,
+              270
+            ],
+            [
+              350,
+              280
+            ],
+            [
+              340,
+              290
+            ],
+            [
+              330,
+              300
+            ]
+          ]
+        }
+      ],
+      "from": "shared_kitchen_meeting",
+      "to": "shared_kitchen_meeting",
       "load": "loaded",
-      "frequency_per_week": 3,
-      "distance_m": 113.1,
-      "estimated_time_minutes": 2.4,
-      "effort_multiplier": 1.58,
-      "winter_time_minutes": 3.2,
-      "winter_effort_multiplier": 2.14,
+      "frequency_per_week": 4,
+      "distance_m": 402.8,
+      "travel_time_minutes": 7.3,
+      "action_time_minutes": 18,
+      "estimated_time_minutes": 25.3,
+      "effort_multiplier": 1.37,
+      "winter_time_minutes": 27.8,
+      "winter_effort_multiplier": 1.86,
       "path": [
+        [
+          330,
+          300
+        ],
+        [
+          320,
+          300
+        ],
+        [
+          310,
+          290
+        ],
+        [
+          300,
+          290
+        ],
+        [
+          290,
+          290
+        ],
+        [
+          280,
+          280
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          260,
+          280
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          280,
+          280
+        ],
+        [
+          290,
+          290
+        ],
+        [
+          300,
+          290
+        ],
+        [
+          310,
+          290
+        ],
+        [
+          320,
+          290
+        ],
+        [
+          330,
+          290
+        ],
         [
           340,
           290
@@ -229,21 +721,802 @@
         [
           420,
           210
+        ],
+        [
+          410,
+          220
+        ],
+        [
+          400,
+          230
+        ],
+        [
+          390,
+          240
+        ],
+        [
+          380,
+          250
+        ],
+        [
+          370,
+          260
+        ],
+        [
+          360,
+          270
+        ],
+        [
+          350,
+          280
+        ],
+        [
+          340,
+          290
+        ],
+        [
+          330,
+          300
+        ]
+      ]
+    },
+    {
+      "id": "firewood_loop",
+      "task_id": "firewood_loop",
+      "label": "Firewood",
+      "title": "Firewood",
+      "assigned_agent_type": "adult_resident",
+      "recurrence": {
+        "frequency_per_week": 5
+      },
+      "priority": 2,
+      "stops": [
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Take empty carrier",
+          "expected_duration_minutes": 1,
+          "load": "unloaded"
+        },
+        {
+          "location_id": "woodshed",
+          "point_id": "woodshed",
+          "action": "Load firewood",
+          "expected_duration_minutes": 5,
+          "load": "loaded",
+          "carried_item": "firewood",
+          "consumes": [
+            "split firewood"
+          ]
+        },
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Stack firewood",
+          "expected_duration_minutes": 4,
+          "produces": [
+            "kitchen firewood"
+          ]
+        }
+      ],
+      "legs": [
+        {
+          "from": "shared_kitchen_meeting",
+          "to": "woodshed",
+          "label": "Common kitchen -> Woodshed",
+          "load": "unloaded",
+          "distance_m": 54.1,
+          "estimated_time_minutes": 0.8,
+          "effort_multiplier": 1.17,
+          "winter_time_minutes": 1.1,
+          "winter_effort_multiplier": 1.58,
+          "path": [
+            [
+              330,
+              300
+            ],
+            [
+              320,
+              300
+            ],
+            [
+              310,
+              290
+            ],
+            [
+              300,
+              290
+            ],
+            [
+              290,
+              290
+            ],
+            [
+              280,
+              290
+            ]
+          ]
+        },
+        {
+          "from": "woodshed",
+          "to": "shared_kitchen_meeting",
+          "label": "Woodshed -> Common kitchen",
+          "load": "loaded",
+          "carried_item": "firewood",
+          "distance_m": 54.1,
+          "estimated_time_minutes": 1.1,
+          "effort_multiplier": 1.49,
+          "winter_time_minutes": 1.5,
+          "winter_effort_multiplier": 2.01,
+          "path": [
+            [
+              280,
+              290
+            ],
+            [
+              290,
+              290
+            ],
+            [
+              300,
+              300
+            ],
+            [
+              310,
+              300
+            ],
+            [
+              320,
+              300
+            ],
+            [
+              330,
+              300
+            ]
+          ]
+        }
+      ],
+      "from": "shared_kitchen_meeting",
+      "to": "shared_kitchen_meeting",
+      "load": "loaded",
+      "frequency_per_week": 5,
+      "distance_m": 108.2,
+      "travel_time_minutes": 1.9,
+      "action_time_minutes": 10,
+      "estimated_time_minutes": 11.9,
+      "effort_multiplier": 1.36,
+      "winter_time_minutes": 12.6,
+      "winter_effort_multiplier": 1.83,
+      "path": [
+        [
+          330,
+          300
+        ],
+        [
+          320,
+          300
+        ],
+        [
+          310,
+          290
+        ],
+        [
+          300,
+          290
+        ],
+        [
+          290,
+          290
+        ],
+        [
+          280,
+          290
+        ],
+        [
+          290,
+          290
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          310,
+          300
+        ],
+        [
+          320,
+          300
+        ],
+        [
+          330,
+          300
+        ]
+      ]
+    },
+    {
+      "id": "garden_harvest_loop",
+      "task_id": "garden_harvest_loop",
+      "label": "Garden harvest",
+      "title": "Garden harvest",
+      "assigned_agent_type": "adult_resident",
+      "recurrence": {
+        "frequency_per_week": 3
+      },
+      "priority": 3,
+      "stops": [
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Take harvest basket",
+          "expected_duration_minutes": 1,
+          "load": "unloaded"
+        },
+        {
+          "location_id": "gardens",
+          "point_id": "gardens",
+          "action": "Harvest and weed",
+          "expected_duration_minutes": 20,
+          "load": "loaded",
+          "carried_item": "harvest basket",
+          "produces": [
+            "vegetables"
+          ],
+          "consumes": [
+            "weeds"
+          ]
+        },
+        {
+          "location_id": "compost",
+          "point_id": "compost",
+          "action": "Drop weeds",
+          "expected_duration_minutes": 3,
+          "load": "loaded",
+          "carried_item": "harvest basket",
+          "produces": [
+            "compost input"
+          ]
+        },
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Return harvest",
+          "expected_duration_minutes": 4,
+          "produces": [
+            "vegetables"
+          ]
+        }
+      ],
+      "legs": [
+        {
+          "from": "shared_kitchen_meeting",
+          "to": "gardens",
+          "label": "Common kitchen -> Garden",
+          "load": "unloaded",
+          "distance_m": 127.3,
+          "estimated_time_minutes": 2.1,
+          "effort_multiplier": 1.24,
+          "winter_time_minutes": 2.8,
+          "winter_effort_multiplier": 1.68,
+          "path": [
+            [
+              330,
+              300
+            ],
+            [
+              340,
+              290
+            ],
+            [
+              350,
+              280
+            ],
+            [
+              360,
+              270
+            ],
+            [
+              370,
+              260
+            ],
+            [
+              380,
+              250
+            ],
+            [
+              390,
+              240
+            ],
+            [
+              400,
+              230
+            ],
+            [
+              410,
+              220
+            ],
+            [
+              420,
+              210
+            ]
+          ]
+        },
+        {
+          "from": "gardens",
+          "to": "compost",
+          "label": "Garden -> Compost",
+          "load": "loaded",
+          "carried_item": "harvest basket",
+          "distance_m": 113.1,
+          "estimated_time_minutes": 2.4,
+          "effort_multiplier": 1.57,
+          "winter_time_minutes": 3.2,
+          "winter_effort_multiplier": 2.12,
+          "path": [
+            [
+              420,
+              210
+            ],
+            [
+              410,
+              220
+            ],
+            [
+              400,
+              230
+            ],
+            [
+              390,
+              240
+            ],
+            [
+              380,
+              250
+            ],
+            [
+              370,
+              260
+            ],
+            [
+              360,
+              270
+            ],
+            [
+              350,
+              280
+            ],
+            [
+              340,
+              290
+            ]
+          ]
+        },
+        {
+          "from": "compost",
+          "to": "shared_kitchen_meeting",
+          "label": "Compost -> Common kitchen",
+          "load": "loaded",
+          "carried_item": "harvest basket",
+          "distance_m": 14.1,
+          "estimated_time_minutes": 0.3,
+          "effort_multiplier": 1.65,
+          "winter_time_minutes": 0.4,
+          "winter_effort_multiplier": 2.23,
+          "path": [
+            [
+              340,
+              290
+            ],
+            [
+              330,
+              300
+            ]
+          ]
+        }
+      ],
+      "from": "shared_kitchen_meeting",
+      "to": "shared_kitchen_meeting",
+      "load": "loaded",
+      "frequency_per_week": 3,
+      "distance_m": 254.5,
+      "travel_time_minutes": 4.8,
+      "action_time_minutes": 28,
+      "estimated_time_minutes": 32.8,
+      "effort_multiplier": 1.43,
+      "winter_time_minutes": 34.4,
+      "winter_effort_multiplier": 1.93,
+      "path": [
+        [
+          330,
+          300
+        ],
+        [
+          340,
+          290
+        ],
+        [
+          350,
+          280
+        ],
+        [
+          360,
+          270
+        ],
+        [
+          370,
+          260
+        ],
+        [
+          380,
+          250
+        ],
+        [
+          390,
+          240
+        ],
+        [
+          400,
+          230
+        ],
+        [
+          410,
+          220
+        ],
+        [
+          420,
+          210
+        ],
+        [
+          410,
+          220
+        ],
+        [
+          400,
+          230
+        ],
+        [
+          390,
+          240
+        ],
+        [
+          380,
+          250
+        ],
+        [
+          370,
+          260
+        ],
+        [
+          360,
+          270
+        ],
+        [
+          350,
+          280
+        ],
+        [
+          340,
+          290
+        ],
+        [
+          330,
+          300
+        ]
+      ]
+    },
+    {
+      "id": "haul_water",
+      "task_id": "haul_water",
+      "label": "Haul water to yurt cluster",
+      "title": "Haul water to yurt cluster",
+      "assigned_agent_type": "adult_resident",
+      "recurrence": {
+        "frequency_per_week": 7
+      },
+      "priority": 1,
+      "stops": [
+        {
+          "location_id": "water_storage",
+          "point_id": "water_storage",
+          "action": "Fill water carrier",
+          "expected_duration_minutes": 4,
+          "load": "loaded",
+          "carried_item": "water",
+          "consumes": [
+            "water"
+          ]
+        },
+        {
+          "location_id": "yurt_cluster",
+          "point_id": "yurt_cluster",
+          "action": "Drop water",
+          "expected_duration_minutes": 3,
+          "produces": [
+            "yurt water"
+          ]
+        }
+      ],
+      "legs": [
+        {
+          "from": "water_storage",
+          "to": "yurt_cluster",
+          "label": "Water source / storage -> Yurt cluster",
+          "load": "loaded",
+          "carried_item": "water",
+          "distance_m": 38.3,
+          "estimated_time_minutes": 0.7,
+          "effort_multiplier": 1.47,
+          "winter_time_minutes": 1,
+          "winter_effort_multiplier": 1.98,
+          "path": [
+            [
+              330,
+              220
+            ],
+            [
+              320,
+              230
+            ],
+            [
+              310,
+              240
+            ],
+            [
+              310,
+              250
+            ]
+          ]
+        }
+      ],
+      "from": "water_storage",
+      "to": "yurt_cluster",
+      "load": "loaded",
+      "frequency_per_week": 7,
+      "distance_m": 38.3,
+      "travel_time_minutes": 0.7,
+      "action_time_minutes": 7,
+      "estimated_time_minutes": 7.7,
+      "effort_multiplier": 1.47,
+      "winter_time_minutes": 8,
+      "winter_effort_multiplier": 1.98,
+      "path": [
+        [
+          330,
+          220
+        ],
+        [
+          320,
+          230
+        ],
+        [
+          310,
+          240
+        ],
+        [
+          310,
+          250
         ]
       ]
     },
     {
       "id": "harvest_shrubs",
+      "task_id": "harvest_shrubs",
       "label": "Harvest shrubs",
+      "title": "Harvest shrubs",
+      "assigned_agent_type": "adult_resident",
+      "recurrence": {
+        "frequency_per_week": 2
+      },
+      "priority": 4,
+      "stops": [
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Take basket",
+          "expected_duration_minutes": 1,
+          "load": "unloaded"
+        },
+        {
+          "location_id": "shrub_area",
+          "point_id": "shrub_area",
+          "action": "Harvest shrubs",
+          "expected_duration_minutes": 15,
+          "load": "loaded",
+          "carried_item": "shrub harvest",
+          "produces": [
+            "shrub harvest"
+          ]
+        },
+        {
+          "location_id": "shared_kitchen_meeting",
+          "point_id": "shared_kitchen_meeting",
+          "action": "Return harvest",
+          "expected_duration_minutes": 3,
+          "produces": [
+            "shrub harvest"
+          ]
+        }
+      ],
+      "legs": [
+        {
+          "from": "shared_kitchen_meeting",
+          "to": "shrub_area",
+          "label": "Common kitchen -> Shrub harvest area",
+          "load": "unloaded",
+          "distance_m": 207.3,
+          "estimated_time_minutes": 3.7,
+          "effort_multiplier": 1.33,
+          "winter_time_minutes": 5,
+          "winter_effort_multiplier": 1.8,
+          "path": [
+            [
+              330,
+              300
+            ],
+            [
+              330,
+              290
+            ],
+            [
+              320,
+              280
+            ],
+            [
+              310,
+              270
+            ],
+            [
+              300,
+              260
+            ],
+            [
+              290,
+              250
+            ],
+            [
+              280,
+              240
+            ],
+            [
+              270,
+              230
+            ],
+            [
+              260,
+              220
+            ],
+            [
+              250,
+              210
+            ],
+            [
+              240,
+              200
+            ],
+            [
+              230,
+              200
+            ],
+            [
+              220,
+              200
+            ],
+            [
+              210,
+              200
+            ],
+            [
+              200,
+              200
+            ],
+            [
+              190,
+              200
+            ],
+            [
+              180,
+              200
+            ],
+            [
+              170,
+              200
+            ]
+          ]
+        },
+        {
+          "from": "shrub_area",
+          "to": "shared_kitchen_meeting",
+          "label": "Shrub harvest area -> Common kitchen",
+          "load": "loaded",
+          "carried_item": "shrub harvest",
+          "distance_m": 201.4,
+          "estimated_time_minutes": 4.7,
+          "effort_multiplier": 1.74,
+          "winter_time_minutes": 6.3,
+          "winter_effort_multiplier": 2.35,
+          "path": [
+            [
+              170,
+              200
+            ],
+            [
+              180,
+              210
+            ],
+            [
+              190,
+              210
+            ],
+            [
+              200,
+              210
+            ],
+            [
+              210,
+              210
+            ],
+            [
+              220,
+              220
+            ],
+            [
+              230,
+              230
+            ],
+            [
+              240,
+              240
+            ],
+            [
+              250,
+              250
+            ],
+            [
+              260,
+              260
+            ],
+            [
+              270,
+              270
+            ],
+            [
+              280,
+              280
+            ],
+            [
+              290,
+              290
+            ],
+            [
+              300,
+              300
+            ],
+            [
+              310,
+              300
+            ],
+            [
+              320,
+              300
+            ],
+            [
+              330,
+              300
+            ]
+          ]
+        }
+      ],
       "from": "shared_kitchen_meeting",
-      "to": "shrub_area",
+      "to": "shared_kitchen_meeting",
       "load": "loaded",
       "frequency_per_week": 2,
-      "distance_m": 207.3,
-      "estimated_time_minutes": 4.7,
-      "effort_multiplier": 1.7,
-      "winter_time_minutes": 6.4,
-      "winter_effort_multiplier": 2.3,
+      "distance_m": 408.7,
+      "travel_time_minutes": 8.4,
+      "action_time_minutes": 19,
+      "estimated_time_minutes": 27.4,
+      "effort_multiplier": 1.56,
+      "winter_time_minutes": 30.3,
+      "winter_effort_multiplier": 2.11,
       "path": [
         [
           330,
@@ -316,25 +1589,50 @@
         [
           170,
           200
-        ]
-      ]
-    },
-    {
-      "id": "bring_firewood",
-      "label": "Bring firewood to kitchen",
-      "from": "woodshed",
-      "to": "shared_kitchen_meeting",
-      "load": "loaded",
-      "frequency_per_week": 5,
-      "distance_m": 54.1,
-      "estimated_time_minutes": 1.1,
-      "effort_multiplier": 1.49,
-      "winter_time_minutes": 1.5,
-      "winter_effort_multiplier": 2.01,
-      "path": [
+        ],
+        [
+          180,
+          210
+        ],
+        [
+          190,
+          210
+        ],
+        [
+          200,
+          210
+        ],
+        [
+          210,
+          210
+        ],
+        [
+          220,
+          220
+        ],
+        [
+          230,
+          230
+        ],
+        [
+          240,
+          240
+        ],
+        [
+          250,
+          250
+        ],
+        [
+          260,
+          260
+        ],
+        [
+          270,
+          270
+        ],
         [
           280,
-          290
+          280
         ],
         [
           290,
@@ -360,9 +1658,10 @@
     }
   ],
   "summary": {
-    "daily_walking_time_minutes": 6.7,
-    "weekly_chore_distance_m": 2388.7,
-    "winter_burden_minutes_per_day": 9.1,
-    "hardest_chore_id": "harvest_shrubs"
+    "daily_walking_time_minutes": 15.2,
+    "daily_task_time_minutes": 70,
+    "weekly_chore_distance_m": 5773.6,
+    "winter_burden_minutes_per_day": 75.4,
+    "hardest_chore_id": "garden_harvest_loop"
   }
 }

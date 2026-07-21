@@ -73,11 +73,47 @@ type HamletLayout = {
 
 type Overlay = { id: string; label: string; hotkey: string; source_field?: keyof TerrainCell; mode: string };
 
-type ChoreRoute = {
+type ChoreTask = {
   id: string;
+  task_id: string;
   label: string;
+  title: string;
+  assigned_agent_type: string;
+  recurrence: { frequency_per_week: number };
+  priority: number;
+  stops: ItineraryStop[];
+  legs: ChoreLeg[];
+  from: string;
+  to: string;
   load: "unloaded" | "loaded";
   frequency_per_week: number;
+  distance_m: number;
+  travel_time_minutes: number;
+  action_time_minutes: number;
+  estimated_time_minutes: number;
+  effort_multiplier: number;
+  winter_time_minutes: number;
+  winter_effort_multiplier: number;
+  path: Array<[number, number]>;
+};
+
+type ItineraryStop = {
+  location_id: string;
+  point_id: string;
+  action: string;
+  expected_duration_minutes: number;
+  load?: "unloaded" | "loaded";
+  carried_item?: string;
+  produces?: string[];
+  consumes?: string[];
+};
+
+type ChoreLeg = {
+  from: string;
+  to: string;
+  label: string;
+  load: "unloaded" | "loaded";
+  carried_item?: string;
   distance_m: number;
   estimated_time_minutes: number;
   effort_multiplier: number;
@@ -87,9 +123,12 @@ type ChoreRoute = {
 };
 
 type ChoreRouteSet = {
-  chores: ChoreRoute[];
+  points: Array<{ id: string; label: string; x_m: number; z_m: number }>;
+  tasks?: ChoreTask[];
+  chores?: ChoreTask[];
   summary: {
     daily_walking_time_minutes: number;
+    daily_task_time_minutes?: number;
     weekly_chore_distance_m: number;
     winter_burden_minutes_per_day: number;
     hardest_chore_id: string;
@@ -380,34 +419,88 @@ async function main(): Promise<void> {
     return line;
   }
 
-  function modeAdjustedTime(chore: ChoreRoute, useWinter: boolean, forceLoaded: boolean): number {
-    const nativeTime = useWinter ? chore.winter_time_minutes : chore.estimated_time_minutes;
-    if (forceLoaded && chore.load === "unloaded") return nativeTime * 1.28;
-    if (!forceLoaded && chore.load === "loaded") return nativeTime / 1.28;
+  function choreTasks(): ChoreTask[] {
+    return choreRoutes?.tasks ?? choreRoutes?.chores ?? [];
+  }
+
+  function stopPointId(stop: ItineraryStop): string {
+    return stop.location_id ?? stop.point_id;
+  }
+
+  function actionDuration(task: ChoreTask): number {
+    return task.stops.reduce((sum, stop) => sum + (stop.expected_duration_minutes ?? 0), 0) || task.action_time_minutes || 0;
+  }
+
+  function modeAdjustedTime(task: ChoreTask, useWinter: boolean, forceLoaded: boolean): number {
+    const travelTime = task.legs.reduce((sum, leg) => sum + modeAdjustedLegTime(leg, useWinter, forceLoaded), 0);
+    return travelTime + actionDuration(task);
+  }
+
+  function modeAdjustedEffort(task: ChoreTask, useWinter: boolean, forceLoaded: boolean): number {
+    const travelTime = task.legs.reduce((sum, leg) => sum + modeAdjustedLegTime(leg, useWinter, forceLoaded), 0);
+    const weighted = task.legs.reduce((sum, leg) => {
+      const legTime = modeAdjustedLegTime(leg, useWinter, forceLoaded);
+      let effort = useWinter ? leg.winter_effort_multiplier : leg.effort_multiplier;
+      if (forceLoaded && leg.load === "unloaded") effort *= 1.18;
+      if (!forceLoaded && leg.load === "loaded") effort /= 1.18;
+      return sum + effort * legTime;
+    }, 0);
+    return Math.max(1, weighted / Math.max(0.1, travelTime));
+  }
+
+  function modeAdjustedLegTime(leg: ChoreLeg, useWinter: boolean, forceLoaded: boolean): number {
+    const nativeTime = useWinter ? leg.winter_time_minutes : leg.estimated_time_minutes;
+    if (forceLoaded && leg.load === "unloaded") return nativeTime * 1.28;
+    if (!forceLoaded && leg.load === "loaded") return nativeTime / 1.28;
     return nativeTime;
   }
 
-  function modeAdjustedEffort(chore: ChoreRoute, useWinter: boolean, forceLoaded: boolean): number {
-    const nativeEffort = useWinter ? chore.winter_effort_multiplier : chore.effort_multiplier;
-    if (forceLoaded && chore.load === "unloaded") return nativeEffort * 1.18;
-    if (!forceLoaded && chore.load === "loaded") return nativeEffort / 1.18;
-    return nativeEffort;
+  function pointLabel(pointId: string): string {
+    const point = choreRoutes?.points.find((item) => item.id === pointId);
+    return point?.label ?? pointId.replaceAll("_", " ");
+  }
+
+  function stopMarker(pointId: string, index: number): THREE.Mesh | undefined {
+    const point = choreRoutes?.points.find((item) => item.id === pointId);
+    if (!point) return undefined;
+    const geometry = new THREE.SphereGeometry(index === 0 ? 5 : 3.8, 14, 10);
+    const material = new THREE.MeshBasicMaterial({ color: index === 0 ? "#ffffff" : "#ffef66", depthWrite: false });
+    const marker = new THREE.Mesh(geometry, material);
+    marker.position.set(point.x_m, elevationNear(point.x_m, point.z_m) + 13, point.z_m);
+    marker.renderOrder = 12;
+    return marker;
+  }
+
+  function stopActionText(stop: ItineraryStop): string {
+    const bits = [
+      `${stop.action} (${stop.expected_duration_minutes.toFixed(0)} min)`,
+      stop.carried_item ? `${stop.load ?? "unloaded"}: ${stop.carried_item}` : stop.load,
+      stop.produces?.length ? `makes ${stop.produces.join(", ")}` : "",
+      stop.consumes?.length ? `uses ${stop.consumes.join(", ")}` : ""
+    ].filter(Boolean);
+    return bits.join(" · ");
   }
 
   function renderSelectedRoute(): void {
     clearObject(routeGroup);
     routeGroup.clear();
-    const route = choreRoutes?.chores.find((chore) => chore.id === selectedRouteId) ?? choreRoutes?.chores[0];
+    const tasks = choreTasks();
+    const route = tasks.find((task) => task.id === selectedRouteId || task.task_id === selectedRouteId) ?? tasks[0];
     if (!route) return;
     selectedRouteId = route.id;
     routeGroup.add(routeLineFromPoints(route.path));
+    route.stops.forEach((stop, index) => {
+      const marker = stopMarker(stopPointId(stop), index);
+      if (marker) routeGroup.add(marker);
+    });
   }
 
   function renderRouteControls(): void {
     if (!routeControlsEl || !choreRoutes) return;
+    const tasks = choreTasks();
     routeControlsEl.innerHTML = `
       <select id="route-select">
-        ${choreRoutes.chores.map((chore) => `<option value="${chore.id}" ${chore.id === selectedRouteId ? "selected" : ""}>${chore.label}</option>`).join("")}
+        ${tasks.map((task) => `<option value="${task.id}" ${task.id === selectedRouteId ? "selected" : ""}>${task.title ?? task.label}</option>`).join("")}
       </select>
       <div class="route-mode">
         <button class="${!winterMode ? "active" : ""}" data-route-mode="normal">Normal</button>
@@ -422,23 +515,40 @@ async function main(): Promise<void> {
 
   function renderRouteSummary(): void {
     if (!routeSummaryEl || !choreRoutes) return;
-    const weeklyMinutes = choreRoutes.chores.reduce((sum, chore) => sum + modeAdjustedTime(chore, winterMode, forceLoadedMode) * chore.frequency_per_week, 0);
-    const weeklyDistance = choreRoutes.chores.reduce((sum, chore) => sum + chore.distance_m * chore.frequency_per_week, 0);
-    const hardest = [...choreRoutes.chores].sort(
+    const tasks = choreTasks();
+    const weeklyMinutes = tasks.reduce((sum, task) => sum + modeAdjustedTime(task, winterMode, forceLoadedMode) * task.frequency_per_week, 0);
+    const weeklyDistance = tasks.reduce((sum, task) => sum + task.distance_m * task.frequency_per_week, 0);
+    const hardest = [...tasks].sort(
       (a, b) => modeAdjustedTime(b, winterMode, forceLoadedMode) * modeAdjustedEffort(b, winterMode, forceLoadedMode) - modeAdjustedTime(a, winterMode, forceLoadedMode) * modeAdjustedEffort(a, winterMode, forceLoadedMode)
     )[0];
-    const selected = choreRoutes.chores.find((chore) => chore.id === selectedRouteId) ?? choreRoutes.chores[0];
+    const selected = tasks.find((task) => task.id === selectedRouteId || task.task_id === selectedRouteId) ?? tasks[0];
+    const stopRows = selected?.stops
+      .map((stop, index) => {
+        const leg = selected.legs[index];
+        const next = leg ? `${leg.distance_m.toFixed(0)} m, ${modeAdjustedLegTime(leg, winterMode, forceLoadedMode).toFixed(1)} min to ${pointLabel(leg.to)}` : "complete";
+        return `<div class="stop-row"><span>${index + 1}. ${pointLabel(stopPointId(stop))}</span><span>${stopActionText(stop)} · next: ${next}</span></div>`;
+      })
+      .join("");
+    const legRows = selected?.legs
+      .map(
+        (leg) =>
+          `<div class="leg-row"><span>${pointLabel(leg.from)} -> ${pointLabel(leg.to)}</span><span>${leg.distance_m.toFixed(0)} m · ${modeAdjustedLegTime(leg, winterMode, forceLoadedMode).toFixed(1)} min · ${forceLoadedMode && leg.load === "unloaded" ? "loaded" : !forceLoadedMode && leg.load === "loaded" ? "unloaded" : leg.load}${leg.carried_item ? ` · ${leg.carried_item}` : ""}</span></div>`
+      )
+      .join("");
     routeSummaryEl.innerHTML = `
       <dt>Daily time</dt><dd>${(weeklyMinutes / 7).toFixed(1)} min</dd>
+      <dt>Daily walking</dt><dd>${choreRoutes.summary.daily_walking_time_minutes.toFixed(1)} min</dd>
       <dt>Weekly distance</dt><dd>${(weeklyDistance / 1000).toFixed(2)} km</dd>
-      <dt>Winter burden</dt><dd>${(choreRoutes.chores.reduce((sum, chore) => sum + modeAdjustedTime(chore, true, forceLoadedMode) * chore.frequency_per_week, 0) / 7).toFixed(1)} min/day</dd>
-      <dt>Hardest</dt><dd>${hardest?.label ?? "none"}</dd>
-      <dt>Selected</dt><dd>${selected ? `${selected.distance_m.toFixed(0)} m, ${modeAdjustedTime(selected, winterMode, forceLoadedMode).toFixed(1)} min, ${modeAdjustedEffort(selected, winterMode, forceLoadedMode).toFixed(2)}x` : "none"}</dd>
+      <dt>Winter burden</dt><dd>${(tasks.reduce((sum, task) => sum + modeAdjustedTime(task, true, forceLoadedMode) * task.frequency_per_week, 0) / 7).toFixed(1)} min/day</dd>
+      <dt>Hardest</dt><dd>${hardest?.title ?? hardest?.label ?? "none"}</dd>
+      <dt>Selected</dt><dd>${selected ? `${selected.distance_m.toFixed(0)} m, ${modeAdjustedTime(selected, winterMode, forceLoadedMode).toFixed(1)} min total (${selected.travel_time_minutes.toFixed(1)} travel + ${actionDuration(selected).toFixed(1)} action), ${modeAdjustedEffort(selected, winterMode, forceLoadedMode).toFixed(2)}x` : "none"}</dd>
+      <dt>Itinerary</dt><dd class="route-details">${stopRows || "none"}</dd>
+      <dt>Legs</dt><dd class="route-details">${legRows || "none"}</dd>
     `;
   }
 
   function renderRouteUi(): void {
-    if (choreRoutes && !selectedRouteId) selectedRouteId = choreRoutes.chores[0]?.id ?? "";
+    if (choreRoutes && !selectedRouteId) selectedRouteId = choreTasks()[0]?.id ?? "";
     renderRouteControls();
     renderRouteSummary();
     renderSelectedRoute();
@@ -598,7 +708,7 @@ async function main(): Promise<void> {
       terrain = nextTerrain;
       layout = nextLayout;
       choreRoutes = nextChoreRoutes;
-      selectedRouteId = choreRoutes.chores[0]?.id ?? "";
+      selectedRouteId = choreTasks()[0]?.id ?? "";
       if (terrainMesh) {
         scene.remove(terrainMesh);
         clearObject(terrainMesh);
@@ -724,6 +834,8 @@ async function main(): Promise<void> {
   animate();
 }
 
-main().catch((error: unknown) => {
-  console.error(error);
-});
+if (window.location.pathname === "/canvassing" || window.location.pathname === "/canvassing/") {
+  import("./canvassing").then(({ canvassingMain }) => canvassingMain()).catch(console.error);
+} else {
+  main().catch((error: unknown) => console.error(error));
+}
