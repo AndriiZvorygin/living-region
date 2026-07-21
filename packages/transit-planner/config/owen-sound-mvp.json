@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "inputs": {
+    "boundary": "data/boundaries/owen-sound.geojson",
+    "road_centrelines": "know/input/gis/road-centrelines-grey.geojson",
+    "osm_pbf": "data/osm/owen-sound.osm.pbf",
+    "population_blocks": "know/produce/grey-census-population-blocks.geojson",
+    "public_facilities": "know/input/gis/public-facilities.geojson",
+    "forbidden": ["know/input/gis/grey-transit-routes.geojson"]
+  },
+  "output_dir": "know/produce/transit-network-mvp",
+  "projection": "local equirectangular metres centred on Owen Sound",
+  "bus": {
+    "default_speed_kph_by_road_class": {
+      "1": 50,
+      "2": 50,
+      "3": 40,
+      "4": 35,
+      "5": 30,
+      "6": 25,
+      "default": 30
+    },
+    "speed_cap_kph": 50,
+    "road_class_penalty_seconds_per_km": {
+      "1": 0,
+      "2": 0,
+      "3": 8,
+      "4": 18,
+      "5": 30,
+      "6": 55,
+      "default": 35
+    },
+    "intersection_penalty_seconds": 3,
+    "turn_penalty_seconds": 7,
+    "sharp_turn_penalty_seconds": 12,
+    "left_turn_major_road_penalty_seconds": 18,
+    "major_road_classes": [1, 2, 3],
+    "stop_dwell_seconds": 20,
+    "terminal_layover_minutes": 5,
+    "service_span_hours": 14,
+    "stop_spacing_target_m": 400,
+    "stop_spacing_min_m": 300,
+    "stop_spacing_max_m": 550,
+    "route_circuitry_warning_ratio": 1.45
+  },
+  "walking": {
+    "speed_kph": 4.5,
+    "coverage_thresholds_m": [300, 400, 600],
+    "population_snap_limit_m": 180,
+    "allowed_highways": ["footway", "path", "pedestrian", "steps", "living_street", "residential", "service", "unclassified", "tertiary", "secondary", "primary", "trunk"]
+  },
+  "demand_model": {
+    "average_passengers_per_loop": 7,
+    "stop_events_per_passenger": 2,
+    "shared_stop_event_factor": 0.72,
+    "low_usage_factor": 0.55,
+    "minimum_used_stops": 2,
+    "method": "Expected unique active stops from effective board/alight events distributed across scheduled stops; low case scales expected use; high case assumes every scheduled stop is used."
+  },
+  "scoring_weights": {
+    "access_population_400m": 0.3,
+    "major_destinations_direct": 0.15,
+    "directness": 0.15,
+    "frequency_feasibility": 0.15,
+    "reliability": 0.1,
+    "operating_efficiency": 0.1,
+    "low_duplication": 0.05
+  },
+  "hill_line": {
+    "id": "hill-line-primary",
+    "title": "Hill Line primary alignment",
+    "anchor_order": [
+      "osdss",
+      "downtown_terminal",
+      "georgian_college",
+      "brightshores_hospital",
+      "retail_16th_12th",
+      "heritage_place",
+      "downtown_terminal",
+      "osdss"
+    ],
+    "operating_variants": [
+      { "id": "hill-two-bus", "active_buses": 2, "target_headway_minutes": 15 },
+      { "id": "hill-one-bus", "active_buses": 1, "target_headway_minutes": 30 }
+    ]
+  },
+  "hill_loop": {
+    "id": "hill-loop",
+    "title": "Hill Loop via authored west and east intersections",
+    "major_destination_order_clockwise": [
+      "osdss",
+      "downtown_terminal",
+      "georgian_college",
+      "brightshores_hospital",
+      "heritage_place",
+      "downtown_terminal",
+      "osdss"
+    ],
+    "clockwise_waypoints": [
+      { "id": "downtown_terminal", "destination_id": "downtown_terminal" },
+      { "id": "hwy_6_8th_ave_w", "label": "Highway 6 / 8th Avenue West", "lon": -80.9595762, "lat": 44.5663884 },
+      { "id": "osdss", "destination_id": "osdss" },
+      { "id": "8th_st_w_3rd_ave_a_w", "label": "8th Street West / 3rd Avenue A West", "lon": -80.9474218, "lat": 44.5633547 },
+      { "id": "8th_st_e_16th_ave_e", "label": "8th Street East / 16th Avenue East", "lon": -80.9146338, "lat": 44.5671369, "served_destination_ids": ["georgian_college", "brightshores_hospital"] },
+      { "id": "16th_st_e_18th_ave_e", "label": "16th Street East / 18th Avenue East", "lon": -80.9130910, "lat": 44.5751464, "served_destination_ids": ["heritage_place"] },
+      { "id": "16th_st_e_9th_ave_e", "label": "16th Street East / 9th Avenue East", "lon": -80.9269497, "lat": 44.5738238 },
+      { "id": "downtown_terminal", "destination_id": "downtown_terminal" }
+    ],
+    "schedule_cycle_targets_minutes": [30, 32],
+    "arrival_model": "random passenger arrival; uniform wait within each direction headway; counter-rotating strategy compared by deterministic 80 x 80 phase grid",
+    "signal_match_radius_m": 30,
+    "oneway_match_radius_m": 18
+  },
+  "brooke_alternatives": [
+    {
+      "id": "brooke-direct-8th-avenue",
+      "title": "Brooke direct via 8th Avenue West",
+      "waypoints": [
+        { "id": "terminal", "destination_id": "downtown_terminal" },
+        { "id": "8th_27th", "label": "8th Avenue West / 27th Street West", "lon": -80.9525633, "lat": 44.5917707 },
+        { "id": "terminal_return", "destination_id": "downtown_terminal" }
+      ]
+    },
+    {
+      "id": "brooke-27th-street-loop",
+      "title": "Brooke and 27th Street loop",
+      "waypoints": [
+        { "id": "terminal", "destination_id": "downtown_terminal" },
+        { "id": "3rd_20th", "label": "3rd Avenue West / 20th Street West", "lon": -80.9482663, "lat": 44.5812446 },
+        { "id": "4th_27th", "label": "4th Avenue West / 27th Street West", "lon": -80.9466149, "lat": 44.5907849 },
+        { "id": "8th_27th", "label": "8th Avenue West / 27th Street West", "lon": -80.9525633, "lat": 44.5917707 },
+        { "id": "8th_23rd", "label": "8th Avenue West / 23rd Street West", "lon": -80.9541531, "lat": 44.5868098 },
+        { "id": "terminal_return", "destination_id": "downtown_terminal" }
+      ]
+    },
+    {
+      "id": "brooke-apartment-grid",
+      "title": "Brooke apartment-grid coverage loop",
+      "waypoints": [
+        { "id": "terminal", "destination_id": "downtown_terminal" },
+        { "id": "4th_20th", "label": "4th Avenue West / 20th Street West", "lon": -80.9496990, "lat": 44.5814557 },
+        { "id": "3rd_20th", "label": "3rd Avenue West / 20th Street West", "lon": -80.9482663, "lat": 44.5812446 },
+        { "id": "8th_27th", "label": "8th Avenue West / 27th Street West", "lon": -80.9525633, "lat": 44.5917707 },
+        { "id": "4th_27th", "label": "4th Avenue West / 27th Street West", "lon": -80.9466149, "lat": 44.5907849 },
+        { "id": "8th_23rd", "label": "8th Avenue West / 23rd Street West", "lon": -80.9541531, "lat": 44.5868098 },
+        { "id": "terminal_return", "destination_id": "downtown_terminal" }
+      ]
+    }
+  ],
+  "integrated_mobility": {
+    "service_days_per_year": 360,
+    "coverage_routes": [
+      {
+        "id": "south-east-coverage",
+        "title": "South and East coverage",
+        "waypoints": [
+          { "id": "terminal", "destination_id": "downtown_terminal" },
+          { "id": "south_downtown", "label": "4th Avenue West / 1st Street West", "lon": -80.94516, "lat": 44.54802 },
+          { "id": "south_owen", "label": "South Owen Sound / 6th Avenue West", "lon": -80.94774, "lat": 44.54772 },
+          { "id": "terminal_return", "destination_id": "downtown_terminal" }
+        ]
+      },
+      {
+        "id": "north-east-coverage",
+        "title": "North and East coverage",
+        "waypoints": [
+          { "id": "terminal", "destination_id": "downtown_terminal" },
+          { "id": "north", "label": "3rd Avenue East / 20th Street East", "lon": -80.9370, "lat": 44.5810 },
+          { "id": "hospital", "destination_id": "brightshores_hospital" },
+          { "id": "heritage", "destination_id": "heritage_place" },
+          { "id": "terminal_return", "destination_id": "downtown_terminal" }
+        ]
+      }
+    ],
+    "cost_profiles": [
+      { "id": "existing_contracted", "title": "Existing contracted operation", "driver_compensation_per_vehicle_hour": 38, "vehicle_operation_per_km": 0.75, "administration_per_vehicle_hour": 8, "fuel_per_km": 0.28, "maintenance_per_km": 0.32, "insurance_per_vehicle_annual": 12000, "capital_replacement_per_km": 0.35 },
+      { "id": "nonprofit_worker_coop", "title": "Nonprofit or worker-co-operative operation", "driver_compensation_per_vehicle_hour": 32, "vehicle_operation_per_km": 0.6, "administration_per_vehicle_hour": 5, "fuel_per_km": 0.28, "maintenance_per_km": 0.3, "insurance_per_vehicle_annual": 11000, "capital_replacement_per_km": 0.32 },
+      { "id": "accessible_evening_minibus", "title": "Smaller accessible evening vehicle", "driver_compensation_per_vehicle_hour": 32, "vehicle_operation_per_km": 0.38, "administration_per_vehicle_hour": 5, "fuel_per_km": 0.16, "maintenance_per_km": 0.2, "insurance_per_vehicle_annual": 8000, "capital_replacement_per_km": 0.2 }
+    ]
+  }
+}

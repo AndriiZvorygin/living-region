@@ -349,6 +349,42 @@
       "licence": "Grey County Open Data terms",
       "schema_version": "1.0",
       "notes": "Auto-registered existing local GIS snapshot for provenance bridge pass."
+    },
+    {
+      "source_id": "owen_sound_2016_aadt_sorted",
+      "title": "Location of AADT Sorted",
+      "source_class": "official_external_snapshot",
+      "origin_url": "https://www.owensound.ca/media/kieh5qdy/location-of-aadt-sorted.pdf",
+      "retrieved_at": "2026-07-12T00:00:00-04:00",
+      "local_path": "know/input/transportation/owen-sound/location-of-aadt-sorted.pdf",
+      "content_hash": "sha256:c708eaf8ab79705f20607ebb7521277a77d855158356ee96748a0cf6b2e6affa",
+      "licence": "City of Owen Sound website terms",
+      "schema_version": "1.0",
+      "notes": "Official historical 2006/2016 AADT intersection-leg table; truck percentages provisional."
+    },
+    {
+      "source_id": "owen_sound_2016_traffic_count_program",
+      "title": "City of Owen Sound 2016 Traffic Counting Program",
+      "source_class": "official_external_snapshot",
+      "origin_url": "https://www.owensound.ca/media/5hjaw1e1/162270-city-of-owen-sound-2016-traffic-count-program-final-to-client-29-may-2017.pdf",
+      "retrieved_at": "2026-07-12T00:00:00-04:00",
+      "local_path": "know/input/transportation/owen-sound/2016-traffic-count-program.pdf",
+      "content_hash": "sha256:c3552c13f7b57b045d135bf9c09986090cfaf7a79e60f6ceae282a427c507acb",
+      "licence": "City of Owen Sound website terms",
+      "schema_version": "1.0",
+      "notes": "Official methodology and classification report, published May 2017."
+    },
+    {
+      "source_id": "owen_sound_1750_16th_avenue_e_tis_2024",
+      "title": "1750 16th Avenue East Transportation Impact Study",
+      "source_class": "official_external_snapshot",
+      "origin_url": "https://www.owensound.ca/media/14jjtjv5/10-transportation-impact-study.pdf",
+      "retrieved_at": "2026-07-12T00:00:00-04:00",
+      "local_path": "know/input/transportation/owen-sound/1750-16th-avenue-east-tis-2024.pdf",
+      "content_hash": "sha256:6ca40b015ae9614462f362a79a11a4b0c31d78491667aafd5ac0f675fb017e16",
+      "licence": "City of Owen Sound website terms",
+      "schema_version": "1.0",
+      "notes": "November 2024 study with observed September 12, 2024 AM/PM turning counts and separate forecasts."
     }
   ]
 }
