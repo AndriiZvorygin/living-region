@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-07-21T19:18:03.148Z",
+  "crs": "OGC:CRS84 / WGS84 longitude-latitude",
+  "extent": [
+    -80.9642092446995,
+    44.5408736503963,
+    -80.8918497733922,
+    44.6095384376204
+  ],
+  "sources": {
+    "osm": "data/osm/owen-sound.osm.pbf",
+    "roads": "know/input/gis/road-centrelines-grey.geojson",
+    "boundary": "data/boundaries/owen-sound.geojson"
+  },
+  "counts": {
+    "structures": 1111,
+    "addresses": 3426,
+    "matched_addresses": 209,
+    "ambiguous_addresses": 0,
+    "unmatched_addresses": 3217,
+    "roads": 883
+  },
+  "source_currency": {
+    "osm_latest_object_timestamp": "2026-05-18",
+    "official_roads": "see source manifest; feature-level currency not supplied"
+  }
+}

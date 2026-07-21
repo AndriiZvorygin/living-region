@@ -94,7 +94,11 @@
     "osm:boundary:owen-sound": "node command/export_owen_sound_boundary.mjs",
     "docker:web:build": "docker compose build hamlet-web",
     "docker:web:up": "docker compose up -d hamlet-web",
-    "docker:web:logs": "docker compose logs -f hamlet-web"
+    "docker:web:logs": "docker compose logs -f hamlet-web",
+    "transit:plan:owen-sound": "tsx packages/transit-planner/src/cli/plan-owen-sound.ts",
+    "canvassing:prepare": "tsx packages/canvassing/src/prepare-data.ts",
+    "canvassing:server": "tsx packages/canvassing/src/server.ts",
+    "canvassing:dev": "npm run canvassing:prepare && concurrently -k -n api,web \"npm run canvassing:server\" \"npm run dev:web\""
   },
   "keywords": [
     "regional-planning",
@@ -111,12 +115,14 @@
   ],
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "vitest": "^2.1.8",
     "@types/node": "^22.10.2",
+    "@types/pdf-parse": "^1.1.5",
     "@types/three": "^0.185.0",
+    "concurrently": "^9.2.4",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
   },
   "repository": {
     "type": "git",
@@ -130,6 +136,8 @@
     "packages/*"
   ],
   "dependencies": {
+    "maplibre-gl": "^5.24.0",
+    "pdf-parse": "^1.1.1",
     "three": "^0.171.0"
   }
 }
