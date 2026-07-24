@@ -11,6 +11,7 @@ coverage/
 .vscode/
 .idea/
 private/
+data/osm/ontario-latest.osm.pbf
 
 know/input/
 !know/input/
