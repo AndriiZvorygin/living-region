@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-07-21T20:59:28.492Z",
+  "config": {
+    "high_confidence_max_m": 12,
+    "probable_max_m": 30,
+    "far_from_road_m": 50
+  },
+  "totals": {
+    "civic_addresses": 3426,
+    "duplicate_normalized_addresses": 335,
+    "outside_municipal_boundary": 12,
+    "far_from_any_road": 13,
+    "no_street_match": 118,
+    "several_points_same_civic_address": 335,
+    "apparent_multi_unit": 331,
+    "more_than_one_candidate_building": 19,
+    "nearest_footprint_beyond_high_confidence_threshold": 3020,
+    "nearest_footprint_beyond_probable_threshold": 2564
+  },
+  "automatic_join_counts": {
+    "exact": 209,
+    "high_confidence": 240,
+    "probable": 395,
+    "ambiguous": 19,
+    "unmatched": 2563
+  },
+  "methodology": "Exact containment and a sole plausible footprint within 12 m are automatic. Candidates within 30 m are probable; probable and ambiguous candidates remain review-only."
+}

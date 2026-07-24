@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T19:18:03.148Z",
+  "generated_at": "2026-07-21T20:59:28.496Z",
   "crs": "OGC:CRS84 / WGS84 longitude-latitude",
   "extent": [
     -80.9642092446995,
@@ -15,10 +15,18 @@
   "counts": {
     "structures": 1111,
     "addresses": 3426,
-    "matched_addresses": 209,
-    "ambiguous_addresses": 0,
-    "unmatched_addresses": 3217,
-    "roads": 883
+    "matched_addresses": 449,
+    "ambiguous_addresses": 19,
+    "unmatched_addresses": 2563,
+    "match_confidence": {
+      "exact": 209,
+      "high_confidence": 240,
+      "probable": 395,
+      "ambiguous": 19,
+      "unmatched": 2563
+    },
+    "roads": 883,
+    "address_review_records": 416
   },
   "source_currency": {
     "osm_latest_object_timestamp": "2026-05-18",

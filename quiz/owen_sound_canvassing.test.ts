@@ -14,7 +14,7 @@ describe("Owen Sound canvassing preparation", () => {
 
   test("unmatched addresses remain mappable point stops rather than forced joins", async () => {
     const addresses = await readJson("packages/web-client/public/canvassing/addresses.geojson");
-    const unmatched = addresses.features.filter((feature: any) => feature.properties.association_status === "unmatched_point");
+    const unmatched = addresses.features.filter((feature: any) => feature.properties.association_status === "unmatched");
     expect(unmatched.length).toBeGreaterThan(0);
     expect(unmatched.every((feature: any) => feature.geometry.type === "Point" && feature.properties.structure_id === null)).toBe(true);
   });

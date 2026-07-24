@@ -97,6 +97,8 @@
     "docker:web:logs": "docker compose logs -f hamlet-web",
     "transit:plan:owen-sound": "tsx packages/transit-planner/src/cli/plan-owen-sound.ts",
     "canvassing:prepare": "tsx packages/canvassing/src/prepare-data.ts",
+    "canvassing:prepare-osm-import": "tsx packages/canvassing/src/prepare-osm-import.ts",
+    "canvassing:verify-operations": "tsx packages/canvassing/src/verify-operations.ts",
     "canvassing:server": "tsx packages/canvassing/src/server.ts",
     "canvassing:dev": "npm run canvassing:prepare && concurrently -k -n api,web \"npm run canvassing:server\" \"npm run dev:web\""
   },

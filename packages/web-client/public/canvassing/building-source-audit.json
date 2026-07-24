@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-07-21T20:59:28.496Z",
+  "result": "No additional licence-compatible Owen Sound building footprint source is present locally.",
+  "usable_sources": [
+    {
+      "source": "OpenStreetMap",
+      "path": "data/osm/owen-sound.osm.pbf",
+      "licence": "ODbL 1.0",
+      "structures": 1111,
+      "role": "application building layer"
+    }
+  ],
+  "audited_absent_sources": [
+    "Microsoft Canadian Building Footprints",
+    "Statistics Canada building footprints",
+    "City of Owen Sound municipal building footprints"
+  ],
+  "excluded_as_building_sources": [
+    "empty import templates",
+    "fixtures and examples",
+    "rural lot and concession polygons"
+  ],
+  "private_reference_layer_added": false
+}
