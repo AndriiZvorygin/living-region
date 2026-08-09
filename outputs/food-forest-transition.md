@@ -6,6 +6,8 @@ Yes, annual crops can independently feed the household during perennial establis
 
 For an ordinary site, the central progressive-handoff model reaches 25%, 50%, 75% and 100% of one adult's calories from perennials in years 5, 8, 10, mature. For two adults plus two children the corresponding thresholds are 5, 10, never, never. These are scenario years, not field predictions. The one-adult conservative and favourable threshold sequences are 8, 10, mature, never and 5, 5, 10, mature respectively.
 
+The ageing-in-place design retains 25% of mature plant calories in annual crops for beans, vegetables, markets, seed and resilience. It reports the separate no-annual-soil-preparation food-energy metric and labour profile in outputs/ageing-in-place-labour.md. For one ordinary-site adult, the retained annual area falls from 0.15 ha in year 1 to 0.04 ha at maturity; this is a planning target, not a claim that all recurring perennial labour disappears.
+
 ## Ordinary-site progressive handoff: one adult
 
 | year | annual usable GJ | perennial usable GJ | total usable GJ | coverage | annual area | released area | occupied food area |

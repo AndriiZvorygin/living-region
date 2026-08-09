@@ -135,3 +135,15 @@ The historical audit above is retained for provenance only. It is not the eviden
 | Yurt envelope/leakage | Explicit low/central/high assumptions | ARC design scenario | Not measured; never presented as an as-built result |
 
 The current model intentionally excludes historical 4.77 GJ/adult, 30 GJ/ha/year coppice, 0.25 + 0.25 + 0.50 ha allocation, and historical 1.0/1.2 ha policy arithmetic from canonical inputs. Those values are listed in `outputs/summary.json` under `historical` and in `outputs/legacy/`.
+
+## Phase 2 extension: labour, perennial protein and livestock
+
+The ageing-in-place extension adds three checked-in source/assumption tables:
+
+| file | contents | canonical status |
+|---|---|---|
+| `data/source/food-production-labour.csv` | labour tasks, establishment versus recurring hours, annual soil preparation, planting, weeding, watering, harvest, pruning, mechanization and older-resident physical intensity | evidence-informed planning classification; hours are not a time-and-motion study |
+| `data/source/perennial-protein-evidence.csv` | honey locust, Siberian peashrub/Caragana, hazelnut, heartnut/walnut, chestnut and perennial vegetables/herbaceous legumes | current evidence boundary; only rows marked eligible with a yield are credited to the current perennial mix |
+| `data/source/livestock-assumptions.csv` | optional six-hen and conservative rabbitry output, feed dry matter/protein/energy, property feed fraction, winter storage, manure and labour | explicit modelled household planning cases; not ARC requirements |
+
+The honey-locust row links USDA Forest Service pod/protein evidence and Ontario soil/moisture tolerance. The Caragana row links USDA plant-material references for hardiness and soil adaptation. Neither row is converted into canonical human protein yield: food safety, processing, cultivar, harvestability and representative Grey-Bruce yield remain unresolved. The livestock rows link Ontario poultry nutrition and rabbit-production guidance plus University of Minnesota/Penn State small-flock guidance; feed and output quantities remain conservative planning assumptions rather than local production measurements.

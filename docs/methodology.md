@@ -64,3 +64,19 @@ Young-row intercropping is represented as an explicit overlap in physical hectar
 `annual area + perennial footprint - intercrop overlap`.
 
 The strict transition forest footprint is solved to keep each requested year within the food-production envelope as overlap declines. This protects the annual bridge but can be smaller than the unconstrained mature forest target. Released annual hectares are reported for a progressive handoff strategy; a staged later planting must use a slower age curve for the new rows. The transition output does not convert the result into hectares per adult-equivalent.
+
+## Ageing-in-place and labour
+
+The mature objective is a labour transition, not maximum GJ/ha. Annual crops are the establishment bridge; perennial berries, shrubs, fruit trees and staple trees progressively increase food supply. The recommended mature planning target retains 25% of plant calories in annual crops for beans, vegetables, market production, seed, rotation and resilience. The zero-annual-area progressive-handoff case remains a sensitivity only.
+
+`data/source/food-production-labour.csv` records establishment labour, recurring labour, annual soil preparation, planting frequency, weeding, watering/monitoring, harvest, pruning/maintenance, mechanization and physical intensity for an older resident. Hours are explicit planning estimates rather than a Grey-Bruce time-and-motion study. The model reports establishment labour separately from mature recurring labour and calculates:
+
+`food energy without annual soil preparation/replanting ÷ household food energy`.
+
+For plants-only rows this equals the perennial calorie percentage. The optional livestock module can make it broader where animal food is credited to perennial/on-property feed, while also adding daily animal care, winter storage, feed and manure handling.
+
+## Perennial protein and optional livestock
+
+Hazelnut and chestnut have usable food composition plus conservative planning yields in the current perennial mix. Heartnut/walnut, honey locust, Siberian peashrub/Caragana and perennial legumes/vegetables are retained as candidate functions or feed sources, not automatically as human protein. Honey locust pod edibility and USDA-reported seed/pod protein, and Caragana hardiness, are evidence to investigate rather than canonical yields.
+
+The optional mature modules compare plants-only, plants plus six laying hens, plants plus a conservative small rabbitry, and both. Plant calories are allocated 75% to perennial food and 25% to annual supplements. Animal feed dry matter, protein, energy, on-property fraction, purchased fraction, winter storage, feed area, labour and manure are explicit. This keeps caloric carrying capacity, nutritional output, livestock production and cash/value production separate.

@@ -40,6 +40,12 @@ The central perennial mix requires 0.46 ha at maturity for one adult and 1.91 ha
 
 The transition outputs in `outputs/food-forest-transition.md` and `outputs/household-transition-scenarios.md` should be read alongside this land guideline. They do not convert the result into hectares per adult-equivalent.
 
+## Ageing-in-place refinement
+
+The mature food-system objective is not maximum calorie density and not elimination of annual crops. The central mature planning target is 75% of plant food energy from perennial systems and 25% from annual beans, vegetables, market crops, seed, rotation and resilience. On the ordinary site, the one-adult annual-crop area falls from 0.15 ha in Year 1 to 0.04 ha at maturity, a 75% reduction in annual soil-preparation area. The household/site rows in outputs/ageing-in-place-labour.json report the corresponding Year 1, Year 5, Year 10 and mature values for every scenario.
+
+The low-replanting metric is reported separately from perennial calories. For plants-only food it is the same percentage; livestock can contribute only to the extent that its food output is credited to perennial/on-property feed. Optional animals add protein and fat diversity but also add feed land, purchased feed, winter storage, manure handling and recurring labour. The canonical recommendation therefore remains plants plus a retained annual supplement, with livestock as a household choice rather than an ARC requirement.
+
 ## What is mathematically required versus allowed
 
 Mathematically required: household food demand divided by the chosen low-input food-system yield, plus audited useful heating demand divided by sustainable woody energy yield.

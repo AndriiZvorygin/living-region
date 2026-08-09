@@ -5,6 +5,8 @@ import {calculateFoodEvidence} from './calc-evidence-food.mjs';
 import {buildEvidenceHeating} from './calc-evidence-heating.mjs';
 import {calculateWoodyLand} from './calc-evidence-woody.mjs';
 import {buildHouseholdCapacity, householdProfiles, siteClasses, policySiteMap} from './calc-household-capacity.mjs';
+import {calculateFoodSystemLabour, calculateTransitionLabour} from './calc-food-system-labour.mjs';
+import {buildLivestockScenarios} from './calc-livestock.mjs';
 
 export const transitionYears = [1, 2, 3, 5, 8, 10, 15, 'mature'];
 const matureYear = 20;
@@ -14,6 +16,7 @@ const annualIntercropOverlap = {1: .75, 2: .75, 3: .60, 5: .40, 8: .15, 10: .05,
 
 const composition = Object.fromEntries(readCsv('data/source/current-food-composition.csv').map(row => [row.food_id, row]));
 const sourceRows = readCsv('data/source/perennial-yield-evidence.csv');
+const perennialProteinRows = readCsv('data/source/perennial-protein-evidence.csv');
 
 const curveAnchors = {
   conservative: {
@@ -39,10 +42,10 @@ const curveAnchors = {
 const yieldMultipliers = {conservative: .65, central: 1, favourable: 1.25};
 
 const mix = [
-  {id: 'early_berry_low_input_synthesis', area_share: .25, class: 'early_bearing_perennial'},
-  {id: 'intermediate_hazelnut_low_input_synthesis', area_share: .25, class: 'intermediate_perennial'},
-  {id: 'long_staple_chestnut_low_input_synthesis', area_share: .25, class: 'late_bearing_staple'},
-  {id: 'intermediate_apple_low_input_synthesis', area_share: .25, class: 'intermediate_perennial'}
+  {id: 'early_berry_low_input_synthesis', area_share: .25, class: 'early_bearing_perennial', labour_id: 'early_berry'},
+  {id: 'intermediate_hazelnut_low_input_synthesis', area_share: .25, class: 'intermediate_perennial', labour_id: 'intermediate_nut_shrub'},
+  {id: 'long_staple_chestnut_low_input_synthesis', area_share: .25, class: 'late_bearing_staple', labour_id: 'long_staple_tree'},
+  {id: 'intermediate_apple_low_input_synthesis', area_share: .25, class: 'intermediate_perennial', labour_id: 'intermediate_fruit_tree'}
 ];
 
 function interpolate(anchors, year) {
@@ -105,6 +108,140 @@ export function calculatePerennialEvidence() {
     ...rows.map(row => [row.id,row.species,row.functional_class,row.role,row.first_meaningful_crop_year,row.substantial_crop_year,row.mature_year,row.mature_yield_t_ha_year,row.yield_mean_t_ha_year,row.yield_median_t_ha_year,row.yield_range_t_ha_year,row.mature_food_gj_ha_year,row.protein_kg_ha,row.fat_kg_ha,row.carbohydrate_kg_ha,row.input_intensity,row.evidence_type,row.canonical_status,row.source,row.notes])
   ]);
   return output;
+}
+
+function calculatePerennialProteinEvidence() {
+  const output = {
+    source: 'data/source/perennial-protein-evidence.csv',
+    rows: perennialProteinRows,
+    human_food_eligible_rows: perennialProteinRows.filter(row => ['yes', 'possible'].includes(row.canonical_human_food_eligible)),
+    human_food_canonical_yield_rows: perennialProteinRows.filter(row => row.canonical_human_food_eligible === 'yes' && number(row.mature_yield_t_ha_year) !== null),
+    livestock_feed_eligible_rows: perennialProteinRows.filter(row => row.livestock_feed_eligible === 'yes'),
+    conclusion: 'Hazelnut and chestnut remain the only rows in this expanded evidence table with both a usable food composition and a current central planning yield. Honey locust and Siberian peashrub are retained as food/feed research candidates; hardiness or pod protein does not establish a safe, processed, representative human-food yield.',
+    source_notes: [
+      'USDA Forest Service reports edible honey-locust pods and 9.3% protein in ground seeds and pods, but this is not a Grey-Bruce human staple yield study.',
+      'Ontario reports honey locust tolerates some drought and flooding and a range of soils; this supports site-function investigation, not calorie credit.',
+      'USDA plant-material references support Siberian peashrub hardiness and broad soil adaptation; no canonical human-food yield is inferred.',
+      'Ontario specialty-crop and conservation material supports hazelnut, heartnut and chestnut functions with material local yield and establishment uncertainties.'
+    ]
+  };
+  writeJson('data/derived/perennial-protein-evidence.json', output);
+  writeCsv('data/derived/perennial-protein-evidence.csv', [
+    Object.keys(perennialProteinRows[0]),
+    ...perennialProteinRows.map(row => Object.values(row))
+  ]);
+  return output;
+}
+
+function perennialProteinMarkdown(evidence) {
+  return `# Perennial protein and staple evidence
+
+This table expands the food-forest research boundary beyond nuts. It distinguishes direct human food, livestock feed, dual-purpose functions and uncertain/experimental use. A species is not credited to the canonical human protein supply merely because it is hardy, fixes nitrogen, has edible pods or is used as animal feed.
+
+| species | role | first meaningful crop | substantial crop | mature yield | human-food status | human canonical? | livestock feed? | evidence boundary |
+|---|---|---:|---:|---:|---|---|---|---|
+${evidence.rows.map(row => `| ${row.species} | ${row.food_role} | ${row.first_meaningful_crop_year || 'n/a'} | ${row.substantial_crop_year || 'n/a'} | ${row.mature_yield_t_ha_year || 'n/a'} | ${row.food_status} | ${row.canonical_human_food_eligible} | ${row.livestock_feed_eligible} | ${row.notes} |`).join('\n')}
+
+## Interpretation
+
+- **Honey locust:** USDA Forest Service material reports edible pods and approximately 9.3% protein in ground seeds and pods. Ontario describes tolerance of some drought and flooding and a broad soil range. The model treats it as a dual-purpose research candidate, not a canonical human staple: processing, anti-nutritional factors, cultivar differences, harvestability and representative Ontario yield remain unresolved.
+- **Siberian peashrub / Caragana:** USDA material supports extreme hardiness and adaptation to sandy and alkaline soils, which is relevant to marginal-site shelter, nitrogen and feed design. It does not establish safe processed human food, protein availability or a Grey-Bruce yield, so it receives no canonical human-food credit.
+- **Hazelnut and heartnut/walnut:** these are direct human food candidates with fat/protein value. Hazelnut has the current conservative synthesis used in the perennial mix; heartnut remains reference-only until local yield evidence exists.
+- **Chestnut:** a human starch staple candidate with Ontario-relevant bearing-time evidence but unresolved local yield, blight, frost and wildlife risk. It is included as a conservative unvalidated synthesis in the current perennial mix.
+- **Perennial vegetables and herbaceous legumes:** useful for diversity, soil cover and possible feed, but species-specific safety, processing, nutrition and hectare yields are not sufficiently established for canonical calorie/protein credit.
+
+Sources: [USDA Forest Service honey locust review](https://research.fs.usda.gov/feis/species-reviews/gletri), [USDA Forest Service honey locust silvics](https://research.fs.usda.gov/silvics/honeylocust), [Ontario honey locust](https://www.ontario.ca/page/honey-locust), [USDA Plants Caragana profile](https://plants.usda.gov/home/plantProfile?symbol=CAAR18), [USDA NRCS plant materials](https://www.nrcs.usda.gov/plantmaterials/wapmctn6337.pdf), [OMAFRA heartnut guidance](https://omafra.gov.on.ca/CropOp/en/spec_fruit/nuts/hear.html), [Ontario American chestnut recovery strategy](https://www.ontario.ca/page/american-chestnut-recovery-strategy).
+`;
+}
+
+function ageingInPlaceOutput(households) {
+  const checkpoints = [1, 5, 10, 'mature'];
+  const rows = households.map(row => {
+    const series = row.transition.progressive_handoff.rows;
+    const checkpointsOutput = Object.fromEntries(checkpoints.map(year => {
+      const item = series.find(entry => entry.year === year);
+      if (year === 'mature') {
+        // Preserve a smaller annual reserve in the mature design. The
+        // progressive-handoff series remains available as a no-reserve upper
+        // sensitivity, but ageing-in-place should not imply that all annual
+        // cultivation disappears or that the diet becomes tree-only.
+        const annualArea = row.household_food_demand_gj_year * .25 / (row.annual_crop_gross_yield_gj_ha_year * (1 - .30));
+        const perennialArea = row.household_food_demand_gj_year * .75 / (row.perennial_mature_mix_gross_yield_gj_ha_year * (1 - .30));
+        const perennialHoursPerHa = item.perennial_area_ha > 0 ? item.labour.perennial_recurring_labour_hours / item.perennial_area_ha : 100;
+        const recurringHours = annualArea * 150 + perennialArea * perennialHoursPerHa;
+        return [String(year), {
+          annual_crop_area_ha: round(annualArea, 6),
+          annual_soil_preparation_area_ha: round(annualArea, 6),
+          annual_soil_preparation_hours: round(annualArea * 45, 2),
+          perennial_food_energy_percent: 75,
+          food_energy_without_annual_soil_preparation_percent: 75,
+          total_recurring_labour_hours: round(recurringHours, 2),
+          total_labour_hours_including_establishment: round(recurringHours, 2),
+          physical_intensity_for_older_resident: annualArea > .1 ? 'moderate-high' : 'moderate',
+          household_food_coverage_ratio: 1,
+          occupied_food_production_area_ha: round(annualArea + perennialArea, 6),
+          mature_design_note: 'Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity.'
+        }];
+      }
+      return [String(year), {
+        annual_crop_area_ha: item.annual_area_ha,
+        annual_soil_preparation_area_ha: item.labour.annual_soil_preparation_area_ha,
+        annual_soil_preparation_hours: item.labour.annual_soil_preparation_hours,
+        perennial_food_energy_percent: item.labour.perennial_food_energy_percent,
+        food_energy_without_annual_soil_preparation_percent: item.labour.low_replanting_food_energy_percent,
+        total_recurring_labour_hours: item.labour.total_recurring_labour_hours,
+        total_labour_hours_including_establishment: item.labour.total_labour_hours_including_establishment,
+        physical_intensity_for_older_resident: item.labour.physical_intensity_for_older_resident,
+        household_food_coverage_ratio: item.household_food_coverage_ratio,
+        occupied_food_production_area_ha: item.occupied_food_production_area_ha
+      }];
+    }));
+    const y1 = checkpointsOutput['1'].annual_crop_area_ha;
+    const mature = checkpointsOutput.mature.annual_crop_area_ha;
+    return {
+      site: row.site,
+      site_label: row.site_label,
+      household: row.household,
+      household_label: row.household_label,
+      household_food_demand_gj_year: row.household_food_demand_gj_year,
+      annual_crop_area_reduction_from_year_1_to_maturity_percent: round((1 - mature / y1) * 100, 3),
+      checkpoints: checkpointsOutput,
+      interpretation: 'Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area.'
+    };
+  });
+  return {
+    model: 'ageing-in-place food-system labour transition',
+    strategy: 'progressive_handoff_with_mature_annual_reserve',
+    metric_definition: 'food energy produced without annual soil preparation/replanting = perennial plant food energy plus any optional livestock output credited to perennial/on-property feed; plants-only rows therefore match perennial calorie percentage.',
+    rows,
+    mature_perennial_food_share_target: .75,
+    mature_annual_food_share_retained_for_resilience: .25,
+    labour_evidence: 'data/source/food-production-labour.csv uses categorical evidence-informed planning classifications and explicit non-field-study hour estimates.'
+  };
+}
+
+function ageingMarkdown(output) {
+  const ordinary = output.rows.filter(row => row.site === 'ordinary_mesic');
+  return `# Ageing-in-place and labour reduction
+
+The objective is a succession from reliable annual staple calories toward a mature system with a substantial low-replanting food share. The target is not zero annual crops: a smaller annual area can remain useful for beans, vegetables, market crops, seed, resilience and crop rotation.
+
+The separate ageing metric is **food energy produced without annual soil preparation/replanting**. In plants-only rows this equals perennial calorie percentage. Optional livestock can make the metric slightly broader when animal output is credited to perennial/on-property feed. Establishment labour is shown separately from mature recurring labour.
+
+The mature planning target retains **25% of plant calories from annual crops** for beans, vegetables, market production, seed, rotation and resilience. The underlying transition series also retains a no-annual-area sensitivity, but that is not the recommended ageing-in-place design.
+
+## Ordinary mesic site
+
+| household | year 1 annual area | year 5 | year 10 | mature | annual-area reduction | mature perennial calories | mature without annual soil prep |
+|---|---:|---:|---:|---:|---:|---:|---:|
+${ordinary.map(row => `| ${row.household_label} | ${format(row.checkpoints['1'].annual_crop_area_ha, 2)} ha | ${format(row.checkpoints['5'].annual_crop_area_ha, 2)} ha | ${format(row.checkpoints['10'].annual_crop_area_ha, 2)} ha | ${format(row.checkpoints.mature.annual_crop_area_ha, 2)} ha | ${format(row.annual_crop_area_reduction_from_year_1_to_maturity_percent, 0)}% | ${format(row.checkpoints.mature.perennial_food_energy_percent, 0)}% | ${format(row.checkpoints.mature.food_energy_without_annual_soil_preparation_percent, 0)}% |`).join('\n')}
+
+## Interpretation
+
+Annual crops can carry the establishment bridge where the Year-1 area fits the site's food envelope. As berries, nut shrubs, fruit trees and staple trees begin bearing, the progressive handoff releases annual ground. A mature tree/shrub system still requires harvest, pruning, monitoring, wildlife protection and periodic replacement; it simply removes the repeated whole-area soil preparation and replanting burden.
+
+The high-value mature design is therefore a **mixed labour profile**: annual cultivation becomes smaller and optional, perennial harvest/maintenance remains, and small livestock can add protein but introduces daily feed, water, health and winter-storage work. Exact hours are planning estimates, not a measured Grey-Bruce time-and-motion study. Full checkpoint data for every site and household is in ` + '`outputs/ageing-in-place-labour.json`' + `.
+`;
 }
 
 function rowFor(capacity, site, household) {
@@ -217,6 +354,7 @@ function transitionSeries({demand, annualYield, forestArea, siteMultiplier, yiel
       young_forest_annual_intercrop_overlap_ha: round(overlap, 6),
       occupied_food_production_area_ha: round(occupied, 6),
       land_double_counted_as_if_separate_ha: round(overlap, 6),
+      labour: calculateTransitionLabour({year, annualArea, forestArea, classProduction: perennialClasses, perennialUsableFoodGJ: perennialUsable, householdDemandGJ: demand}),
       class_production: perennialClasses
     };
   });
@@ -296,6 +434,11 @@ function householdTransition({capacity, perennial, food, siteId, householdId, yi
     food_adult_equivalents: capacityRow.food_adult_equivalents,
     adult_equivalent_scope: 'food-energy normalization only; not a total-land multiplier',
     annual_crop_gross_yield_gj_ha_year: round(annualYield, 6),
+    annual_crop_macro_delivered_per_gj: {
+      protein: round(capacityRow.food_system.macro_delivered_to_household.protein_kg / demand, 8),
+      fat: round(capacityRow.food_system.macro_delivered_to_household.fat_kg / demand, 8),
+      carbohydrate: round(capacityRow.food_system.macro_delivered_to_household.carbohydrate_kg / demand, 8)
+    },
     annual_crop_requirements: annual,
     perennial_mature_mix_gross_yield_gj_ha_year: round(centralMixYield, 6),
     perennial_mature_mix_macro_output_per_ha: matureMacro,
@@ -366,6 +509,8 @@ The central perennial mix yields **${format(output.perennial_evidence.central_mi
 
 For one adult on an ordinary site, the mature mix requires ${format(adult.perennial_area_required_at_maturity_ha['30%']['100%'], 2)} ha at the 30% loss/reserve case to supply all food energy. The central 1 ha ARC allocation leaves ${format(adult.food_production_envelope_at_arc_allocation_ha, 2)} ha after shared heating, so the mature mix can cover the food energy in this scenario only if the resilience/ecological allowances are also accommodated elsewhere or the food mix/yield performs better than the central synthesis. At that full-calorie area, the coarse protein screen supplies ${format(adult.perennial_macro_screen_at_full_calorie_area.protein_g_day, 0)} g/day against ${format(adult.perennial_macro_screen_at_full_calorie_area.protein_screen_target_g_day, 0)} g/day; this is a warning that calorie sufficiency is not nutritional adequacy.
 
+For ageing-in-place, the recommended mature design is a 75% perennial-plant / 25% annual-plant calorie split rather than a tree-only diet. On the ordinary one-adult row this requires ${format(output.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'plants_only').land.perennial_food_area_ha, 2)} ha of perennial food and ${format(output.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'plants_only').land.annual_crop_area_ha, 2)} ha of retained annual food at maturity. The optional livestock comparisons and their feed/labour requirements are in outputs/livestock-scenarios.md.
+
 | household | 25% food | 50% food | 75% food | 100% food | mature area available within ARC food envelope |
 |---|---:|---:|---:|---:|---:|
 ${ordinary.map(row => `| ${row.household_label} | ${format(row.perennial_area_required_at_maturity_ha['30%']['25%'], 2)} ha | ${format(row.perennial_area_required_at_maturity_ha['30%']['50%'], 2)} ha | ${format(row.perennial_area_required_at_maturity_ha['30%']['75%'], 2)} ha | ${format(row.perennial_area_required_at_maturity_ha['30%']['100%'], 2)} ha | ${format(row.food_production_envelope_at_arc_allocation_ha, 2)} ha |`).join('\n')}
@@ -393,6 +538,7 @@ function transitionMarkdown(output) {
   const ordinaryFamily = output.households.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_two_children');
   const centralAdultSeries = ordinaryAdult.transition.progressive_handoff.rows;
   const centralFamilySeries = ordinaryFamily.transition.progressive_handoff.rows;
+  const ordinaryAdultAgeing = output.ageing_in_place?.rows?.find(row => row.household === 'one_adult' && row.site === 'ordinary_mesic');
   const rowTable = row => row.map(year => `| ${year.year} | ${format(year.annual_usable_food_gj, 2)} | ${format(year.perennial_usable_food_gj, 2)} | ${format(year.total_usable_food_gj, 2)} | ${format(year.household_food_coverage_ratio * 100, 0)}% | ${format(year.annual_area_ha, 2)} | ${format(year.released_annual_area_ha, 2)} | ${format(year.occupied_food_production_area_ha, 2)} |`).join('\n');
   return `# Food-forest transition through time
 
@@ -401,6 +547,8 @@ function transitionMarkdown(output) {
 Yes, annual crops can independently feed the household during perennial establishment **when the annual bridge area fits the site's available food-production envelope**. The transition is not a static mature-landscape calculation: young trees and shrubs can share alleys with annuals, then annual acreage is progressively released as perennial production becomes material. The central model does not support saying that every household can replace all calories with a mature perennial mix on 1 or 2 ha; that result depends on household demand, site productivity and whether resilience/ecological land is counted.
 
 For an ordinary site, the central progressive-handoff model reaches 25%, 50%, 75% and 100% of one adult's calories from perennials in years ${Object.values(ordinaryAdult.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')}. For two adults plus two children the corresponding thresholds are ${Object.values(ordinaryFamily.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')}. These are scenario years, not field predictions. The one-adult conservative and favourable threshold sequences are ${Object.values(ordinaryAdult.transition_sensitivity.conservative.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')} and ${Object.values(ordinaryAdult.transition_sensitivity.favourable.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')} respectively.
+
+The ageing-in-place design retains 25% of mature plant calories in annual crops for beans, vegetables, markets, seed and resilience. It reports the separate no-annual-soil-preparation food-energy metric and labour profile in outputs/ageing-in-place-labour.md. For one ordinary-site adult, the retained annual area falls from ${format(ordinaryAdultAgeing?.checkpoints?.['1']?.annual_crop_area_ha ?? 0, 2)} ha in year 1 to ${format(ordinaryAdultAgeing?.checkpoints?.mature?.annual_crop_area_ha ?? 0, 2)} ha at maturity; this is a planning target, not a claim that all recurring perennial labour disappears.
 
 ## Ordinary-site progressive handoff: one adult
 
@@ -425,8 +573,11 @@ See ` + '`outputs/annual-establishment-food.md`' + ` for the 0.25 ha test, ` + '
 }
 
 export function buildFoodForestTransition(energy = buildHealthCanadaEnergy(), food = calculateFoodEvidence(), heating = buildEvidenceHeating(), woody = calculateWoodyLand(heating), capacity = buildHouseholdCapacity(energy, food, heating, woody)) {
+  calculateFoodSystemLabour();
   const perennial = calculatePerennialEvidence();
+  const perennialProtein = calculatePerennialProteinEvidence();
   const households = Object.entries(siteClasses).flatMap(([siteId]) => Object.keys(householdProfiles).map(household => householdTransition({capacity, perennial, food, siteId, householdId: household})));
+  const ageingInPlace = ageingInPlaceOutput(households);
   const output = {
     model: 'evidence-based ARC food-forest transition',
     status: 'current evidence-based model; historical Lyis values are provenance only',
@@ -437,18 +588,24 @@ export function buildFoodForestTransition(energy = buildHealthCanadaEnergy(), fo
     annual_intercrop_overlap_by_year: annualIntercropOverlap,
     annual_crop_basis: {source: 'current evidence-based balanced low-input annual food system', gross_yield_gj_ha_year: 'site-specific from current evidence model', note: 'The 20/30/40% cases are explicit transition scenarios and are not the same as the canonical household model’s detailed storage/wildlife/seed/reserve accounting.'},
     perennial_evidence: perennial,
+    perennial_protein_evidence: perennialProtein,
     site_classes: siteClasses,
     policy_site_map: policySiteMap,
     households,
+    ageing_in_place: ageingInPlace,
     quarter_hectare_tests: quarterHectareTests({capacity, food}),
     land_accounting: {rule: 'annual_area + perennial_area - young_row_intercrop_overlap = occupied food-production area', no_double_counting_test: 'occupied food-production area must be compared with allocation minus shared heating; resilience/ecological allowances remain separate and are not silently converted into food hectares.'}
   };
+  output.livestock = buildLivestockScenarios(output);
   writeJson('outputs/food-forest-transition.json', output);
   writeText('outputs/perennial-yield-evidence.md', sourceMarkdown(perennial));
+  writeText('outputs/perennial-protein-staples.md', perennialProteinMarkdown(perennialProtein));
   writeText('outputs/annual-establishment-food.md', annualMarkdown(output));
   writeText('outputs/mature-food-forest-capacity.md', matureMarkdown(output));
   writeText('outputs/household-transition-scenarios.md', householdMarkdown(output));
   writeText('outputs/food-forest-transition.md', transitionMarkdown(output));
+  writeJson('outputs/ageing-in-place-labour.json', ageingInPlace);
+  writeText('outputs/ageing-in-place-labour.md', ageingMarkdown(ageingInPlace));
   return output;
 }
 

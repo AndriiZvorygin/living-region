@@ -38,6 +38,9 @@ npm test
 - [`outputs/mature-food-forest-capacity.md`](outputs/mature-food-forest-capacity.md)
 - [`outputs/household-transition-scenarios.md`](outputs/household-transition-scenarios.md)
 - [`outputs/perennial-yield-evidence.md`](outputs/perennial-yield-evidence.md)
+- [`outputs/perennial-protein-staples.md`](outputs/perennial-protein-staples.md)
+- [`outputs/ageing-in-place-labour.md`](outputs/ageing-in-place-labour.md)
+- [`outputs/livestock-scenarios.md`](outputs/livestock-scenarios.md)
 - [`docs/source-audit.md`](docs/source-audit.md)
 - [`docs/evidence-methodology.md`](docs/evidence-methodology.md)
 

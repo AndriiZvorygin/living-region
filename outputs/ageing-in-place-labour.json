@@ -1,0 +1,1450 @@
+{
+  "model": "ageing-in-place food-system labour transition",
+  "strategy": "progressive_handoff_with_mature_annual_reserve",
+  "metric_definition": "food energy produced without annual soil preparation/replanting = perennial plant food energy plus any optional livestock output credited to perennial/on-property feed; plants-only rows therefore match perennial calorie percentage.",
+  "rows": [
+    {
+      "site": "wetter_productive",
+      "site_label": "Wetter productive site",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "household_food_demand_gj_year": 3.375074,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.148972,
+          "annual_soil_preparation_area_ha": 0.148972,
+          "annual_soil_preparation_hours": 6.7,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 45.18,
+          "total_labour_hours_including_establishment": 166.97,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.494993
+        },
+        "5": {
+          "annual_crop_area_ha": 0.091335,
+          "annual_soil_preparation_area_ha": 0.091335,
+          "annual_soil_preparation_hours": 4.11,
+          "perennial_food_energy_percent": 38.69,
+          "food_energy_without_annual_soil_preparation_percent": 38.69,
+          "total_recurring_labour_hours": 60.56,
+          "total_labour_hours_including_establishment": 77,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.512551
+        },
+        "10": {
+          "annual_crop_area_ha": 0.031237,
+          "annual_soil_preparation_area_ha": 0.031237,
+          "annual_soil_preparation_hours": 1.41,
+          "perennial_food_energy_percent": 79.031,
+          "food_energy_without_annual_soil_preparation_percent": 79.031,
+          "total_recurring_labour_hours": 64.04,
+          "total_labour_hours_including_establishment": 69.66,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.487425
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.037243,
+          "annual_soil_preparation_area_ha": 0.037243,
+          "annual_soil_preparation_hours": 1.68,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 54.51,
+          "total_labour_hours_including_establishment": 54.51,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.380555,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "wetter_productive",
+      "site_label": "Wetter productive site",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "household_food_demand_gj_year": 5.846183,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.258044,
+          "annual_soil_preparation_area_ha": 0.258044,
+          "annual_soil_preparation_hours": 11.61,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 73.41,
+          "total_labour_hours_including_establishment": 264.23,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.760285
+        },
+        "5": {
+          "annual_crop_area_ha": 0.170436,
+          "annual_soil_preparation_area_ha": 0.170436,
+          "annual_soil_preparation_hours": 7.67,
+          "perennial_food_energy_percent": 33.951,
+          "food_energy_without_annual_soil_preparation_percent": 33.951,
+          "total_recurring_labour_hours": 96.79,
+          "total_labour_hours_including_establishment": 127.46,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.798035
+        },
+        "10": {
+          "annual_crop_area_ha": 0.079089,
+          "annual_soil_preparation_area_ha": 0.079089,
+          "annual_soil_preparation_hours": 3.56,
+          "perennial_food_energy_percent": 69.351,
+          "food_energy_without_annual_soil_preparation_percent": 69.351,
+          "total_recurring_labour_hours": 102.08,
+          "total_labour_hours_including_establishment": 116.32,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.770908
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.064511,
+          "annual_soil_preparation_area_ha": 0.064511,
+          "annual_soil_preparation_hours": 2.9,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 94.42,
+          "total_labour_hours_including_establishment": 94.42,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.659184,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "wetter_productive",
+      "site_label": "Wetter productive site",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "household_food_demand_gj_year": 7.768697,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.342902,
+          "annual_soil_preparation_area_ha": 0.342902,
+          "annual_soil_preparation_hours": 15.43,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 103.99,
+          "total_labour_hours_including_establishment": 384.34,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.139367
+        },
+        "5": {
+          "annual_crop_area_ha": 0.210232,
+          "annual_soil_preparation_area_ha": 0.210232,
+          "annual_soil_preparation_hours": 9.46,
+          "perennial_food_energy_percent": 38.69,
+          "food_energy_without_annual_soil_preparation_percent": 38.69,
+          "total_recurring_labour_hours": 139.39,
+          "total_labour_hours_including_establishment": 177.23,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.179781
+        },
+        "10": {
+          "annual_crop_area_ha": 0.071902,
+          "annual_soil_preparation_area_ha": 0.071902,
+          "annual_soil_preparation_hours": 3.24,
+          "perennial_food_energy_percent": 79.031,
+          "food_energy_without_annual_soil_preparation_percent": 79.031,
+          "total_recurring_labour_hours": 147.4,
+          "total_labour_hours_including_establishment": 160.35,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.121949
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.085725,
+          "annual_soil_preparation_area_ha": 0.085725,
+          "annual_soil_preparation_hours": 3.86,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 125.46,
+          "total_labour_hours_including_establishment": 125.46,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.875957,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "wetter_productive",
+      "site_label": "Wetter productive site",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "household_food_demand_gj_year": 10.239806,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.451974,
+          "annual_soil_preparation_area_ha": 0.451974,
+          "annual_soil_preparation_hours": 20.34,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 137.06,
+          "total_labour_hours_including_establishment": 506.59,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.501783
+        },
+        "5": {
+          "annual_crop_area_ha": 0.277104,
+          "annual_soil_preparation_area_ha": 0.277104,
+          "annual_soil_preparation_hours": 12.47,
+          "perennial_food_energy_percent": 38.69,
+          "food_energy_without_annual_soil_preparation_percent": 38.69,
+          "total_recurring_labour_hours": 183.73,
+          "total_labour_hours_including_establishment": 233.6,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.555053
+        },
+        "10": {
+          "annual_crop_area_ha": 0.094773,
+          "annual_soil_preparation_area_ha": 0.094773,
+          "annual_soil_preparation_hours": 4.26,
+          "perennial_food_energy_percent": 79.031,
+          "food_energy_without_annual_soil_preparation_percent": 79.031,
+          "total_recurring_labour_hours": 194.29,
+          "total_labour_hours_including_establishment": 211.35,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.478824
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.112993,
+          "annual_soil_preparation_area_ha": 0.112993,
+          "annual_soil_preparation_hours": 5.08,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 165.37,
+          "total_labour_hours_including_establishment": 165.37,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.154586,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "wetter_productive",
+      "site_label": "Wetter productive site",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "household_food_demand_gj_year": 14.050693,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.620182,
+          "annual_soil_preparation_area_ha": 0.620182,
+          "annual_soil_preparation_hours": 27.91,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 169.54,
+          "total_labour_hours_including_establishment": 599.52,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.68922
+        },
+        "5": {
+          "annual_crop_area_ha": 0.427007,
+          "annual_soil_preparation_area_ha": 0.427007,
+          "annual_soil_preparation_hours": 19.22,
+          "perennial_food_energy_percent": 31.148,
+          "food_energy_without_annual_soil_preparation_percent": 31.148,
+          "total_recurring_labour_hours": 221.09,
+          "total_labour_hours_including_establishment": 297.95,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.790379
+        },
+        "10": {
+          "annual_crop_area_ha": 0.225588,
+          "annual_soil_preparation_area_ha": 0.225588,
+          "annual_soil_preparation_hours": 10.15,
+          "perennial_food_energy_percent": 63.626,
+          "food_energy_without_annual_soil_preparation_percent": 63.626,
+          "total_recurring_labour_hours": 232.76,
+          "total_labour_hours_including_establishment": 273.37,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.748483
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.155045,
+          "annual_soil_preparation_area_ha": 0.155045,
+          "annual_soil_preparation_hours": 6.98,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 226.92,
+          "total_labour_hours_including_establishment": 226.92,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.584281,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "wetter_productive",
+      "site_label": "Wetter productive site",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "household_food_demand_gj_year": 16.677312,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.736118,
+          "annual_soil_preparation_area_ha": 0.736118,
+          "annual_soil_preparation_hours": 33.13,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 181.55,
+          "total_labour_hours_including_establishment": 609.98,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.610216
+        },
+        "5": {
+          "annual_crop_area_ha": 0.55654,
+          "annual_soil_preparation_area_ha": 0.55654,
+          "annual_soil_preparation_hours": 25.04,
+          "perennial_food_energy_percent": 24.395,
+          "food_energy_without_annual_soil_preparation_percent": 24.395,
+          "total_recurring_labour_hours": 229.47,
+          "total_labour_hours_including_establishment": 329.65,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.760111
+        },
+        "10": {
+          "annual_crop_area_ha": 0.369298,
+          "annual_soil_preparation_area_ha": 0.369298,
+          "annual_soil_preparation_hours": 16.62,
+          "perennial_food_energy_percent": 49.832,
+          "food_energy_without_annual_soil_preparation_percent": 49.832,
+          "total_recurring_labour_hours": 240.32,
+          "total_labour_hours_including_establishment": 306.79,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.777021
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.184029,
+          "annual_soil_preparation_area_ha": 0.184029,
+          "annual_soil_preparation_hours": 8.28,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 269.34,
+          "total_labour_hours_including_establishment": 269.34,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.880444,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "ordinary_mesic",
+      "site_label": "Ordinary mesic site",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "household_food_demand_gj_year": 3.375074,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.148972,
+          "annual_soil_preparation_area_ha": 0.148972,
+          "annual_soil_preparation_hours": 6.7,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 45.18,
+          "total_labour_hours_including_establishment": 166.97,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.494993
+        },
+        "5": {
+          "annual_crop_area_ha": 0.091335,
+          "annual_soil_preparation_area_ha": 0.091335,
+          "annual_soil_preparation_hours": 4.11,
+          "perennial_food_energy_percent": 38.69,
+          "food_energy_without_annual_soil_preparation_percent": 38.69,
+          "total_recurring_labour_hours": 60.56,
+          "total_labour_hours_including_establishment": 77,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.512551
+        },
+        "10": {
+          "annual_crop_area_ha": 0.031237,
+          "annual_soil_preparation_area_ha": 0.031237,
+          "annual_soil_preparation_hours": 1.41,
+          "perennial_food_energy_percent": 79.031,
+          "food_energy_without_annual_soil_preparation_percent": 79.031,
+          "total_recurring_labour_hours": 64.04,
+          "total_labour_hours_including_establishment": 69.66,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.487425
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.037243,
+          "annual_soil_preparation_area_ha": 0.037243,
+          "annual_soil_preparation_hours": 1.68,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 54.51,
+          "total_labour_hours_including_establishment": 54.51,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.380555,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "ordinary_mesic",
+      "site_label": "Ordinary mesic site",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "household_food_demand_gj_year": 5.846183,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.258044,
+          "annual_soil_preparation_area_ha": 0.258044,
+          "annual_soil_preparation_hours": 11.61,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 64.8,
+          "total_labour_hours_including_establishment": 219.81,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.587696
+        },
+        "5": {
+          "annual_crop_area_ha": 0.192167,
+          "annual_soil_preparation_area_ha": 0.192167,
+          "annual_soil_preparation_hours": 8.65,
+          "perennial_food_energy_percent": 25.529,
+          "food_energy_without_annual_soil_preparation_percent": 25.529,
+          "total_recurring_labour_hours": 82.38,
+          "total_labour_hours_including_establishment": 116.97,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.638485
+        },
+        "10": {
+          "annual_crop_area_ha": 0.123479,
+          "annual_soil_preparation_area_ha": 0.123479,
+          "annual_soil_preparation_hours": 5.56,
+          "perennial_food_energy_percent": 52.148,
+          "food_energy_without_annual_soil_preparation_percent": 52.148,
+          "total_recurring_labour_hours": 86.36,
+          "total_labour_hours_including_establishment": 108.59,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.64049
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.064511,
+          "annual_soil_preparation_area_ha": 0.064511,
+          "annual_soil_preparation_hours": 2.9,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 94.41,
+          "total_labour_hours_including_establishment": 94.41,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.659184,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "ordinary_mesic",
+      "site_label": "Ordinary mesic site",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "household_food_demand_gj_year": 7.768697,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.342902,
+          "annual_soil_preparation_area_ha": 0.342902,
+          "annual_soil_preparation_hours": 15.43,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 103.99,
+          "total_labour_hours_including_establishment": 384.34,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.139367
+        },
+        "5": {
+          "annual_crop_area_ha": 0.210232,
+          "annual_soil_preparation_area_ha": 0.210232,
+          "annual_soil_preparation_hours": 9.46,
+          "perennial_food_energy_percent": 38.69,
+          "food_energy_without_annual_soil_preparation_percent": 38.69,
+          "total_recurring_labour_hours": 139.39,
+          "total_labour_hours_including_establishment": 177.23,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.179781
+        },
+        "10": {
+          "annual_crop_area_ha": 0.071902,
+          "annual_soil_preparation_area_ha": 0.071902,
+          "annual_soil_preparation_hours": 3.24,
+          "perennial_food_energy_percent": 79.031,
+          "food_energy_without_annual_soil_preparation_percent": 79.031,
+          "total_recurring_labour_hours": 147.4,
+          "total_labour_hours_including_establishment": 160.35,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.121949
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.085725,
+          "annual_soil_preparation_area_ha": 0.085725,
+          "annual_soil_preparation_hours": 3.86,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 125.46,
+          "total_labour_hours_including_establishment": 125.46,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.875957,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "ordinary_mesic",
+      "site_label": "Ordinary mesic site",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "household_food_demand_gj_year": 10.239806,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.451974,
+          "annual_soil_preparation_area_ha": 0.451974,
+          "annual_soil_preparation_hours": 20.34,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 137.06,
+          "total_labour_hours_including_establishment": 506.59,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.501783
+        },
+        "5": {
+          "annual_crop_area_ha": 0.277104,
+          "annual_soil_preparation_area_ha": 0.277104,
+          "annual_soil_preparation_hours": 12.47,
+          "perennial_food_energy_percent": 38.69,
+          "food_energy_without_annual_soil_preparation_percent": 38.69,
+          "total_recurring_labour_hours": 183.73,
+          "total_labour_hours_including_establishment": 233.6,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.555053
+        },
+        "10": {
+          "annual_crop_area_ha": 0.094773,
+          "annual_soil_preparation_area_ha": 0.094773,
+          "annual_soil_preparation_hours": 4.26,
+          "perennial_food_energy_percent": 79.031,
+          "food_energy_without_annual_soil_preparation_percent": 79.031,
+          "total_recurring_labour_hours": 194.29,
+          "total_labour_hours_including_establishment": 211.35,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.478824
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.112993,
+          "annual_soil_preparation_area_ha": 0.112993,
+          "annual_soil_preparation_hours": 5.08,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 165.37,
+          "total_labour_hours_including_establishment": 165.37,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.154586,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "ordinary_mesic",
+      "site_label": "Ordinary mesic site",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "household_food_demand_gj_year": 14.050693,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.620182,
+          "annual_soil_preparation_area_ha": 0.620182,
+          "annual_soil_preparation_hours": 27.91,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 160.24,
+          "total_labour_hours_including_establishment": 551.49,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.502628
+        },
+        "5": {
+          "annual_crop_area_ha": 0.450501,
+          "annual_soil_preparation_area_ha": 0.450501,
+          "annual_soil_preparation_hours": 20.27,
+          "perennial_food_energy_percent": 27.36,
+          "food_energy_without_annual_soil_preparation_percent": 27.36,
+          "total_recurring_labour_hours": 205.52,
+          "total_labour_hours_including_establishment": 286.61,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.617884
+        },
+        "10": {
+          "annual_crop_area_ha": 0.27358,
+          "annual_soil_preparation_area_ha": 0.27358,
+          "annual_soil_preparation_hours": 12.31,
+          "perennial_food_energy_percent": 55.887,
+          "food_energy_without_annual_soil_preparation_percent": 55.887,
+          "total_recurring_labour_hours": 215.77,
+          "total_labour_hours_including_establishment": 265.01,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.607484
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.155045,
+          "annual_soil_preparation_area_ha": 0.155045,
+          "annual_soil_preparation_hours": 6.98,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 226.92,
+          "total_labour_hours_including_establishment": 226.92,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.584281,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "ordinary_mesic",
+      "site_label": "Ordinary mesic site",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "household_food_demand_gj_year": 16.677312,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.736118,
+          "annual_soil_preparation_area_ha": 0.736118,
+          "annual_soil_preparation_hours": 33.13,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 171.93,
+          "total_labour_hours_including_establishment": 560.36,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.417426
+        },
+        "5": {
+          "annual_crop_area_ha": 0.580815,
+          "annual_soil_preparation_area_ha": 0.580815,
+          "annual_soil_preparation_hours": 26.14,
+          "perennial_food_energy_percent": 21.098,
+          "food_energy_without_annual_soil_preparation_percent": 21.098,
+          "total_recurring_labour_hours": 213.38,
+          "total_labour_hours_including_establishment": 317.92,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.581886
+        },
+        "10": {
+          "annual_crop_area_ha": 0.418885,
+          "annual_soil_preparation_area_ha": 0.418885,
+          "annual_soil_preparation_hours": 18.85,
+          "perennial_food_energy_percent": 43.095,
+          "food_energy_without_annual_soil_preparation_percent": 43.095,
+          "total_recurring_labour_hours": 222.76,
+          "total_labour_hours_including_establishment": 298.16,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.631337
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.184029,
+          "annual_soil_preparation_area_ha": 0.184029,
+          "annual_soil_preparation_hours": 8.28,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 269.34,
+          "total_labour_hours_including_establishment": 269.34,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.880444,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "dry",
+      "site_label": "Dry site",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "household_food_demand_gj_year": 3.375074,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.198629,
+          "annual_soil_preparation_area_ha": 0.198629,
+          "annual_soil_preparation_hours": 8.94,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 44.96,
+          "total_labour_hours_including_establishment": 143.83,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.353829
+        },
+        "5": {
+          "annual_crop_area_ha": 0.16033,
+          "annual_soil_preparation_area_ha": 0.16033,
+          "annual_soil_preparation_hours": 7.21,
+          "perennial_food_energy_percent": 19.282,
+          "food_energy_without_annual_soil_preparation_percent": 19.282,
+          "total_recurring_labour_hours": 55.19,
+          "total_labour_hours_including_establishment": 84.04,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.40037
+        },
+        "10": {
+          "annual_crop_area_ha": 0.120395,
+          "annual_soil_preparation_area_ha": 0.120395,
+          "annual_soil_preparation_hours": 5.42,
+          "perennial_food_energy_percent": 39.387,
+          "food_energy_without_annual_soil_preparation_percent": 39.387,
+          "total_recurring_labour_hours": 57.5,
+          "total_labour_hours_including_establishment": 79.17,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.418548
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.049657,
+          "annual_soil_preparation_area_ha": 0.049657,
+          "annual_soil_preparation_hours": 2.23,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 72.67,
+          "total_labour_hours_including_establishment": 72.67,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.507407,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "dry",
+      "site_label": "Dry site",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "household_food_demand_gj_year": 5.846183,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.344059,
+          "annual_soil_preparation_area_ha": 0.344059,
+          "annual_soil_preparation_hours": 15.48,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 57.11,
+          "total_labour_hours_including_establishment": 141.91,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.371613
+        },
+        "5": {
+          "annual_crop_area_ha": 0.330181,
+          "annual_soil_preparation_area_ha": 0.330181,
+          "annual_soil_preparation_hours": 14.86,
+          "perennial_food_energy_percent": 4.034,
+          "food_energy_without_annual_soil_preparation_percent": 4.034,
+          "total_recurring_labour_hours": 60.81,
+          "total_labour_hours_including_establishment": 120.24,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.396311
+        },
+        "10": {
+          "annual_crop_area_ha": 0.31571,
+          "annual_soil_preparation_area_ha": 0.31571,
+          "annual_soil_preparation_hours": 14.21,
+          "perennial_food_energy_percent": 8.239,
+          "food_energy_without_annual_soil_preparation_percent": 8.239,
+          "total_recurring_labour_hours": 61.65,
+          "total_labour_hours_including_establishment": 118.48,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.420417
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.086015,
+          "annual_soil_preparation_area_ha": 0.086015,
+          "annual_soil_preparation_hours": 3.87,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 125.92,
+          "total_labour_hours_including_establishment": 125.92,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.878912,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "dry",
+      "site_label": "Dry site",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "household_food_demand_gj_year": 7.768697,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.457202,
+          "annual_soil_preparation_area_ha": 0.457202,
+          "annual_soil_preparation_hours": 20.57,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 129.82,
+          "total_labour_hours_including_establishment": 466.91,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.342221
+        },
+        "5": {
+          "annual_crop_area_ha": 0.302589,
+          "annual_soil_preparation_area_ha": 0.302589,
+          "annual_soil_preparation_hours": 13.62,
+          "perennial_food_energy_percent": 33.817,
+          "food_energy_without_annual_soil_preparation_percent": 33.817,
+          "total_recurring_labour_hours": 171.08,
+          "total_labour_hours_including_establishment": 225.55,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.409473
+        },
+        "10": {
+          "annual_crop_area_ha": 0.141378,
+          "annual_soil_preparation_area_ha": 0.141378,
+          "annual_soil_preparation_hours": 6.36,
+          "perennial_food_energy_percent": 69.078,
+          "food_energy_without_annual_soil_preparation_percent": 69.078,
+          "total_recurring_labour_hours": 180.42,
+          "total_labour_hours_including_establishment": 205.87,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.362229
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.114301,
+          "annual_soil_preparation_area_ha": 0.114301,
+          "annual_soil_preparation_hours": 5.14,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 167.29,
+          "total_labour_hours_including_establishment": 167.29,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.167942,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "dry",
+      "site_label": "Dry site",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "household_food_demand_gj_year": 10.239806,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.602632,
+          "annual_soil_preparation_area_ha": 0.602632,
+          "annual_soil_preparation_hours": 27.12,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 144.87,
+          "total_labour_hours_including_establishment": 479.96,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.242807
+        },
+        "5": {
+          "annual_crop_area_ha": 0.465114,
+          "annual_soil_preparation_area_ha": 0.465114,
+          "annual_soil_preparation_hours": 20.93,
+          "perennial_food_energy_percent": 22.82,
+          "food_energy_without_annual_soil_preparation_percent": 22.82,
+          "total_recurring_labour_hours": 181.56,
+          "total_labour_hours_including_establishment": 265.28,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.371217
+        },
+        "10": {
+          "annual_crop_area_ha": 0.321728,
+          "annual_soil_preparation_area_ha": 0.321728,
+          "annual_soil_preparation_hours": 14.48,
+          "perennial_food_energy_percent": 46.613,
+          "food_energy_without_annual_soil_preparation_percent": 46.613,
+          "total_recurring_labour_hours": 189.87,
+          "total_labour_hours_including_establishment": 247.78,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.39779
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.150658,
+          "annual_soil_preparation_area_ha": 0.150658,
+          "annual_soil_preparation_hours": 6.78,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 220.5,
+          "total_labour_hours_including_establishment": 220.5,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.539447,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "dry",
+      "site_label": "Dry site",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "household_food_demand_gj_year": 14.050693,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.826909,
+          "annual_soil_preparation_area_ha": 0.826909,
+          "annual_soil_preparation_hours": 37.21,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 165.81,
+          "total_labour_hours_including_establishment": 488.45,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.044299
+        },
+        "5": {
+          "annual_crop_area_ha": 0.721446,
+          "annual_soil_preparation_area_ha": 0.721446,
+          "annual_soil_preparation_hours": 32.47,
+          "perennial_food_energy_percent": 12.754,
+          "food_energy_without_annual_soil_preparation_percent": 12.754,
+          "total_recurring_labour_hours": 193.95,
+          "total_labour_hours_including_establishment": 323.81,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.27044
+        },
+        "10": {
+          "annual_crop_area_ha": 0.611483,
+          "annual_soil_preparation_area_ha": 0.611483,
+          "annual_soil_preparation_hours": 27.52,
+          "perennial_food_energy_percent": 26.052,
+          "food_energy_without_annual_soil_preparation_percent": 26.052,
+          "total_recurring_labour_hours": 200.32,
+          "total_labour_hours_including_establishment": 310.39,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.418481
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.206727,
+          "annual_soil_preparation_area_ha": 0.206727,
+          "annual_soil_preparation_hours": 9.3,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 302.55,
+          "total_labour_hours_including_establishment": 302.55,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 2.112374,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "dry",
+      "site_label": "Dry site",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "household_food_demand_gj_year": 16.677312,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.981491,
+          "annual_soil_preparation_area_ha": 0.981491,
+          "annual_soil_preparation_hours": 44.17,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 178.29,
+          "total_labour_hours_including_establishment": 484.2,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.137208
+        },
+        "5": {
+          "annual_crop_area_ha": 0.903062,
+          "annual_soil_preparation_area_ha": 0.903062,
+          "annual_soil_preparation_hours": 40.64,
+          "perennial_food_energy_percent": 7.991,
+          "food_energy_without_annual_soil_preparation_percent": 7.991,
+          "total_recurring_labour_hours": 199.22,
+          "total_labour_hours_including_establishment": 361.77,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.276784
+        },
+        "10": {
+          "annual_crop_area_ha": 0.821287,
+          "annual_soil_preparation_area_ha": 0.821287,
+          "annual_soil_preparation_hours": 36.96,
+          "perennial_food_energy_percent": 16.323,
+          "food_energy_without_annual_soil_preparation_percent": 16.323,
+          "total_recurring_labour_hours": 203.96,
+          "total_labour_hours_including_establishment": 351.79,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.413013
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.245373,
+          "annual_soil_preparation_area_ha": 0.245373,
+          "annual_soil_preparation_hours": 11.04,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 359.13,
+          "total_labour_hours_including_establishment": 359.13,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 2.507259,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "site_label": "Shallow/rocky marginal site",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "household_food_demand_gj_year": 3.375074,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.297944,
+          "annual_soil_preparation_area_ha": 0.297944,
+          "annual_soil_preparation_hours": 13.41,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 53.5,
+          "total_labour_hours_including_establishment": 143.75,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.342074
+        },
+        "5": {
+          "annual_crop_area_ha": 0.275718,
+          "annual_soil_preparation_area_ha": 0.275718,
+          "annual_soil_preparation_hours": 12.41,
+          "perennial_food_energy_percent": 7.46,
+          "food_energy_without_annual_soil_preparation_percent": 7.46,
+          "total_recurring_labour_hours": 59.43,
+          "total_labour_hours_including_establishment": 109.06,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.381629
+        },
+        "10": {
+          "annual_crop_area_ha": 0.252543,
+          "annual_soil_preparation_area_ha": 0.252543,
+          "annual_soil_preparation_hours": 11.36,
+          "perennial_food_energy_percent": 15.238,
+          "food_energy_without_annual_soil_preparation_percent": 15.238,
+          "total_recurring_labour_hours": 60.77,
+          "total_labour_hours_including_establishment": 106.23,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.420235
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.074486,
+          "annual_soil_preparation_area_ha": 0.074486,
+          "annual_soil_preparation_hours": 3.35,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 109,
+          "total_labour_hours_including_establishment": 109,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 0.76111,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "site_label": "Shallow/rocky marginal site",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "household_food_demand_gj_year": 5.846183,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 69.324,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.420599,
+          "annual_soil_preparation_area_ha": 0.420599,
+          "annual_soil_preparation_hours": 18.93,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 63.09,
+          "total_labour_hours_including_establishment": 138.8,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 0.814975,
+          "occupied_food_production_area_ha": 0.420599
+        },
+        "5": {
+          "annual_crop_area_ha": 0.420599,
+          "annual_soil_preparation_area_ha": 0.420599,
+          "annual_soil_preparation_hours": 18.93,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 63.09,
+          "total_labour_hours_including_establishment": 138.8,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 0.814975,
+          "occupied_food_production_area_ha": 0.420599
+        },
+        "10": {
+          "annual_crop_area_ha": 0.420599,
+          "annual_soil_preparation_area_ha": 0.420599,
+          "annual_soil_preparation_hours": 18.93,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 63.09,
+          "total_labour_hours_including_establishment": 138.8,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 0.814975,
+          "occupied_food_production_area_ha": 0.420599
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.129022,
+          "annual_soil_preparation_area_ha": 0.129022,
+          "annual_soil_preparation_hours": 5.81,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 138.29,
+          "total_labour_hours_including_establishment": 138.29,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.318368,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "site_label": "Shallow/rocky marginal site",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "household_food_demand_gj_year": 7.768697,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.685803,
+          "annual_soil_preparation_area_ha": 0.685803,
+          "annual_soil_preparation_hours": 30.86,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 153.33,
+          "total_labour_hours_including_establishment": 486.73,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.183261
+        },
+        "5": {
+          "annual_crop_area_ha": 0.558401,
+          "annual_soil_preparation_area_ha": 0.558401,
+          "annual_soil_preparation_hours": 25.13,
+          "perennial_food_energy_percent": 18.577,
+          "food_energy_without_annual_soil_preparation_percent": 18.577,
+          "total_recurring_labour_hours": 187.33,
+          "total_labour_hours_including_establishment": 287.84,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.346851
+        },
+        "10": {
+          "annual_crop_area_ha": 0.425563,
+          "annual_soil_preparation_area_ha": 0.425563,
+          "annual_soil_preparation_hours": 19.15,
+          "perennial_food_energy_percent": 37.947,
+          "food_energy_without_annual_soil_preparation_percent": 37.947,
+          "total_recurring_labour_hours": 195.03,
+          "total_labour_hours_including_establishment": 271.63,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.416095
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.171451,
+          "annual_soil_preparation_area_ha": 0.171451,
+          "annual_soil_preparation_hours": 7.72,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 250.93,
+          "total_labour_hours_including_establishment": 250.93,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.751913,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "site_label": "Shallow/rocky marginal site",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "household_food_demand_gj_year": 10.239806,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 0.903947,
+          "annual_soil_preparation_area_ha": 0.903947,
+          "annual_soil_preparation_hours": 40.68,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 172.53,
+          "total_labour_hours_including_establishment": 488.93,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.089112
+        },
+        "5": {
+          "annual_crop_area_ha": 0.810687,
+          "annual_soil_preparation_area_ha": 0.810687,
+          "annual_soil_preparation_hours": 36.48,
+          "perennial_food_energy_percent": 10.317,
+          "food_energy_without_annual_soil_preparation_percent": 10.317,
+          "total_recurring_labour_hours": 197.42,
+          "total_labour_hours_including_establishment": 343.34,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.255083
+        },
+        "10": {
+          "annual_crop_area_ha": 0.713448,
+          "annual_soil_preparation_area_ha": 0.713448,
+          "annual_soil_preparation_hours": 32.11,
+          "perennial_food_energy_percent": 21.074,
+          "food_energy_without_annual_soil_preparation_percent": 21.074,
+          "total_recurring_labour_hours": 203.05,
+          "total_labour_hours_including_establishment": 331.47,
+          "physical_intensity_for_older_resident": "moderate",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.418434
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.225987,
+          "annual_soil_preparation_area_ha": 0.225987,
+          "annual_soil_preparation_hours": 10.17,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 330.74,
+          "total_labour_hours_including_establishment": 330.74,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 2.309171,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "site_label": "Shallow/rocky marginal site",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "household_food_demand_gj_year": 14.050693,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 75,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 1.240364,
+          "annual_soil_preparation_area_ha": 1.240364,
+          "annual_soil_preparation_hours": 55.82,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 199,
+          "total_labour_hours_including_establishment": 476.12,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.305248
+        },
+        "5": {
+          "annual_crop_area_ha": 1.207684,
+          "annual_soil_preparation_area_ha": 1.207684,
+          "annual_soil_preparation_hours": 54.35,
+          "perennial_food_energy_percent": 2.635,
+          "food_energy_without_annual_soil_preparation_percent": 2.635,
+          "total_recurring_labour_hours": 207.72,
+          "total_labour_hours_including_establishment": 425.1,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.363407
+        },
+        "10": {
+          "annual_crop_area_ha": 1.17361,
+          "annual_soil_preparation_area_ha": 1.17361,
+          "annual_soil_preparation_hours": 52.81,
+          "perennial_food_energy_percent": 5.382,
+          "food_energy_without_annual_soil_preparation_percent": 5.382,
+          "total_recurring_labour_hours": 209.69,
+          "total_labour_hours_including_establishment": 420.94,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 1.420171
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.310091,
+          "annual_soil_preparation_area_ha": 0.310091,
+          "annual_soil_preparation_hours": 13.95,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 453.8,
+          "total_labour_hours_including_establishment": 453.8,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 3.168561,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "site_label": "Shallow/rocky marginal site",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "household_food_demand_gj_year": 16.677312,
+      "annual_crop_area_reduction_from_year_1_to_maturity_percent": 74.091,
+      "checkpoints": {
+        "1": {
+          "annual_crop_area_ha": 1.420599,
+          "annual_soil_preparation_area_ha": 1.420599,
+          "annual_soil_preparation_hours": 63.93,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 213.09,
+          "total_labour_hours_including_establishment": 468.8,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 0.964926,
+          "occupied_food_production_area_ha": 1.420599
+        },
+        "5": {
+          "annual_crop_area_ha": 1.420599,
+          "annual_soil_preparation_area_ha": 1.420599,
+          "annual_soil_preparation_hours": 63.93,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 213.09,
+          "total_labour_hours_including_establishment": 468.8,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 0.964926,
+          "occupied_food_production_area_ha": 1.420599
+        },
+        "10": {
+          "annual_crop_area_ha": 1.420599,
+          "annual_soil_preparation_area_ha": 1.420599,
+          "annual_soil_preparation_hours": 63.93,
+          "perennial_food_energy_percent": 0,
+          "food_energy_without_annual_soil_preparation_percent": 0,
+          "total_recurring_labour_hours": 213.09,
+          "total_labour_hours_including_establishment": 468.8,
+          "physical_intensity_for_older_resident": "high",
+          "household_food_coverage_ratio": 0.964926,
+          "occupied_food_production_area_ha": 1.420599
+        },
+        "mature": {
+          "annual_crop_area_ha": 0.368059,
+          "annual_soil_preparation_area_ha": 0.368059,
+          "annual_soil_preparation_hours": 16.56,
+          "perennial_food_energy_percent": 75,
+          "food_energy_without_annual_soil_preparation_percent": 75,
+          "total_recurring_labour_hours": 394.49,
+          "total_labour_hours_including_establishment": 394.49,
+          "physical_intensity_for_older_resident": "moderate-high",
+          "household_food_coverage_ratio": 1,
+          "occupied_food_production_area_ha": 3.760888,
+          "mature_design_note": "Mature target retains 25% annual plant calories for beans, vegetables, market crops, seed, rotation and resilience; the separate progressive-handoff series shows the zero-annual-area sensitivity."
+        }
+      },
+      "interpretation": "Establishment labour includes the one-time perennial establishment estimate in year 1; mature recurring labour excludes that one-time work. Annual crop soil preparation and replanting remain proportional to annual crop area."
+    }
+  ],
+  "mature_perennial_food_share_target": 0.75,
+  "mature_annual_food_share_retained_for_resilience": 0.25,
+  "labour_evidence": "data/source/food-production-labour.csv uses categorical evidence-informed planning classifications and explicit non-field-study hour estimates."
+}

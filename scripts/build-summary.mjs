@@ -217,6 +217,12 @@ The central perennial mix requires ${f(ordinaryAdultTransition.perennial_area_re
 
 The transition outputs in ` + '`outputs/food-forest-transition.md`' + ` and ` + '`outputs/household-transition-scenarios.md`' + ` should be read alongside this land guideline. They do not convert the result into hectares per adult-equivalent.
 
+## Ageing-in-place refinement
+
+The mature food-system objective is not maximum calorie density and not elimination of annual crops. The central mature planning target is 75% of plant food energy from perennial systems and 25% from annual beans, vegetables, market crops, seed, rotation and resilience. On the ordinary site, the one-adult annual-crop area falls from ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').checkpoints['1'].annual_crop_area_ha, 2)} ha in Year 1 to ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').checkpoints.mature.annual_crop_area_ha, 2)} ha at maturity, a ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').annual_crop_area_reduction_from_year_1_to_maturity_percent, 0)}% reduction in annual soil-preparation area. The household/site rows in outputs/ageing-in-place-labour.json report the corresponding Year 1, Year 5, Year 10 and mature values for every scenario.
+
+The low-replanting metric is reported separately from perennial calories. For plants-only food it is the same percentage; livestock can contribute only to the extent that its food output is credited to perennial/on-property feed. Optional animals add protein and fat diversity but also add feed land, purchased feed, winter storage, manure handling and recurring labour. The canonical recommendation therefore remains plants plus a retained annual supplement, with livestock as a household choice rather than an ARC requirement.
+
 ## What is mathematically required versus allowed
 
 Mathematically required: household food demand divided by the chosen low-input food-system yield, plus audited useful heating demand divided by sustainable woody energy yield.
@@ -227,8 +233,10 @@ The largest remaining uncertainties are measured low-input Grey-Bruce yields, fo
 `;
 }
 
-function headline(energy, food, heating, woody, capacity, economics) {
+function headline(energy, food, heating, woody, capacity, economics, transition) {
   const adult = capacity.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
+  const ageingAdult = transition.ageing_in_place.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
+  const ordinaryBoth = transition.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'plants_plus_chickens_rabbits');
   return `# Evidence-based ARC carrying-capacity headline results
 
 1. A representative current low-active adult-equivalent requires **${f(energy.canonical_adult_equivalent.gj_year, 2)} GJ/year**, ${f(energy.canonical_adult_equivalent.mj_day, 2)} MJ/day and ${f(energy.canonical_adult_equivalent.kcal_day, 0)} kcal/day. The representative woman is ${f(energy.scenarios.adult_woman.gj_year, 2)} GJ/year; the representative man is ${f(energy.scenarios.adult_man.gj_year, 2)} GJ/year. An 8-year-old girl is ${f(energy.scenarios.child_girl_8.gj_year, 2)} GJ/year and a 14-year-old boy is ${f(energy.scenarios.adolescent_boy_14.gj_year, 2)} GJ/year.
@@ -241,6 +249,8 @@ function headline(energy, food, heating, woody, capacity, economics) {
 8. The 1 ha/adult ARC examples are household allocations, not adult-equivalent multipliers: 1 adult receives 1 ha and 2 adults/family receive 2 ha. Their favourable/ordinary/marginal land surpluses or deficits are tabulated in ` + '`outputs/recommended-land-guideline.md`' + `.
 9. The economic module is separate and illustrative: depending on product, covering $1,000–$5,000/year requires the configurable unit volumes in ` + '`data/derived/economic-output.csv`' + `. Current local margins remain unresolved.
 10. Recommendation: use a **household/site-adjusted carrying-capacity test**. Adult-equivalent belongs only in the food-energy calculation; shared heat and resilience/ecological/surplus land must be calculated at household/site level.
+11. Ageing-in-place: on an ordinary site, the central one-adult annual-crop area falls from ${f(ageingAdult.checkpoints['1'].annual_crop_area_ha, 2)} ha in Year 1 to ${f(ageingAdult.checkpoints.mature.annual_crop_area_ha, 2)} ha at maturity, a ${f(ageingAdult.annual_crop_area_reduction_from_year_1_to_maturity_percent, 0)}% reduction. The mature target retains 75% of plant food energy without annual soil preparation/replanting and keeps 25% annual plant calories for beans, vegetables, markets, seed and resilience.
+12. Optional small livestock add protein/fat diversity but also feed and labour: the ordinary one-adult plants-plus-chickens-and-rabbits module supplies ${f(ordinaryBoth.human_food_energy.livestock_gj_year, 2)} GJ/year of livestock food, requires ${f(ordinaryBoth.feed.purchased_dry_matter_kg_year, 0)} kg/year purchased feed in the planning case and adds ${f(ordinaryBoth.labour.livestock_recurring_labour_hours, 0)} recurring labour hours/year. Protein coverage remains a screening result, not full dietary adequacy.
 
 Historical Lyis values are deliberately excluded from these canonical calculations. See ` + '`outputs/legacy/`' + ` and ` + '`historical`' + ` in ` + '`outputs/summary.json`' + ` for provenance only.
 `;
@@ -260,7 +270,7 @@ export function buildEvidenceSummary() {
   const historical = historicalReference();
   const canonical = {status: 'evidence-based current ARC model', human_energy: energy, food_yields: {low_input_distribution: food.low_input_observations, category_stats: food.category_stats_low_input}, heating, woody_yields: woody, household_capacity: capacity, food_forest_transition: transition, economic_output: economics, site_sensitivity: capacity.site_classes, farm_size_reference: {status: 'historical descriptive reference only', correlation: farm.correlation}};
   writeJson('outputs/summary.json', {model_version: 'phase-2-evidence-based', canonical, historical});
-  writeText('outputs/evidence-based-headline-results.md', headline(energy, food, heating, woody, capacity, economics));
+  writeText('outputs/evidence-based-headline-results.md', headline(energy, food, heating, woody, capacity, economics, transition));
   writeText('outputs/low-input-food-yields.md', foodMarkdown(food));
   writeText('outputs/low-input-woody-yields.md', woodyMarkdown(woody));
   writeText('outputs/heating-budget.md', heatingMarkdown(heating, woody));

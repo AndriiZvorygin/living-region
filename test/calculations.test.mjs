@@ -12,6 +12,7 @@ import {calculateWoodyLand} from '../scripts/calc-evidence-woody.mjs';
 import {buildHouseholdCapacity} from '../scripts/calc-household-capacity.mjs';
 import {calculateEconomicTargets} from '../scripts/calc-economics.mjs';
 import {buildFoodForestTransition, calculatePerennialEvidence, transitionYears} from '../scripts/calc-food-forest-transition.mjs';
+import {calculateFoodSystemLabour} from '../scripts/calc-food-system-labour.mjs';
 
 function close(actual, expected, tolerance = 1e-9) {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} was not within ${tolerance} of ${expected}`);
@@ -222,4 +223,38 @@ test('conservative and favourable perennial establishment sensitivities are expl
   assert.ok(row.transition_sensitivity.conservative.mature_mix_gross_yield_gj_ha_year < row.perennial_mature_mix_gross_yield_gj_ha_year);
   assert.ok(row.transition_sensitivity.favourable.mature_mix_gross_yield_gj_ha_year > row.perennial_mature_mix_gross_yield_gj_ha_year);
   assert.ok(row.transition_sensitivity.conservative.transition.progressive_handoff.rows[2].perennial_usable_food_gj <= row.transition.progressive_handoff.rows[2].perennial_usable_food_gj);
+});
+
+test('ageing-in-place keeps a smaller annual reserve and separates establishment labour', () => {
+  const result = buildFoodForestTransition();
+  const row = result.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
+  assert.ok(row.checkpoints['1'].total_labour_hours_including_establishment > row.checkpoints.mature.total_recurring_labour_hours);
+  assert.ok(row.checkpoints['1'].annual_crop_area_ha > row.checkpoints['5'].annual_crop_area_ha);
+  assert.ok(row.checkpoints['5'].annual_crop_area_ha > row.checkpoints.mature.annual_crop_area_ha);
+  close(row.checkpoints.mature.perennial_food_energy_percent, 75, 1e-9);
+  close(row.checkpoints.mature.food_energy_without_annual_soil_preparation_percent, 75, 1e-9);
+  close(row.annual_crop_area_reduction_from_year_1_to_maturity_percent, 75, 0.2);
+});
+
+test('labour source exposes annual preparation and perennial recurring classes', () => {
+  const result = calculateFoodSystemLabour();
+  assert.ok(result.rows.some(row => row.id === 'annual_staple_low_input' && row.annual_soil_preparation === 'high'));
+  assert.ok(result.rows.some(row => row.id === 'long_staple_tree' && row.annual_soil_preparation === 'low'));
+  assert.ok(Number(result.rows.find(row => row.id === 'long_staple_tree').mature_recurring_hours_per_ha) < Number(result.rows.find(row => row.id === 'annual_staple_low_input').mature_recurring_hours_per_ha));
+});
+
+test('optional livestock modules account for feed and maintain land separation', () => {
+  const result = buildFoodForestTransition();
+  const rows = result.livestock.scenarios.filter(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
+  assert.deepEqual(rows.map(row => row.module), ['plants_only', 'plants_plus_chickens', 'plants_plus_rabbits', 'plants_plus_chickens_rabbits']);
+  for (const row of rows) {
+    close(row.human_food_energy.total_gj_year, row.household_food_demand_gj_year, 1e-6);
+    close(row.feed.dry_matter_requirement_kg_year, row.feed.on_property_dry_matter_kg_year + row.feed.purchased_dry_matter_kg_year, 1e-6);
+    close(row.land.total_food_feed_heat_area_ha, row.land.human_food_area_ha + row.land.livestock_feed_area_ha + row.land.woody_heating_area_ha, 1e-6);
+    assert.ok(row.nutritional_output.protein_coverage_percent > 0);
+    assert.ok(row.ageing_in_place.food_energy_without_annual_soil_preparation_percent >= row.human_food_energy.source_percent.perennial_plants);
+  }
+  assert.equal(rows[0].human_food_energy.livestock_gj_year, 0);
+  assert.ok(rows[1].feed.purchased_dry_matter_kg_year > 0);
+  assert.ok(rows[3].labour.total_recurring_labour_hours > rows[0].labour.total_recurring_labour_hours);
 });
