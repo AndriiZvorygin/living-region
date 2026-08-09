@@ -1,0 +1,201 @@
+{
+  "status": "historical reference only",
+  "source_url": "https://ourworldindata.org/farm-size",
+  "rows": [
+    {
+      "label": "<= 1",
+      "upper_bound_ha": 1,
+      "land_share_percent": 12,
+      "crop_share_percent": 12,
+      "food_crop_share_percent": 15,
+      "crop_return": 1,
+      "food_return": 1.25
+    },
+    {
+      "label": "<= 2",
+      "upper_bound_ha": 2,
+      "land_share_percent": 24,
+      "crop_share_percent": 29,
+      "food_crop_share_percent": 32,
+      "crop_return": 1.21,
+      "food_return": 1.33
+    },
+    {
+      "label": "<= 5",
+      "upper_bound_ha": 5,
+      "land_share_percent": 32,
+      "crop_share_percent": 41,
+      "food_crop_share_percent": 46,
+      "crop_return": 1.28,
+      "food_return": 1.44
+    },
+    {
+      "label": "<= 10",
+      "upper_bound_ha": 10,
+      "land_share_percent": 40,
+      "crop_share_percent": 51,
+      "food_crop_share_percent": 55,
+      "crop_return": 1.28,
+      "food_return": 1.38
+    },
+    {
+      "label": "<= 20",
+      "upper_bound_ha": 20,
+      "land_share_percent": 49,
+      "crop_share_percent": 54,
+      "food_crop_share_percent": 59,
+      "crop_return": 1.1,
+      "food_return": 1.2
+    },
+    {
+      "label": "<= 50",
+      "upper_bound_ha": 50,
+      "land_share_percent": 57,
+      "crop_share_percent": 59,
+      "food_crop_share_percent": 63,
+      "crop_return": 1.04,
+      "food_return": 1.11
+    },
+    {
+      "label": "<= 100",
+      "upper_bound_ha": 100,
+      "land_share_percent": 65,
+      "crop_share_percent": 65,
+      "food_crop_share_percent": 69,
+      "crop_return": 1,
+      "food_return": 1.06
+    },
+    {
+      "label": "<= 200",
+      "upper_bound_ha": 200,
+      "land_share_percent": 72,
+      "crop_share_percent": 81,
+      "food_crop_share_percent": 85,
+      "crop_return": 1.13,
+      "food_return": 1.18
+    },
+    {
+      "label": "<= 500",
+      "upper_bound_ha": 500,
+      "land_share_percent": 80,
+      "crop_share_percent": 85,
+      "food_crop_share_percent": 87,
+      "crop_return": 1.06,
+      "food_return": 1.09
+    },
+    {
+      "label": "<= 1000",
+      "upper_bound_ha": 1000,
+      "land_share_percent": 88,
+      "crop_share_percent": 95,
+      "food_crop_share_percent": 97,
+      "crop_return": 1.08,
+      "food_return": 1.1
+    },
+    {
+      "label": "all size",
+      "upper_bound_ha": null,
+      "land_share_percent": 100,
+      "crop_share_percent": 100,
+      "food_crop_share_percent": 100,
+      "crop_return": 1,
+      "food_return": 1
+    }
+  ],
+  "classes": [
+    {
+      "label": "<= 1",
+      "upper_bound_ha": 1,
+      "land_share_percent": 12,
+      "crop_share_percent": 12,
+      "food_crop_share_percent": 15,
+      "crop_return": 1,
+      "food_return": 1.25
+    },
+    {
+      "label": "<= 2",
+      "upper_bound_ha": 2,
+      "land_share_percent": 24,
+      "crop_share_percent": 29,
+      "food_crop_share_percent": 32,
+      "crop_return": 1.21,
+      "food_return": 1.33
+    },
+    {
+      "label": "<= 5",
+      "upper_bound_ha": 5,
+      "land_share_percent": 32,
+      "crop_share_percent": 41,
+      "food_crop_share_percent": 46,
+      "crop_return": 1.28,
+      "food_return": 1.44
+    },
+    {
+      "label": "<= 10",
+      "upper_bound_ha": 10,
+      "land_share_percent": 40,
+      "crop_share_percent": 51,
+      "food_crop_share_percent": 55,
+      "crop_return": 1.28,
+      "food_return": 1.38
+    },
+    {
+      "label": "<= 20",
+      "upper_bound_ha": 20,
+      "land_share_percent": 49,
+      "crop_share_percent": 54,
+      "food_crop_share_percent": 59,
+      "crop_return": 1.1,
+      "food_return": 1.2
+    },
+    {
+      "label": "<= 50",
+      "upper_bound_ha": 50,
+      "land_share_percent": 57,
+      "crop_share_percent": 59,
+      "food_crop_share_percent": 63,
+      "crop_return": 1.04,
+      "food_return": 1.11
+    },
+    {
+      "label": "<= 100",
+      "upper_bound_ha": 100,
+      "land_share_percent": 65,
+      "crop_share_percent": 65,
+      "food_crop_share_percent": 69,
+      "crop_return": 1,
+      "food_return": 1.06
+    },
+    {
+      "label": "<= 200",
+      "upper_bound_ha": 200,
+      "land_share_percent": 72,
+      "crop_share_percent": 81,
+      "food_crop_share_percent": 85,
+      "crop_return": 1.13,
+      "food_return": 1.18
+    },
+    {
+      "label": "<= 500",
+      "upper_bound_ha": 500,
+      "land_share_percent": 80,
+      "crop_share_percent": 85,
+      "food_crop_share_percent": 87,
+      "crop_return": 1.06,
+      "food_return": 1.09
+    },
+    {
+      "label": "<= 1000",
+      "upper_bound_ha": 1000,
+      "land_share_percent": 88,
+      "crop_share_percent": 95,
+      "food_crop_share_percent": 97,
+      "crop_return": 1.08,
+      "food_return": 1.1
+    }
+  ],
+  "correlation": {
+    "crop_return_vs_upper_bound": -0.3450897367782587,
+    "food_return_vs_upper_bound": -0.7449268241227306
+  }
+}

@@ -1,0 +1,10 @@
+heating_case,site_band,dry_biomass_t_ha_year,gross_energy_gj_ha_year,usable_gross_energy_gj_ha_year,gross_wood_required_gj,required_woody_area_ha,useful_delivered_heat_gj
+low,marginal,3,57,48.45,15.94506,0.329103,13.553301
+low,ordinary,5,95,80.75,15.94506,0.197462,13.553301
+low,favourable,8.9,169.1,143.735,15.94506,0.110934,13.553301
+central,marginal,3,57,48.45,28.071998,0.579401,21.053999
+central,ordinary,5,95,80.75,28.071998,0.347641,21.053999
+central,favourable,8.9,169.1,143.735,28.071998,0.195304,21.053999
+high,marginal,3,57,48.45,58.056216,1.198271,37.73654
+high,ordinary,5,95,80.75,58.056216,0.718962,37.73654
+high,favourable,8.9,169.1,143.735,58.056216,0.403911,37.73654

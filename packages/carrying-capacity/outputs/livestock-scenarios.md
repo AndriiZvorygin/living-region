@@ -1,0 +1,48 @@
+# Optional small-livestock and mature low-recurring-labour scenarios
+
+The modules compare a mature 75% perennial-plant calorie target with a 25% annual-plant supplement. Chickens and rabbits are optional protein/food modules; their feed, winter storage, purchased-feed dependence, labour and manure are shown explicitly. They are not free protein and are not required for ARC compliance.
+
+The default livestock unit is six laying hens and/or a conservative 48-fryer rabbitry. The unit is deliberately not scaled linearly by adult-equivalent. Feed rations must remain nutritionally balanced: Ontario poultry guidance emphasizes energy, protein, amino acids and minerals; extension rabbit guidance likewise relies on complete feed and adequate fibre/protein.
+
+## Ordinary-site mature household scenarios
+
+| household | module | perennial plant calories | annual plant calories | livestock calories | protein coverage | annual area | perennial area | feed area | recurring labour |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 adult | Plants only | 75% | 25% | 0% | 102% | 0.04 ha | 0.34 ha | 0 ha | 55 h/y |
+| 1 adult | Small egg flock | 65% | 22% | 13% | 137% | 0.03 ha | 0.30 ha | 0.04 ha | 167 h/y |
+| 1 adult | Rabbits | 68% | 23% | 9% | 140% | 0.03 ha | 0.31 ha | 0.07 ha | 230 h/y |
+| 1 adult | Combined livestock | 58% | 19% | 22% | 175% | 0.03 ha | 0.27 ha | 0.11 ha | 343 h/y |
+| 1 adult | On-site-feed-constrained livestock | 70% | 23% | 7% | 126% | 0.03 ha | 0.32 ha | 0.10 ha | 351 h/y |
+| 1 adult + 1 child | Plants only | 75% | 25% | 0% | 124% | 0.06 ha | 0.59 ha | 0 ha | 151 h/y |
+| 1 adult + 1 child | Small egg flock | 69% | 23% | 8% | 148% | 0.06 ha | 0.55 ha | 0.04 ha | 259 h/y |
+| 1 adult + 1 child | Rabbits | 71% | 24% | 5% | 150% | 0.06 ha | 0.56 ha | 0.07 ha | 323 h/y |
+| 1 adult + 1 child | Combined livestock | 65% | 22% | 13% | 174% | 0.06 ha | 0.52 ha | 0.11 ha | 432 h/y |
+| 1 adult + 1 child | On-site-feed-constrained livestock | 72% | 24% | 4% | 140% | 0.06 ha | 0.57 ha | 0.10 ha | 445 h/y |
+| 2 adults | Plants only | 75% | 25% | 0% | 105% | 0.09 ha | 0.79 ha | 0 ha | 125 h/y |
+| 2 adults | Small egg flock | 71% | 24% | 6% | 121% | 0.08 ha | 0.74 ha | 0.04 ha | 238 h/y |
+| 2 adults | Rabbits | 72% | 24% | 4% | 122% | 0.08 ha | 0.76 ha | 0.07 ha | 301 h/y |
+| 2 adults | Combined livestock | 68% | 23% | 10% | 138% | 0.08 ha | 0.71 ha | 0.11 ha | 413 h/y |
+| 2 adults | On-site-feed-constrained livestock | 73% | 24% | 3% | 116% | 0.08 ha | 0.77 ha | 0.10 ha | 422 h/y |
+| 2 adults + 1 child | Plants only | 75% | 25% | 0% | 116% | 0.11 ha | 1.04 ha | 0 ha | 165 h/y |
+| 2 adults + 1 child | Small egg flock | 72% | 24% | 4% | 129% | 0.11 ha | 1 ha | 0.04 ha | 278 h/y |
+| 2 adults + 1 child | Rabbits | 73% | 24% | 3% | 131% | 0.11 ha | 1.01 ha | 0.07 ha | 341 h/y |
+| 2 adults + 1 child | Combined livestock | 70% | 23% | 7% | 144% | 0.10 ha | 0.97 ha | 0.11 ha | 453 h/y |
+| 2 adults + 1 child | On-site-feed-constrained livestock | 73% | 24% | 2% | 125% | 0.11 ha | 1.02 ha | 0.10 ha | 462 h/y |
+| 2 adults + 2 children | Plants only | 75% | 25% | 0% | 124% | 0.16 ha | 1.43 ha | 0 ha | 395 h/y |
+| 2 adults + 2 children | Small egg flock | 73% | 24% | 3% | 134% | 0.15 ha | 1.38 ha | 0.04 ha | 502 h/y |
+| 2 adults + 2 children | Rabbits | 73% | 24% | 2% | 135% | 0.15 ha | 1.40 ha | 0.07 ha | 566 h/y |
+| 2 adults + 2 children | Combined livestock | 71% | 24% | 5% | 145% | 0.15 ha | 1.35 ha | 0.11 ha | 674 h/y |
+| 2 adults + 2 children | On-site-feed-constrained livestock | 74% | 25% | 2% | 131% | 0.15 ha | 1.40 ha | 0.10 ha | 688 h/y |
+| 2 adults + 3 children | Plants only | 75% | 25% | 0% | 131% | 0.18 ha | 1.70 ha | 0 ha | 371 h/y |
+| 2 adults + 3 children | Small egg flock | 73% | 24% | 3% | 140% | 0.18 ha | 1.65 ha | 0.04 ha | 481 h/y |
+| 2 adults + 3 children | Rabbits | 74% | 25% | 2% | 141% | 0.18 ha | 1.67 ha | 0.07 ha | 544 h/y |
+| 2 adults + 3 children | Combined livestock | 72% | 24% | 4% | 149% | 0.18 ha | 1.62 ha | 0.11 ha | 654 h/y |
+| 2 adults + 3 children | On-site-feed-constrained livestock | 74% | 25% | 1% | 137% | 0.18 ha | 1.67 ha | 0.10 ha | 665 h/y |
+
+## Feed and nutrient accounting
+
+The first ordinary-site row (1 adult; Small egg flock) is a checkable example: 425 kg dry feed/year is required by the optional unit, of which 106 kg is supplied from the property under the planning fraction and 319 kg is purchased or imported. The full household/site/module table is in outputs/livestock-scenarios.json.
+
+The livestock outputs add only 0.45 GJ/year in this small unit. Their primary benefit is protein/fat diversity and manure recycling, not replacing the household calorie field. Chicken rations cannot be replaced by kitchen scraps or pasture alone; rabbit forage also does not remove the need for balanced feed, clean water, winter storage and disease control.
+
+Sources: [UMN laying hens](https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs), [Penn State layer nutrition](https://extension.psu.edu/management-requirements-for-laying-flocks), [Ontario poultry nutrition](https://www.ontario.ca/page/introduction-poultry-nutrition), [Ontario Starting a Farm rabbit section](https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf), [USU rabbit nutrition guide](https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf), [Ontario rabbit disease guidance](https://www.ontario.ca/document/animal-health-updates-and-veterinary-advisories/animal-health-update-rabbit-hemorrhagic-disease-virus-2-2022-06-10).

@@ -1,0 +1,169 @@
+{
+  "source": "data/source/woody-yield-evidence.csv",
+  "energy_conversion_gj_per_dry_tonne": 19,
+  "harvest_storage_retention": 0.85,
+  "bands": {
+    "marginal": 3,
+    "ordinary": 5,
+    "favourable": 8.9
+  },
+  "cases": {
+    "low": {
+      "marginal": {
+        "dry_biomass_t_ha_year": 3,
+        "gross_energy_gj_ha_year": 57,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 48.45,
+        "gross_wood_required_gj": 15.94506,
+        "required_woody_area_ha": 0.329103,
+        "useful_delivered_heat_gj": 13.553301
+      },
+      "ordinary": {
+        "dry_biomass_t_ha_year": 5,
+        "gross_energy_gj_ha_year": 95,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 80.75,
+        "gross_wood_required_gj": 15.94506,
+        "required_woody_area_ha": 0.197462,
+        "useful_delivered_heat_gj": 13.553301
+      },
+      "favourable": {
+        "dry_biomass_t_ha_year": 8.9,
+        "gross_energy_gj_ha_year": 169.1,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 143.735,
+        "gross_wood_required_gj": 15.94506,
+        "required_woody_area_ha": 0.110934,
+        "useful_delivered_heat_gj": 13.553301
+      }
+    },
+    "central": {
+      "marginal": {
+        "dry_biomass_t_ha_year": 3,
+        "gross_energy_gj_ha_year": 57,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 48.45,
+        "gross_wood_required_gj": 28.071998,
+        "required_woody_area_ha": 0.579401,
+        "useful_delivered_heat_gj": 21.053999
+      },
+      "ordinary": {
+        "dry_biomass_t_ha_year": 5,
+        "gross_energy_gj_ha_year": 95,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 80.75,
+        "gross_wood_required_gj": 28.071998,
+        "required_woody_area_ha": 0.347641,
+        "useful_delivered_heat_gj": 21.053999
+      },
+      "favourable": {
+        "dry_biomass_t_ha_year": 8.9,
+        "gross_energy_gj_ha_year": 169.1,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 143.735,
+        "gross_wood_required_gj": 28.071998,
+        "required_woody_area_ha": 0.195304,
+        "useful_delivered_heat_gj": 21.053999
+      }
+    },
+    "high": {
+      "marginal": {
+        "dry_biomass_t_ha_year": 3,
+        "gross_energy_gj_ha_year": 57,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 48.45,
+        "gross_wood_required_gj": 58.056216,
+        "required_woody_area_ha": 1.198271,
+        "useful_delivered_heat_gj": 37.73654
+      },
+      "ordinary": {
+        "dry_biomass_t_ha_year": 5,
+        "gross_energy_gj_ha_year": 95,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 80.75,
+        "gross_wood_required_gj": 58.056216,
+        "required_woody_area_ha": 0.718962,
+        "useful_delivered_heat_gj": 37.73654
+      },
+      "favourable": {
+        "dry_biomass_t_ha_year": 8.9,
+        "gross_energy_gj_ha_year": 169.1,
+        "harvest_storage_retention": 0.85,
+        "usable_gross_energy_gj_ha_year": 143.735,
+        "gross_wood_required_gj": 58.056216,
+        "required_woody_area_ha": 0.403911,
+        "useful_delivered_heat_gj": 37.73654
+      }
+    }
+  },
+  "evidence": [
+    {
+      "id": "willow_stable_low_band",
+      "system": "Willow/coppice",
+      "site_class": "poor-marginal",
+      "source": "https://doi.org/10.3390/f15112041",
+      "geography": "Eastern and northern United States",
+      "years_measured": "1993-2019",
+      "sample_or_coverage": "19 cultivars over 8 rotations",
+      "dry_biomass_t_ha_year": "3.0",
+      "input_intensity": "low",
+      "synthetic_fertilizer": "not central",
+      "irrigation": "not central",
+      "annual_purchased_inputs": "not reported",
+      "canonical_role": "canonical band",
+      "evidence_type": "measured range synthesis",
+      "notes": "Lower stable released-cultivar performance in the long-term trial; not a Grey County measurement."
+    },
+    {
+      "id": "mixed_woody_ordinary",
+      "system": "Mixed low-input woody system",
+      "site_class": "ordinary mesic",
+      "source": "https://doi.org/10.3390/f15112041",
+      "geography": "Eastern and northern United States",
+      "years_measured": "1993-2019",
+      "sample_or_coverage": "stable released cultivar group over 6 rotations",
+      "dry_biomass_t_ha_year": "5.0",
+      "input_intensity": "low",
+      "synthetic_fertilizer": "not central",
+      "irrigation": "not central",
+      "annual_purchased_inputs": "not reported",
+      "canonical_role": "canonical central",
+      "evidence_type": "modelled synthesis",
+      "notes": "Ordinary-site planning value anchored to stable first-rotation group near 5 dry t/ha/year; mixed-system value is a modelled synthesis"
+    },
+    {
+      "id": "willow_commercial_favourable",
+      "system": "Willow/coppice",
+      "site_class": "favourable moist",
+      "source": "https://doi.org/10.3390/f15112041",
+      "geography": "Eastern and northern United States",
+      "years_measured": "1993-2019",
+      "sample_or_coverage": "commercial SV1 first rotation",
+      "dry_biomass_t_ha_year": "8.9",
+      "input_intensity": "moderate",
+      "synthetic_fertilizer": "trial dependent",
+      "irrigation": "trial dependent",
+      "annual_purchased_inputs": "trial dependent",
+      "canonical_role": "sensitivity upper band",
+      "evidence_type": "measured trial result",
+      "notes": "Commercial cultivar first-rotation value; later peak values are excluded from central case."
+    },
+    {
+      "id": "willow_wet_landfill_upper",
+      "system": "Willow/coppice",
+      "site_class": "wetter exceptional",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9861115/",
+      "geography": "Eastern Canada",
+      "years_measured": "2018-2020",
+      "sample_or_coverage": "48 trees across treatments",
+      "dry_biomass_t_ha_year": "8.55",
+      "input_intensity": "moderate/high",
+      "synthetic_fertilizer": "unfertilized or leachate",
+      "irrigation": "groundwater/leachate",
+      "annual_purchased_inputs": "site-specific",
+      "canonical_role": "upper sensitivity only",
+      "evidence_type": "measured site-specific",
+      "notes": "17.1 dry t/ha over two years in the unfertilized treatment; exceptional saturated landfill site"
+    }
+  ]
+}

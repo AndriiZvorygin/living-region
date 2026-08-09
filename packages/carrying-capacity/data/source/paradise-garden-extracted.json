@@ -1,0 +1,1745 @@
+{
+  "source": "/home/htaf/lyis/pcan/paradise-garden.ods",
+  "sheets": [
+    {
+      "source_sheet": "j needs",
+      "source_row": 2,
+      "cells": [
+        "human",
+        "weight (kg)",
+        "kj/day",
+        "Gj/year",
+        "Mj/month",
+        "Mj/week",
+        "protein",
+        "fats"
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "j needs",
+      "source_row": 3,
+      "cells": [
+        "",
+        "50",
+        "8700",
+        "3.177675",
+        "264.80625",
+        "60.9",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "of:=[.C3]*365.25/1000/1000",
+        "of:=[.D3]/12*1000",
+        "of:=[.C3]*7/1000",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "j needs",
+      "source_row": 4,
+      "cells": [
+        "",
+        "75",
+        "13050",
+        "4.7665125",
+        "397.209375",
+        "91.35",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "of:=[.C3]/[.$B$3]*[.$B4]",
+        "of:=[.D3]/[.$B$3]*[.$B4]",
+        "of:=[.E3]/[.$B$3]*[.$B4]",
+        "of:=[.F3]/[.$B$3]*[.$B4]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 1,
+      "cells": [
+        "sustainable foods hardiness 5",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 2,
+      "cells": [
+        "name",
+        "carbs",
+        "fats",
+        "protein",
+        "Kj/100g",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 3,
+      "cells": [
+        "black walnut",
+        "6%",
+        "80%",
+        "14%",
+        "2591",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 4,
+      "cells": [
+        "N. hazelnut",
+        "11%",
+        "81%",
+        "8%",
+        "2629",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 5,
+      "cells": [
+        "pine nut",
+        "8%",
+        "85%",
+        "7%",
+        "2633",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 6,
+      "cells": [
+        "chestnut",
+        "89%",
+        "4%",
+        "7%",
+        "1544",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 7,
+      "cells": [
+        "buckwheat",
+        "79%",
+        "8%",
+        "13%",
+        "1448",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 8,
+      "cells": [
+        "rye",
+        "81%",
+        "6%",
+        "13%",
+        "1415",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 9,
+      "cells": [
+        "wildrice",
+        "82%",
+        "3%",
+        "15%",
+        "1494",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 10,
+      "cells": [
+        "lupine",
+        "44%",
+        "22%",
+        "34%",
+        "1553",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 11,
+      "cells": [
+        "sunflower potato",
+        "90%",
+        "0%",
+        "10%",
+        "305",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 12,
+      "cells": [
+        "mulberry",
+        "81%",
+        "8%",
+        "11%",
+        "180",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 13,
+      "cells": [
+        "mulberry leaf",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 14,
+      "cells": [
+        "bur oak",
+        "42%",
+        "52%",
+        "6%",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 15,
+      "cells": [
+        "autumn olive",
+        "90%",
+        "3%",
+        "7%",
+        "284",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 16,
+      "cells": [
+        "grapes",
+        "93%",
+        "4%",
+        "3%",
+        "288",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 17,
+      "cells": [
+        "apples",
+        "95%",
+        "3%",
+        "2%",
+        "217",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 18,
+      "cells": [
+        "apios americana",
+        "42%",
+        "18%",
+        "40%",
+        "360",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 19,
+      "cells": [
+        "amaranth",
+        "71%",
+        "16%",
+        "13%",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 20,
+      "cells": [
+        "caragana arborescens",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 21,
+      "cells": [
+        "hickory",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 22,
+      "cells": [
+        "butternut",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 23,
+      "cells": [
+        "heartnut",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 24,
+      "cells": [
+        "sea buckthorn",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 25,
+      "cells": [
+        "blackcurrant",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 26,
+      "cells": [
+        "goji berry",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 27,
+      "cells": [
+        "elderberry",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 28,
+      "cells": [
+        "lingonberry",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 29,
+      "cells": [
+        "serviceberry",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 30,
+      "cells": [
+        "raspberry",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 31,
+      "cells": [
+        "pear cactus",
+        "84.00%",
+        "10.00%",
+        "6.00%",
+        "172",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "plant nutrient",
+      "source_row": 32,
+      "cells": [
+        "cassava",
+        "97.00%",
+        "1.00%",
+        "2.00%",
+        "670",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 1,
+      "cells": [
+        "sustainable foods hardiness 5",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A1]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 2,
+      "cells": [
+        "name",
+        "tons per hectare",
+        "Plants per hectare",
+        "Gj/hectare",
+        "Mj/plant",
+        "Mj/(100m2)grove"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A2]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 3,
+      "cells": [
+        "black walnut",
+        "1",
+        "118",
+        "25.91",
+        "219.58",
+        "259.1"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A3]",
+        "",
+        "",
+        "of:=[.B3]*10000*['plant nutrient'.E3]/1000/1000",
+        "of:=[.D3]/[.C3]*1000",
+        "of:=[.D3]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 4,
+      "cells": [
+        "N. hazelnut",
+        "1",
+        "625",
+        "26.29",
+        "42.06",
+        "262.9"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A4]",
+        "",
+        "",
+        "of:=[.B4]*10000*['plant nutrient'.E4]/1000/1000",
+        "of:=[.D4]/[.C4]*1000",
+        "of:=[.D4]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 5,
+      "cells": [
+        "pine nut",
+        "1",
+        "100",
+        "26.33",
+        "263.30",
+        "263.3"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A5]",
+        "",
+        "",
+        "of:=[.B5]*10000*['plant nutrient'.E5]/1000/1000",
+        "of:=[.D5]/[.C5]*1000",
+        "of:=[.D5]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 6,
+      "cells": [
+        "chestnut",
+        "2",
+        "100",
+        "30.88",
+        "308.80",
+        "308.8"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A6]",
+        "",
+        "",
+        "of:=[.B6]*10000*['plant nutrient'.E6]/1000/1000",
+        "of:=[.D6]/[.C6]*1000",
+        "of:=[.D6]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 7,
+      "cells": [
+        "mulberry",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A12]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 8,
+      "cells": [
+        "mulberry leaf",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A13]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 9,
+      "cells": [
+        "bur oak",
+        "2",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A14]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 10,
+      "cells": [
+        "autumn olive",
+        "7",
+        "",
+        "19.88",
+        "",
+        "198.8"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A15]",
+        "",
+        "",
+        "of:=[.B10]*10000*['plant nutrient'.E15]/1000/1000",
+        "",
+        "of:=[.D10]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 11,
+      "cells": [
+        "grapes",
+        "6",
+        "4000",
+        "17.28",
+        "4.32",
+        "172.8"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A16]",
+        "",
+        "",
+        "of:=[.B11]*10000*['plant nutrient'.E16]/1000/1000",
+        "of:=[.D11]/[.C11]*1000",
+        "of:=[.D11]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 12,
+      "cells": [
+        "apples",
+        "6",
+        "166",
+        "13.02",
+        "78.43",
+        "130.2"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A17]",
+        "",
+        "",
+        "of:=[.B12]*10000*['plant nutrient'.E17]/1000/1000",
+        "of:=[.D12]/[.C12]*1000",
+        "of:=[.D12]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 13,
+      "cells": [
+        "apios americana",
+        "7",
+        "",
+        "25.2",
+        "",
+        "252"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A18]",
+        "",
+        "",
+        "of:=[.B13]*10000*['plant nutrient'.E18]/1000/1000",
+        "",
+        "of:=[.D13]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 14,
+      "cells": [
+        "amaranth",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A19]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 15,
+      "cells": [
+        "caragana arborescens",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A20]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 16,
+      "cells": [
+        "hickory",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A21]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 17,
+      "cells": [
+        "butternut",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A22]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "tree yields",
+      "source_row": 18,
+      "cells": [
+        "heartnut",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A23]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "annual yields",
+      "source_row": 1,
+      "cells": [
+        "sustainable foods hardiness 5",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['tree yields'.A1]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "annual yields",
+      "source_row": 2,
+      "cells": [
+        "name",
+        "tons per hectare",
+        "kg seed/ha",
+        "Gj/hectare",
+        "Hkg/kg seed",
+        "Mj/(100m2)grove"
+      ],
+      "formulas": [
+        "of:=['tree yields'.A2]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "annual yields",
+      "source_row": 3,
+      "cells": [
+        "buckwheat",
+        "1.5",
+        "61",
+        "21.72",
+        "24.59",
+        "217.2"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A7]",
+        "",
+        "",
+        "of:=[.B3]*10000*['plant nutrient'.E7]/1000/1000",
+        "of:=[.B3]*1000/[.C3]",
+        "of:=[.D3]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "annual yields",
+      "source_row": 4,
+      "cells": [
+        "rye",
+        "2",
+        "150",
+        "28.3",
+        "13.33",
+        "283"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A8]",
+        "",
+        "",
+        "of:=[.B4]*10000*['plant nutrient'.E8]/1000/1000",
+        "of:=[.B4]*1000/[.C4]",
+        "of:=[.D4]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "annual yields",
+      "source_row": 5,
+      "cells": [
+        "lupine",
+        "2",
+        "87",
+        "31.06",
+        "22.99",
+        "310.6"
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "of:=[.B5]*10000*['plant nutrient'.E10]/1000/1000",
+        "of:=[.B5]*1000/[.C5]",
+        "of:=[.D5]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "perrenial yields",
+      "source_row": 1,
+      "cells": [
+        "sustainable foods hardiness 5",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['annual yields'.A1]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "perrenial yields",
+      "source_row": 2,
+      "cells": [
+        "name",
+        "tons per hectare",
+        "kg seed/ha",
+        "Gj/hectare",
+        "Hkg/kg seed",
+        "Mj/(100m2)grove"
+      ],
+      "formulas": [
+        "of:=['annual yields'.A2]",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "perrenial yields",
+      "source_row": 3,
+      "cells": [
+        "wildrice",
+        "1",
+        "",
+        "14.94",
+        "",
+        "149.4"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A9]",
+        "",
+        "",
+        "of:=[.B3]*10000*['plant nutrient'.E9]/1000/1000",
+        "",
+        "of:=[.D3]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "perrenial yields",
+      "source_row": 4,
+      "cells": [
+        "sunflower potato",
+        "12",
+        "1120",
+        "36.6",
+        "10.71",
+        "366"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A11]",
+        "",
+        "",
+        "of:=[.B4]*10000*['plant nutrient'.E11]/1000/1000",
+        "of:=[.B4]*1000/[.C4]",
+        "of:=[.D4]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "perrenial yields",
+      "source_row": 5,
+      "cells": [
+        "cactus pear",
+        "12",
+        "",
+        "20.64",
+        "#DIV/0!",
+        "206.4"
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "of:=[.B5]*10000*['plant nutrient'.E31]/1000/1000",
+        "of:=[.B5]*1000/[.C5]",
+        "of:=[.D5]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "perrenial yields",
+      "source_row": 6,
+      "cells": [
+        "cassava",
+        "9",
+        "",
+        "60.3",
+        "",
+        "603"
+      ],
+      "formulas": [
+        "",
+        "",
+        "",
+        "of:=[.B6]*10000*['plant nutrient'.E32]/1000/1000",
+        "",
+        "of:=[.D6]*0.01*1000"
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 1,
+      "cells": [
+        "sustainable foods hardiness 5",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A1]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 2,
+      "cells": [
+        "name",
+        "$cost/seedling",
+        "source"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A2]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 3,
+      "cells": [
+        "black walnut",
+        "$12.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A3]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 4,
+      "cells": [
+        "N. hazelnut",
+        "$12.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A4]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 5,
+      "cells": [
+        "pine nut",
+        "$14.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A5]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 6,
+      "cells": [
+        "chestnut",
+        "$15.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A6]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 7,
+      "cells": [
+        "buckwheat",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A7]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 8,
+      "cells": [
+        "rye",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A8]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 9,
+      "cells": [
+        "wildrice",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A9]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 10,
+      "cells": [
+        "lupine",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A10]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 11,
+      "cells": [
+        "sunflower potato",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A11]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 12,
+      "cells": [
+        "mulberry",
+        "$32.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A12]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 13,
+      "cells": [
+        "mulberry leaf",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A13]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 14,
+      "cells": [
+        "bur oak",
+        "$12.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A14]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 15,
+      "cells": [
+        "autumn olive",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A15]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 16,
+      "cells": [
+        "grapes",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A16]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 17,
+      "cells": [
+        "apples",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A17]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 18,
+      "cells": [
+        "apios americana",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A18]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 19,
+      "cells": [
+        "amaranth",
+        "",
+        ""
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A19]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 20,
+      "cells": [
+        "caragana arborescens",
+        "$5.99",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A20]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 21,
+      "cells": [
+        "hickory",
+        "$14.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A21]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 22,
+      "cells": [
+        "butternut",
+        "$13.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A22]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 23,
+      "cells": [
+        "heartnut",
+        "$11.00",
+        "grimonut.com"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A23]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 24,
+      "cells": [
+        "sea buckthorn",
+        "4.99",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A24]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 25,
+      "cells": [
+        "blackcurrant",
+        "6.99",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A25]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 26,
+      "cells": [
+        "goji berry",
+        "6.99",
+        "bambooplants.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A26]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 27,
+      "cells": [
+        "elderberry",
+        "7.49",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A27]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 28,
+      "cells": [
+        "lingonberry",
+        "10.99",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A28]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 29,
+      "cells": [
+        "serviceberry",
+        "5.99",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A29]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 30,
+      "cells": [
+        "raspberry",
+        "5.49",
+        "treetime.ca"
+      ],
+      "formulas": [
+        "of:=['plant nutrient'.A30]",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 31,
+      "cells": [
+        "russian almond",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "source_sheet": "Seedling cost",
+      "source_row": 32,
+      "cells": [
+        "red spruce",
+        "",
+        ""
+      ],
+      "formulas": [
+        "",
+        "",
+        ""
+      ]
+    }
+  ]
+}

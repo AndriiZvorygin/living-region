@@ -1,0 +1,16 @@
+crop_species,energy_role,classification_basis
+black walnut,fat,manual: nut with 80% fat in source nutrient row
+N. hazelnut,fat,manual: nut with 81% fat in source nutrient row
+pine nut,fat,manual: nut with 85% fat in source nutrient row
+chestnut,starch/carbohydrate,manual: 89% carbohydrate in source nutrient row
+autumn olive,fruit,manual: fruit crop in original tree-yield section
+grapes,fruit,manual: fruit crop in original tree-yield section
+apples,fruit,manual: fruit crop in original tree-yield section
+apios americana,protein/legume,manual: edible tuber/legume-like staple; 40% protein in source nutrient row
+buckwheat,starch/carbohydrate,manual: grain/starch; 79% carbohydrate in source nutrient row
+rye,starch/carbohydrate,manual: grain/starch; 81% carbohydrate in source nutrient row
+lupine,protein/legume,manual: legume; 34% protein in source nutrient row
+wildrice,starch/carbohydrate,manual: grain/starch; 82% carbohydrate in source nutrient row
+sunflower potato,starch/carbohydrate,manual: potato/starch; 90% carbohydrate in source nutrient row
+cactus pear,fruit,manual: fruit crop in original perennial-yield section
+cassava,starch/carbohydrate,manual: root/starch; 97% carbohydrate in source nutrient row

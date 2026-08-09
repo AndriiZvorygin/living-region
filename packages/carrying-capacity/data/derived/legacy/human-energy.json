@@ -1,0 +1,67 @@
+{
+  "canonical": {
+    "body_mass_kg": 75,
+    "daily_kj": 13050,
+    "daily_mj": 13.05,
+    "annual_gj": 4.7665125,
+    "annual_kcal": 3119.024856597,
+    "days_per_year": 365.25,
+    "label": "canonical historical active 75 kg"
+  },
+  "cases": [
+    {
+      "body_mass_kg": 50,
+      "daily_kj": 8700,
+      "daily_mj": 8.7,
+      "annual_gj": 3.177675,
+      "annual_kcal": 2079.349904398,
+      "days_per_year": 365.25,
+      "label": "lower/source 50 kg"
+    },
+    {
+      "body_mass_kg": 75,
+      "daily_kj": 13050,
+      "daily_mj": 13.05,
+      "annual_gj": 4.7665125,
+      "annual_kcal": 3119.024856597,
+      "days_per_year": 365.25,
+      "label": "canonical historical active 75 kg"
+    },
+    {
+      "body_mass_kg": 100,
+      "daily_kj": 17400,
+      "daily_mj": 17.4,
+      "annual_gj": 6.35535,
+      "annual_kcal": 4158.699808795,
+      "days_per_year": 365.25,
+      "label": "higher linear sensitivity 100 kg"
+    }
+  ],
+  "source_formulas": [
+    {
+      "cell": "C4",
+      "formula": "of:=[.C3]/[.$B$3]*[.$B4]",
+      "displayed_value": "13050"
+    },
+    {
+      "cell": "D3",
+      "formula": "of:=[.C3]*365.25/1000/1000",
+      "displayed_value": "3.177675"
+    },
+    {
+      "cell": "D4",
+      "formula": "of:=[.D3]/[.$B$3]*[.$B4]",
+      "displayed_value": "4.7665125"
+    },
+    {
+      "cell": "E4",
+      "formula": "of:=[.E3]/[.$B$3]*[.$B4]",
+      "displayed_value": "397.209375"
+    },
+    {
+      "cell": "F4",
+      "formula": "of:=[.F3]/[.$B$3]*[.$B4]",
+      "displayed_value": "91.35"
+    }
+  ]
+}

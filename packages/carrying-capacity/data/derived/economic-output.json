@@ -1,0 +1,111 @@
+{
+  "status": "separate illustrative cash-flow module; not biological carrying-capacity evidence",
+  "targets_cad_year": [
+    1000,
+    2000,
+    3000,
+    5000
+  ],
+  "source_notes": [
+    "OMAFRA cost-of-production budgets are planning tools, not guarantees: https://www.ontario.ca/page/guide-cost-production-budgeting",
+    "OCO grain price data last available in this checked-in source is 2022; local current farmgate/direct-sale data remains required."
+  ],
+  "products": [
+    {
+      "id": "greenhouse_vegetables",
+      "product": "greenhouse vegetables",
+      "unit": "kg",
+      "price_cad": 8,
+      "variable_cost_cad": 5,
+      "source": "configurable ARC direct-sale scenario",
+      "notes": "Illustrative margin; replace with current Owen Sound farmgate records.",
+      "net_margin_cad_per_unit": 3,
+      "required_units_by_target": {
+        "1000": 333.333,
+        "2000": 666.667,
+        "3000": 1000,
+        "5000": 1666.667
+      }
+    },
+    {
+      "id": "seedlings",
+      "product": "seedlings",
+      "unit": "plant",
+      "price_cad": 4,
+      "variable_cost_cad": 1.5,
+      "source": "configurable ARC direct-sale scenario",
+      "notes": "Illustrative margin; local nursery price survey required.",
+      "net_margin_cad_per_unit": 2.5,
+      "required_units_by_target": {
+        "1000": 400,
+        "2000": 800,
+        "3000": 1200,
+        "5000": 2000
+      }
+    },
+    {
+      "id": "berries",
+      "product": "berries",
+      "unit": "kg",
+      "price_cad": 6,
+      "variable_cost_cad": 3.5,
+      "source": "configurable ARC direct-sale scenario",
+      "notes": "Illustrative margin; crop, grade and channel vary widely.",
+      "net_margin_cad_per_unit": 2.5,
+      "required_units_by_target": {
+        "1000": 400,
+        "2000": 800,
+        "3000": 1200,
+        "5000": 2000
+      }
+    },
+    {
+      "id": "firewood",
+      "product": "seasoned firewood",
+      "unit": "full cord",
+      "price_cad": 250,
+      "variable_cost_cad": 150,
+      "source": "configurable ARC direct-sale scenario",
+      "notes": "Illustrative margin; delivery and drying labour are not fully modelled.",
+      "net_margin_cad_per_unit": 100,
+      "required_units_by_target": {
+        "1000": 10,
+        "2000": 20,
+        "3000": 30,
+        "5000": 50
+      }
+    },
+    {
+      "id": "nursery_stock",
+      "product": "nursery stock",
+      "unit": "plant",
+      "price_cad": 25,
+      "variable_cost_cad": 14,
+      "source": "configurable ARC direct-sale scenario",
+      "notes": "Illustrative margin; species and size mix are unresolved.",
+      "net_margin_cad_per_unit": 11,
+      "required_units_by_target": {
+        "1000": 90.909,
+        "2000": 181.818,
+        "3000": 272.727,
+        "5000": 454.545
+      }
+    },
+    {
+      "id": "organic_wheat",
+      "product": "organic soft red winter wheat",
+      "unit": "bushel",
+      "price_cad": 13,
+      "variable_cost_cad": 10,
+      "source": "https://datawrapper.dwcdn.net/Oa49e/6/dataset.csv",
+      "notes": "2022 OCO spot-price range midpoint; not a current guaranteed price and costs are a configurable placeholder.",
+      "net_margin_cad_per_unit": 3,
+      "required_units_by_target": {
+        "1000": 333.333,
+        "2000": 666.667,
+        "3000": 1000,
+        "5000": 1666.667
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "baseline_1_0_ha": {
+    "label": "1.0 ha baseline ARC guideline",
+    "total_area_ha": 1,
+    "allocation": {
+      "core_food_ha": 0.25,
+      "backup_perennial_food_ha": 0.25,
+      "coppice_ha": 0.5,
+      "total_ha": 1
+    },
+    "interpretation": "Historical ARC shorthand; productive allocation is 0.25 ha core food + 0.25 ha backup/perennial food + 0.50 ha coppice."
+  },
+  "higher_resilience_1_2_ha": {
+    "label": "1.2 ha Grey-Bruce higher-provisioning scenario",
+    "total_area_ha": 1.2,
+    "allocation_if_scaled_proportionally": {
+      "core_food_ha": 0.3,
+      "backup_perennial_food_ha": 0.3,
+      "coppice_ha": 0.6
+    },
+    "additional_area_ha": 0.2,
+    "additional_if_scaled_proportionally": {
+      "core_food_ha": 0.05,
+      "backup_perennial_food_ha": 0.05,
+      "coppice_ha": 0.1
+    },
+    "interpretation": "The source text attributes 1.2 ha to a five-month Grey County growing season versus a six-month global-hectare assumption (6/5 = 1.2). It does not specify how the additional 0.2 ha is spatially allocated; proportional scaling is a new scenario assumption."
+  },
+  "heating_reference": {
+    "useful_demand_gj": 19.2902456360225,
+    "required_coppice_ha_at_historical_yield": 0.8573442504898889
+  }
+}

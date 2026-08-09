@@ -1,0 +1,5 @@
+variable,value,units,source_file,source_reference,status,notes
+willow_coppice_area,0.5,ha,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,label: Core wood: Willow SRC 0.5gHa,historical diagram label,"SVG label uses gHa, while surrounding text calls it a hectare allocation"
+willow_coppice_gross_energy,15,GJ/year,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,label: Core wood: Willow SRC 0.5gHa; 1 cord = ~15Gj,historical diagram label,gross fuel energy; not useful delivered heat
+wood_cord_energy,15,GJ/cord,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,label: 1 cord = ~15Gj,historical diagram label,energy-per-cord assumption embedded in graphic
+willow_coppice_yield,1,cord/year,/home/htaf/lyis/sren/long_term_rural/long_term_rural.tex,note at line 328: half hectare willow short rotation coppice to yield 1 cord,historical prose assumption,not a spreadsheet formula
