@@ -2,21 +2,35 @@
 
 ## Result
 
-The evidence-based model supports a **site-adjusted performance range**, not a universal hectare constant.
+The evidence-based model supports a **household/site-adjusted carrying-capacity guideline**, not a universal hectares-per-adult-equivalent rule. Adult-equivalent is retained only as a food-energy normalization.
 
-- A representative low-active adult requires 3.88 GJ/year in the current adult-equivalent definition; the representative woman and man are 3.38 and 4.39 GJ/year.
+- Food-energy normalization: a representative low-active adult-equivalent requires 3.88 GJ/year; the representative woman and man require 3.38 and 4.39 GJ/year.
 - The central low-input food-system synthesis produces 32.4 GJ/ha/year gross edible food energy before household loss/reserve deductions.
-- Central ordinary-site mathematical demand is 0.54 ha for one representative adult; the explicit robust-system scenario is 1.11 ha.
-- Central ordinary-site robust demand is 1.78 ha for two adults plus two representative children.
-- Central yurt useful heating is 21.1 GJ/year; ordinary woody area is 0.35 ha, with 0.58 ha on the marginal band.
+- Shared dwelling heating is 21.1 GJ/year useful heat in the central case. Its ordinary woody area is 0.35 ha; marginal woody area is 0.58 ha.
 
-## Policy interpretation
+## Household/site recommendation
 
-1 ha/adult is **approximately correct as a rounded ordinary-site one-adult design allowance**, but it is not demonstrated as a universal carrying capacity. It is slightly below this model's 1.10 ha ordinary robust-system result and becomes inadequate for larger households unless productive surplus is imported or the design is unusually favourable.
+| household | favourable site | ordinary site | marginal site |
+|---|---:|---:|---:|
+| 1 adult | 0.95 ha | 1.11 ha | 1.53 ha |
+| 1 adult + 1 child | 1.09 ha | 1.25 ha | 1.85 ha |
+| 2 adults | 1.20 ha | 1.35 ha | 2.12 ha |
+| 2 adults + 1 child | 1.36 ha | 1.52 ha | 2.47 ha |
+| 2 adults + 2 children | 1.63 ha | 1.78 ha | 3 ha |
+| 2 adults + 3 children | 1.82 ha | 1.97 ha | 3.37 ha |
 
-Recommended website language: “Plan against a site-adjusted performance test. Use approximately 1.0–1.2 productive hectares per adult-equivalent as an initial ordinary-site planning range, then adjust for measured soil, water, food-yield and heating performance. Marginal land and larger households require more; favourable sites can export surplus.” This is a recommendation derived from the model's explicit scenarios, not a current empirical provincial average.
+The current ARC examples evaluate as follows:
 
-The historic 1.2 ha/person remains a provenance-only Lyis scenario. The evidence-based model arrives near that range for a robust ordinary one-adult system, but by a different calculation and without validating the historic growing-season ratio.
+| ARC planning example | favourable | ordinary | marginal |
+|---|---|---|---|
+| 1 adult → 1 ha | sufficient against robust-area scenario; 0.05 ha | deficit against robust-area scenario; -0.11 ha | deficit against robust-area scenario; -0.53 ha |
+| 2 adults/family → 2 ha | sufficient against robust-area scenario; 0.80 ha | sufficient against robust-area scenario; 0.65 ha | deficit against robust-area scenario; -0.12 ha |
+
+Here “surplus/deficit” is allocation area minus robust productive area. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
+
+Recommended website language: “Plan productive land by household and site. Calculate food land from household food energy, calculate shared dwelling heating land from the building heat load and woody productivity, then add explicit resilience, ecological and surplus allowances. Use 1 ha for a one-adult household and 2 ha for a two-adult household only as planning examples; verify adequacy against the household/site performance table. Children increase food demand without being converted into linear hectare units.”
+
+The historic 1.2 ha/person remains a provenance-only Lyis scenario. The current model may produce totals near that value for particular households/sites, but it does not validate the historical growing-season ratio.
 
 ## What is mathematically required versus allowed
 

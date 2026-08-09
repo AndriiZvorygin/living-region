@@ -38,7 +38,7 @@ npm test
 
 ## Evidence-based recommendation
 
-The model currently recommends a site-adjusted performance test, initially approximately **1.0–1.2 productive hectares per adult-equivalent for an ordinary robust one-adult system**. The central ordinary-site calculation is about 1.11 ha for one representative adult, about 1.35 ha for two adults and about 1.78 ha for two adults plus two representative children. Marginal sites require more; favourable sites can retain exportable surplus.
+The model currently recommends a household/site-adjusted performance test. Adult-equivalent is a food-energy normalization only. The current planning examples are **1 ha for a one-adult household** and **2 ha for a two-adult household**, then checked against the household/site table. The central ordinary-site robust results are about 1.11 ha for one adult, 1.35 ha for two adults, and 1.97 ha for two adults plus three representative children. Marginal sites require more; favourable sites can retain exportable surplus.
 
 That range is a model recommendation, not a measured provincial average. The largest unresolved inputs are measured low-input Grey-Bruce crop yields, nutritional completeness, current climate normals, yurt leakage and thermal bridges, mixed-woody yield, wildlife loss and local sale margins.
 

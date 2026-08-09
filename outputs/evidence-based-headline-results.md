@@ -6,9 +6,9 @@
 4. The central balanced food-system synthesis is 32.4 GJ/ha/year gross edible energy. One representative adult's calculated food area after storage, wildlife, seed, bad-year and community reserves is **0.19 ha**.
 5. The audited 65.6 m² yurt central useful heating requirement is **21.1 GJ/year**, with a low/high range of 13.6–37.7 GJ/year.
 6. Woody bands are 3, 5 and 8.9 dry t/ha/year for marginal, ordinary and favourable scenarios. Central yurt wood area is **0.58 ha marginal, 0.35 ha ordinary, 0.20 ha favourable**.
-7. For an ordinary mesic site, the mathematical food-plus-heat minimum is 0.54 ha and the explicit robust one-adult system is **1.11 ha**. Two adults plus two representative children require 1.78 ha in the same scenario.
-8. One hectare on the ordinary site produces a modeled 8.2 GJ/year post-loss/post-reserve food surplus for one representative adult after heating land is assigned; this is deliberate capacity, not guaranteed export.
+7. For an ordinary mesic site, the mathematical food-plus-shared-heat minimum is 0.54 ha and the explicit robust one-adult system is **1.11 ha**. Two adults plus two representative children require 1.78 ha; two adults plus three children require 1.97 ha.
+8. The 1 ha/adult ARC examples are household allocations, not adult-equivalent multipliers: 1 adult receives 1 ha and 2 adults/family receive 2 ha. Their favourable/ordinary/marginal land surpluses or deficits are tabulated in `outputs/recommended-land-guideline.md`.
 9. The economic module is separate and illustrative: depending on product, covering $1,000–$5,000/year requires the configurable unit volumes in `data/derived/economic-output.csv`. Current local margins remain unresolved.
-10. Recommendation: use a **site-adjusted range/performance test**, initially approximately **1.0–1.2 productive ha per adult-equivalent for an ordinary robust one-adult system**, with larger allowances for marginal land and larger households. Do not publish 1 ha/adult as a universal physical constant.
+10. Recommendation: use a **household/site-adjusted carrying-capacity test**. Adult-equivalent belongs only in the food-energy calculation; shared heat and resilience/ecological/surplus land must be calculated at household/site level.
 
 Historical Lyis values are deliberately excluded from these canonical calculations. See `outputs/legacy/` and `historical` in `outputs/summary.json` for provenance only.

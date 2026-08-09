@@ -1,8 +1,10 @@
 # Deliberate surplus and cash output
 
-At one total hectare on the ordinary site, the central model allocates 0.35 ha to heating and 0.65 ha to food and associated production. For the representative one-adult case, the model reports 8.24 GJ/year of post-loss, post-reserve food surplus after the modeled household requirement. This is a scenario output, not a promise of saleable surplus in every year.
+At one total hectare on the ordinary site, the central model allocates 0.35 ha to shared dwelling heating. For one adult, the 1 ha ARC allocation leaves 8.24 GJ/year of post-loss, post-reserve food surplus after household demand. For two adults plus two children, the 2 ha ARC allocation leaves 15.36 GJ/year under the same shared-dwelling assumption. These are scenario outputs, not promises of saleable surplus in every year.
 
-Two adults plus two children require 1.78 ha in the robust ordinary-site scenario; a one-hectare system therefore cannot be described as a full household food-and-heat system for that household.
+The land comparison is intentionally based on adult count: a 1 adult + child household is evaluated against 1 ha, while 2 adults + 1/2/3 children are evaluated against 2 ha. Adult-equivalents are shown only beside household food demand.
+
+The robust ordinary-site area is 1.78 ha for two adults plus two children and 1.97 ha for two adults plus three children. The difference is household food demand, not a linear adult-equivalent land multiplier.
 
 ## Cash targets
 

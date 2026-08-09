@@ -4,7 +4,7 @@
 
 | assumption | central value | classification | evidence/basis |
 |---|---:|---|---|
-| Adult-equivalent food demand | 3.884 GJ/year | derived current scenario | Mean of representative low-active 35-year-old woman and man using Health Canada EER equations |
+| Adult-equivalent food demand | 3.884 GJ/year | derived current scenario | Mean of representative low-active 35-year-old woman and man using Health Canada EER equations; food-energy normalization only, not a total-land multiplier |
 | Representative adult woman | 3.375 GJ/year | derived current scenario | 35 years, 65 kg, 165 cm, low activity |
 | Representative adult man | 4.394 GJ/year | derived current scenario | 35 years, 80 kg, 178 cm, low activity |
 | Low-input crop energy median | 29.891 GJ/ha/year | modelled synthesis distribution | Six eligible low-input synthesis rows; see `data/source/evidence-food-yields.csv` |

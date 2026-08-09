@@ -12,12 +12,21 @@ export const siteClasses = {
   shallow_rocky_marginal: {label: 'Shallow/rocky marginal site', food_multiplier: .50, woody_band: 'marginal', notes: 'Lower productivity scenario; a site survey is required before using it for a parcel.'}
 };
 
-const householdProfiles = {
-  one_adult: ['adult_woman'],
-  two_adults: ['adult_woman', 'adult_man'],
-  adult_plus_child: ['adult_woman', 'child_girl_8'],
-  adult_plus_two_children: ['adult_woman', 'child_girl_8', 'adolescent_boy_14'],
-  two_adults_plus_two_children: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']
+export const householdProfiles = {
+  one_adult: {label: '1 adult', member_ids: ['adult_woman'], adult_count: 1},
+  adult_plus_child: {label: '1 adult + 1 child', member_ids: ['adult_woman', 'child_girl_8'], adult_count: 1},
+  two_adults: {label: '2 adults', member_ids: ['adult_woman', 'adult_man'], adult_count: 2},
+  two_adults_plus_one_child: {label: '2 adults + 1 child', member_ids: ['adult_woman', 'adult_man', 'child_girl_8'], adult_count: 2},
+  two_adults_plus_two_children: {label: '2 adults + 2 children', member_ids: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], adult_count: 2},
+  two_adults_plus_three_children: {label: '2 adults + 3 children', member_ids: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8'], adult_count: 2}
+};
+
+export const arcPolicyAdultAllocationHa = 1;
+
+export const policySiteMap = {
+  favourable: 'wetter_productive',
+  ordinary: 'ordinary_mesic',
+  marginal: 'shallow_rocky_marginal'
 };
 
 export const foodLossAssumptions = {storage_loss: .10, wildlife_loss: .10, seed_propagation_loss: .03, weather_crop_reserve: .20, emergency_community_reserve: .10};
@@ -58,7 +67,8 @@ export function buildHouseholdCapacity(energy = buildHealthCanadaEnergy(), food 
   for (const [siteId, site] of Object.entries(siteClasses)) {
     const heatingBand = site.woody_band;
     const heatArea = woody.cases.central[heatingBand].required_woody_area_ha;
-    for (const [householdId, members] of Object.entries(householdProfiles)) {
+    for (const [householdId, household] of Object.entries(householdProfiles)) {
+      const members = household.member_ids;
       const membersResult = members.map(id => energy.scenarios[id]);
       const demand = membersResult.reduce((sum, member) => sum + member.gj_year, 0);
       const referenceWeight = membersResult.reduce((sum, member) => sum + member.weight_kg, 0);
@@ -67,15 +77,21 @@ export function buildHouseholdCapacity(energy = buildHealthCanadaEnergy(), food 
       const resilience = {diversity_and_rotation_ha: round(Math.max(.12, foodSystem.required_food_area_ha * .25), 6), soil_water_perennial_buffer_ha: .15, fibre_habitat_wildlife_buffer_ha: .10, deliberate_export_production_ha: .20};
       const resilienceArea = Object.values(resilience).reduce((sum, value) => sum + value, 0);
       const robustArea = mathArea + resilienceArea;
-      const foodSurplusAtOneHa = Math.max(0, 1 - heatArea) * foodSystem.gross_energy_per_ha * foodSystem.delivery_factor_after_losses_and_reserves - demand;
-      rows.push({site: siteId, household: householdId, member_ids: members, member_count: members.length, household_energy_gj_year: round(demand, 6), adult_equivalents: round(demand / adultEquivalent, 6), food_area_ha: foodSystem.required_food_area_ha, heating_area_ha: round(heatArea, 6), mathematical_minimum_area_ha: round(mathArea, 6), resilience_allowances_ha: resilience, resilience_allowance_total_ha: round(resilienceArea, 6), robust_system_area_ha: round(robustArea, 6), food_surplus_at_one_total_ha_gj: round(foodSurplusAtOneHa, 6), food_system: foodSystem, site_notes: site.notes});
+      // ARC's 1 ha/adult example is evaluated by adult household count. Children affect
+      // the food-demand component, but neither become full adult land units nor create a
+      // second dwelling/heating system in this scenario.
+      const arcAllocationHa = household.adult_count * arcPolicyAdultAllocationHa;
+      const availableFoodAreaAtAllocation = arcAllocationHa - heatArea;
+      const foodSurplusAtArcAllocation = availableFoodAreaAtAllocation * foodSystem.gross_energy_per_ha * foodSystem.delivery_factor_after_losses_and_reserves - demand;
+      const landSurplusOrDeficit = arcAllocationHa - robustArea;
+      rows.push({site: siteId, household: householdId, household_label: household.label, member_ids: members, member_count: members.length, adult_count: household.adult_count, household_energy_gj_year: round(demand, 6), food_adult_equivalents: round(demand / adultEquivalent, 6), food_area_ha: foodSystem.required_food_area_ha, heating_area_ha: round(heatArea, 6), mathematical_minimum_area_ha: round(mathArea, 6), resilience_allowances_ha: resilience, resilience_allowance_total_ha: round(resilienceArea, 6), robust_system_area_ha: round(robustArea, 6), arc_policy_allocation_ha: round(arcAllocationHa, 6), land_surplus_or_deficit_ha: round(landSurplusOrDeficit, 6), arc_policy_status: landSurplusOrDeficit >= 0 ? 'sufficient against robust-area scenario' : 'deficit against robust-area scenario', food_surplus_or_deficit_at_arc_allocation_gj: round(foodSurplusAtArcAllocation, 6), food_system: foodSystem, site_notes: site.notes});
     }
   }
-  const output = {source: 'Health Canada EER + evidence-based food system + evidence-based heating/woody model', adult_equivalent_definition: energy.canonical_adult_equivalent, site_classes: siteClasses, food_loss_assumptions: foodLossAssumptions, household_profiles: householdProfiles, rows};
+  const output = {source: 'Health Canada EER + evidence-based food system + evidence-based heating/woody model', food_adult_equivalent_definition: energy.canonical_adult_equivalent, adult_equivalent_scope: 'food-energy normalization only; not a total-land multiplier', arc_policy_definition: '1 ha per adult is evaluated by number of adults in the household allocation, while children increase food demand and shared-household land pressure', site_classes: siteClasses, policy_site_map: policySiteMap, food_loss_assumptions: foodLossAssumptions, household_profiles: householdProfiles, rows};
   writeJson('data/derived/household-capacity.json', output);
   writeCsv('data/derived/household-capacity.csv', [
-    ['site','household','household_energy_gj_year','adult_equivalents','food_area_ha','heating_area_ha','mathematical_minimum_area_ha','resilience_allowance_total_ha','robust_system_area_ha','food_surplus_at_one_total_ha_gj'],
-    ...rows.map(row => [row.site,row.household,row.household_energy_gj_year,row.adult_equivalents,row.food_area_ha,row.heating_area_ha,row.mathematical_minimum_area_ha,row.resilience_allowance_total_ha,row.robust_system_area_ha,row.food_surplus_at_one_total_ha_gj])
+    ['site','household','adult_count','household_energy_gj_year','food_adult_equivalents','mathematical_food_area_ha','heating_area_ha','resilience_surplus_allowance_ha','total_robust_productive_area_ha','arc_policy_allocation_ha','land_surplus_or_deficit_ha','arc_policy_status','food_surplus_or_deficit_at_arc_allocation_gj'],
+    ...rows.map(row => [row.site,row.household,row.adult_count,row.household_energy_gj_year,row.food_adult_equivalents,row.food_area_ha,row.heating_area_ha,row.resilience_allowance_total_ha,row.robust_system_area_ha,row.arc_policy_allocation_ha,row.land_surplus_or_deficit_ha,row.arc_policy_status,row.food_surplus_or_deficit_at_arc_allocation_gj])
   ]);
   return output;
 }

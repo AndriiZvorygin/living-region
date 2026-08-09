@@ -23,7 +23,7 @@ The food-system area calculation uses an explicit energy-share mix of potato, wh
 
 ## Human energy
 
-The current calculation implements Health Canada's Estimated Energy Requirement equations and pregnancy/lactation adjustments. Profiles parameterize age, sex, height, weight, activity and reproductive status. The adult-equivalent is derived as the mean of two representative low-active adults; it is not the old 75 kg Lyis reference.
+The current calculation implements Health Canada's Estimated Energy Requirement equations and pregnancy/lactation adjustments. Profiles parameterize age, sex, height, weight, activity and reproductive status. The adult-equivalent is derived as the mean of two representative low-active adults; it is not the old 75 kg Lyis reference. It is a **food-energy normalization only** and must not be multiplied into total land.
 
 Children are represented by age-specific Health Canada equations and are reported as their own energy demand. Household capacity is the sum of member demands, not a count of full adults.
 
@@ -47,7 +47,7 @@ For each household and site:
 
 `robust system area = mathematical minimum + diversity/rotation + soil/water + fibre/habitat + deliberate export allowances`.
 
-The allowances are displayed separately so a reader can remove or change them. Exportable food surplus is calculated after household demand and the explicit loss/reserve factors; it is not assumed to appear automatically.
+The heating component is shared at the dwelling level in the current household scenarios. Children increase household food demand but do not create linear adult-equivalent land units. The ARC comparison allocation is 1 ha for a one-adult household and 2 ha for a two-adult household; it is evaluated against the robust household result. The allowances are displayed separately so a reader can remove or change them. Exportable food surplus is calculated after household demand and the explicit loss/reserve factors; it is not assumed to appear automatically.
 
 ## Economics
 

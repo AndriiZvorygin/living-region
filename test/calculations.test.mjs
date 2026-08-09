@@ -129,6 +129,29 @@ test('household robust allocation is an explicit sum of food, heat and allowance
   close(row.robust_system_area_ha, row.mathematical_minimum_area_ha + row.resilience_allowance_total_ha, 1e-9);
 });
 
+test('household table covers requested family sizes and keeps adult-equivalent food-only', () => {
+  const result = buildHouseholdCapacity();
+  const requested = ['one_adult', 'adult_plus_child', 'two_adults', 'two_adults_plus_one_child', 'two_adults_plus_two_children', 'two_adults_plus_three_children'];
+  for (const site of ['wetter_productive', 'ordinary_mesic', 'shallow_rocky_marginal']) {
+    const rows = result.rows.filter(row => row.site === site);
+    assert.deepEqual(rows.map(row => row.household), requested);
+    assert.ok(rows.every(row => row.food_adult_equivalents > 0));
+    assert.ok(rows.every(row => row.arc_policy_allocation_ha === (row.adult_count === 1 ? 1 : 2)));
+    assert.ok(rows.every(row => row.heating_area_ha === rows[0].heating_area_ha));
+  }
+  assert.equal(result.adult_equivalent_scope, 'food-energy normalization only; not a total-land multiplier');
+});
+
+test('ARC examples compare adult-count allocations with robust household area', () => {
+  const result = buildHouseholdCapacity();
+  const favourableAdult = result.rows.find(row => row.site === 'wetter_productive' && row.household === 'one_adult');
+  const ordinaryAdult = result.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
+  const marginalTwoAdults = result.rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults');
+  close(favourableAdult.land_surplus_or_deficit_ha, 1 - favourableAdult.robust_system_area_ha, 1e-6);
+  assert.ok(ordinaryAdult.land_surplus_or_deficit_ha < 0);
+  assert.ok(marginalTwoAdults.land_surplus_or_deficit_ha < 0);
+});
+
 test('economic target calculation is margin divided into cash target', () => {
   const row = calculateEconomicTargets([{product: 'test', unit: 'unit', price_cad: 10, variable_cost_cad: 6, source: 'test', notes: ''}], [1000])[0];
   close(row.net_margin_cad_per_unit, 4);
