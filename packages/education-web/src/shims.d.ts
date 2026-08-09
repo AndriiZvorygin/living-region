@@ -4,3 +4,11 @@ declare module '@living-region/carrying-capacity/browser' {
   export function calculateEvidenceHeating(overrides?: Record<string, unknown>): any;
   export const heatingCases: Record<string, any>;
 }
+
+interface ImportMetaEnv {
+  readonly BASE_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
