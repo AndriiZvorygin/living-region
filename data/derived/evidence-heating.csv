@@ -1,0 +1,4 @@
+case,useful_space_heat_gj,gross_wood_gj,dry_wood_tonnes,cords,heater_efficiency,hdd,classification
+low,13.553301,15.94506,0.839214,1.993132,0.85,4031.9,modelled case
+central,21.053999,28.071998,1.477474,2.8072,0.75,4031.9,modelled case
+high,37.73654,58.056216,3.05559,4.838018,0.65,4031.9,modelled case

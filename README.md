@@ -1,43 +1,45 @@
-# ARC carrying-capacity model
+# ARC evidence-based carrying-capacity model
 
-This is an independent, reproducible reconstruction and audit of the quantitative model behind the Affordable Rural Communities one-hectare-per-adult carrying-capacity guideline. It preserves the historical Lyis values first, then adds explicitly labelled calculations for crop-energy spread, useful heat, yurt heating, farm-size ratios, and 1.0/1.2 ha scenarios.
+This repository is an independent, reproducible Phase 2 model for Affordable Rural Communities. The current canonical model is evidence-based and deliberately does not defend a predetermined 1 ha/adult value. Historical Lyis spreadsheets, diagrams and calculations are preserved as provenance only under `data/source/`, `data/derived/legacy/` and `outputs/legacy/`.
 
-The original files under `/home/htaf/lyis/` are read-only inputs to this repository and are not modified.
+The original files under `/home/htaf/lyis/` are read-only inputs and were not modified.
 
-## Run it
+## Run
 
-Requirements: Node.js 20+ and the system `unzip` command. The ODS reader is dependency-free and extracts displayed values, formulas, sheet names, and cell addresses directly from the OpenDocument XML.
+Requirements: Node.js 20+ and `unzip`.
 
 ```sh
 npm run all
 ```
 
-Individual stages:
+This extracts the original ODS files, builds the current evidence-based model and runs the test suite. The current build includes Health Canada EER scenarios, Ontario crop benchmarks and low-input syntheses, Canadian food composition, audited yurt heating, evidence-based woody-energy bands, household capacity, site sensitivity, deliberate surplus and a separate configurable economics module.
+
+Useful commands:
 
 ```sh
-npm run extract   # source ODS -> data/source/
-npm run build     # calculations -> data/derived/ and outputs/
-npm test          # arithmetic and allocation checks
+npm run extract
+npm run build:evidence
+npm test
 ```
 
-The main handoff files are:
+## Current handoff files
 
-- [`outputs/headline-results.md`](outputs/headline-results.md) — answers to the requested policy questions.
-- [`outputs/summary.json`](outputs/summary.json) — machine-readable model summary.
-- [`docs/source-audit.md`](docs/source-audit.md) — cell-level provenance and historical-source audit.
-- [`docs/methodology.md`](docs/methodology.md) — calculation boundaries and interpretation.
-- [`outputs/heating-budget.md`](outputs/heating-budget.md) — transparent yurt heat model.
+- [`outputs/evidence-based-headline-results.md`](outputs/evidence-based-headline-results.md)
+- [`outputs/recommended-land-guideline.md`](outputs/recommended-land-guideline.md)
+- [`outputs/summary.json`](outputs/summary.json), where `canonical` means the current evidence-based model and `historical` means provenance only
+- [`outputs/low-input-food-yields.md`](outputs/low-input-food-yields.md)
+- [`outputs/low-input-woody-yields.md`](outputs/low-input-woody-yields.md)
+- [`outputs/heating-budget.md`](outputs/heating-budget.md)
+- [`outputs/household-capacity.md`](outputs/household-capacity.md)
+- [`outputs/site-sensitivity.md`](outputs/site-sensitivity.md)
+- [`outputs/surplus-production.md`](outputs/surplus-production.md)
+- [`docs/source-audit.md`](docs/source-audit.md)
+- [`docs/evidence-methodology.md`](docs/evidence-methodology.md)
 
-## Historical canonical values
+## Evidence-based recommendation
 
-- Active 75 kg adult: 13.05 MJ/day and 4.7665125 GJ/year, from `paradise-garden.ods` → `j needs`.
-- Historical allocation: 0.25 ha core food, 0.25 ha backup/perennial food, 0.50 ha willow short-rotation coppice.
-- Historical diagram labels: approximately 5–7 GJ/year for each food quarter and 15 GJ/year gross for the half-hectare wood stream.
+The model currently recommends a site-adjusted performance test, initially approximately **1.0–1.2 productive hectares per adult-equivalent for an ordinary robust one-adult system**. The central ordinary-site calculation is about 1.11 ha for one representative adult, about 1.35 ha for two adults and about 1.78 ha for two adults plus two representative children. Marginal sites require more; favourable sites can retain exportable surplus.
 
-The crop workbook contains 15 usable gross-food-energy observations, from 13.02 to 60.30 GJ/ha, median 25.91 GJ/ha. The default new yurt model estimates 19.29 GJ/year useful space heating and therefore does not validate the historical half-hectare coppice allocation under its default assumptions.
+That range is a model recommendation, not a measured provincial average. The largest unresolved inputs are measured low-input Grey-Bruce crop yields, nutritional completeness, current climate normals, yurt leakage and thermal bridges, mixed-woody yield, wildlife loss and local sale margins.
 
-## Source and model boundaries
-
-Gross harvested food energy is not net edible energy after field losses, storage, processing, labour, or dietary balancing. Gross wood energy is not delivered room heat until heater efficiency is applied. The 1.0 ha figure remains a historical ARC policy shorthand; 1.2 ha is represented as a Grey-Bruce higher-resilience scenario based on the historical 6/5 growing-season ratio, not as a validated local yield model.
-
-The heating calculation uses the Owen Sound MOE 1981–2010 climate normal of 4,031.9 heating degree-days below 18°C. The exact station and definition are documented in [`data/source/climate-heating.csv`](data/source/climate-heating.csv); current 1991–2020 normals should be checked before website publication.
+The historical values—13.05 MJ/day for a 75 kg adult, 0.25 + 0.25 + 0.50 ha, 30 GJ/ha/year coppice, and the historical 1.0/1.2 ha policy shorthand—are not canonical inputs. They are documented in the historical source audit and excluded from the Phase 2 calculations.

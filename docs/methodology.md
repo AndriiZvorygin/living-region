@@ -1,61 +1,54 @@
-# Methodology
+# Methodology and model boundary
 
-## Workflow
+The repository has two explicit layers.
 
-The repository follows a source-first pipeline:
+1. The historical layer extracts and preserves Lyis ODS formulas, displayed values, diagrams and related prose.
+2. The current layer uses current Health Canada equations, Canadian nutrient composition, Ontario measured benchmarks, explicit low-input adjustments, current evidence on woody systems and a separately audited building model.
 
-1. `scripts/extract-ods.mjs` reads the three ODS workbooks and writes provenance-preserving CSV/JSON files under `data/source/`.
-2. The calculation scripts consume only those normalized inputs plus explicit new assumptions.
-3. `scripts/build-summary.mjs` writes derived JSON, Markdown, CSV tables, and SVG charts.
-4. `node --test` verifies the canonical arithmetic.
+Historical values cannot enter a canonical calculation merely because they are present in an old spreadsheet.
 
-No original spreadsheet is rewritten or recalculated in place.
+## Food energy
 
-## Units and energy boundaries
+For every current crop row:
 
-The source workbook's food formula treats one tonne/ha as 10,000 × 100 g units/ha. Therefore:
+`edible yield (t/ha) × energy (kJ/100 g) × 0.01 = food GJ/ha/year`
 
-`GJ/ha = yield (tonnes/ha) × 10,000 × energy density (kJ/100 g) ÷ 1,000,000`.
+Protein, fat and carbohydrate are calculated from the Canadian nutrient composition record using:
 
-This is gross harvested food energy as represented by the workbook. The model does not infer an edible fraction when the workbook does not supply one. It also does not treat macronutrient percentages as a replacement for the workbook's listed energy density.
+`edible yield (t/ha) × nutrient (g/100 g) × 10 = nutrient kg/ha/year`.
 
-For the human calculation:
+Commercial Ontario provincial averages are preserved as measured benchmarks. The central current planning distribution uses explicit low-input synthesis rows, mostly conservative fractions of those benchmarks anchored where possible to Ontario organic/conventional relationships. This is a transparent interim model, not a claim that a six-row synthesis replaces multi-year Grey-Bruce trials.
 
-`GJ/year = kJ/day × 365.25 ÷ 1,000,000`.
+The food-system area calculation uses an explicit energy-share mix of potato, wheat, dry beans, sunflower seed and oats. It then applies storage, wildlife, seed, bad-year and community-reserve factors. Fruit, vegetables, nuts, micronutrients and perennial diversity are treated as required design functions but are not assigned unsupported calorie yields.
 
-For wood:
+## Human energy
 
-`useful heat = gross wood energy × heater seasonal efficiency`.
+The current calculation implements Health Canada's Estimated Energy Requirement equations and pregnancy/lactation adjustments. Profiles parameterize age, sex, height, weight, activity and reproductive status. The adult-equivalent is derived as the mean of two representative low-active adults; it is not the old 75 kg Lyis reference.
 
-The historical 15 GJ value is retained as gross fuel energy. A default 75% seasonal masonry-heater efficiency is a new assumption, not a historical source value.
+Children are represented by age-specific Health Canada equations and are reported as their own energy demand. Household capacity is the sum of member demands, not a count of full adults.
 
-## Crop-energy hypothesis
+## Heating and woody land
 
-All rows with a numeric `gj_per_ha` are included in the overall distribution. The statistics are count, minimum, quartiles, median, maximum, arithmetic mean, population standard deviation, coefficient of variation, and interquartile range. Quartiles use linear interpolation between sorted observations.
+The yurt is approximated as a circular cylinder with a conical roof. Heat loss includes opaque wall/roof/floor transmission, windows/doors and ventilation. Annual envelope loss is calculated from the Owen Sound HDD normal and then adjusted by an explicit net-demand factor. Gross wood energy is useful heat divided by heater efficiency.
 
-The `energy_role` field is manual and separate from the original workbook group. It is used only for exploratory group summaries. A group with two observations is not treated as strong evidence.
+Woody area is solved rather than assumed:
 
-## Hectare budget
+`required woody area = gross wood energy requirement ÷ (dry biomass yield × 19 GJ/dry tonne × harvest/storage retention)`.
 
-The historical display is reconstructed separately from the crop cross-check. The displayed 5–7 GJ food ranges are not silently replaced with the crop median. The crop median is used only to calculate a transparent comparison: 0.25 ha × 25.91 GJ/ha = 6.4775 GJ/year.
+Marginal, ordinary and favourable bands are 3.0, 5.0 and 8.9 dry tonnes/ha/year. The ordinary value is a modelled synthesis anchored to stable eastern/northern short-rotation evidence; exceptional wet-landfill and later peak cultivar values remain sensitivities only.
 
-Food and wood are reported as separate streams. A summed gross-biological-energy number is provided for bookkeeping only and should not be interpreted as interchangeable human food, useful heat, or a complete solar-energy budget.
+## Site and household capacity
 
-## Yurt heating
+Site classes alter food productivity and select the woody band: wetter productive, ordinary mesic, dry, and shallow/rocky marginal. These are scenario classes, not claims about every Grey County parcel.
 
-The new building model approximates the dwelling as a circular cylinder with a conical roof. It calculates wall, roof, floor, window/door, and air-change heat-loss conductances, multiplies by heating degree-days, and applies a configurable net-demand factor for internal/passive gains. It separately reports useful space heat, gross wood energy, dry wood mass, cords, and the implied coppice area at the historical gross yield.
+For each household and site:
 
-The model is deliberately not calibrated to the historical diagram. Air leakage, floor construction, glazing, solar gains, thermal mass, occupancy, thermostat schedule, moisture, and actual masonry-heater operation remain material uncertainties.
+`mathematical minimum = food area + heating area`
 
-## Farm-size chart
+`robust system area = mathematical minimum + diversity/rotation + soil/water + fibre/habitat + deliberate export allowances`.
 
-The source rows are copied exactly. The original formulas are:
+The allowances are displayed separately so a reader can remove or change them. Exportable food surplus is calculated after household demand and the explicit loss/reserve factors; it is not assumed to appear automatically.
 
-- crop output relative to land: crop-land share ÷ land share;
-- food-crop output relative to land: food-crop share ÷ land share.
+## Economics
 
-The `all size` aggregate is excluded from the size-class correlation. The reproduced chart keeps the historical labels; the cleaned chart uses explicit hectare labels. This is a descriptive association in a constructed dataset, not a causal farm-size productivity estimate.
-
-## Required area versus resilience area
-
-The mathematical food-only area is food demand divided by assumed crop-energy yield. The historical second food quarter, coppice, growing-season adjustment, nutrient interception, soil regeneration, fibre/materials, wildlife protection, and other ecological buffers are retained as resilience or design allowances unless a source calculation proves otherwise.
+Cash production is separate from calories and useful heat. The economic module reports configurable annual saleable-unit volumes for $1,000, $2,000, $3,000 and $5,000 targets. The checked-in direct-sale margins are illustrative placeholders, except for a clearly vintage OCO organic grain-price reference; they must be replaced with current Owen Sound-area farmgate/direct-sale records before public use.

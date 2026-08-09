@@ -1,0 +1,49 @@
+case,assumption,value,units,classification,source_or_basis,notes
+low,diameter,9.1,m,user target,User-provided ARC dwelling geometry,Target dwelling
+low,floor_area,65.6,m2,user target,User-provided ARC dwelling geometry,Target dwelling
+low,wall_height,2.4,m,modelling assumption,Geometry approximation,Circular wall cylinder
+low,roof_rise,2.0,m,modelling assumption,Geometry approximation,Conical roof approximation
+low,wall_r_value,25,h ft2 F/Btu,design value,ARC design sensitivity,Not asserted as code compliance
+low,roof_r_value,45,h ft2 F/Btu,design value,ARC design sensitivity,Not asserted as code compliance
+low,floor_r_value,35,h ft2 F/Btu,design value,ARC design sensitivity,Insulated floor/platform
+low,window_door_area,6,m2,modelling assumption,ARC design sensitivity,Need measured as-built survey
+low,window_u_value,0.25,W/m2K,design value,ARC design sensitivity,Need product specification
+low,air_changes_per_hour,0.20,1/h,modelling assumption,Low-leakage design case,Needs blower-door measurement
+low,indoor_temperature,20,C,design value,ARC operating target,Not measured
+low,outdoor_design_temperature,-20,C,modelling assumption,Owen Sound design sensitivity,Verify code design temperature
+low,heating_degree_days,4031.9,C degree-days,measured climate normal,ECCC Owen Sound 1981-2010,Normal vintage should be updated before publication
+low,net_demand_factor,0.75,fraction,modelling assumption,Passive/internal gains sensitivity,Not directly measured
+low,thermal_bridge_multiplier,1.10,fraction,modelling assumption,Envelope sensitivity,Applied to opaque transmission only
+low,heater_efficiency,0.85,fraction,design/literature assumption,Masonry heater sensitivity,Needs installed-system verification
+central,diameter,9.1,m,user target,User-provided ARC dwelling geometry,Target dwelling
+central,floor_area,65.6,m2,user target,User-provided ARC dwelling geometry,Target dwelling
+central,wall_height,2.4,m,modelling assumption,Geometry approximation,Circular wall cylinder
+central,roof_rise,2.0,m,modelling assumption,Geometry approximation,Conical roof approximation
+central,wall_r_value,20,h ft2 F/Btu,design value,User target,Not asserted as code compliance
+central,roof_r_value,40,h ft2 F/Btu,design value,User target,Not asserted as code compliance
+central,floor_r_value,30,h ft2 F/Btu,design value,Insulated platform assumption,Not measured
+central,window_door_area,8,m2,modelling assumption,ARC design sensitivity,Need measured as-built survey
+central,window_u_value,0.30,W/m2K,design value,ARC design sensitivity,Need product specification
+central,air_changes_per_hour,0.35,1/h,modelling assumption,Central sensitivity,Needs blower-door measurement
+central,indoor_temperature,20,C,design value,ARC operating target,Not measured
+central,outdoor_design_temperature,-20,C,modelling assumption,Owen Sound design sensitivity,Verify code design temperature
+central,heating_degree_days,4031.9,C degree-days,measured climate normal,ECCC Owen Sound 1981-2010,Normal vintage should be updated before publication
+central,net_demand_factor,0.85,fraction,modelling assumption,Passive/internal gains sensitivity,Not directly measured
+central,thermal_bridge_multiplier,1.15,fraction,modelling assumption,Envelope sensitivity,Applied to opaque transmission only
+central,heater_efficiency,0.75,fraction,design/literature assumption,Masonry heater sensitivity,Needs installed-system verification
+high,diameter,9.1,m,user target,User-provided ARC dwelling geometry,Target dwelling
+high,floor_area,65.6,m2,user target,User-provided ARC dwelling geometry,Target dwelling
+high,wall_height,2.4,m,modelling assumption,Geometry approximation,Circular wall cylinder
+high,roof_rise,2.0,m,modelling assumption,Geometry approximation,Conical roof approximation
+high,wall_r_value,15,h ft2 F/Btu,design value,ARC design sensitivity,Not asserted as code compliance
+high,roof_r_value,30,h ft2 F/Btu,design value,ARC design sensitivity,Not asserted as code compliance
+high,floor_r_value,20,h ft2 F/Btu,design value,ARC design sensitivity,Insulated floor/platform
+high,window_door_area,10,m2,modelling assumption,ARC design sensitivity,Need measured as-built survey
+high,window_u_value,0.40,W/m2K,design value,ARC design sensitivity,Need product specification
+high,air_changes_per_hour,0.60,1/h,modelling assumption,Higher leakage sensitivity,Needs blower-door measurement
+high,indoor_temperature,20,C,design value,ARC operating target,Not measured
+high,outdoor_design_temperature,-20,C,modelling assumption,Owen Sound design sensitivity,Verify code design temperature
+high,heating_degree_days,4031.9,C degree-days,measured climate normal,ECCC Owen Sound 1981-2010,Normal vintage should be updated before publication
+high,net_demand_factor,0.95,fraction,modelling assumption,Low passive/internal gain sensitivity,Not directly measured
+high,thermal_bridge_multiplier,1.30,fraction,modelling assumption,Envelope sensitivity,Applied to opaque transmission only
+high,heater_efficiency,0.65,fraction,design/literature assumption,Masonry heater sensitivity,Needs installed-system verification

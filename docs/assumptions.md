@@ -1,46 +1,40 @@
 # Assumptions register
 
-## Historical inputs preserved
+## Canonical current model
 
-| Assumption | Value | Status |
-|---|---:|---|
-| Canonical adult mass | 75 kg | Historical workbook input |
-| Food energy | 13,050 kJ/day | Historical workbook derived by mass scaling |
-| Annual conversion | 365.25 days/year | Historical workbook formula |
-| Core food allocation | 0.25 ha | Historical diagram label |
-| Backup/perennial food allocation | 0.25 ha | Historical diagram label |
-| Willow short-rotation coppice | 0.50 ha | Historical diagram label |
-| Core and backup food energy | ~5–7 GJ/year each | Historical diagram label |
-| Willow gross energy | ~15 GJ/year | Historical diagram label |
-| Wood energy | ~15 GJ/cord | Historical diagram label |
-| 1.2 ha/person | 6/5 growing-season scaling | Historical prose argument, not local yield validation |
+| assumption | central value | classification | evidence/basis |
+|---|---:|---|---|
+| Adult-equivalent food demand | 3.884 GJ/year | derived current scenario | Mean of representative low-active 35-year-old woman and man using Health Canada EER equations |
+| Representative adult woman | 3.375 GJ/year | derived current scenario | 35 years, 65 kg, 165 cm, low activity |
+| Representative adult man | 4.394 GJ/year | derived current scenario | 35 years, 80 kg, 178 cm, low activity |
+| Low-input crop energy median | 29.891 GJ/ha/year | modelled synthesis distribution | Six eligible low-input synthesis rows; see `data/source/evidence-food-yields.csv` |
+| Food storage loss | 10% | modelling assumption | Explicit reserve model; replace with measured system records |
+| Wildlife loss | 10% | modelling assumption | Explicit site-management sensitivity |
+| Seed/propagation loss | 3% | modelling assumption | Explicit planning allowance |
+| Weather/crop-loss reserve | 20% | design/resilience allowance | Deliberate bad-year reserve, not an observed regional average |
+| Emergency/community reserve | 10% | design/resilience allowance | Deliberate surplus policy choice |
+| Yurt useful space heat | 21.054 GJ/year | derived central case | ECCC HDD plus explicit envelope, leakage, thermal bridge and gain assumptions |
+| Wood energy | 19 GJ/dry tonne | external default | Government of Canada dry-basis wood higher heating value |
+| Harvest/storage retention | 85% | modelling assumption | Converts standing/gross wood energy to usable stored fuel |
+| Ordinary woody yield | 5 dry t/ha/year | modelled evidence synthesis | Long-term eastern/northern willow trial; not direct mixed Grey County measurement |
 
-## New model assumptions
+## Heating cases
 
-| Assumption | Default | Why it matters |
-|---|---:|---|
-| Heater seasonal efficiency | 75% | Converts gross wood fuel into useful heat |
-| Yurt wall R-value | R-20 | Envelope transmission |
-| Yurt roof R-value | R-40 | Envelope transmission |
-| Yurt floor R-value | R-30 | No historical floor value was found |
-| Window/door area | 8 m² | Glazing and door losses |
-| Window/door U-value | 0.30 W/m²K | Glazing/door losses |
-| Air leakage | 0.35 ACH | Ventilation/infiltration losses |
-| Indoor temperature | 20°C | Heating setpoint |
-| Design outdoor temperature | −20°C | Design heat-loss check |
-| HDD base | 18°C; 4,031.9 C-degree-days | Owen Sound MOE 1981–2010 normal |
-| Net demand factor | 0.85 | Approximate internal/passive-gain allowance |
-| Dry wood energy | 18 MJ/kg | Approximate dry-wood energy content; verify locally |
+The low/central/high cases are in `data/source/heating-assumptions.csv`. The geometry is the user-specified 9.1 m diameter and 65.6 m² floor area. R-values, glazing, infiltration, thermal bridges, gain factors and masonry-heater efficiency are design or modelling assumptions, not measurements or code claims. The 4,031.9 heating degree-days below 18°C are an ECCC Owen Sound 1981–2010 climate normal.
 
-These assumptions are editable in `scripts/calc-heating.mjs` and are written to `data/derived/heating.json`.
+The central model uses R-20 walls, R-40 roof, R-30 floor, 8 m² of windows/doors, U=0.30 W/m²K, 0.35 ACH, a 1.15 opaque-envelope thermal-bridge multiplier, 0.85 net-demand factor and 75% seasonal heater efficiency. Sensitivity cases are intentionally broad and must be replaced by as-built measurements.
 
-## Unresolved or weak assumptions
+## Input intensity
 
-- The crop spreadsheet has no consistent edible fraction, harvest-loss, storage-loss, maturity, soil, weather, water, or input basis.
-- The crop values are not a nutritionally complete diet. Gross energy does not prove adequate protein, fat, micronutrients, or seasonal storage.
-- The half-hectare willow number is a diagram/prose assumption, not a measured yield series in the audited files.
-- The 15 GJ/cord value is not tied to a species, moisture content, cord definition, or stove delivery efficiency.
-- The yurt heating model lacks measured infiltration, thermal-mass, occupancy and solar-gain data.
-- The 1.2 ha value is based on a simple growing-season ratio and not a weather-responsive crop model.
-- The farm-size data's class definitions and extraction metadata are not fully documented in the source workbook.
-- The audited sources contain solar-electricity calculations but no quantitative photosynthetic solar-capture efficiency that belongs in this land-energy model.
+`data/derived/input-intensity.csv` records synthetic fertilizer, imported manure/compost, biosolids, irrigation, crop-protection chemicals, mechanized energy, establishment work, annual purchased inputs and recycled nutrients. Commercial Ontario averages are benchmark evidence only. The central food rows are labelled low-input synthesis, not measured zero-input trials; organic evidence is not treated as near-zero input because the documented organic examples still use rotation, manure, machinery and labour.
+
+## Historical boundary
+
+The following values are legacy/reference only:
+
+- 13.05 MJ/day = 4.7665125 GJ/year for the historical 75 kg adult;
+- 0.25 ha core food + 0.25 ha backup/perennial food + 0.50 ha wood;
+- 30 GJ/ha/year historical coppice;
+- historical 1 ha/adult and 1.2 ha/person shorthand.
+
+They are available under `outputs/legacy/` and `data/derived/legacy/`, but are not read by the current canonical build.

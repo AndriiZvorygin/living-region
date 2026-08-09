@@ -118,3 +118,20 @@ Related historical notes inspected include `/home/htaf/lyis/pfet/2024-lyis.tex` 
 ## External climate input
 
 The heating extension uses the Owen Sound MOE 1981–2010 climate normal, annual heating degree-days below 18°C = 4,031.9. The station page is [Environment and Climate Change Canada: Owen Sound MOE climate normals](https://climate.weather.gc.ca/climate_normals/results_1981_2010_e.html?climate_id=6116132&coordsStn=44.745833%7C-81.107222%7COWEN+SOUND+MOE&optProxType=station&searchType=stnProx&txtCentralLatMin=0&txtCentralLatSec=0&txtCentralLongMin=0&txtCentralLongSec=0&txtRadius=25), and the definition is [ECCC's degree-days glossary](https://climate.meteo.gc.ca/glossary_e.html). The exact value, URL, and status are recorded in `data/source/climate-heating.csv`.
+
+## Phase 2 evidence boundary
+
+The historical audit above is retained for provenance only. It is not the evidence base for the current ARC recommendation. Current quantitative sources and their classifications are recorded in [`data/source/evidence-sources.csv`](../data/source/evidence-sources.csv), [`data/source/evidence-food-yields.csv`](../data/source/evidence-food-yields.csv), [`data/source/woody-yield-evidence.csv`](../data/source/woody-yield-evidence.csv), and [`data/source/heating-assumptions.csv`](../data/source/heating-assumptions.csv).
+
+| Current variable | Canonical source/assumption | Geography/site | Status |
+|---|---|---|---|
+| Human food energy | Health Canada EER equations | Canada reference population equations | Current derived model; profiles and equations are checked in |
+| Food composition | 2026 Canadian Nutrient File | Canada food records | Current composition data; checked-in subset |
+| Commercial crop benchmark | Statistics Canada Tables 32-10-0359-01 and 32-10-0358-01 | Ontario, 2020–2024 | Measured benchmark, excluded from low-input central case |
+| Low-input food yield | Explicit fractions of Ontario benchmark anchored by Organic Council relationships where available | Ontario/organic comparator | Modelled synthesis, central but not a direct zero-input measurement |
+| Woody biomass | Peer-reviewed long-term eastern/northern willow evidence | Eastern/northern temperate sites | Marginal/ordinary/favourable band synthesis; mixed Grey County yield remains unresolved |
+| Wood energy | Government of Canada dry-basis default | Canada | 19 GJ per dry tonne gross |
+| Yurt climate | ECCC Owen Sound MOE normal | Owen Sound, 1981–2010 | Measured climate normal; newer normal requires verification |
+| Yurt envelope/leakage | Explicit low/central/high assumptions | ARC design scenario | Not measured; never presented as an as-built result |
+
+The current model intentionally excludes historical 4.77 GJ/adult, 30 GJ/ha/year coppice, 0.25 + 0.25 + 0.50 ha allocation, and historical 1.0/1.2 ha policy arithmetic from canonical inputs. Those values are listed in `outputs/summary.json` under `historical` and in `outputs/legacy/`.

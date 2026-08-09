@@ -1,0 +1,7 @@
+product,unit,price_cad,variable_cost_cad,net_margin_cad_per_unit,target_1000_units,target_2000_units,target_3000_units,target_5000_units,source,notes
+greenhouse vegetables,kg,8,5,3,333.333,666.667,1000,1666.667,configurable ARC direct-sale scenario,Illustrative margin; replace with current Owen Sound farmgate records.
+seedlings,plant,4,1.5,2.5,400,800,1200,2000,configurable ARC direct-sale scenario,Illustrative margin; local nursery price survey required.
+berries,kg,6,3.5,2.5,400,800,1200,2000,configurable ARC direct-sale scenario,"Illustrative margin; crop, grade and channel vary widely."
+seasoned firewood,full cord,250,150,100,10,20,30,50,configurable ARC direct-sale scenario,Illustrative margin; delivery and drying labour are not fully modelled.
+nursery stock,plant,25,14,11,90.909,181.818,272.727,454.545,configurable ARC direct-sale scenario,Illustrative margin; species and size mix are unresolved.
+organic soft red winter wheat,bushel,13,10,3,333.333,666.667,1000,1666.667,https://datawrapper.dwcdn.net/Oa49e/6/dataset.csv,2022 OCO spot-price range midpoint; not a current guaranteed price and costs are a configurable placeholder.

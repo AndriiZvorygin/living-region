@@ -40,10 +40,10 @@ export function buildFarmSize() {
     crop_return_vs_upper_bound: pearson(classes.map(row => Math.log10(row.upper_bound_ha)), classes.map(row => row.crop_return)),
     food_return_vs_upper_bound: pearson(classes.map(row => Math.log10(row.upper_bound_ha)), classes.map(row => row.food_return))
   };
-  writeCsv('data/derived/farm-size-relative-output.csv', [['farm_size_class','upper_bound_ha','land_share_percent','crop_share_percent','food_crop_share_percent','crop_output_relative_to_land','food_output_relative_to_land'], ...rows.map(row => [row.label,row.upper_bound_ha,row.land_share_percent,row.crop_share_percent,row.food_crop_share_percent,row.crop_return,row.food_return])]);
-  writeJson('data/derived/farm-size-analysis.json', {source_url: 'https://ourworldindata.org/farm-size', rows, classes, correlation});
-  writeText('outputs/charts/farm-size-original-reconstructed.svg', chart(classes));
-  writeText('outputs/charts/farm-size-cleaned.svg', chart(classes, true));
+  writeCsv('data/derived/legacy/farm-size-relative-output.csv', [['farm_size_class','upper_bound_ha','land_share_percent','crop_share_percent','food_crop_share_percent','crop_output_relative_to_land','food_output_relative_to_land'], ...rows.map(row => [row.label,row.upper_bound_ha,row.land_share_percent,row.crop_share_percent,row.food_crop_share_percent,row.crop_return,row.food_return])]);
+  writeJson('data/derived/legacy/farm-size-analysis.json', {status: 'historical reference only', source_url: 'https://ourworldindata.org/farm-size', rows, classes, correlation});
+  writeText('outputs/legacy/charts/farm-size-original-reconstructed.svg', chart(classes));
+  writeText('outputs/legacy/charts/farm-size-cleaned.svg', chart(classes, true));
   const md = `# Farm-size/productivity analysis
 
 ## Reconstruction
@@ -60,7 +60,7 @@ Across the ten size classes, the correlation between log upper-size-bound and ou
 
 Important caveats: the sheet does not document the exact OWID extraction date, definitions behind “crop” versus “food crop,” farm-type mix, regional composition, input intensity or whether classes are cumulative thresholds or bins. The all-size row is an aggregate and is not treated as an additional class in the correlation. This result should not be used as a universal productivity coefficient without rebuilding the underlying OWID query and checking the original metadata.
 `;
-  writeText('outputs/farm-size-analysis.md', md);
+  writeText('outputs/legacy/farm-size-analysis.md', '# Historical/reference only\n\n' + md);
   return {rows, classes, correlation};
 }
 
