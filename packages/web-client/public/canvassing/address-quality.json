@@ -1,28 +1,29 @@
 {
-  "generated_at": "2026-07-21T20:59:28.492Z",
+  "generated_at": "2026-08-06T01:35:07.867Z",
   "config": {
     "high_confidence_max_m": 12,
     "probable_max_m": 30,
     "far_from_road_m": 50
   },
   "totals": {
-    "civic_addresses": 3426,
+    "civic_addresses": 7467,
     "duplicate_normalized_addresses": 335,
     "outside_municipal_boundary": 12,
-    "far_from_any_road": 13,
-    "no_street_match": 118,
+    "far_from_any_road": 75,
+    "no_street_match": 80,
     "several_points_same_civic_address": 335,
-    "apparent_multi_unit": 331,
-    "more_than_one_candidate_building": 19,
-    "nearest_footprint_beyond_high_confidence_threshold": 3020,
-    "nearest_footprint_beyond_probable_threshold": 2564
+    "apparent_multi_unit": 339,
+    "more_than_one_candidate_building": 2981,
+    "nearest_footprint_beyond_high_confidence_threshold": 1872,
+    "nearest_footprint_beyond_probable_threshold": 359
   },
   "automatic_join_counts": {
-    "exact": 209,
-    "high_confidence": 240,
-    "probable": 395,
-    "ambiguous": 19,
-    "unmatched": 2563
+    "exact": 352,
+    "high_confidence": 1026,
+    "probable_sourced": 1205,
+    "inferred_range": 4040,
+    "estimated": 840,
+    "unresolved": 4
   },
-  "methodology": "Exact containment and a sole plausible footprint within 12 m are automatic. Candidates within 30 m are probable; probable and ambiguous candidates remain review-only."
+  "methodology": "Point-in-polygon is preferred. Plausible sourced roofs within 12 m are high confidence; sourced roofs up to 30 m are marked probable and queued for review. Unlinked plausible sourced roofs receive stable inferred addresses from official left/right segment ranges and parity. Remaining imported civic-address groups receive a collision-checked, street-oriented estimated roof or remain a reviewable point. Display roofs without their own address retain a provisional reference to the nearest addressed structure so every roof is selectable without creating duplicate households; these references can be separated through an audited manual civic-number correction."
 }

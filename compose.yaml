@@ -20,6 +20,7 @@ services:
       target: canvassing-api
     image: living-region-canvassing-api:latest
     container_name: canvassing-api
+    user: "1000:1000"
     restart: unless-stopped
     volumes:
       - ./private/canvassing:/app/private/canvassing
@@ -28,4 +29,4 @@ services:
       timeout: 5s
       start_period: 5s
       retries: 3
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4174/api/canvassing/state',{headers:{authorization:'Bearer docker-private-canvassing'}}).then(r=>{if(!r.ok)process.exit(1)})"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4174/api/canvassing/health',{headers:{authorization:'Bearer docker-private-canvassing'}}).then(r=>{if(!r.ok)process.exit(1)})"]

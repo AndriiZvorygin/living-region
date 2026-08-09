@@ -1,5 +1,9 @@
 :80 {
 	encode zstd gzip
+
+	@canvassing_data path /canvassing /canvassing/ /canvassing/*.json /canvassing/*.geojson
+	header @canvassing_data Cache-Control "no-cache, must-revalidate"
+
 	handle /api/canvassing/* {
 		reverse_proxy canvassing-api:4174 {
 			header_up Authorization "Bearer docker-private-canvassing"

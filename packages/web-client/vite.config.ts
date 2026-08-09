@@ -7,8 +7,11 @@ export default defineConfig({
   root: webRoot,
   server: {
     host: process.env.LIVING_REGION_HOST ?? "127.0.0.1",
-    allowedHosts: ["localhost", "127.0.0.1", "::1", "zvorygin"]
-    ,proxy: { "/api/canvassing": "http://127.0.0.1:4174" }
+    allowedHosts: ["localhost", "127.0.0.1", "::1", "zvorygin"],
+    proxy: {
+      "/api/canvassing":
+        process.env.CANVASS_API_URL ?? "http://127.0.0.1:4174",
+    },
   },
   build: {
     outDir: "dist",

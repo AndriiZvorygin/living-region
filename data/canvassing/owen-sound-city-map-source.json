@@ -1,0 +1,43 @@
+{
+  "source": "City of Owen Sound, Map - City Map.pdf",
+  "source_path": "Map - City Map.pdf",
+  "source_pdf_sha256": "0224c57ebd3e8f23c4546bc79e0ee2605c71a68953f98db493fb4791fe23f7a9",
+  "source_map_date": "2022-04-07",
+  "source_creator": "Esri ArcGIS Pro 2.9.2.32739",
+  "source_layer": "Map_Frame.Developments.COSGEO_DBO_BuildingFootprints",
+  "source_crs": "NAD83 / UTM zone 17N",
+  "retrieval_context": "Official map supplied directly by the user",
+  "retrieval_date": "2026-07-26",
+  "licence": "Not stated in supplied PDF; retained as a private canvassing reference pending confirmation",
+  "private_reference_only": true,
+  "extraction": {
+    "dpi": 576,
+    "pixel_size_m_approx": 0.44375,
+    "building_threshold_max": 218,
+    "minimum_area_m2": 12,
+    "maximum_area_m2": 25000,
+    "simplify_tolerance_m": 0.35,
+    "topology_cleanup": "two-pixel-radius 5x5-kernel opening before polygonization",
+    "feature_count": 6915,
+    "stable_ids_reused": 6915,
+    "new_or_split_ids": 0,
+    "townhouse_parents_subdivided": 18,
+    "townhouse_units_created": 117,
+    "rejected": {
+      "outside_boundary": 683,
+      "area": 8,
+      "invalid_geometry": 0
+    }
+  },
+  "output_path": "data/canvassing/owen-sound-city-map-buildings.geojson",
+  "output_sha256": "c531d7cb1d0b614b41c5c3af966900dee84ffa458f54a964788be4a31183d260",
+  "limitations": [
+    "The PDF exposes cartographic drawing commands, not original GIS feature records.",
+    "Edges are quantized by the 576 DPI extraction to approximately 0.44 metres.",
+    "A solid-fill threshold intentionally trims light anti-aliased edges so neighbouring roofs remain separate.",
+    "A two-pixel-radius opening removes raster bridges narrower than approximately 1.8 metres.",
+    "Probable long townhouse rows are divided into approximate equal-frontage units; these boundaries are not parcels.",
+    "Building types and original municipal feature identifiers are not present.",
+    "The layer is for private canvassing reference and must not be uploaded to OpenStreetMap."
+  ]
+}

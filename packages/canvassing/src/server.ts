@@ -21,6 +21,12 @@ import {
   scheduleState,
   type SampleOverride,
 } from "./followup-workflow";
+import {
+  frontageCuts,
+  splitStructure,
+  type Geometry,
+  type SplitCut,
+} from "./structure-split";
 
 const root = resolve(process.cwd());
 const host = process.env.CANVASS_HOST ?? "127.0.0.1";
@@ -35,6 +41,14 @@ const storePath = resolve(
 );
 const journalPath = resolve(
   process.env.CANVASS_EVENT_LOG ?? "private/canvassing/visits.pya.jsonl",
+);
+const calibrationPath = resolve(
+  process.env.CANVASS_CALIBRATION_EXPORT ??
+    "private/canvassing/address-number-calibration.json",
+);
+const splitCalibrationPath = resolve(
+  process.env.CANVASS_SPLIT_CALIBRATION_EXPORT ??
+    "private/canvassing/structure-split-calibration.json",
 );
 await mkdir(dirname(storePath), { recursive: true });
 const db = new DatabaseSync(storePath);
@@ -102,9 +116,143 @@ if (!migrated.has(4)) {
   INSERT INTO schema_migrations VALUES (4,'weekly_followup_conversations_recruitment_review',datetime('now'));
   COMMIT;`);
 }
+if (!migrated.has(5)) {
+  db.exec(`BEGIN;
+  ALTER TABLE structures ADD COLUMN source_active INTEGER NOT NULL DEFAULT 1;
+  ALTER TABLE addresses ADD COLUMN source_active INTEGER NOT NULL DEFAULT 1;
+  ALTER TABLE address_review_records ADD COLUMN source_active INTEGER NOT NULL DEFAULT 1;
+  CREATE INDEX addresses_source_active ON addresses(source_active);
+  CREATE INDEX structures_source_active ON structures(source_active);
+  INSERT INTO schema_migrations VALUES (5,'prepared_geography_lifecycle',datetime('now'));
+  COMMIT;`);
+}
+if (!migrated.has(6)) {
+  db.exec(`BEGIN;
+  CREATE TABLE address_number_events (
+    id TEXT PRIMARY KEY,
+    address_id TEXT NOT NULL REFERENCES addresses(id),
+    structure_id TEXT NOT NULL REFERENCES structures(id),
+    occurred_at TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    event_type TEXT NOT NULL CHECK(event_type IN ('set','correct')),
+    civic_number TEXT NOT NULL,
+    street TEXT NOT NULL,
+    unit TEXT NOT NULL,
+    reason TEXT,
+    previous_event_id TEXT REFERENCES address_number_events(id)
+  );
+  CREATE INDEX address_number_events_address ON address_number_events(address_id,occurred_at);
+  CREATE INDEX address_number_events_structure ON address_number_events(structure_id,occurred_at);
+  INSERT INTO schema_migrations VALUES (6,'append_only_address_number_calibration',datetime('now'));
+  COMMIT;`);
+}
+if (!migrated.has(7)) {
+  db.exec(`BEGIN;
+  ALTER TABLE visits ADD COLUMN revisit_requested INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE visits ADD COLUMN no_answer INTEGER NOT NULL DEFAULT 0;
+  INSERT INTO schema_migrations VALUES (7,'independent_visit_result_flags',datetime('now'));
+  COMMIT;`);
+}
+if (!migrated.has(8)) {
+  db.exec(`BEGIN;
+  CREATE TABLE structure_split_events (
+    id TEXT PRIMARY KEY,
+    parent_structure_id TEXT NOT NULL REFERENCES structures(id),
+    occurred_at TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    event_type TEXT NOT NULL CHECK(event_type IN ('accept','reverse')),
+    method TEXT NOT NULL CHECK(method IN ('cut_lines','frontage')),
+    payload_json TEXT NOT NULL,
+    reason TEXT,
+    previous_event_id TEXT REFERENCES structure_split_events(id)
+  );
+  CREATE INDEX structure_split_events_parent ON structure_split_events(parent_structure_id,occurred_at);
+  INSERT INTO schema_migrations VALUES (8,'append_only_structure_splits',datetime('now'));
+  COMMIT;`);
+}
+if (!migrated.has(9)) {
+  db.exec(`BEGIN;
+  CREATE TABLE household_flyer_events (
+    id TEXT PRIMARY KEY,
+    household_id TEXT NOT NULL REFERENCES households(id),
+    occurred_at TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    flyer_delivered INTEGER NOT NULL CHECK(flyer_delivered IN (0,1)),
+    reason TEXT,
+    source TEXT NOT NULL,
+    previous_event_id TEXT REFERENCES household_flyer_events(id)
+  );
+  CREATE INDEX household_flyer_events_household
+    ON household_flyer_events(household_id,occurred_at);
+  INSERT INTO schema_migrations VALUES
+    (9,'append_only_household_flyer_state',datetime('now'));
+  COMMIT;`);
+}
+if (!migrated.has(10)) {
+  db.exec(`BEGIN;
+  ALTER TABLE people
+    ADD COLUMN mailing_list_consent INTEGER NOT NULL DEFAULT 0;
+  CREATE TABLE person_contact_events (
+    id TEXT PRIMARY KEY,
+    person_id TEXT NOT NULL REFERENCES people(id),
+    household_id TEXT NOT NULL REFERENCES households(id),
+    occurred_at TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT NOT NULL,
+    mailing_list_consent INTEGER NOT NULL
+      CHECK(mailing_list_consent IN (0,1)),
+    voluntarily_supplied INTEGER NOT NULL
+      CHECK(voluntarily_supplied IN (0,1)),
+    source TEXT NOT NULL,
+    previous_event_id TEXT REFERENCES person_contact_events(id)
+  );
+  CREATE INDEX person_contact_events_person
+    ON person_contact_events(person_id,occurred_at);
+  CREATE INDEX person_contact_events_household
+    ON person_contact_events(household_id,occurred_at);
+  INSERT INTO schema_migrations VALUES
+    (10,'append_only_person_contact_details',datetime('now'));
+  COMMIT;`);
+}
 db.exec(
   `CREATE VIEW IF NOT EXISTS active_visits AS SELECT v.* FROM visits v WHERE COALESCE((SELECT correction_type FROM visit_corrections c WHERE c.visit_id=v.id ORDER BY c.occurred_at DESC,c.rowid DESC LIMIT 1),'restore')!='undo';`,
 );
+db.exec(`CREATE VIEW IF NOT EXISTS effective_addresses AS
+SELECT a.*,
+  COALESCE((SELECT e.civic_number FROM address_number_events e WHERE e.address_id=a.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),a.civic_number) civic_number_effective,
+  COALESCE((SELECT e.street FROM address_number_events e WHERE e.address_id=a.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),a.street) street_effective,
+  COALESCE((SELECT e.unit FROM address_number_events e WHERE e.address_id=a.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),a.unit) unit_effective,
+  (SELECT e.id FROM address_number_events e WHERE e.address_id=a.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1) number_event_id
+FROM addresses a;`);
+db.exec(`DROP VIEW IF EXISTS household_flyer_state;
+CREATE VIEW household_flyer_state AS
+SELECT h.id household_id,
+  COALESCE((
+    SELECT state FROM (
+      SELECT v.occurred_at,v.id,0 sort_priority,1 state
+      FROM active_visits v
+      WHERE v.household_id=h.id AND v.flyer_delivered=1
+      UNION ALL
+      SELECT f.occurred_at,f.id,1 sort_priority,f.flyer_delivered state
+      FROM household_flyer_events f
+      WHERE f.household_id=h.id
+    )
+    ORDER BY occurred_at DESC,sort_priority DESC,id DESC LIMIT 1
+  ),0) flyer_delivered
+FROM households h;`);
+db.exec(`DROP VIEW IF EXISTS effective_people;
+CREATE VIEW effective_people AS
+SELECT p.id,p.household_id,
+  COALESCE((SELECT e.name FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.name,'') name,
+  COALESCE((SELECT e.phone FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.phone,'') phone,
+  COALESCE((SELECT e.email FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.email,'') email,
+  COALESCE((SELECT e.mailing_list_consent FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.mailing_list_consent,0) mailing_list_consent,
+  COALESCE((SELECT e.voluntarily_supplied FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.voluntarily_supplied,1) voluntarily_supplied,
+  (SELECT e.id FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1) latest_event_id,
+  COALESCE((SELECT e.occurred_at FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.created_at) last_updated_at
+FROM people p;`);
 
 const now = () => new Date().toISOString();
 const json = (
@@ -136,33 +284,140 @@ const audit = (
   db
     .prepare("INSERT INTO audit_events VALUES (?, ?, ?, ?, ?, ?, ?)")
     .run(randomUUID(), now(), user, action, type, id, JSON.stringify(detail));
+let journalWriteQueue = Promise.resolve();
 const recordEvent = async (event: Record<string, unknown>) => {
-  const last = db
-    .prepare(
-      "SELECT sequence,event_hash FROM journal_chain ORDER BY sequence DESC LIMIT 1",
-    )
-    .get() as { sequence: number; event_hash: string } | undefined;
-  const envelope = {
-    sequence: (last?.sequence ?? 0) + 1,
-    previous_hash: last?.event_hash ?? null,
-    event,
-  };
-  const event_hash = createHash("sha256")
-    .update(JSON.stringify(envelope))
-    .digest("hex");
-  await mkdir(dirname(journalPath), { recursive: true });
-  await appendFile(
-    journalPath,
-    JSON.stringify({ ...envelope, event_hash }) + "\n",
-    { mode: 0o600 },
-  );
-  db.prepare("INSERT INTO journal_chain VALUES (?,?,?,?)").run(
-    envelope.sequence,
-    event_hash,
-    envelope.previous_hash,
-    now(),
+  const write = journalWriteQueue.then(async () => {
+    const last = db
+      .prepare(
+        "SELECT sequence,event_hash FROM journal_chain ORDER BY sequence DESC LIMIT 1",
+      )
+      .get() as { sequence: number; event_hash: string } | undefined;
+    const envelope = {
+      sequence: (last?.sequence ?? 0) + 1,
+      previous_hash: last?.event_hash ?? null,
+      event,
+    };
+    const event_hash = createHash("sha256")
+      .update(JSON.stringify(envelope))
+      .digest("hex");
+    await mkdir(dirname(journalPath), { recursive: true });
+    await appendFile(
+      journalPath,
+      JSON.stringify({ ...envelope, event_hash }) + "\n",
+      { mode: 0o600 },
+    );
+    db.prepare("INSERT INTO journal_chain VALUES (?,?,?,?)").run(
+      envelope.sequence,
+      event_hash,
+      envelope.previous_hash,
+      now(),
+    );
+  });
+  journalWriteQueue = write.catch(() => undefined);
+  return write;
+};
+
+const geometryCenter = (geometryJson: string): [number, number] => {
+  const geometry = JSON.parse(geometryJson),
+    points: Array<[number, number]> = [],
+    walk = (coordinates: any) => {
+      if (typeof coordinates?.[0] === "number")
+        points.push(coordinates as [number, number]);
+      else coordinates?.forEach(walk);
+    };
+  walk(geometry.coordinates);
+  return [
+    points.reduce((sum, point) => sum + point[0], 0) / points.length,
+    points.reduce((sum, point) => sum + point[1], 0) / points.length,
+  ];
+};
+
+const metresBetween = (
+  a: [number, number],
+  b: [number, number],
+): number => {
+  const latitude = (((a[1] + b[1]) / 2) * Math.PI) / 180;
+  return Math.hypot(
+    (a[0] - b[0]) * 111320 * Math.cos(latitude),
+    (a[1] - b[1]) * 111320,
   );
 };
+
+const latestSplitEvents = () => {
+  const rows = db
+    .prepare(
+      `SELECT e.* FROM structure_split_events e
+       WHERE e.rowid=(SELECT x.rowid FROM structure_split_events x
+         WHERE x.parent_structure_id=e.parent_structure_id
+         ORDER BY x.occurred_at DESC,x.rowid DESC LIMIT 1)
+       ORDER BY e.occurred_at`,
+    )
+    .all() as any[];
+  return rows.map((row) => ({
+    ...row,
+    payload: JSON.parse(row.payload_json),
+  }));
+};
+
+async function writeSplitCalibration() {
+  const records = latestSplitEvents()
+    .filter((event) => event.event_type === "accept")
+    .map((event) => ({
+      event_id: event.id,
+      parent_structure_id: event.parent_structure_id,
+      occurred_at: event.occurred_at,
+      method: event.method,
+      reason: event.reason,
+      ...event.payload,
+    }));
+  await mkdir(dirname(splitCalibrationPath), { recursive: true });
+  await writeFile(
+    splitCalibrationPath,
+    JSON.stringify(
+      {
+        generated_at: now(),
+        purpose:
+          "Private append-only building split corrections for canvassing regeneration",
+        records,
+      },
+      null,
+      2,
+    ) + "\n",
+    { mode: 0o600 },
+  );
+}
+
+async function writeAddressNumberCalibration() {
+  const records = db
+    .prepare(
+      `SELECT e.id event_id,e.address_id,e.structure_id,e.occurred_at,
+       e.civic_number,e.street,e.unit,e.reason,
+       s.external_source structure_source,s.external_id structure_external_id
+       FROM address_number_events e
+       JOIN structures s ON s.id=e.structure_id
+       WHERE e.rowid=(SELECT e2.rowid FROM address_number_events e2
+         WHERE e2.address_id=e.address_id
+         ORDER BY e2.occurred_at DESC,e2.rowid DESC LIMIT 1)
+       ORDER BY e.structure_id,e.address_id`,
+    )
+    .all();
+  await mkdir(dirname(calibrationPath), { recursive: true });
+  await writeFile(
+    calibrationPath,
+    JSON.stringify(
+      {
+        schema_version: 1,
+        generated_at: now(),
+        purpose:
+          "Private, manually verified civic-number references for canvassing regeneration",
+        records,
+      },
+      null,
+      2,
+    ) + "\n",
+    { mode: 0o600 },
+  );
+}
 
 async function seed() {
   const base = join(root, "packages/web-client/public/canvassing");
@@ -178,8 +433,11 @@ async function seed() {
   const timestamp = now();
   db.exec("BEGIN");
   try {
+    db.exec(
+      "UPDATE structures SET source_active=0 WHERE external_source!='manual_canvassing_split'; UPDATE addresses SET source_active=0 WHERE external_source NOT IN ('manual_canvassing','manual_split_inferred'); UPDATE address_review_records SET source_active=0;",
+    );
     const insertStructure = db.prepare(
-      "INSERT INTO structures VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET geometry_json=excluded.geometry_json,building_type=excluded.building_type,external_source=excluded.external_source,external_id=excluded.external_id,source_confidence=excluded.source_confidence,imported_at=excluded.imported_at",
+      "INSERT INTO structures (id,geometry_json,building_type,external_source,external_id,source_confidence,imported_at,source_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1) ON CONFLICT(id) DO UPDATE SET geometry_json=excluded.geometry_json,building_type=excluded.building_type,external_source=excluded.external_source,external_id=excluded.external_id,source_confidence=excluded.source_confidence,imported_at=excluded.imported_at,source_active=1",
     );
     for (const feature of structures.features)
       insertStructure.run(
@@ -192,7 +450,7 @@ async function seed() {
         timestamp,
       );
     const insertAddress = db.prepare(
-      "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,civic_number=excluded.civic_number,street=excluded.street,unit=excluded.unit,label=excluded.label,lon=excluded.lon,lat=excluded.lat,association_status=excluded.association_status,imported_at=excluded.imported_at",
+      "INSERT INTO addresses (id,structure_id,civic_number,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,civic_number=excluded.civic_number,street=excluded.street,unit=excluded.unit,label=excluded.label,lon=excluded.lon,lat=excluded.lat,association_status=excluded.association_status,imported_at=excluded.imported_at,source_active=1",
     );
     const insertHousehold = db.prepare(
       "INSERT OR IGNORE INTO households VALUES (?, ?, ?, ?)",
@@ -222,7 +480,7 @@ async function seed() {
       );
     }
     const insertReview = db.prepare(
-      "INSERT INTO address_review_records VALUES (?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET address_id=excluded.address_id,external_source=excluded.external_source,external_id=excluded.external_id,label=excluded.label,lon=excluded.lon,lat=excluded.lat,within_boundary=excluded.within_boundary,queue_flags_json=excluded.queue_flags_json,imported_geometry_json=excluded.imported_geometry_json,imported_at=excluded.imported_at",
+      "INSERT INTO address_review_records (id,address_id,external_source,external_id,label,lon,lat,within_boundary,queue_flags_json,imported_geometry_json,imported_at,source_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,1) ON CONFLICT(id) DO UPDATE SET address_id=excluded.address_id,external_source=excluded.external_source,external_id=excluded.external_id,label=excluded.label,lon=excluded.lon,lat=excluded.lat,within_boundary=excluded.within_boundary,queue_flags_json=excluded.queue_flags_json,imported_geometry_json=excluded.imported_geometry_json,imported_at=excluded.imported_at,source_active=1",
     );
     for (const feature of addressReview.features) {
       const p = feature.properties,
@@ -255,6 +513,7 @@ async function seed() {
   }
 }
 await seed();
+await writeAddressNumberCalibration();
 
 const backupDir = resolve("private/canvassing/backups");
 async function performBackup(label = "daily") {
@@ -395,7 +654,9 @@ function sessionSummary(sessionId: string) {
     doors_knocked: visits.filter((v) => v.door_knocked).length,
     answers,
     conversations,
-    revisits: visits.filter((v) => v.outcome === "revisit").length,
+    revisits: visits.filter(
+      (v) => v.revisit_requested || v.outcome === "revisit",
+    ).length,
     skipped_stops: [...skips.values()].filter((value) => value === "skip")
       .length,
     completed_stops_per_hour: activeMs
@@ -409,12 +670,31 @@ function state(role = "candidate") {
     .prepare(
       `SELECT h.id household_id,h.unit_label,a.id address_id,
     CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae WHERE ae.address_id=a.id) THEN (SELECT CASE WHEN ae.event_type='clear' THEN NULL ELSE ae.structure_id END FROM address_association_events ae WHERE ae.address_id=a.id ORDER BY ae.occurred_at DESC,ae.rowid DESC LIMIT 1) ELSE a.structure_id END structure_id,
-    a.structure_id imported_structure_id,a.civic_number,a.street,a.unit,a.label,a.lon,a.lat,CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae WHERE ae.address_id=a.id) THEN 'manual_verified' ELSE a.association_status END association_status,
-    COALESCE((SELECT v.outcome FROM active_visits v WHERE v.household_id=h.id ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),'untouched') status,
-    COALESCE((SELECT max(v.flyer_delivered) FROM active_visits v WHERE v.household_id=h.id),0) flyer_delivered,
+    a.structure_id imported_structure_id,a.civic_number_effective civic_number,a.street_effective street,a.unit_effective unit,
+    CASE WHEN a.number_event_id IS NOT NULL THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END) ELSE a.label END label,
+    a.lon,a.lat,a.number_event_id,CASE WHEN a.number_event_id IS NOT NULL THEN 1 ELSE 0 END number_corrected,
+    CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae WHERE ae.address_id=a.id) THEN 'manual_verified' ELSE a.association_status END association_status,
+    COALESCE((SELECT CASE WHEN v.revisit_requested=1 THEN 'revisit' ELSE v.outcome END FROM active_visits v WHERE v.household_id=h.id AND (fs.flyer_delivered=1 OR v.outcome!='flyer_delivered') ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),'untouched') status,
+    fs.flyer_delivered,
     COALESCE((SELECT max(v.door_knocked) FROM active_visits v WHERE v.household_id=h.id),0) door_knocked,
+    COALESCE((SELECT max(v.conversation_occurred) FROM active_visits v WHERE v.household_id=h.id),0) conversation_occurred,
+    COALESCE((SELECT max(v.revisit_requested) FROM active_visits v WHERE v.household_id=h.id),0) revisit_requested,
+    COALESCE((SELECT max(v.no_answer) FROM active_visits v WHERE v.household_id=h.id),0) no_answer,
+    (SELECT v.outcome FROM active_visits v
+      WHERE v.household_id=h.id
+      AND v.outcome IN ('supportive','undecided','opposed','volunteer_interest','lawn_sign_interest','vacant','no_campaign_material_requested')
+      ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1) political_outcome,
+    (SELECT occurred_at FROM (
+      SELECT v.occurred_at,v.id FROM active_visits v WHERE v.household_id=h.id
+      UNION ALL
+      SELECT f.occurred_at,f.id FROM household_flyer_events f WHERE f.household_id=h.id
+      UNION ALL
+      SELECT p.last_updated_at,p.id FROM effective_people p WHERE p.household_id=h.id
+    ) ORDER BY occurred_at DESC,id DESC LIMIT 1) last_updated_at,
     (SELECT count(*) FROM active_visits v WHERE v.household_id=h.id) visit_count
-    FROM households h JOIN addresses a ON a.id=h.address_id`,
+    FROM households h JOIN effective_addresses a ON a.id=h.address_id
+    JOIN household_flyer_state fs ON fs.household_id=h.id
+    WHERE a.source_active=1`,
     )
     .all();
   const routes = db
@@ -424,7 +704,12 @@ function state(role = "candidate") {
     .all();
   const route_stops = db
     .prepare(
-      "SELECT s.*,a.label,a.civic_number,a.street,a.lon,a.lat FROM route_stops s JOIN households h ON h.id=s.household_id JOIN addresses a ON a.id=h.address_id ORDER BY s.route_id,s.sequence",
+      `SELECT s.*,
+       CASE WHEN a.number_event_id IS NOT NULL THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END) ELSE a.label END label,
+       a.civic_number_effective civic_number,a.street_effective street,a.lon,a.lat
+       FROM route_stops s JOIN households h ON h.id=s.household_id
+       JOIN effective_addresses a ON a.id=h.address_id
+       ORDER BY s.route_id,s.sequence`,
     )
     .all();
   const followup_samples = (
@@ -445,7 +730,9 @@ function state(role = "candidate") {
     ).map((item) => item.household_id),
   }));
   const reviewRows = db
-    .prepare("SELECT queue_flags_json FROM address_review_records")
+    .prepare(
+      "SELECT queue_flags_json FROM address_review_records WHERE source_active=1",
+    )
     .all() as Array<{ queue_flags_json: string }>;
   const address_review_counts: Record<string, number> = {};
   for (const row of reviewRows)
@@ -472,7 +759,13 @@ function state(role = "candidate") {
       ? []
       : (db
           .prepare(
-            "SELECT nc.*,a.label household_label FROM neighbourhood_conversations nc LEFT JOIN households h ON h.id=nc.household_id LEFT JOIN addresses a ON a.id=h.address_id ORDER BY nc.occurred_at DESC LIMIT 100",
+            `SELECT nc.*,CASE WHEN a.number_event_id IS NOT NULL
+             THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END)
+             ELSE a.label END household_label
+             FROM neighbourhood_conversations nc
+             LEFT JOIN households h ON h.id=nc.household_id
+             LEFT JOIN effective_addresses a ON a.id=h.address_id
+             ORDER BY nc.occurred_at DESC LIMIT 100`,
           )
           .all() as any[]);
   const sessions = (
@@ -485,15 +778,17 @@ function state(role = "candidate") {
   const summary = db
     .prepare(
       `SELECT count(*) total_households,
-    sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.flyer_delivered=1)) flyers_delivered,
+    sum(fs.flyer_delivered) flyers_delivered,
     sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.door_knocked=1)) doors_knocked,
     sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.outcome IN ('conversation','supportive','undecided','opposed','volunteer_interest','lawn_sign_interest'))) answers,
     sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.conversation_occurred=1)) conversations,
-    sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.outcome='revisit')) revisits,
+    sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND (v.revisit_requested=1 OR v.outcome='revisit'))) revisits,
     sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.outcome='supportive')) supporters,
     sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.outcome='volunteer_interest')) volunteers,
     sum(EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=h.id AND v.outcome='lawn_sign_interest')) lawn_signs
-    FROM households h`,
+    FROM households h JOIN addresses a ON a.id=h.address_id
+    JOIN household_flyer_state fs ON fs.household_id=h.id
+    WHERE a.source_active=1`,
     )
     .get() as any;
   summary.untouched_households =
@@ -530,7 +825,7 @@ function state(role = "candidate") {
     recruitment_areas,
     recruitment_prospects,
     address_review_counts,
-    schema_version: 4,
+    schema_version: 10,
     summary,
   };
 }
@@ -570,10 +865,11 @@ const csvCell = (value: unknown) =>
 function sourceSamplingStops(routeId: string) {
   return db
     .prepare(
-      `SELECT s.household_id,a.street,a.civic_number,a.lon,a.lat
-       FROM route_stops s JOIN households h ON h.id=s.household_id JOIN addresses a ON a.id=h.address_id
+      `SELECT s.household_id,a.street_effective street,a.civic_number_effective civic_number,a.lon,a.lat
+       FROM route_stops s JOIN households h ON h.id=s.household_id JOIN effective_addresses a ON a.id=h.address_id
+       JOIN household_flyer_state fs ON fs.household_id=s.household_id
        WHERE s.route_id=? AND s.completed_at IS NOT NULL
-       AND EXISTS(SELECT 1 FROM active_visits v WHERE v.household_id=s.household_id AND v.flyer_delivered=1)
+       AND fs.flyer_delivered=1
        ORDER BY s.sequence`,
     )
     .all(routeId) as Array<{
@@ -620,6 +916,10 @@ const server = createServer(async (req, res) => {
       return json(res, 401, { error: "authentication required" });
     const user = String(req.headers["x-canvass-user"] ?? "local-user");
     const role = String(req.headers["x-canvass-role"] ?? "candidate");
+    if (req.method === "GET" && url.pathname === "/api/canvassing/health") {
+      db.prepare("SELECT 1").get();
+      return json(res, 200, { status: "ok" });
+    }
     if (req.method === "GET" && url.pathname === "/api/canvassing/state")
       return json(res, 200, state(role));
     if (req.method === "POST" && url.pathname === "/api/canvassing/visits") {
@@ -672,6 +972,8 @@ const server = createServer(async (req, res) => {
         door_knocked: Boolean(input.door_knocked),
         outcome: input.outcome,
         conversation_occurred: Boolean(input.conversation_occurred),
+        revisit_requested: Boolean(input.revisit_requested),
+        no_answer: Boolean(input.no_answer),
         issue_categories: input.issue_categories ?? [],
         notes: input.notes ?? "",
         follow_up_action: input.follow_up_action ?? null,
@@ -682,7 +984,7 @@ const server = createServer(async (req, res) => {
         session_id: input.session_id ?? null,
       };
       db.prepare(
-        "INSERT INTO visits (id,occurred_at,user_id,household_id,route_id,flyer_delivered,door_knocked,outcome,conversation_occurred,issue_categories_json,notes,follow_up_action,follow_up_date,support_category,source,imported_at,session_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO visits (id,occurred_at,user_id,household_id,route_id,flyer_delivered,door_knocked,outcome,conversation_occurred,issue_categories_json,notes,follow_up_action,follow_up_date,support_category,source,imported_at,session_id,revisit_requested,no_answer) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
       ).run(
         event.id,
         event.occurred_at,
@@ -701,6 +1003,8 @@ const server = createServer(async (req, res) => {
         event.source,
         event.imported_at,
         event.session_id,
+        +event.revisit_requested,
+        +event.no_answer,
       );
       db.prepare(
         "UPDATE submission_keys SET entity_id=? WHERE submission_key=?",
@@ -723,6 +1027,222 @@ const server = createServer(async (req, res) => {
       });
       await recordEvent({ type: "canvassing.visit.appended", ...event });
       return json(res, 201, event);
+    }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/households\/[^/]+\/flyer-status$/.test(url.pathname)
+    ) {
+      const householdId = url.pathname.split("/").at(-2)!,
+        input = JSON.parse(await body(req)),
+        flyerDelivered = input.flyer_delivered;
+      if (typeof flyerDelivered !== "boolean")
+        return json(res, 400, {
+          error: "flyer_delivered must be true or false",
+        });
+      const household = db
+        .prepare("SELECT id FROM households WHERE id=?")
+        .get(householdId);
+      if (!household) return json(res, 404, { error: "household not found" });
+      const current = db
+        .prepare(
+          "SELECT flyer_delivered FROM household_flyer_state WHERE household_id=?",
+        )
+        .get(householdId) as { flyer_delivered: number };
+      if (Boolean(current.flyer_delivered) === flyerDelivered)
+        return json(res, 200, {
+          household_id: householdId,
+          flyer_delivered: flyerDelivered,
+          changed: false,
+        });
+      const previous = db
+          .prepare(
+            "SELECT id FROM household_flyer_events WHERE household_id=? ORDER BY occurred_at DESC,rowid DESC LIMIT 1",
+          )
+          .get(householdId) as { id: string } | undefined,
+        event = {
+          id: randomUUID(),
+          household_id: householdId,
+          occurred_at: input.occurred_at ?? now(),
+          user_id: user,
+          flyer_delivered: flyerDelivered,
+          reason: input.reason ?? "manual household flyer correction",
+          source: input.source ?? "manual_correction",
+          previous_event_id: previous?.id ?? null,
+        };
+      db.prepare(
+        "INSERT INTO household_flyer_events VALUES (?,?,?,?,?,?,?,?)",
+      ).run(
+        event.id,
+        event.household_id,
+        event.occurred_at,
+        event.user_id,
+        +event.flyer_delivered,
+        event.reason,
+        event.source,
+        event.previous_event_id,
+      );
+      audit(user, "correct", "household_flyer_status", householdId, event);
+      await recordEvent({
+        type: "canvassing.household.flyer_status_corrected",
+        ...event,
+      });
+      return json(res, 201, { ...event, changed: true });
+    }
+    if (
+      req.method === "GET" &&
+      /^\/api\/canvassing\/households\/[^/]+\/contacts$/.test(url.pathname)
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, {
+          error: "private contact details require candidate role",
+        });
+      const householdId = url.pathname.split("/").at(-2)!;
+      return json(
+        res,
+        200,
+        db
+          .prepare(
+            `SELECT p.id person_id,p.name,p.phone,p.email,
+             p.mailing_list_consent,p.last_updated_at,
+             a.civic_number_effective civic_number,
+             a.street_effective street,
+             trim(a.civic_number_effective||' '||a.street_effective) address_label
+             FROM effective_people p
+             JOIN households h ON h.id=p.household_id
+             JOIN effective_addresses a ON a.id=h.address_id
+             WHERE p.household_id=? ORDER BY p.name,p.id`,
+          )
+          .all(householdId),
+      );
+    }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/households\/[^/]+\/contacts$/.test(url.pathname)
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, {
+          error: "private contact details require candidate role",
+        });
+      const householdId = url.pathname.split("/").at(-2)!,
+        input = JSON.parse(await body(req)),
+        name = String(input.name ?? "").trim(),
+        phone = String(input.phone ?? "").trim(),
+        email = String(input.email ?? "").trim(),
+        mailingListConsent = Boolean(input.mailing_list_consent);
+      if (!name && !phone && !email)
+        return json(res, 400, {
+          error: "Provide a name, phone number, or email address",
+        });
+      if (
+        name.length > 200 ||
+        phone.length > 50 ||
+        email.length > 254 ||
+        (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      )
+        return json(res, 400, { error: "Contact details are invalid" });
+      if (mailingListConsent && !email)
+        return json(res, 400, {
+          error: "An email address is required for mailing-list consent",
+        });
+      if (
+        !db.prepare("SELECT 1 FROM households WHERE id=?").get(householdId)
+      )
+        return json(res, 404, { error: "household not found" });
+      const timestamp = input.occurred_at ?? now();
+      let personId = String(input.person_id ?? "");
+      if (personId) {
+        const person = db
+          .prepare("SELECT id FROM people WHERE id=? AND household_id=?")
+          .get(personId, householdId);
+        if (!person)
+          return json(res, 404, {
+            error: "contact person not found for this household",
+          });
+      } else {
+        personId = randomUUID();
+        db.prepare(
+          "INSERT INTO people (id,household_id,name,phone,email,voluntarily_supplied,created_at,mailing_list_consent) VALUES (?,?,?,?,?,?,?,?)",
+        ).run(
+          personId,
+          householdId,
+          name,
+          phone,
+          email,
+          1,
+          timestamp,
+          +mailingListConsent,
+        );
+      }
+      const previous = db
+          .prepare(
+            "SELECT id FROM person_contact_events WHERE person_id=? ORDER BY occurred_at DESC,rowid DESC LIMIT 1",
+          )
+          .get(personId) as { id: string } | undefined,
+        event = {
+          id: randomUUID(),
+          person_id: personId,
+          household_id: householdId,
+          occurred_at: timestamp,
+          user_id: user,
+          name,
+          phone,
+          email,
+          mailing_list_consent: mailingListConsent,
+          voluntarily_supplied: true,
+          source: input.source ?? "candidate",
+          previous_event_id: previous?.id ?? null,
+        };
+      db.prepare(
+        "INSERT INTO person_contact_events VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      ).run(
+        event.id,
+        event.person_id,
+        event.household_id,
+        event.occurred_at,
+        event.user_id,
+        event.name,
+        event.phone,
+        event.email,
+        +event.mailing_list_consent,
+        +event.voluntarily_supplied,
+        event.source,
+        event.previous_event_id,
+      );
+      audit(user, "append", "person_contact", personId, {
+        household_id: householdId,
+        mailing_list_consent: mailingListConsent,
+      });
+      await recordEvent({
+        type: "canvassing.person_contact.appended",
+        event_id: event.id,
+        person_id: personId,
+        household_id: householdId,
+        mailing_list_consent: mailingListConsent,
+        source: event.source,
+      });
+      const address = db
+        .prepare(
+          `SELECT a.civic_number_effective civic_number,
+           a.street_effective street,
+           trim(a.civic_number_effective||' '||a.street_effective) address_label
+           FROM households h JOIN effective_addresses a ON a.id=h.address_id
+           WHERE h.id=?`,
+        )
+        .get(householdId) as {
+        civic_number: string;
+        street: string;
+        address_label: string;
+      };
+      return json(res, 201, {
+        person_id: personId,
+        household_id: householdId,
+        name,
+        phone,
+        email,
+        mailing_list_consent: mailingListConsent,
+        last_updated_at: timestamp,
+        ...address,
+      });
     }
     if (
       req.method === "POST" &&
@@ -1609,6 +2129,524 @@ const server = createServer(async (req, res) => {
       return json(res, 201, event);
     }
     if (
+      req.method === "GET" &&
+      url.pathname === "/api/canvassing/structure-splits"
+    ) {
+      const active = latestSplitEvents().filter(
+        (event) => event.event_type === "accept",
+        ),
+        hiddenParentIds = new Set(
+          active.map((event) => event.parent_structure_id),
+        );
+      return json(res, 200, {
+        hidden_parent_ids: [...hiddenParentIds],
+        features: active.flatMap((event) =>
+          event.payload.children
+            .filter((child: any) => !hiddenParentIds.has(child.id))
+            .map((child: any) => ({
+              type: "Feature",
+              id: child.id,
+              properties: {
+                structure_id: child.id,
+                external_source: "manual_canvassing_split",
+                external_id: child.id,
+                building_type: "residential",
+                confidence: "manual_split",
+                geometry_provenance: "manual_split",
+                split_parent_structure_id: event.parent_structure_id,
+                split_event_id: event.id,
+                split_child_index: child.index,
+                civic_label: child.civic_label,
+                civic_numbers: child.civic_numbers,
+              },
+              geometry: child.geometry,
+            })),
+        ),
+      });
+    }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/structures\/[^/]+\/split\/preview$/.test(
+        url.pathname,
+      )
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, { error: "roof splitting requires candidate role" });
+      const structureId = url.pathname.split("/").at(-3)!,
+        input = JSON.parse(await body(req)),
+        structure = db
+          .prepare(
+            "SELECT id,geometry_json FROM structures WHERE id=? AND source_active=1",
+          )
+          .get(structureId) as
+          | { id: string; geometry_json: string }
+          | undefined;
+      if (!structure) return json(res, 404, { error: "structure not found" });
+      const geometry = JSON.parse(structure.geometry_json) as Geometry,
+        method = input.method === "frontage" ? "frontage" : "cut_lines",
+        cuts: SplitCut[] =
+          method === "frontage"
+            ? frontageCuts(
+                geometry,
+                Number(input.unit_count ?? 2),
+                Boolean(input.rotate),
+              )
+            : input.cuts ?? [],
+        previewId = String(input.preview_id ?? randomUUID()),
+        result = splitStructure(structureId, previewId, geometry, cuts);
+      return json(res, 200, { preview_id: previewId, method, cuts, ...result });
+    }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/structures\/[^/]+\/split$/.test(url.pathname)
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, { error: "roof splitting requires candidate role" });
+      const structureId = url.pathname.split("/").at(-2)!,
+        input = JSON.parse(await body(req)),
+        submissionKey = String(input.submission_key ?? "");
+      if (!submissionKey)
+        return json(res, 400, { error: "submission_key is required" });
+      try {
+        db.prepare(
+          "INSERT INTO submission_keys VALUES (?,?,'structure_split',NULL)",
+        ).run(submissionKey, now());
+      } catch {
+        return json(res, 409, {
+          error: "duplicate submission ignored",
+          submission_key: submissionKey,
+        });
+      }
+      const existing = latestSplitEvents().find(
+        (event) =>
+          event.parent_structure_id === structureId &&
+          event.event_type === "accept",
+      );
+      if (existing)
+        return json(res, 409, { error: "structure already has an active split" });
+      const structure = db
+        .prepare(
+          "SELECT * FROM structures WHERE id=? AND source_active=1",
+        )
+        .get(structureId) as any;
+      if (!structure) return json(res, 404, { error: "structure not found" });
+      const eventId = randomUUID(),
+        geometry = JSON.parse(structure.geometry_json) as Geometry,
+        method = input.method === "frontage" ? "frontage" : "cut_lines",
+        cuts: SplitCut[] =
+          method === "frontage"
+            ? frontageCuts(
+                geometry,
+                Number(input.unit_count ?? 2),
+                Boolean(input.rotate),
+              )
+            : input.cuts ?? [],
+        result = splitStructure(structureId, eventId, geometry, cuts),
+        timestamp = now(),
+        homes = state("candidate").households as any[],
+        direct = homes.filter((home) => home.structure_id === structureId),
+        references = new Set(
+          (input.reference_address_ids ?? []).map(String),
+        ),
+        baseHomes = direct.length
+          ? direct
+          : homes.filter((home) => references.has(home.address_id)),
+        centers = result.children.map((child) =>
+          geometryCenter(JSON.stringify(child.geometry)),
+        ),
+        assignedChildren = new Set<number>(),
+        childAddresses = new Map<number, any[]>();
+      for (const home of direct) {
+        let childIndex = 0,
+          distance = Infinity;
+        centers.forEach((center, index) => {
+          const candidate = metresBetween([home.lon, home.lat], center);
+          if (candidate < distance) {
+            distance = candidate;
+            childIndex = index;
+          }
+        });
+        assignedChildren.add(childIndex);
+        childAddresses.set(childIndex, [
+          ...(childAddresses.get(childIndex) ?? []),
+          home,
+        ]);
+      }
+      const base = baseHomes[0],
+        baseNumber = Number.parseInt(String(base?.civic_number ?? "0"), 10),
+        street = String(base?.street ?? input.street ?? "Address review"),
+        used = new Set(
+          (
+            db
+              .prepare(
+                "SELECT civic_number_effective civic_number,street_effective street FROM effective_addresses WHERE source_active=1",
+              )
+              .all() as any[]
+          ).map(
+            (row) =>
+              `${String(row.street).toLowerCase()}|${String(row.civic_number)}`,
+          ),
+        ),
+        children = result.children.map((child, index) => {
+          const linked = childAddresses.get(index) ?? [];
+          return {
+            ...child,
+            index: index + 1,
+            civic_numbers: linked.map((home) => home.civic_number),
+            civic_label: linked.length
+              ? linked.map((home) => home.civic_number).join(" / ")
+              : "",
+          };
+        });
+      db.exec("BEGIN");
+      try {
+        const insertStructure = db.prepare(
+            "INSERT INTO structures (id,geometry_json,building_type,external_source,external_id,source_confidence,imported_at,source_active) VALUES (?,?,?,?,?,?,?,1)",
+          ),
+          insertAssociation = db.prepare(
+            "INSERT INTO address_association_events VALUES (?,?,?,?,?,?,?,?,?)",
+          );
+        for (const child of children)
+          insertStructure.run(
+            child.id,
+            JSON.stringify(child.geometry),
+            "residential",
+            "manual_canvassing_split",
+            child.id,
+            "manual_split",
+            timestamp,
+          );
+        for (const [index, linked] of childAddresses)
+          for (const home of linked) {
+            const previous = db
+              .prepare(
+                "SELECT id FROM address_association_events WHERE address_id=? ORDER BY occurred_at DESC,rowid DESC LIMIT 1",
+              )
+              .get(home.address_id) as any;
+            insertAssociation.run(
+              randomUUID(),
+              home.address_id,
+              children[index].id,
+              timestamp,
+              user,
+              previous ? "correct" : "associate",
+              "manual_verified",
+              "accepted building split",
+              previous?.id ?? null,
+            );
+          }
+        const anchorIndex = children.findIndex(
+          (_, index) => (childAddresses.get(index) ?? []).length > 0,
+        );
+        for (let index = 0; index < children.length; index++) {
+          if (assignedChildren.has(index)) continue;
+          const direction = anchorIndex >= 0 && index < anchorIndex ? -1 : 1;
+          let offset =
+              anchorIndex >= 0
+                ? Math.max(1, Math.abs(index - anchorIndex))
+                : index + 1,
+            civic =
+              Number.isFinite(baseNumber) && baseNumber > 0
+                ? baseNumber + direction * offset * 2
+                : index + 1;
+          while (used.has(`${street.toLowerCase()}|${civic}`)) {
+            offset++;
+            civic = baseNumber + direction * offset * 2;
+          }
+          used.add(`${street.toLowerCase()}|${civic}`);
+          const addressId = `address_${createHash("sha256")
+              .update(`manual-split:${eventId}:${index}`)
+              .digest("hex")
+              .slice(0, 20)}`,
+            householdId = `household_${addressId.slice(8)}`,
+            [lon, lat] = centers[index];
+          db.prepare(
+            "INSERT INTO addresses (id,structure_id,civic_number,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)",
+          ).run(
+            addressId,
+            children[index].id,
+            String(civic),
+            street,
+            "",
+            `~${civic} ${street}`,
+            lon,
+            lat,
+            "manual_split_inferred",
+            children[index].id,
+            "manual_split_inferred",
+            timestamp,
+          );
+          db.prepare("INSERT INTO households VALUES (?,?,?,?)").run(
+            householdId,
+            addressId,
+            "",
+            timestamp,
+          );
+          children[index].civic_numbers = [String(civic)];
+          children[index].civic_label = `~${civic}`;
+        }
+        const payload = {
+          cuts,
+          parent_area_m2: result.parent_area_m2,
+          retained_area_ratio: result.retained_area_ratio,
+          children,
+        };
+        db.prepare(
+          "INSERT INTO structure_split_events VALUES (?,?,?,?,?,?,?,?,NULL)",
+        ).run(
+          eventId,
+          structureId,
+          timestamp,
+          user,
+          "accept",
+          method,
+          JSON.stringify(payload),
+          input.reason ?? "manual roof split",
+        );
+        db.prepare(
+          "UPDATE submission_keys SET entity_id=? WHERE submission_key=?",
+        ).run(eventId, submissionKey);
+        db.exec("COMMIT");
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
+      }
+      await writeSplitCalibration();
+      audit(user, "split", "structure", structureId, {
+        event_id: eventId,
+        child_count: children.length,
+        method,
+      });
+      await recordEvent({
+        type: "canvassing.structure.split",
+        event_id: eventId,
+        parent_structure_id: structureId,
+        child_ids: children.map((child) => child.id),
+        method,
+      });
+      return json(res, 201, {
+        event_id: eventId,
+        parent_structure_id: structureId,
+        method,
+        children,
+      });
+    }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/structures\/[^/]+\/split\/reverse$/.test(
+        url.pathname,
+      )
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, { error: "roof splitting requires candidate role" });
+      const structureId = url.pathname.split("/").at(-3)!,
+        latest = latestSplitEvents().find(
+          (event) => event.parent_structure_id === structureId,
+        );
+      if (!latest || latest.event_type !== "accept")
+        return json(res, 404, { error: "no active split" });
+      const childIds = new Set(
+          latest.payload.children.map((child: any) => child.id),
+        ),
+        nested = latestSplitEvents().find(
+          (event) =>
+            event.event_type === "accept" &&
+            childIds.has(event.parent_structure_id),
+        );
+      if (nested)
+        return json(res, 409, {
+          error: "Undo the finer child split before undoing this parent split",
+          nested_parent_structure_id: nested.parent_structure_id,
+        });
+      const timestamp = now(),
+        eventId = randomUUID(),
+        homes = (state("candidate").households as any[]).filter((home) =>
+          childIds.has(home.structure_id),
+        );
+      db.exec("BEGIN");
+      try {
+        for (const home of homes) {
+          const previous = db
+            .prepare(
+              "SELECT id FROM address_association_events WHERE address_id=? ORDER BY occurred_at DESC,rowid DESC LIMIT 1",
+            )
+            .get(home.address_id) as any;
+          db.prepare(
+            "INSERT INTO address_association_events VALUES (?,?,?,?,?,?,?,?,?)",
+          ).run(
+            randomUUID(),
+            home.address_id,
+            structureId,
+            timestamp,
+            user,
+            previous ? "correct" : "associate",
+            "manual_verified",
+            "reversed building split",
+            previous?.id ?? null,
+          );
+        }
+        db.prepare(
+          "INSERT INTO structure_split_events VALUES (?,?,?,?,?,?,?,?,?)",
+        ).run(
+          eventId,
+          structureId,
+          timestamp,
+          user,
+          "reverse",
+          latest.method,
+          JSON.stringify(latest.payload),
+          "manual split reversal",
+          latest.id,
+        );
+        db.exec("COMMIT");
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
+      }
+      await writeSplitCalibration();
+      audit(user, "reverse_split", "structure", structureId, {
+        event_id: eventId,
+        restored_households: homes.length,
+      });
+      await recordEvent({
+        type: "canvassing.structure.split_reversed",
+        event_id: eventId,
+        parent_structure_id: structureId,
+      });
+      return json(res, 201, {
+        event_id: eventId,
+        parent_structure_id: structureId,
+        restored_households: homes.length,
+      });
+    }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/structures\/[^/]+\/civic-number$/.test(url.pathname)
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, {
+          error: "address correction requires candidate role",
+        });
+      const structureId = url.pathname.split("/").at(-2)!,
+        input = JSON.parse(await body(req)),
+        civicNumber = String(input.civic_number ?? "").trim(),
+        street = String(input.street ?? "").trim();
+      if (
+        !/^[0-9][0-9A-Za-z /-]{0,19}$/.test(civicNumber) ||
+        !street ||
+        street.length > 100
+      )
+        return json(res, 400, {
+          error: "Provide a civic number and street name",
+        });
+      const structure = db
+        .prepare(
+          "SELECT id,geometry_json FROM structures WHERE id=? AND source_active=1",
+        )
+        .get(structureId) as { id: string; geometry_json: string } | undefined;
+      if (!structure) return json(res, 404, { error: "structure not found" });
+
+      let addressIds = (state("candidate").households as any[])
+        .filter((home) => home.structure_id === structureId)
+        .map((home) => String(home.address_id));
+      addressIds = [...new Set(addressIds)];
+      if (!addressIds.length) {
+        const addressId = `address_${createHash("sha256")
+            .update(`manual-structure-address:${structureId}`)
+            .digest("hex")
+            .slice(0, 20)}`,
+          householdId = `household_${addressId.slice(8)}`,
+          [lon, lat] = geometryCenter(structure.geometry_json),
+          timestamp = now();
+        db.prepare(
+          `INSERT INTO addresses
+           (id,structure_id,civic_number,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)
+           ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,source_active=1`,
+        ).run(
+          addressId,
+          structureId,
+          civicNumber,
+          street,
+          "",
+          `${civicNumber} ${street}`,
+          lon,
+          lat,
+          "manual_canvassing",
+          structureId,
+          "manual_verified",
+          timestamp,
+        );
+        db.prepare("INSERT OR IGNORE INTO households VALUES (?,?,?,?)").run(
+          householdId,
+          addressId,
+          "",
+          timestamp,
+        );
+        addressIds = [addressId];
+      }
+
+      const events = [];
+      for (const addressId of addressIds) {
+        const address = db
+          .prepare("SELECT unit FROM addresses WHERE id=?")
+          .get(addressId) as { unit: string } | undefined;
+        if (!address) continue;
+        const previous = db
+            .prepare(
+              "SELECT id FROM address_number_events WHERE address_id=? ORDER BY occurred_at DESC,rowid DESC LIMIT 1",
+            )
+            .get(addressId) as { id: string } | undefined,
+          event = {
+            id: randomUUID(),
+            address_id: addressId,
+            structure_id: structureId,
+            occurred_at: now(),
+            user_id: user,
+            event_type: previous ? "correct" : "set",
+            civic_number: civicNumber,
+            street,
+            unit: address.unit ?? "",
+            reason: input.reason ?? "manual roof number correction",
+            previous_event_id: previous?.id ?? null,
+          };
+        db.prepare(
+          "INSERT INTO address_number_events VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        ).run(
+          event.id,
+          event.address_id,
+          event.structure_id,
+          event.occurred_at,
+          event.user_id,
+          event.event_type,
+          event.civic_number,
+          event.street,
+          event.unit,
+          event.reason,
+          event.previous_event_id,
+        );
+        events.push(event);
+        await recordEvent({
+          type: "canvassing.address_number.appended",
+          ...event,
+        });
+      }
+      await writeAddressNumberCalibration();
+      audit(user, "correct", "structure_civic_number", structureId, {
+        civic_number: civicNumber,
+        street,
+        address_ids: addressIds,
+        events: events.length,
+      });
+      return json(res, 201, {
+        structure_id: structureId,
+        civic_number: civicNumber,
+        street,
+        address_ids: addressIds,
+        events,
+      });
+    }
+    if (
       req.method === "POST" &&
       /^\/api\/canvassing\/addresses\/[^/]+\/association$/.test(url.pathname)
     ) {
@@ -1727,7 +2765,10 @@ const server = createServer(async (req, res) => {
         const address = String(row.address ?? "").toLowerCase();
         const match = db
           .prepare(
-            "SELECT h.id FROM households h JOIN addresses a ON a.id=h.address_id WHERE lower(a.label)=? LIMIT 1",
+            `SELECT h.id FROM households h JOIN effective_addresses a ON a.id=h.address_id
+             WHERE lower(CASE WHEN a.number_event_id IS NOT NULL
+               THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END)
+               ELSE a.label END)=? LIMIT 1`,
           )
           .get(address) as any;
         if (!match) continue;
@@ -1796,7 +2837,15 @@ const server = createServer(async (req, res) => {
     ) {
       const rows = db
         .prepare(
-          "SELECT r.name route,s.sequence,a.label,h.id household_id,s.completed_at,s.skipped FROM route_stops s JOIN routes r ON r.id=s.route_id JOIN households h ON h.id=s.household_id JOIN addresses a ON a.id=h.address_id ORDER BY r.name,s.sequence",
+          `SELECT r.name route,s.sequence,
+           CASE WHEN a.number_event_id IS NOT NULL
+             THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END)
+             ELSE a.label END address,
+           h.id household_id,s.completed_at,s.skipped
+           FROM route_stops s JOIN routes r ON r.id=s.route_id
+           JOIN households h ON h.id=s.household_id
+           JOIN effective_addresses a ON a.id=h.address_id
+           ORDER BY r.name,s.sequence`,
         )
         .all() as any[];
       const headers = [
@@ -1857,7 +2906,7 @@ const server = createServer(async (req, res) => {
       return json(res, 200, {
         backup: await backupStatus(),
         journal: await verifyJournal(),
-        schema_version: 4,
+        schema_version: 10,
       });
     if (req.method === "POST" && url.pathname === "/api/canvassing/backup") {
       const path = await performBackup("manual");
@@ -1874,7 +2923,15 @@ const server = createServer(async (req, res) => {
       );
       const rows = db
         .prepare(
-          "SELECT r.name,s.sequence,a.label,s.completed_at,s.skipped FROM route_stops s JOIN routes r ON r.id=s.route_id JOIN households h ON h.id=s.household_id JOIN addresses a ON a.id=h.address_id ORDER BY r.name,s.sequence",
+          `SELECT r.name,s.sequence,
+           CASE WHEN a.number_event_id IS NOT NULL
+             THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END)
+             ELSE a.label END label,
+           s.completed_at,s.skipped
+           FROM route_stops s JOIN routes r ON r.id=s.route_id
+           JOIN households h ON h.id=s.household_id
+           JOIN effective_addresses a ON a.id=h.address_id
+           ORDER BY r.name,s.sequence`,
         )
         .all() as any[];
       await writeFile(

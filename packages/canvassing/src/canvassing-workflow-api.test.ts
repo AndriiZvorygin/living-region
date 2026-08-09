@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -28,6 +28,10 @@ describe.sequential("canvassing weekly workflow API", () => {
           CANVASS_PORT: String(port),
           CANVASS_DB: join(directory, "canvassing.sqlite"),
           CANVASS_EVENT_LOG: join(directory, "events.jsonl"),
+          CANVASS_CALIBRATION_EXPORT: join(
+            directory,
+            "address-number-calibration.json",
+          ),
         },
         stdio: "ignore",
       },
@@ -74,6 +78,154 @@ describe.sequential("canvassing weekly workflow API", () => {
     await rm(directory, { recursive: true, force: true });
   });
 
+  it("appends civic-number corrections and creates a household for an unlinked roof", async () => {
+    const before = (await request("/state")).data,
+      linkedStructures = new Set(
+        before.households.map((home: any) => home.structure_id).filter(Boolean),
+      ),
+      structures = JSON.parse(
+        await readFile(
+          "packages/web-client/public/canvassing/structures.geojson",
+          "utf8",
+        ),
+      ),
+      unlinked = structures.features.find(
+        (feature: any) =>
+          !linkedStructures.has(feature.properties.structure_id),
+      );
+    expect(unlinked).toBeTruthy();
+    const correction = await request(
+      `/structures/${unlinked.properties.structure_id}/civic-number`,
+      {
+        civic_number: "1234",
+        street: "Test Street",
+        reason: "field verified",
+      },
+    );
+    expect(correction.status).toBe(201);
+    const after = (await request("/state")).data,
+      created = after.households.find(
+        (home: any) => home.structure_id === unlinked.properties.structure_id,
+      );
+    expect(after.schema_version).toBe(10);
+    expect(created).toMatchObject({
+      civic_number: "1234",
+      street: "Test Street",
+      label: "1234 Test Street",
+      number_corrected: 1,
+    });
+    const calibration = JSON.parse(
+      await readFile(
+        join(directory, "address-number-calibration.json"),
+        "utf8",
+      ),
+    );
+    expect(calibration.records).toContainEqual(
+      expect.objectContaining({
+        address_id: created.address_id,
+        structure_id: unlinked.properties.structure_id,
+        civic_number: "1234",
+        street: "Test Street",
+      }),
+    );
+  });
+
+  it("accepts and safely reverses a persistent frontage split", async () => {
+    const before = (await request("/state")).data,
+      structures = JSON.parse(
+        await readFile(
+          "packages/web-client/public/canvassing/structures.geojson",
+          "utf8",
+        ),
+      ),
+      candidate = structures.features.find(
+        (feature: any) =>
+          Number(feature.properties.area_m2) >= 120 &&
+          Number(feature.properties.area_m2) <= 500 &&
+          before.households.some(
+            (home: any) =>
+              home.structure_id === feature.properties.structure_id,
+          ),
+      );
+    expect(candidate).toBeTruthy();
+    const preview = await request(
+      `/structures/${candidate.properties.structure_id}/split/preview`,
+      { method: "frontage", unit_count: 2, rotate: false },
+    );
+    expect(preview.status).toBe(200);
+    expect(preview.data.children).toHaveLength(2);
+    const accepted = await request(
+      `/structures/${candidate.properties.structure_id}/split`,
+      {
+        submission_key: `split-${candidate.properties.structure_id}`,
+        method: "frontage",
+        unit_count: 2,
+        rotate: false,
+        reference_address_ids:
+          candidate.properties.address_reference_ids ?? [],
+      },
+    );
+    expect(accepted.status).toBe(201);
+    expect(accepted.data.children).toHaveLength(2);
+    const overlay = await request("/structure-splits");
+    expect(overlay.data.hidden_parent_ids).toContain(
+      candidate.properties.structure_id,
+    );
+    expect(overlay.data.features).toHaveLength(2);
+    const after = (await request("/state")).data;
+    expect(
+      after.households.some((home: any) =>
+        accepted.data.children.some(
+          (child: any) => child.id === home.structure_id,
+        ),
+      ),
+    ).toBe(true);
+    const child = accepted.data.children[0],
+      nestedPreview = await request(
+        `/structures/${child.id}/split/preview`,
+        { method: "frontage", unit_count: 2, rotate: false },
+      );
+    expect(nestedPreview.status).toBe(200);
+    expect(nestedPreview.data.children).toHaveLength(2);
+    const nested = await request(`/structures/${child.id}/split`, {
+      submission_key: `nested-split-${child.id}`,
+      method: "frontage",
+      unit_count: 2,
+      rotate: false,
+    });
+    expect(nested.status).toBe(201);
+    const refinedOverlay = await request("/structure-splits");
+    expect(refinedOverlay.data.hidden_parent_ids).toEqual(
+      expect.arrayContaining([candidate.properties.structure_id, child.id]),
+    );
+    expect(refinedOverlay.data.features).toHaveLength(3);
+    expect(
+      refinedOverlay.data.features.some(
+        (feature: any) => feature.properties.structure_id === child.id,
+      ),
+    ).toBe(false);
+    expect(
+      (await request(`/structures/${candidate.properties.structure_id}/split/reverse`, {}))
+        .status,
+    ).toBe(409);
+    expect(
+      (await request(`/structures/${child.id}/split/reverse`, {})).status,
+    ).toBe(201);
+    const reversed = await request(
+      `/structures/${candidate.properties.structure_id}/split/reverse`,
+      {},
+    );
+    expect(reversed.status).toBe(201);
+    const collapsed = (await request("/state")).data;
+    expect(
+      collapsed.households.some(
+        (home: any) =>
+          home.structure_id === candidate.properties.structure_id,
+      ),
+    ).toBe(true);
+    expect((await request("/structure-splits")).data.features).toHaveLength(0);
+  });
+
   it("creates a completed flyer route and stable draft sample", async () => {
     const state = (await request("/state")).data;
     sourceHouseholds = state.households
@@ -106,6 +258,163 @@ describe.sequential("canvassing weekly workflow API", () => {
     sampleId = sample.data.id;
     expect(sample.data.household_ids).toHaveLength(5);
     expect(sample.data.scheduled_for).toBe("2026-07-22");
+  });
+
+  it("records flyer, conversation, revisit, and political outcome together", async () => {
+    const visit = await request("/visits", {
+      submission_key: "combined-visit",
+      household_id: sourceHouseholds[0],
+      route_id: routeId,
+      outcome: "supportive",
+      flyer_delivered: true,
+      door_knocked: true,
+      conversation_occurred: true,
+      revisit_requested: true,
+      no_answer: false,
+    });
+    expect(visit.status).toBe(201);
+    expect(visit.data).toMatchObject({
+      outcome: "supportive",
+      flyer_delivered: true,
+      door_knocked: true,
+      conversation_occurred: true,
+      revisit_requested: true,
+      no_answer: false,
+    });
+    const state = (await request("/state")).data,
+      household = state.households.find(
+        (home: any) => home.household_id === sourceHouseholds[0],
+      );
+    expect(household.status).toBe("revisit");
+    expect(household.political_outcome).toBe("supportive");
+    expect(state.summary.revisits).toBeGreaterThanOrEqual(1);
+    expect(state.summary.supporters).toBeGreaterThanOrEqual(1);
+    expect(state.summary.conversations).toBeGreaterThanOrEqual(1);
+  });
+
+  it("removes flyer state without removing a conversation or visit", async () => {
+    const householdId = sourceHouseholds[0],
+      before = (await request("/state")).data,
+      homeBefore = before.households.find(
+        (home: any) => home.household_id === householdId,
+      ),
+      flyerTotal = Number(before.summary.flyers_delivered),
+      corrected = await request(`/households/${householdId}/flyer-status`, {
+        flyer_delivered: false,
+        reason: "field correction",
+      });
+    expect(corrected.status).toBe(201);
+    const after = (await request("/state")).data,
+      homeAfter = after.households.find(
+        (home: any) => home.household_id === householdId,
+      );
+    expect(homeBefore).toMatchObject({
+      flyer_delivered: 1,
+      conversation_occurred: 1,
+    });
+    expect(homeAfter).toMatchObject({
+      flyer_delivered: 0,
+      conversation_occurred: 1,
+      status: "revisit",
+      visit_count: homeBefore.visit_count,
+    });
+    expect(Number(after.summary.flyers_delivered)).toBe(flyerTotal - 1);
+  });
+
+  it("appends private contact details and mailing-list consent", async () => {
+    const householdId = sourceHouseholds[1],
+      household = (await request("/state")).data.households.find(
+        (home: any) => home.household_id === householdId,
+      );
+    expect((await request(`/households/${householdId}/contacts`)).data).toEqual(
+      [],
+    );
+    const created = await request(`/households/${householdId}/contacts`, {
+      name: "Alex Example",
+      phone: "519-555-0101",
+      email: "alex@example.test",
+      mailing_list_consent: true,
+      source: "candidate",
+    });
+    expect(created.status).toBe(201);
+    expect(created.data).toMatchObject({
+      name: "Alex Example",
+      phone: "519-555-0101",
+      email: "alex@example.test",
+      mailing_list_consent: true,
+      civic_number: household.civic_number,
+      street: household.street,
+      address_label: `${household.civic_number} ${household.street}`,
+    });
+    const updated = await request(`/households/${householdId}/contacts`, {
+      person_id: created.data.person_id,
+      name: "Alex Example",
+      phone: "519-555-0102",
+      email: "alex@example.test",
+      mailing_list_consent: false,
+      source: "manual_correction",
+    });
+    expect(updated.status).toBe(201);
+    expect(
+      (await request(`/households/${householdId}/contacts`)).data,
+    ).toContainEqual(
+      expect.objectContaining({
+        person_id: created.data.person_id,
+        phone: "519-555-0102",
+        mailing_list_consent: 0,
+        civic_number: household.civic_number,
+        street: household.street,
+      }),
+    );
+    expect(
+      (await request(`/households/${householdId}/contacts`, undefined, "volunteer"))
+        .status,
+    ).toBe(403);
+  });
+
+  it("serializes concurrent journal writes from bulk flyer delivery", async () => {
+    const state = (await request("/state")).data,
+      households = state.households.slice(20, 28);
+    const results = await Promise.all(
+      households.map((home: any, index: number) =>
+        request("/visits", {
+          submission_key: `concurrent-flyer-${index}`,
+          household_id: home.household_id,
+          outcome: "flyer_delivered",
+          flyer_delivered: true,
+          door_knocked: false,
+          source: "candidate",
+        }),
+      ),
+    );
+    expect(results.every((result) => result.status === 201)).toBe(true);
+    const rows = (await readFile(join(directory, "events.jsonl"), "utf8"))
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    expect(new Set(rows.map((row) => row.sequence)).size).toBe(rows.length);
+    for (let index = 1; index < rows.length; index++)
+      expect(rows[index].previous_hash).toBe(rows[index - 1].event_hash);
+  });
+
+  it("reports the latest household update date and preserves an override", async () => {
+    const before = (await request("/state")).data,
+      home = before.households[100],
+      occurredAt = "2026-07-03T12:00:00.000Z",
+      visit = await request("/visits", {
+        submission_key: "manual-visit-date",
+        household_id: home.household_id,
+        occurred_at: occurredAt,
+        outcome: "flyer_delivered",
+        flyer_delivered: true,
+        door_knocked: false,
+        source: "candidate",
+      });
+    expect(visit.status).toBe(201);
+    const updated = (await request("/state")).data.households.find(
+      (candidate: any) => candidate.household_id === home.household_id,
+    );
+    expect(updated.last_updated_at).toBe(occurredAt);
   });
 
   it("persists manual overrides and locks the accepted route", async () => {

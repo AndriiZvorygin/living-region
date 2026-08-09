@@ -1,24 +1,112 @@
 {
-  "generated_at": "2026-07-21T20:59:28.496Z",
-  "result": "No additional licence-compatible Owen Sound building footprint source is present locally.",
+  "generated_at": "2026-08-06T01:35:07.872Z",
+  "result": "The official Owen Sound city-map building layer fills local roof gaps while preserving suitable OSM footprints; Canada Structures fills remaining gaps. Official Grey County address ranges create stable inferred household stops; unmatched imported civic addresses receive collision-checked local roofs or review points.",
   "usable_sources": [
     {
       "source": "OpenStreetMap",
       "path": "data/osm/owen-sound.osm.pbf",
       "licence": "ODbL 1.0",
       "structures": 1111,
-      "role": "application building layer"
+      "role": "preferred sourced geometry"
+    },
+    {
+      "source": "City of Owen Sound city map",
+      "path": "data/canvassing/owen-sound-city-map-buildings.geojson",
+      "source_path": "Map - City Map.pdf",
+      "source_map_date": "2022-04-07",
+      "source_pdf_sha256": "0224c57ebd3e8f23c4546bc79e0ee2605c71a68953f98db493fb4791fe23f7a9",
+      "derived_sha256": "c531d7cb1d0b614b41c5c3af966900dee84ffa458f54a964788be4a31183d260",
+      "licence": "Not stated in supplied PDF; retained as a private canvassing reference pending confirmation",
+      "structures": 5962,
+      "role": "official-map private reference geometry extracted from the isolated GeoPDF layer",
+      "private_reference_only": true
+    },
+    {
+      "source": "Canada Structures",
+      "path": "data/canvassing/canada-structures-owen-sound.geojson",
+      "source_url": "https://open.canada.ca/data/dataset/3829eee9-f898-4643-9ad8-f48575b8873d/resource/f7fdee7d-09dd-4eb6-88fd-2234ad701309/download/on_structures_en.gpkg",
+      "licence": "Open Government Licence - Canada",
+      "source_last_modified": "2025-09-17T16:07:45.430467",
+      "clip_sha256": "d7839678b50e002953ebc011428fd89c5cd9151a42086027976e3d5d3c03e733",
+      "structures": 128,
+      "role": "deduplicated private reference geometry"
+    },
+    {
+      "source": "Living Region estimated roofs",
+      "licence": null,
+      "structures": 826,
+      "role": "collision-checked local canvassing geometry only"
+    },
+    {
+      "source": "Grey County road address ranges",
+      "path": "know/input/gis/road-centrelines-grey.geojson",
+      "licence": "local source metadata applies",
+      "structures": 4040,
+      "role": "approximate household numbering for unlinked sourced roofs"
     }
   ],
   "audited_absent_sources": [
-    "Microsoft Canadian Building Footprints",
-    "Statistics Canada building footprints",
-    "City of Owen Sound municipal building footprints"
+    "Original City of Owen Sound municipal building GIS feature service or downloadable feature class"
   ],
   "excluded_as_building_sources": [
     "empty import templates",
     "fixtures and examples",
     "rural lot and concession polygons"
   ],
-  "private_reference_layer_added": false
+  "private_reference_layer_added": true,
+  "os_map_import_allowed": false,
+  "coverage": {
+    "generated_at": "2026-08-06T01:35:07.566Z",
+    "existing_osm_footprints": 1111,
+    "city_map_candidates": 6915,
+    "city_map_additional_footprints": 5962,
+    "city_map_deduplicated_polygons": 952,
+    "canada_structures_candidates_in_bbox": 6629,
+    "canada_structures_outside_boundary": 1109,
+    "additional_sourced_footprints": 128,
+    "deduplicated_polygons": 6344,
+    "total_sourced_footprints": 7201,
+    "estimated_footprints": 826,
+    "total_display_footprints": 8027,
+    "structures_with_civic_labels": 8027,
+    "structures_without_civic_labels": 0,
+    "unaddressed_structure_references": {
+      "shared_accessory": 214,
+      "provisional_nearest": 675,
+      "high_confidence": 612,
+      "probable": 137,
+      "distant_review": 140,
+      "unresolved": 0
+    },
+    "small_frontage_inferred": 71,
+    "manual_number_calibrations_applied": 1,
+    "manual_number_calibrations_unmatched": 0,
+    "civic_addresses": 7467,
+    "imported_civic_addresses": 3426,
+    "inferred_range_addresses": 4040,
+    "addresses_matched_to_sourced_roofs": 6623,
+    "addresses_receiving_estimated_roofs": 840,
+    "multi_address_buildings": 236,
+    "unresolved_addresses": 4,
+    "suspicious_or_long_distance_matches": 1209,
+    "generated_geometry_conflicts": 0,
+    "collision_safe_placement_failures": 4,
+    "inference_audit": {
+      "candidates": 4041,
+      "unsuitable_building": 719,
+      "rear_or_accessory": 306,
+      "no_address_range": 125,
+      "ambiguous_corner": 45,
+      "duplicate_frontage": 0,
+      "exhausted_range": 1
+    },
+    "association_counts": {
+      "exact": 352,
+      "high_confidence": 1026,
+      "probable_sourced": 1205,
+      "inferred_range": 4040,
+      "estimated": 840,
+      "unresolved": 4
+    }
+  }
 }

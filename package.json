@@ -96,9 +96,12 @@
     "docker:web:up": "docker compose up -d hamlet-web",
     "docker:web:logs": "docker compose logs -f hamlet-web",
     "transit:plan:owen-sound": "tsx packages/transit-planner/src/cli/plan-owen-sound.ts",
+    "canvassing:acquire-buildings": "tsx packages/canvassing/src/acquire-building-data.ts",
+    "canvassing:extract-city-roofs": "python3 scripts/extract_owen_sound_city_map_buildings.py",
     "canvassing:prepare": "tsx packages/canvassing/src/prepare-data.ts",
     "canvassing:prepare-osm-import": "tsx packages/canvassing/src/prepare-osm-import.ts",
     "canvassing:verify-operations": "tsx packages/canvassing/src/verify-operations.ts",
+    "canvassing:repair-journal": "tsx packages/canvassing/src/repair-journal.ts",
     "canvassing:server": "tsx packages/canvassing/src/server.ts",
     "canvassing:dev": "npm run canvassing:prepare && concurrently -k -n api,web \"npm run canvassing:server\" \"npm run dev:web\""
   },
@@ -121,6 +124,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/three": "^0.185.0",
     "concurrently": "^9.2.4",
+    "playwright": "^1.62.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
@@ -140,6 +144,7 @@
   "dependencies": {
     "maplibre-gl": "^5.24.0",
     "pdf-parse": "^1.1.1",
+    "polygon-clipping": "^0.15.7",
     "three": "^0.171.0"
   }
 }

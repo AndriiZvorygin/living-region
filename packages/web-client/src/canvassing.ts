@@ -5,6 +5,16 @@ import maplibregl, {
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./canvassing.css";
 import { WalkingRoadGraph, metresBetween } from "./canvassing-routing";
+import {
+  buildHouseholdAdjacencyGraph,
+  calculateLocalCoverageArea,
+  isCoverageCovered,
+  isCoverageEligible,
+  selectNextUnderflyeredArea,
+  type CoverageLocation,
+  type HouseholdAdjacencyGraph,
+  type NextUnderflyeredArea,
+} from "./canvassing-coverage";
 
 type Household = {
   household_id: string;
@@ -20,7 +30,24 @@ type Household = {
   status: string;
   flyer_delivered: number;
   door_knocked: number;
+  conversation_occurred: number;
+  revisit_requested: number;
+  no_answer: number;
+  political_outcome: string | null;
   visit_count: number;
+  number_corrected: number;
+  last_updated_at: string | null;
+};
+type Contact = {
+  person_id: string;
+  name: string;
+  phone: string;
+  email: string;
+  mailing_list_consent: number | boolean;
+  last_updated_at: string;
+  civic_number: string;
+  street: string;
+  address_label: string;
 };
 type RouteStop = {
   id: string;
@@ -109,6 +136,9 @@ type FieldPrefs = {
   volunteer: boolean;
   session_id: string;
   route_index: number;
+  multi_select: boolean;
+  selected_household_ids: string[];
+  coverage_mode: boolean;
 };
 const statusColors: Record<string, string> = {
   untouched: "#8b9297",
@@ -125,6 +155,99 @@ const statusColors: Record<string, string> = {
   vacant: "#727b80",
   no_campaign_material_requested: "#8e2f3d",
 };
+const clusterStatusKeys = [
+  "untouched_count",
+  "flyer_count",
+  "knocked_count",
+  "conversation_count",
+  "revisit_count",
+  "interest_count",
+  "restricted_count",
+] as const;
+const dominantClusterCount = [
+  "max",
+  ...clusterStatusKeys.map((key) => ["get", key]),
+];
+const dominantClusterColor = [
+  "case",
+  ["==", ["get", "conversation_count"], dominantClusterCount],
+  statusColors.conversation,
+  ["==", ["get", "interest_count"], dominantClusterCount],
+  statusColors.volunteer_interest,
+  ["==", ["get", "revisit_count"], dominantClusterCount],
+  statusColors.revisit,
+  ["==", ["get", "knocked_count"], dominantClusterCount],
+  statusColors.knocked_no_answer,
+  ["==", ["get", "flyer_count"], dominantClusterCount],
+  statusColors.flyer_delivered,
+  ["==", ["get", "restricted_count"], dominantClusterCount],
+  statusColors.inaccessible,
+  statusColors.untouched,
+];
+const coverageRatioExpression = [
+  "case",
+  [">", ["get", "eligible_count"], 0],
+  ["/", ["get", "covered_count"], ["get", "eligible_count"]],
+  0,
+] as any;
+const coverageClusterColor = [
+  "interpolate",
+  ["linear"],
+  coverageRatioExpression,
+  0,
+  "#000004",
+  0.2,
+  "#420A68",
+  0.4,
+  "#932667",
+  0.6,
+  "#DD513A",
+  0.8,
+  "#FCA50A",
+  1,
+  "#FCFFA4",
+];
+const coverageClusterLabel = [
+  "case",
+  [">", ["get", "eligible_count"], 0],
+  [
+    "case",
+    ["==", ["get", "remaining_count"], 0],
+    "✓",
+    ["to-string", ["get", "remaining_count"]],
+  ],
+  "–",
+];
+const coverageClusterTextColor = [
+  "case",
+  [">=", coverageRatioExpression, 0.7],
+  "#111411",
+  "#fff",
+];
+const coverageClusterTextHalo = [
+  "case",
+  [">=", coverageRatioExpression, 0.7],
+  "#fff",
+  "#445158",
+];
+const coverageClusterRadius = [
+  "interpolate",
+  ["linear"],
+  ["sqrt", ["get", "eligible_count"]],
+  0,
+  13,
+  2,
+  14,
+  5,
+  17,
+  10,
+  22,
+  20,
+  28,
+  40,
+  34,
+];
+const canvassingDataVersion = "all-roofs-addressable-20260726";
 const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const role = document.querySelector<HTMLInputElement>("#volunteer-mode")
     ?.checked
@@ -142,6 +265,26 @@ const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
   return response.json();
 };
 const geo = async (url: string) => fetchJson<any>(url);
+const localDateValue = (value: Date | string = new Date()) => {
+  const date = value instanceof Date ? value : new Date(value);
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+};
+const escapeHtml = (value: unknown) =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character]!,
+  );
 
 export async function canvassingMain() {
   const saved = JSON.parse(
@@ -158,14 +301,21 @@ export async function canvassingMain() {
   };
   document.title = "Owen Sound Canvassing | Living Region";
   document.body.innerHTML = `<div class="canvass-shell">
-    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span></header>
+    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
     <aside class="summary" id="summary"></aside><main id="canvass-map"></main>
+    <aside class="cluster-key" id="cluster-key" hidden><strong id="cluster-key-title">Grouped civic addresses</strong><span id="cluster-key-description">Number = household stops; colour = most common status. Tap to zoom in.</span><div class="coverage-legend" id="coverage-legend" hidden><div class="coverage-swatches"><i style="background:#000004"></i><i style="background:#420A68"></i><i style="background:#FCA50A"></i><i style="background:#FCFFA4"></i></div><div class="coverage-legend-labels"><span>Untouched</span><span>Partly covered</span><span>Fully covered</span></div><small>Bubble number = eligible households remaining</small><small class="next-area-status" id="next-area-status"></small></div></aside>
+    <div class="mobile-scrim" id="mobile-scrim" hidden></div>
+    <section class="mobile-sheet mobile-menu-sheet" id="mobile-menu-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Map menu</strong><button id="mobile-menu-close" class="mobile-close" aria-label="Close map menu">Close</button></div><details open><summary>Campaign tools</summary><div class="mobile-menu-actions"><button id="mobile-bulk-open">Bulk select homes</button><button id="mobile-tools-open">Route and filters</button><button id="mobile-summary-open">Campaign totals</button><button id="mobile-find-next-area">Find next area</button></div></details><details><summary>Workflows</summary><div class="mobile-menu-actions"><button id="mobile-followup-open">Follow-ups</button><button id="mobile-conversation-open">Neighbourhood conversation</button><button id="mobile-recruitment-open">Recruitment</button><button id="mobile-quality-open">Address quality</button></div></details><details><summary>Data and print</summary><div class="mobile-menu-actions"><button id="mobile-import-open">Import records</button><button id="mobile-print-open">Print route</button><a class="button" href="/api/canvassing/export/routes.csv">Export route CSV</a></div></details></section>
+    <section class="mobile-sheet mobile-coverage-sheet" id="mobile-coverage-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Coverage</strong><button id="mobile-coverage-close" class="mobile-close" aria-label="Close coverage legend">Close</button></div><div id="mobile-coverage-content"></div></section>
+    <section class="mobile-sheet mobile-summary-sheet" id="mobile-summary-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Campaign totals</strong><button id="mobile-summary-close" class="mobile-close" aria-label="Close campaign totals">Close</button></div><div id="mobile-summary-content"></div></section>
+    <section class="bulk-selection-bar" id="bulk-selection-bar" aria-label="Bulk household selection"><button id="multi-select" aria-pressed="false">Bulk flyer</button><span id="bulk-selection-status" aria-live="polite">Tap Bulk flyer, then tap roofs</span><button id="bulk-flyer" disabled>Mark selected flyered</button><button id="clear-selection" disabled>Clear</button></section>
     <section class="drawer" id="drawer"><div class="empty"><strong>Select a roof or address</strong><span>Click households to inspect them or add them to a route.</span></div></section>
-    <footer><div class="route-builder"><input id="route-name" placeholder="New route name"><select id="street-side"><option value="">Both sides</option><option value="left">Left side</option><option value="right">Right side</option></select><button id="create-route">Create <span id="selection-count">0</span></button><button id="bulk-flyer">Flyer selected</button></div><div class="route-run"><select id="active-route"><option value="">Choose route</option></select><button id="session-toggle">Start</button><button id="undo-stop">Undo</button><button id="field-conversation">Conversation</button><button id="previous-stop">Previous</button><button id="next-stop">Next</button><button id="locate">Locate</button><button id="recenter" disabled>Recenter</button><span id="route-progress"></span></div><label><input id="volunteer-mode" type="checkbox"> Volunteer delivery mode</label><label>Status <select id="status-filter"><option value="all">All</option>${Object.keys(
+    <footer><button id="mobile-tools-close" class="mobile-sheet-close" aria-label="Close route and filter tools">Close tools</button><div class="route-builder"><input id="route-name" placeholder="New route name"><select id="street-side"><option value="">Both sides</option><option value="left">Left side</option><option value="right">Right side</option></select><button id="create-route">Create <span id="selection-count">0</span></button></div><div class="route-run"><select id="active-route"><option value="">Choose route</option></select><button id="session-toggle">Start</button><button id="undo-stop">Undo</button><button id="field-conversation">Conversation</button><button id="previous-stop">Previous</button><button id="next-stop">Next</button><button id="locate">Locate</button><button id="recenter" disabled>Recenter</button><span id="route-progress"></span></div><label><input id="volunteer-mode" type="checkbox"> Volunteer delivery mode</label><label>Status <select id="status-filter"><option value="all">All</option>${Object.keys(
       statusColors,
     )
       .map((s) => `<option value="${s}">${s.replaceAll("_", " ")}</option>`)
       .join("")}</select></label></footer>
+    <section class="mobile-route-bar" id="mobile-route-bar" hidden aria-label="Active route controls"><button id="mobile-previous-stop" aria-label="Previous stop">Previous</button><button id="mobile-mark-stop">Mark / update</button><button id="mobile-next-stop" aria-label="Next stop">Next</button><button id="mobile-route-more" aria-label="Open route details">Route</button></section>
     <section class="session-strip" id="session-strip"></section>
     <dialog id="import-dialog"><form method="dialog"><h2>Import existing records</h2><p>CSV fields: address, date_met, person_name, outcome, issues, notes, follow_up, support_level.</p><input id="csv-file" type="file" accept=".csv,text/csv"><menu><button value="cancel">Cancel</button><button id="import-submit" value="default">Import</button></menu></form></dialog>
     <dialog id="followup-dialog" class="workflow-dialog"><h2>Weekly follow-ups</h2><div id="followup-workspace"></div><menu><button type="button" data-close="followup-dialog">Close</button></menu></dialog>
@@ -173,35 +323,177 @@ export async function canvassingMain() {
     <dialog id="recruitment-dialog" class="workflow-dialog"><h2>Candidate recruitment</h2><div id="recruitment-workspace"></div><menu><button type="button" data-close="recruitment-dialog">Close</button></menu></dialog>
     <dialog id="quality-dialog" class="workflow-dialog"><h2>Address quality</h2><div id="quality-metrics"></div><div id="quality-queue"></div><menu><button type="button" data-close="quality-dialog">Close</button></menu></dialog>
     <div class="toast" id="toast"></div></div>`;
+  // Bind the primary mobile sheets before the larger offline data payload loads.
+  // A volunteer can open the menu immediately while the map is still preparing.
+  const earlyMobilePanels = [
+    document.querySelector<HTMLElement>("#mobile-menu-sheet")!,
+    document.querySelector<HTMLElement>("#mobile-coverage-sheet")!,
+    document.querySelector<HTMLElement>("#mobile-summary-sheet")!,
+  ];
+  const earlyMobileScrim = document.querySelector<HTMLElement>("#mobile-scrim")!;
+  const earlyShell = document.querySelector<HTMLElement>(".canvass-shell")!;
+  const earlyOpenMobilePanel = (panel: HTMLElement) => {
+    earlyMobilePanels.forEach((other) => {
+      other.hidden = other !== panel;
+      other.setAttribute("aria-hidden", String(other !== panel));
+    });
+    panel.hidden = false;
+    panel.setAttribute("aria-hidden", "false");
+    earlyMobileScrim.hidden = false;
+  };
+  const populateEarlyCoverage = () => {
+    const source = document.querySelector<HTMLElement>("#coverage-legend"),
+      target = document.querySelector<HTMLElement>("#mobile-coverage-content");
+    if (!source || !target) return;
+    const legend = source.cloneNode(true) as HTMLElement;
+    legend.hidden = false;
+    legend.removeAttribute("id");
+    legend.querySelector("#next-area-status")?.removeAttribute("id");
+    target.replaceChildren(legend);
+  };
+  document.querySelector("#mobile-menu")?.addEventListener("click", () =>
+    earlyOpenMobilePanel(earlyMobilePanels[0]),
+  );
+  document.querySelector("#mobile-coverage")?.addEventListener("click", () => {
+    populateEarlyCoverage();
+    earlyOpenMobilePanel(earlyMobilePanels[1]);
+  });
+  document.querySelector("#mobile-summary-open")?.addEventListener("click", () =>
+    earlyOpenMobilePanel(earlyMobilePanels[2]),
+  );
+  document.querySelector("#mobile-tools-open")?.addEventListener("click", () => {
+    earlyMobilePanels.forEach((panel) => {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    });
+    earlyShell.classList.add("mobile-tools-open");
+    earlyMobileScrim.hidden = false;
+  });
+  document.querySelectorAll(".mobile-close, #mobile-menu-close").forEach((button) =>
+    button.addEventListener("click", () => {
+      earlyMobilePanels.forEach((panel) => {
+        panel.hidden = true;
+        panel.setAttribute("aria-hidden", "true");
+      });
+      earlyMobileScrim.hidden = true;
+    }),
+  );
+  document.querySelector("#mobile-tools-close")?.addEventListener("click", () => {
+    earlyShell.classList.remove("mobile-tools-open");
+    earlyMobileScrim.hidden = true;
+  });
+  earlyMobileScrim.addEventListener("click", () => {
+    earlyMobilePanels.forEach((panel) => {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    });
+    earlyMobileScrim.hidden = true;
+  });
   document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked =
     saved.volunteer ?? false;
   let state = await fetchJson<State>("/api/canvassing/state");
-  const [structures, addresses, roads, boundary, addressQuality] =
-    await Promise.all([
-      geo("/canvassing/structures.geojson"),
-      geo("/canvassing/addresses.geojson"),
-      geo("/canvassing/roads.geojson"),
-      geo("/canvassing/boundary.geojson"),
-      geo("/canvassing/address-quality.json"),
-    ]);
+  const [
+    structures,
+    addresses,
+    roads,
+    boundary,
+    addressQuality,
+    buildingCoverage,
+    splitCorrections,
+  ] = await Promise.all([
+    geo(`/canvassing/structures.geojson?v=${canvassingDataVersion}`),
+    geo(`/canvassing/addresses.geojson?v=${canvassingDataVersion}`),
+    geo(`/canvassing/roads.geojson?v=${canvassingDataVersion}`),
+    geo(`/canvassing/boundary.geojson?v=${canvassingDataVersion}`),
+    geo(`/canvassing/address-quality.json?v=${canvassingDataVersion}`),
+    geo(`/canvassing/building-coverage-audit.json?v=${canvassingDataVersion}`),
+    fetchJson<{
+      hidden_parent_ids: string[];
+      features: any[];
+    }>("/api/canvassing/structure-splits"),
+  ]);
+  const hiddenSplitParents = new Set(splitCorrections.hidden_parent_ids);
+  structures.features = structures.features
+    .filter(
+      (feature: any) =>
+        !hiddenSplitParents.has(feature.properties.structure_id),
+    )
+    .concat(splitCorrections.features);
   const walkingGraph = new WalkingRoadGraph(roads);
   const byStructure = new Map<string, Household[]>();
+  const byAddress = new Map<string, Household>();
   for (const h of state.households) {
+    byAddress.set(h.address_id, h);
     if (h.structure_id)
       byStructure.set(h.structure_id, [
         ...(byStructure.get(h.structure_id) ?? []),
         h,
       ]);
   }
-  const selected = new Set<string>();
+  const homesForStructure = (feature: any) => {
+    const direct =
+      byStructure.get(String(feature.properties.structure_id ?? "")) ?? [];
+    if (direct.length) return direct;
+    return [
+      ...new Map(
+        (feature.properties.address_reference_ids ?? [])
+          .map((id: string) => byAddress.get(id))
+          .filter(Boolean)
+          .map((home: Household) => [home.household_id, home]),
+      ).values(),
+    ] as Household[];
+  };
+  const selected = new Set(
+    (saved.selected_household_ids ?? []).filter((id) =>
+      state.households.some((home) => home.household_id === id),
+    ),
+  );
+  const contactCache = new Map<string, Contact[]>();
+  const structureFeatureById = new Map<string, any>(
+      structures.features.map((feature: any) => [
+        String(feature.properties.structure_id),
+        feature,
+      ]),
+    ),
+    structureIdsByHousehold = new Map<string, Set<string>>();
+  for (const feature of structures.features) {
+    const structureId = String(feature.properties.structure_id);
+    for (const home of homesForStructure(feature)) {
+      const ids =
+        structureIdsByHousehold.get(home.household_id) ?? new Set<string>();
+      ids.add(structureId);
+      structureIdsByHousehold.set(home.household_id, ids);
+    }
+  }
   let active: Household | undefined;
-  let coverage = false;
+  // Coverage is the useful citywide starting view; the toggle restores the
+  // individual household/status view when needed.
+  let coverage = saved.coverage_mode ?? true;
+  let multiSelectMode = saved.multi_select ?? false;
   let routeIndex = saved.route_index ?? 0;
   let activeSessionId = saved.session_id ?? "";
   let sessionPaused = false;
   let submitting = false;
+  let lastMapSelection = { key: "", at: 0 };
+  let selectedStructureStates = new Set<string>();
+  let selectedAddressStates = new Set<string>();
   let currentPosition: GeolocationPosition | undefined;
   let locationWatch: number | undefined;
+  let nextAreaPopup: maplibregl.Popup | undefined;
+  let nextAreaTimer: number | undefined;
+  let nextAreaRevision = 0;
+  let nextAreaRecommendation: NextUnderflyeredArea | null = null;
+  let nextAreaPinned = false;
+  let nextAreaRecalculateRequested = false;
+  let coverageAdjacencyGraph: HouseholdAdjacencyGraph;
+  let splitTarget: any;
+  let splitPreview: any;
+  let splitDrawing = false;
+  let splitCutStart: [number, number] | undefined;
+  let splitCuts: Array<{
+    start: [number, number];
+    end: [number, number];
+  }> = [];
   const statusRank = (s: string) =>
     [
       "untouched",
@@ -219,19 +511,59 @@ export async function canvassingMain() {
       "no_campaign_material_requested",
     ].indexOf(s);
   for (const f of structures.features) {
-    const homes = byStructure.get(f.properties.structure_id) ?? [];
+    const homes = homesForStructure(f);
     f.properties.household_count = homes.length;
+    f.properties.selected = homes.some((home) =>
+      selected.has(home.household_id),
+    );
     f.properties.status =
       homes.sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
         ?.status ?? "untouched";
   }
-  for (const f of addresses.features) {
-    const home = state.households.find(
-      (h) => h.address_id === f.properties.address_id,
+  const knownNonResidentialBuildingTypes = new Set([
+    "commercial",
+    "industrial",
+    "retail",
+    "office",
+    "school",
+    "hospital",
+    "college",
+    "warehouse",
+    "church",
+    "civic",
+    "public",
+    "garage",
+    "shed",
+    "barn",
+  ]);
+  const isKnownNonResidential = (home: Household) => {
+    const structure = home.structure_id
+      ? structureFeatureById.get(home.structure_id)
+      : undefined;
+    return knownNonResidentialBuildingTypes.has(
+      String(structure?.properties?.building_type ?? "").toLowerCase(),
     );
-    f.properties.household_id = home?.household_id;
-    f.properties.status = home?.status ?? "untouched";
-  }
+  };
+  const applyAddressCoverageProperties = () => {
+    for (const feature of addresses.features) {
+      const home = byAddress.get(String(feature.properties.address_id));
+      const eligible = Boolean(
+        home && !isKnownNonResidential(home) && isCoverageEligible(home),
+      );
+      const covered = Boolean(home && eligible && isCoverageCovered(home));
+      feature.properties.household_id = home?.household_id;
+      feature.properties.status = home?.status ?? "untouched";
+      feature.properties.selected = Boolean(
+        home && selected.has(home.household_id),
+      );
+      feature.properties.eligible = eligible;
+      feature.properties.covered = covered;
+      feature.properties.eligible_count = eligible ? 1 : 0;
+      feature.properties.covered_count = covered ? 1 : 0;
+      feature.properties.remaining_count = eligible && !covered ? 1 : 0;
+    }
+  };
+  applyAddressCoverageProperties();
   const map = new maplibregl.Map({
     container: "canvass-map",
     center: saved.center ?? [-80.943, 44.567],
@@ -254,7 +586,361 @@ export async function canvassingMain() {
     new maplibregl.NavigationControl({ showCompass: false }),
     "bottom-right",
   );
+  const shell = document.querySelector<HTMLElement>(".canvass-shell")!;
+  const mobileScrim = document.querySelector<HTMLElement>("#mobile-scrim")!;
+  const mobilePanels = [
+    document.querySelector<HTMLElement>("#mobile-menu-sheet")!,
+    document.querySelector<HTMLElement>("#mobile-coverage-sheet")!,
+    document.querySelector<HTMLElement>("#mobile-summary-sheet")!,
+  ];
+  const resizeMap = () => {
+    requestAnimationFrame(() => {
+      map.resize();
+      requestAnimationFrame(() => map.resize());
+    });
+  };
+  const syncMobileScrim = () => {
+    const toolsOpen = shell.classList.contains("mobile-tools-open");
+    mobileScrim.hidden = !toolsOpen && !mobilePanels.some((panel) => !panel.hidden);
+  };
+  const setMobilePanel = (panel: HTMLElement, open: boolean) => {
+    if (open) {
+      mobilePanels.forEach((other) => {
+        if (other !== panel) {
+          other.hidden = true;
+          other.setAttribute("aria-hidden", "true");
+        }
+      });
+      shell.classList.remove("mobile-tools-open");
+      panel.hidden = false;
+      panel.setAttribute("aria-hidden", "false");
+    } else {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    }
+    syncMobileScrim();
+    resizeMap();
+  };
+  const closeMobileDrawer = () => {
+    document.querySelector<HTMLElement>("#drawer")!.classList.remove("mobile-open");
+    resizeMap();
+  };
+  const openMobileDrawer = () => {
+    if (!window.matchMedia("(max-width: 760px)").matches) return;
+    mobilePanels.forEach((panel) => {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    });
+    shell.classList.remove("mobile-tools-open");
+    document.querySelector<HTMLElement>("#drawer")!.classList.add("mobile-open");
+    syncMobileScrim();
+    resizeMap();
+  };
+  const openMobileTools = () => {
+    mobilePanels.forEach((panel) => {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    });
+    closeMobileDrawer();
+    shell.classList.add("mobile-tools-open");
+    syncMobileScrim();
+    resizeMap();
+  };
+  const closeMobileTools = () => {
+    shell.classList.remove("mobile-tools-open");
+    syncMobileScrim();
+    resizeMap();
+  };
+  const closeMobileOverlays = () => {
+    mobilePanels.forEach((panel) => {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    });
+    shell.classList.remove("mobile-tools-open");
+    closeMobileDrawer();
+    syncMobileScrim();
+  };
+  const refreshMobileCoverageLegend = () => {
+    const source = document.querySelector<HTMLElement>("#coverage-legend"),
+      target = document.querySelector<HTMLElement>("#mobile-coverage-content");
+    if (!source || !target) return;
+    const legend = source.cloneNode(true) as HTMLElement;
+    legend.hidden = false;
+    legend.removeAttribute("id");
+    legend.querySelector("#next-area-status")?.removeAttribute("id");
+    target.replaceChildren(legend);
+  };
+  const syncMobileLocationControl = () => {
+    const button = document.querySelector<HTMLButtonElement>("#mobile-locate");
+    if (!button) return;
+    button.textContent = currentPosition ? "Center" : locationWatch != null ? "Locating" : "Locate";
+    button.setAttribute("aria-label", currentPosition ? "Recenter on my location" : "Show current location");
+  };
+  mobileScrim.addEventListener("click", () => {
+    mobilePanels.forEach((panel) => {
+      panel.hidden = true;
+      panel.setAttribute("aria-hidden", "true");
+    });
+    closeMobileTools();
+  });
+  for (const panel of mobilePanels) {
+    let touchStartY = 0;
+    panel.addEventListener("touchstart", (event) => {
+      touchStartY = event.changedTouches[0]?.clientY ?? 0;
+    }, { passive: true });
+    panel.addEventListener("touchend", (event) => {
+      const touchEndY = event.changedTouches[0]?.clientY ?? touchStartY;
+      if (touchEndY - touchStartY > 56) setMobilePanel(panel, false);
+    }, { passive: true });
+  }
+  const setCoverageMode = (enabled: boolean) => {
+    const button =
+      document.querySelector<HTMLButtonElement>("#coverage-toggle")!;
+    button.setAttribute("aria-pressed", String(enabled));
+    button.textContent = enabled ? "Households" : "Coverage";
+    const keyTitle = document.querySelector("#cluster-key-title");
+    const keyDescription = document.querySelector("#cluster-key-description");
+    const legend = document.querySelector<HTMLElement>("#coverage-legend");
+    if (keyTitle)
+      keyTitle.textContent = enabled
+        ? "Flyer coverage"
+        : "Grouped civic addresses";
+    if (keyDescription)
+      keyDescription.textContent = enabled
+        ? "Number = eligible households remaining; tap a bubble for totals."
+        : "Number = household stops; colour = most common status. Tap to zoom in.";
+    if (legend) legend.hidden = !enabled;
+    const mobileCoverage = document.querySelector<HTMLButtonElement>("#mobile-coverage");
+    mobileCoverage?.setAttribute("aria-pressed", String(enabled));
+    refreshMobileCoverageLegend();
+    if (!map.getLayer("address-clusters")) return;
+    map.setPaintProperty(
+      "address-clusters",
+      "circle-color",
+      enabled ? coverageClusterColor : dominantClusterColor,
+    );
+    map.setPaintProperty(
+      "address-clusters",
+      "circle-radius",
+      enabled
+        ? coverageClusterRadius
+        : ["step", ["get", "point_count"], 14, 50, 20, 200, 28],
+    );
+    map.setLayoutProperty(
+      "address-cluster-counts",
+      "text-field",
+      enabled ? coverageClusterLabel : ["get", "point_count_abbreviated"],
+    );
+    map.setPaintProperty(
+      "address-cluster-counts",
+      "text-color",
+      enabled ? coverageClusterTextColor : "#fff",
+    );
+    map.setPaintProperty(
+      "address-cluster-counts",
+      "text-halo-color",
+      enabled ? coverageClusterTextHalo : "#445158",
+    );
+    if (enabled) scheduleNextAreaUpdate();
+    else clearNextAreaHighlight();
+  };
+  const updateClusterKey = () => {
+    const key = document.querySelector<HTMLElement>("#cluster-key")!;
+    key.hidden = map.getZoom() >= 15;
+  };
+  const setNextAreaStatus = (message: string) => {
+    const element = document.querySelector<HTMLElement>("#next-area-status");
+    if (element) element.textContent = message;
+  };
+  function clearNextAreaHighlight() {
+    nextAreaRevision += 1;
+    nextAreaRecommendation = null;
+    nextAreaPinned = false;
+    nextAreaRecalculateRequested = false;
+    nextAreaPopup?.remove();
+    nextAreaPopup = undefined;
+    (map.getSource("next-underflyered") as GeoJSONSource | undefined)?.setData({
+      type: "FeatureCollection",
+      features: [],
+    });
+    setNextAreaStatus("");
+  }
+  function coverageLocations(): CoverageLocation[] {
+    return state.households.map((home) => {
+      const eligible = !isKnownNonResidential(home) && isCoverageEligible(home);
+      return {
+        household_id: home.household_id,
+        lon: home.lon,
+        lat: home.lat,
+        eligible,
+        covered: eligible && isCoverageCovered(home),
+        street: home.street,
+        civic_number: home.civic_number,
+        stop_id: home.structure_id ?? home.address_id,
+      };
+    });
+  }
+  coverageAdjacencyGraph = buildHouseholdAdjacencyGraph(
+    coverageLocations(),
+    roads.features,
+  );
+  const recommendationFromLocalArea = (area: ReturnType<typeof calculateLocalCoverageArea>) =>
+    area
+      ? {
+          ...area,
+          remaining: area.localRemaining,
+          totalEligible: area.sampleSize,
+          coverage: area.sampleSize ? area.localCovered / area.sampleSize : 0,
+          tieBreakResult: `remaining ${area.localRemaining}; average hops ${area.averageHouseholdHops.toFixed(1)}; maximum hops ${area.maxHouseholdHops}`,
+          reason: "local_coverage" as const,
+        }
+      : null;
+  function showNextAreaPopup(event: any) {
+    if (!nextAreaRecommendation) return;
+    const result = nextAreaRecommendation;
+    nextAreaPopup?.remove();
+    nextAreaPopup = new maplibregl.Popup({ closeButton: true, offset: 16 })
+      .setLngLat(event.lngLat)
+      .setHTML(
+        `<strong>Next underflyered area</strong><dl><div><dt>Local remaining</dt><dd>${result.localRemaining.toLocaleString()} of the nearest ${result.sampleSize.toLocaleString()} households</dd></div><div><dt>Local covered</dt><dd>${result.localCovered.toLocaleString()}</dd></div><div><dt>Coverage</dt><dd>${Math.round(result.coverage * 100)}%</dd></div><div><dt>Graph component</dt><dd>${result.graphComponent}</dd></div><div><dt>Household-hop radius</dt><dd>${result.householdHopRadius}</dd></div><div><dt>Average / maximum hops</dt><dd>${result.averageHouseholdHops.toFixed(1)} / ${result.maxHouseholdHops}</dd></div></dl><p>Centre household ${result.center_household_id}. The focus is pinned until you explicitly find the next area.</p><small>Tie-break: ${result.tieBreakResult}</small>`,
+      )
+      .addTo(map);
+  }
+  async function visibleNextAreaFeatures() {
+    const source = map.getSource("addresses") as GeoJSONSource | undefined;
+    if (!source) return [];
+    const layers = ["address-clusters", "address-points"].filter((layer) =>
+      map.getLayer(layer),
+    );
+    if (!layers.length) return [];
+    const features: Array<{ feature: any; household_ids: string[] }> = [];
+    const rendered = map.queryRenderedFeatures({ layers });
+    const seen = new Set<string>();
+    for (const feature of rendered) {
+      const clusterId = String(feature.properties?.cluster_id ?? "");
+      if (clusterId) {
+        if (seen.has(`cluster:${clusterId}`)) continue;
+        seen.add(`cluster:${clusterId}`);
+        try {
+          const leaves = await source.getClusterLeaves(Number(clusterId), 10000, 0);
+          features.push({
+            feature,
+            household_ids: leaves
+              .map((leaf: any) => String(leaf.properties?.household_id ?? ""))
+              .filter(Boolean),
+          });
+        } catch {
+          // The cluster may disappear during a zoom; the next render retries.
+        }
+      } else {
+        const householdId = String(feature.properties?.household_id ?? "");
+        if (householdId && !seen.has(`household:${householdId}`)) {
+          seen.add(`household:${householdId}`);
+          features.push({ feature, household_ids: [householdId] });
+        }
+      }
+    }
+    return features;
+  }
+  async function updateNextAreaHighlight() {
+    const revision = ++nextAreaRevision;
+    if (!coverage || !map.isStyleLoaded()) {
+      if (!coverage) clearNextAreaHighlight();
+      return;
+    }
+    const eligibleLocations = coverageLocations().filter((location) => location.eligible);
+    if (eligibleLocations.length && eligibleLocations.every((location) => location.covered)) {
+      nextAreaRecommendation = null;
+      nextAreaPinned = false;
+      (map.getSource("next-underflyered") as GeoJSONSource | undefined)?.setData({
+        type: "FeatureCollection",
+        features: [],
+      });
+      setNextAreaStatus("Citywide coverage complete");
+      return;
+    }
+    if (!nextAreaRecommendation || nextAreaRecalculateRequested) {
+      const recommendation = selectNextUnderflyeredArea(
+        coverageLocations(),
+        coverageAdjacencyGraph,
+      );
+      if (revision !== nextAreaRevision) return;
+      nextAreaRecommendation = recommendation;
+      nextAreaPinned = Boolean(recommendation);
+      nextAreaRecalculateRequested = false;
+    }
+    if (!nextAreaRecommendation || revision !== nextAreaRevision) {
+      (map.getSource("next-underflyered") as GeoJSONSource | undefined)?.setData({
+        type: "FeatureCollection",
+        features: [],
+      });
+      const locations = coverageLocations().filter((location) => location.eligible);
+      setNextAreaStatus(
+        locations.length > 0 && locations.every((location) => location.covered)
+          ? "Citywide coverage complete"
+          : "No eligible households connected in the prepared graph",
+      );
+      return;
+    }
+    const center = coverageLocations().find(
+      (location) =>
+        location.household_id === nextAreaRecommendation!.center_household_id,
+    );
+    if (!center) return;
+    const visible = await visibleNextAreaFeatures();
+    if (revision !== nextAreaRevision) return;
+    const visibleCentre = visible.find((item) =>
+      item.household_ids.includes(nextAreaRecommendation!.center_household_id),
+    );
+    const feature = visibleCentre?.feature;
+    const coordinates = feature?.geometry?.coordinates ?? [center.lon, center.lat];
+    const visibleSize = Number(
+      feature?.properties?.eligible_count ?? nextAreaRecommendation.sampleSize,
+    );
+    const radius = Math.min(40, Math.max(13, 13 + Math.sqrt(visibleSize) * 3.3));
+    nextAreaRecommendation.cluster_id = String(feature?.properties?.cluster_id ?? "");
+    (map.getSource("next-underflyered") as GeoJSONSource | undefined)?.setData({
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: { radius_px: radius + 5, label: "Next area" },
+          geometry: { type: "Point", coordinates },
+        },
+      ],
+    });
+    setNextAreaStatus(
+      `Next area: ${nextAreaRecommendation.localRemaining.toLocaleString()} of the nearest ${nextAreaRecommendation.sampleSize.toLocaleString()} households remain`,
+    );
+  }
+  async function recalculateNextArea() {
+    nextAreaPinned = false;
+    nextAreaRecommendation = null;
+    nextAreaRecalculateRequested = true;
+    await updateNextAreaHighlight();
+  }
+  const scheduleNextAreaUpdate = () => {
+    if (nextAreaTimer != null) window.clearTimeout(nextAreaTimer);
+    nextAreaTimer = window.setTimeout(() => {
+      nextAreaTimer = undefined;
+      void updateNextAreaHighlight();
+    }, 100);
+  };
+  map.on("zoom", updateClusterKey);
+  updateClusterKey();
   let labelMarkers: maplibregl.Marker[] = [];
+  const featureCenter = (feature: any): [number, number] => {
+    const points: [number, number][] = [];
+    const walk = (coordinates: any) =>
+      typeof coordinates?.[0] === "number"
+        ? points.push(coordinates)
+        : coordinates?.forEach(walk);
+    walk(feature.geometry.coordinates);
+    return [
+      points.reduce((sum, point) => sum + point[0], 0) / points.length,
+      points.reduce((sum, point) => sum + point[1], 0) / points.length,
+    ];
+  };
   const updateLabels = () => {
     labelMarkers.forEach((marker) => marker.remove());
     labelMarkers = [];
@@ -279,22 +965,32 @@ export async function canvassingMain() {
       );
       if (labelMarkers.length >= 70) break;
     }
-    if (map.getZoom() >= 17) {
-      for (const feature of addresses.features) {
-        const point = feature.geometry.coordinates;
+    if (map.getZoom() >= 16.5) {
+      const visibleStatus =
+        document.querySelector<HTMLSelectElement>("#status-filter")?.value ??
+        "all";
+      for (const feature of structures.features) {
+        if (!feature.properties.civic_label) continue;
+        if (
+          visibleStatus !== "all" &&
+          feature.properties.status !== visibleStatus
+        )
+          continue;
+        const point = featureCenter(feature);
         if (!bounds.contains(point)) continue;
         const element = document.createElement("span");
         element.className = "address-number";
-        element.textContent = String(feature.properties.civic_number ?? "");
+        element.textContent = String(feature.properties.civic_label);
         labelMarkers.push(
           new maplibregl.Marker({ element }).setLngLat(point).addTo(map),
         );
-        if (labelMarkers.length >= 180) break;
       }
     }
   };
   map.on("moveend", updateLabels);
   map.on("zoomend", updateLabels);
+  map.on("moveend", scheduleNextAreaUpdate);
+  map.on("zoomend", scheduleNextAreaUpdate);
   map.on("load", () => {
     map.addSource("boundary", { type: "geojson", data: boundary });
     map.addLayer({
@@ -336,6 +1032,8 @@ export async function canvassingMain() {
       type: "geojson",
       data: structures,
       promoteId: "structure_id",
+      attribution:
+        'Buildings: City of Owen Sound official city map (2022, private reference); <a href="https://open.canada.ca/data/en/dataset/3829eee9-f898-4643-9ad8-f48575b8873d">Canada Structures</a>, Open Government Licence - Canada; © OpenStreetMap contributors; estimated roofs © Living Region',
     });
     map.addLayer({
       id: "structures",
@@ -348,10 +1046,86 @@ export async function canvassingMain() {
           "case",
           [">", ["get", "household_count"], 0],
           0.82,
-          0.32,
+          0.24,
         ],
         "fill-outline-color": "#4f5754",
       },
+    });
+    map.addLayer({
+      id: "city-map-structure-outlines",
+      type: "line",
+      source: "structures",
+      minzoom: 14,
+      filter: ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
+      paint: {
+        "line-color": "#344a52",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 14, 0.7, 18, 1.6],
+        "line-opacity": [
+          "case",
+          [">", ["get", "household_count"], 0],
+          0.9,
+          0.32,
+        ],
+      },
+    });
+    map.addLayer({
+      id: "estimated-structure-outlines",
+      type: "line",
+      source: "structures",
+      minzoom: 14,
+      filter: ["==", ["get", "geometry_provenance"], "estimated"],
+      paint: {
+        "line-color": "#303936",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 14, 1, 18, 2],
+        "line-dasharray": [2, 1.5],
+      },
+    });
+    map.addLayer({
+      id: "selected-structure-outlines",
+      type: "line",
+      source: "structures",
+      minzoom: 13,
+      paint: {
+        "line-color": "#0b4f43",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 3, 18, 6],
+        "line-opacity": [
+          "case",
+          ["==", ["feature-state", "selected"], true],
+          1,
+          0,
+        ],
+      },
+    });
+    map.addSource("split-preview", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+    });
+    map.addLayer({
+      id: "split-preview-fill",
+      type: "fill",
+      source: "split-preview",
+      paint: {
+        "fill-color": [
+          "match",
+          ["get", "index"],
+          1,
+          "#4e79a7",
+          2,
+          "#45a36d",
+          3,
+          "#e88935",
+          4,
+          "#8f63b8",
+          "#edc949",
+        ],
+        "fill-opacity": 0.48,
+      },
+    });
+    map.addLayer({
+      id: "split-preview-outline",
+      type: "line",
+      source: "split-preview",
+      paint: { "line-color": "#0b4f43", "line-width": 4 },
     });
     map.addSource("addresses", {
       type: "geojson",
@@ -359,6 +1133,92 @@ export async function canvassingMain() {
       cluster: true,
       clusterRadius: 42,
       clusterMaxZoom: 14,
+      clusterProperties: {
+        eligible_count: ["+", ["get", "eligible_count"]],
+        covered_count: ["+", ["get", "covered_count"]],
+        remaining_count: ["+", ["get", "remaining_count"]],
+        untouched_count: [
+          "+",
+          [
+            "case",
+            ["in", ["get", "status"], ["literal", ["untouched", "vacant"]]],
+            1,
+            0,
+          ],
+        ],
+        flyer_count: [
+          "+",
+          [
+            "case",
+            [
+              "in",
+              ["get", "status"],
+              ["literal", ["flyer_delivered", "undecided"]],
+            ],
+            1,
+            0,
+          ],
+        ],
+        knocked_count: [
+          "+",
+          [
+            "case",
+            ["==", ["get", "status"], "knocked_no_answer"],
+            1,
+            0,
+          ],
+        ],
+        conversation_count: [
+          "+",
+          [
+            "case",
+            [
+              "in",
+              ["get", "status"],
+              ["literal", ["conversation", "supportive"]],
+            ],
+            1,
+            0,
+          ],
+        ],
+        revisit_count: [
+          "+",
+          ["case", ["==", ["get", "status"], "revisit"], 1, 0],
+        ],
+        interest_count: [
+          "+",
+          [
+            "case",
+            [
+              "in",
+              ["get", "status"],
+              ["literal", ["volunteer_interest", "lawn_sign_interest"]],
+            ],
+            1,
+            0,
+          ],
+        ],
+        restricted_count: [
+          "+",
+          [
+            "case",
+            [
+              "in",
+              ["get", "status"],
+              [
+                "literal",
+                [
+                  "opposed",
+                  "inaccessible",
+                  "no_campaign_material_requested",
+                ],
+              ],
+            ],
+            1,
+            0,
+          ],
+        ],
+      },
       promoteId: "address_id",
     });
     map.addLayer({
@@ -368,24 +1228,94 @@ export async function canvassingMain() {
       filter: ["has", "point_count"],
       maxzoom: 15,
       paint: {
-        "circle-color": "#275d50",
+        "circle-color": dominantClusterColor as any,
         "circle-radius": ["step", ["get", "point_count"], 14, 50, 20, 200, 28],
-        "circle-opacity": 0.86,
+        "circle-opacity": 0.9,
+        "circle-stroke-color": "#fff",
+        "circle-stroke-width": 1.5,
+      },
+    });
+    map.addSource("next-underflyered", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+    });
+    map.addLayer({
+      id: "next-underflyered-halo",
+      type: "circle",
+      source: "next-underflyered",
+      paint: {
+        "circle-color": "rgba(0,0,0,0)",
+        "circle-radius": ["get", "radius_px"],
+        "circle-stroke-color": "#00e5ff",
+        "circle-stroke-width": 3,
+        "circle-opacity": 0.98,
+      },
+    });
+    map.addLayer({
+      id: "address-cluster-counts",
+      type: "symbol",
+      source: "addresses",
+      filter: ["has", "point_count"],
+      maxzoom: 15,
+      layout: {
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-size": 12,
+        "text-allow-overlap": true,
+      },
+      paint: {
+        "text-color": "#fff",
+        "text-halo-color": "#445158",
+        "text-halo-width": 1,
+      },
+    });
+    map.addLayer({
+      id: "next-underflyered-label",
+      type: "symbol",
+      source: "next-underflyered",
+      layout: {
+        "text-field": ["get", "label"],
+        "text-size": 11,
+        "text-offset": [0, 1.8],
+        "text-allow-overlap": true,
+      },
+      paint: {
+        "text-color": "#006b79",
+        "text-halo-color": "#fff",
+        "text-halo-width": 1.5,
       },
     });
     map.addLayer({
       id: "address-points",
       type: "circle",
       source: "addresses",
-      filter: ["!", ["has", "point_count"]],
+      filter: [
+        "all",
+        ["!", ["has", "point_count"]],
+        [
+          "any",
+          ["!", ["has", "structure_id"]],
+          ["==", ["get", "structure_id"], ""],
+        ],
+      ],
       minzoom: 14,
       paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 2.5, 18, 5],
         "circle-color": statusExpression,
-        "circle-stroke-color": "#fff",
-        "circle-stroke-width": 1,
+        "circle-stroke-color": [
+          "case",
+          ["==", ["feature-state", "selected"], true],
+          "#0b4f43",
+          "#fff",
+        ],
+        "circle-stroke-width": [
+          "case",
+          ["==", ["feature-state", "selected"], true],
+          4,
+          1,
+        ],
       },
     });
+    setCoverageMode(coverage);
     map.addSource("active-route", {
       type: "geojson",
       data: { type: "FeatureCollection", features: [] },
@@ -448,26 +1378,114 @@ export async function canvassingMain() {
         : ["==", ["get", "status"], restoredFilter],
     );
     map.setFilter(
-      "address-points",
+      "estimated-structure-outlines",
       restoredFilter === "all"
-        ? ["!", ["has", "point_count"]]
+        ? ["==", ["get", "geometry_provenance"], "estimated"]
         : [
             "all",
-            ["!", ["has", "point_count"]],
+            ["==", ["get", "geometry_provenance"], "estimated"],
             ["==", ["get", "status"], restoredFilter],
           ],
     );
-    map.on("click", "structures", pickStructure);
-    map.on("click", "address-points", pickAddress);
-    map.on("click", "address-clusters", async (e) => {
+    map.setFilter(
+      "city-map-structure-outlines",
+      restoredFilter === "all"
+        ? ["==", ["get", "external_source"], "owen_sound_city_map_pdf"]
+        : [
+            "all",
+            ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
+            ["==", ["get", "status"], restoredFilter],
+          ],
+    );
+    map.setFilter(
+      "address-points",
+      restoredFilter === "all"
+        ? [
+            "all",
+            ["!", ["has", "point_count"]],
+            [
+              "any",
+              ["!", ["has", "structure_id"]],
+              ["==", ["get", "structure_id"], ""],
+            ],
+          ]
+        : [
+            "all",
+            ["!", ["has", "point_count"]],
+            [
+              "any",
+              ["!", ["has", "structure_id"]],
+              ["==", ["get", "structure_id"], ""],
+            ],
+            ["==", ["get", "status"], restoredFilter],
+          ],
+    );
+    map.on("click", (event) => {
+      closeMobileOverlays();
+      if (splitTarget && splitDrawing) {
+        const point: [number, number] = [event.lngLat.lng, event.lngLat.lat];
+        if (!splitCutStart) {
+          splitCutStart = point;
+          toast("Tap the other side of the roof");
+        } else {
+          splitCuts.push({ start: splitCutStart, end: point });
+          splitCutStart = undefined;
+          splitDrawing = false;
+          void previewSplit("cut_lines");
+        }
+        return;
+      }
+      if (
+        map.queryRenderedFeatures(event.point, {
+          layers: ["address-clusters", "address-cluster-counts"],
+        }).length
+      )
+        return;
+      const roofs = map.queryRenderedFeatures(event.point, {
+        layers: ["structures"],
+      });
+      if (roofs.length) {
+        pickStructure({ ...event, features: roofs } as any);
+        return;
+      }
+      const addressPoints = map.queryRenderedFeatures(event.point, {
+        layers: ["address-points"],
+      });
+      if (addressPoints.length)
+        pickAddress({ ...event, features: addressPoints } as any);
+    });
+    const expandAddressCluster = async (e: any) => {
       const feature = e.features?.[0];
       if (!feature) return;
+      if (coverage) {
+        const properties = feature.properties ?? {};
+        const covered = Number(properties.covered_count ?? 0);
+        const remaining = Number(properties.remaining_count ?? 0);
+        const totalEligible = Number(properties.eligible_count ?? 0);
+        const percentage = totalEligible
+          ? Math.round((covered / totalEligible) * 100)
+          : 0;
+        toast(
+          `Covered ${covered} · ${remaining} remaining · ${totalEligible} eligible · ${percentage}%`,
+        );
+      }
       const zoom = await (
         map.getSource("addresses") as GeoJSONSource
       ).getClusterExpansionZoom(Number(feature.properties?.cluster_id));
       map.easeTo({ center: (feature.geometry as any).coordinates, zoom });
-    });
-    for (const layer of ["structures", "address-points"]) {
+    };
+    map.on("click", "address-clusters", expandAddressCluster);
+    map.on("click", "address-cluster-counts", expandAddressCluster);
+    for (const layer of [
+      "structures",
+      "city-map-structure-outlines",
+      "estimated-structure-outlines",
+      "address-points",
+      "address-clusters",
+      "address-cluster-counts",
+      "next-underflyered-halo",
+      "next-underflyered-label",
+    ]) {
       map.on(
         "mouseenter",
         layer,
@@ -475,6 +1493,10 @@ export async function canvassingMain() {
       );
       map.on("mouseleave", layer, () => (map.getCanvas().style.cursor = ""));
     }
+    map.on("click", "next-underflyered-halo", showNextAreaPopup);
+    map.on("click", "next-underflyered-label", showNextAreaPopup);
+    map.once("idle", scheduleNextAreaUpdate);
+    applySelectionFeatureState();
     updateLabels();
     renderRoutes();
   });
@@ -500,25 +1522,285 @@ export async function canvassingMain() {
             `<span><i style="background:${c}"></i>${s.replaceAll("_", " ")}</span>`,
         )
         .join("")}</div>`;
+    const mobileSummary = document.querySelector<HTMLElement>("#mobile-summary-content"),
+      summary = document.querySelector<HTMLElement>("#summary");
+    if (mobileSummary && summary && !document.querySelector<HTMLElement>("#mobile-summary-sheet")!.hidden)
+      mobileSummary.innerHTML = summary.innerHTML;
     renderRoutes();
     renderSession();
   }
+  const toggleHouseholds = (homes: Household[], fromMap = false) => {
+    const key = homes
+        .map((home) => home.household_id)
+        .sort()
+        .join("|"),
+      now = Date.now();
+    if (
+      fromMap &&
+      lastMapSelection.key === key &&
+      now - lastMapSelection.at < 450
+    )
+      return;
+    if (fromMap) lastMapSelection = { key, at: now };
+    const remove = homes.every((home) => selected.has(home.household_id));
+    for (const home of homes)
+      remove
+        ? selected.delete(home.household_id)
+        : selected.add(home.household_id);
+    updateSelection();
+    toast(
+      `${selected.size} household${selected.size === 1 ? "" : "s"} selected`,
+    );
+  };
   function pickStructure(
     e: MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
   ) {
-    const id = String(e.features?.[0]?.properties?.structure_id ?? "");
-    const homes = byStructure.get(id) ?? [];
-    if (!homes.length)
+    const rendered = map.queryRenderedFeatures(e.point, {
+      layers: ["structures"],
+    });
+    const picked = rendered
+        .map((renderedFeature) =>
+          structureFeatureById.get(
+            String(renderedFeature.properties?.structure_id ?? ""),
+          ),
+        )
+        .filter(Boolean)
+        .map((feature) => ({ feature, homes: homesForStructure(feature) }))
+        .sort((left, right) => right.homes.length - left.homes.length)[0],
+      homes = picked?.homes ?? [];
+    if (!homes.length) {
+      const structureId = String(rendered[0]?.properties?.structure_id ?? ""),
+        structure = structureFeatureById.get(structureId);
+      if (structure) return showUnlinkedStructure(structure);
       return toast("No civic address is linked to this structure");
+    }
+    if (multiSelectMode) {
+      toggleHouseholds(homes, true);
+      return;
+    }
     persist({ household_id: homes[0].household_id });
-    showHouseholds(homes);
+    showHouseholds(homes, picked?.feature);
+  }
+  const appendCivicEditor = (
+    container: HTMLElement,
+    structure: any,
+    homes: Household[],
+    separateReference = false,
+  ) => {
+    if (document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked)
+      return;
+    const section = document.createElement("section"),
+      civic = document.createElement("input"),
+      street = document.createElement("input"),
+      save = document.createElement("button");
+    section.className = "association-review civic-number-editor";
+    section.innerHTML = separateReference
+      ? "<h3>Separate this roof</h3><p>This roof currently shares a nearby address. Give it its own civic address when it is a separate residence or the automatic classification is wrong.</p>"
+      : "<h3>Building civic number</h3><p>Corrections are audited and reused during map regeneration.</p>";
+    civic.value = homes[0]?.civic_number ?? "";
+    civic.placeholder = "Civic number";
+    civic.inputMode = "text";
+    civic.setAttribute("aria-label", "Civic number");
+    street.value = homes[0]?.street ?? "";
+    street.placeholder = "Street name";
+    street.setAttribute("aria-label", "Street name");
+    save.textContent = separateReference
+      ? "Make separate address"
+      : homes.length
+        ? "Update building number"
+        : "Set number";
+    save.addEventListener("click", async () => {
+      save.disabled = true;
+      try {
+        await postJson(
+          `/api/canvassing/structures/${structure.properties.structure_id}/civic-number`,
+          {
+            civic_number: civic.value,
+            street: street.value,
+            reason: "manual canvassing map correction",
+          },
+        );
+        await refresh();
+        const updated =
+          byStructure.get(structure.properties.structure_id) ?? [];
+        if (updated.length) showHouseholds(updated, structure);
+        toast("Building number correction appended");
+      } catch (error) {
+        toast(
+          error instanceof Error ? error.message : "Number correction failed",
+        );
+      } finally {
+        save.disabled = false;
+      }
+    });
+    section.append(civic, street, save);
+    container.append(section);
+  };
+  const setSplitPreview = (preview?: any) => {
+    splitPreview = preview;
+    (
+      map.getSource("split-preview") as GeoJSONSource | undefined
+    )?.setData({
+      type: "FeatureCollection",
+      features:
+        preview?.children.map((child: any, index: number) => ({
+          type: "Feature",
+          properties: { index: index + 1, area_m2: child.area_m2 },
+          geometry: child.geometry,
+        })) ?? [],
+    });
+    const status = document.querySelector<HTMLElement>("#split-status");
+    if (status)
+      status.textContent = preview
+        ? `${preview.children.length} roofs · ${preview.children
+            .map((child: any) => `${child.area_m2} m2`)
+            .join(" · ")}`
+        : "No preview yet";
+    const accept =
+      document.querySelector<HTMLButtonElement>("#split-accept");
+    if (accept) accept.disabled = !preview;
+  };
+  async function previewSplit(method?: "cut_lines" | "frontage") {
+    if (!splitTarget) return;
+    const selectedMethod =
+      method ??
+      (document.querySelector<HTMLSelectElement>("#split-method")?.value as
+        | "cut_lines"
+        | "frontage");
+    try {
+      const preview = await fetchJson<any>(
+        `/api/canvassing/structures/${splitTarget.properties.structure_id}/split/preview`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            method: selectedMethod,
+            cuts: splitCuts,
+            unit_count: Number(
+              document.querySelector<HTMLInputElement>("#split-count")
+                ?.value ?? 2,
+            ),
+            rotate:
+              document.querySelector<HTMLInputElement>("#split-rotate")
+                ?.checked ?? false,
+          }),
+        },
+      );
+      setSplitPreview(preview);
+      toast(`${preview.children.length} split roofs previewed`);
+    } catch (error) {
+      setSplitPreview();
+      toast(error instanceof Error ? error.message : "Split preview failed");
+    }
+  }
+  function closeSplitEditor() {
+    splitTarget = undefined;
+    splitDrawing = false;
+    splitCutStart = undefined;
+    splitCuts = [];
+    setSplitPreview();
+    if (active) showHouseholds([active]);
+  }
+  function renderSplitEditor(structure: any) {
+    splitTarget = structure;
+    splitDrawing = false;
+    splitCutStart = undefined;
+    splitCuts = [];
+    setSplitPreview();
+    const drawer = document.querySelector<HTMLElement>("#drawer")!;
+    drawer.innerHTML = `<div class="drawer-head"><div><small>Private geometry correction</small><h2>Split roof ${structure.properties.civic_label ?? ""}</h2><span>Preview before accepting</span></div><button id="drawer-close" class="drawer-close" aria-label="Close roof details">Close</button></div><section class="split-editor"><label>Method<select id="split-method"><option value="cut_lines">Draw cut lines</option><option value="frontage">Divide frontage</option></select></label><div id="split-frontage" hidden><label>Number of roofs<input id="split-count" type="number" min="2" max="20" value="2"></label><label><input id="split-rotate" type="checkbox"> Rotate division 90 degrees</label></div><p id="split-instructions">Draw cuts through false bridges by tapping opposite sides of the roof.</p><div class="split-actions"><button id="split-draw">Draw a cut</button><button id="split-preview">Preview</button><button id="split-clear">Clear cuts</button></div><p id="split-status">No preview yet</p><div class="split-commit"><button id="split-accept" disabled>Accept split</button><button id="split-cancel">Cancel</button></div></section>`;
+    openMobileDrawer();
+    const method =
+      document.querySelector<HTMLSelectElement>("#split-method")!;
+    method.addEventListener("change", () => {
+      const frontage = method.value === "frontage";
+      document.querySelector<HTMLElement>("#split-frontage")!.hidden =
+        !frontage;
+      document.querySelector<HTMLButtonElement>("#split-draw")!.hidden =
+        frontage;
+      document.querySelector("#split-instructions")!.textContent = frontage
+        ? "Choose how many frontage units this roof contains."
+        : "Draw cuts through false bridges by tapping opposite sides of the roof.";
+      splitCuts = [];
+      setSplitPreview();
+    });
+    document.querySelector("#split-draw")!.addEventListener("click", () => {
+      splitDrawing = true;
+      splitCutStart = undefined;
+      toast("Tap one side of the false bridge");
+    });
+    document
+      .querySelector("#split-preview")!
+      .addEventListener("click", () => void previewSplit());
+    document.querySelector("#split-clear")!.addEventListener("click", () => {
+      splitCuts = [];
+      splitCutStart = undefined;
+      splitDrawing = false;
+      setSplitPreview();
+    });
+    document
+      .querySelector("#split-cancel")!
+      .addEventListener("click", closeSplitEditor);
+    document.querySelector("#split-accept")!.addEventListener("click", async () => {
+      if (!splitPreview || !splitTarget || submitting) return;
+      submitting = true;
+      const button =
+        document.querySelector<HTMLButtonElement>("#split-accept")!;
+      button.disabled = true;
+      try {
+        await fetchJson(
+          `/api/canvassing/structures/${splitTarget.properties.structure_id}/split`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              submission_key: crypto.randomUUID(),
+              method: document.querySelector<HTMLSelectElement>("#split-method")!
+                .value,
+              cuts: splitCuts,
+              unit_count: Number(
+                document.querySelector<HTMLInputElement>("#split-count")!
+                  .value,
+              ),
+              rotate:
+                document.querySelector<HTMLInputElement>("#split-rotate")!
+                  .checked,
+              reference_address_ids:
+                splitTarget.properties.address_reference_ids ?? [],
+              reason: "manual canvassing roof correction",
+            }),
+          },
+        );
+        toast("Roof split accepted");
+        window.setTimeout(() => window.location.reload(), 350);
+      } catch (error) {
+        submitting = false;
+        button.disabled = false;
+        toast(error instanceof Error ? error.message : "Split failed");
+      }
+    });
+  }
+  function showUnlinkedStructure(structure: any) {
+    const drawer = document.querySelector<HTMLElement>("#drawer")!;
+    drawer.innerHTML = `<div class="drawer-head"><div><small>Reference roof</small><h2>Address needs review</h2><span>${String(structure.properties.building_type ?? "unclassified").replaceAll("_", " ")}</span></div><button id="drawer-close" class="drawer-close" aria-label="Close roof details">Close</button></div><section class="association-review"><h3>Building source</h3><p>${structure.properties.external_source} ${structure.properties.external_id} · ${structure.properties.confidence}</p></section>`;
+    openMobileDrawer();
+    appendCivicEditor(drawer, structure, []);
+    if (!document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked) {
+      const split = document.createElement("button");
+      split.textContent = "Split roof";
+      split.addEventListener("click", () => renderSplitEditor(structure));
+      drawer.append(split);
+    }
   }
   function pickAddress(
     e: MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
   ) {
     const id = String(e.features?.[0]?.properties?.household_id ?? "");
     const home = state.households.find((h) => h.household_id === id);
+    if (home?.structure_id) return;
     if (home) {
+      if (multiSelectMode) {
+        toggleHouseholds([home], true);
+        return;
+      }
       persist({ household_id: home.household_id });
       showHouseholds([home]);
     }
@@ -540,35 +1822,164 @@ export async function canvassingMain() {
     navigateRoute(1);
     toast("Stop skipped");
   };
-  function showHouseholds(homes: Household[]) {
+  async function renderContactEditor(
+    householdId: string,
+    selectedPersonId?: string,
+  ) {
+    const section =
+      document.querySelector<HTMLElement>("#contact-editor");
+    if (!section || active?.household_id !== householdId) return;
+    try {
+      let contacts = contactCache.get(householdId);
+      if (!contacts) {
+        contacts = await fetchJson<Contact[]>(
+          `/api/canvassing/households/${householdId}/contacts`,
+        );
+        contactCache.set(householdId, contacts);
+      }
+      if (!section.isConnected || active?.household_id !== householdId) return;
+      const draw = (contact?: Contact, blank = false) => {
+        const current = blank ? undefined : contact ?? contacts![0],
+          civicNumber = current?.civic_number ?? active?.civic_number ?? "",
+          street = current?.street ?? active?.street ?? "";
+        section.innerHTML = `<h3>Private contact</h3>${
+          contacts!.length
+            ? `<div class="contact-switcher"><select id="contact-person">${contacts!
+                .map(
+                  (person) =>
+                    `<option value="${escapeHtml(person.person_id)}" ${
+                      person.person_id === current?.person_id ? "selected" : ""
+                    }>${escapeHtml(person.name || person.email || person.phone || "Unnamed contact")}</option>`,
+                )
+                .join("")}</select><button id="contact-new" type="button">New person</button></div>`
+            : ""
+        }<div class="contact-address"><label>Civic number<input readonly value="${escapeHtml(civicNumber)}"></label><label>Street<input readonly value="${escapeHtml(street)}"></label></div><div class="contact-fields"><label>Name<input id="contact-name" autocomplete="name" value="${escapeHtml(current?.name)}"></label><label>Phone<input id="contact-phone" type="tel" autocomplete="tel" value="${escapeHtml(current?.phone)}"></label><label>Email<input id="contact-email" type="email" autocomplete="email" value="${escapeHtml(current?.email)}"></label><label class="mailing-consent"><input id="contact-mailing" type="checkbox" ${current?.mailing_list_consent ? "checked" : ""}> Mailing list</label><button id="contact-save" type="button">Save contact</button></div>`;
+        document
+          .querySelector<HTMLSelectElement>("#contact-person")
+          ?.addEventListener("change", (event) =>
+            draw(
+              contacts!.find(
+                (person) =>
+                  person.person_id ===
+                  (event.target as HTMLSelectElement).value,
+              ),
+            ),
+          );
+        document
+          .querySelector("#contact-new")
+          ?.addEventListener("click", () => draw(undefined, true));
+        document
+          .querySelector<HTMLButtonElement>("#contact-save")!
+          .addEventListener("click", async (event) => {
+            const button = event.currentTarget as HTMLButtonElement;
+            button.disabled = true;
+            button.textContent = "Saving...";
+            try {
+              const savedContact = await fetchJson<Contact>(
+                `/api/canvassing/households/${householdId}/contacts`,
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    person_id: current?.person_id ?? null,
+                    name:
+                      document.querySelector<HTMLInputElement>("#contact-name")!
+                        .value,
+                    phone:
+                      document.querySelector<HTMLInputElement>("#contact-phone")!
+                        .value,
+                    email:
+                      document.querySelector<HTMLInputElement>("#contact-email")!
+                        .value,
+                    mailing_list_consent:
+                      document.querySelector<HTMLInputElement>(
+                        "#contact-mailing",
+                      )!.checked,
+                    source: "candidate",
+                  }),
+                },
+              );
+              const next = current
+                ? contacts!.map((person) =>
+                    person.person_id === savedContact.person_id
+                      ? savedContact
+                      : person,
+                  )
+                : [...contacts!, savedContact];
+              contacts = next;
+              contactCache.set(householdId, next);
+              if (active?.household_id === householdId)
+                active.last_updated_at = savedContact.last_updated_at;
+              draw(savedContact);
+              toast("Private contact saved");
+            } catch (error) {
+              button.disabled = false;
+              button.textContent = "Save contact";
+              toast(
+                error instanceof Error
+                  ? error.message
+                  : "Contact could not be saved",
+              );
+            }
+          });
+      };
+      draw(
+        contacts.find((person) => person.person_id === selectedPersonId),
+      );
+    } catch (error) {
+      if (section.isConnected)
+        section.innerHTML = `<h3>Private contact</h3><span>${escapeHtml(
+          error instanceof Error ? error.message : "Contact details unavailable",
+        )}</span>`;
+    }
+  }
+  function showHouseholds(homes: Household[], clickedStructure?: any) {
     active = homes[0];
     const volunteer =
-      document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked;
+        document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked,
+      today = localDateValue(),
+      latestDate = active.last_updated_at
+        ? localDateValue(active.last_updated_at)
+        : today,
+      flyerCurrent = Boolean(active.flyer_delivered),
+      noAnswerCurrent = Boolean(active.no_answer),
+      talkedCurrent = Boolean(active.conversation_occurred),
+      revisitCurrent = Boolean(active.revisit_requested);
     document.querySelector("#drawer")!.innerHTML =
-      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits</span></div><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<div class="quick-actions"><button data-outcome="flyer_delivered">Flyer</button><button data-outcome="knocked_no_answer">No answer</button><button data-outcome="conversation">Talked</button><button data-outcome="revisit">Revisit</button><button data-outcome="inaccessible">Skip</button></div>${
+      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span></div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : "Flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
         volunteer
           ? ""
-          : `<div class="private-fields"><label>Outcome<select id="outcome">${Object.keys(
-              statusColors,
-            )
+          : `<div class="private-fields"><label>Political outcome<select id="outcome" data-initial="${escapeHtml(active.political_outcome ?? "")}"><option value="">Not recorded</option>${[
+              "supportive",
+              "undecided",
+              "opposed",
+              "volunteer_interest",
+              "lawn_sign_interest",
+              "vacant",
+              "no_campaign_material_requested",
+            ]
               .map(
                 (s) =>
-                  `<option ${s === active!.status ? "selected" : ""} value="${s}">${s.replaceAll("_", " ")}</option>`,
+                  `<option value="${s}" ${active!.political_outcome === s ? "selected" : ""}>${s.replaceAll("_", " ")}</option>`,
               )
               .join(
                 "",
-              )}</select></label><label>Issues<input id="issues" placeholder="housing; transit; affordability"></label><label>Private notes<textarea id="notes" rows="3"></textarea></label><label>Follow-up<input id="follow-up"></label><label>Date<input id="follow-date" type="date"></label><button id="save-detail">Save visit</button></div>`
+              )}</select></label><label>Issues<input id="issues" placeholder="housing; transit; affordability"></label><label>Private notes<textarea id="notes" rows="3"></textarea></label><label>Follow-up<input id="follow-up"></label><label>Follow-up due<input id="follow-date" type="date"></label></div><section class="contact-editor" id="contact-editor"><h3>Private contact</h3><span>Loading...</span></section>`
       }`;
+    openMobileDrawer();
     const addressFeature = addresses.features.find(
         (feature: any) => feature.properties.address_id === active!.address_id,
       ),
-      structureFeature = structures.features.find(
+      primaryStructureFeature = structures.features.find(
         (feature: any) =>
           feature.properties.structure_id === active!.structure_id,
-      );
+      ),
+      structureFeature = clickedStructure ?? primaryStructureFeature,
+      sharedReference =
+        structureFeature &&
+        structureFeature.properties.structure_id !== active.structure_id;
     const provenance = document.createElement("section");
     provenance.className = "association-review";
-    provenance.innerHTML = `<h3>Building association</h3><p>${active.association_status.replaceAll("_", " ")}${structureFeature ? ` · ${structureFeature.properties.external_source} ${structureFeature.properties.external_id} · ${structureFeature.properties.confidence}` : " · point stop"}</p>`;
+    provenance.innerHTML = `<h3>Building association</h3><p>${sharedReference ? `${String(structureFeature.properties.address_relation ?? "provisional reference").replaceAll("_", " ")} · shares ${active.label} · ${structureFeature.properties.address_reference_distance_m} m from addressed roof` : active.association_status.replaceAll("_", " ")}${addressFeature?.properties.address_confidence === "inferred_range" ? " · approximate civic number from official road range" : ""}${structureFeature ? ` · ${structureFeature.properties.external_source === "living_region_estimate" ? "estimated local roof" : `${structureFeature.properties.external_source} ${structureFeature.properties.external_id}`} · ${structureFeature.properties.confidence}${structureFeature.properties.source_components?.length ? ` · ${structureFeature.properties.source_components.join(" + ")}` : ""}` : " · point stop"}</p>`;
     if (
       !volunteer &&
       addressFeature?.properties.association_candidates?.length
@@ -598,8 +2009,15 @@ export async function canvassingMain() {
         provenance.append(button);
       }
       const clear = document.createElement("button");
-      clear.textContent = "Clear manual association";
+      clear.className = "association-detach";
+      clear.textContent = "Detach address from this roof...";
       clear.addEventListener("click", async () => {
+        if (
+          !window.confirm(
+            "Detach this address from its roof? Flyer, visit, conversation, and route history will be preserved.",
+          )
+        )
+          return;
         await fetchJson(
           `/api/canvassing/addresses/${active!.address_id}/association`,
           {
@@ -611,6 +2029,7 @@ export async function canvassingMain() {
           },
         );
         await refresh();
+        toast("Address detached; campaign history preserved");
       });
       provenance.append(clear);
       if (active.association_status === "manual_verified") {
@@ -627,13 +2046,51 @@ export async function canvassingMain() {
         provenance.append(undo);
       }
     }
-    document.querySelector("#drawer")!.append(provenance);
+    const drawer = document.querySelector<HTMLElement>("#drawer")!;
+    drawer.append(provenance);
+    if (structureFeature)
+      appendCivicEditor(drawer, structureFeature, homes, sharedReference);
+    if (structureFeature && !volunteer) {
+      const splitParent =
+        structureFeature.properties.split_parent_structure_id;
+      const split = document.createElement("button");
+      split.className = "split-roof";
+      split.textContent = splitParent ? "Split this roof again" : "Split roof";
+      split.addEventListener("click", () =>
+        renderSplitEditor(structureFeature),
+      );
+      drawer.append(split);
+      if (splitParent) {
+        const reverse = document.createElement("button");
+        reverse.className = "split-reverse";
+        reverse.textContent = "Undo parent building split";
+        reverse.addEventListener("click", async () => {
+          if (
+            !window.confirm(
+              "Restore the parent roof? Household and visit history will be preserved.",
+            )
+          )
+            return;
+          reverse.disabled = true;
+          try {
+            await fetchJson(
+              `/api/canvassing/structures/${splitParent}/split/reverse`,
+              { method: "POST", body: "{}" },
+            );
+            window.location.reload();
+          } catch (error) {
+            reverse.disabled = false;
+            toast(
+              error instanceof Error ? error.message : "Split reversal failed",
+            );
+          }
+        });
+        drawer.append(reverse);
+      }
+    }
     document.querySelector("#add-selection")!.addEventListener("click", () => {
       if (!active) return;
-      selected.has(active.household_id)
-        ? selected.delete(active.household_id)
-        : selected.add(active.household_id);
-      updateSelection();
+      toggleHouseholds([active]);
       showHouseholds(homes);
     });
     document.querySelectorAll<HTMLElement>("[data-household]").forEach((el) =>
@@ -642,95 +2099,180 @@ export async function canvassingMain() {
         showHouseholds(homes);
       }),
     );
+    const flyer =
+        document.querySelector<HTMLInputElement>("#visit-flyer")!,
+      flyerLabel = document.querySelector<HTMLElement>("#visit-flyer + span")!,
+      saveButton =
+        document.querySelector<HTMLButtonElement>("#save-visit")!,
+      noAnswer =
+        document.querySelector<HTMLInputElement>("#visit-no-answer")!,
+      talked = document.querySelector<HTMLInputElement>("#visit-talked")!,
+      visitDate =
+        document.querySelector<HTMLInputElement>("#visit-date")!,
+      advanceVisitDate = () => {
+        if (visitDate.dataset.manual !== "true")
+          visitDate.value = localDateValue();
+      };
+    visitDate.addEventListener(
+      "input",
+      () => (visitDate.dataset.manual = "true"),
+    );
+    flyer.addEventListener("change", () => {
+      const removing =
+        flyer.dataset.initial === "true" && !flyer.checked;
+      flyerLabel.textContent = removing
+        ? "Remove flyer"
+        : flyer.dataset.initial === "true"
+          ? "Flyered"
+          : "Flyer";
+      saveButton.textContent = removing
+        ? "Apply correction"
+        : "Save changes";
+    });
     document
-      .querySelectorAll<HTMLElement>("[data-outcome]")
-      .forEach((el) =>
-        el.addEventListener("click", () =>
-          el.dataset.outcome === "inaccessible"
-            ? skipCurrent()
-            : saveVisit(el.dataset.outcome!),
-        ),
-      );
+      .querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+        "#drawer input:not(#visit-date):not(#follow-date), #drawer select, #drawer textarea",
+      )
+      .forEach((field) => field.addEventListener("change", advanceVisitDate));
+    noAnswer.addEventListener("change", () => {
+      if (noAnswer.checked) talked.checked = false;
+    });
+    talked.addEventListener("change", () => {
+      if (talked.checked) noAnswer.checked = false;
+    });
     document
-      .querySelector("#save-detail")
-      ?.addEventListener("click", () =>
-        saveVisit(
-          document.querySelector<HTMLSelectElement>("#outcome")!.value,
-          true,
-        ),
-      );
+      .querySelector("#save-visit")!
+      .addEventListener("click", () => saveVisit(!volunteer));
+    document
+      .querySelector("#skip-household")!
+      .addEventListener("click", skipCurrent);
+    if (!volunteer) void renderContactEditor(active.household_id);
   }
-  async function saveVisit(outcome: string, detailed = false) {
+  async function saveVisit(detailed = false) {
     if (!active || submitting) return;
+    const visitDate =
+        document.querySelector<HTMLInputElement>("#visit-date")!,
+      dateWasManuallyEdited = visitDate.dataset.manual === "true",
+      today = localDateValue();
+    if (!dateWasManuallyEdited) visitDate.value = today;
+    const flyerInput =
+        document.querySelector<HTMLInputElement>("#visit-flyer")!,
+      noAnswerInput =
+        document.querySelector<HTMLInputElement>("#visit-no-answer")!,
+      talkedInput =
+        document.querySelector<HTMLInputElement>("#visit-talked")!,
+      revisitInput =
+        document.querySelector<HTMLInputElement>("#visit-revisit")!,
+      flyerAdded =
+        flyerInput.checked && flyerInput.dataset.initial !== "true",
+      flyerRemoved =
+        !flyerInput.checked && flyerInput.dataset.initial === "true",
+      noAnswer =
+        noAnswerInput.checked && noAnswerInput.dataset.initial !== "true",
+      talked = talkedInput.checked && talkedInput.dataset.initial !== "true",
+      revisit =
+        revisitInput.checked && revisitInput.dataset.initial !== "true",
+      outcomeSelect =
+        document.querySelector<HTMLSelectElement>("#outcome"),
+      politicalOutcome =
+        outcomeSelect &&
+        outcomeSelect.value !== (outcomeSelect.dataset.initial ?? "")
+          ? outcomeSelect.value
+          : "",
+      outcome =
+        politicalOutcome ||
+        (revisit
+          ? "revisit"
+          : talked
+            ? "conversation"
+            : noAnswer
+              ? "knocked_no_answer"
+              : flyerAdded
+                ? "flyer_delivered"
+                : "");
+    if (!outcome && !flyerRemoved)
+      return toast("Change at least one household status");
     submitting = true;
     document
-      .querySelectorAll<HTMLButtonElement>(".quick-actions button,#save-detail")
+      .querySelectorAll<HTMLButtonElement>(".visit-commands button")
       .forEach((button) => (button.disabled = true));
     try {
-      await fetchJson("/api/canvassing/visits", {
-        method: "POST",
-        body: JSON.stringify({
-          submission_key: crypto.randomUUID(),
-          session_id: activeSessionId || null,
-          household_id: active.household_id,
-          route_id:
-            document.querySelector<HTMLSelectElement>("#active-route")!.value ||
-            null,
-          outcome,
-          flyer_delivered: outcome === "flyer_delivered",
-          door_knocked: [
-            "knocked_no_answer",
-            "conversation",
-            "revisit",
-            "supportive",
-            "undecided",
-            "opposed",
-            "volunteer_interest",
-            "lawn_sign_interest",
-          ].includes(outcome),
-          conversation_occurred: [
-            "conversation",
-            "supportive",
-            "undecided",
-            "opposed",
-            "volunteer_interest",
-            "lawn_sign_interest",
-          ].includes(outcome),
-          issue_categories: detailed
-            ? (document.querySelector<HTMLInputElement>("#issues")?.value ?? "")
-                .split(";")
-                .filter(Boolean)
-            : [],
-          notes: detailed
-            ? document.querySelector<HTMLTextAreaElement>("#notes")?.value
-            : "",
-          follow_up_action: detailed
-            ? document.querySelector<HTMLInputElement>("#follow-up")?.value
-            : null,
-          follow_up_date: detailed
-            ? document.querySelector<HTMLInputElement>("#follow-date")?.value
-            : null,
-          source: document.querySelector<HTMLInputElement>("#volunteer-mode")!
-            .checked
-            ? "volunteer"
-            : "candidate",
-        }),
-      });
+      const occurredAt = dateWasManuallyEdited
+          ? `${visitDate.value}T12:00:00.000Z`
+          : undefined,
+        source = document.querySelector<HTMLInputElement>("#volunteer-mode")!
+          .checked
+          ? "volunteer"
+          : "candidate";
+      if (outcome)
+        await fetchJson("/api/canvassing/visits", {
+          method: "POST",
+          body: JSON.stringify({
+            submission_key: crypto.randomUUID(),
+            session_id: activeSessionId || null,
+            household_id: active.household_id,
+            route_id:
+              document.querySelector<HTMLSelectElement>("#active-route")!
+                .value || null,
+            occurred_at: occurredAt,
+            outcome,
+            flyer_delivered: flyerAdded,
+            door_knocked: noAnswer || talked || Boolean(politicalOutcome),
+            conversation_occurred: talked || Boolean(politicalOutcome),
+            revisit_requested: revisit,
+            no_answer: noAnswer,
+            issue_categories: detailed
+              ? (
+                  document.querySelector<HTMLInputElement>("#issues")?.value ??
+                  ""
+                )
+                  .split(";")
+                  .filter(Boolean)
+              : [],
+            notes: detailed
+              ? document.querySelector<HTMLTextAreaElement>("#notes")?.value
+              : "",
+            follow_up_action: detailed
+              ? document.querySelector<HTMLInputElement>("#follow-up")?.value
+              : null,
+            follow_up_date: detailed
+              ? document.querySelector<HTMLInputElement>("#follow-date")?.value
+              : null,
+            source,
+          }),
+        });
+      if (flyerRemoved)
+        await fetchJson(
+          `/api/canvassing/households/${active.household_id}/flyer-status`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              flyer_delivered: false,
+              occurred_at: occurredAt,
+              reason: "manual correction from household drawer",
+              source,
+            }),
+          },
+        );
       await refresh();
-      toast("Visit appended");
+      toast(
+        flyerRemoved && !outcome
+          ? "Flyer status removed; history preserved"
+          : "Household status updated",
+      );
     } finally {
       submitting = false;
       document
-        .querySelectorAll<HTMLButtonElement>(
-          ".quick-actions button,#save-detail",
-        )
+        .querySelectorAll<HTMLButtonElement>(".visit-commands button")
         .forEach((button) => (button.disabled = false));
     }
   }
   async function refresh() {
     state = await fetchJson<State>("/api/canvassing/state");
     byStructure.clear();
+    byAddress.clear();
     for (const h of state.households) {
+      byAddress.set(h.address_id, h);
       if (h.structure_id)
         byStructure.set(h.structure_id, [
           ...(byStructure.get(h.structure_id) ?? []),
@@ -739,16 +2281,62 @@ export async function canvassingMain() {
       if (active?.household_id === h.household_id) active = h;
     }
     for (const feature of structures.features) {
-      const homes = byStructure.get(feature.properties.structure_id) ?? [];
+      const homes = homesForStructure(feature);
       feature.properties.status =
         homes.sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
           ?.status ?? "untouched";
+      feature.properties.household_count = homes.length;
+      const civicNumbers = [
+        ...new Set(homes.map((home) => home.civic_number)),
+      ].sort((left, right) =>
+        left.localeCompare(right, undefined, { numeric: true }),
+      );
+      const inferredOnly =
+        homes.length > 0 &&
+        homes.every(
+          (home) =>
+            home.association_status === "inferred_range" &&
+            !home.number_corrected,
+        );
+      feature.properties.civic_numbers = civicNumbers;
+      feature.properties.civic_label = civicNumbers.length
+        ? civicNumbers.length <= 3
+          ? `${inferredOnly ? "~" : ""}${civicNumbers.join(" / ")}`
+          : `${inferredOnly ? "~" : ""}${civicNumbers[0]} +${civicNumbers.length - 1}`
+        : "";
     }
     for (const feature of addresses.features) {
-      feature.properties.status =
-        state.households.find(
-          (h) => h.address_id === feature.properties.address_id,
-        )?.status ?? "untouched";
+      const home = byAddress.get(String(feature.properties.address_id));
+      const eligible = Boolean(
+        home && !isKnownNonResidential(home) && isCoverageEligible(home),
+      );
+      const covered = Boolean(home && eligible && isCoverageCovered(home));
+      feature.properties.household_id = home?.household_id;
+      feature.properties.status = home?.status ?? "untouched";
+      feature.properties.selected = Boolean(
+        home && selected.has(home.household_id),
+      );
+      feature.properties.eligible = eligible;
+      feature.properties.covered = covered;
+      feature.properties.eligible_count = eligible ? 1 : 0;
+      feature.properties.covered_count = covered ? 1 : 0;
+      feature.properties.remaining_count = eligible && !covered ? 1 : 0;
+    }
+    coverageAdjacencyGraph = buildHouseholdAdjacencyGraph(
+      coverageLocations(),
+      roads.features,
+    );
+    if (nextAreaPinned && nextAreaRecommendation) {
+      const updated = recommendationFromLocalArea(
+        calculateLocalCoverageArea(
+          nextAreaRecommendation.center_household_id,
+          coverageLocations(),
+          coverageAdjacencyGraph,
+        ),
+      );
+      nextAreaRecommendation = updated
+        ? { ...updated, cluster_id: nextAreaRecommendation.cluster_id }
+        : null;
     }
     (map.getSource("structures") as GeoJSONSource | undefined)?.setData(
       structures,
@@ -756,6 +2344,8 @@ export async function canvassingMain() {
     (map.getSource("addresses") as GeoJSONSource | undefined)?.setData(
       addresses,
     );
+    map.once("idle", scheduleNextAreaUpdate);
+    updateLabels();
     renderSummary();
     if (active) showHouseholds([active]);
   }
@@ -988,6 +2578,8 @@ export async function canvassingMain() {
     const stops = state.route_stops.filter((s) => s.route_id === current),
       done = stops.filter((s) => s.completed_at).length,
       points = stops.map((stop) => [stop.lon, stop.lat] as [number, number]);
+    const mobileRouteBar = document.querySelector<HTMLElement>("#mobile-route-bar");
+    if (mobileRouteBar) mobileRouteBar.hidden = !current;
     let straight = 0;
     for (let index = 1; index < points.length; index++)
       straight += metresBetween(points[index - 1], points[index]);
@@ -1162,6 +2754,7 @@ export async function canvassingMain() {
       `<span class="location-stat">Accuracy ${accuracy.toFixed(0)} m</span>${selectedDistance == null ? "" : `<span class="location-stat">Selected ${selectedDistance.toFixed(0)} m</span>`}${nearest ? `<span class="location-stat">Nearest unfinished ${nearest.label} · ${metresBetween([lon, lat], [nearest.lon, nearest.lat]).toFixed(0)} m</span>` : ""}`,
     );
     document.querySelector<HTMLButtonElement>("#recenter")!.disabled = false;
+    syncMobileLocationControl();
   }
   function toggleLocation() {
     if (locationWatch != null) {
@@ -1172,6 +2765,7 @@ export async function canvassingMain() {
         { type: "FeatureCollection", features: [] },
       );
       document.querySelector("#locate")!.textContent = "Locate";
+      syncMobileLocationControl();
       return;
     }
     if (!navigator.geolocation) return toast("Geolocation is unavailable");
@@ -1184,12 +2778,86 @@ export async function canvassingMain() {
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
     );
     document.querySelector("#locate")!.textContent = "Stop location";
+    syncMobileLocationControl();
+  }
+  function applySelectionFeatureState() {
+    if (!map.getSource("structures") || !map.getSource("addresses")) return;
+    const nextStructures = new Set<string>(),
+      nextAddresses = new Set<string>();
+    for (const householdId of selected) {
+      for (const structureId of structureIdsByHousehold.get(householdId) ?? [])
+        nextStructures.add(structureId);
+      const home = state.households.find(
+        (candidate) => candidate.household_id === householdId,
+      );
+      if (home) nextAddresses.add(home.address_id);
+    }
+    for (const structureId of selectedStructureStates)
+      if (!nextStructures.has(structureId))
+        map.setFeatureState(
+          { source: "structures", id: structureId },
+          { selected: false },
+        );
+    for (const structureId of nextStructures)
+      if (!selectedStructureStates.has(structureId))
+        map.setFeatureState(
+          { source: "structures", id: structureId },
+          { selected: true },
+        );
+    for (const addressId of selectedAddressStates)
+      if (!nextAddresses.has(addressId))
+        map.setFeatureState(
+          { source: "addresses", id: addressId },
+          { selected: false },
+        );
+    for (const addressId of nextAddresses)
+      if (!selectedAddressStates.has(addressId))
+        map.setFeatureState(
+          { source: "addresses", id: addressId },
+          { selected: true },
+        );
+    selectedStructureStates = nextStructures;
+    selectedAddressStates = nextAddresses;
   }
   function updateSelection() {
-    document.querySelector("#selection-count")!.textContent = String(
-      selected.size,
-    );
+    applySelectionFeatureState();
+    const count = selected.size,
+      multiSelect = document.querySelector<HTMLButtonElement>("#multi-select")!,
+      bulkFlyer = document.querySelector<HTMLButtonElement>("#bulk-flyer")!,
+      clear = document.querySelector<HTMLButtonElement>("#clear-selection")!,
+      status = document.querySelector<HTMLElement>("#bulk-selection-status")!,
+      bar = document.querySelector<HTMLElement>("#bulk-selection-bar")!;
+    document.querySelector("#selection-count")!.textContent = String(count);
+    multiSelect.textContent = multiSelectMode ? "Done selecting" : "Bulk flyer";
+    multiSelect.setAttribute("aria-pressed", String(multiSelectMode));
+    multiSelect.classList.toggle("active", multiSelectMode);
+    status.textContent = submitting
+      ? `Saving ${count} household${count === 1 ? "" : "s"}...`
+      : multiSelectMode
+        ? count
+          ? `${count} household${count === 1 ? "" : "s"} selected`
+          : "Tap each roof to select it"
+        : count
+          ? `${count} household${count === 1 ? "" : "s"} ready`
+          : "Tap Bulk flyer, then tap roofs";
+    bulkFlyer.textContent = submitting
+      ? "Saving..."
+      : count
+        ? `Mark ${count} flyered`
+        : "Mark selected flyered";
+    bulkFlyer.disabled = count === 0 || submitting;
+    clear.disabled = count === 0;
+    bar.classList.toggle("has-selection", count > 0);
+    bar.classList.toggle("active", multiSelectMode);
+    document
+      .querySelector(".canvass-shell")!
+      .classList.toggle("multi-selecting", multiSelectMode);
+    persist({
+      multi_select: multiSelectMode,
+      selected_household_ids: [...selected],
+    });
   }
+  updateSelection();
   const orderGeographically = (
     homes: Household[],
     start?: [number, number],
@@ -1339,29 +3007,76 @@ export async function canvassingMain() {
       await refresh();
       toast(`Route created: ${result.id.slice(0, 8)}`);
     });
+  document.querySelector("#multi-select")!.addEventListener("click", () => {
+    multiSelectMode = !multiSelectMode;
+    updateSelection();
+    toast(
+      multiSelectMode
+        ? "Tap roofs to add or remove them"
+        : `${selected.size} household${selected.size === 1 ? "" : "s"} kept selected`,
+    );
+  });
+  document.querySelector("#clear-selection")!.addEventListener("click", () => {
+    selected.clear();
+    updateSelection();
+    toast("Selection cleared");
+  });
   document.querySelector("#bulk-flyer")!.addEventListener("click", async () => {
-    if (submitting) return;
+    if (submitting || !selected.size) return;
+    const householdIds = [...selected];
+    const batchKey = crypto.randomUUID();
     submitting = true;
+    updateSelection();
     try {
-      for (const household_id of selected)
-        await fetchJson("/api/canvassing/visits", {
-          method: "POST",
-          body: JSON.stringify({
-            submission_key: crypto.randomUUID(),
-            session_id: activeSessionId || null,
-            household_id,
-            outcome: "flyer_delivered",
-            flyer_delivered: true,
-            door_knocked: false,
-            source: "volunteer",
+      const results = await Promise.allSettled(
+        householdIds.map((household_id) =>
+          fetchJson("/api/canvassing/visits", {
+            method: "POST",
+            body: JSON.stringify({
+              submission_key: `${batchKey}:${household_id}`,
+              session_id: activeSessionId || null,
+              household_id,
+              outcome: "flyer_delivered",
+              flyer_delivered: true,
+              door_knocked: false,
+              source: document.querySelector<HTMLInputElement>(
+                "#volunteer-mode",
+              )!.checked
+                ? "volunteer"
+                : "candidate",
+            }),
           }),
-        });
+        ),
+      );
+      const failedIds = householdIds.filter(
+        (_, index) => results[index].status === "rejected",
+      );
       selected.clear();
+      failedIds.forEach((id) => selected.add(id));
+      multiSelectMode = failedIds.length > 0;
       updateSelection();
-      await refresh();
-      toast("Selected addresses marked flyer delivered");
+      const savedCount = householdIds.length - failedIds.length;
+      toast(
+        failedIds.length
+          ? `${savedCount} marked flyered; ${failedIds.length} still selected for retry`
+          : `${savedCount} household${
+              savedCount === 1 ? "" : "s"
+            } marked flyer delivered`,
+      );
+      void refresh().catch((error) =>
+        toast(
+          error instanceof Error
+            ? `Saved, but map refresh failed: ${error.message}`
+            : "Saved, but map refresh failed",
+        ),
+      );
+    } catch (error) {
+      toast(
+        error instanceof Error ? error.message : "Bulk flyer update failed",
+      );
     } finally {
       submitting = false;
+      updateSelection();
     }
   });
   document.querySelector("#active-route")!.addEventListener("change", () => {
@@ -1434,15 +3149,49 @@ export async function canvassingMain() {
       value === "all" ? null : ["==", ["get", "status"], value],
     );
     map.setFilter(
-      "address-points",
+      "estimated-structure-outlines",
       value === "all"
-        ? ["!", ["has", "point_count"]]
+        ? ["==", ["get", "geometry_provenance"], "estimated"]
         : [
             "all",
-            ["!", ["has", "point_count"]],
+            ["==", ["get", "geometry_provenance"], "estimated"],
             ["==", ["get", "status"], value],
           ],
     );
+    map.setFilter(
+      "city-map-structure-outlines",
+      value === "all"
+        ? ["==", ["get", "external_source"], "owen_sound_city_map_pdf"]
+        : [
+            "all",
+            ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
+            ["==", ["get", "status"], value],
+          ],
+    );
+    map.setFilter(
+      "address-points",
+      value === "all"
+        ? [
+            "all",
+            ["!", ["has", "point_count"]],
+            [
+              "any",
+              ["!", ["has", "structure_id"]],
+              ["==", ["get", "structure_id"], ""],
+            ],
+          ]
+        : [
+            "all",
+            ["!", ["has", "point_count"]],
+            [
+              "any",
+              ["!", ["has", "structure_id"]],
+              ["==", ["get", "structure_id"], ""],
+            ],
+            ["==", ["get", "status"], value],
+          ],
+    );
+    updateLabels();
   });
   document
     .querySelector("#volunteer-mode")!
@@ -1454,14 +3203,104 @@ export async function canvassingMain() {
     });
   document.querySelector("#coverage-toggle")!.addEventListener("click", () => {
     coverage = !coverage;
+    persist({ coverage_mode: coverage });
+    setCoverageMode(coverage);
     map.easeTo({ zoom: coverage ? 12.2 : 15 });
-    toast(coverage ? "Coverage aggregation enabled" : "Household view enabled");
+    toast(
+      coverage
+        ? "Bubbles show eligible households remaining; tap one for coverage totals"
+      : "Individual household view enabled",
+    );
   });
+  const findNextArea = async () => {
+    await recalculateNextArea();
+    toast(
+      nextAreaRecommendation
+        ? "Next underflyered area recalculated"
+        : "Citywide coverage is complete",
+    );
+  };
+  document.querySelector("#find-next-area")!.addEventListener("click", () => {
+    void findNextArea();
+  });
+  const openMobileMenu = () => setMobilePanel(mobilePanels[0], true);
+  const openMobileCoverage = () => {
+    refreshMobileCoverageLegend();
+    setMobilePanel(mobilePanels[1], true);
+  };
+  const openMobileSummary = () => {
+    const summary = document.querySelector("#summary"),
+      target = document.querySelector("#mobile-summary-content");
+    if (summary && target) target.innerHTML = summary.innerHTML;
+    setMobilePanel(mobilePanels[2], true);
+  };
+  document.querySelector("#mobile-menu")!.addEventListener("click", openMobileMenu);
+  document.querySelector("#mobile-coverage")!.addEventListener("click", openMobileCoverage);
+  document.querySelector("#mobile-menu-close")!.addEventListener("click", () => setMobilePanel(mobilePanels[0], false));
+  document.querySelector("#mobile-coverage-close")!.addEventListener("click", () => setMobilePanel(mobilePanels[1], false));
+  document.querySelector("#mobile-summary-close")!.addEventListener("click", () => setMobilePanel(mobilePanels[2], false));
+  document.querySelector("#mobile-summary-open")!.addEventListener("click", openMobileSummary);
+  document.querySelector("#mobile-find-next-area")!.addEventListener("click", () => {
+    setMobilePanel(mobilePanels[0], false);
+    void findNextArea();
+  });
+  document.querySelector("#mobile-tools-open")!.addEventListener("click", openMobileTools);
+  document.querySelector("#mobile-tools-close")!.addEventListener("click", closeMobileTools);
+  document.querySelector("#mobile-bulk-open")!.addEventListener("click", () => {
+    setMobilePanel(mobilePanels[0], false);
+    document.querySelector<HTMLButtonElement>("#multi-select")!.click();
+  });
+  const forwardMobileAction = (source: string) => {
+    setMobilePanel(mobilePanels[0], false);
+    document.querySelector<HTMLButtonElement>(source)?.click();
+  };
+  document.querySelector("#mobile-followup-open")!.addEventListener("click", () => forwardMobileAction("#followup-open"));
+  document.querySelector("#mobile-conversation-open")!.addEventListener("click", () => forwardMobileAction("#conversation-open"));
+  document.querySelector("#mobile-recruitment-open")!.addEventListener("click", () => forwardMobileAction("#recruitment-open"));
+  document.querySelector("#mobile-quality-open")!.addEventListener("click", () => forwardMobileAction("#quality-open"));
+  document.querySelector("#mobile-import-open")!.addEventListener("click", () => forwardMobileAction("#import-open"));
+  document.querySelector("#mobile-print-open")!.addEventListener("click", () => forwardMobileAction("#print-route"));
+  document.querySelector("#mobile-locate")!.addEventListener("click", () => {
+    if (currentPosition) document.querySelector<HTMLButtonElement>("#recenter")!.click();
+    else document.querySelector<HTMLButtonElement>("#locate")!.click();
+  });
+  document.querySelector("#mobile-previous-stop")!.addEventListener("click", () => document.querySelector<HTMLButtonElement>("#previous-stop")!.click());
+  document.querySelector("#mobile-next-stop")!.addEventListener("click", () => document.querySelector<HTMLButtonElement>("#next-stop")!.click());
+  document.querySelector("#mobile-mark-stop")!.addEventListener("click", () => {
+    const save = document.querySelector<HTMLButtonElement>("#save-visit");
+    if (save) save.click();
+    else toast("Select the current route stop first");
+  });
+  document.querySelector("#mobile-route-more")!.addEventListener("click", openMobileTools);
+  document.querySelector("#drawer")!.addEventListener("click", (event) => {
+    if ((event.target as HTMLElement).closest("#drawer-close")) closeMobileDrawer();
+  });
+  let drawerTouchStartY = 0;
+  document.querySelector("#drawer")!.addEventListener("touchstart", (event) => {
+    drawerTouchStartY = (event as TouchEvent).changedTouches[0]?.clientY ?? 0;
+  }, { passive: true });
+  document.querySelector("#drawer")!.addEventListener("touchend", (event) => {
+    if (((event as TouchEvent).changedTouches[0]?.clientY ?? drawerTouchStartY) - drawerTouchStartY > 56)
+      closeMobileDrawer();
+  }, { passive: true });
   const qualityDialog =
     document.querySelector<HTMLDialogElement>("#quality-dialog")!;
   document.querySelector("#quality-open")!.addEventListener("click", () => {
     document.querySelector("#quality-metrics")!.innerHTML =
-      `<dl>${Object.entries(addressQuality.totals)
+      `<h3>Roof coverage</h3><dl>${Object.entries(buildingCoverage)
+        .filter(
+          ([key, value]) =>
+            key !== "generated_at" &&
+            key !== "association_counts" &&
+            typeof value === "number",
+        )
+        .map(
+          ([key, value]) =>
+            `<div><dt>${key.replaceAll("_", " ")}</dt><dd>${Number(value).toLocaleString()}</dd></div>`,
+        )
+        .join("")}</dl><h3>Address quality</h3><dl>${Object.entries(
+        addressQuality.totals,
+      )
         .map(
           ([key, value]) =>
             `<div><dt>${key.replaceAll("_", " ")}</dt><dd>${Number(value).toLocaleString()}</dd></div>`,

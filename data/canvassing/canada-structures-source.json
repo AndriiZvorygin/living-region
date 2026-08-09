@@ -1,0 +1,21 @@
+{
+  "dataset": "Canada Structures",
+  "dataset_id": "3829eee9-f898-4643-9ad8-f48575b8873d",
+  "resource": "ON_Structures_EN",
+  "organization": "Public Safety Canada",
+  "source_url": "https://open.canada.ca/data/dataset/3829eee9-f898-4643-9ad8-f48575b8873d/resource/f7fdee7d-09dd-4eb6-88fd-2234ad701309/download/on_structures_en.gpkg",
+  "source_last_modified": "2025-09-17T16:07:45.430467",
+  "retrieved_at": "2026-07-24T15:11:15.583Z",
+  "licence": "Open Government Licence - Canada",
+  "citation": "Sandison J., Hayes S., Darlington C., Chastko K., & Ballard M. (2025). Canada Structures. https://doi.org/10.82126/z1bc-zd72",
+  "source_crs": "PCS Lambert Conformal Conic GRS80; exported to OGC:CRS84 / EPSG:4326",
+  "clip_bbox_wgs84": [
+    -80.97,
+    44.53,
+    -80.88,
+    44.62
+  ],
+  "clip_features": 6629,
+  "clip_sha256": "d7839678b50e002953ebc011428fd89c5cd9151a42086027976e3d5d3c03e733",
+  "preprocessing": "GDAL spatial-filtered range read from the Ontario GeoPackage; exact municipal-boundary filtering occurs during canvassing preparation."
+}

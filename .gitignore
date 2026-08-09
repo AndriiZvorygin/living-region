@@ -1,4 +1,5 @@
 node_modules/
+__pycache__/
 packages/*/dist/
 know/produce/
 coverage/

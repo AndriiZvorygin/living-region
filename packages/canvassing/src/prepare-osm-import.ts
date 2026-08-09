@@ -21,7 +21,12 @@ function geometryResult(geometry: any) {
 
 async function main() {
   const source = JSON.parse(await readFile(input, "utf8"));
-  const features = source.features.map((feature: any) => ({
+  const features = source.features
+    .filter(
+      (feature: any) =>
+        feature.properties.external_source === "openstreetmap",
+    )
+    .map((feature: any) => ({
     type: "Feature",
     properties: {
       source_footprint_id: feature.properties.external_id,
@@ -32,7 +37,7 @@ async function main() {
       candidate_import_batch: null,
     },
     geometry: feature.geometry,
-  }));
+    }));
   const collection = {
     type: "FeatureCollection",
     metadata: {
