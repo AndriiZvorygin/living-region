@@ -3,32 +3,33 @@ import {readCsv, number, round, writeCsv, writeJson, writeText, format} from './
 
 const assumptions = readCsv('data/source/livestock-assumptions.csv');
 const byId = Object.fromEntries(assumptions.map(row => [row.id, row]));
-const modules = {
-  plants_only: [],
-  plants_plus_chickens: ['small_layer_flock'],
-  plants_plus_rabbits: ['small_meat_rabbitry'],
-  plants_plus_chickens_rabbits: ['small_layer_flock', 'small_meat_rabbitry']
+export const moduleDefinitions = {
+  plants_only: {ids: [], label: 'Plants only'},
+  small_egg_flock: {ids: ['small_layer_flock'], label: 'Small egg flock'},
+  rabbits: {ids: ['small_meat_rabbitry'], label: 'Rabbits'},
+  combined_livestock: {ids: ['small_layer_flock', 'small_meat_rabbitry'], label: 'Combined livestock'},
+  on_site_feed_constrained_livestock: {ids: ['small_layer_flock', 'small_meat_rabbitry'], label: 'On-site-feed-constrained livestock', feed_fraction_override: 1, feed_area_budget_ha: .10}
 };
-const maturePerennialFoodShareTarget = .75;
+export const maturePerennialFoodShareTarget = .75;
 const transitionLossReserve = .30;
 
 function n(value, fallback = 0) { return number(value) ?? fallback; }
 function sum(rows, key) { return rows.reduce((total, row) => total + n(row[key]), 0); }
 
-function animalOutputs(ids, siteMultiplier) {
+function animalOutputs(ids, siteMultiplier, scale = 1, feedFractionOverride = null) {
   return ids.map(id => {
     const row = byId[id];
-    const totalFeed = n(row.total_feed_dm_kg_year);
-    const propertyFeed = totalFeed * n(row.on_property_feed_fraction);
+    const totalFeed = n(row.total_feed_dm_kg_year) * scale;
+    const propertyFeed = totalFeed * (feedFractionOverride ?? n(row.on_property_feed_fraction));
     const perennialFeed = totalFeed * n(row.perennial_feed_fraction_of_total);
     return {
       id,
       animal: row.animal,
       unit_definition: row.unit_definition,
-      food_output_kg_year: n(row.food_output_kg_year),
-      food_energy_gj_year: n(row.food_energy_gj_year),
-      food_protein_kg_year: n(row.food_protein_kg_year),
-      food_fat_kg_year: n(row.food_fat_kg_year),
+      food_output_kg_year: n(row.food_output_kg_year) * scale,
+      food_energy_gj_year: n(row.food_energy_gj_year) * scale,
+      food_protein_kg_year: n(row.food_protein_kg_year) * scale,
+      food_fat_kg_year: n(row.food_fat_kg_year) * scale,
       feed_dry_matter_requirement_kg_year: totalFeed,
       feed_energy_requirement_gj_year: totalFeed * n(row.feed_energy_gj_per_kg_dm),
       feed_protein_requirement_kg_year: totalFeed * n(row.feed_protein_fraction),
@@ -46,14 +47,20 @@ function animalOutputs(ids, siteMultiplier) {
       physical_intensity_for_older_resident: row.physical_intensity_older_resident,
       feed_protein_fraction: n(row.feed_protein_fraction),
       source: row.source,
-      notes: row.notes
+      notes: row.notes,
+      scale,
+      feed_fraction_override: feedFractionOverride
     };
   });
 }
 
 function macroTotals(row, plantEnergy, perennialEnergy, annualEnergy, animalRows) {
   const annualPerGJ = row.annual_crop_macro_delivered_per_gj;
-  const perennialPerGJ = Object.fromEntries(Object.entries(row.perennial_mature_mix_macro_output_per_ha).map(([key, value]) => [key, n(value) * (1 - transitionLossReserve) / (row.perennial_mature_mix_gross_yield_gj_ha_year * (1 - transitionLossReserve))]));
+  const perennialPerGJ = {
+    protein: n(row.perennial_mature_mix_macro_output_per_ha.protein_kg_ha) / n(row.perennial_mature_mix_gross_yield_gj_ha_year),
+    fat: n(row.perennial_mature_mix_macro_output_per_ha.fat_kg_ha) / n(row.perennial_mature_mix_gross_yield_gj_ha_year),
+    carbohydrate: n(row.perennial_mature_mix_macro_output_per_ha.carbohydrate_kg_ha) / n(row.perennial_mature_mix_gross_yield_gj_ha_year)
+  };
   const plant = {
     protein_kg_year: annualEnergy * n(annualPerGJ.protein) + perennialEnergy * n(perennialPerGJ.protein),
     fat_kg_year: annualEnergy * n(annualPerGJ.fat) + perennialEnergy * n(perennialPerGJ.fat),
@@ -67,14 +74,18 @@ function macroTotals(row, plantEnergy, perennialEnergy, annualEnergy, animalRows
   return {plant, animal, total: Object.fromEntries(Object.keys(plant).map(key => [key, round(plant[key] + animal[key], 6)]))};
 }
 
-function maturityScenario(row, module, siteMultiplier) {
-  const animalRows = animalOutputs(modules[module], siteMultiplier);
+export function calculateMatureScenario(row, module, siteMultiplier, perennialShare = maturePerennialFoodShareTarget) {
+  const moduleDefinition = moduleDefinitions[module];
+  if (!moduleDefinition) throw new Error(`Unknown livestock module: ${module}`);
+  const unitFeedArea = moduleDefinition.ids.reduce((total, id) => total + n(byId[id].total_feed_dm_kg_year) / (n(byId[id].feed_dm_yield_t_ha_year) * 1000 * siteMultiplier), 0);
+  const scale = moduleDefinition.feed_area_budget_ha ? Math.min(1, moduleDefinition.feed_area_budget_ha / unitFeedArea) : 1;
+  const animalRows = animalOutputs(moduleDefinition.ids, siteMultiplier, scale, moduleDefinition.feed_fraction_override ?? null);
   const animalEnergy = sum(animalRows, 'food_energy_gj_year');
   const householdDemand = row.household_food_demand_gj_year;
   const plantDemand = Math.max(0, householdDemand - animalEnergy);
   const perennialNetYield = row.perennial_mature_mix_gross_yield_gj_ha_year * (1 - transitionLossReserve);
   const annualNetYield = row.annual_crop_gross_yield_gj_ha_year * (1 - transitionLossReserve);
-  const perennialEnergy = plantDemand * maturePerennialFoodShareTarget;
+  const perennialEnergy = plantDemand * perennialShare;
   const annualEnergy = plantDemand - perennialEnergy;
   const perennialArea = perennialEnergy / perennialNetYield;
   const annualArea = annualEnergy / annualNetYield;
@@ -104,7 +115,7 @@ function maturityScenario(row, module, siteMultiplier) {
   const lowReplantingEnergy = perennialEnergy + animalRows.reduce((total, animal) => total + animal.food_energy_gj_year * (Math.min(animal.perennial_feed_dry_matter_kg_year, animal.on_property_feed_dry_matter_kg_year) / Math.max(1, animal.feed_dry_matter_requirement_kg_year)), 0);
   return {
     module,
-    module_label: module.replaceAll('_', ' '),
+    module_label: moduleDefinition.label,
     household: row.household,
     household_label: row.household_label,
     site: row.site,
@@ -117,6 +128,8 @@ function maturityScenario(row, module, siteMultiplier) {
     animals: animalRows,
     labour: {plant_recurring_labour_hours: round(plantRecurringHours, 2), livestock_recurring_labour_hours: round(livestockHours, 2), total_recurring_labour_hours: round(plantRecurringHours + livestockHours, 2), annual_soil_preparation_area_ha: round(annualArea, 6), annual_soil_preparation_hours: round(annualArea * 45, 2), physical_intensity_for_older_resident: annualArea > .1 || livestockHours > 150 ? 'moderate-high' : 'moderate', recurring_labour_note: 'Plant hours use the transition labour classifications and animal hours are explicit module planning assumptions. Establishment labour is excluded from this mature comparison.'},
     ageing_in_place: {perennial_food_energy_percent: round(perennialEnergy / householdDemand * 100, 3), food_energy_without_annual_soil_preparation_percent: round(lowReplantingEnergy / householdDemand * 100, 3), annual_replanting_reduction_relative_to_full_annual_bridge_percent: round((1 - annualArea / (householdDemand / annualNetYield)) * 100, 3)},
+    mature_perennial_food_share: perennialShare,
+    module_definition: moduleDefinition,
     evidence_boundary: 'Livestock modules are optional illustrative household units, not ARC requirements. Feed conversion, output, feed-area yield and labour are modelled planning assumptions bounded by the cited extension guidance.'
   };
 }
@@ -148,14 +161,14 @@ Sources: [UMN laying hens](https://extension.umn.edu/small-scale-poultry/raising
 }
 
 export function buildLivestockScenarios(transitionOutput) {
-  const scenarios = transitionOutput.households.flatMap(row => Object.keys(modules).map(module => maturityScenario(row, module, transitionOutput.site_classes[row.site].food_multiplier)));
+  const scenarios = transitionOutput.households.flatMap(row => Object.keys(moduleDefinitions).map(module => calculateMatureScenario(row, module, transitionOutput.site_classes[row.site].food_multiplier)));
   const output = {
     model: 'optional livestock and mature low-recurring-labour food modules',
     status: 'current evidence-based planning module; optional and not a canonical ARC requirement',
     mature_perennial_food_share_target: maturePerennialFoodShareTarget,
     transition_loss_reserve_fraction: transitionLossReserve,
     assumptions,
-    modules,
+    modules: moduleDefinitions,
     scenarios,
     limitations: ['Animal output and feed conversion are planning assumptions rather than Grey-Bruce household trials.', 'Feed area is represented as additional land and not overlapped with human food area.', 'Protein coverage is a screening calculation and does not establish complete dietary adequacy.', 'Manure is listed as a nutrient-recycling output but nutrient balances and pathogen handling are not yet modelled.']
   };

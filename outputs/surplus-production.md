@@ -1,6 +1,8 @@
-# Deliberate surplus and cash output
+# Baseline deliberate surplus and cash output
 
 At one total hectare on the ordinary site, the central model allocates 0.35 ha to shared dwelling heating. For one adult, the 1 ha ARC allocation leaves 8.24 GJ/year of post-loss, post-reserve food surplus after household demand. For two adults plus two children, the 2 ha ARC allocation leaves 15.36 GJ/year under the same shared-dwelling assumption. These are scenario outputs, not promises of saleable surplus in every year.
+
+These surplus figures use the pre-ageing baseline capacity layer. The mature ageing-in-place land test is reported separately because its perennial share, annual resilience and recurring labour constraints change the robust total.
 
 The land comparison is intentionally based on adult count: a 1 adult + child household is evaluated against 1 ha, while 2 adults + 1/2/3 children are evaluated against 2 ha. Adult-equivalents are shown only beside household food demand.
 

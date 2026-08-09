@@ -1,4 +1,4 @@
-# Household capacity
+# Baseline household capacity (before ageing-in-place mature constraint)
 
 Food and heat are calculated separately. Food demand uses current Health Canada EER equations; children are not counted as full adults. The adult-equivalent is a **food-energy normalization only**. It is not multiplied into total land, because dwelling heat and ecological/infrastructure functions are shared at the household/site level.
 
@@ -26,6 +26,8 @@ The ARC comparison allocation is 1 ha for a one-adult household and 2 ha for a t
 | Marginal/shallow-rocky | 2 adults + 3 children | 16.68 | 4.29 | 1.87 ha | 0.58 ha | 0.92 ha | **3.37 ha** | 2 ha | **-1.37 ha** | -4.03 |
 
 The mathematical minimum is food plus shared dwelling heating. The robust-system column adds explicit allowances for crop diversity/rotation, perennial soil/water buffers, fibre/habitat/wildlife protection and deliberate export production. Those allowances are design choices, not hidden biological constants.
+
+This is the pre-ageing baseline capacity layer. The canonical mature plants-only land/labour recommendation, which adds the solved perennial-share and recurring-labour constraints, is in outputs/mature-food-system-canonical.md.
 
 The ordinary representative one-adult food mix passes the simple macro screening check in the derived JSON: {"protein":15.183,"fat":22.109,"carbohydrate":62.709} of food energy from protein/fat/carbohydrate and 87 g protein/day against the explicit 52 g/day screening threshold. This does not establish micronutrient sufficiency, amino-acid quality, dietary acceptability or seasonal availability.
 

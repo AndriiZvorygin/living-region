@@ -246,7 +246,7 @@ test('labour source exposes annual preparation and perennial recurring classes',
 test('optional livestock modules account for feed and maintain land separation', () => {
   const result = buildFoodForestTransition();
   const rows = result.livestock.scenarios.filter(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
-  assert.deepEqual(rows.map(row => row.module), ['plants_only', 'plants_plus_chickens', 'plants_plus_rabbits', 'plants_plus_chickens_rabbits']);
+  assert.deepEqual(rows.map(row => row.module), ['plants_only', 'small_egg_flock', 'rabbits', 'combined_livestock', 'on_site_feed_constrained_livestock']);
   for (const row of rows) {
     close(row.human_food_energy.total_gj_year, row.household_food_demand_gj_year, 1e-6);
     close(row.feed.dry_matter_requirement_kg_year, row.feed.on_property_dry_matter_kg_year + row.feed.purchased_dry_matter_kg_year, 1e-6);
@@ -257,4 +257,52 @@ test('optional livestock modules account for feed and maintain land separation',
   assert.equal(rows[0].human_food_energy.livestock_gj_year, 0);
   assert.ok(rows[1].feed.purchased_dry_matter_kg_year > 0);
   assert.ok(rows[3].labour.total_recurring_labour_hours > rows[0].labour.total_recurring_labour_hours);
+  const constrained = rows[4];
+  assert.equal(constrained.feed.purchased_dry_matter_kg_year, 0);
+  assert.ok(constrained.animals.every(animal => animal.scale < 1));
+  assert.ok(constrained.land.livestock_feed_area_ha <= .1 + 1e-9);
+});
+
+test('protein g/day and percentage coverage use distinct audited units and denominators', () => {
+  const result = buildFoodForestTransition();
+  const row = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
+  const full = row.protein_audit.full_perennial_calorie_case;
+  const comparison = row.protein_audit.mature_75_25_comparison_case;
+  close(full.protein_g_day, full.protein_kg_year * 1000 / 365.25, .001);
+  close(full.coverage_percent, full.protein_g_day / full.target_g_day * 100, .001);
+  close(comparison.protein_g_day, comparison.protein_kg_year * 1000 / 365.25, .001);
+  close(comparison.coverage_percent, comparison.protein_g_day / row.protein_audit.target_g_day * 100, .001);
+  close(full.protein_g_day, 41.676, .001);
+  close(full.coverage_percent, 80.146, .01);
+  assert.ok(comparison.protein_g_day > 50);
+  assert.ok(comparison.coverage_percent > 100);
+  assert.notEqual(full.protein_g_day, full.coverage_percent);
+  assert.match(result.protein_audit.discrepancy, /field-name bug/);
+});
+
+test('mature food-system canonical share is solved from labour, nutrition and resilience constraints', () => {
+  const result = buildFoodForestTransition();
+  const mature = result.mature_food_system;
+  assert.equal(mature.canonical_rows.length, 24);
+  assert.deepEqual(mature.tested_perennial_shares, [.5, .6, .7, .75, .8]);
+  for (const row of mature.canonical_rows) {
+    close(row.perennial_share_requested, .7, 1e-9);
+    assert.ok(row.protein_coverage_percent >= 100);
+    assert.ok(row.annual_food_resilience_share_percent >= 20);
+    assert.ok(row.recurring_labour.physically_demanding_annual_reduction_percent >= 70);
+  }
+  const ordinaryAdultMax = mature.max_share_summary.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
+  close(ordinaryAdultMax.biological_max_share, .774, .001);
+  assert.equal(ordinaryAdultMax.max_share_within_arc_allocation, null);
+  const family = mature.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_two_children');
+  close(family.mature_annual_area_ha + family.mature_perennial_area_ha + family.heating_area_ha, 1.863, .01);
+  assert.ok(family.total_robust_productive_area_ha > family.previous_robust_system_area_ha);
+  const marginalFamily = mature.canonical_rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults_plus_two_children');
+  const marginalLargerFamily = mature.canonical_rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults_plus_three_children');
+  assert.ok(marginalLargerFamily.recurring_labour.total_recurring_labour_hours > marginalFamily.recurring_labour.total_recurring_labour_hours);
+  assert.ok(marginalFamily.recurring_labour.annual_soil_preparation_hours > 0);
+  assert.ok(marginalFamily.recurring_labour.annual_planting_hours > 0);
+  assert.ok(marginalFamily.recurring_labour.annual_weeding_hours > 0);
+  assert.ok(marginalFamily.recurring_labour.perennial_pruning_maintenance_hours > 0);
+  assert.ok(marginalFamily.recurring_labour.perennial_harvest_hours > 0);
 });

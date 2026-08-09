@@ -4,7 +4,7 @@ The central perennial mix yields **10.5 GJ/ha/year gross** before the same 30% l
 
 For one adult on an ordinary site, the mature mix requires 0.46 ha at the 30% loss/reserve case to supply all food energy. The central 1 ha ARC allocation leaves 0.65 ha after shared heating, so the mature mix can cover the food energy in this scenario only if the resilience/ecological allowances are also accommodated elsewhere or the food mix/yield performs better than the central synthesis. At that full-calorie area, the coarse protein screen supplies 42 g/day against 52 g/day; this is a warning that calorie sufficiency is not nutritional adequacy.
 
-For ageing-in-place, the recommended mature design is a 75% perennial-plant / 25% annual-plant calorie split rather than a tree-only diet. On the ordinary one-adult row this requires 0.34 ha of perennial food and 0.04 ha of retained annual food at maturity. The optional livestock comparisons and their feed/labour requirements are in outputs/livestock-scenarios.md.
+For ageing-in-place, the 75% perennial-plant / 25% annual-plant split is a comparison scenario rather than a fixed recommendation. The solved mature plants-only trade-off is reported in `outputs/mature-food-system-canonical.md`; it selects the lowest tested perennial share meeting the explicit low-replanting, annual-resilience and macro-screen constraints. The optional livestock comparisons and their feed/labour requirements are in outputs/livestock-scenarios.md.
 
 | household | 25% food | 50% food | 75% food | 100% food | mature area available within ARC food envelope |
 |---|---:|---:|---:|---:|---:|

@@ -4,7 +4,7 @@ The objective is a succession from reliable annual staple calories toward a matu
 
 The separate ageing metric is **food energy produced without annual soil preparation/replanting**. In plants-only rows this equals perennial calorie percentage. Optional livestock can make the metric slightly broader when animal output is credited to perennial/on-property feed. Establishment labour is shown separately from mature recurring labour.
 
-The mature planning target retains **25% of plant calories from annual crops** for beans, vegetables, market production, seed, rotation and resilience. The underlying transition series also retains a no-annual-area sensitivity, but that is not the recommended ageing-in-place design.
+The **75% perennial / 25% annual** split in this file is a comparison series. It is not the canonical ARC mature-share recommendation. The canonical share is solved separately in `outputs/mature-food-system-canonical.md` using nutrition, annual resilience, site productivity and low-recurring-labour constraints. The underlying transition series also retains a no-annual-area sensitivity.
 
 ## Ordinary mesic site
 

@@ -12,21 +12,21 @@ The evidence-based model supports a **household/site-adjusted carrying-capacity 
 
 | household | favourable site | ordinary site | marginal site |
 |---|---:|---:|---:|
-| 1 adult | 0.95 ha | 1.11 ha | 1.53 ha |
-| 1 adult + 1 child | 1.09 ha | 1.25 ha | 1.85 ha |
-| 2 adults | 1.20 ha | 1.35 ha | 2.12 ha |
-| 2 adults + 1 child | 1.36 ha | 1.52 ha | 2.47 ha |
-| 2 adults + 2 children | 1.63 ha | 1.78 ha | 3 ha |
-| 2 adults + 3 children | 1.82 ha | 1.97 ha | 3.37 ha |
+| 1 adult | 1.13 ha | 1.28 ha | 1.88 ha |
+| 1 adult + 1 child | 1.40 ha | 1.55 ha | 2.46 ha |
+| 2 adults | 1.61 ha | 1.76 ha | 2.93 ha |
+| 2 adults + 1 child | 1.90 ha | 2.05 ha | 3.53 ha |
+| 2 adults + 2 children | 2.36 ha | 2.51 ha | 4.46 ha |
+| 2 adults + 3 children | 2.68 ha | 2.84 ha | 5.11 ha |
 
 The current ARC examples evaluate as follows:
 
 | ARC planning example | favourable | ordinary | marginal |
 |---|---|---|---|
-| 1 adult → 1 ha | sufficient against robust-area scenario; 0.05 ha | deficit against robust-area scenario; -0.11 ha | deficit against robust-area scenario; -0.53 ha |
-| 2 adults/family → 2 ha | sufficient against robust-area scenario; 0.80 ha | sufficient against robust-area scenario; 0.65 ha | deficit against robust-area scenario; -0.12 ha |
+| 1 adult → 1 ha | deficit against mature ageing-in-place scenario; -0.13 ha | deficit against mature ageing-in-place scenario; -0.28 ha | deficit against mature ageing-in-place scenario; -0.88 ha |
+| 2 adults/family → 2 ha | sufficient against mature ageing-in-place scenario; 0.39 ha | sufficient against mature ageing-in-place scenario; 0.24 ha | deficit against mature ageing-in-place scenario; -0.93 ha |
 
-Here “surplus/deficit” is allocation area minus robust productive area. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
+Here “surplus/deficit” is allocation area minus the canonical mature robust productive area. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
 
 Recommended website language: “Plan productive land by household and site. Calculate food land from household food energy, calculate shared dwelling heating land from the building heat load and woody productivity, then add explicit resilience, ecological and surplus allowances. Use 1 ha for a one-adult household and 2 ha for a two-adult household only as planning examples; verify adequacy against the household/site performance table. Children increase food demand without being converted into linear hectare units.”
 
@@ -42,7 +42,7 @@ The transition outputs in `outputs/food-forest-transition.md` and `outputs/house
 
 ## Ageing-in-place refinement
 
-The mature food-system objective is not maximum calorie density and not elimination of annual crops. The central mature planning target is 75% of plant food energy from perennial systems and 25% from annual beans, vegetables, market crops, seed, rotation and resilience. On the ordinary site, the one-adult annual-crop area falls from 0.15 ha in Year 1 to 0.04 ha at maturity, a 75% reduction in annual soil-preparation area. The household/site rows in outputs/ageing-in-place-labour.json report the corresponding Year 1, Year 5, Year 10 and mature values for every scenario.
+The mature food-system objective is not maximum calorie density and not elimination of annual crops. The solved ordinary-site plants-only trade-off selects 70% perennial food calories for one adult and 70% for two adults plus two children: the lowest tested share meeting the explicit reduction, annual-resilience and macro-screen constraints. The 75% case remains a sensitivity comparison. On the ordinary site, the one-adult annual-crop area falls from 0.15 ha in Year 1 to 0.04 ha at the solved mature share, a 70% reduction in annual cultivation area. The household/site rows in outputs/ageing-in-place-labour.json report the transition checkpoints; the solved land/labour table is in outputs/mature-food-system-canonical.md.
 
 The low-replanting metric is reported separately from perennial calories. For plants-only food it is the same percentage; livestock can contribute only to the extent that its food output is credited to perennial/on-property feed. Optional animals add protein and fat diversity but also add feed land, purchased feed, winter storage, manure handling and recurring labour. The canonical recommendation therefore remains plants plus a retained annual supplement, with livestock as a household choice rather than an ARC requirement.
 

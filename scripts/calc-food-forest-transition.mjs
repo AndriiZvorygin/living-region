@@ -7,6 +7,7 @@ import {calculateWoodyLand} from './calc-evidence-woody.mjs';
 import {buildHouseholdCapacity, householdProfiles, siteClasses, policySiteMap} from './calc-household-capacity.mjs';
 import {calculateFoodSystemLabour, calculateTransitionLabour} from './calc-food-system-labour.mjs';
 import {buildLivestockScenarios} from './calc-livestock.mjs';
+import {buildMatureFoodSystem} from './calc-mature-food-system.mjs';
 
 export const transitionYears = [1, 2, 3, 5, 8, 10, 15, 'mature'];
 const matureYear = 20;
@@ -210,14 +211,49 @@ function ageingInPlaceOutput(households) {
     };
   });
   return {
-    model: 'ageing-in-place food-system labour transition',
+    model: 'ageing-in-place food-system labour transition (75% comparison series)',
     strategy: 'progressive_handoff_with_mature_annual_reserve',
     metric_definition: 'food energy produced without annual soil preparation/replanting = perennial plant food energy plus any optional livestock output credited to perennial/on-property feed; plants-only rows therefore match perennial calorie percentage.',
     rows,
     mature_perennial_food_share_target: .75,
+    mature_perennial_food_share_status: 'comparison scenario; canonical mature share is solved in mature-food-system-canonical.json',
     mature_annual_food_share_retained_for_resilience: .25,
     labour_evidence: 'data/source/food-production-labour.csv uses categorical evidence-informed planning classifications and explicit non-field-study hour estimates.'
   };
+}
+
+function proteinAuditOutput(households) {
+  return {
+    model: 'protein-unit and denominator audit',
+    target_definition: 'Health Canada-derived screening target of 0.8 g protein per kg reference body mass per day; this is a screening target, not a complete dietary adequacy standard.',
+    rows: households.map(row => ({site: row.site, household: row.household, household_label: row.household_label, demand_gj_year: row.household_food_demand_gj_year, audit: row.protein_audit})),
+    discrepancy: 'The earlier approximately 42 g/day result is the full-perennial calorie case: 15.222 kg/year × 1,000 ÷ 365.25 = 41.676 g/day, which is 80.15% of 52 g/day. The later approximately 42% result came from the mature 75/25 plants-only scenario after a field-name bug dropped the perennial protein component and divided only annual-plant protein (7.985 kg/year) by the annual target (18.993 kg/year). The corrected 75/25 case is reported separately and no percentage is labelled as g/day.'
+  };
+}
+
+function proteinAuditMarkdown(output) {
+  const ordinary = output.rows.filter(row => row.site === 'ordinary_mesic');
+  return `# Protein calculation audit
+
+## Reconciled discrepancy
+
+The historical transition field reported approximately **41.676 g/day** for the ordinary one-adult full-perennial calorie case. Its denominator is the Health Canada-derived screening target of **52 g/day**, so the corresponding coverage is **80.15%**, not 42%.
+
+The later **42.04%** headline was not the same case. It came from the mature 75/25 plants-only scenario, and a field-name bug in the livestock macro calculation silently omitted the perennial protein contribution because the stored fields are named protein_kg_ha, fat_kg_ha and carbohydrate_kg_ha. After correction, the 75/25 case is approximately 53 g/day and approximately 102% of the 52 g/day screening target for the ordinary representative adult.
+
+The unit chain is:
+
+protein kg/year × 1,000 g/kg ÷ 365.25 days/year = protein g/day
+
+protein g/day ÷ target g/day × 100 = percentage coverage
+
+| case | protein kg/year | protein g/day | target g/day | coverage |
+|---|---:|---:|---:|---:|
+${ordinary.filter(row => ['one_adult','two_adults_plus_two_children'].includes(row.household)).map(row => `| ${row.household_label} full perennial calories | ${format(row.audit.full_perennial_calorie_case.protein_kg_year, 2)} | ${format(row.audit.full_perennial_calorie_case.protein_g_day, 1)} | ${format(row.audit.target_g_day, 1)} | ${format(row.audit.full_perennial_calorie_case.coverage_percent, 1)}% |`).join('\n')}
+${ordinary.filter(row => ['one_adult','two_adults_plus_two_children'].includes(row.household)).map(row => `| ${row.household_label} mature 75/25 comparison | ${format(row.audit.mature_75_25_comparison_case.protein_kg_year, 2)} | ${format(row.audit.mature_75_25_comparison_case.protein_g_day, 1)} | ${format(row.audit.target_g_day, 1)} | ${format(row.audit.mature_75_25_comparison_case.coverage_percent, 1)}% |`).join('\n')}
+
+The corrected percentage is always dimensionless. It must not be displayed as grams per day.
+`;
 }
 
 function ageingMarkdown(output) {
@@ -228,7 +264,7 @@ The objective is a succession from reliable annual staple calories toward a matu
 
 The separate ageing metric is **food energy produced without annual soil preparation/replanting**. In plants-only rows this equals perennial calorie percentage. Optional livestock can make the metric slightly broader when animal output is credited to perennial/on-property feed. Establishment labour is shown separately from mature recurring labour.
 
-The mature planning target retains **25% of plant calories from annual crops** for beans, vegetables, market production, seed, rotation and resilience. The underlying transition series also retains a no-annual-area sensitivity, but that is not the recommended ageing-in-place design.
+The **75% perennial / 25% annual** split in this file is a comparison series. It is not the canonical ARC mature-share recommendation. The canonical share is solved separately in ` + '`outputs/mature-food-system-canonical.md`' + ` using nutrition, annual resilience, site productivity and low-recurring-labour constraints. The underlying transition series also retains a no-annual-area sensitivity.
 
 ## Ordinary mesic site
 
@@ -425,6 +461,15 @@ function householdTransition({capacity, perennial, food, siteId, householdId, yi
   const matureMacro = Object.fromEntries(['protein_kg_ha', 'fat_kg_ha', 'carbohydrate_kg_ha'].map(key => [key, round(perennial.central_mix[key] * site.food_multiplier * yieldMultipliers[yieldCase], 6)]));
   const fullCalorieAreaAt30 = matureAreas['30%']['100%'];
   const deliveredMacroAtFullCalories = Object.fromEntries(Object.entries(matureMacro).map(([key, value]) => [key, round(value * fullCalorieAreaAt30 * (1 - loss), 6)]));
+  const targetGDay = capacityRow.food_system.protein_reference_target_g_day;
+  const targetKgYear = targetGDay * 365.25 / 1000;
+  const annualProteinPerGJ = capacityRow.food_system.macro_delivered_to_household.protein_kg / demand;
+  const perennialProteinPerGJ = matureMacro.protein_kg_ha / centralMixYield;
+  const mature75AnnualEnergy = demand * .25;
+  const mature75PerennialEnergy = demand * .75;
+  const mature75AnnualProtein = mature75AnnualEnergy * annualProteinPerGJ;
+  const mature75PerennialProtein = mature75PerennialEnergy * perennialProteinPerGJ;
+  const mature75ProteinKg = mature75AnnualProtein + mature75PerennialProtein;
   return {
     site: siteId,
     site_label: site.label,
@@ -442,7 +487,19 @@ function householdTransition({capacity, perennial, food, siteId, householdId, yi
     annual_crop_requirements: annual,
     perennial_mature_mix_gross_yield_gj_ha_year: round(centralMixYield, 6),
     perennial_mature_mix_macro_output_per_ha: matureMacro,
-    perennial_macro_screen_at_full_calorie_area: {delivered_kg_year: deliveredMacroAtFullCalories, protein_g_day: round(deliveredMacroAtFullCalories.protein_kg_ha * 1000 / 365.25, 3), protein_screen_target_g_day: capacityRow.food_system.protein_reference_target_g_day, note: 'Coarse protein/fat/carbohydrate screen only; does not establish micronutrient, amino-acid, fatty-acid, processing, storage or dietary adequacy.'},
+    resilience_allowances_ha: capacityRow.resilience_allowances_ha,
+    resilience_ecological_allowance_ha: round(capacityRow.resilience_allowance_total_ha - capacityRow.resilience_allowances_ha.deliberate_export_production_ha, 6),
+    market_export_allowance_ha: capacityRow.resilience_allowances_ha.deliberate_export_production_ha,
+    previous_robust_system_area_ha: capacityRow.robust_system_area_ha,
+    perennial_macro_screen_at_full_calorie_area: {delivered_kg_year: deliveredMacroAtFullCalories, protein_g_day: round(deliveredMacroAtFullCalories.protein_kg_ha * 1000 / 365.25, 3), protein_screen_target_g_day: targetGDay, protein_coverage_percent: round(deliveredMacroAtFullCalories.protein_kg_ha / targetKgYear * 100, 3), note: 'Coarse protein/fat/carbohydrate screen only; does not establish micronutrient, amino-acid, fatty-acid, processing, storage or dietary adequacy.'},
+    protein_audit: {
+      target_g_day: round(targetGDay, 6),
+      target_kg_year: round(targetKgYear, 6),
+      unit_conversion: 'kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage',
+      full_perennial_calorie_case: {protein_kg_year: round(deliveredMacroAtFullCalories.protein_kg_ha, 6), protein_g_day: round(deliveredMacroAtFullCalories.protein_kg_ha * 1000 / 365.25, 3), target_g_day: targetGDay, coverage_percent: round(deliveredMacroAtFullCalories.protein_kg_ha / targetKgYear * 100, 3), perennial_area_ha: fullCalorieAreaAt30},
+      mature_75_25_comparison_case: {annual_food_energy_gj_year: round(mature75AnnualEnergy, 6), perennial_food_energy_gj_year: round(mature75PerennialEnergy, 6), annual_protein_kg_year: round(mature75AnnualProtein, 6), perennial_protein_kg_year: round(mature75PerennialProtein, 6), protein_kg_year: round(mature75ProteinKg, 6), protein_g_day: round(mature75ProteinKg * 1000 / 365.25, 3), target_g_day: targetGDay, coverage_percent: round(mature75ProteinKg / targetKgYear * 100, 3)},
+      denominator_note: 'The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator.'
+    },
     perennial_area_required_at_maturity_ha: matureAreas,
     arc_allocation_ha: capacityRow.arc_policy_allocation_ha,
     shared_heating_area_ha: capacityRow.heating_area_ha,
@@ -509,7 +566,7 @@ The central perennial mix yields **${format(output.perennial_evidence.central_mi
 
 For one adult on an ordinary site, the mature mix requires ${format(adult.perennial_area_required_at_maturity_ha['30%']['100%'], 2)} ha at the 30% loss/reserve case to supply all food energy. The central 1 ha ARC allocation leaves ${format(adult.food_production_envelope_at_arc_allocation_ha, 2)} ha after shared heating, so the mature mix can cover the food energy in this scenario only if the resilience/ecological allowances are also accommodated elsewhere or the food mix/yield performs better than the central synthesis. At that full-calorie area, the coarse protein screen supplies ${format(adult.perennial_macro_screen_at_full_calorie_area.protein_g_day, 0)} g/day against ${format(adult.perennial_macro_screen_at_full_calorie_area.protein_screen_target_g_day, 0)} g/day; this is a warning that calorie sufficiency is not nutritional adequacy.
 
-For ageing-in-place, the recommended mature design is a 75% perennial-plant / 25% annual-plant calorie split rather than a tree-only diet. On the ordinary one-adult row this requires ${format(output.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'plants_only').land.perennial_food_area_ha, 2)} ha of perennial food and ${format(output.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'plants_only').land.annual_crop_area_ha, 2)} ha of retained annual food at maturity. The optional livestock comparisons and their feed/labour requirements are in outputs/livestock-scenarios.md.
+For ageing-in-place, the 75% perennial-plant / 25% annual-plant split is a comparison scenario rather than a fixed recommendation. The solved mature plants-only trade-off is reported in ` + '`outputs/mature-food-system-canonical.md`' + `; it selects the lowest tested perennial share meeting the explicit low-replanting, annual-resilience and macro-screen constraints. The optional livestock comparisons and their feed/labour requirements are in outputs/livestock-scenarios.md.
 
 | household | 25% food | 50% food | 75% food | 100% food | mature area available within ARC food envelope |
 |---|---:|---:|---:|---:|---:|
@@ -548,7 +605,7 @@ Yes, annual crops can independently feed the household during perennial establis
 
 For an ordinary site, the central progressive-handoff model reaches 25%, 50%, 75% and 100% of one adult's calories from perennials in years ${Object.values(ordinaryAdult.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')}. For two adults plus two children the corresponding thresholds are ${Object.values(ordinaryFamily.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')}. These are scenario years, not field predictions. The one-adult conservative and favourable threshold sequences are ${Object.values(ordinaryAdult.transition_sensitivity.conservative.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')} and ${Object.values(ordinaryAdult.transition_sensitivity.favourable.transition.progressive_handoff.thresholds).map(value => value ?? 'never').join(', ')} respectively.
 
-The ageing-in-place design retains 25% of mature plant calories in annual crops for beans, vegetables, markets, seed and resilience. It reports the separate no-annual-soil-preparation food-energy metric and labour profile in outputs/ageing-in-place-labour.md. For one ordinary-site adult, the retained annual area falls from ${format(ordinaryAdultAgeing?.checkpoints?.['1']?.annual_crop_area_ha ?? 0, 2)} ha in year 1 to ${format(ordinaryAdultAgeing?.checkpoints?.mature?.annual_crop_area_ha ?? 0, 2)} ha at maturity; this is a planning target, not a claim that all recurring perennial labour disappears.
+The ageing-in-place transition output retains 25% of mature plant calories in its 75% comparison case for beans, vegetables, markets, seed and resilience. The solved mature share and labour profile are in outputs/mature-food-system-canonical.md; the separate checkpoint series remains in outputs/ageing-in-place-labour.md. For one ordinary-site adult, the comparison annual area falls from ${format(ordinaryAdultAgeing?.checkpoints?.['1']?.annual_crop_area_ha ?? 0, 2)} ha in year 1 to ${format(ordinaryAdultAgeing?.checkpoints?.mature?.annual_crop_area_ha ?? 0, 2)} ha at maturity; this is a planning sensitivity, not a claim that all recurring perennial labour disappears.
 
 ## Ordinary-site progressive handoff: one adult
 
@@ -578,6 +635,7 @@ export function buildFoodForestTransition(energy = buildHealthCanadaEnergy(), fo
   const perennialProtein = calculatePerennialProteinEvidence();
   const households = Object.entries(siteClasses).flatMap(([siteId]) => Object.keys(householdProfiles).map(household => householdTransition({capacity, perennial, food, siteId, householdId: household})));
   const ageingInPlace = ageingInPlaceOutput(households);
+  const proteinAudit = proteinAuditOutput(households);
   const output = {
     model: 'evidence-based ARC food-forest transition',
     status: 'current evidence-based model; historical Lyis values are provenance only',
@@ -589,6 +647,7 @@ export function buildFoodForestTransition(energy = buildHealthCanadaEnergy(), fo
     annual_crop_basis: {source: 'current evidence-based balanced low-input annual food system', gross_yield_gj_ha_year: 'site-specific from current evidence model', note: 'The 20/30/40% cases are explicit transition scenarios and are not the same as the canonical household model’s detailed storage/wildlife/seed/reserve accounting.'},
     perennial_evidence: perennial,
     perennial_protein_evidence: perennialProtein,
+    protein_audit: proteinAudit,
     site_classes: siteClasses,
     policy_site_map: policySiteMap,
     households,
@@ -597,9 +656,12 @@ export function buildFoodForestTransition(energy = buildHealthCanadaEnergy(), fo
     land_accounting: {rule: 'annual_area + perennial_area - young_row_intercrop_overlap = occupied food-production area', no_double_counting_test: 'occupied food-production area must be compared with allocation minus shared heating; resilience/ecological allowances remain separate and are not silently converted into food hectares.'}
   };
   output.livestock = buildLivestockScenarios(output);
+  output.mature_food_system = buildMatureFoodSystem(output);
   writeJson('outputs/food-forest-transition.json', output);
   writeText('outputs/perennial-yield-evidence.md', sourceMarkdown(perennial));
   writeText('outputs/perennial-protein-staples.md', perennialProteinMarkdown(perennialProtein));
+  writeJson('outputs/protein-audit.json', proteinAudit);
+  writeText('outputs/protein-audit.md', proteinAuditMarkdown(proteinAudit));
   writeText('outputs/annual-establishment-food.md', annualMarkdown(output));
   writeText('outputs/mature-food-forest-capacity.md', matureMarkdown(output));
   writeText('outputs/household-transition-scenarios.md', householdMarkdown(output));

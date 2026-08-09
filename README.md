@@ -39,6 +39,8 @@ npm test
 - [`outputs/household-transition-scenarios.md`](outputs/household-transition-scenarios.md)
 - [`outputs/perennial-yield-evidence.md`](outputs/perennial-yield-evidence.md)
 - [`outputs/perennial-protein-staples.md`](outputs/perennial-protein-staples.md)
+- [`outputs/protein-audit.md`](outputs/protein-audit.md)
+- [`outputs/mature-food-system-canonical.md`](outputs/mature-food-system-canonical.md)
 - [`outputs/ageing-in-place-labour.md`](outputs/ageing-in-place-labour.md)
 - [`outputs/livestock-scenarios.md`](outputs/livestock-scenarios.md)
 - [`docs/source-audit.md`](docs/source-audit.md)
@@ -46,8 +48,10 @@ npm test
 
 ## Evidence-based recommendation
 
-The model currently recommends a household/site-adjusted performance test. Adult-equivalent is a food-energy normalization only. The current planning examples are **1 ha for a one-adult household** and **2 ha for a two-adult household**, then checked against the household/site table. The central ordinary-site robust results are about 1.11 ha for one adult, 1.35 ha for two adults, and 1.97 ha for two adults plus three representative children. Marginal sites require more; favourable sites can retain exportable surplus.
+The model currently recommends a household/site-adjusted performance test. Adult-equivalent is a food-energy normalization only. The current planning examples are **1 ha for a one-adult household** and **2 ha for a two-adult household**, then checked against the mature household/site table. Marginal sites require more; favourable sites can retain exportable surplus.
 
-That range is a model recommendation, not a measured provincial average. The largest unresolved inputs are measured low-input Grey-Bruce crop yields, nutritional completeness, current climate normals, yurt leakage and thermal bridges, mixed-woody yield, wildlife loss and local sale margins.
+The current ageing-in-place plants-only trade-off selects a 70% perennial-calorie mature scenario, while retaining annual production for resilience, beans, vegetables, markets and rotation. Canonical mature robust land is about 1.28 ha for one ordinary-site adult, 2.51 ha for two adults plus two children, and 2.84 ha for two adults plus three children; the full site/household table is the recommendation, not a linear adult-equivalent rule.
+
+That range is a model recommendation, not a measured provincial average. The largest unresolved inputs are measured low-input Grey-Bruce crop yields, nutritional completeness, current climate normals, yurt leakage and thermal bridges, mixed-woody yield, wildlife loss, labour and local sale margins.
 
 The historical values—13.05 MJ/day for a 75 kg adult, 0.25 + 0.25 + 0.50 ha, 30 GJ/ha/year coppice, and the historical 1.0/1.2 ha policy shorthand—are not canonical inputs. They are documented in the historical source audit and excluded from the Phase 2 calculations.

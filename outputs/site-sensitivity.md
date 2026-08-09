@@ -1,6 +1,8 @@
-# Site sensitivity
+# Baseline site sensitivity (before ageing-in-place mature constraint)
 
 Site classes are scenarios, not parcel classifications. A site survey must replace the food multipliers and woody band before an ARC decision is made. Heating is shared at the dwelling level in these scenarios; a larger or second dwelling requires a separate heat-load calculation.
+
+These are baseline capacity values before the mature food-system labour objective. Use outputs/mature-food-system-canonical.md for the current robust household/site recommendation.
 
 | site | food multiplier | woody band | 1 adult | 2 adults | 2 adults + 2 children | 2 adults + 3 children |
 |---|---:|---|---:|---:|---:|---:|

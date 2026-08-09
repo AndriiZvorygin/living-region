@@ -110,7 +110,7 @@ function householdMarkdown(capacity) {
   const siteOrder = ['favourable', 'ordinary', 'marginal'];
   const siteLabels = {favourable: 'Favourable/wetter', ordinary: 'Ordinary mesic', marginal: 'Marginal/shallow-rocky'};
   const rows = siteOrder.flatMap(site => capacity.rows.filter(row => row.site === capacity.policy_site_map[site]));
-  return `# Household capacity
+  return `# Baseline household capacity (before ageing-in-place mature constraint)
 
 Food and heat are calculated separately. Food demand uses current Health Canada EER equations; children are not counted as full adults. The adult-equivalent is a **food-energy normalization only**. It is not multiplied into total land, because dwelling heat and ecological/infrastructure functions are shared at the household/site level.
 
@@ -122,6 +122,8 @@ ${rows.map(row => `| ${siteLabels[siteOrder.find(site => capacity.policy_site_ma
 
 The mathematical minimum is food plus shared dwelling heating. The robust-system column adds explicit allowances for crop diversity/rotation, perennial soil/water buffers, fibre/habitat/wildlife protection and deliberate export production. Those allowances are design choices, not hidden biological constants.
 
+This is the pre-ageing baseline capacity layer. The canonical mature plants-only land/labour recommendation, which adds the solved perennial-share and recurring-labour constraints, is in outputs/mature-food-system-canonical.md.
+
 The ordinary representative one-adult food mix passes the simple macro screening check in the derived JSON: ${JSON.stringify(rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult').food_system.macro_energy_shares_percent)} of food energy from protein/fat/carbohydrate and ${f(rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult').food_system.protein_g_day, 0)} g protein/day against the explicit ${f(rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult').food_system.protein_reference_target_g_day, 0)} g/day screening threshold. This does not establish micronutrient sufficiency, amino-acid quality, dietary acceptability or seasonal availability.
 
 The calorie model does not prove micronutrient sufficiency, animal-food substitution, labour feasibility, seed security or long-term soil nutrient balance. The planned perennial fruit/vegetable and ecological zones are therefore required functions even where they do not improve the calorie median.
@@ -130,9 +132,11 @@ The calorie model does not prove micronutrient sufficiency, animal-food substitu
 
 function siteMarkdown(capacity) {
   const households = ['one_adult', 'two_adults', 'two_adults_plus_two_children', 'two_adults_plus_three_children'];
-  return `# Site sensitivity
+  return `# Baseline site sensitivity (before ageing-in-place mature constraint)
 
 Site classes are scenarios, not parcel classifications. A site survey must replace the food multipliers and woody band before an ARC decision is made. Heating is shared at the dwelling level in these scenarios; a larger or second dwelling requires a separate heat-load calculation.
+
+These are baseline capacity values before the mature food-system labour objective. Use outputs/mature-food-system-canonical.md for the current robust household/site recommendation.
 
 | site | food multiplier | woody band | 1 adult | 2 adults | 2 adults + 2 children | 2 adults + 3 children |
 |---|---:|---|---:|---:|---:|---:|
@@ -149,9 +153,11 @@ function surplusMarkdown(capacity, economics) {
   const ordinaryRows = capacity.rows.filter(row => row.site === 'ordinary_mesic');
   const oneHa = ordinaryRows.find(row => row.household === 'one_adult');
   const family = ordinaryRows.find(row => row.household === 'two_adults_plus_two_children');
-  return `# Deliberate surplus and cash output
+  return `# Baseline deliberate surplus and cash output
 
 At one total hectare on the ordinary site, the central model allocates ${f(oneHa.heating_area_ha, 2)} ha to shared dwelling heating. For one adult, the 1 ha ARC allocation leaves ${f(oneHa.food_surplus_or_deficit_at_arc_allocation_gj, 2)} GJ/year of post-loss, post-reserve food surplus after household demand. For two adults plus two children, the 2 ha ARC allocation leaves ${f(family.food_surplus_or_deficit_at_arc_allocation_gj, 2)} GJ/year under the same shared-dwelling assumption. These are scenario outputs, not promises of saleable surplus in every year.
+
+These surplus figures use the pre-ageing baseline capacity layer. The mature ageing-in-place land test is reported separately because its perennial share, annual resilience and recurring labour constraints change the robust total.
 
 The land comparison is intentionally based on adult count: a 1 adult + child household is evaluated against 1 ha, while 2 adults + 1/2/3 children are evaluated against 2 ha. Adult-equivalents are shown only beside household food demand.
 
@@ -170,11 +176,14 @@ These are annual saleable-unit requirements, not net farm-income forecasts. Labo
 }
 
 function recommendationMarkdown(energy, food, heating, woody, capacity, economics, transition) {
-  const row = (site, household) => capacity.rows.find(item => item.site === capacity.policy_site_map[site] && item.household === household);
+  const row = (site, household) => transition.mature_food_system.canonical_rows.find(item => item.site === capacity.policy_site_map[site] && item.household === household);
+  const capacityOrdinaryAdult = capacity.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
   const ordinaryAdult = row('ordinary', 'one_adult');
   const transitionRow = (household) => transition.households.find(item => item.site === 'ordinary_mesic' && item.household === household);
   const ordinaryAdultTransition = transitionRow('one_adult');
   const ordinaryFamilyTransition = transitionRow('two_adults_plus_two_children');
+  const canonicalAdult = transition.mature_food_system.canonical_rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
+  const canonicalFamily = transition.mature_food_system.canonical_rows.find(item => item.site === 'ordinary_mesic' && item.household === 'two_adults_plus_two_children');
   return `# Recommended ARC land guideline
 
 ## Result
@@ -182,19 +191,19 @@ function recommendationMarkdown(energy, food, heating, woody, capacity, economic
 The evidence-based model supports a **household/site-adjusted carrying-capacity guideline**, not a universal hectares-per-adult-equivalent rule. Adult-equivalent is retained only as a food-energy normalization.
 
 - Food-energy normalization: a representative low-active adult-equivalent requires ${f(energy.canonical_adult_equivalent.gj_year, 2)} GJ/year; the representative woman and man require ${f(energy.scenarios.adult_woman.gj_year, 2)} and ${f(energy.scenarios.adult_man.gj_year, 2)} GJ/year.
-- The central low-input food-system synthesis produces ${f(ordinaryAdult.food_system.gross_energy_per_ha, 1)} GJ/ha/year gross edible food energy before household loss/reserve deductions.
+- The central low-input food-system synthesis produces ${f(capacityOrdinaryAdult.food_system.gross_energy_per_ha, 1)} GJ/ha/year gross edible food energy before household loss/reserve deductions.
 - Shared dwelling heating is ${f(heating.cases.central.heat_loss.annual_useful_space_heating_gj, 1)} GJ/year useful heat in the central case. Its ordinary woody area is ${f(woody.cases.central.ordinary.required_woody_area_ha, 2)} ha; marginal woody area is ${f(woody.cases.central.marginal.required_woody_area_ha, 2)} ha.
 
 ## Household/site recommendation
 
 | household | favourable site | ordinary site | marginal site |
 |---|---:|---:|---:|
-| 1 adult | ${f(row('favourable', 'one_adult').robust_system_area_ha, 2)} ha | ${f(row('ordinary', 'one_adult').robust_system_area_ha, 2)} ha | ${f(row('marginal', 'one_adult').robust_system_area_ha, 2)} ha |
-| 1 adult + 1 child | ${f(row('favourable', 'adult_plus_child').robust_system_area_ha, 2)} ha | ${f(row('ordinary', 'adult_plus_child').robust_system_area_ha, 2)} ha | ${f(row('marginal', 'adult_plus_child').robust_system_area_ha, 2)} ha |
-| 2 adults | ${f(row('favourable', 'two_adults').robust_system_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults').robust_system_area_ha, 2)} ha | ${f(row('marginal', 'two_adults').robust_system_area_ha, 2)} ha |
-| 2 adults + 1 child | ${f(row('favourable', 'two_adults_plus_one_child').robust_system_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults_plus_one_child').robust_system_area_ha, 2)} ha | ${f(row('marginal', 'two_adults_plus_one_child').robust_system_area_ha, 2)} ha |
-| 2 adults + 2 children | ${f(row('favourable', 'two_adults_plus_two_children').robust_system_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults_plus_two_children').robust_system_area_ha, 2)} ha | ${f(row('marginal', 'two_adults_plus_two_children').robust_system_area_ha, 2)} ha |
-| 2 adults + 3 children | ${f(row('favourable', 'two_adults_plus_three_children').robust_system_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults_plus_three_children').robust_system_area_ha, 2)} ha | ${f(row('marginal', 'two_adults_plus_three_children').robust_system_area_ha, 2)} ha |
+| 1 adult | ${f(row('favourable', 'one_adult').total_robust_productive_area_ha, 2)} ha | ${f(row('ordinary', 'one_adult').total_robust_productive_area_ha, 2)} ha | ${f(row('marginal', 'one_adult').total_robust_productive_area_ha, 2)} ha |
+| 1 adult + 1 child | ${f(row('favourable', 'adult_plus_child').total_robust_productive_area_ha, 2)} ha | ${f(row('ordinary', 'adult_plus_child').total_robust_productive_area_ha, 2)} ha | ${f(row('marginal', 'adult_plus_child').total_robust_productive_area_ha, 2)} ha |
+| 2 adults | ${f(row('favourable', 'two_adults').total_robust_productive_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults').total_robust_productive_area_ha, 2)} ha | ${f(row('marginal', 'two_adults').total_robust_productive_area_ha, 2)} ha |
+| 2 adults + 1 child | ${f(row('favourable', 'two_adults_plus_one_child').total_robust_productive_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults_plus_one_child').total_robust_productive_area_ha, 2)} ha | ${f(row('marginal', 'two_adults_plus_one_child').total_robust_productive_area_ha, 2)} ha |
+| 2 adults + 2 children | ${f(row('favourable', 'two_adults_plus_two_children').total_robust_productive_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults_plus_two_children').total_robust_productive_area_ha, 2)} ha | ${f(row('marginal', 'two_adults_plus_two_children').total_robust_productive_area_ha, 2)} ha |
+| 2 adults + 3 children | ${f(row('favourable', 'two_adults_plus_three_children').total_robust_productive_area_ha, 2)} ha | ${f(row('ordinary', 'two_adults_plus_three_children').total_robust_productive_area_ha, 2)} ha | ${f(row('marginal', 'two_adults_plus_three_children').total_robust_productive_area_ha, 2)} ha |
 
 The current ARC examples evaluate as follows:
 
@@ -203,7 +212,7 @@ The current ARC examples evaluate as follows:
 | 1 adult → 1 ha | ${row('favourable', 'one_adult').arc_policy_status}; ${f(row('favourable', 'one_adult').land_surplus_or_deficit_ha, 2)} ha | ${row('ordinary', 'one_adult').arc_policy_status}; ${f(row('ordinary', 'one_adult').land_surplus_or_deficit_ha, 2)} ha | ${row('marginal', 'one_adult').arc_policy_status}; ${f(row('marginal', 'one_adult').land_surplus_or_deficit_ha, 2)} ha |
 | 2 adults/family → 2 ha | ${row('favourable', 'two_adults').arc_policy_status}; ${f(row('favourable', 'two_adults').land_surplus_or_deficit_ha, 2)} ha | ${row('ordinary', 'two_adults').arc_policy_status}; ${f(row('ordinary', 'two_adults').land_surplus_or_deficit_ha, 2)} ha | ${row('marginal', 'two_adults').arc_policy_status}; ${f(row('marginal', 'two_adults').land_surplus_or_deficit_ha, 2)} ha |
 
-Here “surplus/deficit” is allocation area minus robust productive area. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
+Here “surplus/deficit” is allocation area minus the canonical mature robust productive area. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
 
 Recommended website language: “Plan productive land by household and site. Calculate food land from household food energy, calculate shared dwelling heating land from the building heat load and woody productivity, then add explicit resilience, ecological and surplus allowances. Use 1 ha for a one-adult household and 2 ha for a two-adult household only as planning examples; verify adequacy against the household/site performance table. Children increase food demand without being converted into linear hectare units.”
 
@@ -219,7 +228,7 @@ The transition outputs in ` + '`outputs/food-forest-transition.md`' + ` and ` + 
 
 ## Ageing-in-place refinement
 
-The mature food-system objective is not maximum calorie density and not elimination of annual crops. The central mature planning target is 75% of plant food energy from perennial systems and 25% from annual beans, vegetables, market crops, seed, rotation and resilience. On the ordinary site, the one-adult annual-crop area falls from ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').checkpoints['1'].annual_crop_area_ha, 2)} ha in Year 1 to ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').checkpoints.mature.annual_crop_area_ha, 2)} ha at maturity, a ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').annual_crop_area_reduction_from_year_1_to_maturity_percent, 0)}% reduction in annual soil-preparation area. The household/site rows in outputs/ageing-in-place-labour.json report the corresponding Year 1, Year 5, Year 10 and mature values for every scenario.
+The mature food-system objective is not maximum calorie density and not elimination of annual crops. The solved ordinary-site plants-only trade-off selects ${f(canonicalAdult.mature_perennial_share_percent, 0)}% perennial food calories for one adult and ${f(canonicalFamily.mature_perennial_share_percent, 0)}% for two adults plus two children: the lowest tested share meeting the explicit reduction, annual-resilience and macro-screen constraints. The 75% case remains a sensitivity comparison. On the ordinary site, the one-adult annual-crop area falls from ${f(transition.ageing_in_place.rows.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult').checkpoints['1'].annual_crop_area_ha, 2)} ha in Year 1 to ${f(canonicalAdult.mature_annual_area_ha, 2)} ha at the solved mature share, a ${f(canonicalAdult.recurring_labour.physically_demanding_annual_reduction_percent, 0)}% reduction in annual cultivation area. The household/site rows in outputs/ageing-in-place-labour.json report the transition checkpoints; the solved land/labour table is in outputs/mature-food-system-canonical.md.
 
 The low-replanting metric is reported separately from perennial calories. For plants-only food it is the same percentage; livestock can contribute only to the extent that its food output is credited to perennial/on-property feed. Optional animals add protein and fat diversity but also add feed land, purchased feed, winter storage, manure handling and recurring labour. The canonical recommendation therefore remains plants plus a retained annual supplement, with livestock as a household choice rather than an ARC requirement.
 
@@ -236,7 +245,8 @@ The largest remaining uncertainties are measured low-input Grey-Bruce yields, fo
 function headline(energy, food, heating, woody, capacity, economics, transition) {
   const adult = capacity.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
   const ageingAdult = transition.ageing_in_place.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
-  const ordinaryBoth = transition.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'plants_plus_chickens_rabbits');
+  const ordinaryBoth = transition.livestock.scenarios.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult' && row.module === 'combined_livestock');
+  const canonicalAdult = transition.mature_food_system.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
   return `# Evidence-based ARC carrying-capacity headline results
 
 1. A representative current low-active adult-equivalent requires **${f(energy.canonical_adult_equivalent.gj_year, 2)} GJ/year**, ${f(energy.canonical_adult_equivalent.mj_day, 2)} MJ/day and ${f(energy.canonical_adult_equivalent.kcal_day, 0)} kcal/day. The representative woman is ${f(energy.scenarios.adult_woman.gj_year, 2)} GJ/year; the representative man is ${f(energy.scenarios.adult_man.gj_year, 2)} GJ/year. An 8-year-old girl is ${f(energy.scenarios.child_girl_8.gj_year, 2)} GJ/year and a 14-year-old boy is ${f(energy.scenarios.adolescent_boy_14.gj_year, 2)} GJ/year.
@@ -245,12 +255,12 @@ function headline(energy, food, heating, woody, capacity, economics, transition)
 4. The central balanced food-system synthesis is ${f(adult.food_system.gross_energy_per_ha, 1)} GJ/ha/year gross edible energy. One representative adult's calculated food area after storage, wildlife, seed, bad-year and community reserves is **${f(adult.food_area_ha, 2)} ha**.
 5. The audited 65.6 m² yurt central useful heating requirement is **${f(heating.cases.central.heat_loss.annual_useful_space_heating_gj, 1)} GJ/year**, with a low/high range of ${f(heating.cases.low.heat_loss.annual_useful_space_heating_gj, 1)}–${f(heating.cases.high.heat_loss.annual_useful_space_heating_gj, 1)} GJ/year.
 6. Woody bands are ${woody.bands.marginal}, ${woody.bands.ordinary} and ${woody.bands.favourable} dry t/ha/year for marginal, ordinary and favourable scenarios. Central yurt wood area is **${f(woody.cases.central.marginal.required_woody_area_ha, 2)} ha marginal, ${f(woody.cases.central.ordinary.required_woody_area_ha, 2)} ha ordinary, ${f(woody.cases.central.favourable.required_woody_area_ha, 2)} ha favourable**.
-7. For an ordinary mesic site, the mathematical food-plus-shared-heat minimum is ${f(adult.mathematical_minimum_area_ha, 2)} ha and the explicit robust one-adult system is **${f(adult.robust_system_area_ha, 2)} ha**. Two adults plus two representative children require ${f(capacity.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_two_children').robust_system_area_ha, 2)} ha; two adults plus three children require ${f(capacity.rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_three_children').robust_system_area_ha, 2)} ha.
+7. For an ordinary mesic site, the solved canonical mature plants-only system is **${f(transition.mature_food_system.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult').total_robust_productive_area_ha, 2)} ha** for one adult. Two adults plus two representative children require **${f(transition.mature_food_system.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_two_children').total_robust_productive_area_ha, 2)} ha**; two adults plus three children require **${f(transition.mature_food_system.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_three_children').total_robust_productive_area_ha, 2)} ha**. The earlier mathematical minimum and pre-ageing robust results remain in the legacy/current-capacity comparison outputs.
 8. The 1 ha/adult ARC examples are household allocations, not adult-equivalent multipliers: 1 adult receives 1 ha and 2 adults/family receive 2 ha. Their favourable/ordinary/marginal land surpluses or deficits are tabulated in ` + '`outputs/recommended-land-guideline.md`' + `.
 9. The economic module is separate and illustrative: depending on product, covering $1,000–$5,000/year requires the configurable unit volumes in ` + '`data/derived/economic-output.csv`' + `. Current local margins remain unresolved.
 10. Recommendation: use a **household/site-adjusted carrying-capacity test**. Adult-equivalent belongs only in the food-energy calculation; shared heat and resilience/ecological/surplus land must be calculated at household/site level.
-11. Ageing-in-place: on an ordinary site, the central one-adult annual-crop area falls from ${f(ageingAdult.checkpoints['1'].annual_crop_area_ha, 2)} ha in Year 1 to ${f(ageingAdult.checkpoints.mature.annual_crop_area_ha, 2)} ha at maturity, a ${f(ageingAdult.annual_crop_area_reduction_from_year_1_to_maturity_percent, 0)}% reduction. The mature target retains 75% of plant food energy without annual soil preparation/replanting and keeps 25% annual plant calories for beans, vegetables, markets, seed and resilience.
-12. Optional small livestock add protein/fat diversity but also feed and labour: the ordinary one-adult plants-plus-chickens-and-rabbits module supplies ${f(ordinaryBoth.human_food_energy.livestock_gj_year, 2)} GJ/year of livestock food, requires ${f(ordinaryBoth.feed.purchased_dry_matter_kg_year, 0)} kg/year purchased feed in the planning case and adds ${f(ordinaryBoth.labour.livestock_recurring_labour_hours, 0)} recurring labour hours/year. Protein coverage remains a screening result, not full dietary adequacy.
+11. Ageing-in-place: on an ordinary site, the one-adult annual-crop area falls from ${f(ageingAdult.checkpoints['1'].annual_crop_area_ha, 2)} ha in Year 1 to ${f(canonicalAdult.mature_annual_area_ha, 2)} ha at the solved mature share, a ${f(canonicalAdult.recurring_labour.physically_demanding_annual_reduction_percent, 0)}% reduction. The solved canonical share is ${f(canonicalAdult.mature_perennial_share_percent, 0)}% perennial plant calories; 75% is a comparison scenario, not a fixed input.
+12. Optional small livestock add protein/fat diversity but also feed and labour: the ordinary one-adult combined chicken+rabbit module supplies ${f(ordinaryBoth.human_food_energy.livestock_gj_year, 2)} GJ/year of livestock food, requires ${f(ordinaryBoth.feed.purchased_dry_matter_kg_year, 0)} kg/year purchased feed in the planning case and adds ${f(ordinaryBoth.labour.livestock_recurring_labour_hours, 0)} recurring labour hours/year. Protein coverage remains a screening result, not full dietary adequacy.
 
 Historical Lyis values are deliberately excluded from these canonical calculations. See ` + '`outputs/legacy/`' + ` and ` + '`historical`' + ` in ` + '`outputs/summary.json`' + ` for provenance only.
 `;

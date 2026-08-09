@@ -1,0 +1,703 @@
+{
+  "model": "protein-unit and denominator audit",
+  "target_definition": "Health Canada-derived screening target of 0.8 g protein per kg reference body mass per day; this is a screening target, not a complete dietary adequacy standard.",
+  "rows": [
+    {
+      "site": "wetter_productive",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "demand_gj_year": 3.375074,
+      "audit": {
+        "target_g_day": 52,
+        "target_kg_year": 18.993,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 15.22219,
+          "protein_g_day": 41.676,
+          "target_g_day": 52,
+          "coverage_percent": 80.146,
+          "perennial_area_ha": 0.45775
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 0.843769,
+          "perennial_food_energy_gj_year": 2.531306,
+          "annual_protein_kg_year": 7.984926,
+          "perennial_protein_kg_year": 11.416634,
+          "protein_kg_year": 19.40156,
+          "protein_g_day": 53.119,
+          "target_g_day": 52,
+          "coverage_percent": 102.151
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "wetter_productive",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "demand_gj_year": 5.846183,
+      "audit": {
+        "target_g_day": 74.4,
+        "target_kg_year": 27.1746,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 26.367327,
+          "protein_g_day": 72.19,
+          "target_g_day": 74.4,
+          "coverage_percent": 97.029,
+          "perennial_area_ha": 0.792898
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.461546,
+          "perennial_food_energy_gj_year": 4.384637,
+          "annual_protein_kg_year": 13.831205,
+          "perennial_protein_kg_year": 19.775487,
+          "protein_kg_year": 33.606691,
+          "protein_g_day": 92.01,
+          "target_g_day": 74.4,
+          "coverage_percent": 123.669
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "wetter_productive",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "demand_gj_year": 7.768697,
+      "audit": {
+        "target_g_day": 116,
+        "target_kg_year": 42.369,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 35.038206,
+          "protein_g_day": 95.929,
+          "target_g_day": 116,
+          "coverage_percent": 82.698,
+          "perennial_area_ha": 1.053642
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.942174,
+          "perennial_food_energy_gj_year": 5.826523,
+          "annual_protein_kg_year": 18.379588,
+          "perennial_protein_kg_year": 26.278644,
+          "protein_kg_year": 44.658233,
+          "protein_g_day": 122.268,
+          "target_g_day": 116,
+          "coverage_percent": 105.403
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "wetter_productive",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "demand_gj_year": 10.239806,
+      "audit": {
+        "target_g_day": 138.4,
+        "target_kg_year": 50.5506,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 46.183343,
+          "protein_g_day": 126.443,
+          "target_g_day": 138.4,
+          "coverage_percent": 91.361,
+          "perennial_area_ha": 1.38879
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 2.559952,
+          "perennial_food_energy_gj_year": 7.679854,
+          "annual_protein_kg_year": 24.225867,
+          "perennial_protein_kg_year": 34.637497,
+          "protein_kg_year": 58.863364,
+          "protein_g_day": 161.159,
+          "target_g_day": 138.4,
+          "coverage_percent": 116.444
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "wetter_productive",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "demand_gj_year": 14.050693,
+      "audit": {
+        "target_g_day": 178.4,
+        "target_kg_year": 65.1606,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 63.3711,
+          "protein_g_day": 173.501,
+          "target_g_day": 178.4,
+          "coverage_percent": 97.254,
+          "perennial_area_ha": 1.905647
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 3.512673,
+          "perennial_food_energy_gj_year": 10.53802,
+          "annual_protein_kg_year": 33.241862,
+          "perennial_protein_kg_year": 47.528326,
+          "protein_kg_year": 80.770188,
+          "protein_g_day": 221.137,
+          "target_g_day": 178.4,
+          "coverage_percent": 123.956
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "wetter_productive",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "demand_gj_year": 16.677312,
+      "audit": {
+        "target_g_day": 200.8,
+        "target_kg_year": 73.3422,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 75.217605,
+          "protein_g_day": 205.935,
+          "target_g_day": 200.8,
+          "coverage_percent": 102.557,
+          "perennial_area_ha": 2.261886
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 4.169328,
+          "perennial_food_energy_gj_year": 12.507984,
+          "annual_protein_kg_year": 39.456054,
+          "perennial_protein_kg_year": 56.413212,
+          "protein_kg_year": 95.869266,
+          "protein_g_day": 262.476,
+          "target_g_day": 200.8,
+          "coverage_percent": 130.715
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "ordinary_mesic",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "demand_gj_year": 3.375074,
+      "audit": {
+        "target_g_day": 52,
+        "target_kg_year": 18.993,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 15.22219,
+          "protein_g_day": 41.676,
+          "target_g_day": 52,
+          "coverage_percent": 80.146,
+          "perennial_area_ha": 0.45775
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 0.843769,
+          "perennial_food_energy_gj_year": 2.531306,
+          "annual_protein_kg_year": 7.984926,
+          "perennial_protein_kg_year": 11.416634,
+          "protein_kg_year": 19.40156,
+          "protein_g_day": 53.119,
+          "target_g_day": 52,
+          "coverage_percent": 102.151
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "ordinary_mesic",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "demand_gj_year": 5.846183,
+      "audit": {
+        "target_g_day": 74.4,
+        "target_kg_year": 27.1746,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 26.367327,
+          "protein_g_day": 72.19,
+          "target_g_day": 74.4,
+          "coverage_percent": 97.029,
+          "perennial_area_ha": 0.792898
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.461546,
+          "perennial_food_energy_gj_year": 4.384637,
+          "annual_protein_kg_year": 13.831205,
+          "perennial_protein_kg_year": 19.775487,
+          "protein_kg_year": 33.606691,
+          "protein_g_day": 92.01,
+          "target_g_day": 74.4,
+          "coverage_percent": 123.669
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "ordinary_mesic",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "demand_gj_year": 7.768697,
+      "audit": {
+        "target_g_day": 116,
+        "target_kg_year": 42.369,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 35.038206,
+          "protein_g_day": 95.929,
+          "target_g_day": 116,
+          "coverage_percent": 82.698,
+          "perennial_area_ha": 1.053642
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.942174,
+          "perennial_food_energy_gj_year": 5.826523,
+          "annual_protein_kg_year": 18.379588,
+          "perennial_protein_kg_year": 26.278644,
+          "protein_kg_year": 44.658233,
+          "protein_g_day": 122.268,
+          "target_g_day": 116,
+          "coverage_percent": 105.403
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "ordinary_mesic",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "demand_gj_year": 10.239806,
+      "audit": {
+        "target_g_day": 138.4,
+        "target_kg_year": 50.5506,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 46.183343,
+          "protein_g_day": 126.443,
+          "target_g_day": 138.4,
+          "coverage_percent": 91.361,
+          "perennial_area_ha": 1.38879
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 2.559952,
+          "perennial_food_energy_gj_year": 7.679854,
+          "annual_protein_kg_year": 24.225867,
+          "perennial_protein_kg_year": 34.637497,
+          "protein_kg_year": 58.863364,
+          "protein_g_day": 161.159,
+          "target_g_day": 138.4,
+          "coverage_percent": 116.444
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "ordinary_mesic",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "demand_gj_year": 14.050693,
+      "audit": {
+        "target_g_day": 178.4,
+        "target_kg_year": 65.1606,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 63.3711,
+          "protein_g_day": 173.501,
+          "target_g_day": 178.4,
+          "coverage_percent": 97.254,
+          "perennial_area_ha": 1.905647
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 3.512673,
+          "perennial_food_energy_gj_year": 10.53802,
+          "annual_protein_kg_year": 33.241862,
+          "perennial_protein_kg_year": 47.528326,
+          "protein_kg_year": 80.770188,
+          "protein_g_day": 221.137,
+          "target_g_day": 178.4,
+          "coverage_percent": 123.956
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "ordinary_mesic",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "demand_gj_year": 16.677312,
+      "audit": {
+        "target_g_day": 200.8,
+        "target_kg_year": 73.3422,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 75.217605,
+          "protein_g_day": 205.935,
+          "target_g_day": 200.8,
+          "coverage_percent": 102.557,
+          "perennial_area_ha": 2.261886
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 4.169328,
+          "perennial_food_energy_gj_year": 12.507984,
+          "annual_protein_kg_year": 39.456054,
+          "perennial_protein_kg_year": 56.413212,
+          "protein_kg_year": 95.869266,
+          "protein_g_day": 262.476,
+          "target_g_day": 200.8,
+          "coverage_percent": 130.715
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "dry",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "demand_gj_year": 3.375074,
+      "audit": {
+        "target_g_day": 52,
+        "target_kg_year": 18.993,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 15.222182,
+          "protein_g_day": 41.676,
+          "target_g_day": 52,
+          "coverage_percent": 80.146,
+          "perennial_area_ha": 0.610333
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 0.843769,
+          "perennial_food_energy_gj_year": 2.531306,
+          "annual_protein_kg_year": 7.984926,
+          "perennial_protein_kg_year": 11.416634,
+          "protein_kg_year": 19.40156,
+          "protein_g_day": 53.119,
+          "target_g_day": 52,
+          "coverage_percent": 102.151
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "dry",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "demand_gj_year": 5.846183,
+      "audit": {
+        "target_g_day": 74.4,
+        "target_kg_year": 27.1746,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 26.367319,
+          "protein_g_day": 72.19,
+          "target_g_day": 74.4,
+          "coverage_percent": 97.029,
+          "perennial_area_ha": 1.057197
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.461546,
+          "perennial_food_energy_gj_year": 4.384637,
+          "annual_protein_kg_year": 13.831205,
+          "perennial_protein_kg_year": 19.775487,
+          "protein_kg_year": 33.606691,
+          "protein_g_day": 92.01,
+          "target_g_day": 74.4,
+          "coverage_percent": 123.669
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "dry",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "demand_gj_year": 7.768697,
+      "audit": {
+        "target_g_day": 116,
+        "target_kg_year": 42.369,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 35.038182,
+          "protein_g_day": 95.929,
+          "target_g_day": 116,
+          "coverage_percent": 82.698,
+          "perennial_area_ha": 1.404855
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.942174,
+          "perennial_food_energy_gj_year": 5.826523,
+          "annual_protein_kg_year": 18.379588,
+          "perennial_protein_kg_year": 26.278645,
+          "protein_kg_year": 44.658233,
+          "protein_g_day": 122.268,
+          "target_g_day": 116,
+          "coverage_percent": 105.403
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "dry",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "demand_gj_year": 10.239806,
+      "audit": {
+        "target_g_day": 138.4,
+        "target_kg_year": 50.5506,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 46.183319,
+          "protein_g_day": 126.443,
+          "target_g_day": 138.4,
+          "coverage_percent": 91.361,
+          "perennial_area_ha": 1.851719
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 2.559952,
+          "perennial_food_energy_gj_year": 7.679854,
+          "annual_protein_kg_year": 24.225867,
+          "perennial_protein_kg_year": 34.637498,
+          "protein_kg_year": 58.863364,
+          "protein_g_day": 161.159,
+          "target_g_day": 138.4,
+          "coverage_percent": 116.444
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "dry",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "demand_gj_year": 14.050693,
+      "audit": {
+        "target_g_day": 178.4,
+        "target_kg_year": 65.1606,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 63.371109,
+          "protein_g_day": 173.501,
+          "target_g_day": 178.4,
+          "coverage_percent": 97.254,
+          "perennial_area_ha": 2.540863
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 3.512673,
+          "perennial_food_energy_gj_year": 10.53802,
+          "annual_protein_kg_year": 33.241862,
+          "perennial_protein_kg_year": 47.528327,
+          "protein_kg_year": 80.770189,
+          "protein_g_day": 221.137,
+          "target_g_day": 178.4,
+          "coverage_percent": 123.956
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "dry",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "demand_gj_year": 16.677312,
+      "audit": {
+        "target_g_day": 200.8,
+        "target_kg_year": 73.3422,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 75.217606,
+          "protein_g_day": 205.935,
+          "target_g_day": 200.8,
+          "coverage_percent": 102.557,
+          "perennial_area_ha": 3.015848
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 4.169328,
+          "perennial_food_energy_gj_year": 12.507984,
+          "annual_protein_kg_year": 39.456054,
+          "perennial_protein_kg_year": 56.413213,
+          "protein_kg_year": 95.869267,
+          "protein_g_day": 262.476,
+          "target_g_day": 200.8,
+          "coverage_percent": 130.715
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "household": "one_adult",
+      "household_label": "1 adult",
+      "demand_gj_year": 3.375074,
+      "audit": {
+        "target_g_day": 52,
+        "target_kg_year": 18.993,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 15.222174,
+          "protein_g_day": 41.676,
+          "target_g_day": 52,
+          "coverage_percent": 80.146,
+          "perennial_area_ha": 0.915499
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 0.843769,
+          "perennial_food_energy_gj_year": 2.531306,
+          "annual_protein_kg_year": 7.984926,
+          "perennial_protein_kg_year": 11.416634,
+          "protein_kg_year": 19.40156,
+          "protein_g_day": 53.119,
+          "target_g_day": 52,
+          "coverage_percent": 102.151
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "household": "adult_plus_child",
+      "household_label": "1 adult + 1 child",
+      "demand_gj_year": 5.846183,
+      "audit": {
+        "target_g_day": 74.4,
+        "target_kg_year": 27.1746,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 26.367311,
+          "protein_g_day": 72.19,
+          "target_g_day": 74.4,
+          "coverage_percent": 97.029,
+          "perennial_area_ha": 1.585795
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.461546,
+          "perennial_food_energy_gj_year": 4.384637,
+          "annual_protein_kg_year": 13.831205,
+          "perennial_protein_kg_year": 19.775487,
+          "protein_kg_year": 33.606691,
+          "protein_g_day": 92.01,
+          "target_g_day": 74.4,
+          "coverage_percent": 123.669
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "household": "two_adults",
+      "household_label": "2 adults",
+      "demand_gj_year": 7.768697,
+      "audit": {
+        "target_g_day": 116,
+        "target_kg_year": 42.369,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 35.03819,
+          "protein_g_day": 95.929,
+          "target_g_day": 116,
+          "coverage_percent": 82.698,
+          "perennial_area_ha": 2.107283
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 1.942174,
+          "perennial_food_energy_gj_year": 5.826523,
+          "annual_protein_kg_year": 18.379588,
+          "perennial_protein_kg_year": 26.278644,
+          "protein_kg_year": 44.658233,
+          "protein_g_day": 122.268,
+          "target_g_day": 116,
+          "coverage_percent": 105.403
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "household": "two_adults_plus_one_child",
+      "household_label": "2 adults + 1 child",
+      "demand_gj_year": 10.239806,
+      "audit": {
+        "target_g_day": 138.4,
+        "target_kg_year": 50.5506,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 46.183327,
+          "protein_g_day": 126.443,
+          "target_g_day": 138.4,
+          "coverage_percent": 91.361,
+          "perennial_area_ha": 2.777579
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 2.559952,
+          "perennial_food_energy_gj_year": 7.679854,
+          "annual_protein_kg_year": 24.225867,
+          "perennial_protein_kg_year": 34.637497,
+          "protein_kg_year": 58.863364,
+          "protein_g_day": 161.159,
+          "target_g_day": 138.4,
+          "coverage_percent": 116.444
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "household": "two_adults_plus_two_children",
+      "household_label": "2 adults + 2 children",
+      "demand_gj_year": 14.050693,
+      "audit": {
+        "target_g_day": 178.4,
+        "target_kg_year": 65.1606,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 63.3711,
+          "protein_g_day": 173.501,
+          "target_g_day": 178.4,
+          "coverage_percent": 97.254,
+          "perennial_area_ha": 3.811294
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 3.512673,
+          "perennial_food_energy_gj_year": 10.53802,
+          "annual_protein_kg_year": 33.241862,
+          "perennial_protein_kg_year": 47.528326,
+          "protein_kg_year": 80.770188,
+          "protein_g_day": 221.137,
+          "target_g_day": 178.4,
+          "coverage_percent": 123.956
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    },
+    {
+      "site": "shallow_rocky_marginal",
+      "household": "two_adults_plus_three_children",
+      "household_label": "2 adults + 3 children",
+      "demand_gj_year": 16.677312,
+      "audit": {
+        "target_g_day": 200.8,
+        "target_kg_year": 73.3422,
+        "unit_conversion": "kg/year × 1000 ÷ 365.25 = g/day; g/day ÷ target g/day × 100 = percentage coverage",
+        "full_perennial_calorie_case": {
+          "protein_kg_year": 75.217622,
+          "protein_g_day": 205.935,
+          "target_g_day": 200.8,
+          "coverage_percent": 102.557,
+          "perennial_area_ha": 4.523773
+        },
+        "mature_75_25_comparison_case": {
+          "annual_food_energy_gj_year": 4.169328,
+          "perennial_food_energy_gj_year": 12.507984,
+          "annual_protein_kg_year": 39.456054,
+          "perennial_protein_kg_year": 56.413212,
+          "protein_kg_year": 95.869266,
+          "protein_g_day": 262.476,
+          "target_g_day": 200.8,
+          "coverage_percent": 130.715
+        },
+        "denominator_note": "The target denominator is target_g_day for a daily comparison or target_kg_year for an annual comparison. Adult-equivalent is not a protein denominator."
+      }
+    }
+  ],
+  "discrepancy": "The earlier approximately 42 g/day result is the full-perennial calorie case: 15.222 kg/year × 1,000 ÷ 365.25 = 41.676 g/day, which is 80.15% of 52 g/day. The later approximately 42% result came from the mature 75/25 plants-only scenario after a field-name bug dropped the perennial protein component and divided only annual-plant protein (7.985 kg/year) by the annual target (18.993 kg/year). The corrected 75/25 case is reported separately and no percentage is labelled as g/day."
+}
