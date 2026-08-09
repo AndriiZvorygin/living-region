@@ -24,6 +24,24 @@ Living Region is an open-source regional resilience model for testing how land, 
 - parcel ownership/address-level dwelling data still missing
 - model outputs are scenario diagnostics, not official forecasts
 
+## Unified model architecture
+
+Living Region is the regional umbrella. Its first-class
+`@living-region/carrying-capacity` workspace preserves the ARC evidence,
+source data, derived outputs, standalone Node test suite and reproducible
+calculations under `packages/carrying-capacity/`. ARC calculations are the
+canonical source for household food energy, annual/perennial succession,
+heating, woody biomass, mature multifunctional land, labour and site
+sensitivity; regional reports aggregate those rows instead of copying their
+coefficients.
+
+The Energy Model remains a separate upstream repository. Living Region consumes
+only the versioned generated contract at
+`data/systemic-energy/systemic-energy-v1.json`, through
+`packages/systemic-energy-adapter/`. See
+[`docs/systemic-energy-contract.md`](docs/systemic-energy-contract.md) for
+provenance and the current evidence/assumption boundary.
+
 ## Quickstart
 
 ```bash
@@ -111,6 +129,9 @@ npm run report:grey:dwelling-land-access
 npm run report:grey:labour-land
 npm run report:grey:ag-labour
 npm run report:model:assessment
+npm run report:carrying-capacity
+npm run report:grey:carrying-capacity
+npm run report:grey:household-transition
 ```
 
 ### Food/fuel/shock reports

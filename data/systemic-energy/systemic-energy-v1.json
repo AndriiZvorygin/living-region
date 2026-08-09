@@ -1,0 +1,420 @@
+{
+  "contract_id": "living-region.systemic-energy",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-09T13:46:34.403990Z",
+  "producer": {
+    "repository": "https://github.com/AndriiZvorygin/energy-model",
+    "git_commit": "7349a4d0d12b86156c8b374013673b5efd146181",
+    "generator": "scripts/export_living_region_contract.py"
+  },
+  "scope": {
+    "upstream_scale": "global_and_canadian_energy_economic_conditions",
+    "downstream_consumer": "Living Region regional metabolism, land, food, labour and transition scenarios",
+    "geography": [
+      "global",
+      "Canada",
+      "Ontario context where available"
+    ]
+  },
+  "fields": [
+    {
+      "field_id": "fuelAvailabilityIndex",
+      "value": null,
+      "unit": "index (1 = scenario baseline)",
+      "evidence_status": "not_available",
+      "description": "Physical fuel availability or supply-loss parameter.",
+      "evidence_indicator_ids": [],
+      "notes": "Energy Model contains price, production, refinery and consumption indicators but no validated fuel-availability index."
+    },
+    {
+      "field_id": "fuelPriceIncreasePct",
+      "value": null,
+      "unit": "percent",
+      "evidence_status": "contextual_evidence_only",
+      "description": "Direct fuel price increase parameter for Living Region scenarios.",
+      "evidence_indicator_ids": [
+        "canada-energy-cpi-yoy",
+        "canada-gasoline-cpi-yoy",
+        "canada-fuel-oil-cpi-yoy"
+      ],
+      "notes": "The listed CPI growth series are not a diesel price series and must not be substituted automatically."
+    },
+    {
+      "field_id": "dieselPriceMultiplier",
+      "value": null,
+      "unit": "ratio",
+      "evidence_status": "not_available",
+      "description": "Diesel price multiplier relative to a documented baseline.",
+      "evidence_indicator_ids": [
+        "canada-energy-cpi-yoy"
+      ],
+      "notes": "Requires a diesel-specific price series and baseline definition."
+    },
+    {
+      "field_id": "fertilizerAvailabilityIndex",
+      "value": null,
+      "unit": "index (1 = scenario baseline)",
+      "evidence_status": "not_available",
+      "description": "Physical fertilizer availability or supply-loss parameter.",
+      "evidence_indicator_ids": [],
+      "notes": "No fertilizer supply/availability series is published by the current Energy Model contract."
+    },
+    {
+      "field_id": "fertilizerPriceMultiplier",
+      "value": null,
+      "unit": "ratio",
+      "evidence_status": "not_available",
+      "description": "Fertilizer price multiplier relative to a documented baseline.",
+      "evidence_indicator_ids": [],
+      "notes": "Do not infer from oil or natural-gas CPI without a fertilizer-specific pass-through model."
+    },
+    {
+      "field_id": "transportCostMultiplier",
+      "value": null,
+      "unit": "ratio",
+      "evidence_status": "contextual_evidence_only",
+      "description": "Transport cost multiplier used by local food and freight scenarios.",
+      "evidence_indicator_ids": [
+        "freight-activity",
+        "canada-energy-cpi-yoy",
+        "canada-refinery-input-growth"
+      ],
+      "notes": "Freight activity and energy-price changes are contextual signals, not a calibrated cost multiplier."
+    },
+    {
+      "field_id": "importPricePressureMultiplier",
+      "value": null,
+      "unit": "ratio",
+      "evidence_status": "contextual_evidence_only",
+      "description": "Import-price pressure applied to food and essential goods.",
+      "evidence_indicator_ids": [
+        "global-food-price-index",
+        "canada-real-food-price-index",
+        "canada-food-inflation-gap"
+      ],
+      "notes": "Food-price indexes provide upstream pressure evidence; Living Region must retain its scenario multiplier until pass-through is calibrated."
+    },
+    {
+      "field_id": "globalFoodPricePressure",
+      "value": 130.32118009277124,
+      "unit": "index or documented scenario value",
+      "evidence_status": "measured_contextual",
+      "description": "Global food-price pressure indicator.",
+      "evidence_indicator_ids": [
+        "global-food-price-index"
+      ],
+      "notes": ""
+    },
+    {
+      "field_id": "lowerSurplusEnergyPurchasingPowerProxy",
+      "value": null,
+      "unit": "index or documented scenario value",
+      "evidence_status": "contextual_evidence_only",
+      "description": "Purchasing-power pressure related to energy and essential costs.",
+      "evidence_indicator_ids": [
+        "canada-real-wage-index",
+        "canada-real-wage-growth",
+        "canada-disposable-income-per-person",
+        "canada-household-saving-rate"
+      ],
+      "notes": "These indicators can inform the proxy but cannot be collapsed into the existing coefficient without a documented model."
+    },
+    {
+      "field_id": "tradeCompetitionIndex",
+      "value": null,
+      "unit": "index",
+      "evidence_status": "not_available",
+      "description": "Trade competition or export-restriction scenario parameter.",
+      "evidence_indicator_ids": [
+        "global-food-price-index"
+      ],
+      "notes": "No direct trade-competition estimate is produced."
+    },
+    {
+      "field_id": "householdAffordabilityTransmissionShare",
+      "value": null,
+      "unit": "share",
+      "evidence_status": "not_available",
+      "description": "Share of upstream pressure transmitted to households.",
+      "evidence_indicator_ids": [
+        "canada-real-wage-index",
+        "canada-disposable-income-per-person"
+      ],
+      "notes": "Requires regional household pass-through calibration."
+    }
+  ],
+  "indicators": [
+    {
+      "indicator_id": "canada-energy-cpi-yoy",
+      "label": "Canada energy CPI growth",
+      "value": 22.17529039070749,
+      "unit": "percent",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": null,
+      "source": "Statistics Canada, StatCan 18-10-0004-01",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada may revise recent and historical observations.",
+        "Cross-country definitions differ."
+      ]
+    },
+    {
+      "indicator_id": "canada-gasoline-cpi-yoy",
+      "label": "Canada gasoline CPI growth",
+      "value": 33.187347931873475,
+      "unit": "percent",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": null,
+      "source": "Statistics Canada, StatCan 18-10-0004-01",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada may revise recent and historical observations.",
+        "Cross-country definitions differ."
+      ]
+    },
+    {
+      "indicator_id": "canada-fuel-oil-cpi-yoy",
+      "label": "Canada fuel oil CPI growth",
+      "value": 45.55971418849951,
+      "unit": "percent",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": null,
+      "source": "Statistics Canada, StatCan 18-10-0004-01",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada may revise recent and historical observations.",
+        "Cross-country definitions differ."
+      ]
+    },
+    {
+      "indicator_id": "canada-natural-gas-cpi-yoy",
+      "label": "Canada natural gas CPI growth",
+      "value": -4.232804232804243,
+      "unit": "percent",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": null,
+      "source": "Statistics Canada, StatCan 18-10-0004-01",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada may revise recent and historical observations.",
+        "Cross-country definitions differ."
+      ]
+    },
+    {
+      "indicator_id": "canada-refinery-input-growth",
+      "label": "Crude input to Canadian refineries growth",
+      "value": 11.117235680820281,
+      "unit": "Barrels",
+      "observation_date": "2026-04-01",
+      "source_date": "2026-06-30",
+      "retrieval_date": null,
+      "source": "Statistics Canada, StatCan 25-10-0063-01",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2510006301",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada may revise recent and historical observations.",
+        "Cross-country definitions differ."
+      ]
+    },
+    {
+      "indicator_id": "canada-crude-exports-growth",
+      "label": "Canadian crude oil export growth",
+      "value": 11.377403897236338,
+      "unit": "Barrels",
+      "observation_date": "2026-04-01",
+      "source_date": "2026-06-30",
+      "retrieval_date": null,
+      "source": "Statistics Canada, StatCan 25-10-0063-01",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2510006301",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada may revise recent and historical observations.",
+        "Cross-country definitions differ."
+      ]
+    },
+    {
+      "indicator_id": "freight-activity",
+      "status": "missing"
+    },
+    {
+      "indicator_id": "global-food-price-index",
+      "label": "FAO Food Price Index (nominal)",
+      "value": 130.32118009277124,
+      "unit": "index, 2014-2016=100",
+      "observation_date": "2026-06-01",
+      "source_date": "2026-07-03",
+      "retrieval_date": "2026-07-16T14:12:52+00:00",
+      "source": "Food and Agriculture Organization of the United Nations",
+      "source_url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+      "evidence_status": "measured",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "FAO may revise the full history. Recent meat-index observations combine projected and observed prices and may be revised materially.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    },
+    {
+      "indicator_id": "canada-real-food-price-index",
+      "label": "Canada real food-price index",
+      "value": 119.5754716981132,
+      "unit": "index",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": "2026-07-16T14:12:53+00:00",
+      "source": "Statistics Canada; Statistics Canada",
+      "source_url": "https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromVector",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Derived ratio. Statistics Canada table 18-10-0004-01 may revise recent and historical observations; classifications and baskets follow the native table. Statistics Canada table 18-10-0004-01 may revise recent and historical observations; classifications and baskets follow the native table.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    },
+    {
+      "indicator_id": "canada-food-inflation-gap",
+      "label": "Canada food inflation gap",
+      "value": 0.5612969260738954,
+      "unit": "percentage points",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": "2026-07-16T14:12:53+00:00",
+      "source": "Derived from Statistics Canada; Derived from Statistics Canada",
+      "source_url": "https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromVector",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Derived difference. Statistics Canada table 18-10-0004-01 may revise recent and historical observations; classifications and baskets follow the native table. Statistics Canada table 18-10-0004-01 may revise recent and historical observations; classifications and baskets follow the native table.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    },
+    {
+      "indicator_id": "canada-real-wage-index",
+      "label": "Canada real wage index",
+      "value": 106.61801119199723,
+      "unit": "index",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": "2026-07-16T14:52:20+00:00",
+      "source": "Derived from Statistics Canada; Derived from Statistics Canada",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410006301",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Derived ratio. Normalized to 100 at 2017-01-01. Statistics Canada table 14-10-0063-01 is latest-vintage and may revise recent or historical observations. Normalized to 100 at 2017-01-01. Statistics Canada table 18-10-0004-01 may revise recent and historical observations; classifications and baskets follow the native table.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    },
+    {
+      "indicator_id": "canada-real-wage-growth",
+      "label": "Canada real wage growth",
+      "value": -0.1820875805558897,
+      "unit": "percentage points",
+      "observation_date": "2026-05-01",
+      "source_date": "2026-06-22",
+      "retrieval_date": "2026-07-16T14:52:20+00:00",
+      "source": "Derived from Statistics Canada; Derived from Statistics Canada",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410006301",
+      "evidence_status": "derived",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Derived difference. Statistics Canada table 14-10-0063-01 is latest-vintage and may revise recent or historical observations. Statistics Canada table 18-10-0004-01 may revise recent and historical observations; classifications and baskets follow the native table.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    },
+    {
+      "indicator_id": "canada-disposable-income-per-person",
+      "label": "Canada household disposable income per person",
+      "value": 43691.27269017439,
+      "unit": "annualized CAD per person",
+      "observation_date": "2026-01-01",
+      "source_date": "2026-06-17",
+      "retrieval_date": "2026-07-16T14:52:20+00:00",
+      "source": "Statistics Canada; Statistics Canada",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610011201",
+      "evidence_status": "measured",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Income is a seasonally adjusted annual rate in millions of CAD and is not divided by four; population is the matching quarterly estimate. Statistics Canada table 36-10-0112-01 is latest-vintage and may revise recent or historical observations. Values are published at seasonally adjusted annual rates. Statistics Canada table 17-10-0009-01 is latest-vintage and may revise recent or historical observations.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    },
+    {
+      "indicator_id": "canada-household-saving-rate",
+      "label": "Household saving rate",
+      "value": 3.5,
+      "unit": "percent",
+      "observation_date": "2026-01-01",
+      "source_date": "2026-05-29",
+      "retrieval_date": "2026-07-16T14:52:20+00:00",
+      "source": "Statistics Canada",
+      "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610011201",
+      "evidence_status": "measured",
+      "evidence_label": "Contextual indicator",
+      "confidence": "medium",
+      "limitations": [
+        "Statistics Canada table 36-10-0112-01 is latest-vintage and may revise recent or historical observations. Values are published at seasonally adjusted annual rates.",
+        "Country baskets, weights, index bases, seasonal treatment, and housing institutions differ. Compare growth rates and within-country percentiles before levels."
+      ]
+    }
+  ],
+  "compatibility": {
+    "rule": "Living Region may import measured/contextual indicators, but only values with matching semantics may populate scenario coefficients.",
+    "current_living_region_scenario_assumptions": [
+      "fuelAvailabilityIndex",
+      "fuelPriceIncreasePct",
+      "dieselPriceMultiplier",
+      "fertilizerAvailabilityIndex",
+      "fertilizerPriceMultiplier",
+      "transportCostMultiplier",
+      "importPricePressureMultiplier",
+      "tradeCompetitionIndex",
+      "householdAffordabilityTransmissionShare",
+      "lowerSurplusEnergyPurchasingPowerProxy"
+    ],
+    "currently_safe_direct_import": [
+      "globalFoodPricePressure"
+    ],
+    "requires_local_calibration": [
+      "fuelPriceIncreasePct",
+      "dieselPriceMultiplier",
+      "transportCostMultiplier",
+      "importPricePressureMultiplier",
+      "lowerSurplusEnergyPurchasingPowerProxy",
+      "householdAffordabilityTransmissionShare"
+    ]
+  },
+  "provenance_requirements": [
+    "source dates",
+    "retrieval dates",
+    "source URL",
+    "evidence status",
+    "confidence",
+    "limitations"
+  ]
+}

@@ -1,7 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-export const ROOT = '/home/htaf/arc-carrying-capacity-model';
+// Resolve all evidence and generated outputs from this workspace package. The
+// standalone ARC checkout used an absolute path, which would make the migrated
+// calculations depend on a second repository at runtime.
+export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export function readCsv(relative) {
   const text = fs.readFileSync(path.join(ROOT, relative), 'utf8');

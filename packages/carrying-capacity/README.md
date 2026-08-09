@@ -1,5 +1,14 @@
 # ARC evidence-based carrying-capacity model
 
+This directory is the history-preserving migration of the standalone ARC
+repository into Living Region. It is a first-class workspace package named
+`@living-region/carrying-capacity`; its source evidence, derived tables,
+reports, scripts and Node test history remain together under this prefix.
+
+From the Living Region root, use `npm run report:carrying-capacity` or
+`npm run test:carrying-capacity`. The programmatic boundary is
+`src/index.mjs`, with the regional aggregation in `src/regional.mjs`.
+
 This repository is an independent, reproducible Phase 2 model for Affordable Rural Communities. The current canonical model is evidence-based and deliberately does not defend a predetermined 1 ha/adult value. Historical Lyis spreadsheets, diagrams and calculations are preserved as provenance only under `data/source/`, `data/derived/legacy/` and `outputs/legacy/`.
 
 The original files under `/home/htaf/lyis/` are read-only inputs and were not modified.
