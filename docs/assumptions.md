@@ -34,6 +34,10 @@ The transition model uses the current balanced annual-food yield as the establis
 
 Bearing curves are bounded interpolations from Ontario or comparable extension milestones. The central curve is accompanied by a slower/lower-yield conservative case and a faster/higher-yield favourable case. The strict transition footprint is solved so annual and perennial production remain within the available food-production envelope as young-row overlap declines. A later staged expansion may use released annual land, but new plantings cannot inherit the age of the original forest.
 
+## Mature multifunction land and labour
+
+The mature canonical land minimum retains the existing diversity/rotation value as an exclusive reserve. The soil/water and fibre/habitat/wildlife values are functional coverage hosted within perennial food and woody heating zones; they are not added again as hectares. The optional 0.20 ha export target first uses annual acreage released during succession. Paths/access and greenhouse/building footprints are not included in the food/heat site total. Mature labour includes explicit planning estimates for annual cultivation, perennial pruning/harvest/maintenance, food and nut processing/storage, coppice cutting, firewood hauling/splitting/stacking, and pest/wildlife management. These are not measured time-and-motion values.
+
 The perennial calorie model is not a complete nutrition model. Its coarse protein screen is shown explicitly; the ordinary one-adult full-calorie perennial mix supplies about 42 g protein/day against a 52 g/day screening target in the current synthesis. Annual legumes or another validated protein source remain necessary unless future evidence changes that result.
 
 ## Historical boundary

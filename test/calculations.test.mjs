@@ -241,6 +241,11 @@ test('labour source exposes annual preparation and perennial recurring classes',
   assert.ok(result.rows.some(row => row.id === 'annual_staple_low_input' && row.annual_soil_preparation === 'high'));
   assert.ok(result.rows.some(row => row.id === 'long_staple_tree' && row.annual_soil_preparation === 'low'));
   assert.ok(Number(result.rows.find(row => row.id === 'long_staple_tree').mature_recurring_hours_per_ha) < Number(result.rows.find(row => row.id === 'annual_staple_low_input').mature_recurring_hours_per_ha));
+  const woody = result.rows.find(row => row.id === 'woody_heating_coppice');
+  assert.ok(Number(woody.coppice_cutting_hours_per_ha) > 0);
+  assert.ok(Number(woody.firewood_hauling_hours_per_ha) > 0);
+  assert.ok(Number(woody.firewood_splitting_hours_per_ha) > 0);
+  assert.ok(Number(result.rows.find(row => row.id === 'annual_staple_low_input').processing_storage_hours_per_ha) > 0);
 });
 
 test('optional livestock modules account for feed and maintain land separation', () => {
@@ -293,10 +298,23 @@ test('mature food-system canonical share is solved from labour, nutrition and re
   }
   const ordinaryAdultMax = mature.max_share_summary.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
   close(ordinaryAdultMax.biological_max_share, .774, .001);
-  assert.equal(ordinaryAdultMax.max_share_within_arc_allocation, null);
+  close(ordinaryAdultMax.max_share_within_arc_allocation, .774, .001);
   const family = mature.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_two_children');
   close(family.mature_annual_area_ha + family.mature_perennial_area_ha + family.heating_area_ha, 1.863, .01);
   assert.ok(family.total_robust_productive_area_ha > family.previous_robust_system_area_ha);
+  assert.ok(family.robust_household_minimum_area_ha <= family.total_robust_productive_area_ha);
+  close(family.total_robust_productive_area_ha, family.robust_household_minimum_area_ha + family.additional_productive_surplus_area_ha, 1e-6);
+  assert.equal(family.land_accounting.paths_access_area_ha, 0);
+  assert.equal(family.land_accounting.greenhouse_building_area_ha, 0);
+  assert.ok(family.land_accounting.multifunctional_ecological_area_ha < family.land_accounting.multifunctional_functional_coverage_area_sum_ha);
+  const adult = mature.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'one_adult');
+  close(adult.robust_household_minimum_area_ha, .832758, .001);
+  close(adult.gross_site_area_ha, .928478, .001);
+  assert.equal(adult.arc_policy_status, 'sufficient against mature ageing-in-place scenario');
+  assert.ok(adult.land_accounting.market_export_overlap_with_released_annual_area_ha > 0);
+  assert.ok(adult.land_accounting.market_export_overlap_with_released_annual_area_ha < adult.land_accounting.market_export_target_area_ha);
+  assert.ok(adult.recurring_labour.physically_demanding_hours > adult.recurring_labour.heavy_annual_cultivation_hours);
+  assert.ok(adult.recurring_labour.processing_storage_hours > 0);
   const marginalFamily = mature.canonical_rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults_plus_two_children');
   const marginalLargerFamily = mature.canonical_rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults_plus_three_children');
   assert.ok(marginalLargerFamily.recurring_labour.total_recurring_labour_hours > marginalFamily.recurring_labour.total_recurring_labour_hours);

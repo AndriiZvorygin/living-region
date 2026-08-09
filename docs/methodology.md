@@ -41,13 +41,13 @@ Marginal, ordinary and favourable bands are 3.0, 5.0 and 8.9 dry tonnes/ha/year.
 
 Site classes alter food productivity and select the woody band: wetter productive, ordinary mesic, dry, and shallow/rocky marginal. These are scenario classes, not claims about every Grey County parcel.
 
-For each household and site:
+For the pre-ageing baseline household capacity layer:
 
 `mathematical minimum = food area + heating area`
 
-`robust system area = mathematical minimum + diversity/rotation + soil/water + fibre/habitat + deliberate export allowances`.
+`baseline robust system area = mathematical minimum + diversity/rotation + soil/water + fibre/habitat + deliberate export allowances`.
 
-The heating component is shared at the dwelling level in the current household scenarios. Children increase household food demand but do not create linear adult-equivalent land units. The ARC comparison allocation is 1 ha for a one-adult household and 2 ha for a two-adult household; it is evaluated against the robust household result. The allowances are displayed separately so a reader can remove or change them. Exportable food surplus is calculated after household demand and the explicit loss/reserve factors; it is not assumed to appear automatically.
+The heating component is shared at the dwelling level in the current household scenarios. Children increase household food demand but do not create linear adult-equivalent land units. The ARC comparison allocation is 1 ha for a one-adult household and 2 ha for a two-adult household; it is evaluated against both the baseline and mature ageing-in-place result. The mature solver retains the existing diversity/rotation allowance as an exclusive reserve, but places soil/water, wildlife, fibre and habitat functions inside productive perennial/woody zones. Optional market land first uses annual acreage released during succession; only any residual is added to gross site area.
 
 ## Economics
 
@@ -69,11 +69,11 @@ The strict transition forest footprint is solved to keep each requested year wit
 
 The mature objective is a labour transition, not maximum GJ/ha. Annual crops are the establishment bridge; perennial berries, shrubs, fruit trees and staple trees progressively increase food supply. The model tests 50%, 60%, 70%, 75%, 80% and continuous maximum-feasible perennial-calorie shares. The canonical plants-only share is selected as the lowest tested share that meets the explicit low-replanting, annual-resilience, protein and fat screening constraints; 75% is therefore a comparison scenario, not a fixed assumption. The zero-annual-area progressive-handoff case remains a sensitivity only.
 
-`data/source/food-production-labour.csv` records establishment labour, recurring labour, annual soil preparation, planting frequency, weeding, watering/monitoring, harvest, pruning/maintenance, mechanization and physical intensity for an older resident. Hours are explicit planning estimates rather than a Grey-Bruce time-and-motion study. The model reports establishment labour separately from mature recurring labour and calculates:
+`data/source/food-production-labour.csv` records establishment labour, recurring labour, annual soil preparation, planting frequency, weeding, watering/monitoring, harvest, pruning/maintenance, irrigation, orchard maintenance, pest/wildlife work, processing/storage, greenhouse management and explicit coppice/firewood tasks. Hours are explicit planning estimates rather than a Grey-Bruce time-and-motion study. The model reports establishment labour separately from mature recurring labour and calculates:
 
 `food energy without annual soil preparation/replanting ÷ household food energy`.
 
-For plants-only rows this equals the perennial calorie percentage. The optional livestock module can make it broader where animal food is credited to perennial/on-property feed, while also adding daily animal care, winter storage, feed and manure handling.
+For plants-only rows this equals the perennial calorie percentage. The optional livestock module can make it broader where animal food is credited to perennial/on-property feed, while also adding daily animal care, winter storage, feed and manure handling. The mature canonical labour audit separates heavy annual cultivation, heavy woody work, physically demanding hours, light/moderate recurring hours and processing/storage hours.
 
 ## Perennial protein and optional livestock
 

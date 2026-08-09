@@ -12,23 +12,23 @@ The evidence-based model supports a **household/site-adjusted carrying-capacity 
 
 | household | favourable site | ordinary site | marginal site |
 |---|---:|---:|---:|
-| 1 adult | 1.13 ha | 1.28 ha | 1.88 ha |
-| 1 adult + 1 child | 1.40 ha | 1.55 ha | 2.46 ha |
-| 2 adults | 1.61 ha | 1.76 ha | 2.93 ha |
-| 2 adults + 1 child | 1.90 ha | 2.05 ha | 3.53 ha |
-| 2 adults + 2 children | 2.36 ha | 2.51 ha | 4.46 ha |
-| 2 adults + 3 children | 2.68 ha | 2.84 ha | 5.11 ha |
+| 1 adult | 0.68 ha min / 0.78 ha with surplus | 0.83 ha min / 0.93 ha with surplus | 1.43 ha min / 1.43 ha with surplus |
+| 1 adult + 1 child | 0.95 ha min / 0.97 ha with surplus | 1.10 ha min / 1.12 ha with surplus | 2.01 ha min / 2.01 ha with surplus |
+| 2 adults | 1.16 ha min / 1.16 ha with surplus | 1.31 ha min / 1.31 ha with surplus | 2.48 ha min / 2.48 ha with surplus |
+| 2 adults + 1 child | 1.45 ha min / 1.45 ha with surplus | 1.60 ha min / 1.60 ha with surplus | 3.08 ha min / 3.08 ha with surplus |
+| 2 adults + 2 children | 1.91 ha min / 1.91 ha with surplus | 2.06 ha min / 2.06 ha with surplus | 4.01 ha min / 4.01 ha with surplus |
+| 2 adults + 3 children | 2.23 ha min / 2.23 ha with surplus | 2.39 ha min / 2.39 ha with surplus | 4.66 ha min / 4.66 ha with surplus |
 
 The current ARC examples evaluate as follows:
 
 | ARC planning example | favourable | ordinary | marginal |
 |---|---|---|---|
-| 1 adult → 1 ha | deficit against mature ageing-in-place scenario; -0.13 ha | deficit against mature ageing-in-place scenario; -0.28 ha | deficit against mature ageing-in-place scenario; -0.88 ha |
-| 2 adults/family → 2 ha | sufficient against mature ageing-in-place scenario; 0.39 ha | sufficient against mature ageing-in-place scenario; 0.24 ha | deficit against mature ageing-in-place scenario; -0.93 ha |
+| 1 adult → 1 ha | sufficient against mature ageing-in-place scenario; 0.22 ha | sufficient against mature ageing-in-place scenario; 0.07 ha | deficit against mature ageing-in-place scenario; -0.43 ha |
+| 2 adults/family → 2 ha | sufficient against mature ageing-in-place scenario; 0.84 ha | sufficient against mature ageing-in-place scenario; 0.69 ha | deficit against mature ageing-in-place scenario; -0.48 ha |
 
-Here “surplus/deficit” is allocation area minus the canonical mature robust productive area. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
+Here “surplus/deficit” is allocation area minus the recommended total site area, which includes only the portion of the optional market target not accommodated by released annual land. The robust household minimum is reported separately. It is not a food adult-equivalent. The two-adult allocation is shared across the household; children are not silently assigned or denied a full hectare.
 
-Recommended website language: “Plan productive land by household and site. Calculate food land from household food energy, calculate shared dwelling heating land from the building heat load and woody productivity, then add explicit resilience, ecological and surplus allowances. Use 1 ha for a one-adult household and 2 ha for a two-adult household only as planning examples; verify adequacy against the household/site performance table. Children increase food demand without being converted into linear hectare units.”
+Recommended website language: “Plan productive land by household and site. Calculate food land from household food energy, calculate shared dwelling heating land from the building heat load and woody productivity, retain an explicit reserve, and treat soil/water, wildlife, fibre and habitat functions as overlapping with productive zones. Report optional export land separately. Use 1 ha for a one-adult household and 2 ha for a two-adult household only as planning examples; verify adequacy against the household/site performance table. Children increase food demand without being converted into linear hectare units.”
 
 The historic 1.2 ha/person remains a provenance-only Lyis scenario. The current model may produce totals near that value for particular households/sites, but it does not validate the historical growing-season ratio.
 
