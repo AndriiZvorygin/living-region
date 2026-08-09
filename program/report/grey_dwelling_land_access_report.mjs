@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import {buildGreyCanonicalCarryingCapacityContext} from './grey_carrying_capacity_context.mjs';
 import {
   getGeometryCentroid,
   pointInPolygon,
@@ -491,6 +492,7 @@ export function buildGreyDwellingLandAccessReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    canonicalCarryingCapacity: buildGreyCanonicalCarryingCapacityContext({produceDir}),
     dataStatus: 'ok',
     dwellingLandAccessValid: true,
     confidence: 'low_to_moderate',

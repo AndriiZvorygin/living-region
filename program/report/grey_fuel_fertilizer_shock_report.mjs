@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import {buildGreyCanonicalCarryingCapacityContext} from './grey_carrying_capacity_context.mjs';
 
 function n(v, fallback = 0) { const x = Number(v); return Number.isFinite(x) ? x : fallback; }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -230,6 +231,7 @@ export function buildGreyFuelFertilizerShockReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    canonicalCarryingCapacity: buildGreyCanonicalCarryingCapacityContext({produceDir}),
     baselineAssumptions: {
       presentIndustrialFossilBaselineCoverage: n(presentIndustrial.foodCoverage),
       localizedPresentTechBaselineCoverage: presentTechCoverage,

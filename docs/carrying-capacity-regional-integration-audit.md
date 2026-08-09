@@ -1,0 +1,36 @@
+# Grey regional carrying-capacity integration audit
+
+Generated during the regional integration milestone. The carrying-capacity package is the canonical source for household food energy, balanced low-input food area, annual bridge, perennial transition, woody heating area, household/site labour and multifunctional land accounting. The older Grey reports also contain system-level market, trade, fuel, fertilizer, labour-market and affordability scenarios. Those concepts are retained where they are genuinely different.
+
+| Existing field | Current implementation | Carrying-capacity equivalent | Action | Caveat |
+|---|---|---|---|---|
+| `annualFoodEnergyGJPerPerson` | `grey_food_system_calibration` uses a fixed 3.7656 GJ/person/year | Health Canada EER by person and household composition | Canonical household scenarios use package EER; retain fixed value only as a clearly labelled calibration bridge for existing population-wide reports | Population average is not a household composition model |
+| `grossFoodEnergyGJPerHa` / `netGJPerHa` | Grey calibration yield-profile table with scenario coefficients | `calculateFoodSystem` and evidence food-yield rows | New ARC adoption outputs route balanced household food area through package | Grey crop-profile rows remain a broader regional calibration envelope |
+| `food land/person` | Derived indirectly from fixed population energy and candidate land | `food_area_ha`, `year1_annual_bridge_area_ha`, mature annual/perennial areas | Use canonical rows in `grey-carrying-capacity` and transition adoption output | Current land is a proxy, not legal or biological parcel capacity |
+| Household food demand | Fixed per-person demand in food calibration and food-price scenarios | `calculateHealthCanadaHouseholdFoodEnergyDemand` | Canonical adoption and public calculator use household members | Food-price report still models market demand and affordability, not biological household demand |
+| Household self-provision | Grey food-gap and supply reports use modality shares such as `selfProvisionPotentialShare` | Household canonical food delivered and demand displaced | Report canonical self-provision and market-demand displacement separately | Existing share scenarios represent market behaviour and should not be silently replaced |
+| Local surplus | Food supply/price reports use scenario-added local supply coefficients | Canonical mature `exportable_food_energy_surplus_gj_year` | New adoption output reports mature exportable surplus separately | Market access, processing and distribution remain outside ARC biology |
+| Annual establishment food | Grey replacement report has modality-specific year-1 yields | Canonical `annual_food_area_ha` and `total_usable_food_gj` at transition checkpoints | Canonical adoption report now includes establishment bridge by year | Modality replacement remains a separate emergency-program comparison |
+| Perennial production | Grey calibration has simplified perennial maturity shares and profiles | Canonical annual-to-perennial succession and mature plants-only rows | Transition pathway report now embeds canonical adoption scenarios | Canonical perennial rows are evidence-bounded planning scenarios, not local trials |
+| Household land requirement | Dwelling/food reports use garden, subsistence and smallholding thresholds | `robust_household_minimum_area_ha`, optional surplus and land accounting | Eligibility uses garden-scale access proxy; required land uses canonical site/profile rows | No validated Grey biological site-capability map exists |
+| Heating biomass land | Older Grey reports generally do not calculate household heating land | `heating_area_ha` and woody biomass bands | Canonical regional outputs include woody/heating hectares | Dwelling envelope and wood productivity are modelled evidence cases |
+| Household labour | Grey calibration and fuel shock use FTE/ha and labour productivity proxies | Canonical transition labour and mature recurring labour hours | Adoption output reports establishment and mature labour from package | Regional workforce availability remains a separate constraint |
+| Site productivity | Grey calibration uses scenario yield profiles and land-use suitability | Favourable/ordinary/marginal canonical site bands | Site shares are explicit inputs and sensitivity variants | Shares must not be read as cadastral soil classification |
+| Fuel/fertilizer availability | Grey fuel shock owns diesel, fertilizer, machinery and transport assumptions | No direct ARC equivalent; systemic-energy contract provides contextual indicators | Keep in Living Region overlays; canonical adoption exposes present/constrained/deeper input factors | Do not treat CPI or global indicators as a local physical availability measurement |
+| Food coverage | Grey calibration compares candidate land output to total county demand | Canonical household demand displaced and regional coverage change | Report both metrics side by side | Household self-provision and saleable surplus are separate flows |
+| Food-price pressure | Grey food-price report models price transmission and affordability | No direct biological equivalent | Preserve report and feed canonical local-demand-displacement output as an input/context field | Price pass-through is a Living Region scenario assumption |
+
+## Adopted regional contract
+
+`calculateGreyCarryingCapacityAdoption` is the shared regional API. It accepts:
+
+- eligible households and people from the best current dwelling-land proxy;
+- explicit favourable/ordinary/marginal site shares;
+- an explicit household-composition mix;
+- adoption rates of 0%, 10%, 25%, 50% and 75%;
+- canonical annual-to-perennial checkpoints at years 1, 5, 10, 15 and mature;
+- present, constrained and deeper systemic-input overlays.
+
+The default eligibility basis is `estimatedDwellingsWithGardenScaleAccess`, because it is the least overclaiming current proxy for households with some land-access potential. It is not a legal parcel, tenure, soil or biological capability claim. The generated output reports household demand displaced, exportable surplus, establishment annual area, mature annual/perennial area, woody heating area, exclusive productive land and labour separately.
+
+The transition-pathway report and `report:grey:carrying-capacity` now consume this API. The older Grey calibration, food-gap, food-price and fuel-shock rows remain available as system-level scenario diagnostics, with their differing assumptions documented rather than silently relabelled as ARC results.

@@ -6,7 +6,8 @@
   "type": "module",
   "main": "src/index.mjs",
   "exports": {
-    ".": "./src/index.mjs"
+    ".": "./src/index.mjs",
+    "./browser": "./src/browser.mjs"
   },
   "scripts": {
     "extract": "node scripts/extract-ods.mjs",

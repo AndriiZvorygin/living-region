@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import {buildGreyCanonicalCarryingCapacityContext} from './grey_carrying_capacity_context.mjs';
 import { greyCountySeedNodes } from '../data/grey_county_seed_nodes.mjs';
 
 const ANNUAL_FOOD_ENERGY_GJ_PER_PERSON = 3.7656;
@@ -470,6 +471,7 @@ export function buildGreyFoodSystemCalibration(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    canonicalCarryingCapacity: buildGreyCanonicalCarryingCapacityContext({produceDir}),
     warnings,
     assumptions: {
       annualFoodEnergyGJPerPerson: ANNUAL_FOOD_ENERGY_GJ_PER_PERSON,

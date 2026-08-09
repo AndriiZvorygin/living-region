@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {calculateRegionalCarryingCapacity} from '../src/regional.mjs';
+import {calculateRegionalCarryingCapacity, calculateGreyCarryingCapacityAdoption} from '../src/regional.mjs';
 
 test('regional aggregation reports household composition and site sensitivity', () => {
   const result = calculateRegionalCarryingCapacity({
@@ -23,4 +23,16 @@ test('regional site shares are normalized and remain explicit', () => {
   assert.ok(Math.abs(total - 1) < 1e-12);
   assert.equal(result.site_allocation.shares.marginal, 0.5);
   assert.match(result.site_allocation.rule, /scenario allocation/);
+});
+
+test('Grey adoption scenarios use eligible households, explicit site mix and canonical transition years', () => {
+  const result = calculateGreyCarryingCapacityAdoption({eligibleHouseholds: 100, eligiblePopulation: 260, regionalFoodDemandGJ: 1000, adoptionRates: [0, .5], externalInputConditions: {present: 1}});
+  assert.deepEqual(result.adoption_rates, [0, .5]);
+  assert.equal(result.scenarios.length, 2);
+  const mature = result.scenarios[1].transition_years.find((row) => row.year === 'mature');
+  const yearOne = result.scenarios[1].transition_years.find((row) => row.year === 1);
+  assert.equal(mature.participating_households, 50);
+  assert.ok(yearOne.establishment_annual_food_area_ha > mature.mature_annual_food_area_ha);
+  assert.ok(mature.market_food_demand_displaced_gj_year > 0);
+  assert.ok(mature.mature_exportable_surplus_gj_year >= 0);
 });

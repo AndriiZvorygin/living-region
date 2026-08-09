@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const root = path.resolve('packages/education-web/public/generated/carrying-capacity');
+const contract = JSON.parse(fs.readFileSync(path.join(root, 'presentation.json'), 'utf8'));
+const schema = JSON.parse(fs.readFileSync(path.join(root, 'presentation.schema.json'), 'utf8'));
+const required = schema.required;
+for (const key of required) if (!(key in contract)) throw new Error(`presentation contract missing ${key}`);
+if (contract.units.energy !== 'MJ/day and GJ/year') throw new Error('presentation contract must use metric energy units');
+if (contract.household_presets.length < schema.properties.household_presets.minItems) throw new Error('presentation contract is missing household presets');
+if (contract.mature_rows.length < schema.properties.mature_rows.minItems || contract.transition_rows.length < schema.properties.transition_rows.minItems) throw new Error('presentation contract is missing canonical rows');
+if (!contract.regional.grey.scenarios?.length) throw new Error('presentation contract is missing regional scenarios');
+console.log(`validated carrying-capacity presentation contract ${contract.contract_version} (${contract.household_presets.length} presets, ${contract.regional.grey.scenarios.length} regional scenarios)`);

@@ -88,6 +88,14 @@ for (const source of selected) {
     ...(overrides[source.id] ?? {})
   };
 
+  // Resolve the provincewide guard before metadata discovery or any network
+  // request. This keeps the safety check deterministic and unit-testable.
+  if (source.largeDataset && !dryRun && !allowLargeDownload && !explicitWhere && !explicitBbox) {
+    console.log(`${source.id}: blocked (large dataset requires --allow-large-download or --where/--bbox filter)`);
+    manifestRows.push({ id: source.id, ok: false, reason: 'large-download-blocked' });
+    continue;
+  }
+
   const discovered = (sourceWithOverride.itemId || sourceWithOverride.serviceUrl || dryRun) && !refreshMetadata
     ? { ...sourceWithOverride, layers: [], warnings: dryRun ? ['dry-run: discovery skipped'] : [] }
     : await discoverLayerDownloadInfo({ ...sourceWithOverride });
@@ -117,12 +125,6 @@ for (const source of selected) {
   if (dryRun) {
     console.log(`[dry-run] ${source.id}: itemId=${itemId ?? 'n/a'} serviceUrl=${serviceUrl ?? 'n/a'} layerId=${layerId ?? 'n/a'}`);
     manifestRows.push({ id: source.id, dryRun: true, itemId: itemId ?? null, serviceUrl: serviceUrl ?? null, layerId, outputPath: path.join(outDir, `${source.id}.geojson`) });
-    continue;
-  }
-
-  if (source.largeDataset && !allowLargeDownload && !explicitWhere && !explicitBbox) {
-    console.log(`${source.id}: blocked (large dataset requires --allow-large-download or --where/--bbox filter)`);
-    manifestRows.push({ id: source.id, ok: false, reason: 'large-download-blocked' });
     continue;
   }
 

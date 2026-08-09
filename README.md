@@ -146,6 +146,28 @@ npm run report:grey:fuel-shock
 npm run report:grey:transition-pathways
 ```
 
+### Carrying-capacity integration and public explorer
+
+The canonical carrying-capacity package is shared by Grey County reports and the
+educational web interface. Build the metric-first presentation contract and
+static site with:
+
+```bash
+npm run report:carrying-capacity
+npm run report:grey:carrying-capacity
+npm run report:grey:transition-pathways
+npm run build:education
+npm run dev:education
+```
+
+The public pages are `/carrying-capacity` and `/grey-county-transition`. The
+browser consumes the generated contract at
+`packages/education-web/public/generated/carrying-capacity/presentation.json`;
+it does not contain independent regional formulas. See
+`docs/carrying-capacity-education-web-architecture.md` and
+`docs/carrying-capacity-regional-integration-audit.md` for the data flow,
+evidence status and remaining Grey land-access caveats.
+
 ### Human-readable outputs
 
 ```bash

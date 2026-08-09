@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "site_classes", "household_presets", "mature_rows", "transition_rows", "regional", "sources"],
+  "properties": {
+    "contract_version": {"type": "string"},
+    "model_contract_version": {"type": "string"},
+    "generated_at": {"type": "string"},
+    "units": {"type": "object", "required": ["energy", "land", "labour"]},
+    "health_canada": {"type": "object", "required": ["scenarios", "activity_categories"]},
+    "site_classes": {"type": "object", "minProperties": 3},
+    "household_presets": {"type": "array", "minItems": 6},
+    "mature_rows": {"type": "array", "minItems": 18},
+    "transition_rows": {"type": "array", "minItems": 18},
+    "regional": {"type": "object", "required": ["grey"]},
+    "sources": {"type": "array", "minItems": 3}
+  }
+}

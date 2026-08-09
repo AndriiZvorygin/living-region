@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import {buildGreyCanonicalCarryingCapacityContext} from './grey_carrying_capacity_context.mjs';
 
 function n(v, fallback = 0) { const x = Number(v); return Number.isFinite(x) ? x : fallback; }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -442,6 +443,7 @@ export function buildGreyFoodSupplyDemandPriceReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    canonicalCarryingCapacity: buildGreyCanonicalCarryingCapacityContext({produceDir}),
     sourceFiles: {
       foodCalibration: path.join(produceDir, 'grey-food-calibration.json'),
       currentShockThreshold: path.join(produceDir, 'grey-current-system-shock-threshold.json'),

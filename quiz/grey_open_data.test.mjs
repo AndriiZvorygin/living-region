@@ -439,8 +439,8 @@ describe('grey open data tools', () => {
     }
   });
 
-  test('candidates option prints candidate lines in non-dry-run mode', () => {
-    const discover = spawnSync('node', ['command/discover_grey_open_data.mjs', '--source=municipality-boundaries', '--candidates'], { encoding: 'utf8' });
+  test('candidates option prints candidate summary without requiring network access', () => {
+    const discover = spawnSync('node', ['command/discover_grey_open_data.mjs', '--source=municipality-boundaries', '--candidates', '--dry-run'], { encoding: 'utf8' });
     expect(discover.status).toBe(0);
     expect(discover.stdout).toContain('candidates:');
   });

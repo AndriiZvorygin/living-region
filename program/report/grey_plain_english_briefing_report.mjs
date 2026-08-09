@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'node:fs';
 import path from 'node:path';
+import {buildGreyCanonicalCarryingCapacityContext} from './grey_carrying_capacity_context.mjs';
 
 function n(v, fallback = 0) { const x = Number(v); return Number.isFinite(x) ? x : fallback; }
 
@@ -178,6 +179,7 @@ export function buildGreyPlainEnglishBriefingReport(options = {}) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    canonicalCarryingCapacity: buildGreyCanonicalCarryingCapacityContext({produceDir}),
     title: 'Living Region Grey County: Early Findings from the First Real-Data Baseline',
     oneParagraphSummary:
       'Living Region now combines real Grey County open data, Census small-area population geography, land-use and road data, lots/concessions reference fabric, food-energy assumptions, labour estimates, and shock scenarios to explore how land, food, transport, labour, and local infrastructure interact.',
