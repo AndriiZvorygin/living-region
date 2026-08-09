@@ -12,7 +12,7 @@ Requirements: Node.js 20+ and `unzip`.
 npm run all
 ```
 
-This extracts the original ODS files, builds the current evidence-based model and runs the test suite. The current build includes Health Canada EER scenarios, Ontario crop benchmarks and low-input syntheses, Canadian food composition, audited yurt heating, evidence-based woody-energy bands, household capacity, site sensitivity, deliberate surplus and a separate configurable economics module.
+This extracts the original ODS files, builds the current evidence-based model and runs the test suite. The current build includes Health Canada EER scenarios, Ontario crop benchmarks and low-input syntheses, Canadian food composition, audited yurt heating, evidence-based woody-energy bands, household capacity, site sensitivity, deliberate surplus, a time-dependent annual-to-perennial food-forest transition model and a separate configurable economics module.
 
 Useful commands:
 
@@ -33,6 +33,11 @@ npm test
 - [`outputs/household-capacity.md`](outputs/household-capacity.md)
 - [`outputs/site-sensitivity.md`](outputs/site-sensitivity.md)
 - [`outputs/surplus-production.md`](outputs/surplus-production.md)
+- [`outputs/food-forest-transition.md`](outputs/food-forest-transition.md)
+- [`outputs/annual-establishment-food.md`](outputs/annual-establishment-food.md)
+- [`outputs/mature-food-forest-capacity.md`](outputs/mature-food-forest-capacity.md)
+- [`outputs/household-transition-scenarios.md`](outputs/household-transition-scenarios.md)
+- [`outputs/perennial-yield-evidence.md`](outputs/perennial-yield-evidence.md)
 - [`docs/source-audit.md`](docs/source-audit.md)
 - [`docs/evidence-methodology.md`](docs/evidence-methodology.md)
 

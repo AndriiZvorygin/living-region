@@ -28,6 +28,14 @@ The central model uses R-20 walls, R-40 roof, R-30 floor, 8 m² of windows/doors
 
 `data/derived/input-intensity.csv` records synthetic fertilizer, imported manure/compost, biosolids, irrigation, crop-protection chemicals, mechanized energy, establishment work, annual purchased inputs and recycled nutrients. Commercial Ontario averages are benchmark evidence only. The central food rows are labelled low-input synthesis, not measured zero-input trials; organic evidence is not treated as near-zero input because the documented organic examples still use rotation, manure, machinery and labour.
 
+## Food-forest succession
+
+The transition model uses the current balanced annual-food yield as the establishment bridge. It reports gross area and 20%, 30% and 40% loss/reserve cases separately. The perennial central mix is a transparent synthesis: 25% berries, 25% hazelnut, 25% chestnut and 25% apple/fruit-storage layer. Its central gross yield is 10.533 GJ/ha/year before the transition loss/reserve case; this is not a measured Grey-Bruce food-forest yield.
+
+Bearing curves are bounded interpolations from Ontario or comparable extension milestones. The central curve is accompanied by a slower/lower-yield conservative case and a faster/higher-yield favourable case. The strict transition footprint is solved so annual and perennial production remain within the available food-production envelope as young-row overlap declines. A later staged expansion may use released annual land, but new plantings cannot inherit the age of the original forest.
+
+The perennial calorie model is not a complete nutrition model. Its coarse protein screen is shown explicitly; the ordinary one-adult full-calorie perennial mix supplies about 42 g protein/day against a 52 g/day screening target in the current synthesis. Annual legumes or another validated protein source remain necessary unless future evidence changes that result.
+
 ## Historical boundary
 
 The following values are legacy/reference only:

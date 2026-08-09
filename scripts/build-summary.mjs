@@ -7,6 +7,7 @@ import {buildEvidenceWoody} from './calc-evidence-woody.mjs';
 import {buildHouseholdCapacity} from './calc-household-capacity.mjs';
 import {buildEconomics} from './calc-economics.mjs';
 import {buildFarmSize} from './calc-farm-size.mjs';
+import {buildFoodForestTransition} from './calc-food-forest-transition.mjs';
 
 const f = (value, digits = 2) => format(value, digits);
 
@@ -168,9 +169,12 @@ These are annual saleable-unit requirements, not net farm-income forecasts. Labo
 `;
 }
 
-function recommendationMarkdown(energy, food, heating, woody, capacity, economics) {
+function recommendationMarkdown(energy, food, heating, woody, capacity, economics, transition) {
   const row = (site, household) => capacity.rows.find(item => item.site === capacity.policy_site_map[site] && item.household === household);
   const ordinaryAdult = row('ordinary', 'one_adult');
+  const transitionRow = (household) => transition.households.find(item => item.site === 'ordinary_mesic' && item.household === household);
+  const ordinaryAdultTransition = transitionRow('one_adult');
+  const ordinaryFamilyTransition = transitionRow('two_adults_plus_two_children');
   return `# Recommended ARC land guideline
 
 ## Result
@@ -204,6 +208,14 @@ Here “surplus/deficit” is allocation area minus robust productive area. It i
 Recommended website language: “Plan productive land by household and site. Calculate food land from household food energy, calculate shared dwelling heating land from the building heat load and woody productivity, then add explicit resilience, ecological and surplus allowances. Use 1 ha for a one-adult household and 2 ha for a two-adult household only as planning examples; verify adequacy against the household/site performance table. Children increase food demand without being converted into linear hectare units.”
 
 The historic 1.2 ha/person remains a provenance-only Lyis scenario. The current model may produce totals near that value for particular households/sites, but it does not validate the historical growing-season ratio.
+
+## Succession through establishment
+
+The annual/perennial transition is a separate time-dependent constraint. On the ordinary site, the central 30% loss/reserve case requires ${f(ordinaryAdultTransition.annual_bridge_area_at_30_percent_loss_or_reserve_ha, 2)} ha of annual crops for one adult and ${f(ordinaryFamilyTransition.annual_bridge_area_at_30_percent_loss_or_reserve_ha, 2)} ha for two adults plus two children. Those annuals can be planted in the future food-forest footprint while young rows remain agriculturally usable; the model records that as overlap rather than adding hectares twice.
+
+The central perennial mix requires ${f(ordinaryAdultTransition.perennial_area_required_at_maturity_ha['30%']['100%'], 2)} ha at maturity for one adult and ${f(ordinaryFamilyTransition.perennial_area_required_at_maturity_ha['30%']['100%'], 2)} ha for two adults plus two children, after the same 30% loss/reserve case. Within the current ARC allocations, the food-production envelopes after shared heat are ${f(ordinaryAdultTransition.food_production_envelope_at_arc_allocation_ha, 2)} ha and ${f(ordinaryFamilyTransition.food_production_envelope_at_arc_allocation_ha, 2)} ha respectively. This is why a household/site test is necessary: annuals can bridge establishment, but mature full perennial replacement and resilience/ecological land may not fit the same allocation.
+
+The transition outputs in ` + '`outputs/food-forest-transition.md`' + ` and ` + '`outputs/household-transition-scenarios.md`' + ` should be read alongside this land guideline. They do not convert the result into hectares per adult-equivalent.
 
 ## What is mathematically required versus allowed
 
@@ -243,9 +255,10 @@ export function buildEvidenceSummary() {
   const economics = buildEconomics();
   writeInputIntensity(food);
   const farm = buildFarmSize();
+  const transition = buildFoodForestTransition(energy, food, heating, woody, capacity);
 
   const historical = historicalReference();
-  const canonical = {status: 'evidence-based current ARC model', human_energy: energy, food_yields: {low_input_distribution: food.low_input_observations, category_stats: food.category_stats_low_input}, heating, woody_yields: woody, household_capacity: capacity, economic_output: economics, site_sensitivity: capacity.site_classes, farm_size_reference: {status: 'historical descriptive reference only', correlation: farm.correlation}};
+  const canonical = {status: 'evidence-based current ARC model', human_energy: energy, food_yields: {low_input_distribution: food.low_input_observations, category_stats: food.category_stats_low_input}, heating, woody_yields: woody, household_capacity: capacity, food_forest_transition: transition, economic_output: economics, site_sensitivity: capacity.site_classes, farm_size_reference: {status: 'historical descriptive reference only', correlation: farm.correlation}};
   writeJson('outputs/summary.json', {model_version: 'phase-2-evidence-based', canonical, historical});
   writeText('outputs/evidence-based-headline-results.md', headline(energy, food, heating, woody, capacity, economics));
   writeText('outputs/low-input-food-yields.md', foodMarkdown(food));
@@ -254,7 +267,7 @@ export function buildEvidenceSummary() {
   writeText('outputs/household-capacity.md', householdMarkdown(capacity));
   writeText('outputs/site-sensitivity.md', siteMarkdown(capacity));
   writeText('outputs/surplus-production.md', surplusMarkdown(capacity, economics));
-  writeText('outputs/recommended-land-guideline.md', recommendationMarkdown(energy, food, heating, woody, capacity, economics));
+  writeText('outputs/recommended-land-guideline.md', recommendationMarkdown(energy, food, heating, woody, capacity, economics, transition));
   writeText('outputs/legacy/README.md', '# Historical Lyis reference outputs\n\nThe files in this directory are Phase 1 reconstructions of Lyis spreadsheets, diagrams and historical calculations. They are provenance only and are not canonical inputs to the evidence-based ARC model. Historical values include the 75 kg/4.77 GJ adult, the 0.25 + 0.25 + 0.50 ha allocation, the historical 30 GJ/ha/year coppice assumption and the 1.0/1.2 ha policy shorthand. The current model is generated by `scripts/build-summary.mjs`; its machine-readable boundary is `outputs/summary.json` with current values under `canonical` and reference values under `historical`.\n');
   return {canonical, historical};
 }

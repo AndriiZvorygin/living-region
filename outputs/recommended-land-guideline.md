@@ -32,6 +32,14 @@ Recommended website language: “Plan productive land by household and site. Cal
 
 The historic 1.2 ha/person remains a provenance-only Lyis scenario. The current model may produce totals near that value for particular households/sites, but it does not validate the historical growing-season ratio.
 
+## Succession through establishment
+
+The annual/perennial transition is a separate time-dependent constraint. On the ordinary site, the central 30% loss/reserve case requires 0.15 ha of annual crops for one adult and 0.62 ha for two adults plus two children. Those annuals can be planted in the future food-forest footprint while young rows remain agriculturally usable; the model records that as overlap rather than adding hectares twice.
+
+The central perennial mix requires 0.46 ha at maturity for one adult and 1.91 ha for two adults plus two children, after the same 30% loss/reserve case. Within the current ARC allocations, the food-production envelopes after shared heat are 0.65 ha and 1.65 ha respectively. This is why a household/site test is necessary: annuals can bridge establishment, but mature full perennial replacement and resilience/ecological land may not fit the same allocation.
+
+The transition outputs in `outputs/food-forest-transition.md` and `outputs/household-transition-scenarios.md` should be read alongside this land guideline. They do not convert the result into hectares per adult-equivalent.
+
 ## What is mathematically required versus allowed
 
 Mathematically required: household food demand divided by the chosen low-input food-system yield, plus audited useful heating demand divided by sustainable woody energy yield.

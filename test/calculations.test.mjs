@@ -11,6 +11,7 @@ import {calculateEvidenceHeating} from '../scripts/calc-evidence-heating.mjs';
 import {calculateWoodyLand} from '../scripts/calc-evidence-woody.mjs';
 import {buildHouseholdCapacity} from '../scripts/calc-household-capacity.mjs';
 import {calculateEconomicTargets} from '../scripts/calc-economics.mjs';
+import {buildFoodForestTransition, calculatePerennialEvidence, transitionYears} from '../scripts/calc-food-forest-transition.mjs';
 
 function close(actual, expected, tolerance = 1e-9) {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} was not within ${tolerance} of ${expected}`);
@@ -156,4 +157,69 @@ test('economic target calculation is margin divided into cash target', () => {
   const row = calculateEconomicTargets([{product: 'test', unit: 'unit', price_cad: 10, variable_cost_cad: 6, source: 'test', notes: ''}], [1000])[0];
   close(row.net_margin_cad_per_unit, 4);
   close(row.required_units_by_target['1000'], 250);
+});
+
+test('annual establishment bridge area meets demand after the selected loss/reserve case', () => {
+  const result = buildFoodForestTransition();
+  const row = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'two_adults_plus_two_children');
+  const case30 = row.annual_crop_requirements['30%'];
+  close(case30.after_loss_reserve_area_ha * case30.net_yield_gj_ha_year, row.household_food_demand_gj_year, 1e-6);
+});
+
+test('perennial mature mix scales by area and has a bounded production curve', () => {
+  const evidence = calculatePerennialEvidence();
+  assert.ok(evidence.central_mix.mature_food_gj_ha_year > 0);
+  const curve = evidence.curve_anchors.central.late_bearing_staple;
+  assert.equal(curve[1], 0);
+  assert.equal(curve[20], 1);
+  for (const year of [2, 3, 5, 8, 10, 15]) assert.ok(curve[year] >= 0 && curve[year] <= 1);
+});
+
+test('food-forest handoff releases annual area while perennial supply rises', () => {
+  const result = buildFoodForestTransition();
+  const row = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
+  const series = row.transition.progressive_handoff.rows;
+  assert.deepEqual(series.map(item => item.year), transitionYears);
+  assert.ok(series.at(-1).annual_area_ha < series[0].annual_area_ha);
+  assert.ok(series.at(-1).perennial_food_coverage_ratio > series[0].perennial_food_coverage_ratio);
+  assert.ok(series.every(item => item.released_annual_area_ha >= 0));
+});
+
+test('young-row intercropping prevents annual and perennial hectares from being double-counted', () => {
+  const result = buildFoodForestTransition();
+  for (const row of result.households) {
+    for (const item of row.transition.progressive_handoff.rows) {
+      close(item.occupied_food_production_area_ha, item.annual_area_ha + item.perennial_area_ha - item.young_forest_annual_intercrop_overlap_ha, 2e-6);
+      assert.ok(item.land_double_counted_as_if_separate_ha >= 0);
+      assert.ok(item.occupied_food_production_area_ha <= row.food_production_envelope_at_arc_allocation_ha + 2e-6);
+    }
+  }
+});
+
+test('perennial calorie thresholds are reported independently from total household coverage', () => {
+  const result = buildFoodForestTransition();
+  const row = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
+  const thresholds = row.transition.progressive_handoff.thresholds;
+  assert.ok(thresholds['25%'] !== null);
+  assert.ok(thresholds['50%'] !== null);
+  assert.ok(thresholds['75%'] !== null);
+  assert.ok(thresholds['100%'] !== null);
+  assert.ok(row.transition.progressive_handoff.rows.every(item => item.household_food_coverage_ratio >= 0.999));
+});
+
+test('marginal establishment deficits are exposed rather than hidden by intercropping', () => {
+  const result = buildFoodForestTransition();
+  const ordinaryFamily = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'two_adults_plus_two_children');
+  const marginalAdultChild = result.households.find(item => item.site === 'shallow_rocky_marginal' && item.household === 'adult_plus_child');
+  assert.ok(ordinaryFamily.transition.progressive_handoff.rows.every(item => !item.annual_land_limited));
+  assert.ok(marginalAdultChild.transition.progressive_handoff.rows.some(item => item.annual_land_limited));
+  assert.ok(marginalAdultChild.transition.progressive_handoff.rows[0].household_food_coverage_ratio < 1);
+});
+
+test('conservative and favourable perennial establishment sensitivities are explicit', () => {
+  const result = buildFoodForestTransition();
+  const row = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'one_adult');
+  assert.ok(row.transition_sensitivity.conservative.mature_mix_gross_yield_gj_ha_year < row.perennial_mature_mix_gross_yield_gj_ha_year);
+  assert.ok(row.transition_sensitivity.favourable.mature_mix_gross_yield_gj_ha_year > row.perennial_mature_mix_gross_yield_gj_ha_year);
+  assert.ok(row.transition_sensitivity.conservative.transition.progressive_handoff.rows[2].perennial_usable_food_gj <= row.transition.progressive_handoff.rows[2].perennial_usable_food_gj);
 });

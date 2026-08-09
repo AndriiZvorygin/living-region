@@ -52,3 +52,15 @@ The heating component is shared at the dwelling level in the current household s
 ## Economics
 
 Cash production is separate from calories and useful heat. The economic module reports configurable annual saleable-unit volumes for $1,000, $2,000, $3,000 and $5,000 targets. The checked-in direct-sale margins are illustrative placeholders, except for a clearly vintage OCO organic grain-price reference; they must be replaced with current Owen Sound-area farmgate/direct-sale records before public use.
+
+## Annual-to-perennial transition
+
+The food-forest transition is a succession model. For each household/site, annual crops first provide the residual household demand while perennial production follows class-specific bearing curves. The central mix is not a monocrop: berry/vitamin, hazelnut fat/protein, chestnut starch and fruit/storage layers each have an area share and separate yield fraction. Production is calculated as:
+
+`annual usable food + perennial usable food = total usable food`
+
+Young-row intercropping is represented as an explicit overlap in physical hectares. Occupied food land is:
+
+`annual area + perennial footprint - intercrop overlap`.
+
+The strict transition forest footprint is solved to keep each requested year within the food-production envelope as overlap declines. This protects the annual bridge but can be smaller than the unconstrained mature forest target. Released annual hectares are reported for a progressive handoff strategy; a staged later planting must use a slower age curve for the new rows. The transition output does not convert the result into hectares per adult-equivalent.

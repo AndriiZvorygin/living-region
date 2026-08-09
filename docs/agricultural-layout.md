@@ -32,6 +32,14 @@ The intended pattern is annual production embedded inside progressively more per
 
 The objective is to minimize loss, not to promise zero runoff. Actual performance depends on slope, soil texture, drainage, rainfall intensity, compaction, ground cover, swales or other earthworks, livestock pressure, and maintenance. Any future erosion-rate analysis must distinguish regional averages, severe-site examples, and estimated soil-formation rates rather than presenting one severe rate as a North American average.
 
+## Establishment succession
+
+The annual fields are the calorie bridge while the perennial zones establish. Young-tree and shrub rows may support annual/intercrop production in their alleys where light, root competition, access and harvest timing make that agronomically plausible. The transition model records the shared footprint explicitly: annual area plus perennial footprint minus the young-row overlap is occupied food-production area. As the canopy closes, annual area is progressively released to market gardens, staple reserve, nursery stock, fibre, soil-building rotation, community production or additional perennial planting. This is a time sequence, not permission to count a mature food forest and a full permanent annual field as separate uses of the same hectares.
+
+The first layout zones therefore remain close to the dwelling even after perennial planting begins: greenhouse and intensive gardens for daily monitoring, annual staples for reliable establishment calories, then early berries and perennial vegetables, shrubs and hazelnuts, intermediate fruit trees, and taller chestnut/walnut/heartnut/oak functions at the outer layers. Coppice and thorny edge plantings can provide biomass, wildlife protection and runoff interception, but their heating and ecological area is calculated separately from the perennial calorie mix.
+
 ## Relationship to the energy model
 
 Food-energy land and coppice land are the explicit arithmetic streams. Perennial buffers, nutrient interception, runoff control, wildlife protection, fibre/materials, soil-building rotations, and unproductive establishment years are resilience/design allowances. They should be displayed as such in a future ARC interface rather than hidden inside a single productivity coefficient.
+
+The quantitative succession outputs are in `outputs/food-forest-transition.md`, `outputs/annual-establishment-food.md`, and `outputs/household-transition-scenarios.md`.
