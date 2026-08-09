@@ -1,0 +1,9 @@
+variable,value,units,source_file,source_sheet,source_row,source_cell,formula,status
+body_mass,50,kg,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,3,B3,,input in workbook
+body_mass,75,kg,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,4,B4,,input in workbook
+daily_energy_50kg,8700,kJ/day,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,3,C3,,input in workbook
+daily_energy_75kg,13050,kJ/day,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,4,C4,of:=[.C3]/[.$B$3]*[.$B4],derived formula in workbook
+annual_energy_50kg,3.177675,GJ/year,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,3,D3,of:=[.C3]*365.25/1000/1000,derived formula in workbook
+annual_energy_75kg,4.7665125,GJ/year,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,4,D4,of:=[.D3]/[.$B$3]*[.$B4],derived formula in workbook
+monthly_energy_75kg,397.209375,MJ/month,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,4,E4,of:=[.E3]/[.$B$3]*[.$B4],derived formula in workbook
+weekly_energy_75kg,91.35,MJ/week,/home/htaf/lyis/pcan/paradise-garden.ods,j needs,4,F4,of:=[.F3]/[.$B$3]*[.$B4],derived formula in workbook

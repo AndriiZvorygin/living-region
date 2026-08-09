@@ -1,0 +1,39 @@
+{
+  "allocation": {
+    "core_food_ha": 0.25,
+    "backup_perennial_food_ha": 0.25,
+    "coppice_ha": 0.5,
+    "total_ha": 1
+  },
+  "food": {
+    "annual_demand_gj": 4.7665125,
+    "median_crop_gj_per_ha": 25.91,
+    "q1_crop_gj_per_ha": 20.259999999999998,
+    "q3_crop_gj_per_ha": 29.59,
+    "mathematical_food_area_at_median_ha": 0.18396420301042068,
+    "mathematical_food_area_at_q1_ha": 0.23526715202369203,
+    "mathematical_food_area_at_q3_ha": 0.16108524839472796,
+    "core_median_output_gj": 6.4775,
+    "backup_median_output_gj": 6.4775,
+    "core_food_surplus_factor": 1.3589600362948802,
+    "core_food_safety_margin_percent": 35.896003629488014,
+    "total_food_median_output_gj": 12.955,
+    "historical_core_output_low_gj": 5,
+    "historical_core_output_high_gj": 7,
+    "historical_backup_output_low_gj": 5,
+    "historical_backup_output_high_gj": 7
+  },
+  "thermal": {
+    "coppice_gross_gj": 15,
+    "heater_efficiency": 0.65,
+    "coppice_useful_heat_gj": 9.75,
+    "gross_biological_energy_using_median_food_gj": 27.955,
+    "useful_energy_after_heater_gj": 22.705
+  },
+  "historical_displayed_range": {
+    "food_gj_low": 10,
+    "food_gj_high": 14,
+    "mixed_gross_gj_low": 25,
+    "mixed_gross_gj_high": 29
+  }
+}

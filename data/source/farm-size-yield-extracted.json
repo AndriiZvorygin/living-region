@@ -1,0 +1,1536 @@
+[
+  {
+    "name": "Sheet1",
+    "matrix": [
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "Farm (ha)",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "% of land",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "% crop",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "% food",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 5,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "crop ROL",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 6,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "food ROL",
+          "repeat": 1,
+          "number": null
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 1",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "12",
+          "stringValue": null,
+          "text": "12",
+          "repeat": 2,
+          "number": 12
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "12",
+          "stringValue": null,
+          "text": "12",
+          "repeat": 2,
+          "number": 12
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "15",
+          "stringValue": null,
+          "text": "15",
+          "repeat": 1,
+          "number": 15
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C2]/[.B2]",
+          "valueType": "float",
+          "value": "1",
+          "stringValue": null,
+          "text": "1.00",
+          "repeat": 1,
+          "number": 1
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D2]/[.B2]",
+          "valueType": "float",
+          "value": "1.25",
+          "stringValue": null,
+          "text": "1.25",
+          "repeat": 1,
+          "number": 1.25
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 2",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "24",
+          "stringValue": null,
+          "text": "24",
+          "repeat": 1,
+          "number": 24
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "29",
+          "stringValue": null,
+          "text": "29",
+          "repeat": 1,
+          "number": 29
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "32",
+          "stringValue": null,
+          "text": "32",
+          "repeat": 1,
+          "number": 32
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C3]/[.B3]",
+          "valueType": "float",
+          "value": "1.20833333333333",
+          "stringValue": null,
+          "text": "1.21",
+          "repeat": 1,
+          "number": 1.20833333333333
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D3]/[.B3]",
+          "valueType": "float",
+          "value": "1.33333333333333",
+          "stringValue": null,
+          "text": "1.33",
+          "repeat": 1,
+          "number": 1.33333333333333
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 5",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "32",
+          "stringValue": null,
+          "text": "32",
+          "repeat": 1,
+          "number": 32
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "41",
+          "stringValue": null,
+          "text": "41",
+          "repeat": 1,
+          "number": 41
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "46",
+          "stringValue": null,
+          "text": "46",
+          "repeat": 1,
+          "number": 46
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C4]/[.B4]",
+          "valueType": "float",
+          "value": "1.28125",
+          "stringValue": null,
+          "text": "1.28",
+          "repeat": 1,
+          "number": 1.28125
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D4]/[.B4]",
+          "valueType": "float",
+          "value": "1.4375",
+          "stringValue": null,
+          "text": "1.44",
+          "repeat": 1,
+          "number": 1.4375
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 10",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "40",
+          "stringValue": null,
+          "text": "40",
+          "repeat": 1,
+          "number": 40
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "51",
+          "stringValue": null,
+          "text": "51",
+          "repeat": 1,
+          "number": 51
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "55",
+          "stringValue": null,
+          "text": "55",
+          "repeat": 1,
+          "number": 55
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C5]/[.B5]",
+          "valueType": "float",
+          "value": "1.275",
+          "stringValue": null,
+          "text": "1.28",
+          "repeat": 1,
+          "number": 1.275
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D5]/[.B5]",
+          "valueType": "float",
+          "value": "1.375",
+          "stringValue": null,
+          "text": "1.38",
+          "repeat": 1,
+          "number": 1.375
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 20",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "49",
+          "stringValue": null,
+          "text": "49",
+          "repeat": 1,
+          "number": 49
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "54",
+          "stringValue": null,
+          "text": "54",
+          "repeat": 1,
+          "number": 54
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "59",
+          "stringValue": null,
+          "text": "59",
+          "repeat": 1,
+          "number": 59
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C6]/[.B6]",
+          "valueType": "float",
+          "value": "1.10204081632653",
+          "stringValue": null,
+          "text": "1.10",
+          "repeat": 1,
+          "number": 1.10204081632653
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D6]/[.B6]",
+          "valueType": "float",
+          "value": "1.20408163265306",
+          "stringValue": null,
+          "text": "1.20",
+          "repeat": 1,
+          "number": 1.20408163265306
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 50",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "57",
+          "stringValue": null,
+          "text": "57",
+          "repeat": 1,
+          "number": 57
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "59",
+          "stringValue": null,
+          "text": "59",
+          "repeat": 1,
+          "number": 59
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "63",
+          "stringValue": null,
+          "text": "63",
+          "repeat": 1,
+          "number": 63
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C7]/[.B7]",
+          "valueType": "float",
+          "value": "1.03508771929825",
+          "stringValue": null,
+          "text": "1.04",
+          "repeat": 1,
+          "number": 1.03508771929825
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D7]/[.B7]",
+          "valueType": "float",
+          "value": "1.10526315789474",
+          "stringValue": null,
+          "text": "1.11",
+          "repeat": 1,
+          "number": 1.10526315789474
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 100",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "65",
+          "stringValue": null,
+          "text": "65",
+          "repeat": 2,
+          "number": 65
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "65",
+          "stringValue": null,
+          "text": "65",
+          "repeat": 2,
+          "number": 65
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "69",
+          "stringValue": null,
+          "text": "69",
+          "repeat": 1,
+          "number": 69
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C8]/[.B8]",
+          "valueType": "float",
+          "value": "1",
+          "stringValue": null,
+          "text": "1.00",
+          "repeat": 1,
+          "number": 1
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D8]/[.B8]",
+          "valueType": "float",
+          "value": "1.06153846153846",
+          "stringValue": null,
+          "text": "1.06",
+          "repeat": 1,
+          "number": 1.06153846153846
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 200",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "72",
+          "stringValue": null,
+          "text": "72",
+          "repeat": 1,
+          "number": 72
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "81",
+          "stringValue": null,
+          "text": "81",
+          "repeat": 1,
+          "number": 81
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "85",
+          "stringValue": null,
+          "text": "85",
+          "repeat": 1,
+          "number": 85
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C9]/[.B9]",
+          "valueType": "float",
+          "value": "1.125",
+          "stringValue": null,
+          "text": "1.13",
+          "repeat": 1,
+          "number": 1.125
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D9]/[.B9]",
+          "valueType": "float",
+          "value": "1.18055555555556",
+          "stringValue": null,
+          "text": "1.18",
+          "repeat": 1,
+          "number": 1.18055555555556
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 500",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "80",
+          "stringValue": null,
+          "text": "80",
+          "repeat": 1,
+          "number": 80
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "85",
+          "stringValue": null,
+          "text": "85",
+          "repeat": 1,
+          "number": 85
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "87",
+          "stringValue": null,
+          "text": "87",
+          "repeat": 1,
+          "number": 87
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C10]/[.B10]",
+          "valueType": "float",
+          "value": "1.0625",
+          "stringValue": null,
+          "text": "1.06",
+          "repeat": 1,
+          "number": 1.0625
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D10]/[.B10]",
+          "valueType": "float",
+          "value": "1.0875",
+          "stringValue": null,
+          "text": "1.09",
+          "repeat": 1,
+          "number": 1.0875
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "<= 1000",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "88",
+          "stringValue": null,
+          "text": "88",
+          "repeat": 1,
+          "number": 88
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "95",
+          "stringValue": null,
+          "text": "95",
+          "repeat": 1,
+          "number": 95
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "97",
+          "stringValue": null,
+          "text": "97",
+          "repeat": 1,
+          "number": 97
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C11]/[.B11]",
+          "valueType": "float",
+          "value": "1.07954545454545",
+          "stringValue": null,
+          "text": "1.08",
+          "repeat": 1,
+          "number": 1.07954545454545
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D11]/[.B11]",
+          "valueType": "float",
+          "value": "1.10227272727273",
+          "stringValue": null,
+          "text": "1.10",
+          "repeat": 1,
+          "number": 1.10227272727273
+        }
+      ],
+      [
+        {
+          "column": 1,
+          "formula": null,
+          "valueType": "string",
+          "value": null,
+          "stringValue": null,
+          "text": "all size",
+          "repeat": 1,
+          "number": null
+        },
+        {
+          "column": 2,
+          "formula": null,
+          "valueType": "float",
+          "value": "100",
+          "stringValue": null,
+          "text": "100",
+          "repeat": 3,
+          "number": 100
+        },
+        {
+          "column": 3,
+          "formula": null,
+          "valueType": "float",
+          "value": "100",
+          "stringValue": null,
+          "text": "100",
+          "repeat": 3,
+          "number": 100
+        },
+        {
+          "column": 4,
+          "formula": null,
+          "valueType": "float",
+          "value": "100",
+          "stringValue": null,
+          "text": "100",
+          "repeat": 3,
+          "number": 100
+        },
+        {
+          "column": 5,
+          "formula": "of:=[.C12]/[.B12]",
+          "valueType": "float",
+          "value": "1",
+          "stringValue": null,
+          "text": "1.00",
+          "repeat": 1,
+          "number": 1
+        },
+        {
+          "column": 6,
+          "formula": "of:=[.D12]/[.B12]",
+          "valueType": "float",
+          "value": "1",
+          "stringValue": null,
+          "text": "1.00",
+          "repeat": 1,
+          "number": 1
+        }
+      ]
+    ],
+    "table": {
+      "name": "Sheet1",
+      "rows": [
+        {
+          "index": 1,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "Farm (ha)",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "% of land",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "% crop",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "% food",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 5,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "crop ROL",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 6,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "food ROL",
+              "repeat": 1,
+              "number": null
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 1",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "12",
+              "stringValue": null,
+              "text": "12",
+              "repeat": 2,
+              "number": 12
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "12",
+              "stringValue": null,
+              "text": "12",
+              "repeat": 2,
+              "number": 12
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "15",
+              "stringValue": null,
+              "text": "15",
+              "repeat": 1,
+              "number": 15
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C2]/[.B2]",
+              "valueType": "float",
+              "value": "1",
+              "stringValue": null,
+              "text": "1.00",
+              "repeat": 1,
+              "number": 1
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D2]/[.B2]",
+              "valueType": "float",
+              "value": "1.25",
+              "stringValue": null,
+              "text": "1.25",
+              "repeat": 1,
+              "number": 1.25
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 2",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "24",
+              "stringValue": null,
+              "text": "24",
+              "repeat": 1,
+              "number": 24
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "29",
+              "stringValue": null,
+              "text": "29",
+              "repeat": 1,
+              "number": 29
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "32",
+              "stringValue": null,
+              "text": "32",
+              "repeat": 1,
+              "number": 32
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C3]/[.B3]",
+              "valueType": "float",
+              "value": "1.20833333333333",
+              "stringValue": null,
+              "text": "1.21",
+              "repeat": 1,
+              "number": 1.20833333333333
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D3]/[.B3]",
+              "valueType": "float",
+              "value": "1.33333333333333",
+              "stringValue": null,
+              "text": "1.33",
+              "repeat": 1,
+              "number": 1.33333333333333
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 5",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "32",
+              "stringValue": null,
+              "text": "32",
+              "repeat": 1,
+              "number": 32
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "41",
+              "stringValue": null,
+              "text": "41",
+              "repeat": 1,
+              "number": 41
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "46",
+              "stringValue": null,
+              "text": "46",
+              "repeat": 1,
+              "number": 46
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C4]/[.B4]",
+              "valueType": "float",
+              "value": "1.28125",
+              "stringValue": null,
+              "text": "1.28",
+              "repeat": 1,
+              "number": 1.28125
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D4]/[.B4]",
+              "valueType": "float",
+              "value": "1.4375",
+              "stringValue": null,
+              "text": "1.44",
+              "repeat": 1,
+              "number": 1.4375
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 10",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "40",
+              "stringValue": null,
+              "text": "40",
+              "repeat": 1,
+              "number": 40
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "51",
+              "stringValue": null,
+              "text": "51",
+              "repeat": 1,
+              "number": 51
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "55",
+              "stringValue": null,
+              "text": "55",
+              "repeat": 1,
+              "number": 55
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C5]/[.B5]",
+              "valueType": "float",
+              "value": "1.275",
+              "stringValue": null,
+              "text": "1.28",
+              "repeat": 1,
+              "number": 1.275
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D5]/[.B5]",
+              "valueType": "float",
+              "value": "1.375",
+              "stringValue": null,
+              "text": "1.38",
+              "repeat": 1,
+              "number": 1.375
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 20",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "49",
+              "stringValue": null,
+              "text": "49",
+              "repeat": 1,
+              "number": 49
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "54",
+              "stringValue": null,
+              "text": "54",
+              "repeat": 1,
+              "number": 54
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "59",
+              "stringValue": null,
+              "text": "59",
+              "repeat": 1,
+              "number": 59
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C6]/[.B6]",
+              "valueType": "float",
+              "value": "1.10204081632653",
+              "stringValue": null,
+              "text": "1.10",
+              "repeat": 1,
+              "number": 1.10204081632653
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D6]/[.B6]",
+              "valueType": "float",
+              "value": "1.20408163265306",
+              "stringValue": null,
+              "text": "1.20",
+              "repeat": 1,
+              "number": 1.20408163265306
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 50",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "57",
+              "stringValue": null,
+              "text": "57",
+              "repeat": 1,
+              "number": 57
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "59",
+              "stringValue": null,
+              "text": "59",
+              "repeat": 1,
+              "number": 59
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "63",
+              "stringValue": null,
+              "text": "63",
+              "repeat": 1,
+              "number": 63
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C7]/[.B7]",
+              "valueType": "float",
+              "value": "1.03508771929825",
+              "stringValue": null,
+              "text": "1.04",
+              "repeat": 1,
+              "number": 1.03508771929825
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D7]/[.B7]",
+              "valueType": "float",
+              "value": "1.10526315789474",
+              "stringValue": null,
+              "text": "1.11",
+              "repeat": 1,
+              "number": 1.10526315789474
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 100",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "65",
+              "stringValue": null,
+              "text": "65",
+              "repeat": 2,
+              "number": 65
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "65",
+              "stringValue": null,
+              "text": "65",
+              "repeat": 2,
+              "number": 65
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "69",
+              "stringValue": null,
+              "text": "69",
+              "repeat": 1,
+              "number": 69
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C8]/[.B8]",
+              "valueType": "float",
+              "value": "1",
+              "stringValue": null,
+              "text": "1.00",
+              "repeat": 1,
+              "number": 1
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D8]/[.B8]",
+              "valueType": "float",
+              "value": "1.06153846153846",
+              "stringValue": null,
+              "text": "1.06",
+              "repeat": 1,
+              "number": 1.06153846153846
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 200",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "72",
+              "stringValue": null,
+              "text": "72",
+              "repeat": 1,
+              "number": 72
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "81",
+              "stringValue": null,
+              "text": "81",
+              "repeat": 1,
+              "number": 81
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "85",
+              "stringValue": null,
+              "text": "85",
+              "repeat": 1,
+              "number": 85
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C9]/[.B9]",
+              "valueType": "float",
+              "value": "1.125",
+              "stringValue": null,
+              "text": "1.13",
+              "repeat": 1,
+              "number": 1.125
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D9]/[.B9]",
+              "valueType": "float",
+              "value": "1.18055555555556",
+              "stringValue": null,
+              "text": "1.18",
+              "repeat": 1,
+              "number": 1.18055555555556
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 500",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "80",
+              "stringValue": null,
+              "text": "80",
+              "repeat": 1,
+              "number": 80
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "85",
+              "stringValue": null,
+              "text": "85",
+              "repeat": 1,
+              "number": 85
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "87",
+              "stringValue": null,
+              "text": "87",
+              "repeat": 1,
+              "number": 87
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C10]/[.B10]",
+              "valueType": "float",
+              "value": "1.0625",
+              "stringValue": null,
+              "text": "1.06",
+              "repeat": 1,
+              "number": 1.0625
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D10]/[.B10]",
+              "valueType": "float",
+              "value": "1.0875",
+              "stringValue": null,
+              "text": "1.09",
+              "repeat": 1,
+              "number": 1.0875
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "<= 1000",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "88",
+              "stringValue": null,
+              "text": "88",
+              "repeat": 1,
+              "number": 88
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "95",
+              "stringValue": null,
+              "text": "95",
+              "repeat": 1,
+              "number": 95
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "97",
+              "stringValue": null,
+              "text": "97",
+              "repeat": 1,
+              "number": 97
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C11]/[.B11]",
+              "valueType": "float",
+              "value": "1.07954545454545",
+              "stringValue": null,
+              "text": "1.08",
+              "repeat": 1,
+              "number": 1.07954545454545
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D11]/[.B11]",
+              "valueType": "float",
+              "value": "1.10227272727273",
+              "stringValue": null,
+              "text": "1.10",
+              "repeat": 1,
+              "number": 1.10227272727273
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "cells": [
+            {
+              "column": 1,
+              "formula": null,
+              "valueType": "string",
+              "value": null,
+              "stringValue": null,
+              "text": "all size",
+              "repeat": 1,
+              "number": null
+            },
+            {
+              "column": 2,
+              "formula": null,
+              "valueType": "float",
+              "value": "100",
+              "stringValue": null,
+              "text": "100",
+              "repeat": 3,
+              "number": 100
+            },
+            {
+              "column": 3,
+              "formula": null,
+              "valueType": "float",
+              "value": "100",
+              "stringValue": null,
+              "text": "100",
+              "repeat": 3,
+              "number": 100
+            },
+            {
+              "column": 4,
+              "formula": null,
+              "valueType": "float",
+              "value": "100",
+              "stringValue": null,
+              "text": "100",
+              "repeat": 3,
+              "number": 100
+            },
+            {
+              "column": 5,
+              "formula": "of:=[.C12]/[.B12]",
+              "valueType": "float",
+              "value": "1",
+              "stringValue": null,
+              "text": "1.00",
+              "repeat": 1,
+              "number": 1
+            },
+            {
+              "column": 6,
+              "formula": "of:=[.D12]/[.B12]",
+              "valueType": "float",
+              "value": "1",
+              "stringValue": null,
+              "text": "1.00",
+              "repeat": 1,
+              "number": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

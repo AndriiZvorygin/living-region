@@ -1,0 +1,12 @@
+farm_size_class,land_share_percent,crop_share_percent,food_crop_share_percent,return_on_land_food,return_on_land_food_and_crop,source_file,source_sheet,source_row,source_formulas
+<= 1,12,12,15,1,1.25,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,2, |  |  |  | of:=[.C2]/[.B2] | of:=[.D2]/[.B2]
+<= 2,24,29,32,1.21,1.33,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,3, |  |  |  | of:=[.C3]/[.B3] | of:=[.D3]/[.B3]
+<= 5,32,41,46,1.28,1.44,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,4, |  |  |  | of:=[.C4]/[.B4] | of:=[.D4]/[.B4]
+<= 10,40,51,55,1.28,1.38,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,5, |  |  |  | of:=[.C5]/[.B5] | of:=[.D5]/[.B5]
+<= 20,49,54,59,1.1,1.2,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,6, |  |  |  | of:=[.C6]/[.B6] | of:=[.D6]/[.B6]
+<= 50,57,59,63,1.04,1.11,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,7, |  |  |  | of:=[.C7]/[.B7] | of:=[.D7]/[.B7]
+<= 100,65,65,69,1,1.06,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,8, |  |  |  | of:=[.C8]/[.B8] | of:=[.D8]/[.B8]
+<= 200,72,81,85,1.13,1.18,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,9, |  |  |  | of:=[.C9]/[.B9] | of:=[.D9]/[.B9]
+<= 500,80,85,87,1.06,1.09,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,10, |  |  |  | of:=[.C10]/[.B10] | of:=[.D10]/[.B10]
+<= 1000,88,95,97,1.08,1.1,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,11, |  |  |  | of:=[.C11]/[.B11] | of:=[.D11]/[.B11]
+all size,100,100,100,1,1,/home/htaf/lyis/sren/Farm_size_to_yield.ods,Sheet1,12, |  |  |  | of:=[.C12]/[.B12] | of:=[.D12]/[.B12]

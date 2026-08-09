@@ -1,0 +1,7 @@
+variable,value,units,source,status,notes
+heating_degree_days_below_18_c,4031.9,C degree-days,https://climate.weather.gc.ca/climate_normals/results_1981_2010_e.html?climate_id=6116132&coordsStn=44.745833%7C-81.107222%7COWEN+SOUND+MOE&optProxType=station&searchType=stnProx&txtCentralLatMin=0&txtCentralLatSec=0&txtCentralLongMin=0&txtCentralLongSec=0&txtRadius=25,external assumption,Owen Sound MOE; 1981–2010 station normals; below 18 C annual value
+heating_degree_day_definition,18,C base,https://climate.meteo.gc.ca/glossary_e.html,external definition,ECCC defines heating degree-days as degrees below 18 C
+dry_wood_energy,0.018,GJ/kg,new model assumption,new assumption,"18 MJ/kg dry wood; verify by species, moisture and cord convention"
+masonry_heater_efficiency,0.75,fraction,new model assumption,new assumption,seasonal delivered-useful efficiency; not found in historical Lyis source
+net_demand_factor,0.85,fraction,new model assumption,new assumption,15% reduction from HDD envelope loss for internal/passive gains; sensitivity required
+floor_r_value,30,h ft2 F/Btu,new model assumption,new assumption,insulated floor/platform; historical Lyis material did not specify a floor R-value

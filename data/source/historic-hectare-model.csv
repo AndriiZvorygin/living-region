@@ -1,0 +1,5 @@
+allocation,area_ha,energy_low_gj_per_year,energy_high_gj_per_year,energy_type,source_file,source_reference,status,notes
+core food,0.25,5,7,food,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,label: core food 0.25gHa ~5-7Gj,historical diagram label,not formula-linked to a specific crop mix
+backup/perennial food,0.25,5,7,food,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,label: backup food/food forest 0.25 ~5-7Gj,historical diagram label,not formula-linked to a specific crop mix
+willow short-rotation coppice,0.5,15,15,gross woody biomass,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,label: Core wood: Willow SRC 0.5gHa; 1 cord = ~15Gj,historical diagram label,not found as a formula in the audited ODS files
+total productive land,1,25,29,mixed gross biological energy,/home/htaf/lyis/pfet/hfoc/hectare_breakdown.svg,sum of displayed component ranges,derived reconstruction,food and wood streams are not directly interchangeable

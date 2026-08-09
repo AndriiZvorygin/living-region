@@ -1,0 +1,306 @@
+{
+  "human": {
+    "canonical": {
+      "body_mass_kg": 75,
+      "daily_kj": 13050,
+      "daily_mj": 13.05,
+      "annual_gj": 4.7665125,
+      "annual_kcal": 3119.024856597,
+      "days_per_year": 365.25,
+      "label": "canonical historical active 75 kg"
+    },
+    "cases": [
+      {
+        "body_mass_kg": 50,
+        "daily_kj": 8700,
+        "daily_mj": 8.7,
+        "annual_gj": 3.177675,
+        "annual_kcal": 2079.349904398,
+        "days_per_year": 365.25,
+        "label": "lower/source 50 kg"
+      },
+      {
+        "body_mass_kg": 75,
+        "daily_kj": 13050,
+        "daily_mj": 13.05,
+        "annual_gj": 4.7665125,
+        "annual_kcal": 3119.024856597,
+        "days_per_year": 365.25,
+        "label": "canonical historical active 75 kg"
+      },
+      {
+        "body_mass_kg": 100,
+        "daily_kj": 17400,
+        "daily_mj": 17.4,
+        "annual_gj": 6.35535,
+        "annual_kcal": 4158.699808795,
+        "days_per_year": 365.25,
+        "label": "higher linear sensitivity 100 kg"
+      }
+    ],
+    "source_formulas": [
+      {
+        "cell": "C4",
+        "formula": "of:=[.C3]/[.$B$3]*[.$B4]",
+        "displayed_value": "13050"
+      },
+      {
+        "cell": "D3",
+        "formula": "of:=[.C3]*365.25/1000/1000",
+        "displayed_value": "3.177675"
+      },
+      {
+        "cell": "D4",
+        "formula": "of:=[.D3]/[.$B$3]*[.$B4]",
+        "displayed_value": "4.7665125"
+      },
+      {
+        "cell": "E4",
+        "formula": "of:=[.E3]/[.$B$3]*[.$B4]",
+        "displayed_value": "397.209375"
+      },
+      {
+        "cell": "F4",
+        "formula": "of:=[.F3]/[.$B$3]*[.$B4]",
+        "displayed_value": "91.35"
+      }
+    ]
+  },
+  "crops": {
+    "overall": {
+      "count": 15,
+      "min": 13.02,
+      "q1": 20.259999999999998,
+      "median": 25.91,
+      "q3": 29.59,
+      "max": 60.3,
+      "mean": 26.55666666666667,
+      "standard_deviation": 10.927322738082838,
+      "coefficient_of_variation": 0.4114719243661166,
+      "interquartile_range": 9.330000000000002
+    },
+    "groups": [
+      {
+        "group": "fat",
+        "count": 3,
+        "min": 25.91,
+        "q1": 26.1,
+        "median": 26.29,
+        "q3": 26.31,
+        "max": 26.33,
+        "mean": 26.176666666666666,
+        "standard_deviation": 0.1892675942210445,
+        "coefficient_of_variation": 0.007230393259431218,
+        "interquartile_range": 0.2099999999999973
+      },
+      {
+        "group": "starch/carbohydrate",
+        "count": 6,
+        "min": 14.94,
+        "q1": 23.365,
+        "median": 29.59,
+        "q3": 35.17,
+        "max": 60.3,
+        "mean": 32.123333333333335,
+        "standard_deviation": 14.33890473114627,
+        "coefficient_of_variation": 0.44637038698182846,
+        "interquartile_range": 11.805000000000003
+      },
+      {
+        "group": "fruit",
+        "count": 4,
+        "min": 13.02,
+        "q1": 16.215,
+        "median": 18.58,
+        "q3": 20.07,
+        "max": 20.64,
+        "mean": 17.705,
+        "standard_deviation": 2.978032068329688,
+        "coefficient_of_variation": 0.16820288440156386,
+        "interquartile_range": 3.8550000000000004
+      },
+      {
+        "group": "protein/legume",
+        "count": 2,
+        "min": 25.2,
+        "q1": 26.665,
+        "median": 28.13,
+        "q3": 29.595,
+        "max": 31.06,
+        "mean": 28.13,
+        "standard_deviation": 2.9299999999999997,
+        "coefficient_of_variation": 0.10415926057589761,
+        "interquartile_range": 2.9299999999999997
+      }
+    ]
+  },
+  "hectare": {
+    "allocation": {
+      "core_food_ha": 0.25,
+      "backup_perennial_food_ha": 0.25,
+      "coppice_ha": 0.5,
+      "total_ha": 1
+    },
+    "food": {
+      "annual_demand_gj": 4.7665125,
+      "median_crop_gj_per_ha": 25.91,
+      "q1_crop_gj_per_ha": 20.259999999999998,
+      "q3_crop_gj_per_ha": 29.59,
+      "mathematical_food_area_at_median_ha": 0.18396420301042068,
+      "mathematical_food_area_at_q1_ha": 0.23526715202369203,
+      "mathematical_food_area_at_q3_ha": 0.16108524839472796,
+      "core_median_output_gj": 6.4775,
+      "backup_median_output_gj": 6.4775,
+      "core_food_surplus_factor": 1.3589600362948802,
+      "core_food_safety_margin_percent": 35.896003629488014,
+      "total_food_median_output_gj": 12.955,
+      "historical_core_output_low_gj": 5,
+      "historical_core_output_high_gj": 7,
+      "historical_backup_output_low_gj": 5,
+      "historical_backup_output_high_gj": 7
+    },
+    "thermal": {
+      "coppice_gross_gj": 15,
+      "heater_efficiency": 0.65,
+      "coppice_useful_heat_gj": 9.75,
+      "gross_biological_energy_using_median_food_gj": 27.955,
+      "useful_energy_after_heater_gj": 22.705
+    },
+    "historical_displayed_range": {
+      "food_gj_low": 10,
+      "food_gj_high": 14,
+      "mixed_gross_gj_low": 25,
+      "mixed_gross_gj_high": 29
+    }
+  },
+  "heating": {
+    "result": {
+      "assumptions": {
+        "diameter_m": 9.1,
+        "floor_area_m2": 65.6,
+        "wall_height_m": 2.4,
+        "roof_rise_m": 2,
+        "wall_r_value_ip": 20,
+        "roof_r_value_ip": 40,
+        "floor_r_value_ip": 30,
+        "window_door_area_m2": 8,
+        "window_door_u_w_per_m2k": 0.3,
+        "air_changes_per_hour": 0.35,
+        "indoor_temperature_c": 20,
+        "outdoor_design_temperature_c": -20,
+        "heating_degree_days_c_18": 4031.9,
+        "net_demand_factor": 0.85,
+        "masonry_heater_seasonal_efficiency": 0.75,
+        "dry_wood_energy_gj_per_kg": 0.018,
+        "historical_wood_gj_per_cord": 15,
+        "historical_coppice_gross_gj_per_year": 15,
+        "historical_coppice_area_ha": 0.5
+      },
+      "geometry": {
+        "radius_m": 4.55,
+        "circumference_m": 28.588493147667116,
+        "wall_gross_m2": 68.61238355440108,
+        "wall_opaque_m2": 60.61238355440108,
+        "roof_area_m2": 71.04470631945443,
+        "floor_area_m2": 65.6,
+        "conditioned_volume_m3": 199.45238719355757
+      },
+      "heat_loss": {
+        "wall_u_w_per_m2k": 0.2839131668659357,
+        "roof_u_w_per_m2k": 0.14195658343296785,
+        "floor_u_w_per_m2k": 0.18927544457729045,
+        "transmission_ua_w_per_k": 42.110386710601354,
+        "ventilation_ua_w_per_k": 23.0367507208559,
+        "total_ua_w_per_k": 65.14713743145725,
+        "annual_gross_envelope_loss_gj": 22.694406630614708,
+        "net_demand_factor": 0.85,
+        "annual_useful_space_heating_gj": 19.2902456360225,
+        "design_heat_loss_kw": 2.6058854972582903
+      },
+      "wood": {
+        "masonry_heater_efficiency": 0.75,
+        "gross_wood_energy_required_gj": 25.720327514696667,
+        "dry_wood_energy_gj_per_kg": 0.018,
+        "approximate_dry_wood_mass_kg": 1428.9070841498149,
+        "historical_cord_energy_gj": 15,
+        "approximate_cords_per_year": 1.7146885009797779,
+        "historical_half_ha_useful_heat_gj": 11.25,
+        "historical_half_ha_heat_fraction": 0.5831963061679116,
+        "required_coppice_area_at_historical_yield_ha": 0.8573442504898889
+      }
+    },
+    "sensitivity": [
+      {
+        "efficiency": 0.65,
+        "useful_demand_gj": 19.2902456360225,
+        "gross_wood_gj": 29.677300978496156,
+        "cords": 1.9784867318997437,
+        "required_coppice_ha": 0.9892433659498718,
+        "half_ha_fraction": 0.5054367986788567
+      },
+      {
+        "efficiency": 0.75,
+        "useful_demand_gj": 19.2902456360225,
+        "gross_wood_gj": 25.720327514696667,
+        "cords": 1.7146885009797779,
+        "required_coppice_ha": 0.8573442504898889,
+        "half_ha_fraction": 0.5831963061679116
+      },
+      {
+        "efficiency": 0.85,
+        "useful_demand_gj": 19.2902456360225,
+        "gross_wood_gj": 22.694406630614708,
+        "cords": 1.5129604420409806,
+        "required_coppice_ha": 0.7564802210204903,
+        "half_ha_fraction": 0.6609558136569665
+      },
+      {
+        "efficiency": 0.9,
+        "useful_demand_gj": 19.2902456360225,
+        "gross_wood_gj": 21.433606262247224,
+        "cords": 1.428907084149815,
+        "required_coppice_ha": 0.7144535420749075,
+        "half_ha_fraction": 0.699835567401494
+      }
+    ]
+  },
+  "farm": {
+    "correlation": {
+      "crop_return_vs_upper_bound": -0.3450897367782587,
+      "food_return_vs_upper_bound": -0.7449268241227306
+    }
+  },
+  "scenarios": {
+    "baseline_1_0_ha": {
+      "label": "1.0 ha baseline ARC guideline",
+      "total_area_ha": 1,
+      "allocation": {
+        "core_food_ha": 0.25,
+        "backup_perennial_food_ha": 0.25,
+        "coppice_ha": 0.5,
+        "total_ha": 1
+      },
+      "interpretation": "Historical ARC shorthand; productive allocation is 0.25 ha core food + 0.25 ha backup/perennial food + 0.50 ha coppice."
+    },
+    "higher_resilience_1_2_ha": {
+      "label": "1.2 ha Grey-Bruce higher-provisioning scenario",
+      "total_area_ha": 1.2,
+      "allocation_if_scaled_proportionally": {
+        "core_food_ha": 0.3,
+        "backup_perennial_food_ha": 0.3,
+        "coppice_ha": 0.6
+      },
+      "additional_area_ha": 0.2,
+      "additional_if_scaled_proportionally": {
+        "core_food_ha": 0.05,
+        "backup_perennial_food_ha": 0.05,
+        "coppice_ha": 0.1
+      },
+      "interpretation": "The source text attributes 1.2 ha to a five-month Grey County growing season versus a six-month global-hectare assumption (6/5 = 1.2). It does not specify how the additional 0.2 ha is spatially allocated; proportional scaling is a new scenario assumption."
+    },
+    "heating_reference": {
+      "useful_demand_gj": 19.2902456360225,
+      "required_coppice_ha_at_historical_yield": 0.8573442504898889
+    }
+  }
+}
