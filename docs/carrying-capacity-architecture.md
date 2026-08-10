@@ -42,6 +42,25 @@ optional productive surplus. Site shares are explicit scenario inputs because
 the current Grey land layers do not constitute a validated biological
 capability map.
 
+### Household land roles and establishment
+
+`src/household-demand.mjs` separates pooled household food demand into
+`permanent_adult` and `dependent_child` roles. Adults size the permanent
+perennial footprint. Dependent children contribute to current food demand and
+therefore to the annual bridge while they remain dependent, but they do not
+receive child-specific perennial acreage. Annual and perennial food are pooled
+and available to everyone in the household. At the adult transition age, the
+former child leaves the parental parcel calculation and receives a separate
+future allocation.
+
+The establishment solver plants the adult-sized perennial footprint from Year
+1, evaluates its maturity curve, supplies residual pooled household food with
+annual production, and takes the maximum exclusive footprint across the
+transition years. Year 1 is the starting establishment season; at later
+numeric checkpoints age advances by `year - 1`. ARC's one-hectare-per-adult
+allocation is compared after this biological calculation and never constrains
+it.
+
 ## Report commands
 
 ```sh

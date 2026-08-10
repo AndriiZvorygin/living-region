@@ -18,10 +18,10 @@ The two ecological function footprints sum to 0.25 ha as tags, but their conserv
 | household | food/heat exclusive | exclusive reserve | multifunction ecological overlay | robust minimum | optional market target | additional market area | total site area |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 1 adult | 0.71 ha | 0.12 ha | 0.15 ha | 0.83 ha | 0.20 ha | 0.10 ha | 0.93 ha |
-| 1 adult + 1 child | 0.98 ha | 0.12 ha | 0.15 ha | 1.10 ha | 0.20 ha | 0.02 ha | 1.12 ha |
+| 1 adult + 1 child | 0.71 ha | 0.12 ha | 0.15 ha | 0.83 ha | 0.20 ha | 0.10 ha | 0.93 ha |
 | 2 adults | 1.19 ha | 0.12 ha | 0.15 ha | 1.31 ha | 0.20 ha | 0 ha | 1.31 ha |
-| 2 adults + 1 child | 1.46 ha | 0.14 ha | 0.15 ha | 1.60 ha | 0.20 ha | 0 ha | 1.60 ha |
-| 2 adults + 2 children | 1.87 ha | 0.20 ha | 0.15 ha | 2.06 ha | 0.20 ha | 0 ha | 2.06 ha |
-| 2 adults + 3 children | 2.15 ha | 0.23 ha | 0.15 ha | 2.39 ha | 0.20 ha | 0 ha | 2.39 ha |
+| 2 adults + 1 child | 1.19 ha | 0.12 ha | 0.15 ha | 1.31 ha | 0.20 ha | 0 ha | 1.31 ha |
+| 2 adults + 2 children | 1.19 ha | 0.12 ha | 0.15 ha | 1.31 ha | 0.20 ha | 0 ha | 1.31 ha |
+| 2 adults + 3 children | 1.19 ha | 0.12 ha | 0.15 ha | 1.31 ha | 0.20 ha | 0 ha | 1.31 ha |
 
 The model does not allocate separate hectares for paths, greenhouse/building footprint, habitat or fibre. Those are explicit omissions requiring a site plan before a parcel-level policy decision; they are not silently assumed to be zero in a complete property design.

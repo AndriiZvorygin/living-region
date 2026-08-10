@@ -81,7 +81,7 @@ export function calculateMatureScenario(row, module, siteMultiplier, perennialSh
   const scale = moduleDefinition.feed_area_budget_ha ? Math.min(1, moduleDefinition.feed_area_budget_ha / unitFeedArea) : 1;
   const animalRows = animalOutputs(moduleDefinition.ids, siteMultiplier, scale, moduleDefinition.feed_fraction_override ?? null);
   const animalEnergy = sum(animalRows, 'food_energy_gj_year');
-  const householdDemand = row.household_food_demand_gj_year;
+  const householdDemand = row.mature_parental_food_demand_gj_year ?? row.permanent_adult_food_demand_gj_year ?? row.household_food_demand_gj_year;
   const plantDemand = Math.max(0, householdDemand - animalEnergy);
   const perennialNetYield = row.perennial_mature_mix_gross_yield_gj_ha_year * (1 - transitionLossReserve);
   const annualNetYield = row.annual_crop_gross_yield_gj_ha_year * (1 - transitionLossReserve);

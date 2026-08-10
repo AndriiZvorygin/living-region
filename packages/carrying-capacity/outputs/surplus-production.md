@@ -6,7 +6,7 @@ These surplus figures use the pre-ageing baseline capacity layer. The mature age
 
 The land comparison is intentionally based on adult count: a 1 adult + child household is evaluated against 1 ha, while 2 adults + 1/2/3 children are evaluated against 2 ha. Adult-equivalents are shown only beside household food demand.
 
-The robust ordinary-site area is 1.78 ha for two adults plus two children and 1.97 ha for two adults plus three children. The difference is household food demand, not a linear adult-equivalent land multiplier.
+The robust ordinary-site area is 1.71 ha for two adults plus two children and 1.85 ha for two adults plus three children. The difference is household food demand, not a linear adult-equivalent land multiplier.
 
 ## Cash targets
 

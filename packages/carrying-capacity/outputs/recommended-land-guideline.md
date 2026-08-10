@@ -13,11 +13,11 @@ The evidence-based model supports a **household/site-adjusted carrying-capacity 
 | household | favourable site | ordinary site | marginal site |
 |---|---:|---:|---:|
 | 1 adult | 0.61 ha min / 0.71 ha with surplus | 0.83 ha min / 0.93 ha with surplus | 2.17 ha min / 2.17 ha with surplus |
-| 1 adult + 1 child | 0.83 ha min / 0.87 ha with surplus | 1.10 ha min / 1.12 ha with surplus | 2.95 ha min / 2.95 ha with surplus |
+| 1 adult + 1 child | 0.61 ha min / 0.71 ha with surplus | 0.83 ha min / 0.93 ha with surplus | 2.17 ha min / 2.17 ha with surplus |
 | 2 adults | 1.01 ha min / 1.01 ha with surplus | 1.31 ha min / 1.31 ha with surplus | 3.57 ha min / 3.57 ha with surplus |
-| 2 adults + 1 child | 1.24 ha min / 1.24 ha with surplus | 1.60 ha min / 1.60 ha with surplus | 4.37 ha min / 4.37 ha with surplus |
-| 2 adults + 2 children | 1.64 ha min / 1.64 ha with surplus | 2.06 ha min / 2.06 ha with surplus | 5.61 ha min / 5.61 ha with surplus |
-| 2 adults + 3 children | 1.91 ha min / 1.91 ha with surplus | 2.39 ha min / 2.39 ha with surplus | 6.46 ha min / 6.46 ha with surplus |
+| 2 adults + 1 child | 1.01 ha min / 1.01 ha with surplus | 1.31 ha min / 1.31 ha with surplus | 3.57 ha min / 3.57 ha with surplus |
+| 2 adults + 2 children | 1.01 ha min / 1.01 ha with surplus | 1.31 ha min / 1.31 ha with surplus | 3.57 ha min / 3.57 ha with surplus |
+| 2 adults + 3 children | 1.01 ha min / 1.01 ha with surplus | 1.31 ha min / 1.31 ha with surplus | 3.57 ha min / 3.57 ha with surplus |
 
 The current ARC examples evaluate as follows:
 
@@ -36,7 +36,7 @@ The historic 1.2 ha/person remains a provenance-only Lyis scenario. The current 
 
 The annual/perennial transition is a separate time-dependent constraint. On the ordinary site, the central 30% loss/reserve case requires 0.15 ha of annual crops for one adult and 0.62 ha for two adults plus two children. Those annuals can be planted in the future food-forest footprint while young rows remain agriculturally usable; the model records that as overlap rather than adding hectares twice.
 
-The central perennial mix requires 0.46 ha at maturity for one adult and 1.91 ha for two adults plus two children, after the same 30% loss/reserve case. Within the current ARC allocations, the food-production envelopes after shared heat are 0.65 ha and 1.65 ha respectively. This is why a household/site test is necessary: annuals can bridge establishment, but mature full perennial replacement and resilience/ecological land may not fit the same allocation.
+The central perennial mix requires 0.46 ha at maturity for one adult and 1.05 ha for two adults plus two children, after the same 30% loss/reserve case. Within the current ARC allocations, the food-production envelopes after shared heat are 0.65 ha and 1.65 ha respectively. This is why a household/site test is necessary: annuals can bridge establishment, but mature full perennial replacement and resilience/ecological land may not fit the same allocation.
 
 The transition outputs in `outputs/food-forest-transition.md` and `outputs/household-transition-scenarios.md` should be read alongside this land guideline. They do not convert the result into hectares per adult-equivalent.
 

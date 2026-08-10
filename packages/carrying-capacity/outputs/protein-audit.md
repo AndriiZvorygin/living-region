@@ -15,8 +15,8 @@ protein g/day ÷ target g/day × 100 = percentage coverage
 | case | protein kg/year | protein g/day | target g/day | coverage |
 |---|---:|---:|---:|---:|
 | 1 adult full perennial calories | 15.22 | 41.7 | 52.0 | 80.1% |
-| 2 adults + 2 children full perennial calories | 63.37 | 173.5 | 178.4 | 97.3% |
+| 2 adults + 2 children full perennial calories | 35.04 | 95.9 | 116.0 | 82.7% |
 | 1 adult mature 75/25 comparison | 19.40 | 53.1 | 52.0 | 102.2% |
-| 2 adults + 2 children mature 75/25 comparison | 80.77 | 221.1 | 178.4 | 124.0% |
+| 2 adults + 2 children mature 75/25 comparison | 44.66 | 122.3 | 116.0 | 105.4% |
 
 The corrected percentage is always dimensionless. It must not be displayed as grams per day.

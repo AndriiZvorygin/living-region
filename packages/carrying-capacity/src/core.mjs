@@ -1,6 +1,7 @@
 import {calculateHealthCanadaEER, representativeProfiles} from './health-canada.mjs';
 import {siteCapabilityDefinitions, siteCapability, owenSoundGrowingEnvironment} from './environment.mjs';
 import {calculateEstablishmentLandRequirement, calculateEstablishmentLandAccounting} from './establishment.mjs';
+import {calculateHouseholdFoodDemandProfile, householdLandRole} from './household-demand.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 export const siteClasses = Object.entries(siteCapabilityDefinitions).filter(([id]) => id !== 'wet_land').map(([id, capability]) => ({
@@ -117,23 +118,25 @@ export function calculateFoodSystem(foodEvidence, demandGJ, siteMultiplierOrCapa
 }
 
 export function calculateInteractiveHousehold({members = [], buildings = [defaultBuilding()], siteId = 'ordinary_mesic', foodEvidence, woodyCases, matureReferenceRow, establishmentModel = null, arcPolicyAllocationHa = null} = {}) {
-  const demand = members.reduce((sum, member) => sum + Number(member.gj_year), 0);
+  const demandProfile = calculateHouseholdFoodDemandProfile(members, establishmentModel?.years);
+  const demand = demandProfile.current_household_food_demand_gj_year;
   const referenceWeight = members.reduce((sum, member) => sum + Number(member.weight_kg), 0);
   const site = siteClasses[siteId] ?? siteClasses.ordinary_mesic;
   const food = calculateFoodSystem(foodEvidence, demand, site, referenceWeight);
+  const permanentAdultFood = calculateFoodSystem(foodEvidence, demandProfile.permanent_adult_food_demand_gj_year, site, members.filter((member) => householdLandRole(member) === 'permanent_adult').reduce((sum, member) => sum + Number(member.weight_kg), 0));
   const heating = calculateHeatingLoads({buildings});
   const woodBand = woodyCases?.central?.[site.woody_band];
   const baseWoodYield = Number(woodBand?.usable_gross_energy_gj_ha_year ?? woodBand?.usable_gross_energy_gj_year ?? 0);
   const woodYield = baseWoodYield * Number(site.woody_yield_multiplier ?? 1);
   const heatingArea = woodYield > 0 ? heating.total_gross_wood_energy_gj_year / woodYield : 0;
-  const resilience = {diversity_and_rotation_ha: round(Math.max(.12, food.required_food_area_ha * .25)), soil_water_perennial_buffer_ha: .15, fibre_habitat_wildlife_buffer_ha: .1};
+  const resilience = {diversity_and_rotation_ha: round(Math.max(.12, permanentAdultFood.required_food_area_ha * .25)), soil_water_perennial_buffer_ha: .15, fibre_habitat_wildlife_buffer_ha: .1};
   const landAllocation = calculateExclusiveLandAllocation({foodAreaHa: food.required_food_area_ha, heatingAreaHa: heatingArea, reserveHa: resilience.diversity_and_rotation_ha});
   const robustMinimum = landAllocation.exclusive_total_ha;
-  const adultCount = Math.max(1, members.filter((member) => Number(member.age_y ?? 35) >= 19).length);
+  const adultCount = Math.max(1, demandProfile.permanent_adult_count);
   const policyAllocation = arcPolicyAllocationHa ?? adultCount;
   let establishmentLand = null;
   if (establishmentModel) {
-    const modelInputs = {demandGJ: demand, annualYieldGJHaYear: food.gross_energy_per_ha, perennialMix: establishmentModel.perennial_mix, curveAnchors: establishmentModel.curve_anchors, years: establishmentModel.years, annualIntercropOverlap: establishmentModel.annual_intercrop_overlap_by_year, loss: establishmentModel.loss_or_reserve_fraction ?? .30, annualReserveFraction: establishmentModel.annual_reserve_fraction ?? .25, heatingAreaHa: heatingArea, exclusiveReserveHa: resilience.diversity_and_rotation_ha, arcPolicyAllocationHa: policyAllocation};
+    const modelInputs = {demandGJ: demand, permanentAdultDemandGJ: demandProfile.permanent_adult_food_demand_gj_year, demandByYear: demandProfile.demand_by_year, demandScopeByYear: demandProfile.scope_by_year, annualYieldGJHaYear: food.gross_energy_per_ha, perennialMix: establishmentModel.perennial_mix, curveAnchors: establishmentModel.curve_anchors, years: establishmentModel.years, annualIntercropOverlap: establishmentModel.annual_intercrop_overlap_by_year, loss: establishmentModel.loss_or_reserve_fraction ?? .30, annualReserveFraction: establishmentModel.annual_reserve_fraction ?? .25, heatingAreaHa: heatingArea, exclusiveReserveHa: resilience.diversity_and_rotation_ha, arcPolicyAllocationHa: policyAllocation};
     const progressive = calculateEstablishmentLandRequirement({...modelInputs, strategy: 'progressive_handoff'});
     const constant = calculateEstablishmentLandRequirement({...modelInputs, strategy: 'constant_annual_reserve'});
     establishmentLand = calculateEstablishmentLandAccounting({progressive, constant});
@@ -143,5 +146,5 @@ export function calculateInteractiveHousehold({members = [], buildings = [defaul
   const labourCapacity = calculateHouseholdLabourCapacity(members);
   const scale = demand / referenceDemand;
   const labourRequired = {hours_year: Number(referenceLabour.total_recurring_labour_hours ?? 0) * scale, heavy_hours_year: Number(referenceLabour.physically_demanding_hours ?? 0) * scale};
-  return {members, buildings, household_food_gj_year: round(demand), food_adult_equivalents: round(demand / FOOD_ADULT_EQUIVALENT_GJ_YEAR), food_adult_equivalent_basis_gj_year: round(FOOD_ADULT_EQUIVALENT_GJ_YEAR), food, food_area_ha: food.required_food_area_ha, heating_area_ha: round(heatingArea), heating, resilience_allowances_ha: resilience, land_allocation: {...landAllocation, exclusive_total_ha: round(landAllocation.exclusive_total_ha)}, robust_minimum_area_ha: round(robustMinimum), establishment_land: establishmentLand, arc_policy_allocation_ha: round(policyAllocation), reference_transition_scale: round(scale), labour: {required_hours_year: round(labourRequired.hours_year), required_heavy_hours_year: round(labourRequired.heavy_hours_year), available_hours_year: round(labourCapacity.available_hours_year), available_heavy_hours_year: round(labourCapacity.heavy_work_hours_year), surplus_hours_year: round(labourCapacity.available_hours_year - labourRequired.hours_year), surplus_heavy_hours_year: round(labourCapacity.heavy_work_hours_year - labourRequired.heavy_hours_year), capacity: labourCapacity}, site_id: siteId, caveat: 'Food-adult-equivalent is a food-energy normalization only, not a total-land multiplier. Food demand and assigned labour capacity are independent inputs. When establishmentModel is supplied, bare-land establishment and mature land are calculated independently of ARC allocation.'};
+  return {members, buildings, household_food_gj_year: round(demand), permanent_adult_food_demand_gj_year: round(demandProfile.permanent_adult_food_demand_gj_year), dependent_child_food_demand_gj_year: round(demandProfile.dependent_child_food_demand_gj_year), food_demand_profile: demandProfile, food_adult_equivalents: round(demand / FOOD_ADULT_EQUIVALENT_GJ_YEAR), food_adult_equivalent_basis_gj_year: round(FOOD_ADULT_EQUIVALENT_GJ_YEAR), adult_equivalent_scope: 'food-energy normalization only; not a total-land multiplier', food, food_area_ha: food.required_food_area_ha, heating_area_ha: round(heatingArea), heating, resilience_allowances_ha: resilience, land_allocation: {...landAllocation, exclusive_total_ha: round(landAllocation.exclusive_total_ha)}, robust_minimum_area_ha: round(robustMinimum), establishment_land: establishmentLand, arc_policy_allocation_ha: round(policyAllocation), reference_transition_scale: round(scale), labour: {required_hours_year: round(labourRequired.hours_year), required_heavy_hours_year: round(labourRequired.heavy_hours_year), available_hours_year: round(labourCapacity.available_hours_year), available_heavy_hours_year: round(labourCapacity.heavy_work_hours_year), surplus_hours_year: round(labourCapacity.available_hours_year - labourRequired.hours_year), surplus_heavy_hours_year: round(labourCapacity.heavy_work_hours_year - labourRequired.heavy_hours_year), capacity: labourCapacity}, site_id: siteId, caveat: 'Food-adult demand sizes the permanent perennial footprint; food-adult equivalents are a food-energy normalization only. Dependent children increase pooled current food demand and annual bridge requirements only while they remain under the household land-adult age. Annual and perennial outputs are pooled, and former dependent children transition to their own ARC allocation.'};
 }

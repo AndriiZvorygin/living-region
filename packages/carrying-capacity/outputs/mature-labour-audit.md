@@ -28,8 +28,8 @@ The resulting ordinary one-adult totals are 7.8 heavy annual-cultivation hours, 
 | ordinary household | heavy annual hours | physically demanding hours | light/moderate hours | processing/storage hours | total recurring hours |
 |---|---:|---:|---:|---:|---:|
 | 1 adult | 8 | 32 | 76 | 27 | 134 |
-| 1 adult + 1 child | 14 | 38 | 128 | 41 | 207 |
+| 1 adult + 1 child | 8 | 32 | 76 | 27 | 134 |
 | 2 adults | 18 | 42 | 169 | 52 | 264 |
-| 2 adults + 1 child | 24 | 48 | 222 | 66 | 337 |
-| 2 adults + 2 children | 33 | 57 | 303 | 89 | 449 |
-| 2 adults + 3 children | 39 | 63 | 360 | 104 | 526 |
+| 2 adults + 1 child | 18 | 42 | 169 | 52 | 264 |
+| 2 adults + 2 children | 18 | 42 | 169 | 52 | 264 |
+| 2 adults + 3 children | 18 | 42 | 169 | 52 | 264 |

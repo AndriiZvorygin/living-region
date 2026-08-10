@@ -303,8 +303,8 @@ test('mature food-system canonical share is solved from labour, nutrition and re
   close(ordinaryAdultMax.biological_max_share, .774, .001);
   close(ordinaryAdultMax.max_share_within_arc_allocation, .774, .001);
   const family = mature.canonical_rows.find(row => row.site === 'ordinary_mesic' && row.household === 'two_adults_plus_two_children');
-  close(family.mature_annual_area_ha + family.mature_perennial_area_ha + family.heating_area_ha, 1.863, .01);
-  assert.ok(family.total_robust_productive_area_ha > family.previous_robust_system_area_ha);
+  close(family.mature_annual_area_ha + family.mature_perennial_area_ha + family.heating_area_ha, 1.188, .01);
+  assert.ok(family.total_robust_productive_area_ha < family.previous_robust_system_area_ha);
   assert.ok(family.robust_household_minimum_area_ha <= family.total_robust_productive_area_ha);
   close(family.total_robust_productive_area_ha, family.robust_household_minimum_area_ha + family.additional_productive_surplus_area_ha, 1e-6);
   assert.equal(family.land_accounting.paths_access_area_ha, 0);
@@ -320,7 +320,7 @@ test('mature food-system canonical share is solved from labour, nutrition and re
   assert.ok(adult.recurring_labour.processing_storage_hours > 0);
   const marginalFamily = mature.canonical_rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults_plus_two_children');
   const marginalLargerFamily = mature.canonical_rows.find(row => row.site === 'shallow_rocky_marginal' && row.household === 'two_adults_plus_three_children');
-  assert.ok(marginalLargerFamily.recurring_labour.total_recurring_labour_hours > marginalFamily.recurring_labour.total_recurring_labour_hours);
+  close(marginalLargerFamily.recurring_labour.total_recurring_labour_hours, marginalFamily.recurring_labour.total_recurring_labour_hours, .001);
   assert.ok(marginalFamily.recurring_labour.annual_soil_preparation_hours > 0);
   assert.ok(marginalFamily.recurring_labour.annual_planting_hours > 0);
   assert.ok(marginalFamily.recurring_labour.annual_weeding_hours > 0);

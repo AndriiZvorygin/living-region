@@ -9,10 +9,10 @@ For ageing-in-place, the 75% perennial-plant / 25% annual-plant split is a compa
 | household | 25% food | 50% food | 75% food | 100% food | mature area available within ARC food envelope |
 |---|---:|---:|---:|---:|---:|
 | 1 adult | 0.11 ha | 0.23 ha | 0.34 ha | 0.46 ha | 0.65 ha |
-| 1 adult + 1 child | 0.20 ha | 0.40 ha | 0.59 ha | 0.79 ha | 0.65 ha |
+| 1 adult + 1 child | 0.11 ha | 0.23 ha | 0.34 ha | 0.46 ha | 0.65 ha |
 | 2 adults | 0.26 ha | 0.53 ha | 0.79 ha | 1.05 ha | 1.65 ha |
-| 2 adults + 1 child | 0.35 ha | 0.69 ha | 1.04 ha | 1.39 ha | 1.65 ha |
-| 2 adults + 2 children | 0.48 ha | 0.95 ha | 1.43 ha | 1.91 ha | 1.65 ha |
-| 2 adults + 3 children | 0.57 ha | 1.13 ha | 1.70 ha | 2.26 ha | 1.65 ha |
+| 2 adults + 1 child | 0.26 ha | 0.53 ha | 0.79 ha | 1.05 ha | 1.65 ha |
+| 2 adults + 2 children | 0.26 ha | 0.53 ha | 0.79 ha | 1.05 ha | 1.65 ha |
+| 2 adults + 3 children | 0.26 ha | 0.53 ha | 0.79 ha | 1.05 ha | 1.65 ha |
 
 The mature mix does not rely on one exceptional crop. Nevertheless, its central yield is partly modelled because Ontario lacks a long-term, low-input, mixed perennial trial applicable to Grey-Bruce. Heartnut, oak/acorn and perennial vegetable yields remain separate research needs.

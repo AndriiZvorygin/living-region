@@ -11,11 +11,11 @@ The **75% perennial / 25% annual** split in this file is a comparison series. It
 | household | year 1 annual area | year 5 | year 10 | mature | annual-area reduction | mature perennial calories | mature without annual soil prep |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 1 adult | 0.15 ha | 0.09 ha | 0.03 ha | 0.04 ha | 75% | 75% | 75% |
-| 1 adult + 1 child | 0.26 ha | 0.16 ha | 0.05 ha | 0.06 ha | 75% | 75% | 75% |
+| 1 adult + 1 child | 0.26 ha | 0.19 ha | 0.13 ha | 0.04 ha | 86% | 75% | 75% |
 | 2 adults | 0.34 ha | 0.21 ha | 0.07 ha | 0.09 ha | 75% | 75% | 75% |
-| 2 adults + 1 child | 0.45 ha | 0.28 ha | 0.09 ha | 0.11 ha | 75% | 75% | 75% |
-| 2 adults + 2 children | 0.62 ha | 0.38 ha | 0.13 ha | 0.16 ha | 75% | 75% | 75% |
-| 2 adults + 3 children | 0.74 ha | 0.45 ha | 0.15 ha | 0.18 ha | 75% | 75% | 75% |
+| 2 adults + 1 child | 0.45 ha | 0.31 ha | 0.17 ha | 0.09 ha | 81% | 75% | 75% |
+| 2 adults + 2 children | 0.62 ha | 0.31 ha | 0.17 ha | 0.09 ha | 86% | 75% | 75% |
+| 2 adults + 3 children | 0.74 ha | 0.43 ha | 0.29 ha | 0.09 ha | 88% | 75% | 75% |
 
 ## Interpretation
 

@@ -161,11 +161,12 @@ function landAccounting(row, scenario, year1AnnualArea) {
 function evaluateScenario(row, module, share) {
   const siteMultiplier = row.site === 'wetter_productive' ? 1 : row.site === 'ordinary_mesic' ? 1 : row.site === 'dry' ? .75 : .50;
   const scenario = calculateMatureScenario(row, module, siteMultiplier, share);
-  const year1AnnualArea = row.household_food_demand_gj_year / (row.annual_crop_gross_yield_gj_ha_year * (1 - transitionLossReserve));
+  const matureDemand = row.mature_parental_food_demand_gj_year ?? row.permanent_adult_food_demand_gj_year ?? row.household_food_demand_gj_year;
+  const year1AnnualArea = matureDemand / (row.annual_crop_gross_yield_gj_ha_year * (1 - transitionLossReserve));
   const labour = labourForScenario(row, scenario, year1AnnualArea);
   const land = landAccounting(row, scenario, year1AnnualArea);
   const totalRobust = land.gross_site_area_ha;
-  const annualFoodShare = scenario.human_food_energy.annual_plant_gj_year / row.household_food_demand_gj_year;
+  const annualFoodShare = scenario.human_food_energy.annual_plant_gj_year / matureDemand;
   const adequateProtein = scenario.nutritional_output.protein_coverage_percent >= 100;
   const adequateFat = scenario.nutritional_output.fat_coverage_percent >= 100;
   const adequateAnnualResilience = annualFoodShare >= minimumAnnualResilienceShare;
@@ -179,7 +180,10 @@ function evaluateScenario(row, module, share) {
     module_label: scenario.module_label,
     perennial_share_requested: share,
     mature_perennial_share_percent: scenario.human_food_energy.source_percent.perennial_plants,
-    household_food_gj_year: row.household_food_demand_gj_year,
+    household_food_gj_year: matureDemand,
+    current_household_food_demand_gj_year: row.current_household_food_demand_gj_year ?? row.household_food_demand_gj_year,
+    permanent_adult_food_demand_gj_year: row.permanent_adult_food_demand_gj_year ?? matureDemand,
+    dependent_child_food_demand_gj_year: row.dependent_child_food_demand_gj_year ?? 0,
     year1_annual_bridge_area_ha: round(year1AnnualArea, 6),
     mature_annual_area_ha: scenario.land.annual_crop_area_ha,
     mature_perennial_area_ha: scenario.land.perennial_food_area_ha,
@@ -206,7 +210,7 @@ function evaluateScenario(row, module, share) {
     protein_coverage_percent: scenario.nutritional_output.protein_coverage_percent,
     fat_coverage_percent: scenario.nutritional_output.fat_coverage_percent,
     annual_food_resilience_share_percent: round(annualFoodShare * 100, 3),
-    calories_adequate: scenario.human_food_energy.total_gj_year + 1e-9 >= row.household_food_demand_gj_year,
+    calories_adequate: scenario.human_food_energy.total_gj_year + 1e-9 >= matureDemand,
     protein_adequate: adequateProtein,
     fat_adequate: adequateFat,
     annual_resilience_adequate: adequateAnnualResilience,

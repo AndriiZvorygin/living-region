@@ -10,6 +10,7 @@ import {buildLivestockScenarios} from './calc-livestock.mjs';
 import {buildMatureFoodSystem} from './calc-mature-food-system.mjs';
 import {selectPerennialMixForSite} from '../src/environment.mjs';
 import {calculateEstablishmentLandRequirement} from '../src/establishment.mjs';
+import {calculateHouseholdFoodDemandProfile} from '../src/household-demand.mjs';
 
 export const transitionYears = [1, 2, 3, 5, 8, 10, 15, 'mature'];
 const matureYear = 20;
@@ -176,8 +177,9 @@ function ageingInPlaceOutput(households) {
         // progressive-handoff series remains available as a no-reserve upper
         // sensitivity, but ageing-in-place should not imply that all annual
         // cultivation disappears or that the diet becomes tree-only.
-        const annualArea = row.household_food_demand_gj_year * .25 / (row.annual_crop_gross_yield_gj_ha_year * (1 - .30));
-        const perennialArea = row.household_food_demand_gj_year * .75 / (row.perennial_mature_mix_gross_yield_gj_ha_year * (1 - .30));
+        const matureDemand = row.mature_parental_food_demand_gj_year ?? row.permanent_adult_food_demand_gj_year ?? row.household_food_demand_gj_year;
+        const annualArea = matureDemand * .25 / (row.annual_crop_gross_yield_gj_ha_year * (1 - .30));
+        const perennialArea = matureDemand * .75 / (row.perennial_mature_mix_gross_yield_gj_ha_year * (1 - .30));
         const perennialHoursPerHa = item.perennial_area_ha > 0 ? item.labour.perennial_recurring_labour_hours / item.perennial_area_ha : 100;
         const recurringHours = annualArea * 150 + perennialArea * perennialHoursPerHa;
         return [String(year), {
@@ -351,11 +353,14 @@ function classProduction(mixRows, forestArea, siteMultiplier, yieldCase, curveCa
 
 function sumProduction(rows) { return rows.reduce((sum, row) => sum + row.gross_food_gj, 0); }
 
-function transitionSeries({demand, annualYield, siteMultiplier = 1, yieldCase, curveCase, loss, strategy, mixRows, foodEnvelope: _foodEnvelope, heatingAreaHa = 0, exclusiveReserveHa = .12}) {
+function transitionSeries({demand, demandProfile, annualYield, siteMultiplier = 1, yieldCase, curveCase, loss, strategy, mixRows, foodEnvelope: _foodEnvelope, heatingAreaHa = 0, exclusiveReserveHa = .12}) {
   // This is deliberately a thin report adapter over the canonical bare-land
   // establishment engine. ARC allocation is comparison metadata only.
   const establishment = calculateEstablishmentLandRequirement({
     demandGJ: demand,
+    permanentAdultDemandGJ: demandProfile?.permanent_adult_food_demand_gj_year ?? demand,
+    demandByYear: demandProfile?.demand_by_year,
+    demandScopeByYear: demandProfile?.scope_by_year,
     annualYieldGJHaYear: annualYield,
     perennialMix: mixRows,
     curveAnchors: curveAnchors[curveCase],
@@ -369,21 +374,21 @@ function transitionSeries({demand, annualYield, siteMultiplier = 1, yieldCase, c
     yieldMultiplier: yieldMultipliers[yieldCase] * Number(siteMultiplier ?? 1)
   });
   const annualNetYield = annualYield * (1 - loss);
-  const initialBridgeArea = demand / annualNetYield;
+  const initialBridgeArea = Number(demandProfile?.demand_by_year?.['1'] ?? demand) / annualNetYield;
   return establishment.rows.map(row => {
     const annualArea = row.annual_area_ha;
     const forestArea = row.perennial_area_ha;
     const perennialClasses = row.class_production;
-    const intentionalAnnualReserveGJ = strategy === 'constant_annual_reserve' ? demand * annualReserveFraction : 0;
+    const intentionalAnnualReserveGJ = strategy === 'constant_annual_reserve' ? row.household_food_demand_gj_year * annualReserveFraction : 0;
     return {...row,
       perennial_curve_case: curveCase,
       annual_area_required_ha: row.annual_area_required_ha,
       exportable_food_energy_surplus_gj: round(Math.max(0, row.total_usable_food_gj - demand - intentionalAnnualReserveGJ), 6),
       intentional_annual_reserve_food_gj: round(intentionalAnnualReserveGJ, 6),
       annual_land_limited: false,
-      food_supplied_percent: {annual: round(row.annual_usable_food_gj / demand * 100, 3), perennial: round(row.perennial_usable_food_gj / demand * 100, 3)},
+      food_supplied_percent: {annual: round(row.annual_usable_food_gj / row.household_food_demand_gj_year * 100, 3), perennial: round(row.perennial_usable_food_gj / row.household_food_demand_gj_year * 100, 3)},
       released_annual_area_ha: round(Math.max(0, initialBridgeArea - annualArea), 6),
-      labour: calculateTransitionLabour({year: row.year, annualArea, forestArea, classProduction: perennialClasses, perennialUsableFoodGJ: row.perennial_usable_food_gj, householdDemandGJ: demand}),
+      labour: calculateTransitionLabour({year: row.year, annualArea, forestArea, classProduction: perennialClasses, perennialUsableFoodGJ: row.perennial_usable_food_gj, householdDemandGJ: row.household_food_demand_gj_year}),
       class_production: perennialClasses
     };
   });
@@ -413,22 +418,25 @@ function quarterHectareTests({capacity, food, households = Object.keys(household
   }));
 }
 
-function householdTransition({capacity, perennial, food, siteId, householdId, yieldCase = 'central', curveCase = 'central'}) {
+function householdTransition({capacity, perennial, food, energy, siteId, householdId, yieldCase = 'central', curveCase = 'central'}) {
   const capacityRow = rowFor(capacity, siteId, householdId);
   const site = siteClasses[siteId];
-  const demand = capacityRow.household_energy_gj_year;
+  const members = capacityRow.member_ids.map((id) => energy.scenarios[id]);
+  const demandProfile = calculateHouseholdFoodDemandProfile(members, transitionYears);
+  const demand = demandProfile.current_household_food_demand_gj_year;
+  const permanentAdultDemand = demandProfile.permanent_adult_food_demand_gj_year;
   const annualYield = capacityRow.food_system.gross_energy_per_ha;
   const mixRows = selectPerennialMixForSite(perennial.mix, siteId);
   const centralMixYield = mixRows.reduce((sum, row) => sum + Number(row.area_share) * Number(row.mature_food_gj_ha_year) * Number(row.site_yield_multiplier ?? 1), 0) * yieldMultipliers[yieldCase] * Number(site.food_multiplier ?? 1);
   const annual = Object.fromEntries(transitionLossReserveCases.map(loss => [lossLabel(loss), annualRequirements(demand, annualYield, loss)]));
-  const matureAreas = Object.fromEntries(transitionLossReserveCases.map(loss => [lossLabel(loss), perennialAreaRequirements(demand, centralMixYield, loss)]));
+  const matureAreas = Object.fromEntries(transitionLossReserveCases.map(loss => [lossLabel(loss), perennialAreaRequirements(permanentAdultDemand, centralMixYield, loss)]));
   const loss = .30;
   const annualBridgeArea = demand / (annualYield * (1 - loss));
   const foodEnvelope = Math.max(0, capacityRow.arc_policy_allocation_ha - capacityRow.heating_area_ha);
-  const longTermFoodForestArea = demand / (centralMixYield * (1 - loss));
+  const longTermFoodForestArea = permanentAdultDemand / (centralMixYield * (1 - loss));
   const series = {};
   for (const strategy of ['constant_annual_reserve', 'progressive_handoff']) {
-    const rows = transitionSeries({demand, annualYield, siteMultiplier: site.food_multiplier, yieldCase, curveCase, loss, strategy, mixRows, foodEnvelope, heatingAreaHa: capacityRow.heating_area_ha, exclusiveReserveHa: capacityRow.resilience_allowances_ha.diversity_and_rotation_ha});
+    const rows = transitionSeries({demand, demandProfile, annualYield, siteMultiplier: site.food_multiplier, yieldCase, curveCase, loss, strategy, mixRows, foodEnvelope, heatingAreaHa: capacityRow.heating_area_ha, exclusiveReserveHa: capacityRow.resilience_allowances_ha.diversity_and_rotation_ha});
     const peak = rows.reduce((best, row) => row.total_exclusive_land_requirement_ha > best.total_exclusive_land_requirement_ha ? row : best, rows[0]);
     const mature = rows.at(-1);
     series[strategy] = {forest_area_used_ha: rows[0].perennial_area_ha, planted_perennial_footprint_ha: rows[0].planted_perennial_footprint_ha, establishment_land_requirement_ha: peak.total_exclusive_land_requirement_ha, establishment_peak_year: peak.year, mature_land_requirement_ha: mature.total_exclusive_land_requirement_ha, description: strategy === 'constant_annual_reserve' ? 'Annual acreage contracts only until a 25% food-demand annual reserve floor is reached, then remains at that floor.' : 'Annual acreage contracts to the residual food requirement and can reach zero when the perennial mix covers demand; no extra annual reserve floor is imposed.', thresholds: thresholds(rows), rows};
@@ -436,10 +444,10 @@ function householdTransition({capacity, perennial, food, siteId, householdId, yi
   const transitionSensitivity = {};
   for (const scenario of ['conservative', 'favourable']) {
     const scenarioYield = mixRows.reduce((sum, row) => sum + Number(row.area_share) * Number(row.mature_food_gj_ha_year) * Number(row.site_yield_multiplier ?? 1), 0) * site.food_multiplier * yieldMultipliers[scenario];
-    const scenarioTarget = demand / (scenarioYield * (1 - loss));
+    const scenarioTarget = permanentAdultDemand / (scenarioYield * (1 - loss));
     const scenarioSeries = {};
     for (const strategy of ['constant_annual_reserve', 'progressive_handoff']) {
-      const rows = transitionSeries({demand, annualYield, siteMultiplier: site.food_multiplier, yieldCase: scenario, curveCase: scenario, loss, strategy, mixRows, foodEnvelope, heatingAreaHa: capacityRow.heating_area_ha, exclusiveReserveHa: capacityRow.resilience_allowances_ha.diversity_and_rotation_ha});
+      const rows = transitionSeries({demand, demandProfile, annualYield, siteMultiplier: site.food_multiplier, yieldCase: scenario, curveCase: scenario, loss, strategy, mixRows, foodEnvelope, heatingAreaHa: capacityRow.heating_area_ha, exclusiveReserveHa: capacityRow.resilience_allowances_ha.diversity_and_rotation_ha});
       scenarioSeries[strategy] = {forest_area_used_ha: rows[0].perennial_area_ha, mature_perennial_food_coverage_ratio: rows.at(-1).perennial_food_coverage_ratio, thresholds: thresholds(rows), rows};
     }
     transitionSensitivity[scenario] = {mature_mix_gross_yield_gj_ha_year: round(scenarioYield, 6), long_term_forest_target_ha: round(scenarioTarget, 6), transition: scenarioSeries};
@@ -451,12 +459,12 @@ function householdTransition({capacity, perennial, food, siteId, householdId, yi
   const matureMacro = Object.fromEntries(['protein_kg_ha', 'fat_kg_ha', 'carbohydrate_kg_ha'].map(key => [key, round(mixRows.reduce((sum, row) => sum + Number(row.area_share) * Number(row[key] ?? 0) * Number(row.site_yield_multiplier ?? 1), 0) * site.food_multiplier * yieldMultipliers[yieldCase], 6)]));
   const fullCalorieAreaAt30 = matureAreas['30%']['100%'];
   const deliveredMacroAtFullCalories = Object.fromEntries(Object.entries(matureMacro).map(([key, value]) => [key, round(value * fullCalorieAreaAt30 * (1 - loss), 6)]));
-  const targetGDay = capacityRow.food_system.protein_reference_target_g_day;
+  const targetGDay = capacityRow.permanent_adult_protein_reference_target_g_day ?? capacityRow.food_system.protein_reference_target_g_day;
   const targetKgYear = targetGDay * 365.25 / 1000;
   const annualProteinPerGJ = capacityRow.food_system.macro_delivered_to_household.protein_kg / demand;
   const perennialProteinPerGJ = matureMacro.protein_kg_ha / centralMixYield;
-  const mature75AnnualEnergy = demand * .25;
-  const mature75PerennialEnergy = demand * .75;
+  const mature75AnnualEnergy = permanentAdultDemand * .25;
+  const mature75PerennialEnergy = permanentAdultDemand * .75;
   const mature75AnnualProtein = mature75AnnualEnergy * annualProteinPerGJ;
   const mature75PerennialProtein = mature75PerennialEnergy * perennialProteinPerGJ;
   const mature75ProteinKg = mature75AnnualProtein + mature75PerennialProtein;
@@ -466,6 +474,14 @@ function householdTransition({capacity, perennial, food, siteId, householdId, yi
     household: householdId,
     household_label: capacityRow.household_label,
     household_food_demand_gj_year: demand,
+    current_household_food_demand_gj_year: demand,
+    permanent_adult_food_demand_gj_year: permanentAdultDemand,
+    dependent_child_food_demand_gj_year: demandProfile.dependent_child_food_demand_gj_year,
+    mature_parental_food_demand_gj_year: demandProfile.scope_by_year.mature.household_food_demand_gj_year,
+    dependent_food_demand_by_year: Object.fromEntries(Object.entries(demandProfile.scope_by_year).map(([year, row]) => [year, {demand_gj_year: row.dependent_child_food_demand_gj_year, active_dependent_member_ids: row.active_dependent_member_ids, active_dependent_child_count: row.active_dependent_child_count}])),
+    land_roles: demandProfile.members,
+    adult_transition_age: demandProfile.adult_transition_age,
+    year_convention: demandProfile.year_convention,
     food_adult_equivalents: capacityRow.food_adult_equivalents,
     adult_equivalent_scope: 'food-energy normalization only; not a total-land multiplier',
     annual_crop_gross_yield_gj_ha_year: round(annualYield, 6),
@@ -644,7 +660,7 @@ export function buildFoodForestTransition(energy = buildHealthCanadaEnergy(), fo
   calculateFoodSystemLabour();
   const perennial = calculatePerennialEvidence();
   const perennialProtein = calculatePerennialProteinEvidence();
-  const households = Object.entries(siteClasses).flatMap(([siteId]) => Object.keys(householdProfiles).map(household => householdTransition({capacity, perennial, food, siteId, householdId: household})));
+  const households = Object.entries(siteClasses).flatMap(([siteId]) => Object.keys(householdProfiles).map(household => householdTransition({capacity, perennial, food, energy, siteId, householdId: household})));
   const ageingInPlace = ageingInPlaceOutput(households);
   const proteinAudit = proteinAuditOutput(households);
   const output = {

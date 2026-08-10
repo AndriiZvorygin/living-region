@@ -41,6 +41,9 @@ function classProduction({perennialMix, curveAnchors = {}, year, footprintHa, yi
  */
 export function calculateEstablishmentLandRequirement({
   demandGJ,
+  permanentAdultDemandGJ = null,
+  demandByYear = null,
+  demandScopeByYear = null,
   annualYieldGJHaYear,
   perennialMix = [],
   curveAnchors = {},
@@ -61,15 +64,24 @@ export function calculateEstablishmentLandRequirement({
   const netAnnualYield = annualYield * (1 - Number(loss));
   const maturePerennialYield = perennialMix.reduce((sum, row) => sum + Number(row.area_share ?? 0) * Number(row.mature_food_gj_ha_year ?? 0) * Number(row.site_yield_multiplier ?? 1), 0) * Number(yieldMultiplier);
   if (!(maturePerennialYield > 0)) throw new Error('selected perennial system has no mature food yield');
-  const plantedPerennialFootprintHa = Number(demandGJ) / (maturePerennialYield * (1 - Number(loss)));
-  const annualReserveHa = Number(demandGJ) * Number(annualReserveFraction) / netAnnualYield;
+  const permanentDemand = Number(permanentAdultDemandGJ ?? demandGJ);
+  if (!(permanentDemand > 0)) throw new Error('establishment land requires positive permanent adult food demand');
+  const demandAt = (year) => Number(demandByYear?.[String(year)] ?? demandGJ);
+  const scopeAt = (year) => demandScopeByYear?.[String(year)] ?? {
+    permanent_adult_food_demand_gj_year: permanentDemand,
+    dependent_child_food_demand_gj_year: Math.max(0, demandAt(year) - permanentDemand),
+    household_food_demand_gj_year: demandAt(year)
+  };
+  const plantedPerennialFootprintHa = permanentDemand / (maturePerennialYield * (1 - Number(loss)));
   const rows = years.map((year) => {
+    const householdDemand = demandAt(year);
+    const demandScope = scopeAt(year);
     const productionRows = classProduction({perennialMix, curveAnchors, year, footprintHa: plantedPerennialFootprintHa, yieldMultiplier});
     const perennialGross = productionRows.reduce((sum, row) => sum + row.gross_food_gj, 0);
     const perennialUsable = perennialGross * (1 - Number(loss));
-    const residual = Math.max(0, Number(demandGJ) - perennialUsable);
+    const residual = Math.max(0, householdDemand - perennialUsable);
     const requestedAnnualArea = strategy === 'constant_annual_reserve'
-      ? Math.max(annualReserveHa, residual / netAnnualYield)
+      ? Math.max(householdDemand * Number(annualReserveFraction) / netAnnualYield, residual / netAnnualYield)
       : residual / netAnnualYield;
     const overlapFraction = Number(annualIntercropOverlap[year] ?? 0);
     const overlap = Math.min(requestedAnnualArea, plantedPerennialFootprintHa) * overlapFraction;
@@ -77,6 +89,8 @@ export function calculateEstablishmentLandRequirement({
     const totalExclusive = occupiedFood + Number(heatingAreaHa) + Number(exclusiveReserveHa);
     const annualGross = requestedAnnualArea * annualYield;
     const annualUsable = annualGross * (1 - Number(loss));
+    const adultResidual = Math.max(0, permanentDemand - perennialUsable);
+    const adultAnnualArea = adultResidual / netAnnualYield;
     return {
       year,
       annual_area_required_ha: round(requestedAnnualArea),
@@ -90,9 +104,17 @@ export function calculateEstablishmentLandRequirement({
       perennial_by_function_usable_gj: Object.fromEntries(productionRows.map((row) => [row.functional_class, row.usable_food_gj])),
       class_production: productionRows,
       total_usable_food_gj: round(annualUsable + perennialUsable),
-      household_food_coverage_ratio: round((annualUsable + perennialUsable) / Number(demandGJ)),
-      perennial_food_coverage_ratio: round(perennialUsable / Number(demandGJ)),
-      household_food_surplus_or_deficit_gj: round(annualUsable + perennialUsable - Number(demandGJ)),
+      household_food_demand_gj_year: round(householdDemand),
+      permanent_adult_food_demand_gj_year: round(Number(demandScope.permanent_adult_food_demand_gj_year ?? permanentDemand)),
+      dependent_child_food_demand_gj_year: round(Number(demandScope.dependent_child_food_demand_gj_year ?? Math.max(0, householdDemand - permanentDemand))),
+      active_dependent_member_ids: demandScope.active_dependent_member_ids ?? [],
+      active_dependent_child_count: Number(demandScope.active_dependent_child_count ?? 0),
+      permanent_adult_annual_area_required_ha: round(adultAnnualArea),
+      dependent_food_supplement_annual_area_ha: round(Math.max(0, requestedAnnualArea - adultAnnualArea)),
+      dependent_food_supplement_gj_year: round(Math.max(0, householdDemand - permanentDemand)),
+      household_food_coverage_ratio: householdDemand > 0 ? round((annualUsable + perennialUsable) / householdDemand) : 1,
+      perennial_food_coverage_ratio: householdDemand > 0 ? round(perennialUsable / householdDemand) : 1,
+      household_food_surplus_or_deficit_gj: round(annualUsable + perennialUsable - householdDemand),
       young_forest_annual_intercrop_overlap_ha: round(overlap),
       land_double_counted_as_if_separate_ha: round(overlap),
       occupied_food_production_area_ha: round(occupiedFood),
@@ -100,7 +122,7 @@ export function calculateEstablishmentLandRequirement({
       exclusive_resilience_reserve_ha: round(exclusiveReserveHa),
       total_exclusive_land_requirement_ha: round(totalExclusive),
       annual_land_limited: false,
-      establishment_deficit_gj: round(Math.max(0, Number(demandGJ) - annualUsable - perennialUsable))
+      establishment_deficit_gj: round(Math.max(0, householdDemand - annualUsable - perennialUsable))
     };
   });
   const peak = rows.reduce((best, row) => row.total_exclusive_land_requirement_ha > best.total_exclusive_land_requirement_ha ? row : best, rows[0]);
@@ -114,7 +136,10 @@ export function calculateEstablishmentLandRequirement({
     annual_yield_gj_ha_year: round(annualYield),
     mature_perennial_yield_gj_ha_year: round(maturePerennialYield),
     planted_perennial_footprint_ha: round(plantedPerennialFootprintHa),
-    annual_bridge_area_required_year_1_ha: round(Number(demandGJ) / netAnnualYield),
+    current_household_food_demand_gj_year: round(Number(demandGJ)),
+    permanent_adult_food_demand_gj_year: round(permanentDemand),
+    dependent_child_food_demand_gj_year: round(Math.max(0, Number(demandGJ) - permanentDemand)),
+    annual_bridge_area_required_year_1_ha: round(demandAt(1) / netAnnualYield),
     rows,
     establishment_land_requirement_ha: peak.total_exclusive_land_requirement_ha,
     establishment_peak_year: peak.year,
