@@ -19,6 +19,13 @@ const composition = Object.fromEntries(readCsv('data/source/current-food-composi
 const sourceRows = readCsv('data/source/perennial-yield-evidence.csv');
 const perennialProteinRows = readCsv('data/source/perennial-protein-evidence.csv');
 
+const perennialResearchUpdates = [
+  {species: 'Hazelnut', source: 'https://www.mdpi.com/2071-1050/17/4/1543', source_date: '2025', evidence_status: 'measured Ontario on-farm trial; short series', finding: 'Fertility treatments and cultivar/site performance are being measured in Ontario, strengthening the evidence base without establishing a Grey-Bruce low-input mature yield.', canonical_action: 'retain the existing conservative planning synthesis; do not promote to a measured canonical yield.'},
+  {species: 'White oak/acorn systems', source: 'https://research.fs.usda.gov/treesearch/36770', source_date: '2009', evidence_status: 'measured comparable-climate forest study; high inter-tree and year variability', finding: 'Acorn production can be measured but is strongly episodic and uneven among trees and sites.', canonical_action: 'retain research-only status; do not credit acorn calories to the central mix.'},
+  {species: 'Chinese chestnut', source: 'https://ucanr.edu/site/fruit-nut-research-information-center/chestnut-fact-sheet', source_date: 'extension reference', evidence_status: 'comparable-climate extension production guidance', finding: 'Supports the crop function and orchard establishment context, but does not provide a Grey-Bruce low-input yield series.', canonical_action: 'retain the conservative unvalidated synthesis and its climate, blight, frost and wildlife caveats.'},
+  {species: 'Heartnut/Japanese walnut', source: 'https://omafra.gov.on.ca/CropOp/en/spec_fruit/nuts/hear.html', source_date: 'Ontario reference', evidence_status: 'Ontario specialty-crop reference without a yield series', finding: 'Supports a possible food-tree role and bearing-time investigation, not a defensible local hectare yield.', canonical_action: 'retain reference-only status pending regional trials.'}
+];
+
 const curveAnchors = {
   conservative: {
     early_bearing_perennial: {1: 0, 2: .10, 3: .40, 5: .70, 8: .90, 10: .95, 15: 1, 20: 1},
@@ -101,7 +108,8 @@ export function calculatePerennialEvidence() {
       'Chestnut bearing-time evidence is regionally relevant but yield evidence is mainly outside Ontario; chestnut suitability, blight, frost and wildlife risk remain unresolved.',
       'Heartnut and oak/acorn functions are documented but excluded from the central calorie mix because no defensible Grey-Bruce yield series was found.',
       'The curves are bounded interpolations between published bearing-time anchors and planning milestones, not annual field measurements.'
-    ]
+    ],
+    research_updates: perennialResearchUpdates
   };
   writeJson('data/derived/perennial-yield-evidence.json', output);
   writeCsv('data/derived/perennial-yield-evidence.csv', [
@@ -532,6 +540,10 @@ ${rows.filter(row => row.mature_food_gj_ha_year !== null || row.canonical_status
 - Ontario recovery material says American chestnut can begin producing seed at about year 8. Chestnut production references from comparable climates support the function, but not a Grey-Bruce yield. The model therefore uses 0.75 t/ha as a conservative synthesis and treats climate, blight, frost and wildlife as unresolved.
 - Ontario heartnut information supports the species as a possible food-tree function and gives commercial production timing, but reports no Ontario fertility recommendations and no yield series. Heartnut is not used in the central calorie yield.
 - The production curves are bounded interpolations between those evidence anchors. They are scenarios, not claims that yield increases linearly in real orchards.
+
+## Evidence updates reviewed for this model
+
+${(perennial.research_updates ?? []).map(row => `- **${row.species}:** [source](${row.source}) (${row.source_date}; ${row.evidence_status}). ${row.finding} **Model action:** ${row.canonical_action}`).join('\n')}
 
 Sources: [OMAFRA raspberry guidance](https://www.ontario.ca/page/growing-raspberries-and-blackberries-home-gardens), [OMAFRA Starting a Farm 101](https://files.ontario.ca/omafra-starting-a-farm-in-ontario-pub-61-en-2023-04-21.pdf), [OMAFRA hazelnut economic report](https://www.ontario.ca/page/2018-economic-report-establishment-and-production-costs-hazelnuts-ontario), [Ontario American chestnut recovery strategy](https://www.ontario.ca/page/american-chestnut-recovery-strategy), [UC ANR chestnut fact sheet](https://ucanr.edu/site/fruit-nut-research-information-center/chestnut-fact-sheet), [OMAFRA heartnut information](https://omafra.gov.on.ca/CropOp/en/spec_fruit/nuts/hear.html).
 `;

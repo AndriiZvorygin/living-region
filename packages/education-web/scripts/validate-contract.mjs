@@ -9,4 +9,9 @@ if (contract.units.energy !== 'MJ/day and GJ/year') throw new Error('presentatio
 if (contract.household_presets.length < schema.properties.household_presets.minItems) throw new Error('presentation contract is missing household presets');
 if (contract.mature_rows.length < schema.properties.mature_rows.minItems || contract.transition_rows.length < schema.properties.transition_rows.minItems) throw new Error('presentation contract is missing canonical rows');
 if (!contract.regional.grey.scenarios?.length) throw new Error('presentation contract is missing regional scenarios');
+if (!contract.perennial_food_evidence.rows.some((row) => row.evidence_status === 'reference only')) throw new Error('perennial contract must preserve reference-only evidence rows');
+if (!contract.perennial_food_evidence.rows.some((row) => row.species.toLowerCase().includes('hazelnut') && Number(row.mature_food_gj_ha_year) > 0)) throw new Error('perennial contract is missing canonical hazelnut evidence');
+if (JSON.stringify(contract).match(/\bkcal\b/i)) throw new Error('public presentation contract leaked a non-metric kcal unit');
+if (JSON.stringify(contract).match(/\bcalories?\b/i)) throw new Error('public presentation contract leaked a customary calorie term');
+if (JSON.stringify(contract).match(/"(?:wall|roof|floor)_r"\s*:/)) throw new Error('public presentation contract leaked source-style thermal R fields; expose RSI instead');
 console.log(`validated carrying-capacity presentation contract ${contract.contract_version} (${contract.household_presets.length} presets, ${contract.regional.grey.scenarios.length} regional scenarios)`);

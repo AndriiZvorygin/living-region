@@ -10,7 +10,9 @@ import {calculateTransitionLabour, calculateFoodSystemLabour} from '../scripts/c
 import {buildFoodForestTransition} from '../scripts/calc-food-forest-transition.mjs';
 import {buildMatureFoodSystem} from '../scripts/calc-mature-food-system.mjs';
 export {calculateHealthCanadaEER, representativeProfiles, HEALTH_CANADA_EER_SOURCE} from './health-canada.mjs';
-export {calculateFoodSystem, calculateInteractiveHousehold, calculateEvidenceHeating, heatingCases, siteClasses, householdProfiles, foodLossAssumptions, FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './core.mjs';
+export {calculateFoodSystem, calculateInteractiveHousehold, calculateEvidenceHeating, calculateBuildingHeatingDemand, calculateHeatingLoads, calculateHouseholdLabourCapacity, calculateExclusiveLandAllocation, defaultBuilding, buildingArchetypes, insulationPresets, labourCapacityLevels, heatingCases, siteClasses, householdProfiles, foodLossAssumptions, FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './core.mjs';
+export {calculatePersonVisualMetrics} from './people.mjs';
+export {calculatePerennialMixTimeline} from './perennial.mjs';
 
 export const CARRYING_CAPACITY_CONTRACT_VERSION = '1.0.0';
 export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

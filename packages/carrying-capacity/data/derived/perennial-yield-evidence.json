@@ -533,5 +533,39 @@
     "Chestnut bearing-time evidence is regionally relevant but yield evidence is mainly outside Ontario; chestnut suitability, blight, frost and wildlife risk remain unresolved.",
     "Heartnut and oak/acorn functions are documented but excluded from the central calorie mix because no defensible Grey-Bruce yield series was found.",
     "The curves are bounded interpolations between published bearing-time anchors and planning milestones, not annual field measurements."
+  ],
+  "research_updates": [
+    {
+      "species": "Hazelnut",
+      "source": "https://www.mdpi.com/2071-1050/17/4/1543",
+      "source_date": "2025",
+      "evidence_status": "measured Ontario on-farm trial; short series",
+      "finding": "Fertility treatments and cultivar/site performance are being measured in Ontario, strengthening the evidence base without establishing a Grey-Bruce low-input mature yield.",
+      "canonical_action": "retain the existing conservative planning synthesis; do not promote to a measured canonical yield."
+    },
+    {
+      "species": "White oak/acorn systems",
+      "source": "https://research.fs.usda.gov/treesearch/36770",
+      "source_date": "2009",
+      "evidence_status": "measured comparable-climate forest study; high inter-tree and year variability",
+      "finding": "Acorn production can be measured but is strongly episodic and uneven among trees and sites.",
+      "canonical_action": "retain research-only status; do not credit acorn calories to the central mix."
+    },
+    {
+      "species": "Chinese chestnut",
+      "source": "https://ucanr.edu/site/fruit-nut-research-information-center/chestnut-fact-sheet",
+      "source_date": "extension reference",
+      "evidence_status": "comparable-climate extension production guidance",
+      "finding": "Supports the crop function and orchard establishment context, but does not provide a Grey-Bruce low-input yield series.",
+      "canonical_action": "retain the conservative unvalidated synthesis and its climate, blight, frost and wildlife caveats."
+    },
+    {
+      "species": "Heartnut/Japanese walnut",
+      "source": "https://omafra.gov.on.ca/CropOp/en/spec_fruit/nuts/hear.html",
+      "source_date": "Ontario reference",
+      "evidence_status": "Ontario specialty-crop reference without a yield series",
+      "finding": "Supports a possible food-tree role and bearing-time investigation, not a defensible local hectare yield.",
+      "canonical_action": "retain reference-only status pending regional trials."
+    }
   ]
 }

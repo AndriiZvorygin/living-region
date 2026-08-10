@@ -230,7 +230,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
@@ -364,7 +364,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
@@ -498,7 +498,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
@@ -633,7 +633,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
@@ -769,7 +769,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
@@ -906,7 +906,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
@@ -1039,7 +1039,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
@@ -1173,7 +1173,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
@@ -1307,7 +1307,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
@@ -1442,7 +1442,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
@@ -1578,7 +1578,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
@@ -1715,7 +1715,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
@@ -1848,7 +1848,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
@@ -1982,7 +1982,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
@@ -2116,7 +2116,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
@@ -2251,7 +2251,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
@@ -2387,7 +2387,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
@@ -2524,7 +2524,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
@@ -2657,7 +2657,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
@@ -2791,7 +2791,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
@@ -2925,7 +2925,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
@@ -3060,7 +3060,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
@@ -3196,7 +3196,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
@@ -3333,7 +3333,7 @@
           "weather_crop_reserve": 0.2,
           "emergency_community_reserve": 0.1,
           "protein_reference_g_per_kg": 0.8,
-          "macro_energy_factors": "4 kcal/g protein and carbohydrate; 9 kcal/g fat converted to GJ"
+          "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
       "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."

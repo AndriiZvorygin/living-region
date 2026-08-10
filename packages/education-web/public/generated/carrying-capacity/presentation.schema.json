@@ -1,17 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "site_classes", "household_presets", "mature_rows", "transition_rows", "regional", "sources"],
+  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "reference_profile", "site_classes", "household_presets", "mature_rows", "transition_rows", "heating", "perennial_food_evidence", "regional", "sources"],
   "properties": {
     "contract_version": {"type": "string"},
     "model_contract_version": {"type": "string"},
     "generated_at": {"type": "string"},
     "units": {"type": "object", "required": ["energy", "land", "labour"]},
     "health_canada": {"type": "object", "required": ["scenarios", "activity_categories"]},
+    "reference_profile": {"type": "object", "required": ["sex", "age_y", "weight_kg", "height_cm", "activity", "mj_day", "gj_year"]},
     "site_classes": {"type": "object", "minProperties": 3},
     "household_presets": {"type": "array", "minItems": 6},
     "mature_rows": {"type": "array", "minItems": 18},
     "transition_rows": {"type": "array", "minItems": 18},
+    "heating": {"type": "object", "required": ["building_archetypes", "insulation_presets", "default_building"]},
+    "perennial_food_evidence": {"type": "object", "required": ["rows", "mix", "central_mix", "mix_timeline"]},
     "regional": {"type": "object", "required": ["grey"]},
     "sources": {"type": "array", "minItems": 3}
   }
