@@ -192,7 +192,8 @@ test('young-row intercropping prevents annual and perennial hectares from being 
     for (const item of row.transition.progressive_handoff.rows) {
       close(item.occupied_food_production_area_ha, item.annual_area_ha + item.perennial_area_ha - item.young_forest_annual_intercrop_overlap_ha, 2e-6);
       assert.ok(item.land_double_counted_as_if_separate_ha >= 0);
-      assert.ok(item.occupied_food_production_area_ha <= row.food_production_envelope_at_arc_allocation_ha + 2e-6);
+      assert.equal(item.annual_land_limited, false);
+      assert.ok(item.total_exclusive_land_requirement_ha >= item.occupied_food_production_area_ha);
     }
   }
 });
@@ -208,13 +209,15 @@ test('perennial calorie thresholds are reported independently from total househo
   assert.ok(row.transition.progressive_handoff.rows.every(item => item.household_food_coverage_ratio >= 0.999));
 });
 
-test('marginal establishment deficits are exposed rather than hidden by intercropping', () => {
+test('marginal biological requirements are exposed rather than hidden by ARC allocation', () => {
   const result = buildFoodForestTransition();
   const ordinaryFamily = result.households.find(item => item.site === 'ordinary_mesic' && item.household === 'two_adults_plus_two_children');
   const marginalAdultChild = result.households.find(item => item.site === 'shallow_rocky_marginal' && item.household === 'adult_plus_child');
   assert.ok(ordinaryFamily.transition.progressive_handoff.rows.every(item => !item.annual_land_limited));
-  assert.ok(marginalAdultChild.transition.progressive_handoff.rows.some(item => item.annual_land_limited));
-  assert.ok(marginalAdultChild.transition.progressive_handoff.rows[0].household_food_coverage_ratio < 1);
+  assert.ok(marginalAdultChild.transition.progressive_handoff.rows.every(item => !item.annual_land_limited));
+  assert.ok(marginalAdultChild.establishment_land_requirement_ha > marginalAdultChild.arc_allocation_ha);
+  assert.ok(marginalAdultChild.arc_policy_comparison.establishment_surplus_or_deficit_ha < 0);
+  assert.ok(marginalAdultChild.transition.progressive_handoff.rows[0].household_food_coverage_ratio >= 1);
 });
 
 test('conservative and favourable perennial establishment sensitivities are explicit', () => {

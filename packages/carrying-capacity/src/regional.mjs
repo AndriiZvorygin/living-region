@@ -123,10 +123,11 @@ function normalizedShares(input, fallback) {
 }
 
 function transitionFor(canonical, site, household, year) {
-  const row = (canonical.canonical?.food_forest_transition?.households ?? []).find((candidate) => candidate.site === site && candidate.household === household);
-  if (!row) throw new Error(`Missing canonical transition row for ${site}/${household}`);
-  const rows = row.transition?.constant_annual_reserve?.rows ?? [];
-  return rows.find((candidate) => candidate.year === year) ?? (year === 'mature' ? rows.find((candidate) => candidate.year === 'mature') : null) ?? rows.at(-1);
+  const householdRow = (canonical.canonical?.food_forest_transition?.households ?? []).find((candidate) => candidate.site === site && candidate.household === household);
+  if (!householdRow) throw new Error(`Missing canonical transition row for ${site}/${household}`);
+  const rows = householdRow.transition?.constant_annual_reserve?.rows ?? [];
+  const row = rows.find((candidate) => candidate.year === year) ?? (year === 'mature' ? rows.find((candidate) => candidate.year === 'mature') : null) ?? rows.at(-1);
+  return {...row, establishment_land_requirement_ha: householdRow.establishment_land_requirement_ha, mature_land_requirement_ha: householdRow.mature_land_requirement_ha, arc_policy_allocation_ha: householdRow.arc_policy_comparison?.allocation_ha ?? householdRow.arc_allocation_ha, arc_policy_establishment_surplus_or_deficit_ha: householdRow.arc_policy_comparison?.establishment_surplus_or_deficit_ha};
 }
 
 function matureFor(canonical, site, household) {
@@ -162,7 +163,7 @@ export function calculateGreyCarryingCapacityAdoption({
       const conditionId = condition[0];
       const inputFactor = finite(condition[1], 1);
       const years = transitionYears.map((year) => {
-        const totals = {participating_households: 0, participating_population_people: 0, productive_land_required_ha: 0, establishment_annual_food_area_ha: 0, mature_annual_food_area_ha: 0, mature_perennial_food_area_ha: 0, woody_heating_area_ha: 0, labour_hours_total: 0, heavy_cultivation_labour_hours: 0, household_food_demand_supplied_gj_year: 0, market_food_demand_displaced_gj_year: 0, mature_exportable_surplus_gj_year: 0};
+        const totals = {participating_households: 0, participating_population_people: 0, productive_land_required_ha: 0, establishment_land_requirement_ha: 0, mature_land_requirement_ha: 0, arc_policy_allocation_ha: 0, arc_policy_establishment_surplus_or_deficit_ha: 0, establishment_annual_food_area_ha: 0, mature_annual_food_area_ha: 0, mature_perennial_food_area_ha: 0, woody_heating_area_ha: 0, labour_hours_total: 0, heavy_cultivation_labour_hours: 0, household_food_demand_supplied_gj_year: 0, market_food_demand_displaced_gj_year: 0, mature_exportable_surplus_gj_year: 0};
         const profileRows = [];
         for (const [profile, profileShare] of Object.entries(mix)) {
           const memberCount = householdProfiles[profile]?.member_ids?.length ?? 0;
@@ -176,12 +177,16 @@ export function calculateGreyCarryingCapacityAdoption({
             const displaced = Math.min(householdDemand, coveredFood);
             const surplus = Math.max(0, coveredFood - householdDemand);
             const occupied = finite(transition.occupied_food_production_area_ha, finite(transition.annual_area_ha) + finite(transition.perennial_area_ha) - finite(transition.young_forest_annual_intercrop_overlap_ha));
-            const reserve = finite(mature.land_accounting?.exclusive_other_area_ha);
+            const exclusiveLand = finite(transition.total_exclusive_land_requirement_ha, occupied + finite(mature.heating_area_ha) + finite(mature.land_accounting?.exclusive_other_area_ha));
             const labourTotal = finite(transition.labour?.total_labour_hours_including_establishment, transition.labour?.total_recurring_labour_hours);
             const heavy = finite(transition.labour?.annual_soil_preparation_hours) + finite(transition.labour?.annual_planting_hours) + finite(transition.labour?.annual_weeding_hours);
             totals.participating_households += participants;
             totals.participating_population_people += participants * memberCount;
-            totals.productive_land_required_ha += participants * (occupied + finite(mature.heating_area_ha) + reserve);
+            totals.productive_land_required_ha += participants * exclusiveLand;
+            totals.establishment_land_requirement_ha += participants * finite(transition.establishment_land_requirement_ha, exclusiveLand);
+            totals.mature_land_requirement_ha += participants * finite(transition.mature_land_requirement_ha, exclusiveLand);
+            totals.arc_policy_allocation_ha += participants * finite(transition.arc_policy_allocation_ha);
+            totals.arc_policy_establishment_surplus_or_deficit_ha += participants * finite(transition.arc_policy_establishment_surplus_or_deficit_ha);
             totals.establishment_annual_food_area_ha += participants * finite(transition.annual_area_ha);
             totals.mature_annual_food_area_ha += participants * finite(mature.mature_annual_area_ha);
             totals.mature_perennial_food_area_ha += participants * finite(mature.mature_perennial_area_ha);
@@ -191,7 +196,7 @@ export function calculateGreyCarryingCapacityAdoption({
             totals.household_food_demand_supplied_gj_year += participants * coveredFood;
             totals.market_food_demand_displaced_gj_year += participants * displaced;
             totals.mature_exportable_surplus_gj_year += participants * surplus;
-            profileRows.push({profile, site_class: key, households: participants, people: participants * memberCount, food_demand_gj_year: participants * householdDemand, food_supplied_gj_year: participants * coveredFood, market_demand_displaced_gj_year: participants * displaced, exportable_surplus_gj_year: participants * surplus, occupied_food_area_ha: participants * occupied, annual_food_area_ha: participants * finite(transition.annual_area_ha), perennial_food_area_ha: participants * finite(transition.perennial_area_ha), heating_area_ha: participants * finite(mature.heating_area_ha), labour_hours: participants * labourTotal / Math.max(inputFactor, .1)});
+            profileRows.push({profile, site_class: key, households: participants, people: participants * memberCount, food_demand_gj_year: participants * householdDemand, food_supplied_gj_year: participants * coveredFood, market_demand_displaced_gj_year: participants * displaced, exportable_surplus_gj_year: participants * surplus, occupied_food_area_ha: participants * occupied, productive_land_required_ha: participants * exclusiveLand, establishment_land_requirement_ha: participants * finite(transition.establishment_land_requirement_ha, exclusiveLand), mature_land_requirement_ha: participants * finite(transition.mature_land_requirement_ha, exclusiveLand), annual_food_area_ha: participants * finite(transition.annual_area_ha), perennial_food_area_ha: participants * finite(transition.perennial_area_ha), heating_area_ha: participants * finite(mature.heating_area_ha), labour_hours: participants * labourTotal / Math.max(inputFactor, .1)});
           }
         }
         const demand = finite(regionalFoodDemandGJ);

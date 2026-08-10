@@ -11,6 +11,8 @@ import {buildFoodForestTransition} from '../scripts/calc-food-forest-transition.
 import {buildMatureFoodSystem} from '../scripts/calc-mature-food-system.mjs';
 export {calculateHealthCanadaEER, representativeProfiles, HEALTH_CANADA_EER_SOURCE} from './health-canada.mjs';
 export {calculateFoodSystem, calculateInteractiveHousehold, calculateEvidenceHeating, calculateBuildingHeatingDemand, calculateHeatingLoads, calculateHouseholdLabourCapacity, calculateExclusiveLandAllocation, defaultBuilding, buildingArchetypes, insulationPresets, labourCapacityLevels, heatingCases, siteClasses, householdProfiles, foodLossAssumptions, FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './core.mjs';
+export {calculateEstablishmentLandRequirement, calculateEstablishmentLandAccounting, DEFAULT_ESTABLISHMENT_YEARS, DEFAULT_ANNUAL_INTERCROP_OVERLAP} from './establishment.mjs';
+export {GROWING_ENVIRONMENT_CONTRACT_VERSION, owenSoundGrowingEnvironment, siteCapabilityDefinitions, siteCapability, selectPerennialMixForSite, viableAnnualCropIds} from './environment.mjs';
 export {calculatePersonVisualMetrics} from './people.mjs';
 export {calculatePerennialMixTimeline} from './perennial.mjs';
 
@@ -46,7 +48,7 @@ export function calculateAnnualFoodBridge({demandGJ, site = 'ordinary_mesic', fo
   const evidence = foodEvidence ?? readJson('data/derived/evidence-food-yields.json');
   const siteClass = siteClasses[site];
   if (!siteClass) throw new Error(`Unknown site class: ${site}`);
-  return calculateFoodSystem(evidence, demandGJ, siteClass.food_multiplier);
+  return calculateFoodSystem(evidence, demandGJ, siteClass);
 }
 
 /** Calculate the explicit yurt/dwelling heating demand from the ARC envelope model. */

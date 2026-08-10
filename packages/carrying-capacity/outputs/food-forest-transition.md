@@ -4,7 +4,7 @@
 
 Yes, annual crops can independently feed the household during perennial establishment **when the annual bridge area fits the site's available food-production envelope**. The transition is not a static mature-landscape calculation: young trees and shrubs can share alleys with annuals, then annual acreage is progressively released as perennial production becomes material. The central model does not support saying that every household can replace all calories with a mature perennial mix on 1 or 2 ha; that result depends on household demand, site productivity and whether resilience/ecological land is counted.
 
-For an ordinary site, the central progressive-handoff model reaches 25%, 50%, 75% and 100% of one adult's calories from perennials in years 5, 8, 10, mature. For two adults plus two children the corresponding thresholds are 5, 10, never, never. These are scenario years, not field predictions. The one-adult conservative and favourable threshold sequences are 8, 10, mature, never and 5, 5, 10, mature respectively.
+For an ordinary site, the central progressive-handoff model reaches 25%, 50%, 75% and 100% of one adult's calories from perennials in years 5, 8, 10, mature. For two adults plus two children the corresponding thresholds are 5, 8, 10, mature. These are scenario years, not field predictions. The one-adult conservative and favourable threshold sequences are 5, 10, 15, mature and 5, 5, 10, mature respectively.
 
 The ageing-in-place transition output retains 25% of mature plant calories in its 75% comparison case for beans, vegetables, markets, seed and resilience. The solved mature share and labour profile are in outputs/mature-food-system-canonical.md; the separate checkpoint series remains in outputs/ageing-in-place-labour.md. For one ordinary-site adult, the comparison annual area falls from 0.15 ha in year 1 to 0.04 ha at maturity; this is a planning sensitivity, not a claim that all recurring perennial labour disappears.
 
@@ -25,14 +25,14 @@ The ageing-in-place transition output retains 25% of mature plant calories in it
 
 | year | annual usable GJ | perennial usable GJ | total usable GJ | coverage | annual area | released area | occupied food area |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 14.05 | 0 | 14.05 | 100% | 0.62 | 0 | 1.50 |
-| 2 | 13.66 | 0.39 | 14.05 | 100% | 0.60 | 0.02 | 1.50 |
-| 3 | 12.57 | 1.48 | 14.05 | 100% | 0.55 | 0.07 | 1.57 |
-| 5 | 10.21 | 3.84 | 14.05 | 100% | 0.45 | 0.17 | 1.62 |
-| 8 | 7.82 | 6.23 | 14.05 | 100% | 0.35 | 0.27 | 1.64 |
-| 10 | 6.20 | 7.85 | 14.05 | 100% | 0.27 | 0.35 | 1.61 |
-| 15 | 4.53 | 9.52 | 14.05 | 100% | 0.20 | 0.42 | 1.55 |
-| mature | 4.11 | 9.94 | 14.05 | 100% | 0.18 | 0.44 | 1.53 |
+| 1 | 14.05 | 0 | 14.05 | 100% | 0.62 | 0 | 2.06 |
+| 2 | 13.50 | 0.56 | 14.05 | 100% | 0.60 | 0.02 | 2.05 |
+| 3 | 11.96 | 2.09 | 14.05 | 100% | 0.53 | 0.09 | 2.12 |
+| 5 | 8.61 | 5.44 | 14.05 | 100% | 0.38 | 0.24 | 2.13 |
+| 8 | 5.24 | 8.81 | 14.05 | 100% | 0.23 | 0.39 | 2.10 |
+| 10 | 2.95 | 11.10 | 14.05 | 100% | 0.13 | 0.49 | 2.03 |
+| 15 | 0.59 | 13.46 | 14.05 | 100% | 0.03 | 0.59 | 1.93 |
+| mature | 0 | 14.05 | 14.05 | 100% | 0 | 0.62 | 1.91 |
 
 Strategy A keeps a 25% annual food-demand reserve after the perennial system supplies the remaining demand. Strategy B progressively hands annual acreage to perennials and does not impose that additional annual reserve floor. Both strategies use the same explicit 30% loss/reserve case and the same young-row overlap schedule.
 

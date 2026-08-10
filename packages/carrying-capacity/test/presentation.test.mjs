@@ -9,6 +9,11 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.reference_profile.sex, 'male');
   assert.equal(contract.reference_profile.weight_kg, 75);
   assert.equal(contract.reference_profile.height_cm, 178);
+  assert.equal(contract.environment.climate.growing_degree_days.value_degree_days, 2073.5);
+  assert.equal(contract.environment.solar.status, 'unresolved');
+  assert.equal(contract.establishment.starting_condition, 'bare_land_new_planting');
+  assert.ok(contract.establishment.site_models.ordinary_mesic.perennial_mix.length > 0);
+  assert.ok(contract.transition_rows.some((row) => Number(row.establishment_land_requirement_ha) > Number(row.mature_land_requirement_ha)));
   assert.equal(contract.perennial_food_evidence.rows.length, 8);
   assert.ok(contract.perennial_food_evidence.rows.some((row) => row.species === 'Heartnut/Japanese walnut' && row.evidence_status === 'reference only' && row.mature_food_gj_ha_year === null));
   assert.ok(contract.perennial_food_evidence.rows.some((row) => row.species === 'White oak/acorn systems' && row.evidence_status === 'reference only'));

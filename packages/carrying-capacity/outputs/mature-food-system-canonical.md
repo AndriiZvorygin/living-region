@@ -8,30 +8,30 @@ The labour hours are planning estimates. Annual cultivation includes soil prepar
 
 | site | household | Year-1 annual area | mature annual area | mature perennial share | perennial area | heating area | multifunction ecological area | exclusive other area | robust minimum | optional additional surplus | total site area | protein coverage | recurring labour |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Wetter productive site | 1 adult | 0.15 ha | 0.04 ha | 70% | 0.32 ha | 0.20 ha | 0.15 ha | 0.12 ha | **0.68 ha** | 0.10 ha | **0.78 ha** | 107% | 119 h/y |
-| Wetter productive site | 1 adult + 1 child | 0.26 ha | 0.08 ha | 70% | 0.56 ha | 0.20 ha | 0.15 ha | 0.12 ha | **0.95 ha** | 0.02 ha | **0.97 ha** | 129% | 192 h/y |
-| Wetter productive site | 2 adults | 0.34 ha | 0.10 ha | 70% | 0.74 ha | 0.20 ha | 0.15 ha | 0.12 ha | **1.16 ha** | 0 ha | **1.16 ha** | 110% | 248 h/y |
-| Wetter productive site | 2 adults + 1 child | 0.45 ha | 0.14 ha | 70% | 0.97 ha | 0.20 ha | 0.15 ha | 0.14 ha | **1.45 ha** | 0 ha | **1.45 ha** | 121% | 321 h/y |
-| Wetter productive site | 2 adults + 2 children | 0.62 ha | 0.19 ha | 70% | 1.33 ha | 0.20 ha | 0.15 ha | 0.20 ha | **1.91 ha** | 0 ha | **1.91 ha** | 129% | 434 h/y |
-| Wetter productive site | 2 adults + 3 children | 0.74 ha | 0.22 ha | 70% | 1.58 ha | 0.20 ha | 0.15 ha | 0.23 ha | **2.23 ha** | 0 ha | **2.23 ha** | 136% | 511 h/y |
-| Ordinary mesic site | 1 adult | 0.15 ha | 0.04 ha | 70% | 0.32 ha | 0.35 ha | 0.15 ha | 0.12 ha | **0.83 ha** | 0.10 ha | **0.93 ha** | 107% | 134 h/y |
-| Ordinary mesic site | 1 adult + 1 child | 0.26 ha | 0.08 ha | 70% | 0.56 ha | 0.35 ha | 0.15 ha | 0.12 ha | **1.10 ha** | 0.02 ha | **1.12 ha** | 129% | 207 h/y |
-| Ordinary mesic site | 2 adults | 0.34 ha | 0.10 ha | 70% | 0.74 ha | 0.35 ha | 0.15 ha | 0.12 ha | **1.31 ha** | 0 ha | **1.31 ha** | 110% | 264 h/y |
-| Ordinary mesic site | 2 adults + 1 child | 0.45 ha | 0.14 ha | 70% | 0.97 ha | 0.35 ha | 0.15 ha | 0.14 ha | **1.60 ha** | 0 ha | **1.60 ha** | 121% | 337 h/y |
-| Ordinary mesic site | 2 adults + 2 children | 0.62 ha | 0.19 ha | 70% | 1.33 ha | 0.35 ha | 0.15 ha | 0.20 ha | **2.06 ha** | 0 ha | **2.06 ha** | 129% | 449 h/y |
-| Ordinary mesic site | 2 adults + 3 children | 0.74 ha | 0.22 ha | 70% | 1.58 ha | 0.35 ha | 0.15 ha | 0.23 ha | **2.39 ha** | 0 ha | **2.39 ha** | 136% | 526 h/y |
-| Dry site | 1 adult | 0.20 ha | 0.06 ha | 70% | 0.43 ha | 0.58 ha | 0.15 ha | 0.12 ha | **1.19 ha** | 0.06 ha | **1.25 ha** | 107% | 191 h/y |
-| Dry site | 1 adult + 1 child | 0.34 ha | 0.10 ha | 70% | 0.74 ha | 0.58 ha | 0.15 ha | 0.12 ha | **1.54 ha** | 0 ha | **1.54 ha** | 129% | 288 h/y |
-| Dry site | 2 adults | 0.46 ha | 0.14 ha | 70% | 0.98 ha | 0.58 ha | 0.15 ha | 0.15 ha | **1.85 ha** | 0 ha | **1.85 ha** | 110% | 363 h/y |
-| Dry site | 2 adults + 1 child | 0.60 ha | 0.18 ha | 70% | 1.30 ha | 0.58 ha | 0.15 ha | 0.19 ha | **2.25 ha** | 0 ha | **2.25 ha** | 121% | 460 h/y |
-| Dry site | 2 adults + 2 children | 0.83 ha | 0.25 ha | 70% | 1.78 ha | 0.58 ha | 0.15 ha | 0.26 ha | **2.87 ha** | 0 ha | **2.87 ha** | 129% | 610 h/y |
-| Dry site | 2 adults + 3 children | 0.98 ha | 0.29 ha | 70% | 2.11 ha | 0.58 ha | 0.15 ha | 0.31 ha | **3.30 ha** | 0 ha | **3.30 ha** | 136% | 713 h/y |
-| Shallow/rocky marginal site | 1 adult | 0.30 ha | 0.09 ha | 70% | 0.64 ha | 0.58 ha | 0.15 ha | 0.12 ha | **1.43 ha** | 0 ha | **1.43 ha** | 107% | 257 h/y |
-| Shallow/rocky marginal site | 1 adult + 1 child | 0.52 ha | 0.15 ha | 70% | 1.11 ha | 0.58 ha | 0.15 ha | 0.16 ha | **2.01 ha** | 0 ha | **2.01 ha** | 129% | 403 h/y |
-| Shallow/rocky marginal site | 2 adults | 0.69 ha | 0.21 ha | 70% | 1.48 ha | 0.58 ha | 0.15 ha | 0.22 ha | **2.48 ha** | 0 ha | **2.48 ha** | 110% | 516 h/y |
-| Shallow/rocky marginal site | 2 adults + 1 child | 0.90 ha | 0.27 ha | 70% | 1.94 ha | 0.58 ha | 0.15 ha | 0.29 ha | **3.08 ha** | 0 ha | **3.08 ha** | 121% | 661 h/y |
-| Shallow/rocky marginal site | 2 adults + 2 children | 1.24 ha | 0.37 ha | 70% | 2.67 ha | 0.58 ha | 0.15 ha | 0.39 ha | **4.01 ha** | 0 ha | **4.01 ha** | 129% | 886 h/y |
-| Shallow/rocky marginal site | 2 adults + 3 children | 1.47 ha | 0.44 ha | 70% | 3.17 ha | 0.58 ha | 0.15 ha | 0.47 ha | **4.66 ha** | 0 ha | **4.66 ha** | 136% | 1041 h/y |
+| Favourable / deep / well-drained productive soil | 1 adult | 0.14 ha | 0.04 ha | 70% | 0.27 ha | 0.18 ha | 0.15 ha | 0.12 ha | **0.61 ha** | 0.11 ha | **0.71 ha** | 107% | 101 h/y |
+| Favourable / deep / well-drained productive soil | 1 adult + 1 child | 0.23 ha | 0.07 ha | 70% | 0.46 ha | 0.18 ha | 0.15 ha | 0.12 ha | **0.83 ha** | 0.04 ha | **0.87 ha** | 129% | 163 h/y |
+| Favourable / deep / well-drained productive soil | 2 adults | 0.31 ha | 0.09 ha | 70% | 0.61 ha | 0.18 ha | 0.15 ha | 0.12 ha | **1.01 ha** | 0 ha | **1.01 ha** | 110% | 210 h/y |
+| Favourable / deep / well-drained productive soil | 2 adults + 1 child | 0.41 ha | 0.12 ha | 70% | 0.81 ha | 0.18 ha | 0.15 ha | 0.13 ha | **1.24 ha** | 0 ha | **1.24 ha** | 121% | 272 h/y |
+| Favourable / deep / well-drained productive soil | 2 adults + 2 children | 0.56 ha | 0.17 ha | 70% | 1.11 ha | 0.18 ha | 0.15 ha | 0.18 ha | **1.64 ha** | 0 ha | **1.64 ha** | 129% | 366 h/y |
+| Favourable / deep / well-drained productive soil | 2 adults + 3 children | 0.67 ha | 0.20 ha | 70% | 1.32 ha | 0.18 ha | 0.15 ha | 0.21 ha | **1.91 ha** | 0 ha | **1.91 ha** | 136% | 431 h/y |
+| Ordinary / mesic Grey County soil | 1 adult | 0.15 ha | 0.04 ha | 70% | 0.32 ha | 0.35 ha | 0.15 ha | 0.12 ha | **0.83 ha** | 0.10 ha | **0.93 ha** | 107% | 134 h/y |
+| Ordinary / mesic Grey County soil | 1 adult + 1 child | 0.26 ha | 0.08 ha | 70% | 0.56 ha | 0.35 ha | 0.15 ha | 0.12 ha | **1.10 ha** | 0.02 ha | **1.12 ha** | 129% | 207 h/y |
+| Ordinary / mesic Grey County soil | 2 adults | 0.34 ha | 0.10 ha | 70% | 0.74 ha | 0.35 ha | 0.15 ha | 0.12 ha | **1.31 ha** | 0 ha | **1.31 ha** | 110% | 264 h/y |
+| Ordinary / mesic Grey County soil | 2 adults + 1 child | 0.45 ha | 0.14 ha | 70% | 0.97 ha | 0.35 ha | 0.15 ha | 0.14 ha | **1.60 ha** | 0 ha | **1.60 ha** | 121% | 337 h/y |
+| Ordinary / mesic Grey County soil | 2 adults + 2 children | 0.62 ha | 0.19 ha | 70% | 1.33 ha | 0.35 ha | 0.15 ha | 0.20 ha | **2.06 ha** | 0 ha | **2.06 ha** | 129% | 449 h/y |
+| Ordinary / mesic Grey County soil | 2 adults + 3 children | 0.74 ha | 0.22 ha | 70% | 1.58 ha | 0.35 ha | 0.15 ha | 0.23 ha | **2.39 ha** | 0 ha | **2.39 ha** | 136% | 526 h/y |
+| Dry / moisture-limited soil | 1 adult | 0.20 ha | 0.06 ha | 70% | 0.53 ha | 0.77 ha | 0.15 ha | 0.12 ha | **1.49 ha** | 0.06 ha | **1.54 ha** | 112% | 239 h/y |
+| Dry / moisture-limited soil | 1 adult + 1 child | 0.35 ha | 0.10 ha | 70% | 0.92 ha | 0.77 ha | 0.15 ha | 0.12 ha | **1.92 ha** | 0 ha | **1.92 ha** | 135% | 358 h/y |
+| Dry / moisture-limited soil | 2 adults | 0.46 ha | 0.14 ha | 70% | 1.23 ha | 0.77 ha | 0.15 ha | 0.15 ha | **2.28 ha** | 0 ha | **2.28 ha** | 115% | 450 h/y |
+| Dry / moisture-limited soil | 2 adults + 1 child | 0.61 ha | 0.18 ha | 70% | 1.62 ha | 0.77 ha | 0.15 ha | 0.19 ha | **2.77 ha** | 0 ha | **2.77 ha** | 127% | 568 h/y |
+| Dry / moisture-limited soil | 2 adults + 2 children | 0.84 ha | 0.25 ha | 70% | 2.22 ha | 0.77 ha | 0.15 ha | 0.27 ha | **3.51 ha** | 0 ha | **3.51 ha** | 136% | 751 h/y |
+| Dry / moisture-limited soil | 2 adults + 3 children | 0.99 ha | 0.30 ha | 70% | 2.63 ha | 0.77 ha | 0.15 ha | 0.32 ha | **4.02 ha** | 0 ha | **4.02 ha** | 143% | 877 h/y |
+| Marginal / shallow / rocky soil | 1 adult | 0.30 ha | 0.09 ha | 70% | 0.91 ha | 1.05 ha | 0.15 ha | 0.12 ha | **2.17 ha** | 0 ha | **2.17 ha** | 123% | 379 h/y |
+| Marginal / shallow / rocky soil | 1 adult + 1 child | 0.52 ha | 0.16 ha | 70% | 1.58 ha | 1.05 ha | 0.15 ha | 0.16 ha | **2.95 ha** | 0 ha | **2.95 ha** | 149% | 579 h/y |
+| Marginal / shallow / rocky soil | 2 adults | 0.69 ha | 0.21 ha | 70% | 2.09 ha | 1.05 ha | 0.15 ha | 0.22 ha | **3.57 ha** | 0 ha | **3.57 ha** | 127% | 734 h/y |
+| Marginal / shallow / rocky soil | 2 adults + 1 child | 0.91 ha | 0.27 ha | 70% | 2.76 ha | 1.05 ha | 0.15 ha | 0.29 ha | **4.37 ha** | 0 ha | **4.37 ha** | 140% | 934 h/y |
+| Marginal / shallow / rocky soil | 2 adults + 2 children | 1.24 ha | 0.37 ha | 70% | 3.79 ha | 1.05 ha | 0.15 ha | 0.40 ha | **5.61 ha** | 0 ha | **5.61 ha** | 149% | 1243 h/y |
+| Marginal / shallow / rocky soil | 2 adults + 3 children | 1.48 ha | 0.44 ha | 70% | 4.49 ha | 1.05 ha | 0.15 ha | 0.47 ha | **6.46 ha** | 0 ha | **6.46 ha** | 157% | 1455 h/y |
 
 ## Ordinary-site share scenarios
 
@@ -56,30 +56,30 @@ The following rows correspond to the canonical 70% plants-only selection. Hours 
 
 | site | household | share | mature annual area | annual soil prep h/y | annual planting h/y | annual weeding h/y | perennial pruning h/y | perennial harvest h/y | total recurring h/y | annual cultivation reduction |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Wetter productive site | 1 adult | 70% | 0.04 ha | 8 | 14 | 21 | 74 | 23 | 119 | 70% |
-| Wetter productive site | 1 adult + 1 child | 70% | 0.08 ha | 14 | 14 | 27 | 127 | 38 | 192 | 70% |
-| Wetter productive site | 2 adults | 70% | 0.10 ha | 18 | 14 | 32 | 168 | 49 | 248 | 70% |
-| Wetter productive site | 2 adults + 1 child | 70% | 0.14 ha | 24 | 14 | 37 | 221 | 63 | 321 | 70% |
-| Wetter productive site | 2 adults + 2 children | 70% | 0.19 ha | 33 | 14 | 46 | 302 | 85 | 434 | 70% |
-| Wetter productive site | 2 adults + 3 children | 70% | 0.22 ha | 39 | 14 | 52 | 358 | 101 | 511 | 70% |
-| Ordinary mesic site | 1 adult | 70% | 0.04 ha | 8 | 24 | 32 | 76 | 27 | 134 | 70% |
-| Ordinary mesic site | 1 adult + 1 child | 70% | 0.08 ha | 14 | 24 | 38 | 128 | 41 | 207 | 70% |
-| Ordinary mesic site | 2 adults | 70% | 0.10 ha | 18 | 24 | 42 | 169 | 52 | 264 | 70% |
-| Ordinary mesic site | 2 adults + 1 child | 70% | 0.14 ha | 24 | 24 | 48 | 222 | 66 | 337 | 70% |
-| Ordinary mesic site | 2 adults + 2 children | 70% | 0.19 ha | 33 | 24 | 57 | 303 | 89 | 449 | 70% |
-| Ordinary mesic site | 2 adults + 3 children | 70% | 0.22 ha | 39 | 24 | 63 | 360 | 104 | 526 | 70% |
-| Dry site | 1 adult | 70% | 0.06 ha | 10 | 41 | 51 | 102 | 38 | 191 | 70% |
-| Dry site | 1 adult + 1 child | 70% | 0.10 ha | 18 | 41 | 59 | 172 | 57 | 288 | 70% |
-| Dry site | 2 adults | 70% | 0.14 ha | 24 | 41 | 65 | 227 | 72 | 363 | 70% |
-| Dry site | 2 adults + 1 child | 70% | 0.18 ha | 32 | 41 | 72 | 297 | 91 | 460 | 70% |
-| Dry site | 2 adults + 2 children | 70% | 0.25 ha | 43 | 41 | 84 | 406 | 120 | 610 | 70% |
-| Dry site | 2 adults + 3 children | 70% | 0.29 ha | 52 | 41 | 92 | 481 | 141 | 713 | 70% |
-| Shallow/rocky marginal site | 1 adult | 70% | 0.09 ha | 16 | 41 | 56 | 150 | 51 | 257 | 70% |
-| Shallow/rocky marginal site | 1 adult + 1 child | 70% | 0.15 ha | 27 | 41 | 68 | 255 | 79 | 403 | 70% |
-| Shallow/rocky marginal site | 2 adults | 70% | 0.21 ha | 36 | 41 | 77 | 338 | 102 | 516 | 70% |
-| Shallow/rocky marginal site | 2 adults + 1 child | 70% | 0.27 ha | 47 | 41 | 88 | 443 | 130 | 661 | 70% |
-| Shallow/rocky marginal site | 2 adults + 2 children | 70% | 0.37 ha | 65 | 41 | 106 | 606 | 175 | 886 | 70% |
-| Shallow/rocky marginal site | 2 adults + 3 children | 70% | 0.44 ha | 77 | 41 | 118 | 718 | 205 | 1041 | 70% |
+| Favourable / deep / well-drained productive soil | 1 adult | 70% | 0.04 ha | 7 | 12 | 20 | 62 | 20 | 101 | 70% |
+| Favourable / deep / well-drained productive soil | 1 adult + 1 child | 70% | 0.07 ha | 12 | 12 | 25 | 106 | 32 | 163 | 70% |
+| Favourable / deep / well-drained productive soil | 2 adults | 70% | 0.09 ha | 16 | 12 | 29 | 140 | 41 | 210 | 70% |
+| Favourable / deep / well-drained productive soil | 2 adults + 1 child | 70% | 0.12 ha | 22 | 12 | 34 | 184 | 53 | 272 | 70% |
+| Favourable / deep / well-drained productive soil | 2 adults + 2 children | 70% | 0.17 ha | 30 | 12 | 42 | 252 | 72 | 366 | 70% |
+| Favourable / deep / well-drained productive soil | 2 adults + 3 children | 70% | 0.20 ha | 35 | 12 | 48 | 299 | 85 | 431 | 70% |
+| Ordinary / mesic Grey County soil | 1 adult | 70% | 0.04 ha | 8 | 24 | 32 | 76 | 27 | 134 | 70% |
+| Ordinary / mesic Grey County soil | 1 adult + 1 child | 70% | 0.08 ha | 14 | 24 | 38 | 128 | 41 | 207 | 70% |
+| Ordinary / mesic Grey County soil | 2 adults | 70% | 0.10 ha | 18 | 24 | 42 | 169 | 52 | 264 | 70% |
+| Ordinary / mesic Grey County soil | 2 adults + 1 child | 70% | 0.14 ha | 24 | 24 | 48 | 222 | 66 | 337 | 70% |
+| Ordinary / mesic Grey County soil | 2 adults + 2 children | 70% | 0.19 ha | 33 | 24 | 57 | 303 | 89 | 449 | 70% |
+| Ordinary / mesic Grey County soil | 2 adults + 3 children | 70% | 0.22 ha | 39 | 24 | 63 | 360 | 104 | 526 | 70% |
+| Dry / moisture-limited soil | 1 adult | 70% | 0.06 ha | 11 | 54 | 65 | 127 | 48 | 239 | 70% |
+| Dry / moisture-limited soil | 1 adult + 1 child | 70% | 0.10 ha | 18 | 54 | 72 | 214 | 71 | 358 | 70% |
+| Dry / moisture-limited soil | 2 adults | 70% | 0.14 ha | 24 | 54 | 78 | 282 | 89 | 450 | 70% |
+| Dry / moisture-limited soil | 2 adults + 1 child | 70% | 0.18 ha | 32 | 54 | 86 | 370 | 113 | 568 | 70% |
+| Dry / moisture-limited soil | 2 adults + 2 children | 70% | 0.25 ha | 44 | 54 | 98 | 504 | 149 | 751 | 70% |
+| Dry / moisture-limited soil | 2 adults + 3 children | 70% | 0.30 ha | 52 | 54 | 106 | 597 | 174 | 877 | 70% |
+| Marginal / shallow / rocky soil | 1 adult | 70% | 0.09 ha | 16 | 74 | 89 | 214 | 75 | 379 | 70% |
+| Marginal / shallow / rocky soil | 1 adult + 1 child | 70% | 0.16 ha | 27 | 74 | 101 | 363 | 115 | 579 | 70% |
+| Marginal / shallow / rocky soil | 2 adults | 70% | 0.21 ha | 36 | 74 | 110 | 478 | 146 | 734 | 70% |
+| Marginal / shallow / rocky soil | 2 adults + 1 child | 70% | 0.27 ha | 48 | 74 | 121 | 627 | 186 | 934 | 70% |
+| Marginal / shallow / rocky soil | 2 adults + 2 children | 70% | 0.37 ha | 65 | 74 | 139 | 857 | 247 | 1243 | 70% |
+| Marginal / shallow / rocky soil | 2 adults + 3 children | 70% | 0.44 ha | 78 | 74 | 151 | 1015 | 289 | 1455 | 70% |
 
 ## Reconciliation: ordinary 2 adults + 2 children
 

@@ -62,3 +62,8 @@
 .mix-0 { background: var(--sage); }.mix-1 { background: var(--teal); }.mix-2 { background: var(--purple); }.mix-3 { background: var(--amber); }
 @media (max-width: 800px) { .member-card-layout, .parallel-chain, .perennial-grid { grid-template-columns: 1fr; } .member-figure-wrap { justify-items: start; grid-template-columns: 86px 1fr; text-align: left; } .person-figure { width: 82px; height: 130px; } .perennial-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 430px) { .perennial-timeline { grid-template-columns: 1fr; } .mix-bar span { font-size: .62rem; } }
+
+/* Keep desktop grids from inheriting unbreakable metric content at narrow landscape widths. */
+main, #app, .split > *, .land-layout > *, .hero > *, .sticky-panel, .labour-panel, .building-list, .member-card { min-width: 0; max-width: 100%; }
+.metric, .metric span, .metric small, .metric strong { min-width: 0; overflow-wrap: anywhere; }
+body { overflow-x: clip; }

@@ -10,28 +10,220 @@
   "arc_policy_definition": "1 ha per adult is evaluated by number of adults in the household allocation, while children increase food demand and shared-household land pressure",
   "site_classes": {
     "wetter_productive": {
-      "label": "Wetter productive site",
-      "food_multiplier": 1,
+      "label": "Favourable / deep / well-drained productive soil",
+      "cli_capability_class_band": "1-3 scenario band",
+      "soil_depth": "deep",
+      "drainage": "well to imperfectly drained",
+      "wetness_constraint": "low when managed; saturated pockets remain unsuitable",
+      "bedrock_rockiness": "not a defining limitation",
+      "food_yield_multiplier": 1.1,
+      "woody_yield_multiplier": 1.1,
+      "annual_crops": {
+        "potato_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        },
+        "wheat_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        },
+        "dry_beans_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        },
+        "sunflower_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        },
+        "oats_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        }
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        },
+        "intermediate_hazelnut_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        },
+        "long_staple_chestnut_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.05
+        },
+        "intermediate_apple_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1.1
+        }
+      },
+      "environment_id": "owen_sound_grey_county",
+      "food_multiplier": 1.1,
       "woody_band": "favourable",
-      "notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     "ordinary_mesic": {
-      "label": "Ordinary mesic site",
+      "label": "Ordinary / mesic Grey County soil",
+      "cli_capability_class_band": "3-4 scenario band",
+      "soil_depth": "moderate",
+      "drainage": "moderately well to imperfectly drained",
+      "wetness_constraint": "moderate; wet areas require separate drainage and crop placement",
+      "bedrock_rockiness": "local variation unresolved",
+      "food_yield_multiplier": 1,
+      "woody_yield_multiplier": 1,
+      "annual_crops": {
+        "potato_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "wheat_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "dry_beans_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "sunflower_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "oats_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        }
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "intermediate_hazelnut_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "long_staple_chestnut_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        },
+        "intermediate_apple_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 1
+        }
+      },
+      "environment_id": "owen_sound_grey_county",
       "food_multiplier": 1,
       "woody_band": "ordinary",
-      "notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     "dry": {
-      "label": "Dry site",
+      "label": "Dry / moisture-limited soil",
+      "cli_capability_class_band": "4-5 scenario band",
+      "soil_depth": "variable to shallow",
+      "drainage": "rapid to well drained",
+      "wetness_constraint": "low wetness but high drought exposure",
+      "bedrock_rockiness": "variable",
+      "food_yield_multiplier": 0.75,
+      "woody_yield_multiplier": 0.75,
+      "annual_crops": {
+        "potato_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.8
+        },
+        "wheat_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        },
+        "dry_beans_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.75
+        },
+        "sunflower_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        },
+        "oats_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.75
+        }
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.8
+        },
+        "intermediate_hazelnut_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.75
+        },
+        "long_staple_chestnut_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        },
+        "intermediate_apple_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.6
+        }
+      },
+      "environment_id": "owen_sound_grey_county",
       "food_multiplier": 0.75,
       "woody_band": "marginal",
-      "notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     "shallow_rocky_marginal": {
-      "label": "Shallow/rocky marginal site",
+      "label": "Marginal / shallow / rocky soil",
+      "cli_capability_class_band": "5-6 scenario band",
+      "soil_depth": "shallow",
+      "drainage": "variable; bedrock and slope dominate local conditions",
+      "wetness_constraint": "variable; saturated depressions are excluded",
+      "bedrock_rockiness": "high potential limitation",
+      "food_yield_multiplier": 0.5,
+      "woody_yield_multiplier": 0.55,
+      "annual_crops": {
+        "potato_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.55
+        },
+        "wheat_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        },
+        "dry_beans_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.5
+        },
+        "sunflower_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        },
+        "oats_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.5
+        }
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.6
+        },
+        "intermediate_hazelnut_low_input_synthesis": {
+          "viable": true,
+          "yield_multiplier": 0.55
+        },
+        "long_staple_chestnut_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        },
+        "intermediate_apple_low_input_synthesis": {
+          "viable": false,
+          "yield_multiplier": 0
+        }
+      },
+      "environment_id": "owen_sound_grey_county",
       "food_multiplier": 0.5,
       "woody_band": "marginal",
-      "notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     }
   },
   "policy_site_map": {
@@ -113,9 +305,9 @@
       "adult_count": 1,
       "household_energy_gj_year": 3.375074,
       "food_adult_equivalents": 0.868891,
-      "food_area_ha": 0.189604,
-      "heating_area_ha": 0.195304,
-      "mathematical_minimum_area_ha": 0.384908,
+      "food_area_ha": 0.172367,
+      "heating_area_ha": 0.177549,
+      "mathematical_minimum_area_ha": 0.349916,
       "resilience_allowances_ha": {
         "diversity_and_rotation_ha": 0.12,
         "soil_water_perennial_buffer_ha": 0.15,
@@ -123,11 +315,11 @@
         "deliberate_export_production_ha": 0.2
       },
       "resilience_allowance_total_ha": 0.57,
-      "robust_system_area_ha": 0.954908,
+      "robust_system_area_ha": 0.919916,
       "arc_policy_allocation_ha": 1,
-      "land_surplus_or_deficit_ha": 0.045092,
+      "land_surplus_or_deficit_ha": 0.080084,
       "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 10.949022,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 12.729085,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -136,67 +328,85 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
-            "food_gj_ha": 42.675984,
-            "area_ha": 0.019771506615992734,
-            "protein_kg_ha": 248.94324,
-            "fat_kg_ha": 14.81805,
-            "carbohydrate_kg_ha": 2327.915655
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 46.943582400000004,
+            "area_ha": 0.017974096923629754,
+            "protein_kg_ha": 273.83756400000004,
+            "fat_kg_ha": 16.299855,
+            "carbohydrate_kg_ha": 2560.7072205
           },
           {
             "id": "wheat_low_input_synthesis",
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
-            "food_gj_ha": 44.166838,
-            "area_ha": 0.015283294674615377,
-            "protein_kg_ha": 407.122677,
-            "fat_kg_ha": 49.719978,
-            "carbohydrate_kg_ha": 2298.096126
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 48.5835218,
+            "area_ha": 0.013893904249650342,
+            "protein_kg_ha": 447.83494470000005,
+            "fat_kg_ha": 54.6919758,
+            "carbohydrate_kg_ha": 2527.9057386
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
-            "food_gj_ha": 23.457868,
-            "area_ha": 0.028775624451463363,
-            "protein_kg_ha": 351.78525,
-            "fat_kg_ha": 14.89914,
-            "carbohydrate_kg_ha": 1047.07845
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 25.803654800000004,
+            "area_ha": 0.02615965859223942,
+            "protein_kg_ha": 386.96377500000006,
+            "fat_kg_ha": 16.389054,
+            "carbohydrate_kg_ha": 1151.786295
           },
           {
             "id": "sunflower_low_input_synthesis",
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
-            "food_gj_ha": 28.421658,
-            "area_ha": 0.029687518581780134,
-            "protein_kg_ha": 241.555032,
-            "fat_kg_ha": 598.191624,
-            "carbohydrate_kg_ha": 232.488
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 31.263823800000004,
+            "area_ha": 0.026988653256163755,
+            "protein_kg_ha": 265.71053520000004,
+            "fat_kg_ha": 658.0107864000001,
+            "carbohydrate_kg_ha": 255.73680000000002
           },
           {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
-            "food_gj_ha": 31.359676,
-            "area_ha": 0.010762464510156292,
-            "protein_kg_ha": 325.347003,
-            "fat_kg_ha": 132.91263,
-            "carbohydrate_kg_ha": 1276.539129
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 34.4956436,
+            "area_ha": 0.009784058645596628,
+            "protein_kg_ha": 357.8817033,
+            "fat_kg_ha": 146.20389300000002,
+            "carbohydrate_kg_ha": 1404.1930419
           }
         ],
-        "gross_energy_per_ha": 32.36537,
-        "raw_calorie_area_ha": 0.10428,
+        "gross_energy_per_ha": 35.601907,
+        "raw_calorie_area_ha": 0.0948,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.189604,
+        "required_food_area_ha": 0.172367,
         "gross_food_energy_at_required_area_gj": 6.13661,
         "delivered_food_energy_gj": 3.375074,
         "macro_output_at_required_area": {
@@ -233,7 +443,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "site_capability": {
+        "id": "wetter_productive",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1.1
+      },
+      "site_notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "wetter_productive",
@@ -247,9 +470,9 @@
       "adult_count": 1,
       "household_energy_gj_year": 5.846183,
       "food_adult_equivalents": 1.505062,
-      "food_area_ha": 0.328426,
-      "heating_area_ha": 0.195304,
-      "mathematical_minimum_area_ha": 0.52373,
+      "food_area_ha": 0.298569,
+      "heating_area_ha": 0.177549,
+      "mathematical_minimum_area_ha": 0.476118,
       "resilience_allowances_ha": {
         "diversity_and_rotation_ha": 0.12,
         "soil_water_perennial_buffer_ha": 0.15,
@@ -257,11 +480,11 @@
         "deliberate_export_production_ha": 0.2
       },
       "resilience_allowance_total_ha": 0.57,
-      "robust_system_area_ha": 1.09373,
+      "robust_system_area_ha": 1.046118,
       "arc_policy_allocation_ha": 1,
-      "land_surplus_or_deficit_ha": -0.09373,
+      "land_surplus_or_deficit_ha": -0.046118,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 8.477913,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 10.257976,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -270,67 +493,85 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
-            "food_gj_ha": 42.675984,
-            "area_ha": 0.03424749971787411,
-            "protein_kg_ha": 248.94324,
-            "fat_kg_ha": 14.81805,
-            "carbohydrate_kg_ha": 2327.915655
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 46.943582400000004,
+            "area_ha": 0.031134090652612825,
+            "protein_kg_ha": 273.83756400000004,
+            "fat_kg_ha": 16.299855,
+            "carbohydrate_kg_ha": 2560.7072205
           },
           {
             "id": "wheat_low_input_synthesis",
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
-            "food_gj_ha": 44.166838,
-            "area_ha": 0.026473178813479926,
-            "protein_kg_ha": 407.122677,
-            "fat_kg_ha": 49.719978,
-            "carbohydrate_kg_ha": 2298.096126
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 48.5835218,
+            "area_ha": 0.02406652619407266,
+            "protein_kg_ha": 447.83494470000005,
+            "fat_kg_ha": 54.6919758,
+            "carbohydrate_kg_ha": 2527.9057386
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
-            "food_gj_ha": 23.457868,
-            "area_ha": 0.049844112005404756,
-            "protein_kg_ha": 351.78525,
-            "fat_kg_ha": 14.89914,
-            "carbohydrate_kg_ha": 1047.07845
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 25.803654800000004,
+            "area_ha": 0.0453128290958225,
+            "protein_kg_ha": 386.96377500000006,
+            "fat_kg_ha": 16.389054,
+            "carbohydrate_kg_ha": 1151.786295
           },
           {
             "id": "sunflower_low_input_synthesis",
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
-            "food_gj_ha": 28.421658,
-            "area_ha": 0.05142366254635813,
-            "protein_kg_ha": 241.555032,
-            "fat_kg_ha": 598.191624,
-            "carbohydrate_kg_ha": 232.488
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 31.263823800000004,
+            "area_ha": 0.04674878413305284,
+            "protein_kg_ha": 265.71053520000004,
+            "fat_kg_ha": 658.0107864000001,
+            "carbohydrate_kg_ha": 255.73680000000002
           },
           {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
-            "food_gj_ha": 31.359676,
-            "area_ha": 0.018642357784563846,
-            "protein_kg_ha": 325.347003,
-            "fat_kg_ha": 132.91263,
-            "carbohydrate_kg_ha": 1276.539129
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 34.4956436,
+            "area_ha": 0.016947597985967133,
+            "protein_kg_ha": 357.8817033,
+            "fat_kg_ha": 146.20389300000002,
+            "carbohydrate_kg_ha": 1404.1930419
           }
         ],
-        "gross_energy_per_ha": 32.36537,
-        "raw_calorie_area_ha": 0.180631,
+        "gross_energy_per_ha": 35.601907,
+        "raw_calorie_area_ha": 0.16421,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.328426,
+        "required_food_area_ha": 0.298569,
         "gross_food_energy_at_required_area_gj": 10.629617,
         "delivered_food_energy_gj": 5.846183,
         "macro_output_at_required_area": {
@@ -367,7 +608,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "site_capability": {
+        "id": "wetter_productive",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1.1
+      },
+      "site_notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "wetter_productive",
@@ -381,9 +635,9 @@
       "adult_count": 2,
       "household_energy_gj_year": 7.768697,
       "food_adult_equivalents": 2,
-      "food_area_ha": 0.436428,
-      "heating_area_ha": 0.195304,
-      "mathematical_minimum_area_ha": 0.631732,
+      "food_area_ha": 0.396753,
+      "heating_area_ha": 0.177549,
+      "mathematical_minimum_area_ha": 0.574302,
       "resilience_allowances_ha": {
         "diversity_and_rotation_ha": 0.12,
         "soil_water_perennial_buffer_ha": 0.15,
@@ -391,11 +645,11 @@
         "deliberate_export_production_ha": 0.2
       },
       "resilience_allowance_total_ha": 0.57,
-      "robust_system_area_ha": 1.201732,
+      "robust_system_area_ha": 1.144302,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": 0.798268,
+      "land_surplus_or_deficit_ha": 0.855698,
       "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 24.356028,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 27.916154,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -404,67 +658,85 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
-            "food_gj_ha": 42.675984,
-            "area_ha": 0.04550977078817913,
-            "protein_kg_ha": 248.94324,
-            "fat_kg_ha": 14.81805,
-            "carbohydrate_kg_ha": 2327.915655
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 46.943582400000004,
+            "area_ha": 0.04137251889834466,
+            "protein_kg_ha": 273.83756400000004,
+            "fat_kg_ha": 16.299855,
+            "carbohydrate_kg_ha": 2560.7072205
           },
           {
             "id": "wheat_low_input_synthesis",
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
-            "food_gj_ha": 44.166838,
-            "area_ha": 0.035178868815557957,
-            "protein_kg_ha": 407.122677,
-            "fat_kg_ha": 49.719978,
-            "carbohydrate_kg_ha": 2298.096126
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 48.5835218,
+            "area_ha": 0.03198078983232541,
+            "protein_kg_ha": 447.83494470000005,
+            "fat_kg_ha": 54.6919758,
+            "carbohydrate_kg_ha": 2527.9057386
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
-            "food_gj_ha": 23.457868,
-            "area_ha": 0.06623532027718802,
-            "protein_kg_ha": 351.78525,
-            "fat_kg_ha": 14.89914,
-            "carbohydrate_kg_ha": 1047.07845
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 25.803654800000004,
+            "area_ha": 0.060213927524716375,
+            "protein_kg_ha": 386.96377500000006,
+            "fat_kg_ha": 16.389054,
+            "carbohydrate_kg_ha": 1151.786295
           },
           {
             "id": "sunflower_low_input_synthesis",
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
-            "food_gj_ha": 28.421658,
-            "area_ha": 0.06833430512744892,
-            "protein_kg_ha": 241.555032,
-            "fat_kg_ha": 598.191624,
-            "carbohydrate_kg_ha": 232.488
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 31.263823800000004,
+            "area_ha": 0.06212209557040811,
+            "protein_kg_ha": 265.71053520000004,
+            "fat_kg_ha": 658.0107864000001,
+            "carbohydrate_kg_ha": 255.73680000000002
           },
           {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
-            "food_gj_ha": 31.359676,
-            "area_ha": 0.024772886684160896,
-            "protein_kg_ha": 325.347003,
-            "fat_kg_ha": 132.91263,
-            "carbohydrate_kg_ha": 1276.539129
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 34.4956436,
+            "area_ha": 0.022520806076509903,
+            "protein_kg_ha": 357.8817033,
+            "fat_kg_ha": 146.20389300000002,
+            "carbohydrate_kg_ha": 1404.1930419
           }
         ],
-        "gross_energy_per_ha": 32.36537,
-        "raw_calorie_area_ha": 0.240031,
+        "gross_energy_per_ha": 35.601907,
+        "raw_calorie_area_ha": 0.21821,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.436428,
+        "required_food_area_ha": 0.396753,
         "gross_food_energy_at_required_area_gj": 14.12516,
         "delivered_food_energy_gj": 7.768697,
         "macro_output_at_required_area": {
@@ -501,7 +773,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "site_capability": {
+        "id": "wetter_productive",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1.1
+      },
+      "site_notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "wetter_productive",
@@ -516,21 +801,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 10.239806,
       "food_adult_equivalents": 2.636171,
-      "food_area_ha": 0.57525,
-      "heating_area_ha": 0.195304,
-      "mathematical_minimum_area_ha": 0.770554,
+      "food_area_ha": 0.522954,
+      "heating_area_ha": 0.177549,
+      "mathematical_minimum_area_ha": 0.700503,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.143813,
+        "diversity_and_rotation_ha": 0.130739,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.593813,
-      "robust_system_area_ha": 1.364367,
+      "resilience_allowance_total_ha": 0.580739,
+      "robust_system_area_ha": 1.281242,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": 0.635633,
+      "land_surplus_or_deficit_ha": 0.718758,
       "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 21.884919,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 25.445045,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -539,67 +824,85 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
-            "food_gj_ha": 42.675984,
-            "area_ha": 0.05998576389006051,
-            "protein_kg_ha": 248.94324,
-            "fat_kg_ha": 14.81805,
-            "carbohydrate_kg_ha": 2327.915655
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 46.943582400000004,
+            "area_ha": 0.05453251262732773,
+            "protein_kg_ha": 273.83756400000004,
+            "fat_kg_ha": 16.299855,
+            "carbohydrate_kg_ha": 2560.7072205
           },
           {
             "id": "wheat_low_input_synthesis",
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
-            "food_gj_ha": 44.166838,
-            "area_ha": 0.046368752954422505,
-            "protein_kg_ha": 407.122677,
-            "fat_kg_ha": 49.719978,
-            "carbohydrate_kg_ha": 2298.096126
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 48.5835218,
+            "area_ha": 0.04215341177674773,
+            "protein_kg_ha": 447.83494470000005,
+            "fat_kg_ha": 54.6919758,
+            "carbohydrate_kg_ha": 2527.9057386
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
-            "food_gj_ha": 23.457868,
-            "area_ha": 0.08730380783112941,
-            "protein_kg_ha": 351.78525,
-            "fat_kg_ha": 14.89914,
-            "carbohydrate_kg_ha": 1047.07845
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 25.803654800000004,
+            "area_ha": 0.07936709802829946,
+            "protein_kg_ha": 386.96377500000006,
+            "fat_kg_ha": 16.389054,
+            "carbohydrate_kg_ha": 1151.786295
           },
           {
             "id": "sunflower_low_input_synthesis",
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
-            "food_gj_ha": 28.421658,
-            "area_ha": 0.09007044909202692,
-            "protein_kg_ha": 241.555032,
-            "fat_kg_ha": 598.191624,
-            "carbohydrate_kg_ha": 232.488
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 31.263823800000004,
+            "area_ha": 0.0818822264472972,
+            "protein_kg_ha": 265.71053520000004,
+            "fat_kg_ha": 658.0107864000001,
+            "carbohydrate_kg_ha": 255.73680000000002
           },
           {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
-            "food_gj_ha": 31.359676,
-            "area_ha": 0.03265277995856845,
-            "protein_kg_ha": 325.347003,
-            "fat_kg_ha": 132.91263,
-            "carbohydrate_kg_ha": 1276.539129
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 34.4956436,
+            "area_ha": 0.02968434541688041,
+            "protein_kg_ha": 357.8817033,
+            "fat_kg_ha": 146.20389300000002,
+            "carbohydrate_kg_ha": 1404.1930419
           }
         ],
-        "gross_energy_per_ha": 32.36537,
-        "raw_calorie_area_ha": 0.316382,
+        "gross_energy_per_ha": 35.601907,
+        "raw_calorie_area_ha": 0.28762,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.57525,
+        "required_food_area_ha": 0.522954,
         "gross_food_energy_at_required_area_gj": 18.618168,
         "delivered_food_energy_gj": 10.239806,
         "macro_output_at_required_area": {
@@ -636,7 +939,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "site_capability": {
+        "id": "wetter_productive",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1.1
+      },
+      "site_notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "wetter_productive",
@@ -652,21 +968,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 14.050693,
       "food_adult_equivalents": 3.617259,
-      "food_area_ha": 0.789337,
-      "heating_area_ha": 0.195304,
-      "mathematical_minimum_area_ha": 0.984641,
+      "food_area_ha": 0.717579,
+      "heating_area_ha": 0.177549,
+      "mathematical_minimum_area_ha": 0.895128,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.197334,
+        "diversity_and_rotation_ha": 0.179395,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.647334,
-      "robust_system_area_ha": 1.631975,
+      "resilience_allowance_total_ha": 0.629395,
+      "robust_system_area_ha": 1.524523,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": 0.368025,
+      "land_surplus_or_deficit_ha": 0.475477,
       "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 18.074032,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 21.634158,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -675,67 +991,85 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
-            "food_gj_ha": 42.675984,
-            "area_ha": 0.08231030478406777,
-            "protein_kg_ha": 248.94324,
-            "fat_kg_ha": 14.81805,
-            "carbohydrate_kg_ha": 2327.915655
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 46.943582400000004,
+            "area_ha": 0.07482754980369798,
+            "protein_kg_ha": 273.83756400000004,
+            "fat_kg_ha": 16.299855,
+            "carbohydrate_kg_ha": 2560.7072205
           },
           {
             "id": "wheat_low_input_synthesis",
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
-            "food_gj_ha": 44.166838,
-            "area_ha": 0.06362553280359351,
-            "protein_kg_ha": 407.122677,
-            "fat_kg_ha": 49.719978,
-            "carbohydrate_kg_ha": 2298.096126
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 48.5835218,
+            "area_ha": 0.05784139345781228,
+            "protein_kg_ha": 447.83494470000005,
+            "fat_kg_ha": 54.6919758,
+            "carbohydrate_kg_ha": 2527.9057386
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
-            "food_gj_ha": 23.457868,
-            "area_ha": 0.11979514080307724,
-            "protein_kg_ha": 351.78525,
-            "fat_kg_ha": 14.89914,
-            "carbohydrate_kg_ha": 1047.07845
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 25.803654800000004,
+            "area_ha": 0.10890467345734293,
+            "protein_kg_ha": 386.96377500000006,
+            "fat_kg_ha": 16.389054,
+            "carbohydrate_kg_ha": 1151.786295
           },
           {
             "id": "sunflower_low_input_synthesis",
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
-            "food_gj_ha": 28.421658,
-            "area_ha": 0.12359142629891612,
-            "protein_kg_ha": 241.555032,
-            "fat_kg_ha": 598.191624,
-            "carbohydrate_kg_ha": 232.488
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 31.263823800000004,
+            "area_ha": 0.11235584208992373,
+            "protein_kg_ha": 265.71053520000004,
+            "fat_kg_ha": 658.0107864000001,
+            "carbohydrate_kg_ha": 255.73680000000002
           },
           {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
-            "food_gj_ha": 31.359676,
-            "area_ha": 0.044804968648273026,
-            "protein_kg_ha": 325.347003,
-            "fat_kg_ha": 132.91263,
-            "carbohydrate_kg_ha": 1276.539129
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 34.4956436,
+            "area_ha": 0.0407317896802482,
+            "protein_kg_ha": 357.8817033,
+            "fat_kg_ha": 146.20389300000002,
+            "carbohydrate_kg_ha": 1404.1930419
           }
         ],
-        "gross_energy_per_ha": 32.36537,
-        "raw_calorie_area_ha": 0.434127,
+        "gross_energy_per_ha": 35.601907,
+        "raw_calorie_area_ha": 0.394661,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.789337,
+        "required_food_area_ha": 0.717579,
         "gross_food_energy_at_required_area_gj": 25.547179,
         "delivered_food_energy_gj": 14.050693,
         "macro_output_at_required_area": {
@@ -772,7 +1106,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "site_capability": {
+        "id": "wetter_productive",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1.1
+      },
+      "site_notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "wetter_productive",
@@ -789,21 +1136,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 16.677312,
       "food_adult_equivalents": 4.293465,
-      "food_area_ha": 0.936894,
-      "heating_area_ha": 0.195304,
-      "mathematical_minimum_area_ha": 1.132198,
+      "food_area_ha": 0.851722,
+      "heating_area_ha": 0.177549,
+      "mathematical_minimum_area_ha": 1.029271,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.234224,
+        "diversity_and_rotation_ha": 0.212931,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.684224,
-      "robust_system_area_ha": 1.816422,
+      "resilience_allowance_total_ha": 0.662931,
+      "robust_system_area_ha": 1.692202,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": 0.183578,
+      "land_surplus_or_deficit_ha": 0.307798,
       "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 15.447413,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 19.007539,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -812,67 +1159,85 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
-            "food_gj_ha": 42.675984,
-            "area_ha": 0.0976972903542189,
-            "protein_kg_ha": 248.94324,
-            "fat_kg_ha": 14.81805,
-            "carbohydrate_kg_ha": 2327.915655
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 46.943582400000004,
+            "area_ha": 0.08881571850383535,
+            "protein_kg_ha": 273.83756400000004,
+            "fat_kg_ha": 16.299855,
+            "carbohydrate_kg_ha": 2560.7072205
           },
           {
             "id": "wheat_low_input_synthesis",
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
-            "food_gj_ha": 44.166838,
-            "area_ha": 0.07551961043713386,
-            "protein_kg_ha": 407.122677,
-            "fat_kg_ha": 49.719978,
-            "carbohydrate_kg_ha": 2298.096126
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 48.5835218,
+            "area_ha": 0.06865419130648533,
+            "protein_kg_ha": 447.83494470000005,
+            "fat_kg_ha": 54.6919758,
+            "carbohydrate_kg_ha": 2527.9057386
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
-            "food_gj_ha": 23.457868,
-            "area_ha": 0.14218949479978318,
-            "protein_kg_ha": 351.78525,
-            "fat_kg_ha": 14.89914,
-            "carbohydrate_kg_ha": 1047.07845
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 25.803654800000004,
+            "area_ha": 0.12926317709071197,
+            "protein_kg_ha": 386.96377500000006,
+            "fat_kg_ha": 16.389054,
+            "carbohydrate_kg_ha": 1151.786295
           },
           {
             "id": "sunflower_low_input_synthesis",
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
-            "food_gj_ha": 28.421658,
-            "area_ha": 0.14669545316462537,
-            "protein_kg_ha": 241.555032,
-            "fat_kg_ha": 598.191624,
-            "carbohydrate_kg_ha": 232.488
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 31.263823800000004,
+            "area_ha": 0.13335950287693213,
+            "protein_kg_ha": 265.71053520000004,
+            "fat_kg_ha": 658.0107864000001,
+            "carbohydrate_kg_ha": 255.73680000000002
           },
           {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
-            "food_gj_ha": 31.359676,
-            "area_ha": 0.0531807535256423,
-            "protein_kg_ha": 325.347003,
-            "fat_kg_ha": 132.91263,
-            "carbohydrate_kg_ha": 1276.539129
+            "viability": "viable",
+            "site_yield_multiplier": 1.1,
+            "food_gj_ha": 34.4956436,
+            "area_ha": 0.048346139568765725,
+            "protein_kg_ha": 357.8817033,
+            "fat_kg_ha": 146.20389300000002,
+            "carbohydrate_kg_ha": 1404.1930419
           }
         ],
-        "gross_energy_per_ha": 32.36537,
-        "raw_calorie_area_ha": 0.515283,
+        "gross_energy_per_ha": 35.601907,
+        "raw_calorie_area_ha": 0.468439,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.936894,
+        "required_food_area_ha": 0.851722,
         "gross_food_energy_at_required_area_gj": 30.322937,
         "delivered_food_energy_gj": 16.677312,
         "macro_output_at_required_area": {
@@ -909,7 +1274,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Moisture-tolerant woody systems can be considered, but exceptional saturated-site trials are excluded."
+      "site_capability": {
+        "id": "wetter_productive",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1.1
+      },
+      "site_notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "ordinary_mesic",
@@ -945,12 +1323,22 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 42.675984,
             "area_ha": 0.019771506615992734,
             "protein_kg_ha": 248.94324,
@@ -962,6 +1350,8 @@
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 44.166838,
             "area_ha": 0.015283294674615377,
             "protein_kg_ha": 407.122677,
@@ -973,6 +1363,8 @@
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 23.457868,
             "area_ha": 0.028775624451463363,
             "protein_kg_ha": 351.78525,
@@ -984,6 +1376,8 @@
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 28.421658,
             "area_ha": 0.029687518581780134,
             "protein_kg_ha": 241.555032,
@@ -995,6 +1389,8 @@
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 31.359676,
             "area_ha": 0.010762464510156292,
             "protein_kg_ha": 325.347003,
@@ -1042,7 +1438,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "site_capability": {
+        "id": "ordinary_mesic",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1
+      },
+      "site_notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "ordinary_mesic",
@@ -1079,12 +1488,22 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 42.675984,
             "area_ha": 0.03424749971787411,
             "protein_kg_ha": 248.94324,
@@ -1096,6 +1515,8 @@
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 44.166838,
             "area_ha": 0.026473178813479926,
             "protein_kg_ha": 407.122677,
@@ -1107,6 +1528,8 @@
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 23.457868,
             "area_ha": 0.049844112005404756,
             "protein_kg_ha": 351.78525,
@@ -1118,6 +1541,8 @@
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 28.421658,
             "area_ha": 0.05142366254635813,
             "protein_kg_ha": 241.555032,
@@ -1129,6 +1554,8 @@
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 31.359676,
             "area_ha": 0.018642357784563846,
             "protein_kg_ha": 325.347003,
@@ -1176,7 +1603,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "site_capability": {
+        "id": "ordinary_mesic",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1
+      },
+      "site_notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "ordinary_mesic",
@@ -1213,12 +1653,22 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 42.675984,
             "area_ha": 0.04550977078817913,
             "protein_kg_ha": 248.94324,
@@ -1230,6 +1680,8 @@
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 44.166838,
             "area_ha": 0.035178868815557957,
             "protein_kg_ha": 407.122677,
@@ -1241,6 +1693,8 @@
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 23.457868,
             "area_ha": 0.06623532027718802,
             "protein_kg_ha": 351.78525,
@@ -1252,6 +1706,8 @@
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 28.421658,
             "area_ha": 0.06833430512744892,
             "protein_kg_ha": 241.555032,
@@ -1263,6 +1719,8 @@
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 31.359676,
             "area_ha": 0.024772886684160896,
             "protein_kg_ha": 325.347003,
@@ -1310,7 +1768,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "site_capability": {
+        "id": "ordinary_mesic",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1
+      },
+      "site_notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "ordinary_mesic",
@@ -1348,12 +1819,22 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 42.675984,
             "area_ha": 0.05998576389006051,
             "protein_kg_ha": 248.94324,
@@ -1365,6 +1846,8 @@
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 44.166838,
             "area_ha": 0.046368752954422505,
             "protein_kg_ha": 407.122677,
@@ -1376,6 +1859,8 @@
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 23.457868,
             "area_ha": 0.08730380783112941,
             "protein_kg_ha": 351.78525,
@@ -1387,6 +1872,8 @@
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 28.421658,
             "area_ha": 0.09007044909202692,
             "protein_kg_ha": 241.555032,
@@ -1398,6 +1885,8 @@
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 31.359676,
             "area_ha": 0.03265277995856845,
             "protein_kg_ha": 325.347003,
@@ -1445,7 +1934,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "site_capability": {
+        "id": "ordinary_mesic",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1
+      },
+      "site_notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "ordinary_mesic",
@@ -1484,12 +1986,22 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 42.675984,
             "area_ha": 0.08231030478406777,
             "protein_kg_ha": 248.94324,
@@ -1501,6 +2013,8 @@
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 44.166838,
             "area_ha": 0.06362553280359351,
             "protein_kg_ha": 407.122677,
@@ -1512,6 +2026,8 @@
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 23.457868,
             "area_ha": 0.11979514080307724,
             "protein_kg_ha": 351.78525,
@@ -1523,6 +2039,8 @@
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 28.421658,
             "area_ha": 0.12359142629891612,
             "protein_kg_ha": 241.555032,
@@ -1534,6 +2052,8 @@
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 31.359676,
             "area_ha": 0.044804968648273026,
             "protein_kg_ha": 325.347003,
@@ -1581,7 +2101,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "site_capability": {
+        "id": "ordinary_mesic",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1
+      },
+      "site_notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "ordinary_mesic",
@@ -1621,12 +2154,22 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 42.675984,
             "area_ha": 0.0976972903542189,
             "protein_kg_ha": 248.94324,
@@ -1638,6 +2181,8 @@
             "crop": "Wheat",
             "category": "starch",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 44.166838,
             "area_ha": 0.07551961043713386,
             "protein_kg_ha": 407.122677,
@@ -1649,6 +2194,8 @@
             "crop": "Dry beans",
             "category": "protein-legume",
             "energy_share": 0.2,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 23.457868,
             "area_ha": 0.14218949479978318,
             "protein_kg_ha": 351.78525,
@@ -1660,6 +2207,8 @@
             "crop": "Sunflower seed",
             "category": "fat-seed",
             "energy_share": 0.25,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 28.421658,
             "area_ha": 0.14669545316462537,
             "protein_kg_ha": 241.555032,
@@ -1671,6 +2220,8 @@
             "crop": "Oats",
             "category": "starch",
             "energy_share": 0.1,
+            "viability": "viable",
+            "site_yield_multiplier": 1,
             "food_gj_ha": 31.359676,
             "area_ha": 0.0531807535256423,
             "protein_kg_ha": 325.347003,
@@ -1718,7 +2269,20 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Central planning class for reasonably designed mixed perennial and annual production."
+      "site_capability": {
+        "id": "ordinary_mesic",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "wheat_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "sunflower_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [],
+        "woody_yield_multiplier": 1
+      },
+      "site_notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "dry",
@@ -1731,9 +2295,9 @@
       "adult_count": 1,
       "household_energy_gj_year": 3.375074,
       "food_adult_equivalents": 0.868891,
-      "food_area_ha": 0.252806,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 0.832207,
+      "food_area_ha": 0.255978,
+      "heating_area_ha": 0.772535,
+      "mathematical_minimum_area_ha": 1.028513,
       "resilience_allowances_ha": {
         "diversity_and_rotation_ha": 0.12,
         "soil_water_perennial_buffer_ha": 0.15,
@@ -1741,11 +2305,11 @@
         "deliberate_export_production_ha": 0.2
       },
       "resilience_allowance_total_ha": 0.57,
-      "robust_system_area_ha": 1.402207,
+      "robust_system_area_ha": 1.598513,
       "arc_policy_allocation_ha": 1,
-      "land_surplus_or_deficit_ha": -0.402207,
+      "land_surplus_or_deficit_ha": -0.598513,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 2.240121,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -0.375936,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -1754,91 +2318,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 32.006988,
-            "area_ha": 0.026362008821323644,
-            "protein_kg_ha": 186.70743,
-            "fat_kg_ha": 11.1135375,
-            "carbohydrate_kg_ha": 1745.9367412499998
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 33.1251285,
-            "area_ha": 0.0203777262328205,
-            "protein_kg_ha": 305.34200775,
-            "fat_kg_ha": 37.2899835,
-            "carbohydrate_kg_ha": 1723.5720944999998
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.8,
+            "food_gj_ha": 34.1407872,
+            "area_ha": 0.04493524230907439,
+            "protein_kg_ha": 199.154592,
+            "fat_kg_ha": 11.85444,
+            "carbohydrate_kg_ha": 1862.332524
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 17.593401,
-            "area_ha": 0.03836749926861782,
+            "area_ha": 0.06975908957930513,
             "protein_kg_ha": 263.83893750000004,
             "fat_kg_ha": 11.174354999999998,
             "carbohydrate_kg_ha": 785.3088375
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.3162435,
-            "area_ha": 0.039583358109040186,
-            "protein_kg_ha": 181.16627400000002,
-            "fat_kg_ha": 448.64371800000004,
-            "carbohydrate_kg_ha": 174.36599999999999
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 23.519757,
-            "area_ha": 0.01434995268020839,
+            "area_ha": 0.026090823054924345,
             "protein_kg_ha": 244.01025224999998,
             "fat_kg_ha": 99.6844725,
             "carbohydrate_kg_ha": 957.4043467500001
           }
         ],
-        "gross_energy_per_ha": 24.274027,
-        "raw_calorie_area_ha": 0.139041,
+        "gross_energy_per_ha": 23.973224,
+        "raw_calorie_area_ha": 0.140785,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.252806,
+        "required_food_area_ha": 0.255978,
         "gross_food_energy_at_required_area_gj": 6.13661,
         "delivered_food_energy_gj": 3.375074,
         "macro_output_at_required_area": {
-          "protein_kg": 58.073245,
-          "fat_kg": 37.58411,
-          "carbohydrate_kg": 239.858752
+          "protein_kg": 61.311392,
+          "fat_kg": 7.114756,
+          "carbohydrate_kg": 297.180422
         },
         "macro_delivered_to_household": {
-          "protein_kg": 31.939704,
-          "fat_kg": 20.670885,
-          "carbohydrate_kg": 131.919915
+          "protein_kg": 33.720652,
+          "fat_kg": 3.913045,
+          "carbohydrate_kg": 163.44626
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 87.446,
+        "protein_g_day": 92.322,
         "protein_reference_target_g_day": 52,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -1851,7 +2408,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "site_capability": {
+        "id": "dry",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.75
+      },
+      "site_notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "dry",
@@ -1865,9 +2436,9 @@
       "adult_count": 1,
       "household_energy_gj_year": 5.846183,
       "food_adult_equivalents": 1.505062,
-      "food_area_ha": 0.437901,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.017302,
+      "food_area_ha": 0.443395,
+      "heating_area_ha": 0.772535,
+      "mathematical_minimum_area_ha": 1.21593,
       "resilience_allowances_ha": {
         "diversity_and_rotation_ha": 0.12,
         "soil_water_perennial_buffer_ha": 0.15,
@@ -1875,11 +2446,11 @@
         "deliberate_export_production_ha": 0.2
       },
       "resilience_allowance_total_ha": 0.57,
-      "robust_system_area_ha": 1.587302,
+      "robust_system_area_ha": 1.78593,
       "arc_policy_allocation_ha": 1,
-      "land_surplus_or_deficit_ha": -0.587302,
+      "land_surplus_or_deficit_ha": -0.78593,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": -0.230988,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -2.847045,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -1888,91 +2459,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 32.006988,
-            "area_ha": 0.04566333295716548,
-            "protein_kg_ha": 186.70743,
-            "fat_kg_ha": 11.1135375,
-            "carbohydrate_kg_ha": 1745.9367412499998
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 33.1251285,
-            "area_ha": 0.035297571751306565,
-            "protein_kg_ha": 305.34200775,
-            "fat_kg_ha": 37.2899835,
-            "carbohydrate_kg_ha": 1723.5720944999998
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.8,
+            "food_gj_ha": 34.1407872,
+            "area_ha": 0.07783522663153207,
+            "protein_kg_ha": 199.154592,
+            "fat_kg_ha": 11.85444,
+            "carbohydrate_kg_ha": 1862.332524
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 17.593401,
-            "area_ha": 0.06645881600720634,
+            "area_ha": 0.12083421092219335,
             "protein_kg_ha": 263.83893750000004,
             "fat_kg_ha": 11.174354999999998,
             "carbohydrate_kg_ha": 785.3088375
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.3162435,
-            "area_ha": 0.06856488339514417,
-            "protein_kg_ha": 181.16627400000002,
-            "fat_kg_ha": 448.64371800000004,
-            "carbohydrate_kg_ha": 174.36599999999999
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 23.519757,
-            "area_ha": 0.02485647704608513,
+            "area_ha": 0.045193594629245694,
             "protein_kg_ha": 244.01025224999998,
             "fat_kg_ha": 99.6844725,
             "carbohydrate_kg_ha": 957.4043467500001
           }
         ],
-        "gross_energy_per_ha": 24.274027,
-        "raw_calorie_area_ha": 0.240841,
+        "gross_energy_per_ha": 23.973224,
+        "raw_calorie_area_ha": 0.243863,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.437901,
+        "required_food_area_ha": 0.443395,
         "gross_food_energy_at_required_area_gj": 10.629617,
         "delivered_food_energy_gj": 5.846183,
         "macro_output_at_required_area": {
-          "protein_kg": 100.592407,
-          "fat_kg": 65.101857,
-          "carbohydrate_kg": 415.47479
+          "protein_kg": 106.201409,
+          "fat_kg": 12.323928,
+          "carbohydrate_kg": 514.765344
         },
         "macro_delivered_to_household": {
-          "protein_kg": 55.324818,
-          "fat_kg": 35.80537,
-          "carbohydrate_kg": 228.50698
+          "protein_kg": 58.409713,
+          "fat_kg": 6.778037,
+          "carbohydrate_kg": 283.115792
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 151.471,
+        "protein_g_day": 159.917,
         "protein_reference_target_g_day": 74.4,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -1985,7 +2549,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "site_capability": {
+        "id": "dry",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.75
+      },
+      "site_notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "dry",
@@ -1999,21 +2577,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 7.768697,
       "food_adult_equivalents": 2,
-      "food_area_ha": 0.581904,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.161305,
+      "food_area_ha": 0.589206,
+      "heating_area_ha": 0.772535,
+      "mathematical_minimum_area_ha": 1.361741,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.145476,
+        "diversity_and_rotation_ha": 0.147302,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.595476,
-      "robust_system_area_ha": 1.756781,
+      "resilience_allowance_total_ha": 0.597302,
+      "robust_system_area_ha": 1.959043,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": 0.243219,
+      "land_surplus_or_deficit_ha": 0.040957,
       "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 11.19697,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 8.415475,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2022,91 +2600,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 32.006988,
-            "area_ha": 0.06067969438423884,
-            "protein_kg_ha": 186.70743,
-            "fat_kg_ha": 11.1135375,
-            "carbohydrate_kg_ha": 1745.9367412499998
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 33.1251285,
-            "area_ha": 0.046905158420743935,
-            "protein_kg_ha": 305.34200775,
-            "fat_kg_ha": 37.2899835,
-            "carbohydrate_kg_ha": 1723.5720944999998
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.8,
+            "food_gj_ha": 34.1407872,
+            "area_ha": 0.10343129724586166,
+            "protein_kg_ha": 199.154592,
+            "fat_kg_ha": 11.85444,
+            "carbohydrate_kg_ha": 1862.332524
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 17.593401,
-            "area_ha": 0.08831376036958402,
+            "area_ha": 0.16057047339924366,
             "protein_kg_ha": 263.83893750000004,
             "fat_kg_ha": 11.174354999999998,
             "carbohydrate_kg_ha": 785.3088375
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.3162435,
-            "area_ha": 0.09111240683659858,
-            "protein_kg_ha": 181.16627400000002,
-            "fat_kg_ha": 448.64371800000004,
-            "carbohydrate_kg_ha": 174.36599999999999
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 23.519757,
-            "area_ha": 0.033030515578881196,
+            "area_ha": 0.060055482870693074,
             "protein_kg_ha": 244.01025224999998,
             "fat_kg_ha": 99.6844725,
             "carbohydrate_kg_ha": 957.4043467500001
           }
         ],
-        "gross_energy_per_ha": 24.274027,
-        "raw_calorie_area_ha": 0.320042,
+        "gross_energy_per_ha": 23.973224,
+        "raw_calorie_area_ha": 0.324057,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.581904,
+        "required_food_area_ha": 0.589206,
         "gross_food_energy_at_required_area_gj": 14.12516,
         "delivered_food_energy_gj": 7.768697,
         "macro_output_at_required_area": {
-          "protein_kg": 133.672164,
-          "fat_kg": 86.510566,
-          "carbohydrate_kg": 552.103441
+          "protein_kg": 141.125683,
+          "fat_kg": 16.376645,
+          "carbohydrate_kg": 684.045639
         },
         "macro_delivered_to_household": {
-          "protein_kg": 73.518353,
-          "fat_kg": 47.579946,
-          "carbohydrate_kg": 303.651372
+          "protein_kg": 77.617714,
+          "fat_kg": 9.006991,
+          "carbohydrate_kg": 376.218261
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 201.282,
+        "protein_g_day": 212.506,
         "protein_reference_target_g_day": 116,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2119,7 +2690,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "site_capability": {
+        "id": "dry",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.75
+      },
+      "site_notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "dry",
@@ -2134,21 +2719,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 10.239806,
       "food_adult_equivalents": 2.636171,
-      "food_area_ha": 0.767,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.346401,
+      "food_area_ha": 0.776623,
+      "heating_area_ha": 0.772535,
+      "mathematical_minimum_area_ha": 1.549158,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.19175,
+        "diversity_and_rotation_ha": 0.194156,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.64175,
-      "robust_system_area_ha": 1.988151,
+      "resilience_allowance_total_ha": 0.644156,
+      "robust_system_area_ha": 2.193314,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": 0.011849,
-      "arc_policy_status": "sufficient against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 8.725861,
+      "land_surplus_or_deficit_ha": -0.193314,
+      "arc_policy_status": "deficit against robust-area scenario",
+      "food_surplus_or_deficit_at_arc_allocation_gj": 5.944366,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2157,91 +2742,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 32.006988,
-            "area_ha": 0.07998101852008067,
-            "protein_kg_ha": 186.70743,
-            "fat_kg_ha": 11.1135375,
-            "carbohydrate_kg_ha": 1745.9367412499998
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 33.1251285,
-            "area_ha": 0.061825003939229996,
-            "protein_kg_ha": 305.34200775,
-            "fat_kg_ha": 37.2899835,
-            "carbohydrate_kg_ha": 1723.5720944999998
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.8,
+            "food_gj_ha": 34.1407872,
+            "area_ha": 0.13633128156831933,
+            "protein_kg_ha": 199.154592,
+            "fat_kg_ha": 11.85444,
+            "carbohydrate_kg_ha": 1862.332524
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 17.593401,
-            "area_ha": 0.11640507710817255,
+            "area_ha": 0.2116455947421319,
             "protein_kg_ha": 263.83893750000004,
             "fat_kg_ha": 11.174354999999998,
             "carbohydrate_kg_ha": 785.3088375
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.3162435,
-            "area_ha": 0.12009393212270258,
-            "protein_kg_ha": 181.16627400000002,
-            "fat_kg_ha": 448.64371800000004,
-            "carbohydrate_kg_ha": 174.36599999999999
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 23.519757,
-            "area_ha": 0.04353703994475794,
+            "area_ha": 0.07915825444501443,
             "protein_kg_ha": 244.01025224999998,
             "fat_kg_ha": 99.6844725,
             "carbohydrate_kg_ha": 957.4043467500001
           }
         ],
-        "gross_energy_per_ha": 24.274027,
-        "raw_calorie_area_ha": 0.421842,
+        "gross_energy_per_ha": 23.973224,
+        "raw_calorie_area_ha": 0.427135,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.767,
+        "required_food_area_ha": 0.776623,
         "gross_food_energy_at_required_area_gj": 18.618168,
         "delivered_food_energy_gj": 10.239806,
         "macro_output_at_required_area": {
-          "protein_kg": 176.191326,
-          "fat_kg": 114.028314,
-          "carbohydrate_kg": 727.719479
+          "protein_kg": 186.015701,
+          "fat_kg": 21.585816,
+          "carbohydrate_kg": 901.630562
         },
         "macro_delivered_to_household": {
-          "protein_kg": 96.903467,
-          "fat_kg": 62.714432,
-          "carbohydrate_kg": 400.238436
+          "protein_kg": 102.306775,
+          "fat_kg": 11.871983,
+          "carbohydrate_kg": 495.887793
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 265.307,
+        "protein_g_day": 280.101,
         "protein_reference_target_g_day": 138.4,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2254,7 +2832,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "site_capability": {
+        "id": "dry",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.75
+      },
+      "site_notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "dry",
@@ -2270,21 +2862,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 14.050693,
       "food_adult_equivalents": 3.617259,
-      "food_area_ha": 1.052449,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.63185,
+      "food_area_ha": 1.065655,
+      "heating_area_ha": 0.772535,
+      "mathematical_minimum_area_ha": 1.83819,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.263112,
+        "diversity_and_rotation_ha": 0.266414,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.713112,
-      "robust_system_area_ha": 2.344962,
+      "resilience_allowance_total_ha": 0.716414,
+      "robust_system_area_ha": 2.554604,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": -0.344962,
+      "land_surplus_or_deficit_ha": -0.554604,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 4.914974,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 2.133479,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2293,91 +2885,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 32.006988,
-            "area_ha": 0.1097470730454237,
-            "protein_kg_ha": 186.70743,
-            "fat_kg_ha": 11.1135375,
-            "carbohydrate_kg_ha": 1745.9367412499998
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 33.1251285,
-            "area_ha": 0.08483404373812467,
-            "protein_kg_ha": 305.34200775,
-            "fat_kg_ha": 37.2899835,
-            "carbohydrate_kg_ha": 1723.5720944999998
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.8,
+            "food_gj_ha": 34.1407872,
+            "area_ha": 0.18706887450924495,
+            "protein_kg_ha": 199.154592,
+            "fat_kg_ha": 11.85444,
+            "carbohydrate_kg_ha": 1862.332524
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 17.593401,
-            "area_ha": 0.159726854404103,
+            "area_ha": 0.29041246255291453,
             "protein_kg_ha": 263.83893750000004,
             "fat_kg_ha": 11.174354999999998,
             "carbohydrate_kg_ha": 785.3088375
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.3162435,
-            "area_ha": 0.16478856839855482,
-            "protein_kg_ha": 181.16627400000002,
-            "fat_kg_ha": 448.64371800000004,
-            "carbohydrate_kg_ha": 174.36599999999999
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 23.519757,
-            "area_ha": 0.059739958197697375,
+            "area_ha": 0.10861810581399521,
             "protein_kg_ha": 244.01025224999998,
             "fat_kg_ha": 99.6844725,
             "carbohydrate_kg_ha": 957.4043467500001
           }
         ],
-        "gross_energy_per_ha": 24.274027,
-        "raw_calorie_area_ha": 0.578836,
+        "gross_energy_per_ha": 23.973224,
+        "raw_calorie_area_ha": 0.586099,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 1.052449,
+        "required_food_area_ha": 1.065655,
         "gross_food_energy_at_required_area_gj": 25.547179,
         "delivered_food_energy_gj": 14.050693,
         "macro_output_at_required_area": {
-          "protein_kg": 241.763392,
-          "fat_kg": 156.465545,
-          "carbohydrate_kg": 998.550459
+          "protein_kg": 255.244045,
+          "fat_kg": 29.619279,
+          "carbohydrate_kg": 1237.184984
         },
         "macro_delivered_to_household": {
-          "protein_kg": 132.967448,
-          "fat_kg": 86.054485,
-          "carbohydrate_kg": 549.192767
+          "protein_kg": 140.381672,
+          "fat_kg": 16.290307,
+          "carbohydrate_kg": 680.439369
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 364.045,
+        "protein_g_day": 384.344,
         "protein_reference_target_g_day": 178.4,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2390,7 +2975,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "site_capability": {
+        "id": "dry",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.75
+      },
+      "site_notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "dry",
@@ -2407,21 +3006,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 16.677312,
       "food_adult_equivalents": 4.293465,
-      "food_area_ha": 1.249193,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.828594,
+      "food_area_ha": 1.264867,
+      "heating_area_ha": 0.772535,
+      "mathematical_minimum_area_ha": 2.037402,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.312298,
+        "diversity_and_rotation_ha": 0.316217,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.762298,
-      "robust_system_area_ha": 2.590892,
+      "resilience_allowance_total_ha": 0.766217,
+      "robust_system_area_ha": 2.803619,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": -0.590892,
+      "land_surplus_or_deficit_ha": -0.803619,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 2.288355,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -0.49314,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2430,91 +3029,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 32.006988,
-            "area_ha": 0.1302630538056252,
-            "protein_kg_ha": 186.70743,
-            "fat_kg_ha": 11.1135375,
-            "carbohydrate_kg_ha": 1745.9367412499998
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 33.1251285,
-            "area_ha": 0.10069281391617847,
-            "protein_kg_ha": 305.34200775,
-            "fat_kg_ha": 37.2899835,
-            "carbohydrate_kg_ha": 1723.5720944999998
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.8,
+            "food_gj_ha": 34.1407872,
+            "area_ha": 0.2220392962595884,
+            "protein_kg_ha": 199.154592,
+            "fat_kg_ha": 11.85444,
+            "carbohydrate_kg_ha": 1862.332524
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 17.593401,
-            "area_ha": 0.18958599306637758,
+            "area_ha": 0.34470180557523195,
             "protein_kg_ha": 263.83893750000004,
             "fat_kg_ha": 11.174354999999998,
             "carbohydrate_kg_ha": 785.3088375
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.3162435,
-            "area_ha": 0.19559393755283386,
-            "protein_kg_ha": 181.16627400000002,
-            "fat_kg_ha": 448.64371800000004,
-            "carbohydrate_kg_ha": 174.36599999999999
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.75,
             "food_gj_ha": 23.519757,
-            "area_ha": 0.07090767136752307,
+            "area_ha": 0.12892303885004194,
             "protein_kg_ha": 244.01025224999998,
             "fat_kg_ha": 99.6844725,
             "carbohydrate_kg_ha": 957.4043467500001
           }
         ],
-        "gross_energy_per_ha": 24.274027,
-        "raw_calorie_area_ha": 0.687043,
+        "gross_energy_per_ha": 23.973224,
+        "raw_calorie_area_ha": 0.695664,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 1.249193,
+        "required_food_area_ha": 1.264867,
         "gross_food_energy_at_required_area_gj": 30.322937,
         "delivered_food_energy_gj": 16.677312,
         "macro_output_at_required_area": {
-          "protein_kg": 286.958339,
-          "fat_kg": 185.715019,
-          "carbohydrate_kg": 1185.218235
+          "protein_kg": 302.959048,
+          "fat_kg": 35.15627,
+          "carbohydrate_kg": 1468.462799
         },
         "macro_delivered_to_household": {
-          "protein_kg": 157.824217,
-          "fat_kg": 102.141403,
-          "carbohydrate_kg": 651.858177
+          "protein_kg": 166.624447,
+          "fat_kg": 19.335597,
+          "carbohydrate_kg": 807.639855
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 432.099,
+        "protein_g_day": 456.193,
         "protein_reference_target_g_day": 200.8,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2527,7 +3119,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Water limitation is represented as a transparent scenario multiplier, not a measured Grey County average."
+      "site_capability": {
+        "id": "dry",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.75
+      },
+      "site_notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "shallow_rocky_marginal",
@@ -2540,9 +3146,9 @@
       "adult_count": 1,
       "household_energy_gj_year": 3.375074,
       "food_adult_equivalents": 0.868891,
-      "food_area_ha": 0.379208,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 0.958609,
+      "food_area_ha": 0.380253,
+      "heating_area_ha": 1.053456,
+      "mathematical_minimum_area_ha": 1.433709,
       "resilience_allowances_ha": {
         "diversity_and_rotation_ha": 0.12,
         "soil_water_perennial_buffer_ha": 0.15,
@@ -2550,11 +3156,11 @@
         "deliberate_export_production_ha": 0.2
       },
       "resilience_allowance_total_ha": 0.57,
-      "robust_system_area_ha": 1.528609,
+      "robust_system_area_ha": 2.003709,
       "arc_policy_allocation_ha": 1,
-      "land_surplus_or_deficit_ha": -0.528609,
+      "land_surplus_or_deficit_ha": -1.003709,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 0.36839,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -3.849546,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2563,91 +3169,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.337992,
-            "area_ha": 0.03954301323198547,
-            "protein_kg_ha": 124.47162,
-            "fat_kg_ha": 7.409025,
-            "carbohydrate_kg_ha": 1163.9578275
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 22.083419,
-            "area_ha": 0.030566589349230754,
-            "protein_kg_ha": 203.5613385,
-            "fat_kg_ha": 24.859989,
-            "carbohydrate_kg_ha": 1149.048063
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.55,
+            "food_gj_ha": 23.471791200000002,
+            "area_ha": 0.06536035244956274,
+            "protein_kg_ha": 136.91878200000002,
+            "fat_kg_ha": 8.1499275,
+            "carbohydrate_kg_ha": 1280.35361025
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 11.728934,
-            "area_ha": 0.057551248902926726,
+            "area_ha": 0.10463863436895768,
             "protein_kg_ha": 175.892625,
             "fat_kg_ha": 7.44957,
             "carbohydrate_kg_ha": 523.539225
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 14.210829,
-            "area_ha": 0.05937503716356027,
-            "protein_kg_ha": 120.777516,
-            "fat_kg_ha": 299.095812,
-            "carbohydrate_kg_ha": 116.244
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 15.679838,
-            "area_ha": 0.021524929020312583,
+            "area_ha": 0.03913623458238651,
             "protein_kg_ha": 162.6735015,
             "fat_kg_ha": 66.456315,
             "carbohydrate_kg_ha": 638.2695645
           }
         ],
-        "gross_energy_per_ha": 16.182685,
-        "raw_calorie_area_ha": 0.208561,
+        "gross_energy_per_ha": 16.138238,
+        "raw_calorie_area_ha": 0.209135,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.379208,
+        "required_food_area_ha": 0.380253,
         "gross_food_energy_at_required_area_gj": 6.13661,
         "delivered_food_energy_gj": 3.375074,
         "macro_output_at_required_area": {
-          "protein_kg": 58.073245,
-          "fat_kg": 37.58411,
-          "carbohydrate_kg": 239.858752
+          "protein_kg": 61.311392,
+          "fat_kg": 7.114756,
+          "carbohydrate_kg": 297.180422
         },
         "macro_delivered_to_household": {
-          "protein_kg": 31.939704,
-          "fat_kg": 20.670885,
-          "carbohydrate_kg": 131.919915
+          "protein_kg": 33.720652,
+          "fat_kg": 3.913045,
+          "carbohydrate_kg": 163.44626
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 87.446,
+        "protein_g_day": 92.322,
         "protein_reference_target_g_day": 52,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2660,7 +3259,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "site_capability": {
+        "id": "shallow_rocky_marginal",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.55
+      },
+      "site_notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "shallow_rocky_marginal",
@@ -2674,21 +3287,21 @@
       "adult_count": 1,
       "household_energy_gj_year": 5.846183,
       "food_adult_equivalents": 1.505062,
-      "food_area_ha": 0.656851,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.236252,
+      "food_area_ha": 0.65866,
+      "heating_area_ha": 1.053456,
+      "mathematical_minimum_area_ha": 1.712116,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.164213,
+        "diversity_and_rotation_ha": 0.164665,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.614213,
-      "robust_system_area_ha": 1.850465,
+      "resilience_allowance_total_ha": 0.614665,
+      "robust_system_area_ha": 2.326781,
       "arc_policy_allocation_ha": 1,
-      "land_surplus_or_deficit_ha": -0.850465,
+      "land_surplus_or_deficit_ha": -1.326781,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": -2.102719,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -6.320655,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2697,91 +3310,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.337992,
-            "area_ha": 0.06849499943574822,
-            "protein_kg_ha": 124.47162,
-            "fat_kg_ha": 7.409025,
-            "carbohydrate_kg_ha": 1163.9578275
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 22.083419,
-            "area_ha": 0.05294635762695985,
-            "protein_kg_ha": 203.5613385,
-            "fat_kg_ha": 24.859989,
-            "carbohydrate_kg_ha": 1149.048063
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.55,
+            "food_gj_ha": 23.471791200000002,
+            "area_ha": 0.11321487510041027,
+            "protein_kg_ha": 136.91878200000002,
+            "fat_kg_ha": 8.1499275,
+            "carbohydrate_kg_ha": 1280.35361025
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 11.728934,
-            "area_ha": 0.09968822401080951,
+            "area_ha": 0.18125131638329003,
             "protein_kg_ha": 175.892625,
             "fat_kg_ha": 7.44957,
             "carbohydrate_kg_ha": 523.539225
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 14.210829,
-            "area_ha": 0.10284732509271625,
-            "protein_kg_ha": 120.777516,
-            "fat_kg_ha": 299.095812,
-            "carbohydrate_kg_ha": 116.244
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 15.679838,
-            "area_ha": 0.03728471556912769,
+            "area_ha": 0.06779039194386853,
             "protein_kg_ha": 162.6735015,
             "fat_kg_ha": 66.456315,
             "carbohydrate_kg_ha": 638.2695645
           }
         ],
-        "gross_energy_per_ha": 16.182685,
-        "raw_calorie_area_ha": 0.361262,
+        "gross_energy_per_ha": 16.138238,
+        "raw_calorie_area_ha": 0.362257,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.656851,
+        "required_food_area_ha": 0.65866,
         "gross_food_energy_at_required_area_gj": 10.629617,
         "delivered_food_energy_gj": 5.846183,
         "macro_output_at_required_area": {
-          "protein_kg": 100.592407,
-          "fat_kg": 65.101857,
-          "carbohydrate_kg": 415.47479
+          "protein_kg": 106.201409,
+          "fat_kg": 12.323928,
+          "carbohydrate_kg": 514.765344
         },
         "macro_delivered_to_household": {
-          "protein_kg": 55.324818,
-          "fat_kg": 35.80537,
-          "carbohydrate_kg": 228.50698
+          "protein_kg": 58.409713,
+          "fat_kg": 6.778037,
+          "carbohydrate_kg": 283.115792
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 151.471,
+        "protein_g_day": 159.917,
         "protein_reference_target_g_day": 74.4,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2794,7 +3400,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "site_capability": {
+        "id": "shallow_rocky_marginal",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.55
+      },
+      "site_notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "shallow_rocky_marginal",
@@ -2808,21 +3428,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 7.768697,
       "food_adult_equivalents": 2,
-      "food_area_ha": 0.872856,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.452257,
+      "food_area_ha": 0.87526,
+      "heating_area_ha": 1.053456,
+      "mathematical_minimum_area_ha": 1.928716,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.218214,
+        "diversity_and_rotation_ha": 0.218815,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.668214,
-      "robust_system_area_ha": 2.120471,
+      "resilience_allowance_total_ha": 0.668815,
+      "robust_system_area_ha": 2.597531,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": -0.120471,
+      "land_surplus_or_deficit_ha": -0.597531,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 4.875081,
+      "food_surplus_or_deficit_at_arc_allocation_gj": 0.632701,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2831,91 +3451,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.337992,
-            "area_ha": 0.09101954157635826,
-            "protein_kg_ha": 124.47162,
-            "fat_kg_ha": 7.409025,
-            "carbohydrate_kg_ha": 1163.9578275
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 22.083419,
-            "area_ha": 0.07035773763111591,
-            "protein_kg_ha": 203.5613385,
-            "fat_kg_ha": 24.859989,
-            "carbohydrate_kg_ha": 1149.048063
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.55,
+            "food_gj_ha": 23.471791200000002,
+            "area_ha": 0.15044552326670785,
+            "protein_kg_ha": 136.91878200000002,
+            "fat_kg_ha": 8.1499275,
+            "carbohydrate_kg_ha": 1280.35361025
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 11.728934,
-            "area_ha": 0.13247064055437605,
+            "area_ha": 0.2408557100988655,
             "protein_kg_ha": 175.892625,
             "fat_kg_ha": 7.44957,
             "carbohydrate_kg_ha": 523.539225
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 14.210829,
-            "area_ha": 0.13666861025489785,
-            "protein_kg_ha": 120.777516,
-            "fat_kg_ha": 299.095812,
-            "carbohydrate_kg_ha": 116.244
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 15.679838,
-            "area_ha": 0.04954577336832179,
+            "area_ha": 0.09008322430603961,
             "protein_kg_ha": 162.6735015,
             "fat_kg_ha": 66.456315,
             "carbohydrate_kg_ha": 638.2695645
           }
         ],
-        "gross_energy_per_ha": 16.182685,
-        "raw_calorie_area_ha": 0.480062,
+        "gross_energy_per_ha": 16.138238,
+        "raw_calorie_area_ha": 0.481384,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 0.872856,
+        "required_food_area_ha": 0.87526,
         "gross_food_energy_at_required_area_gj": 14.12516,
         "delivered_food_energy_gj": 7.768697,
         "macro_output_at_required_area": {
-          "protein_kg": 133.672164,
-          "fat_kg": 86.510566,
-          "carbohydrate_kg": 552.103441
+          "protein_kg": 141.125683,
+          "fat_kg": 16.376645,
+          "carbohydrate_kg": 684.045639
         },
         "macro_delivered_to_household": {
-          "protein_kg": 73.518353,
-          "fat_kg": 47.579946,
-          "carbohydrate_kg": 303.651372
+          "protein_kg": 77.617714,
+          "fat_kg": 9.006991,
+          "carbohydrate_kg": 376.218261
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 201.282,
+        "protein_g_day": 212.506,
         "protein_reference_target_g_day": 116,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -2928,7 +3541,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "site_capability": {
+        "id": "shallow_rocky_marginal",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.55
+      },
+      "site_notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "shallow_rocky_marginal",
@@ -2943,21 +3570,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 10.239806,
       "food_adult_equivalents": 2.636171,
-      "food_area_ha": 1.150499,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 1.7299,
+      "food_area_ha": 1.153668,
+      "heating_area_ha": 1.053456,
+      "mathematical_minimum_area_ha": 2.207124,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.287625,
+        "diversity_and_rotation_ha": 0.288417,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.737625,
-      "robust_system_area_ha": 2.467525,
+      "resilience_allowance_total_ha": 0.738417,
+      "robust_system_area_ha": 2.945541,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": -0.467525,
+      "land_surplus_or_deficit_ha": -0.945541,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": 2.403972,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -1.838408,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -2966,91 +3593,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.337992,
-            "area_ha": 0.11997152778012102,
-            "protein_kg_ha": 124.47162,
-            "fat_kg_ha": 7.409025,
-            "carbohydrate_kg_ha": 1163.9578275
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 22.083419,
-            "area_ha": 0.09273750590884501,
-            "protein_kg_ha": 203.5613385,
-            "fat_kg_ha": 24.859989,
-            "carbohydrate_kg_ha": 1149.048063
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.55,
+            "food_gj_ha": 23.471791200000002,
+            "area_ha": 0.19830004591755537,
+            "protein_kg_ha": 136.91878200000002,
+            "fat_kg_ha": 8.1499275,
+            "carbohydrate_kg_ha": 1280.35361025
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 11.728934,
-            "area_ha": 0.17460761566225882,
+            "area_ha": 0.31746839211319783,
             "protein_kg_ha": 175.892625,
             "fat_kg_ha": 7.44957,
             "carbohydrate_kg_ha": 523.539225
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 14.210829,
-            "area_ha": 0.18014089818405385,
-            "protein_kg_ha": 120.777516,
-            "fat_kg_ha": 299.095812,
-            "carbohydrate_kg_ha": 116.244
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 15.679838,
-            "area_ha": 0.0653055599171369,
+            "area_ha": 0.11873738166752162,
             "protein_kg_ha": 162.6735015,
             "fat_kg_ha": 66.456315,
             "carbohydrate_kg_ha": 638.2695645
           }
         ],
-        "gross_energy_per_ha": 16.182685,
-        "raw_calorie_area_ha": 0.632763,
+        "gross_energy_per_ha": 16.138238,
+        "raw_calorie_area_ha": 0.634506,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 1.150499,
+        "required_food_area_ha": 1.153668,
         "gross_food_energy_at_required_area_gj": 18.618168,
         "delivered_food_energy_gj": 10.239806,
         "macro_output_at_required_area": {
-          "protein_kg": 176.191326,
-          "fat_kg": 114.028314,
-          "carbohydrate_kg": 727.719479
+          "protein_kg": 186.015701,
+          "fat_kg": 21.585816,
+          "carbohydrate_kg": 901.630562
         },
         "macro_delivered_to_household": {
-          "protein_kg": 96.903467,
-          "fat_kg": 62.714432,
-          "carbohydrate_kg": 400.238436
+          "protein_kg": 102.306775,
+          "fat_kg": 11.871983,
+          "carbohydrate_kg": 495.887793
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 265.307,
+        "protein_g_day": 280.101,
         "protein_reference_target_g_day": 138.4,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -3063,7 +3683,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "site_capability": {
+        "id": "shallow_rocky_marginal",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.55
+      },
+      "site_notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "shallow_rocky_marginal",
@@ -3079,21 +3713,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 14.050693,
       "food_adult_equivalents": 3.617259,
-      "food_area_ha": 1.578674,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 2.158075,
+      "food_area_ha": 1.583022,
+      "heating_area_ha": 1.053456,
+      "mathematical_minimum_area_ha": 2.636478,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.394669,
+        "diversity_and_rotation_ha": 0.395756,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.844669,
-      "robust_system_area_ha": 3.002744,
+      "resilience_allowance_total_ha": 0.845756,
+      "robust_system_area_ha": 3.482234,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": -1.002744,
+      "land_surplus_or_deficit_ha": -1.482234,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": -1.406915,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -5.649295,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -3102,91 +3736,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.337992,
-            "area_ha": 0.16462060956813554,
-            "protein_kg_ha": 124.47162,
-            "fat_kg_ha": 7.409025,
-            "carbohydrate_kg_ha": 1163.9578275
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 22.083419,
-            "area_ha": 0.12725106560718702,
-            "protein_kg_ha": 203.5613385,
-            "fat_kg_ha": 24.859989,
-            "carbohydrate_kg_ha": 1149.048063
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.55,
+            "food_gj_ha": 23.471791200000002,
+            "area_ha": 0.27210018110435624,
+            "protein_kg_ha": 136.91878200000002,
+            "fat_kg_ha": 8.1499275,
+            "carbohydrate_kg_ha": 1280.35361025
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 11.728934,
-            "area_ha": 0.23959028160615448,
+            "area_ha": 0.4356186938293718,
             "protein_kg_ha": 175.892625,
             "fat_kg_ha": 7.44957,
             "carbohydrate_kg_ha": 523.539225
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 14.210829,
-            "area_ha": 0.24718285259783224,
-            "protein_kg_ha": 120.777516,
-            "fat_kg_ha": 299.095812,
-            "carbohydrate_kg_ha": 116.244
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 15.679838,
-            "area_ha": 0.08960993729654605,
+            "area_ha": 0.1629271587209928,
             "protein_kg_ha": 162.6735015,
             "fat_kg_ha": 66.456315,
             "carbohydrate_kg_ha": 638.2695645
           }
         ],
-        "gross_energy_per_ha": 16.182685,
-        "raw_calorie_area_ha": 0.868255,
+        "gross_energy_per_ha": 16.138238,
+        "raw_calorie_area_ha": 0.870646,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 1.578674,
+        "required_food_area_ha": 1.583022,
         "gross_food_energy_at_required_area_gj": 25.547179,
         "delivered_food_energy_gj": 14.050693,
         "macro_output_at_required_area": {
-          "protein_kg": 241.763392,
-          "fat_kg": 156.465545,
-          "carbohydrate_kg": 998.550459
+          "protein_kg": 255.244045,
+          "fat_kg": 29.619279,
+          "carbohydrate_kg": 1237.184984
         },
         "macro_delivered_to_household": {
-          "protein_kg": 132.967448,
-          "fat_kg": 86.054485,
-          "carbohydrate_kg": 549.192767
+          "protein_kg": 140.381672,
+          "fat_kg": 16.290307,
+          "carbohydrate_kg": 680.439369
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 364.045,
+        "protein_g_day": 384.344,
         "protein_reference_target_g_day": 178.4,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -3199,7 +3826,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "site_capability": {
+        "id": "shallow_rocky_marginal",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.55
+      },
+      "site_notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     {
       "site": "shallow_rocky_marginal",
@@ -3216,21 +3857,21 @@
       "adult_count": 2,
       "household_energy_gj_year": 16.677312,
       "food_adult_equivalents": 4.293465,
-      "food_area_ha": 1.873789,
-      "heating_area_ha": 0.579401,
-      "mathematical_minimum_area_ha": 2.45319,
+      "food_area_ha": 1.87895,
+      "heating_area_ha": 1.053456,
+      "mathematical_minimum_area_ha": 2.932406,
       "resilience_allowances_ha": {
-        "diversity_and_rotation_ha": 0.468447,
+        "diversity_and_rotation_ha": 0.469738,
         "soil_water_perennial_buffer_ha": 0.15,
         "fibre_habitat_wildlife_buffer_ha": 0.1,
         "deliberate_export_production_ha": 0.2
       },
-      "resilience_allowance_total_ha": 0.918447,
-      "robust_system_area_ha": 3.371637,
+      "resilience_allowance_total_ha": 0.919738,
+      "robust_system_area_ha": 3.852144,
       "arc_policy_allocation_ha": 2,
-      "land_surplus_or_deficit_ha": -1.371637,
+      "land_surplus_or_deficit_ha": -1.852144,
       "arc_policy_status": "deficit against robust-area scenario",
-      "food_surplus_or_deficit_at_arc_allocation_gj": -4.033534,
+      "food_surplus_or_deficit_at_arc_allocation_gj": -8.275914,
       "food_system": {
         "diet_energy_shares": {
           "potato_low_input_synthesis": 0.25,
@@ -3239,91 +3880,84 @@
           "sunflower_low_input_synthesis": 0.25,
           "oats_low_input_synthesis": 0.1
         },
+        "viable_crop_ids": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_crop_ids": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
         "rows": [
           {
             "id": "potato_low_input_synthesis",
             "crop": "Potato",
             "category": "starch",
-            "energy_share": 0.25,
-            "food_gj_ha": 21.337992,
-            "area_ha": 0.1953945807084378,
-            "protein_kg_ha": 124.47162,
-            "fat_kg_ha": 7.409025,
-            "carbohydrate_kg_ha": 1163.9578275
-          },
-          {
-            "id": "wheat_low_input_synthesis",
-            "crop": "Wheat",
-            "category": "starch",
-            "energy_share": 0.2,
-            "food_gj_ha": 22.083419,
-            "area_ha": 0.15103922087426772,
-            "protein_kg_ha": 203.5613385,
-            "fat_kg_ha": 24.859989,
-            "carbohydrate_kg_ha": 1149.048063
+            "energy_share": 0.45454545454545453,
+            "viability": "viable",
+            "site_yield_multiplier": 0.55,
+            "food_gj_ha": 23.471791200000002,
+            "area_ha": 0.32296624910485583,
+            "protein_kg_ha": 136.91878200000002,
+            "fat_kg_ha": 8.1499275,
+            "carbohydrate_kg_ha": 1280.35361025
           },
           {
             "id": "dry_beans_low_input_synthesis",
             "crop": "Dry beans",
             "category": "protein-legume",
-            "energy_share": 0.2,
+            "energy_share": 0.36363636363636365,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 11.728934,
-            "area_ha": 0.28437898959956637,
+            "area_ha": 0.5170527083628479,
             "protein_kg_ha": 175.892625,
             "fat_kg_ha": 7.44957,
             "carbohydrate_kg_ha": 523.539225
           },
           {
-            "id": "sunflower_low_input_synthesis",
-            "crop": "Sunflower seed",
-            "category": "fat-seed",
-            "energy_share": 0.25,
-            "food_gj_ha": 14.210829,
-            "area_ha": 0.29339090632925074,
-            "protein_kg_ha": 120.777516,
-            "fat_kg_ha": 299.095812,
-            "carbohydrate_kg_ha": 116.244
-          },
-          {
             "id": "oats_low_input_synthesis",
             "crop": "Oats",
             "category": "starch",
-            "energy_share": 0.1,
+            "energy_share": 0.18181818181818182,
+            "viability": "viable",
+            "site_yield_multiplier": 0.5,
             "food_gj_ha": 15.679838,
-            "area_ha": 0.1063615070512846,
+            "area_ha": 0.19338455827506287,
             "protein_kg_ha": 162.6735015,
             "fat_kg_ha": 66.456315,
             "carbohydrate_kg_ha": 638.2695645
           }
         ],
-        "gross_energy_per_ha": 16.182685,
-        "raw_calorie_area_ha": 1.030565,
+        "gross_energy_per_ha": 16.138238,
+        "raw_calorie_area_ha": 1.033404,
         "delivery_factor_after_losses_and_reserves": 0.54999,
-        "required_food_area_ha": 1.873789,
+        "required_food_area_ha": 1.87895,
         "gross_food_energy_at_required_area_gj": 30.322937,
         "delivered_food_energy_gj": 16.677312,
         "macro_output_at_required_area": {
-          "protein_kg": 286.958339,
-          "fat_kg": 185.715019,
-          "carbohydrate_kg": 1185.218235
+          "protein_kg": 302.959048,
+          "fat_kg": 35.15627,
+          "carbohydrate_kg": 1468.462799
         },
         "macro_delivered_to_household": {
-          "protein_kg": 157.824217,
-          "fat_kg": 102.141403,
-          "carbohydrate_kg": 651.858177
+          "protein_kg": 166.624447,
+          "fat_kg": 19.335597,
+          "carbohydrate_kg": 807.639855
         },
         "macro_energy_shares_percent": {
-          "protein": 15.183,
-          "fat": 22.109,
-          "carbohydrate": 62.709
+          "protein": 16.372,
+          "fat": 4.275,
+          "carbohydrate": 79.354
         },
-        "protein_g_day": 432.099,
+        "protein_g_day": 456.193,
         "protein_reference_target_g_day": 200.8,
         "protein_threshold_met": true,
         "macro_range_check": {
           "protein_10_to_35_percent": true,
-          "fat_20_to_35_percent": true,
-          "carbohydrate_45_to_65_percent": true,
+          "fat_20_to_35_percent": false,
+          "carbohydrate_45_to_65_percent": false,
           "status": "screening check only; does not establish micronutrient sufficiency"
         },
         "assumptions": {
@@ -3336,7 +3970,21 @@
           "macro_energy_factors": "0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat"
         }
       },
-      "site_notes": "Lower productivity scenario; a site survey is required before using it for a parcel."
+      "site_capability": {
+        "id": "shallow_rocky_marginal",
+        "environment_id": "owen_sound_grey_county",
+        "viable_annual_crops": [
+          "potato_low_input_synthesis",
+          "dry_beans_low_input_synthesis",
+          "oats_low_input_synthesis"
+        ],
+        "excluded_annual_crops": [
+          "wheat_low_input_synthesis",
+          "sunflower_low_input_synthesis"
+        ],
+        "woody_yield_multiplier": 0.55
+      },
+      "site_notes": "Marginal / shallow / rocky soil. This is a scenario capability band, not a parcel-level soil classification."
     }
   ]
 }

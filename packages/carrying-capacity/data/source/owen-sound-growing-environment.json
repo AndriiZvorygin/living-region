@@ -1,0 +1,203 @@
+{
+  "contract_version": "1.0.0",
+  "region": {
+    "id": "owen_sound_grey_county",
+    "label": "Owen Sound / Grey County growing environment",
+    "geography": "Owen Sound MOE climate station and Grey County soil-capability framework",
+    "default_use": "regional educational scenario; not a parcel-level site survey"
+  },
+  "climate": {
+    "station": "OWEN SOUND MOE",
+    "climate_id": "6116132",
+    "latitude": 44.583333,
+    "longitude": -80.933333,
+    "elevation_m": 178.9,
+    "normals_period": "1981-2010",
+    "growing_degree_days": {
+      "base_temperature_c": 5,
+      "value_degree_days": 2073.5,
+      "evidence_status": "measured_normal",
+      "transformation": "ECCC degree-days above 5 C used as the local thermal-season index"
+    },
+    "frost_free_period": {
+      "average_last_spring_frost": "05-05",
+      "average_first_fall_frost": "10-14",
+      "average_length_days": 162,
+      "evidence_status": "measured_normal",
+      "uncertainty": "1981-2006 observations contribute to the 1981-2010 normal for this element"
+    },
+    "precipitation": {
+      "annual_mm": 1114.4,
+      "growing_season_months": "May-October",
+      "growing_season_mm": 510.7,
+      "evidence_status": "measured_normal",
+      "transformation": "sum of ECCC monthly total precipitation for May through October"
+    },
+    "heating_degree_days": {
+      "base_temperature_c": 18,
+      "value_degree_days": 4031.9,
+      "evidence_status": "measured_normal",
+      "transformation": "retained from the existing ECCC-backed heating evidence contract"
+    },
+    "solar": {
+      "status": "unresolved",
+      "annual_insolation_mj_m2_year": null,
+      "note": "No defensible local solar-radiation source and biological transformation chain has been accepted into the model; no photosynthetic efficiency is invented."
+    },
+    "sources": [
+      {
+        "institution": "Environment and Climate Change Canada",
+        "title": "Canadian Climate Normals 1981-2010 Station Data: Owen Sound MOE",
+        "url": "https://climate.weather.gc.ca/climate_normals/results_1981_2010_e.html?climate_id=6116132",
+        "source_date": "1981-2010 normals",
+        "retrieval_date": "2026-08-10",
+        "geography": "Owen Sound MOE station",
+        "evidence_status": "measured_normal",
+        "uncertainty": "Climate station is a regional proxy and does not capture every Grey County elevation or lake-effect microclimate."
+      },
+      {
+        "institution": "Environment and Climate Change Canada",
+        "title": "Technical documentation: Climate Normals",
+        "url": "https://www.canada.ca/en/environment-climate-change/services/climate-change/canadian-centre-climate-services/display-download/technical-documentation-climate-normals.html",
+        "source_date": "2020",
+        "geography": "Canada; methods documentation",
+        "evidence_status": "methodology",
+        "uncertainty": "Growing-degree-day base temperature varies by crop; base 5 C is used here as a regional index, not a crop-specific maturity guarantee."
+      }
+    ]
+  },
+  "soil_framework": {
+    "classification": "Canada Land Inventory Soil Capability for Agriculture",
+    "classes": "1-7, where lower classes have fewer limitations for common field crops",
+    "local_status": "framework_only",
+    "limitation": "The current package does not contain a validated parcel-level Grey County CLI polygon joined to the household scenarios.",
+    "variables_supported_by_source": ["soil capability class", "slope class", "stoniness", "drainage class", "surface texture"],
+    "sources": [
+      {
+        "institution": "Ontario Ministry of Agriculture, Food and Agribusiness",
+        "title": "Soil capability for agriculture in Ontario",
+        "url": "https://www.ontario.ca/page/soil-capability-agriculture-ontario",
+        "source_date": "2024 guidance",
+        "geography": "Ontario; CLI interpretation framework",
+        "evidence_status": "official classification framework",
+        "uncertainty": "Capability class is not a measured yield and the current model does not claim that a selected scenario class is the mapped class of a particular property."
+      },
+      {
+        "institution": "Ontario Ministry of Agriculture, Food and Agribusiness",
+        "title": "Soil data in Ontario",
+        "url": "https://www.ontario.ca/page/soil-data",
+        "source_date": "2024 guidance; underlying surveys vary",
+        "geography": "Ontario, including Grey County soil-survey coverage",
+        "evidence_status": "official data catalogue",
+        "uncertainty": "Survey scale, vintage and local mapping completeness vary."
+      }
+    ]
+  },
+  "site_capabilities": {
+    "wetter_productive": {
+      "label": "Favourable / deep / well-drained productive soil",
+      "cli_capability_class_band": "1-3 scenario band",
+      "soil_depth": "deep",
+      "drainage": "well to imperfectly drained",
+      "wetness_constraint": "low when managed; saturated pockets remain unsuitable",
+      "bedrock_rockiness": "not a defining limitation",
+      "food_yield_multiplier": 1.1,
+      "woody_yield_multiplier": 1.1,
+      "annual_crops": {
+        "potato_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1},
+        "wheat_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1},
+        "dry_beans_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1},
+        "sunflower_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1},
+        "oats_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1}
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1},
+        "intermediate_hazelnut_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1},
+        "long_staple_chestnut_low_input_synthesis": {"viable": true, "yield_multiplier": 1.05},
+        "intermediate_apple_low_input_synthesis": {"viable": true, "yield_multiplier": 1.1}
+      }
+    },
+    "ordinary_mesic": {
+      "label": "Ordinary / mesic Grey County soil",
+      "cli_capability_class_band": "3-4 scenario band",
+      "soil_depth": "moderate",
+      "drainage": "moderately well to imperfectly drained",
+      "wetness_constraint": "moderate; wet areas require separate drainage and crop placement",
+      "bedrock_rockiness": "local variation unresolved",
+      "food_yield_multiplier": 1,
+      "woody_yield_multiplier": 1,
+      "annual_crops": {
+        "potato_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "wheat_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "dry_beans_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "sunflower_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "oats_low_input_synthesis": {"viable": true, "yield_multiplier": 1}
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "intermediate_hazelnut_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "long_staple_chestnut_low_input_synthesis": {"viable": true, "yield_multiplier": 1},
+        "intermediate_apple_low_input_synthesis": {"viable": true, "yield_multiplier": 1}
+      }
+    },
+    "dry": {
+      "label": "Dry / moisture-limited soil",
+      "cli_capability_class_band": "4-5 scenario band",
+      "soil_depth": "variable to shallow",
+      "drainage": "rapid to well drained",
+      "wetness_constraint": "low wetness but high drought exposure",
+      "bedrock_rockiness": "variable",
+      "food_yield_multiplier": 0.75,
+      "woody_yield_multiplier": 0.75,
+      "annual_crops": {
+        "potato_low_input_synthesis": {"viable": true, "yield_multiplier": 0.8},
+        "wheat_low_input_synthesis": {"viable": false, "yield_multiplier": 0},
+        "dry_beans_low_input_synthesis": {"viable": true, "yield_multiplier": 0.75},
+        "sunflower_low_input_synthesis": {"viable": false, "yield_multiplier": 0},
+        "oats_low_input_synthesis": {"viable": true, "yield_multiplier": 0.75}
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {"viable": true, "yield_multiplier": 0.8},
+        "intermediate_hazelnut_low_input_synthesis": {"viable": true, "yield_multiplier": 0.75},
+        "long_staple_chestnut_low_input_synthesis": {"viable": false, "yield_multiplier": 0},
+        "intermediate_apple_low_input_synthesis": {"viable": true, "yield_multiplier": 0.6}
+      }
+    },
+    "shallow_rocky_marginal": {
+      "label": "Marginal / shallow / rocky soil",
+      "cli_capability_class_band": "5-6 scenario band",
+      "soil_depth": "shallow",
+      "drainage": "variable; bedrock and slope dominate local conditions",
+      "wetness_constraint": "variable; saturated depressions are excluded",
+      "bedrock_rockiness": "high potential limitation",
+      "food_yield_multiplier": 0.5,
+      "woody_yield_multiplier": 0.55,
+      "annual_crops": {
+        "potato_low_input_synthesis": {"viable": true, "yield_multiplier": 0.55},
+        "wheat_low_input_synthesis": {"viable": false, "yield_multiplier": 0},
+        "dry_beans_low_input_synthesis": {"viable": true, "yield_multiplier": 0.5},
+        "sunflower_low_input_synthesis": {"viable": false, "yield_multiplier": 0},
+        "oats_low_input_synthesis": {"viable": true, "yield_multiplier": 0.5}
+      },
+      "perennial_layers": {
+        "early_berry_low_input_synthesis": {"viable": true, "yield_multiplier": 0.6},
+        "intermediate_hazelnut_low_input_synthesis": {"viable": true, "yield_multiplier": 0.55},
+        "long_staple_chestnut_low_input_synthesis": {"viable": false, "yield_multiplier": 0},
+        "intermediate_apple_low_input_synthesis": {"viable": false, "yield_multiplier": 0}
+      }
+    },
+    "wet_land": {
+      "label": "Wet / saturated land",
+      "cli_capability_class_band": "site-specific; commonly limited without drainage",
+      "soil_depth": "organic or mineral depth unresolved",
+      "drainage": "poorly to very poorly drained",
+      "wetness_constraint": "high",
+      "bedrock_rockiness": "unresolved",
+      "food_yield_multiplier": 0,
+      "woody_yield_multiplier": 0,
+      "annual_crops": {},
+      "perennial_layers": {},
+      "availability": "not a default household production class; requires hydrology and drainage assessment"
+    }
+  }
+}
