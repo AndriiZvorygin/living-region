@@ -651,24 +651,9 @@ export function calculateLocalCoverageArea(
   );
 }
 
-/**
- * Choose a stable centre from the full household graph. This deliberately
- * does not inspect map clusters: zooming only changes how the fixed centre is
- * drawn, never which neighbourhood wins.
- */
-export function selectNextUnderflyeredArea(
-  locations: CoverageLocation[],
-  graph: HouseholdAdjacencyGraph,
-  targetSize = LOCAL_COVERAGE_TARGET,
-): NextUnderflyeredArea | null {
-  const context = buildLocalCoverageContext(locations, graph);
-  const eligible = [...context.locations.values()].filter((location) => location.eligible);
-  if (!eligible.length || eligible.every((location) => location.covered)) return null;
-  const scored = eligible
-    .map((location) =>
-      calculateLocalCoverageAreaWithContext(location.household_id, graph, context, targetSize),
-    )
-    .filter((area): area is LocalCoverageArea => Boolean(area));
+const chooseNextUnderflyeredArea = (
+  scored: LocalCoverageArea[],
+): NextUnderflyeredArea | null => {
   const chosen = [...scored].sort(
     (left, right) =>
       right.localRemaining - left.localRemaining ||
@@ -689,6 +674,55 @@ export function selectNextUnderflyeredArea(
     tieBreakResult,
     reason: "local_coverage",
   };
+};
+
+/**
+ * Choose a stable centre from the full household graph. This deliberately
+ * does not inspect map clusters: zooming only changes how the fixed centre is
+ * drawn, never which neighbourhood wins.
+ */
+export function selectNextUnderflyeredArea(
+  locations: CoverageLocation[],
+  graph: HouseholdAdjacencyGraph,
+  targetSize = LOCAL_COVERAGE_TARGET,
+): NextUnderflyeredArea | null {
+  const context = buildLocalCoverageContext(locations, graph);
+  const eligible = [...context.locations.values()].filter((location) => location.eligible);
+  if (!eligible.length || eligible.every((location) => location.covered)) return null;
+  const scored = eligible
+    .map((location) =>
+      calculateLocalCoverageAreaWithContext(location.household_id, graph, context, targetSize),
+    )
+    .filter((area): area is LocalCoverageArea => Boolean(area));
+  return chooseNextUnderflyeredArea(scored);
+}
+
+/**
+ * Browser-friendly version of the same deterministic selector. It yields
+ * between candidate centres so a phone can paint and accept map gestures
+ * while the recommendation is being calculated.
+ */
+export async function selectNextUnderflyeredAreaAsync(
+  locations: CoverageLocation[],
+  graph: HouseholdAdjacencyGraph,
+  targetSize = LOCAL_COVERAGE_TARGET,
+): Promise<NextUnderflyeredArea | null> {
+  const context = buildLocalCoverageContext(locations, graph);
+  const eligible = [...context.locations.values()].filter((location) => location.eligible);
+  if (!eligible.length || eligible.every((location) => location.covered)) return null;
+  const scored: LocalCoverageArea[] = [];
+  for (let index = 0; index < eligible.length; index += 1) {
+    const area = calculateLocalCoverageAreaWithContext(
+      eligible[index].household_id,
+      graph,
+      context,
+      targetSize,
+    );
+    if (area) scored.push(area);
+    if ((index + 1) % 32 === 0)
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  }
+  return chooseNextUnderflyeredArea(scored);
 }
 
 /**

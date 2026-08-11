@@ -14,6 +14,7 @@ import {
 import { DatabaseSync, backup } from "node:sqlite";
 import { dirname, join, resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
+import { gzipSync } from "node:zlib";
 import {
   applySampleOverrides,
   defaultFollowupDate,
@@ -216,6 +217,24 @@ if (!migrated.has(10)) {
     (10,'append_only_person_contact_details',datetime('now'));
   COMMIT;`);
 }
+if (!migrated.has(11)) {
+  db.exec(`BEGIN;
+  CREATE INDEX IF NOT EXISTS visits_household_occurred
+    ON visits(household_id,occurred_at,id);
+  CREATE INDEX IF NOT EXISTS visit_corrections_visit_occurred
+    ON visit_corrections(visit_id,occurred_at);
+  CREATE INDEX IF NOT EXISTS address_association_events_address_occurred
+    ON address_association_events(address_id,occurred_at);
+  CREATE INDEX IF NOT EXISTS address_association_events_structure_occurred
+    ON address_association_events(structure_id,occurred_at);
+  CREATE INDEX IF NOT EXISTS recruitment_status_events_area_scope_occurred
+    ON recruitment_status_events(area_id,scope,occurred_at);
+  CREATE INDEX IF NOT EXISTS recruitment_status_events_prospect_scope_occurred
+    ON recruitment_status_events(prospect_id,scope,occurred_at);
+  INSERT INTO schema_migrations VALUES
+    (11,'canvassing_state_query_indexes',datetime('now'));
+  COMMIT;`);
+}
 db.exec(
   `CREATE VIEW IF NOT EXISTS active_visits AS SELECT v.* FROM visits v WHERE COALESCE((SELECT correction_type FROM visit_corrections c WHERE c.visit_id=v.id ORDER BY c.occurred_at DESC,c.rowid DESC LIMIT 1),'restore')!='undo';`,
 );
@@ -269,6 +288,32 @@ const json = (
   });
   res.end(body);
 };
+const compressedJson = (
+  res: ServerResponse,
+  status: number,
+  value: unknown,
+) => {
+  const body = gzipSync(JSON.stringify(value));
+  res.writeHead(status, {
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store",
+    "content-encoding": "gzip",
+    vary: "Accept-Encoding",
+    "content-length": body.byteLength,
+  });
+  res.end(body);
+};
+const jsonForRequest = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  status: number,
+  value: unknown,
+) =>
+  String(req.headers["accept-encoding"] ?? "")
+    .toLowerCase()
+    .includes("gzip")
+    ? compressedJson(res, status, value)
+    : json(res, status, value);
 const body = async (req: IncomingMessage) => {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(Buffer.from(chunk));
@@ -825,7 +870,7 @@ function state(role = "candidate") {
     recruitment_areas,
     recruitment_prospects,
     address_review_counts,
-    schema_version: 10,
+    schema_version: 11,
     summary,
   };
 }
@@ -921,7 +966,7 @@ const server = createServer(async (req, res) => {
       return json(res, 200, { status: "ok" });
     }
     if (req.method === "GET" && url.pathname === "/api/canvassing/state")
-      return json(res, 200, state(role));
+      return jsonForRequest(req, res, 200, state(role));
     if (req.method === "POST" && url.pathname === "/api/canvassing/visits") {
       const input = JSON.parse(await body(req));
       if (role === "volunteer") {
@@ -2906,7 +2951,7 @@ const server = createServer(async (req, res) => {
       return json(res, 200, {
         backup: await backupStatus(),
         journal: await verifyJournal(),
-        schema_version: 10,
+        schema_version: 11,
       });
     if (req.method === "POST" && url.pathname === "/api/canvassing/backup") {
       const path = await performBackup("manual");

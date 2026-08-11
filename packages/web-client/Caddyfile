@@ -1,8 +1,10 @@
 :80 {
 	encode zstd gzip
 
-	@canvassing_data path /canvassing /canvassing/ /canvassing/*.json /canvassing/*.geojson
-	header @canvassing_data Cache-Control "no-cache, must-revalidate"
+	@canvassing_app path /canvassing /canvassing/
+	header @canvassing_app Cache-Control "no-cache, must-revalidate"
+	@canvassing_data path /canvassing/*.json /canvassing/*.geojson
+	header @canvassing_data Cache-Control "public, max-age=31536000, immutable"
 
 	handle /api/canvassing/* {
 		reverse_proxy canvassing-api:4174 {

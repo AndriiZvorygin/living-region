@@ -10,7 +10,7 @@ import {
   calculateLocalCoverageArea,
   isCoverageCovered,
   isCoverageEligible,
-  selectNextUnderflyeredArea,
+  selectNextUnderflyeredAreaAsync,
   type CoverageLocation,
   type HouseholdAdjacencyGraph,
   type NextUnderflyeredArea,
@@ -264,7 +264,14 @@ const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
   if (!response.ok) throw new Error(await response.text());
   return response.json();
 };
-const geo = async (url: string) => fetchJson<any>(url);
+// Prepared geography is versioned and immutable between data regenerations.
+// Reuse it across reloads instead of redownloading it on every phone visit.
+const fetchStaticJson = async <T>(url: string): Promise<T> => {
+  const response = await fetch(url, { cache: "force-cache" });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+};
+const geo = async (url: string) => fetchStaticJson<any>(url);
 const localDateValue = (value: Date | string = new Date()) => {
   const date = value instanceof Date ? value : new Date(value);
   return [
@@ -391,16 +398,8 @@ export async function canvassingMain() {
   });
   document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked =
     saved.volunteer ?? false;
-  let state = await fetchJson<State>("/api/canvassing/state");
-  const [
-    structures,
-    addresses,
-    roads,
-    boundary,
-    addressQuality,
-    buildingCoverage,
-    splitCorrections,
-  ] = await Promise.all([
+  const statePromise = fetchJson<State>("/api/canvassing/state");
+  const mapDataPromise = Promise.all([
     geo(`/canvassing/structures.geojson?v=${canvassingDataVersion}`),
     geo(`/canvassing/addresses.geojson?v=${canvassingDataVersion}`),
     geo(`/canvassing/roads.geojson?v=${canvassingDataVersion}`),
@@ -412,6 +411,28 @@ export async function canvassingMain() {
       features: any[];
     }>("/api/canvassing/structure-splits"),
   ]);
+  // These payloads are independent. Start them together so a slow API or a
+  // slow map file does not block the other half of the initial screen.
+  let state: State;
+  let structures: any;
+  let addresses: any;
+  let roads: any;
+  let boundary: any;
+  let addressQuality: any;
+  let buildingCoverage: any;
+  let splitCorrections: { hidden_parent_ids: string[]; features: any[] };
+  [
+    state,
+    [
+      structures,
+      addresses,
+      roads,
+      boundary,
+      addressQuality,
+      buildingCoverage,
+      splitCorrections,
+    ],
+  ] = await Promise.all([statePromise, mapDataPromise]);
   const hiddenSplitParents = new Set(splitCorrections.hidden_parent_ids);
   structures.features = structures.features
     .filter(
@@ -564,6 +585,23 @@ export async function canvassingMain() {
     }
   };
   applyAddressCoverageProperties();
+  const featureCenter = (feature: any): [number, number] => {
+    const points: [number, number][] = [];
+    const walk = (coordinates: any) =>
+      typeof coordinates?.[0] === "number"
+        ? points.push(coordinates)
+        : coordinates?.forEach(walk);
+    walk(feature.geometry.coordinates);
+    return [
+      points.reduce((sum, point) => sum + point[0], 0) / points.length,
+      points.reduce((sum, point) => sum + point[1], 0) / points.length,
+    ];
+  };
+  // Polygon-centre calculation is invariant while the map is open. Populate
+  // this only when address labels are requested; the default citywide view
+  // does not need to pay for thousands of label centres.
+  const structureLabelPoints = new Map<string, [number, number]>();
+  let structureLabelsPrepared = false;
   const map = new maplibregl.Map({
     container: "canvass-map",
     center: saved.center ?? [-80.943, 44.567],
@@ -860,7 +898,7 @@ export async function canvassingMain() {
       return;
     }
     if (!nextAreaRecommendation || nextAreaRecalculateRequested) {
-      const recommendation = selectNextUnderflyeredArea(
+      const recommendation = await selectNextUnderflyeredAreaAsync(
         coverageLocations(),
         coverageAdjacencyGraph,
       );
@@ -929,24 +967,14 @@ export async function canvassingMain() {
   map.on("zoom", updateClusterKey);
   updateClusterKey();
   let labelMarkers: maplibregl.Marker[] = [];
-  const featureCenter = (feature: any): [number, number] => {
-    const points: [number, number][] = [];
-    const walk = (coordinates: any) =>
-      typeof coordinates?.[0] === "number"
-        ? points.push(coordinates)
-        : coordinates?.forEach(walk);
-    walk(feature.geometry.coordinates);
-    return [
-      points.reduce((sum, point) => sum + point[0], 0) / points.length,
-      points.reduce((sum, point) => sum + point[1], 0) / points.length,
-    ];
-  };
+  const smallScreen = window.matchMedia("(max-width: 600px)").matches;
   const updateLabels = () => {
     labelMarkers.forEach((marker) => marker.remove());
     labelMarkers = [];
     if (map.getZoom() < 14) return;
     const bounds = map.getBounds(),
       seen = new Set<string>();
+    const maxRoadLabels = smallScreen ? 35 : 70;
     for (const feature of roads.features) {
       const name = String(feature.properties.name ?? "");
       if (!name || seen.has(name)) continue;
@@ -963,20 +991,34 @@ export async function canvassingMain() {
       labelMarkers.push(
         new maplibregl.Marker({ element }).setLngLat(point).addTo(map),
       );
-      if (labelMarkers.length >= 70) break;
+      if (labelMarkers.length >= maxRoadLabels) break;
     }
     if (map.getZoom() >= 16.5) {
+      if (!structureLabelsPrepared) {
+        for (const feature of structures.features) {
+          if (feature.properties.civic_label)
+            structureLabelPoints.set(
+              String(feature.properties.structure_id),
+              featureCenter(feature),
+            );
+        }
+        structureLabelsPrepared = true;
+      }
+      const maxAddressLabels = smallScreen ? 140 : 400;
+      let addressLabelCount = 0;
       const visibleStatus =
         document.querySelector<HTMLSelectElement>("#status-filter")?.value ??
         "all";
       for (const feature of structures.features) {
-        if (!feature.properties.civic_label) continue;
+        const point = structureLabelPoints.get(
+          String(feature.properties.structure_id),
+        );
+        if (!point) continue;
         if (
           visibleStatus !== "all" &&
           feature.properties.status !== visibleStatus
         )
           continue;
-        const point = featureCenter(feature);
         if (!bounds.contains(point)) continue;
         const element = document.createElement("span");
         element.className = "address-number";
@@ -984,6 +1026,8 @@ export async function canvassingMain() {
         labelMarkers.push(
           new maplibregl.Marker({ element }).setLngLat(point).addTo(map),
         );
+        addressLabelCount += 1;
+        if (addressLabelCount >= maxAddressLabels) break;
       }
     }
   };
