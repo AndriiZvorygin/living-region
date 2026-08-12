@@ -769,6 +769,74 @@ dialog menu {
   color: #a53d35;
   font-weight: 700;
 }
+.flyer-summary {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #d7ddd8;
+  font-size: 12px;
+}
+.flyer-summary strong {
+  color: #173e35;
+}
+.flyer-summary span {
+  color: #56625d;
+}
+.flyer-history {
+  display: grid;
+  gap: 5px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px solid #d3dbd5;
+  border-radius: 6px;
+  background: #f0f4f0;
+  font-size: 12px;
+}
+.flyer-history h3 {
+  margin: 0 0 3px;
+  font-size: 13px;
+}
+.flyer-history span {
+  color: #56625d;
+}
+.flyer-edit {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #d3dbd5;
+  border-radius: 6px;
+}
+.flyer-edit legend {
+  padding: 0 5px;
+  color: #56625d;
+  font-size: 12px;
+}
+.flyer-edit label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  color: #56625d;
+  font-size: 12px;
+}
+.flyer-edit input:not([type="checkbox"]) {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px;
+}
+.flyer-edit label:nth-last-of-type(1),
+.flyer-edit button {
+  grid-column: 1 / -1;
+}
+.mobile-flyer-controls {
+  display: none;
+}
+.mobile-active-flyer-chip,
+.mobile-route-flyer-chip {
+  display: none;
+}
 .workflow-item.due > header time {
   color: #b45f18;
   font-weight: 700;
@@ -1085,6 +1153,19 @@ dialog menu {
     margin-left: auto;
     margin-right: auto;
   }
+  .mobile-active-flyer-chip {
+    display: block !important;
+    min-width: 0;
+    max-width: 118px;
+    overflow: hidden;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .mobile-coverage-chip > span {
     display: inline-block;
     width: 35px;
@@ -1156,6 +1237,24 @@ dialog menu {
     padding: 11px 4px;
     cursor: pointer;
     font-weight: 700;
+  }
+  .mobile-flyer-controls {
+    display: grid;
+    gap: 8px;
+    margin: 4px 0 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dce1dd;
+  }
+  .mobile-flyer-controls label {
+    display: grid;
+    gap: 4px;
+    color: #56625d;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .mobile-flyer-controls select,
+  .mobile-flyer-controls button {
+    min-height: 44px;
   }
   .mobile-menu-actions {
     display: grid;
@@ -1289,6 +1388,29 @@ dialog menu {
     color: #fff;
     font-size: 12px;
     font-weight: 700;
+  }
+  .mobile-route-flyer-chip {
+    display: block !important;
+    flex: 0 1 86px;
+    min-width: 0;
+    max-width: 92px;
+    overflow: hidden;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    text-overflow: ellipsis;
+  }
+  .flyer-history {
+    margin-bottom: 8px;
+  }
+  .flyer-edit {
+    grid-template-columns: 1fr;
+  }
+  .flyer-edit label:nth-last-of-type(1),
+  .flyer-edit button {
+    grid-column: auto;
   }
   .mobile-route-bar #mobile-mark-stop {
     flex: 1.35 1 0;

@@ -34,8 +34,8 @@ if (foreignKeyProblems.length)
   throw new Error(
     `Database has ${foreignKeyProblems.length} foreign-key violations`,
   );
-if (schemaVersion !== 11)
-  throw new Error(`Expected schema version 11, found ${schemaVersion}`);
+if (schemaVersion !== 12)
+  throw new Error(`Expected schema version 12, found ${schemaVersion}`);
 
 let previous: string | null = null,
   journalCount = 0;

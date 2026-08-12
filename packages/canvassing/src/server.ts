@@ -51,6 +51,8 @@ const splitCalibrationPath = resolve(
   process.env.CANVASS_SPLIT_CALIBRATION_EXPORT ??
     "private/canvassing/structure-split-calibration.json",
 );
+const LEGACY_FLYER_ID = "flyer-1-original";
+const CURRENT_FLYER_ID = "flyer-2-current";
 await mkdir(dirname(storePath), { recursive: true });
 const db = new DatabaseSync(storePath);
 db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;
@@ -233,6 +235,36 @@ if (!migrated.has(11)) {
     ON recruitment_status_events(prospect_id,scope,occurred_at);
   INSERT INTO schema_migrations VALUES
     (11,'canvassing_state_query_indexes',datetime('now'));
+  COMMIT;`);
+}
+if (!migrated.has(12)) {
+  db.exec(`BEGIN;
+  CREATE TABLE flyer_catalogue (
+    id TEXT PRIMARY KEY,
+    short_name TEXT NOT NULL,
+    description TEXT,
+    introduction_date TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)),
+    printable_url TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  INSERT INTO flyer_catalogue
+    (id,short_name,description,introduction_date,active,printable_url,created_at,updated_at)
+  VALUES
+    ('flyer-1-original','Flyer 1: Original flyer',NULL,'2026-07-26',1,NULL,datetime('now'),datetime('now')),
+    ('flyer-2-current','Flyer 2: Current flyer',NULL,'2026-08-12',1,NULL,datetime('now'),datetime('now'));
+  ALTER TABLE visits ADD COLUMN flyer_id TEXT REFERENCES flyer_catalogue(id);
+  ALTER TABLE household_flyer_events ADD COLUMN flyer_id TEXT REFERENCES flyer_catalogue(id);
+  UPDATE visits SET flyer_id='flyer-1-original' WHERE flyer_delivered=1;
+  UPDATE household_flyer_events SET flyer_id='flyer-1-original'
+    WHERE flyer_delivered=1 AND flyer_id IS NULL;
+  CREATE INDEX visits_flyer_household_occurred
+    ON visits(flyer_id,household_id,occurred_at);
+  CREATE INDEX household_flyer_events_flyer_household_occurred
+    ON household_flyer_events(flyer_id,household_id,occurred_at);
+  INSERT INTO schema_migrations VALUES
+    (12,'campaign_flyer_catalogue_and_delivery_versions',datetime('now'));
   COMMIT;`);
 }
 db.exec(
@@ -741,7 +773,48 @@ function state(role = "candidate") {
     JOIN household_flyer_state fs ON fs.household_id=h.id
     WHERE a.source_active=1`,
     )
-    .all();
+    .all() as any[];
+  const flyers = db
+    .prepare("SELECT * FROM flyer_catalogue ORDER BY introduction_date,id")
+    .all() as any[];
+  const flyerHistoryRows = db
+    .prepare(
+      `SELECT v.household_id,v.id event_id,v.occurred_at,v.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              v.user_id,v.source
+         FROM active_visits v
+         LEFT JOIN flyer_catalogue fc ON fc.id=v.flyer_id
+        WHERE v.flyer_delivered=1
+       UNION ALL
+       SELECT f.household_id,f.id event_id,f.occurred_at,f.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              f.user_id,f.source
+         FROM household_flyer_events f
+         LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
+        WHERE f.flyer_delivered=1
+        ORDER BY occurred_at DESC,event_id DESC`,
+    )
+    .all() as any[];
+  const flyerHistoryByHousehold = new Map<string, any[]>();
+  for (const row of flyerHistoryRows) {
+    const history = flyerHistoryByHousehold.get(row.household_id) ?? [];
+    history.push({
+      event_id: row.event_id,
+      occurred_at: row.occurred_at,
+      flyer_id: row.flyer_id,
+      flyer_name: row.flyer_name,
+      user_id: row.user_id,
+      source: row.source,
+    });
+    flyerHistoryByHousehold.set(row.household_id, history);
+  }
+  for (const household of households) {
+    const history = flyerHistoryByHousehold.get(household.household_id) ?? [];
+    household.flyer_history = history;
+    household.flyer_ids = [
+      ...new Set(history.map((event) => event.flyer_id).filter(Boolean)),
+    ];
+  }
   const routes = db
     .prepare(
       "SELECT r.*,count(s.id) stop_count,sum(CASE WHEN s.completed_at IS NOT NULL THEN 1 ELSE 0 END) completed_count FROM routes r LEFT JOIN route_stops s ON s.route_id=r.id GROUP BY r.id ORDER BY r.created_at DESC",
@@ -860,8 +933,54 @@ function state(role = "candidate") {
   summary.households_completed_per_hour = hours
     ? +(span.completed / hours).toFixed(1)
     : 0;
+  const flyerSummary = new Map<
+    string,
+    { flyer_id: string; delivery_count: number; household_ids: Set<string> }
+  >();
+  for (const row of flyerHistoryRows) {
+    const flyerId = row.flyer_id ?? "unknown-legacy-flyer";
+    const current =
+      flyerSummary.get(flyerId) ?? {
+        flyer_id: flyerId,
+        delivery_count: 0,
+        household_ids: new Set<string>(),
+      };
+    current.delivery_count += 1;
+    current.household_ids.add(row.household_id);
+    flyerSummary.set(flyerId, current);
+  }
+  summary.flyer_breakdown = [
+    ...flyers.map((flyer) => {
+      const row = flyerSummary.get(flyer.id);
+      return {
+        flyer_id: flyer.id,
+        short_name: flyer.short_name,
+        delivery_count: row?.delivery_count ?? 0,
+        household_count: row?.household_ids.size ?? 0,
+      };
+    }),
+    ...(flyerSummary.has("unknown-legacy-flyer")
+      ? [
+          {
+            flyer_id: "unknown-legacy-flyer",
+            short_name: "Unknown legacy flyer",
+            delivery_count: flyerSummary.get("unknown-legacy-flyer")!
+              .delivery_count,
+            household_count: flyerSummary.get("unknown-legacy-flyer")!
+              .household_ids.size,
+          },
+        ]
+      : []),
+  ];
+  summary.households_receiving_both_flyers = households.filter(
+    (household: any) => household.flyer_ids.length >= 2,
+  ).length;
+  summary.unknown_flyer_deliveries = flyerHistoryRows.filter(
+    (row) => !row.flyer_id,
+  ).length;
   return {
     households,
+    flyers,
     routes,
     route_stops,
     route_sessions: sessions,
@@ -870,7 +989,7 @@ function state(role = "candidate") {
     recruitment_areas,
     recruitment_prospects,
     address_review_counts,
-    schema_version: 11,
+    schema_version: 12,
     summary,
   };
 }
@@ -967,6 +1086,51 @@ const server = createServer(async (req, res) => {
     }
     if (req.method === "GET" && url.pathname === "/api/canvassing/state")
       return jsonForRequest(req, res, 200, state(role));
+    if (
+      req.method === "PATCH" &&
+      /^\/api\/canvassing\/flyers\/[^/]+$/.test(url.pathname)
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, { error: "flyer catalogue requires candidate role" });
+      const flyerId = url.pathname.split("/").at(-1)!;
+      const input = JSON.parse(await body(req));
+      const current = db
+        .prepare("SELECT * FROM flyer_catalogue WHERE id=?")
+        .get(flyerId) as any;
+      if (!current) return json(res, 404, { error: "flyer not found" });
+      const shortName = String(input.short_name ?? current.short_name).trim();
+      if (!shortName) return json(res, 400, { error: "short_name is required" });
+      const updated = {
+        ...current,
+        short_name: shortName,
+        description: input.description ?? current.description,
+        introduction_date: String(
+          input.introduction_date ?? current.introduction_date,
+        ),
+        active: input.active == null ? current.active : input.active ? 1 : 0,
+        printable_url: input.printable_url ?? current.printable_url,
+        updated_at: now(),
+      };
+      db.prepare(
+        "UPDATE flyer_catalogue SET short_name=?,description=?,introduction_date=?,active=?,printable_url=?,updated_at=? WHERE id=?",
+      ).run(
+        updated.short_name,
+        updated.description,
+        updated.introduction_date,
+        updated.active,
+        updated.printable_url,
+        updated.updated_at,
+        flyerId,
+      );
+      audit(user, "update", "flyer_catalogue", flyerId, updated);
+      await recordEvent({
+        type: "canvassing.flyer_catalogue.updated",
+        flyer_id: flyerId,
+        ...updated,
+        user_id: user,
+      });
+      return json(res, 200, updated);
+    }
     if (req.method === "POST" && url.pathname === "/api/canvassing/visits") {
       const input = JSON.parse(await body(req));
       if (role === "volunteer") {
@@ -1019,6 +1183,10 @@ const server = createServer(async (req, res) => {
         conversation_occurred: Boolean(input.conversation_occurred),
         revisit_requested: Boolean(input.revisit_requested),
         no_answer: Boolean(input.no_answer),
+        flyer_id: input.flyer_delivered
+          ? String(input.flyer_id ?? LEGACY_FLYER_ID)
+          : null,
+        allow_duplicate_flyer: Boolean(input.allow_duplicate_flyer),
         issue_categories: input.issue_categories ?? [],
         notes: input.notes ?? "",
         follow_up_action: input.follow_up_action ?? null,
@@ -1028,8 +1196,46 @@ const server = createServer(async (req, res) => {
         imported_at: now(),
         session_id: input.session_id ?? null,
       };
+      if (event.flyer_id) {
+        const flyer = db
+          .prepare("SELECT id FROM flyer_catalogue WHERE id=?")
+          .get(event.flyer_id);
+        if (!flyer) {
+          db.prepare("DELETE FROM submission_keys WHERE submission_key=?").run(
+            submissionKey,
+          );
+          return json(res, 400, {
+            error: "unknown flyer_id",
+            flyer_id: event.flyer_id,
+          });
+        }
+        const prior = db
+          .prepare(
+            `SELECT occurred_at FROM active_visits
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+             UNION ALL
+             SELECT occurred_at FROM household_flyer_events
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+             ORDER BY occurred_at DESC LIMIT 1`,
+          )
+          .get(event.household_id, event.flyer_id, event.household_id, event.flyer_id) as
+          | { occurred_at: string }
+          | undefined;
+        if (prior && !event.allow_duplicate_flyer) {
+          db.prepare("DELETE FROM submission_keys WHERE submission_key=?").run(
+            submissionKey,
+          );
+          return json(res, 409, {
+            error: "duplicate flyer delivery",
+            duplicate: true,
+            flyer_id: event.flyer_id,
+            occurred_at: prior.occurred_at,
+            message: "This household already received this flyer. Confirm an intentional second delivery to continue.",
+          });
+        }
+      }
       db.prepare(
-        "INSERT INTO visits (id,occurred_at,user_id,household_id,route_id,flyer_delivered,door_knocked,outcome,conversation_occurred,issue_categories_json,notes,follow_up_action,follow_up_date,support_category,source,imported_at,session_id,revisit_requested,no_answer) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO visits (id,occurred_at,user_id,household_id,route_id,flyer_delivered,door_knocked,outcome,conversation_occurred,issue_categories_json,notes,follow_up_action,follow_up_date,support_category,source,imported_at,session_id,revisit_requested,no_answer,flyer_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
       ).run(
         event.id,
         event.occurred_at,
@@ -1050,6 +1256,7 @@ const server = createServer(async (req, res) => {
         event.session_id,
         +event.revisit_requested,
         +event.no_answer,
+        event.flyer_id,
       );
       db.prepare(
         "UPDATE submission_keys SET entity_id=? WHERE submission_key=?",
@@ -1069,6 +1276,7 @@ const server = createServer(async (req, res) => {
       audit(user, "append", "visit", event.id, {
         household_id: event.household_id,
         outcome: event.outcome,
+        flyer_id: event.flyer_id,
       });
       await recordEvent({ type: "canvassing.visit.appended", ...event });
       return json(res, 201, event);
@@ -1113,9 +1321,38 @@ const server = createServer(async (req, res) => {
           reason: input.reason ?? "manual household flyer correction",
           source: input.source ?? "manual_correction",
           previous_event_id: previous?.id ?? null,
+          flyer_id: flyerDelivered
+            ? String(input.flyer_id ?? LEGACY_FLYER_ID)
+            : null,
         };
+      if (event.flyer_id) {
+        const flyer = db
+          .prepare("SELECT id FROM flyer_catalogue WHERE id=?")
+          .get(event.flyer_id);
+        if (!flyer)
+          return json(res, 400, { error: "unknown flyer_id" });
+        const prior = db
+          .prepare(
+            `SELECT occurred_at FROM active_visits
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+             UNION ALL
+             SELECT occurred_at FROM household_flyer_events
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+             ORDER BY occurred_at DESC LIMIT 1`,
+          )
+          .get(householdId, event.flyer_id, householdId, event.flyer_id) as
+          | { occurred_at: string }
+          | undefined;
+        if (prior && !input.allow_duplicate_flyer)
+          return json(res, 409, {
+            error: "duplicate flyer delivery",
+            duplicate: true,
+            flyer_id: event.flyer_id,
+            occurred_at: prior.occurred_at,
+          });
+      }
       db.prepare(
-        "INSERT INTO household_flyer_events VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO household_flyer_events (id,household_id,occurred_at,user_id,flyer_delivered,reason,source,previous_event_id,flyer_id) VALUES (?,?,?,?,?,?,?,?,?)",
       ).run(
         event.id,
         event.household_id,
@@ -1125,6 +1362,7 @@ const server = createServer(async (req, res) => {
         event.reason,
         event.source,
         event.previous_event_id,
+        event.flyer_id,
       );
       audit(user, "correct", "household_flyer_status", householdId, event);
       await recordEvent({
@@ -2886,7 +3124,17 @@ const server = createServer(async (req, res) => {
            CASE WHEN a.number_event_id IS NOT NULL
              THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END)
              ELSE a.label END address,
-           h.id household_id,s.completed_at,s.skipped
+           h.id household_id,s.completed_at,s.skipped,
+           (SELECT group_concat(DISTINCT COALESCE(delivery.flyer_id,'unknown-legacy-flyer'))
+              FROM (
+                SELECT v.flyer_id
+                  FROM active_visits v
+                 WHERE v.household_id=h.id AND v.flyer_delivered=1
+                UNION ALL
+                SELECT f.flyer_id
+                  FROM household_flyer_events f
+                 WHERE f.household_id=h.id AND f.flyer_delivered=1
+              ) delivery) flyer_versions
            FROM route_stops s JOIN routes r ON r.id=s.route_id
            JOIN households h ON h.id=s.household_id
            JOIN effective_addresses a ON a.id=h.address_id
@@ -2900,6 +3148,7 @@ const server = createServer(async (req, res) => {
         "household_id",
         "completed_at",
         "skipped",
+        "flyer_versions",
       ];
       audit(user, "export", "route_csv", null, { rows: rows.length });
       return json(
@@ -2951,7 +3200,7 @@ const server = createServer(async (req, res) => {
       return json(res, 200, {
         backup: await backupStatus(),
         journal: await verifyJournal(),
-        schema_version: 11,
+        schema_version: 12,
       });
     if (req.method === "POST" && url.pathname === "/api/canvassing/backup") {
       const path = await performBackup("manual");

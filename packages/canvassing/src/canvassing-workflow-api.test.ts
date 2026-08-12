@@ -15,7 +15,8 @@ describe.sequential("canvassing weekly workflow API", () => {
     conversationId = "",
     prospectId = "",
     areaId = "";
-  let sourceHouseholds: string[] = [];
+  let sourceHouseholds: string[] = [],
+    versionedHousehold = "";
 
   async function startServer() {
     server = spawn(
@@ -51,13 +52,18 @@ describe.sequential("canvassing weekly workflow API", () => {
     await new Promise<void>((resolve) => server.once("exit", () => resolve()));
   }
 
-  async function request(path: string, value?: unknown, role = "candidate") {
+  async function request(
+    path: string,
+    value?: unknown,
+    role = "candidate",
+    method = "POST",
+  ) {
     const response = await fetch(
       `${base}${path}`,
       value === undefined
         ? { headers: { "x-canvass-role": role } }
         : {
-            method: "POST",
+            method,
             headers: {
               "content-type": "application/json",
               "x-canvass-role": role,
@@ -67,6 +73,12 @@ describe.sequential("canvassing weekly workflow API", () => {
     );
     const data = await response.json();
     return { status: response.status, data };
+  }
+  async function requestText(path: string, role = "candidate") {
+    const response = await fetch(`${base}${path}`, {
+      headers: { "x-canvass-role": role },
+    });
+    return { status: response.status, text: await response.text() };
   }
 
   beforeAll(async () => {
@@ -107,7 +119,7 @@ describe.sequential("canvassing weekly workflow API", () => {
       created = after.households.find(
         (home: any) => home.structure_id === unlinked.properties.structure_id,
       );
-    expect(after.schema_version).toBe(11);
+    expect(after.schema_version).toBe(12);
     expect(created).toMatchObject({
       civic_number: "1234",
       street: "Test Street",
@@ -260,6 +272,80 @@ describe.sequential("canvassing weekly workflow API", () => {
     expect(sample.data.scheduled_for).toBe("2026-07-22");
   });
 
+  it("tracks flyer versions, warns on repeats, and preserves delivery history", async () => {
+    const before = (await request("/state")).data,
+      flyerOne = before.flyers.find((flyer: any) => flyer.id === "flyer-1-original"),
+      flyerTwo = before.flyers.find((flyer: any) => flyer.id === "flyer-2-current");
+    expect(flyerOne).toMatchObject({ short_name: "Flyer 1: Original flyer" });
+    expect(flyerTwo).toMatchObject({ short_name: "Flyer 2: Current flyer" });
+    expect(
+      (await request("/flyers/flyer-2-current", {
+        short_name: "Spring information flyer",
+        description: "Field test version",
+        introduction_date: "2026-08-12",
+        active: true,
+      }, "candidate", "PATCH")).status,
+    ).toBe(200);
+    versionedHousehold = before.households.find(
+      (home: any) => !home.flyer_delivered,
+    ).household_id;
+    const first = await request("/visits", {
+      submission_key: "versioned-flyer-first",
+      household_id: versionedHousehold,
+      outcome: "flyer_delivered",
+      flyer_delivered: true,
+      flyer_id: "flyer-2-current",
+      door_knocked: false,
+    });
+    expect(first.status).toBe(201);
+    expect(first.data.flyer_id).toBe("flyer-2-current");
+    const duplicate = await request("/visits", {
+      submission_key: "versioned-flyer-duplicate",
+      household_id: versionedHousehold,
+      outcome: "flyer_delivered",
+      flyer_delivered: true,
+      flyer_id: "flyer-2-current",
+      door_knocked: false,
+    });
+    expect(duplicate.status).toBe(409);
+    expect(duplicate.data.duplicate).toBe(true);
+    const override = await request("/visits", {
+      submission_key: "versioned-flyer-override",
+      household_id: versionedHousehold,
+      outcome: "flyer_delivered",
+      flyer_delivered: true,
+      flyer_id: "flyer-2-current",
+      allow_duplicate_flyer: true,
+      door_knocked: false,
+    });
+    expect(override.status).toBe(201);
+    const after = (await request("/state")).data,
+      household = after.households.find(
+        (home: any) => home.household_id === versionedHousehold,
+      ),
+      flyerSummary = after.summary.flyer_breakdown.find(
+        (row: any) => row.flyer_id === "flyer-2-current",
+      );
+    expect(household.flyer_history).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flyer_id: "flyer-2-current",
+          flyer_name: "Spring information flyer",
+        }),
+      ]),
+    );
+    expect(household.flyer_ids).toContain("flyer-2-current");
+    expect(flyerSummary).toMatchObject({ delivery_count: 2, household_count: 1 });
+    expect(after.summary.unknown_flyer_deliveries).toBe(0);
+    expect(after.summary.households_receiving_both_flyers).toBe(0);
+    const routeExport = await requestText("/export/routes.csv");
+    expect(routeExport.status).toBe(200);
+    expect(routeExport.text.split("\n", 1)[0]).toContain("flyer_versions");
+    expect(await readFile(join(directory, "events.jsonl"), "utf8")).toContain(
+      '"flyer_id":"flyer-2-current"',
+    );
+  });
+
   it("records flyer, conversation, revisit, and political outcome together", async () => {
     const visit = await request("/visits", {
       submission_key: "combined-visit",
@@ -267,6 +353,8 @@ describe.sequential("canvassing weekly workflow API", () => {
       route_id: routeId,
       outcome: "supportive",
       flyer_delivered: true,
+      flyer_id: "flyer-1-original",
+      allow_duplicate_flyer: true,
       door_knocked: true,
       conversation_occurred: true,
       revisit_requested: true,

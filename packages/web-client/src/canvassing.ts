@@ -35,8 +35,26 @@ type Household = {
   no_answer: number;
   political_outcome: string | null;
   visit_count: number;
+  flyer_history: FlyerDelivery[];
+  flyer_ids: string[];
   number_corrected: number;
   last_updated_at: string | null;
+};
+type Flyer = {
+  id: string;
+  short_name: string;
+  description: string | null;
+  introduction_date: string;
+  active: number;
+  printable_url: string | null;
+};
+type FlyerDelivery = {
+  event_id: string;
+  occurred_at: string;
+  flyer_id: string | null;
+  flyer_name: string;
+  user_id: string;
+  source: string;
 };
 type Contact = {
   person_id: string;
@@ -107,6 +125,7 @@ type SessionSummary = {
 };
 type State = {
   households: Household[];
+  flyers: Flyer[];
   routes: Array<{
     id: string;
     name: string;
@@ -125,7 +144,14 @@ type State = {
   recruitment_prospects: RecruitmentProspect[];
   address_review_counts: Record<string, number>;
   schema_version: number;
-  summary: Record<string, number>;
+  summary: Record<string, number> & {
+    flyer_breakdown?: Array<{
+      flyer_id: string;
+      short_name: string;
+      delivery_count: number;
+      household_count: number;
+    }>;
+  };
 };
 type FieldPrefs = {
   route_id: string;
@@ -139,6 +165,8 @@ type FieldPrefs = {
   multi_select: boolean;
   selected_household_ids: string[];
   coverage_mode: boolean;
+  active_flyer_id: string;
+  flyer_filter: string;
 };
 const statusColors: Record<string, string> = {
   untouched: "#8b9297",
@@ -308,27 +336,28 @@ export async function canvassingMain() {
   };
   document.title = "Owen Sound Canvassing | Living Region";
   document.body.innerHTML = `<div class="canvass-shell">
-    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
+    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="flyer-catalogue-open">Flyer catalogue</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><span class="mobile-active-flyer-chip" id="mobile-active-flyer-chip">Flyer: choose</span><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
     <aside class="summary" id="summary"></aside><main id="canvass-map"></main>
     <aside class="cluster-key" id="cluster-key" hidden><strong id="cluster-key-title">Grouped civic addresses</strong><span id="cluster-key-description">Number = household stops; colour = most common status. Tap to zoom in.</span><div class="coverage-legend" id="coverage-legend" hidden><div class="coverage-swatches"><i style="background:#000004"></i><i style="background:#420A68"></i><i style="background:#FCA50A"></i><i style="background:#FCFFA4"></i></div><div class="coverage-legend-labels"><span>Untouched</span><span>Partly covered</span><span>Fully covered</span></div><small>Bubble number = eligible households remaining</small><small class="next-area-status" id="next-area-status"></small></div></aside>
     <div class="mobile-scrim" id="mobile-scrim" hidden></div>
-    <section class="mobile-sheet mobile-menu-sheet" id="mobile-menu-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Map menu</strong><button id="mobile-menu-close" class="mobile-close" aria-label="Close map menu">Close</button></div><details open><summary>Campaign tools</summary><div class="mobile-menu-actions"><button id="mobile-bulk-open">Bulk select homes</button><button id="mobile-tools-open">Route and filters</button><button id="mobile-summary-open">Campaign totals</button><button id="mobile-find-next-area">Find next area</button></div></details><details><summary>Workflows</summary><div class="mobile-menu-actions"><button id="mobile-followup-open">Follow-ups</button><button id="mobile-conversation-open">Neighbourhood conversation</button><button id="mobile-recruitment-open">Recruitment</button><button id="mobile-quality-open">Address quality</button></div></details><details><summary>Data and print</summary><div class="mobile-menu-actions"><button id="mobile-import-open">Import records</button><button id="mobile-print-open">Print route</button><a class="button" href="/api/canvassing/export/routes.csv">Export route CSV</a></div></details></section>
+    <section class="mobile-sheet mobile-menu-sheet" id="mobile-menu-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Map menu</strong><button id="mobile-menu-close" class="mobile-close" aria-label="Close map menu">Close</button></div><section class="mobile-flyer-controls"><label>Active flyer<select id="mobile-active-flyer"><option value="">Choose flyer</option></select></label><label>Inspect distribution<select id="mobile-flyer-filter"><option value="">All flyers</option></select></label><button id="mobile-flyer-catalogue-open">Edit flyer names</button></section><details open><summary>Campaign tools</summary><div class="mobile-menu-actions"><button id="mobile-bulk-open">Bulk select homes</button><button id="mobile-tools-open">Route and filters</button><button id="mobile-summary-open">Campaign totals</button><button id="mobile-find-next-area">Find next area</button></div></details><details><summary>Workflows</summary><div class="mobile-menu-actions"><button id="mobile-followup-open">Follow-ups</button><button id="mobile-conversation-open">Neighbourhood conversation</button><button id="mobile-recruitment-open">Recruitment</button><button id="mobile-quality-open">Address quality</button></div></details><details><summary>Data and print</summary><div class="mobile-menu-actions"><button id="mobile-import-open">Import records</button><button id="mobile-print-open">Print route</button><a class="button" href="/api/canvassing/export/routes.csv">Export route CSV</a></div></details></section>
     <section class="mobile-sheet mobile-coverage-sheet" id="mobile-coverage-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Coverage</strong><button id="mobile-coverage-close" class="mobile-close" aria-label="Close coverage legend">Close</button></div><div id="mobile-coverage-content"></div></section>
     <section class="mobile-sheet mobile-summary-sheet" id="mobile-summary-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Campaign totals</strong><button id="mobile-summary-close" class="mobile-close" aria-label="Close campaign totals">Close</button></div><div id="mobile-summary-content"></div></section>
     <section class="bulk-selection-bar" id="bulk-selection-bar" aria-label="Bulk household selection"><button id="multi-select" aria-pressed="false">Bulk flyer</button><span id="bulk-selection-status" aria-live="polite">Tap Bulk flyer, then tap roofs</span><button id="bulk-flyer" disabled>Mark selected flyered</button><button id="clear-selection" disabled>Clear</button></section>
     <section class="drawer" id="drawer"><div class="empty"><strong>Select a roof or address</strong><span>Click households to inspect them or add them to a route.</span></div></section>
-    <footer><button id="mobile-tools-close" class="mobile-sheet-close" aria-label="Close route and filter tools">Close tools</button><div class="route-builder"><input id="route-name" placeholder="New route name"><select id="street-side"><option value="">Both sides</option><option value="left">Left side</option><option value="right">Right side</option></select><button id="create-route">Create <span id="selection-count">0</span></button></div><div class="route-run"><select id="active-route"><option value="">Choose route</option></select><button id="session-toggle">Start</button><button id="undo-stop">Undo</button><button id="field-conversation">Conversation</button><button id="previous-stop">Previous</button><button id="next-stop">Next</button><button id="locate">Locate</button><button id="recenter" disabled>Recenter</button><span id="route-progress"></span></div><label><input id="volunteer-mode" type="checkbox"> Volunteer delivery mode</label><label>Status <select id="status-filter"><option value="all">All</option>${Object.keys(
+    <footer><button id="mobile-tools-close" class="mobile-sheet-close" aria-label="Close route and filter tools">Close tools</button><div class="route-builder"><input id="route-name" placeholder="New route name"><select id="street-side"><option value="">Both sides</option><option value="left">Left side</option><option value="right">Right side</option></select><button id="create-route">Create <span id="selection-count">0</span></button></div><div class="route-run"><select id="active-route"><option value="">Choose route</option></select><button id="session-toggle">Start</button><button id="undo-stop">Undo</button><button id="field-conversation">Conversation</button><button id="previous-stop">Previous</button><button id="next-stop">Next</button><button id="locate">Locate</button><button id="recenter" disabled>Recenter</button><span id="route-progress"></span></div><label>Active flyer <select id="active-flyer"><option value="">Choose flyer</option></select></label><label>Inspect flyer <select id="flyer-filter"><option value="">All flyers</option></select></label><label><input id="volunteer-mode" type="checkbox"> Volunteer delivery mode</label><label>Status <select id="status-filter"><option value="all">All</option>${Object.keys(
       statusColors,
     )
       .map((s) => `<option value="${s}">${s.replaceAll("_", " ")}</option>`)
       .join("")}</select></label></footer>
-    <section class="mobile-route-bar" id="mobile-route-bar" hidden aria-label="Active route controls"><button id="mobile-previous-stop" aria-label="Previous stop">Previous</button><button id="mobile-mark-stop">Mark / update</button><button id="mobile-next-stop" aria-label="Next stop">Next</button><button id="mobile-route-more" aria-label="Open route details">Route</button></section>
+    <section class="mobile-route-bar" id="mobile-route-bar" hidden aria-label="Active route controls"><span class="mobile-route-flyer-chip" id="mobile-route-flyer-chip">Flyer: choose</span><button id="mobile-previous-stop" aria-label="Previous stop">Previous</button><button id="mobile-mark-stop">Mark / update</button><button id="mobile-next-stop" aria-label="Next stop">Next</button><button id="mobile-route-more" aria-label="Open route details">Route</button></section>
     <section class="session-strip" id="session-strip"></section>
     <dialog id="import-dialog"><form method="dialog"><h2>Import existing records</h2><p>CSV fields: address, date_met, person_name, outcome, issues, notes, follow_up, support_level.</p><input id="csv-file" type="file" accept=".csv,text/csv"><menu><button value="cancel">Cancel</button><button id="import-submit" value="default">Import</button></menu></form></dialog>
     <dialog id="followup-dialog" class="workflow-dialog"><h2>Weekly follow-ups</h2><div id="followup-workspace"></div><menu><button type="button" data-close="followup-dialog">Close</button></menu></dialog>
     <dialog id="conversation-dialog" class="workflow-dialog"><h2>Neighbourhood conversation</h2><form id="conversation-form" class="workflow-form"><label>Issue discussed<input id="conversation-issue" required></label><label>Political outcome<select id="conversation-outcome"><option value="">Not recorded</option><option value="supportive">Supportive</option><option value="undecided">Undecided</option><option value="opposed">Opposed</option></select></label><label><input id="conversation-volunteer" type="checkbox"> Possible volunteer</label><label><input id="conversation-representative" type="checkbox"> Possible Local Representative</label><label><input id="conversation-councillor" type="checkbox"> Possible councillor candidate</label><label><input id="conversation-followup" type="checkbox"> Follow-up requested</label><label><input id="conversation-household" type="checkbox"> Associate selected household</label><label><input id="conversation-complete" type="checkbox"> Complete selected household attempt</label><button>Record conversation</button></form><menu><button type="button" data-close="conversation-dialog">Close</button></menu></dialog>
     <dialog id="recruitment-dialog" class="workflow-dialog"><h2>Candidate recruitment</h2><div id="recruitment-workspace"></div><menu><button type="button" data-close="recruitment-dialog">Close</button></menu></dialog>
     <dialog id="quality-dialog" class="workflow-dialog"><h2>Address quality</h2><div id="quality-metrics"></div><div id="quality-queue"></div><menu><button type="button" data-close="quality-dialog">Close</button></menu></dialog>
+    <dialog id="flyer-dialog" class="workflow-dialog"><h2>Flyer catalogue</h2><p>Names and descriptions are private campaign metadata. Delivery history keeps stable flyer IDs.</p><div id="flyer-catalogue-workspace"></div><menu><button type="button" data-close="flyer-dialog">Close</button></menu></dialog>
     <div class="toast" id="toast"></div></div>`;
   // Bind the primary mobile sheets before the larger offline data payload loads.
   // A volunteer can open the menu immediately while the map is still preparing.
@@ -433,6 +462,16 @@ export async function canvassingMain() {
       splitCorrections,
     ],
   ] = await Promise.all([statePromise, mapDataPromise]);
+  let activeFlyerId = saved.active_flyer_id ?? "";
+  let flyerFilter = saved.flyer_filter ?? "";
+  const availableFlyers = state.flyers ?? [];
+  if (!availableFlyers.some((flyer) => flyer.id === activeFlyerId))
+    activeFlyerId = "";
+  if (
+    flyerFilter &&
+    !availableFlyers.some((flyer) => flyer.id === flyerFilter)
+  )
+    flyerFilter = "";
   const hiddenSplitParents = new Set(splitCorrections.hidden_parent_ids);
   structures.features = structures.features
     .filter(
@@ -540,6 +579,9 @@ export async function canvassingMain() {
     f.properties.status =
       homes.sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
         ?.status ?? "untouched";
+    f.properties.flyer_ids = [
+      ...new Set(homes.flatMap((home) => home.flyer_ids ?? [])),
+    ];
   }
   const knownNonResidentialBuildingTypes = new Set([
     "commercial",
@@ -582,6 +624,7 @@ export async function canvassingMain() {
       feature.properties.eligible_count = eligible ? 1 : 0;
       feature.properties.covered_count = covered ? 1 : 0;
       feature.properties.remaining_count = eligible && !covered ? 1 : 0;
+      feature.properties.flyer_ids = home?.flyer_ids ?? [];
     }
   };
   applyAddressCoverageProperties();
@@ -624,6 +667,68 @@ export async function canvassingMain() {
     new maplibregl.NavigationControl({ showCompass: false }),
     "bottom-right",
   );
+  const combinedMapFilter = (...filters: any[]) => {
+    const activeFilters = filters.filter(Boolean);
+    return activeFilters.length === 0
+      ? null
+      : activeFilters.length === 1
+        ? activeFilters[0]
+        : ["all", ...activeFilters];
+  };
+  const flyerMapFilter = () =>
+    flyerFilter ? ["in", flyerFilter, ["get", "flyer_ids"]] : null;
+  const applyMapFilters = () => {
+    const status =
+      document.querySelector<HTMLSelectElement>("#status-filter")?.value ??
+      "all";
+    const statusFilter =
+      status === "all" ? null : ["==", ["get", "status"], status];
+    if (map.getLayer("structures"))
+      map.setFilter("structures", combinedMapFilter(statusFilter, flyerMapFilter()));
+    if (map.getLayer("estimated-structure-outlines"))
+      map.setFilter(
+        "estimated-structure-outlines",
+        combinedMapFilter(
+          ["==", ["get", "geometry_provenance"], "estimated"],
+          statusFilter,
+          flyerMapFilter(),
+        ),
+      );
+    if (map.getLayer("city-map-structure-outlines"))
+      map.setFilter(
+        "city-map-structure-outlines",
+        combinedMapFilter(
+          ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
+          statusFilter,
+          flyerMapFilter(),
+        ),
+      );
+    if (map.getLayer("address-points"))
+      map.setFilter(
+        "address-points",
+        combinedMapFilter(
+          ["!", ["has", "point_count"]],
+          [
+            "any",
+            ["!", ["has", "structure_id"]],
+            ["==", ["get", "structure_id"], ""],
+          ],
+          statusFilter,
+        ),
+      );
+    const source = map.getSource("addresses") as GeoJSONSource | undefined;
+    if (source)
+      source.setData(
+        flyerFilter
+          ? {
+              ...addresses,
+              features: addresses.features.filter((feature: any) =>
+                (feature.properties.flyer_ids ?? []).includes(flyerFilter),
+              ),
+            }
+          : addresses,
+      );
+  };
   const shell = document.querySelector<HTMLElement>(".canvass-shell")!;
   const mobileScrim = document.querySelector<HTMLElement>("#mobile-scrim")!;
   const mobilePanels = [
@@ -1414,56 +1519,7 @@ export async function canvassingMain() {
         "circle-stroke-width": 3,
       },
     });
-    const restoredFilter = saved.status_filter ?? "all";
-    map.setFilter(
-      "structures",
-      restoredFilter === "all"
-        ? null
-        : ["==", ["get", "status"], restoredFilter],
-    );
-    map.setFilter(
-      "estimated-structure-outlines",
-      restoredFilter === "all"
-        ? ["==", ["get", "geometry_provenance"], "estimated"]
-        : [
-            "all",
-            ["==", ["get", "geometry_provenance"], "estimated"],
-            ["==", ["get", "status"], restoredFilter],
-          ],
-    );
-    map.setFilter(
-      "city-map-structure-outlines",
-      restoredFilter === "all"
-        ? ["==", ["get", "external_source"], "owen_sound_city_map_pdf"]
-        : [
-            "all",
-            ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
-            ["==", ["get", "status"], restoredFilter],
-          ],
-    );
-    map.setFilter(
-      "address-points",
-      restoredFilter === "all"
-        ? [
-            "all",
-            ["!", ["has", "point_count"]],
-            [
-              "any",
-              ["!", ["has", "structure_id"]],
-              ["==", ["get", "structure_id"], ""],
-            ],
-          ]
-        : [
-            "all",
-            ["!", ["has", "point_count"]],
-            [
-              "any",
-              ["!", ["has", "structure_id"]],
-              ["==", ["get", "structure_id"], ""],
-            ],
-            ["==", ["get", "status"], restoredFilter],
-          ],
-    );
+    applyMapFilters();
     map.on("click", (event) => {
       closeMobileOverlays();
       if (splitTarget && splitDrawing) {
@@ -1554,11 +1610,103 @@ export async function canvassingMain() {
     el.classList.add("show");
     setTimeout(() => el.classList.remove("show"), 2200);
   };
+  function flyerLabel(flyerId: string | null | undefined) {
+    return (
+      state.flyers.find((flyer) => flyer.id === flyerId)?.short_name ??
+      "Unknown legacy flyer"
+    );
+  }
+  function renderFlyerControls() {
+    if (
+      activeFlyerId &&
+      !state.flyers.some(
+        (flyer) => flyer.id === activeFlyerId && Boolean(flyer.active),
+      )
+    ) {
+      activeFlyerId = "";
+      persist({ active_flyer_id: "" });
+    }
+    if (flyerFilter && !state.flyers.some((flyer) => flyer.id === flyerFilter)) {
+      flyerFilter = "";
+      persist({ flyer_filter: "" });
+    }
+    const activeOptions = state.flyers
+      .filter((flyer) => flyer.active)
+      .map(
+        (flyer) =>
+          `<option value="${escapeHtml(flyer.id)}">${escapeHtml(flyer.short_name)}</option>`,
+      )
+      .join("");
+    const filterOptions = state.flyers
+      .map(
+        (flyer) =>
+          `<option value="${escapeHtml(flyer.id)}">${escapeHtml(flyer.short_name)}</option>`,
+      )
+      .join("");
+    for (const id of ["active-flyer", "mobile-active-flyer"]) {
+      const select = document.querySelector<HTMLSelectElement>(`#${id}`);
+      if (!select) continue;
+      select.innerHTML = `<option value="">Choose flyer</option>${activeOptions}`;
+      select.value = activeFlyerId;
+    }
+    for (const id of ["flyer-filter", "mobile-flyer-filter"]) {
+      const select = document.querySelector<HTMLSelectElement>(`#${id}`);
+      if (!select) continue;
+      select.innerHTML = `<option value="">All flyers</option>${filterOptions}`;
+      select.value = flyerFilter;
+    }
+    const label = activeFlyerId
+      ? `Flyer: ${flyerLabel(activeFlyerId)}`
+      : "Flyer: choose";
+    for (const id of ["mobile-active-flyer-chip", "mobile-route-flyer-chip"]) {
+      const chip = document.querySelector<HTMLElement>(`#${id}`);
+      if (chip) chip.textContent = label;
+    }
+  }
+  function renderFlyerCatalogue() {
+    const workspace = document.querySelector("#flyer-catalogue-workspace");
+    if (!workspace) return;
+    workspace.innerHTML = state.flyers
+      .map(
+        (flyer) =>
+          `<fieldset class="flyer-edit"><legend>${escapeHtml(flyer.id)}</legend><label>Short name<input data-flyer-field="short_name" data-flyer-id="${escapeHtml(flyer.id)}" value="${escapeHtml(flyer.short_name)}" required></label><label>Description<input data-flyer-field="description" data-flyer-id="${escapeHtml(flyer.id)}" value="${escapeHtml(flyer.description ?? "")}"></label><label>Introduction date<input type="date" data-flyer-field="introduction_date" data-flyer-id="${escapeHtml(flyer.id)}" value="${escapeHtml(flyer.introduction_date)}"></label><label>Printable filename or link<input data-flyer-field="printable_url" data-flyer-id="${escapeHtml(flyer.id)}" value="${escapeHtml(flyer.printable_url ?? "")}"></label><label><input type="checkbox" data-flyer-field="active" data-flyer-id="${escapeHtml(flyer.id)}" ${flyer.active ? "checked" : ""}> Active</label><button type="button" data-save-flyer="${escapeHtml(flyer.id)}">Save flyer details</button></fieldset>`,
+      )
+      .join("");
+    workspace.querySelectorAll<HTMLButtonElement>("[data-save-flyer]").forEach((button) =>
+      button.addEventListener("click", async () => {
+        const flyerId = button.dataset.saveFlyer!;
+        const value = (field: string) =>
+          workspace.querySelector<HTMLInputElement>(
+            `[data-flyer-field="${field}"][data-flyer-id="${flyerId}"]`,
+          );
+        button.disabled = true;
+        try {
+          await fetchJson(`/api/canvassing/flyers/${flyerId}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              short_name: value("short_name")?.value,
+              description: value("description")?.value || null,
+              introduction_date: value("introduction_date")?.value,
+              printable_url: value("printable_url")?.value || null,
+              active: Boolean(value("active")?.checked),
+            }),
+          });
+          await refresh();
+          renderFlyerCatalogue();
+          toast("Flyer catalogue updated");
+        } catch (error) {
+          toast(error instanceof Error ? error.message : "Flyer update failed");
+        } finally {
+          button.disabled = false;
+        }
+      }),
+    );
+  }
   function renderSummary() {
     const s = state.summary,
       total = Number(s.total_households);
     document.querySelector("#summary")!.innerHTML =
-      `<dl><div><dt>Households</dt><dd>${total.toLocaleString()}</dd></div><div><dt>Flyers</dt><dd>${s.flyers_delivered}</dd></div><div><dt>Knocked</dt><dd>${s.doors_knocked}</dd></div><div><dt>Answers</dt><dd>${s.answers}</dd></div><div><dt>Talked</dt><dd>${s.conversations}</dd></div><div><dt>Revisit</dt><dd>${s.revisits}</dd></div><div><dt>Untouched</dt><dd>${s.untouched_households}</dd></div><div><dt>Per hour</dt><dd>${s.households_completed_per_hour}</dd></div><div><dt>Answer rate</dt><dd>${s.answer_rate}%</dd></div></dl><div class="legend">${Object.entries(
+      `<dl><div><dt>Households</dt><dd>${total.toLocaleString()}</dd></div><div><dt>Flyers</dt><dd>${s.flyers_delivered}</dd></div><div><dt>Knocked</dt><dd>${s.doors_knocked}</dd></div><div><dt>Answers</dt><dd>${s.answers}</dd></div><div><dt>Talked</dt><dd>${s.conversations}</dd></div><div><dt>Revisit</dt><dd>${s.revisits}</dd></div><div><dt>Untouched</dt><dd>${s.untouched_households}</dd></div><div><dt>Per hour</dt><dd>${s.households_completed_per_hour}</dd></div><div><dt>Answer rate</dt><dd>${s.answer_rate}%</dd></div><div><dt>Both flyers</dt><dd>${s.households_receiving_both_flyers ?? 0}</dd></div><div><dt>Unknown flyer deliveries</dt><dd>${s.unknown_flyer_deliveries ?? 0}</dd></div></dl><div class="flyer-summary"><strong>Households by flyer</strong>${(s.flyer_breakdown ?? []).map((row: any) => `<span>${escapeHtml(row.short_name)}: <b>${Number(row.household_count).toLocaleString()}</b> households · ${Number(row.delivery_count).toLocaleString()} deliveries</span>`).join("")}</div><div class="legend">${Object.entries(
         statusColors,
       )
         .map(
@@ -1566,6 +1714,7 @@ export async function canvassingMain() {
             `<span><i style="background:${c}"></i>${s.replaceAll("_", " ")}</span>`,
         )
         .join("")}</div>`;
+    renderFlyerControls();
     const mobileSummary = document.querySelector<HTMLElement>("#mobile-summary-content"),
       summary = document.querySelector<HTMLElement>("#summary");
     if (mobileSummary && summary && !document.querySelector<HTMLElement>("#mobile-summary-sheet")!.hidden)
@@ -1989,7 +2138,7 @@ export async function canvassingMain() {
       talkedCurrent = Boolean(active.conversation_occurred),
       revisitCurrent = Boolean(active.revisit_requested);
     document.querySelector("#drawer")!.innerHTML =
-      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span></div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : "Flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
+      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span></div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
         volunteer
           ? ""
           : `<div class="private-fields"><label>Political outcome<select id="outcome" data-initial="${escapeHtml(active.political_outcome ?? "")}"><option value="">Not recorded</option>${[
@@ -2010,6 +2159,10 @@ export async function canvassingMain() {
               )}</select></label><label>Issues<input id="issues" placeholder="housing; transit; affordability"></label><label>Private notes<textarea id="notes" rows="3"></textarea></label><label>Follow-up<input id="follow-up"></label><label>Follow-up due<input id="follow-date" type="date"></label></div><section class="contact-editor" id="contact-editor"><h3>Private contact</h3><span>Loading...</span></section>`
       }`;
     openMobileDrawer();
+    const historySection = document.createElement("section");
+    historySection.className = "flyer-history";
+    historySection.innerHTML = `<h3>Flyer delivery history</h3>${active.flyer_history?.length ? `<ul>${active.flyer_history.map((event) => `<li><strong>${escapeHtml(event.flyer_name)}</strong> · ${escapeHtml(localDateValue(event.occurred_at))}<small>${escapeHtml(event.source)}</small></li>`).join("")}</ul>` : "<p>No flyer delivery recorded.</p>"}`;
+    document.querySelector("#drawer .visit-flags")?.before(historySection);
     const addressFeature = addresses.features.find(
         (feature: any) => feature.properties.address_id === active!.address_id,
       ),
@@ -2145,7 +2298,7 @@ export async function canvassingMain() {
     );
     const flyer =
         document.querySelector<HTMLInputElement>("#visit-flyer")!,
-      flyerLabel = document.querySelector<HTMLElement>("#visit-flyer + span")!,
+      flyerCheckboxLabel = document.querySelector<HTMLElement>("#visit-flyer + span")!,
       saveButton =
         document.querySelector<HTMLButtonElement>("#save-visit")!,
       noAnswer =
@@ -2164,7 +2317,7 @@ export async function canvassingMain() {
     flyer.addEventListener("change", () => {
       const removing =
         flyer.dataset.initial === "true" && !flyer.checked;
-      flyerLabel.textContent = removing
+      flyerCheckboxLabel.textContent = removing
         ? "Remove flyer"
         : flyer.dataset.initial === "true"
           ? "Flyered"
@@ -2236,6 +2389,17 @@ export async function canvassingMain() {
                 : "");
     if (!outcome && !flyerRemoved)
       return toast("Change at least one household status");
+    let allowDuplicateFlyer = false;
+    if (flyerAdded) {
+      if (!activeFlyerId)
+        return toast("Choose an active flyer before recording delivery");
+      if (active.flyer_ids?.includes(activeFlyerId)) {
+        allowDuplicateFlyer = window.confirm(
+          `${flyerLabel(activeFlyerId)} was already delivered here. Deliver it again intentionally?`,
+        );
+        if (!allowDuplicateFlyer) return;
+      }
+    }
     submitting = true;
     document
       .querySelectorAll<HTMLButtonElement>(".visit-commands button")
@@ -2261,6 +2425,8 @@ export async function canvassingMain() {
             occurred_at: occurredAt,
             outcome,
             flyer_delivered: flyerAdded,
+            flyer_id: flyerAdded ? activeFlyerId : null,
+            allow_duplicate_flyer: allowDuplicateFlyer,
             door_knocked: noAnswer || talked || Boolean(politicalOutcome),
             conversation_occurred: talked || Boolean(politicalOutcome),
             revisit_requested: revisit,
@@ -2329,6 +2495,9 @@ export async function canvassingMain() {
       feature.properties.status =
         homes.sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
           ?.status ?? "untouched";
+      feature.properties.flyer_ids = [
+        ...new Set(homes.flatMap((home) => home.flyer_ids ?? [])),
+      ];
       feature.properties.household_count = homes.length;
       const civicNumbers = [
         ...new Set(homes.map((home) => home.civic_number)),
@@ -2365,6 +2534,7 @@ export async function canvassingMain() {
       feature.properties.eligible_count = eligible ? 1 : 0;
       feature.properties.covered_count = covered ? 1 : 0;
       feature.properties.remaining_count = eligible && !covered ? 1 : 0;
+      feature.properties.flyer_ids = home?.flyer_ids ?? [];
     }
     coverageAdjacencyGraph = buildHouseholdAdjacencyGraph(
       coverageLocations(),
@@ -2385,9 +2555,7 @@ export async function canvassingMain() {
     (map.getSource("structures") as GeoJSONSource | undefined)?.setData(
       structures,
     );
-    (map.getSource("addresses") as GeoJSONSource | undefined)?.setData(
-      addresses,
-    );
+    applyMapFilters();
     map.once("idle", scheduleNextAreaUpdate);
     updateLabels();
     renderSummary();
@@ -3067,7 +3235,22 @@ export async function canvassingMain() {
   });
   document.querySelector("#bulk-flyer")!.addEventListener("click", async () => {
     if (submitting || !selected.size) return;
+    if (!activeFlyerId) {
+      toast("Choose an active flyer before marking delivery");
+      return;
+    }
     const householdIds = [...selected];
+    const duplicateCount = householdIds.filter((householdId) =>
+      state.households
+        .find((home) => home.household_id === householdId)
+        ?.flyer_ids?.includes(activeFlyerId),
+    ).length;
+    const allowDuplicateFlyer = duplicateCount
+      ? window.confirm(
+          `${duplicateCount} selected household${duplicateCount === 1 ? " has" : "s have"} already received ${flyerLabel(activeFlyerId)}. Deliver again intentionally?`,
+        )
+      : false;
+    if (duplicateCount && !allowDuplicateFlyer) return;
     const batchKey = crypto.randomUUID();
     submitting = true;
     updateSelection();
@@ -3082,6 +3265,8 @@ export async function canvassingMain() {
               household_id,
               outcome: "flyer_delivered",
               flyer_delivered: true,
+              flyer_id: activeFlyerId,
+              allow_duplicate_flyer: allowDuplicateFlyer,
               door_knocked: false,
               source: document.querySelector<HTMLInputElement>(
                 "#volunteer-mode",
@@ -3185,56 +3370,31 @@ export async function canvassingMain() {
         zoom: 18,
       });
   });
+  const chooseActiveFlyer = (value: string) => {
+    activeFlyerId = value;
+    persist({ active_flyer_id: value });
+    renderFlyerControls();
+  };
+  for (const id of ["active-flyer", "mobile-active-flyer"])
+    document.querySelector<HTMLSelectElement>(`#${id}`)?.addEventListener(
+      "change",
+      (event) => chooseActiveFlyer((event.target as HTMLSelectElement).value),
+    );
+  const chooseFlyerFilter = (value: string) => {
+    flyerFilter = value;
+    persist({ flyer_filter: value });
+    applyMapFilters();
+    updateLabels();
+  };
+  for (const id of ["flyer-filter", "mobile-flyer-filter"])
+    document.querySelector<HTMLSelectElement>(`#${id}`)?.addEventListener(
+      "change",
+      (event) => chooseFlyerFilter((event.target as HTMLSelectElement).value),
+    );
   document.querySelector("#status-filter")!.addEventListener("change", (e) => {
     const value = (e.target as HTMLSelectElement).value;
     persist({ status_filter: value });
-    map.setFilter(
-      "structures",
-      value === "all" ? null : ["==", ["get", "status"], value],
-    );
-    map.setFilter(
-      "estimated-structure-outlines",
-      value === "all"
-        ? ["==", ["get", "geometry_provenance"], "estimated"]
-        : [
-            "all",
-            ["==", ["get", "geometry_provenance"], "estimated"],
-            ["==", ["get", "status"], value],
-          ],
-    );
-    map.setFilter(
-      "city-map-structure-outlines",
-      value === "all"
-        ? ["==", ["get", "external_source"], "owen_sound_city_map_pdf"]
-        : [
-            "all",
-            ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
-            ["==", ["get", "status"], value],
-          ],
-    );
-    map.setFilter(
-      "address-points",
-      value === "all"
-        ? [
-            "all",
-            ["!", ["has", "point_count"]],
-            [
-              "any",
-              ["!", ["has", "structure_id"]],
-              ["==", ["get", "structure_id"], ""],
-            ],
-          ]
-        : [
-            "all",
-            ["!", ["has", "point_count"]],
-            [
-              "any",
-              ["!", ["has", "structure_id"]],
-              ["==", ["get", "structure_id"], ""],
-            ],
-            ["==", ["get", "status"], value],
-          ],
-    );
+    applyMapFilters();
     updateLabels();
   });
   document
@@ -3408,6 +3568,18 @@ export async function canvassingMain() {
         }),
       );
     qualityDialog.showModal();
+  });
+  const flyerDialog = document.querySelector<HTMLDialogElement>("#flyer-dialog")!;
+  const openFlyerCatalogue = () => {
+    if (document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked)
+      return toast("Flyer catalogue editing is hidden in volunteer mode");
+    renderFlyerCatalogue();
+    flyerDialog.showModal();
+  };
+  document.querySelector("#flyer-catalogue-open")!.addEventListener("click", openFlyerCatalogue);
+  document.querySelector("#mobile-flyer-catalogue-open")!.addEventListener("click", () => {
+    setMobilePanel(mobilePanels[0], false);
+    openFlyerCatalogue();
   });
   const followupDialog =
     document.querySelector<HTMLDialogElement>("#followup-dialog")!;
