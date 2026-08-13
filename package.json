@@ -114,6 +114,7 @@
     "canvassing:prepare-osm-import": "tsx packages/canvassing/src/prepare-osm-import.ts",
     "canvassing:verify-operations": "tsx packages/canvassing/src/verify-operations.ts",
     "canvassing:repair-journal": "tsx packages/canvassing/src/repair-journal.ts",
+    "test:e2e:canvassing": "playwright test --config=playwright.canvassing.config.ts",
     "canvassing:server": "tsx packages/canvassing/src/server.ts",
     "canvassing:dev": "npm run canvassing:prepare && concurrently -k -n api,web \"npm run canvassing:server\" \"npm run dev:web\""
   },

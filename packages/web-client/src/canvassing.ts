@@ -336,7 +336,7 @@ export async function canvassingMain() {
   };
   document.title = "Owen Sound Canvassing | Living Region";
   document.body.innerHTML = `<div class="canvass-shell">
-    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="flyer-catalogue-open">Flyer catalogue</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><span class="mobile-active-flyer-chip" id="mobile-active-flyer-chip">Flyer: choose</span><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
+    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="flyer-catalogue-open">Flyer catalogue</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><button id="mobile-next-area" class="mobile-next-area" aria-label="Open next underflyered area" title="Open next underflyered area" hidden>Next</button><span class="mobile-active-flyer-chip" id="mobile-active-flyer-chip">Flyer: choose</span><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
     <aside class="summary" id="summary"></aside><main id="canvass-map"></main>
     <aside class="cluster-key" id="cluster-key" hidden><strong id="cluster-key-title">Grouped civic addresses</strong><span id="cluster-key-description">Number = household stops; colour = most common status. Tap to zoom in.</span><div class="coverage-legend" id="coverage-legend" hidden><div class="coverage-swatches"><i style="background:#000004"></i><i style="background:#420A68"></i><i style="background:#FCA50A"></i><i style="background:#FCFFA4"></i></div><div class="coverage-legend-labels"><span>Untouched</span><span>Partly covered</span><span>Fully covered</span></div><small>Bubble number = eligible households remaining</small><small class="next-area-status" id="next-area-status"></small></div></aside>
     <div class="mobile-scrim" id="mobile-scrim" hidden></div>
@@ -663,6 +663,12 @@ export async function canvassingMain() {
       ],
     },
   });
+  if (new URLSearchParams(window.location.search).has("e2e"))
+    (window as any).__livingRegionCanvassing = {
+      map,
+      state: () => state,
+      nextArea: () => nextAreaRecommendation,
+    };
   map.addControl(
     new maplibregl.NavigationControl({ showCompass: false }),
     "bottom-right",
@@ -894,6 +900,14 @@ export async function canvassingMain() {
   const setNextAreaStatus = (message: string) => {
     const element = document.querySelector<HTMLElement>("#next-area-status");
     if (element) element.textContent = message;
+    const mobileButton = document.querySelector<HTMLButtonElement>(
+      "#mobile-next-area",
+    );
+    if (mobileButton) {
+      mobileButton.hidden = !nextAreaRecommendation;
+      mobileButton.textContent = nextAreaRecommendation ? "Next" : "";
+      mobileButton.title = message || "Open next underflyered area";
+    }
   };
   function clearNextAreaHighlight() {
     nextAreaRevision += 1;
@@ -938,16 +952,33 @@ export async function canvassingMain() {
           reason: "local_coverage" as const,
         }
       : null;
-  function showNextAreaPopup(event: any) {
+  function showNextAreaPopupAt(coordinates: [number, number]) {
     if (!nextAreaRecommendation) return;
     const result = nextAreaRecommendation;
     nextAreaPopup?.remove();
     nextAreaPopup = new maplibregl.Popup({ closeButton: true, offset: 16 })
-      .setLngLat(event.lngLat)
+      .setLngLat(coordinates)
       .setHTML(
         `<strong>Next underflyered area</strong><dl><div><dt>Local remaining</dt><dd>${result.localRemaining.toLocaleString()} of the nearest ${result.sampleSize.toLocaleString()} households</dd></div><div><dt>Local covered</dt><dd>${result.localCovered.toLocaleString()}</dd></div><div><dt>Coverage</dt><dd>${Math.round(result.coverage * 100)}%</dd></div><div><dt>Graph component</dt><dd>${result.graphComponent}</dd></div><div><dt>Household-hop radius</dt><dd>${result.householdHopRadius}</dd></div><div><dt>Average / maximum hops</dt><dd>${result.averageHouseholdHops.toFixed(1)} / ${result.maxHouseholdHops}</dd></div></dl><p>Centre household ${result.center_household_id}. The focus is pinned until you explicitly find the next area.</p><small>Tie-break: ${result.tieBreakResult}</small>`,
       )
       .addTo(map);
+  }
+  function showNextAreaPopup(event: any) {
+    showNextAreaPopupAt([event.lngLat.lng, event.lngLat.lat]);
+  }
+  function openNextAreaPopup() {
+    if (!nextAreaRecommendation) return toast("No next underflyered area yet");
+    const center = coverageLocations().find(
+      (location) =>
+        location.household_id === nextAreaRecommendation!.center_household_id,
+    );
+    if (!center) return toast("The next area is not available in this view");
+    map.easeTo({ center: [center.lon, center.lat], zoom: Math.max(14.5, map.getZoom()) });
+    showNextAreaPopupAt([center.lon, center.lat]);
+    window.setTimeout(() => {
+      if (nextAreaRecommendation)
+        showNextAreaPopupAt([center.lon, center.lat]);
+    }, 350);
   }
   async function visibleNextAreaFeatures() {
     const source = map.getSource("addresses") as GeoJSONSource | undefined;
@@ -3220,6 +3251,13 @@ export async function canvassingMain() {
       toast(`Route created: ${result.id.slice(0, 8)}`);
     });
   document.querySelector("#multi-select")!.addEventListener("click", () => {
+    if (!multiSelectMode && coverage) {
+      coverage = false;
+      persist({ coverage_mode: false });
+      setCoverageMode(false);
+      if (map.getZoom() < 15.5)
+        map.easeTo({ zoom: 15.5, duration: 250 });
+    }
     multiSelectMode = !multiSelectMode;
     updateSelection();
     toast(
@@ -3237,6 +3275,8 @@ export async function canvassingMain() {
     if (submitting || !selected.size) return;
     if (!activeFlyerId) {
       toast("Choose an active flyer before marking delivery");
+      if (window.matchMedia("(max-width: 760px)").matches)
+        setMobilePanel(mobilePanels[0], true);
       return;
     }
     const householdIds = [...selected];
@@ -3416,8 +3456,9 @@ export async function canvassingMain() {
       : "Individual household view enabled",
     );
   });
-  const findNextArea = async () => {
+  const findNextArea = async (openPopup = false) => {
     await recalculateNextArea();
+    if (openPopup && nextAreaRecommendation) openNextAreaPopup();
     toast(
       nextAreaRecommendation
         ? "Next underflyered area recalculated"
@@ -3446,7 +3487,7 @@ export async function canvassingMain() {
   document.querySelector("#mobile-summary-open")!.addEventListener("click", openMobileSummary);
   document.querySelector("#mobile-find-next-area")!.addEventListener("click", () => {
     setMobilePanel(mobilePanels[0], false);
-    void findNextArea();
+    void findNextArea(true);
   });
   document.querySelector("#mobile-tools-open")!.addEventListener("click", openMobileTools);
   document.querySelector("#mobile-tools-close")!.addEventListener("click", closeMobileTools);
@@ -3454,6 +3495,9 @@ export async function canvassingMain() {
     setMobilePanel(mobilePanels[0], false);
     document.querySelector<HTMLButtonElement>("#multi-select")!.click();
   });
+  document
+    .querySelector("#mobile-next-area")!
+    .addEventListener("click", openNextAreaPopup);
   const forwardMobileAction = (source: string) => {
     setMobilePanel(mobilePanels[0], false);
     document.querySelector<HTMLButtonElement>(source)?.click();

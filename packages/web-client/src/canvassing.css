@@ -834,7 +834,8 @@ dialog menu {
   display: none;
 }
 .mobile-active-flyer-chip,
-.mobile-route-flyer-chip {
+.mobile-route-flyer-chip,
+.mobile-next-area {
   display: none;
 }
 .workflow-item.due > header time {
@@ -1130,7 +1131,7 @@ dialog menu {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 4px;
     height: 58px;
     pointer-events: auto;
   }
@@ -1150,13 +1151,30 @@ dialog menu {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0;
+  }
+  .mobile-topbar .mobile-next-area {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 9px;
+    border: 1px solid #00e5ff;
+    border-radius: 22px;
+    background: #083e49ee;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 10px #17211d40;
+  }
+  .mobile-topbar .mobile-next-area[hidden] {
+    display: none;
   }
   .mobile-active-flyer-chip {
     display: block !important;
     min-width: 0;
-    max-width: 118px;
+    max-width: 78px;
     overflow: hidden;
     color: #fff;
     font-size: 10px;
