@@ -165,6 +165,7 @@ type FieldPrefs = {
   multi_select: boolean;
   selected_household_ids: string[];
   coverage_mode: boolean;
+  coverage_mode_user_set?: boolean;
   active_flyer_id: string;
   flyer_filter: string;
 };
@@ -526,10 +527,14 @@ export async function canvassingMain() {
     }
   }
   let active: Household | undefined;
-  // Coverage is the useful citywide starting view; the toggle restores the
-  // individual household/status view when needed.
-  let coverage = saved.coverage_mode ?? true;
+  // Coverage is the useful citywide starting view. A previous bulk-selection
+  // implementation persisted its temporary roof view, so only an explicit
+  // user toggle is allowed to override this default.
+  let coverage =
+    saved.coverage_mode_user_set === true ? saved.coverage_mode ?? true : true;
   let multiSelectMode = saved.multi_select ?? false;
+  if (multiSelectMode) coverage = false;
+  let coverageBeforeMultiSelect = multiSelectMode ? true : coverage;
   let routeIndex = saved.route_index ?? 0;
   let activeSessionId = saved.session_id ?? "";
   let sessionPaused = false;
@@ -545,6 +550,9 @@ export async function canvassingMain() {
   let nextAreaRecommendation: NextUnderflyeredArea | null = null;
   let nextAreaPinned = false;
   let nextAreaRecalculateRequested = false;
+  let nextAreaCalculation:
+    | Promise<NextUnderflyeredArea | null>
+    | undefined;
   let coverageAdjacencyGraph: HouseholdAdjacencyGraph;
   let splitTarget: any;
   let splitPreview: any;
@@ -1052,10 +1060,14 @@ export async function canvassingMain() {
       return;
     }
     if (!nextAreaRecommendation || nextAreaRecalculateRequested) {
-      const recommendation = await selectNextUnderflyeredAreaAsync(
-        coverageLocations(),
-        coverageAdjacencyGraph,
-      );
+      const calculation =
+        nextAreaCalculation ??
+        (nextAreaCalculation = selectNextUnderflyeredAreaAsync(
+          coverageLocations(),
+          coverageAdjacencyGraph,
+        ));
+      const recommendation = await calculation;
+      if (nextAreaCalculation === calculation) nextAreaCalculation = undefined;
       if (revision !== nextAreaRevision) return;
       nextAreaRecommendation = recommendation;
       nextAreaPinned = Boolean(recommendation);
@@ -3269,12 +3281,19 @@ export async function canvassingMain() {
       toast(`Route created: ${result.id.slice(0, 8)}`);
     });
   document.querySelector("#multi-select")!.addEventListener("click", () => {
-    if (!multiSelectMode && coverage) {
-      coverage = false;
-      persist({ coverage_mode: false });
-      setCoverageMode(false);
-      if (map.getZoom() < 15.5)
-        map.easeTo({ zoom: 15.5, duration: 250 });
+    if (!multiSelectMode) {
+      coverageBeforeMultiSelect = coverage;
+      if (coverage) {
+        coverage = false;
+        setCoverageMode(false);
+        if (map.getZoom() < 15.5)
+          map.easeTo({ zoom: 15.5, duration: 250 });
+      }
+    } else if (coverageBeforeMultiSelect && !coverage) {
+      coverage = true;
+      persist({ coverage_mode: true });
+      setCoverageMode(true);
+      map.easeTo({ zoom: 12.2, duration: 250 });
     }
     multiSelectMode = !multiSelectMode;
     updateSelection();
@@ -3341,6 +3360,12 @@ export async function canvassingMain() {
       selected.clear();
       failedIds.forEach((id) => selected.add(id));
       multiSelectMode = failedIds.length > 0;
+      if (!multiSelectMode && coverageBeforeMultiSelect && !coverage) {
+        coverage = true;
+        persist({ coverage_mode: true });
+        setCoverageMode(true);
+        map.easeTo({ zoom: 12.2, duration: 250 });
+      }
       updateSelection();
       const savedCount = householdIds.length - failedIds.length;
       toast(
@@ -3465,7 +3490,7 @@ export async function canvassingMain() {
     });
   document.querySelector("#coverage-toggle")!.addEventListener("click", () => {
     coverage = !coverage;
-    persist({ coverage_mode: coverage });
+    persist({ coverage_mode: coverage, coverage_mode_user_set: true });
     setCoverageMode(coverage);
     map.easeTo({ zoom: coverage ? 12.2 : 15 });
     toast(

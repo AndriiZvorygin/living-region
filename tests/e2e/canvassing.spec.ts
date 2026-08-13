@@ -112,6 +112,22 @@ async function clickRoofs(page: Page, count = 2) {
 }
 
 test.describe("Owen Sound canvassing field workflows", () => {
+  test("coverage mode is the default after a temporary bulk-view preference", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "living-region.canvassing.field-state",
+        JSON.stringify({ coverage_mode: false, multi_select: false }),
+      );
+    });
+    await openCanvassing(page);
+    await expect(page.locator("#coverage-toggle")).toHaveText("Households");
+    await expect(page.locator("#mobile-next-area")).toBeVisible({
+      timeout: 30_000,
+    });
+  });
+
   test("mobile next area opens its diagnostic popup", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/canvassing/?e2e=1", { waitUntil: "domcontentloaded" });
@@ -167,6 +183,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await expect(page.locator("#toast")).toContainText("marked flyer delivered", {
       timeout: 10_000,
     });
+    await expect(page.locator("#coverage-toggle")).toHaveText("Households");
     const summary = await page.evaluate(async () => {
       const state = await fetch("/api/canvassing/state").then((response) =>
         response.json(),
@@ -184,6 +201,19 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await page.locator("#mobile-menu").click();
     await page.locator("#mobile-bulk-open").click();
     await page.locator("#multi-select").click();
+    await page.evaluate(() => {
+      (window as any).__livingRegionCanvassing.map.jumpTo({ zoom: 15.5 });
+    });
+    await page.waitForFunction(
+      () =>
+        ((window as any).__livingRegionCanvassing?.map?.queryRenderedFeatures({
+          layers: ["structures"],
+        }) ?? []).some(
+          (feature: any) => Number(feature.properties?.household_count) > 0,
+        ),
+      undefined,
+      { timeout: 30_000 },
+    );
     const [point] = await roofPoints(page, 1);
     expect(point).toBeTruthy();
     await page.mouse.click(point.x, point.y);
