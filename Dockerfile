@@ -25,6 +25,7 @@ WORKDIR /app
 COPY package.json package-lock.json tsconfig.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY packages/canvassing ./packages/canvassing
+COPY packages/web-client/src ./packages/web-client/src
 COPY packages/web-client/public ./packages/web-client/public
 
 ENV CANVASS_HOST=0.0.0.0

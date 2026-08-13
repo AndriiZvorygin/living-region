@@ -28,6 +28,16 @@ import {
   type Geometry,
   type SplitCut,
 } from "./structure-split";
+import {
+  buildHouseholdAdjacencyGraph,
+  calculateNestedCoverageArea,
+  isCoverageCovered,
+  isCoverageEligible,
+  selectNextUnderflyeredArea,
+  type CoverageLocation,
+  type HouseholdAdjacencyGraph,
+  type NextUnderflyeredArea,
+} from "../../web-client/src/canvassing-coverage";
 
 const root = resolve(process.cwd());
 const host = process.env.CANVASS_HOST ?? "127.0.0.1";
@@ -592,6 +602,13 @@ async function seed() {
 await seed();
 await writeAddressNumberCalibration();
 
+const coverageRoads = JSON.parse(
+  await readFile(
+    join(root, "packages/web-client/public/canvassing/roads.geojson"),
+    "utf8",
+  ),
+).features;
+
 const backupDir = resolve("private/canvassing/backups");
 async function performBackup(label = "daily") {
   await mkdir(backupDir, { recursive: true });
@@ -994,6 +1011,164 @@ function state(role = "candidate") {
   };
 }
 
+const knownNonResidentialBuildingTypes = new Set([
+  "commercial",
+  "industrial",
+  "retail",
+  "office",
+  "school",
+  "hospital",
+  "college",
+  "warehouse",
+  "church",
+  "civic",
+  "public",
+  "garage",
+  "shed",
+  "barn",
+]);
+
+type ServerCoverageSnapshot = {
+  locations: CoverageLocation[];
+  graph: HouseholdAdjacencyGraph;
+  coverageKey: string;
+};
+
+let coverageGraphCache:
+  | { structuralKey: string; graph: HouseholdAdjacencyGraph }
+  | undefined;
+let nextAreaCache:
+  | { coverageKey: string; recommendation: NextUnderflyeredArea | null }
+  | undefined;
+let nextAreaInFlight:
+  | {
+      coverageKey: string;
+      promise: Promise<NextUnderflyeredArea | null>;
+    }
+  | undefined;
+
+function serverCoverageSnapshot(): ServerCoverageSnapshot {
+  const current = state("candidate").households as Array<any>;
+  const buildingTypes = new Map(
+    (
+      db
+        .prepare(
+          "SELECT id,building_type FROM structures WHERE source_active=1",
+        )
+        .all() as Array<{ id: string; building_type: string }>
+    ).map((row) => [row.id, String(row.building_type ?? "").toLowerCase()]),
+  );
+  const locations = current.map((home) => {
+    const nonResidential = knownNonResidentialBuildingTypes.has(
+      buildingTypes.get(String(home.structure_id ?? "")) ?? "",
+    );
+    const eligible =
+      !nonResidential &&
+      isCoverageEligible({
+        household_id: home.household_id,
+        status: home.status,
+        eligible: true,
+      });
+    return {
+      household_id: home.household_id,
+      lon: Number(home.lon),
+      lat: Number(home.lat),
+      eligible,
+      covered:
+        eligible &&
+        isCoverageCovered({
+          household_id: home.household_id,
+          status: home.status,
+          eligible: true,
+        }),
+      street: home.street,
+      civic_number: home.civic_number,
+      stop_id: home.structure_id ?? home.address_id,
+    } satisfies CoverageLocation;
+  });
+  const structuralKey = locations
+    .map((location) =>
+      [
+        location.household_id,
+        location.lon,
+        location.lat,
+        location.street,
+        location.civic_number,
+        location.stop_id,
+        location.eligible ? 1 : 0,
+      ].join("\u001f"),
+    )
+    .join("\u001e");
+  if (!coverageGraphCache || coverageGraphCache.structuralKey !== structuralKey)
+    coverageGraphCache = {
+      structuralKey,
+      graph: buildHouseholdAdjacencyGraph(locations, coverageRoads),
+    };
+  const coverageKey = createHash("sha1")
+    .update(
+      locations
+        .filter((location) => location.eligible)
+        .map((location) => `${location.household_id}:${location.covered ? 1 : 0}`)
+        .join("\u001e"),
+    )
+    .digest("hex");
+  return {
+    locations,
+    graph: coverageGraphCache.graph,
+    coverageKey,
+  };
+}
+
+async function serverNextArea(centerHouseholdId?: string) {
+  const started = Date.now();
+  const snapshot = serverCoverageSnapshot();
+  const eligible = snapshot.locations.filter((location) => location.eligible);
+  const complete = eligible.length > 0 && eligible.every((location) => location.covered);
+  if (complete)
+    return {
+      recommendation: null,
+      complete: true,
+      cached: false,
+      calculation_ms: Date.now() - started,
+    };
+  if (centerHouseholdId) {
+    return {
+      recommendation: calculateNestedCoverageArea(
+        centerHouseholdId,
+        snapshot.locations,
+        snapshot.graph,
+      ),
+      complete: false,
+      cached: false,
+      calculation_ms: Date.now() - started,
+    };
+  }
+  if (nextAreaCache?.coverageKey === snapshot.coverageKey)
+    return {
+      recommendation: nextAreaCache.recommendation,
+      complete: false,
+      cached: true,
+      calculation_ms: Date.now() - started,
+    };
+  let calculation = nextAreaInFlight;
+  if (!calculation || calculation.coverageKey !== snapshot.coverageKey) {
+    const promise = Promise.resolve().then(() =>
+      selectNextUnderflyeredArea(snapshot.locations, snapshot.graph),
+    );
+    calculation = { coverageKey: snapshot.coverageKey, promise };
+    nextAreaInFlight = calculation;
+  }
+  const recommendation = await calculation.promise;
+  if (nextAreaInFlight === calculation) nextAreaInFlight = undefined;
+  nextAreaCache = { coverageKey: snapshot.coverageKey, recommendation };
+  return {
+    recommendation,
+    complete: false,
+    cached: false,
+    calculation_ms: Date.now() - started,
+  };
+}
+
 function parseCsv(text: string) {
   const rows: string[][] = [];
   let row: string[] = [],
@@ -1083,6 +1258,16 @@ const server = createServer(async (req, res) => {
     if (req.method === "GET" && url.pathname === "/api/canvassing/health") {
       db.prepare("SELECT 1").get();
       return json(res, 200, { status: "ok" });
+    }
+    if (req.method === "GET" && url.pathname === "/api/canvassing/next-area") {
+      const centerHouseholdId =
+        url.searchParams.get("center_household_id") ?? undefined;
+      return jsonForRequest(
+        req,
+        res,
+        200,
+        await serverNextArea(centerHouseholdId),
+      );
     }
     if (req.method === "GET" && url.pathname === "/api/canvassing/state")
       return jsonForRequest(req, res, 200, state(role));
@@ -3351,6 +3536,16 @@ const server = createServer(async (req, res) => {
     });
   }
 });
-server.listen(port, host, () =>
-  console.log(`Private canvassing API listening on http://${host}:${port}`),
-);
+server.listen(port, host, () => {
+  console.log(`Private canvassing API listening on http://${host}:${port}`);
+  // Warm the expensive citywide selector once after startup. Mobile clients
+  // then receive the cached recommendation instead of calculating thousands
+  // of graph candidates on the device.
+  void serverNextArea()
+    .then((result) =>
+      console.log(
+        `Next-area cache warmed (${result.calculation_ms}ms, cached=${result.cached})`,
+      ),
+    )
+    .catch((error) => console.error("Next-area cache warm failed", error));
+});

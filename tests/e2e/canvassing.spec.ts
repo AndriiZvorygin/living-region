@@ -134,6 +134,12 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await expect(page.locator("#mobile-next-area")).toBeVisible({
       timeout: 30_000,
     });
+    const serverResult = await page.evaluate(async () => {
+      const response = await fetch("/api/canvassing/next-area");
+      return response.json();
+    });
+    expect(serverResult).toHaveProperty("recommendation");
+    expect(serverResult).toHaveProperty("calculation_ms");
     await page.locator("#mobile-next-area").click();
     await expect(page.locator(".maplibregl-popup")).toContainText(
       "Next underflyered area",

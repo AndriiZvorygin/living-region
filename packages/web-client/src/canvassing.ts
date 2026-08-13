@@ -6,13 +6,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./canvassing.css";
 import { WalkingRoadGraph, metresBetween } from "./canvassing-routing";
 import {
-  buildHouseholdAdjacencyGraph,
-  calculateNestedCoverageArea,
   isCoverageCovered,
   isCoverageEligible,
-  selectNextUnderflyeredAreaAsync,
   type CoverageLocation,
-  type HouseholdAdjacencyGraph,
   type NextUnderflyeredArea,
 } from "./canvassing-coverage";
 
@@ -47,6 +43,13 @@ type Flyer = {
   introduction_date: string;
   active: number;
   printable_url: string | null;
+};
+
+type NextAreaResponse = {
+  recommendation: NextUnderflyeredArea | null;
+  complete: boolean;
+  cached: boolean;
+  calculation_ms: number;
 };
 type FlyerDelivery = {
   event_id: string;
@@ -550,10 +553,8 @@ export async function canvassingMain() {
   let nextAreaRecommendation: NextUnderflyeredArea | null = null;
   let nextAreaPinned = false;
   let nextAreaRecalculateRequested = false;
-  let nextAreaCalculation:
-    | Promise<NextUnderflyeredArea | null>
-    | undefined;
-  let coverageAdjacencyGraph: HouseholdAdjacencyGraph;
+  let nextAreaCalculation: Promise<NextAreaResponse> | undefined;
+  let nextAreaComplete = false;
   let splitTarget: any;
   let splitPreview: any;
   let splitDrawing = false;
@@ -923,6 +924,7 @@ export async function canvassingMain() {
     nextAreaRevision += 1;
     nextAreaRecommendation = null;
     nextAreaPinned = false;
+    nextAreaComplete = false;
     nextAreaRecalculateRequested = false;
     nextAreaPopup?.remove();
     nextAreaPopup = undefined;
@@ -947,21 +949,14 @@ export async function canvassingMain() {
       };
     });
   }
-  coverageAdjacencyGraph = buildHouseholdAdjacencyGraph(
-    coverageLocations(),
-    roads.features,
-  );
-  const recommendationFromLocalArea = (area: ReturnType<typeof calculateNestedCoverageArea>) =>
-    area
-      ? {
-          ...area,
-          remaining: area.localRemaining,
-          totalEligible: area.inner.sampleSize,
-          coverage: area.inner.coverage,
-          tieBreakResult: `score ${(area.nestedUndercoverageScore * 100).toFixed(1)}%; nearest covered hops ${area.nearestCoveredHouseholdHops == null ? "unconnected" : area.nearestCoveredHouseholdHops}; inner average hops ${area.inner.averageHouseholdHops.toFixed(1)}`,
-          reason: "local_coverage" as const,
-        }
-      : null;
+  const requestNextArea = (centerHouseholdId?: string) => {
+    const query = centerHouseholdId
+      ? `?center_household_id=${encodeURIComponent(centerHouseholdId)}`
+      : "";
+    return fetchJson<NextAreaResponse>(
+      `/api/canvassing/next-area${query}`,
+    );
+  };
   function showNextAreaPopupAt(coordinates: [number, number]) {
     if (!nextAreaRecommendation) return;
     const result = nextAreaRecommendation;
@@ -1049,29 +1044,25 @@ export async function canvassingMain() {
   async function updateNextAreaHighlight() {
     const revision = ++nextAreaRevision;
     if (!map.isStyleLoaded()) return;
-    const eligibleLocations = coverageLocations().filter((location) => location.eligible);
-    if (eligibleLocations.length && eligibleLocations.every((location) => location.covered)) {
-      nextAreaRecommendation = null;
-      nextAreaPinned = false;
-      (map.getSource("next-underflyered") as GeoJSONSource | undefined)?.setData({
-        type: "FeatureCollection",
-        features: [],
-      });
-      setNextAreaStatus("Citywide coverage complete");
-      return;
-    }
     if (!nextAreaRecommendation || nextAreaRecalculateRequested) {
+      setNextAreaStatus("Finding next area on server...");
       const calculation =
         nextAreaCalculation ??
-        (nextAreaCalculation = selectNextUnderflyeredAreaAsync(
-          coverageLocations(),
-          coverageAdjacencyGraph,
-        ));
-      const recommendation = await calculation;
+        (nextAreaCalculation = requestNextArea());
+      let response: NextAreaResponse;
+      try {
+        response = await calculation;
+      } catch (error) {
+        if (nextAreaCalculation === calculation) nextAreaCalculation = undefined;
+        console.warn("Could not calculate next area on server", error);
+        setNextAreaStatus("Next area server unavailable");
+        return;
+      }
       if (nextAreaCalculation === calculation) nextAreaCalculation = undefined;
       if (revision !== nextAreaRevision) return;
-      nextAreaRecommendation = recommendation;
-      nextAreaPinned = Boolean(recommendation);
+      nextAreaRecommendation = response.recommendation;
+      nextAreaComplete = response.complete;
+      nextAreaPinned = Boolean(response.recommendation);
       nextAreaRecalculateRequested = false;
     }
     if (!nextAreaRecommendation || revision !== nextAreaRevision) {
@@ -1079,9 +1070,8 @@ export async function canvassingMain() {
         type: "FeatureCollection",
         features: [],
       });
-      const locations = coverageLocations().filter((location) => location.eligible);
       setNextAreaStatus(
-        locations.length > 0 && locations.every((location) => location.covered)
+        nextAreaComplete
           ? "Citywide coverage complete"
           : "No eligible households connected in the prepared graph",
       );
@@ -1122,6 +1112,7 @@ export async function canvassingMain() {
   async function recalculateNextArea() {
     nextAreaPinned = false;
     nextAreaRecommendation = null;
+    nextAreaComplete = false;
     nextAreaRecalculateRequested = true;
     await updateNextAreaHighlight();
   }
@@ -2599,21 +2590,22 @@ export async function canvassingMain() {
       feature.properties.remaining_count = eligible && !covered ? 1 : 0;
       feature.properties.flyer_ids = home?.flyer_ids ?? [];
     }
-    coverageAdjacencyGraph = buildHouseholdAdjacencyGraph(
-      coverageLocations(),
-      roads.features,
-    );
     if (nextAreaPinned && nextAreaRecommendation) {
-      const updated = recommendationFromLocalArea(
-        calculateNestedCoverageArea(
+      try {
+        const response = await requestNextArea(
           nextAreaRecommendation.center_household_id,
-          coverageLocations(),
-          coverageAdjacencyGraph,
-        ),
-      );
-      nextAreaRecommendation = updated
-        ? { ...updated, cluster_id: nextAreaRecommendation.cluster_id }
-        : null;
+        );
+        const clusterId = nextAreaRecommendation.cluster_id;
+        nextAreaRecommendation = response.recommendation
+          ? { ...response.recommendation, cluster_id: clusterId }
+          : null;
+        nextAreaComplete = response.complete;
+        nextAreaPinned = Boolean(nextAreaRecommendation);
+      } catch (error) {
+        // Keep the last pinned counts visible if a mobile connection briefly
+        // drops during a status submission. The next explicit refresh retries.
+        console.warn("Could not refresh next-area counts", error);
+      }
     }
     (map.getSource("structures") as GeoJSONSource | undefined)?.setData(
       structures,
