@@ -12,7 +12,7 @@ import {
   type ServerResponse,
 } from "node:http";
 import { DatabaseSync, backup } from "node:sqlite";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { gzipSync } from "node:zlib";
 import {
@@ -1130,6 +1130,102 @@ const server = createServer(async (req, res) => {
         user_id: user,
       });
       return json(res, 200, updated);
+    }
+    if (
+      req.method === "POST" &&
+      url.pathname === "/api/canvassing/flyers/reassign-date"
+    ) {
+      if (role === "volunteer")
+        return json(res, 403, {
+          error: "flyer delivery reassignment requires candidate role",
+        });
+      const input = JSON.parse(await body(req));
+      const date = String(input.date ?? "");
+      const flyerId = String(input.flyer_id ?? "");
+      const reason = String(input.reason ?? "manual date correction");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+        return json(res, 400, { error: "date must use YYYY-MM-DD" });
+      const flyer = db
+        .prepare("SELECT id,short_name FROM flyer_catalogue WHERE id=?")
+        .get(flyerId) as { id: string; short_name: string } | undefined;
+      if (!flyer) return json(res, 404, { error: "flyer not found" });
+      const visits = db
+        .prepare(
+          `SELECT id,household_id,flyer_id FROM active_visits
+           WHERE flyer_delivered=1 AND substr(occurred_at,1,10)=?`,
+        )
+        .all(date) as Array<{
+        id: string;
+        household_id: string;
+        flyer_id: string | null;
+      }>;
+      const flyerEvents = db
+        .prepare(
+          `SELECT id,household_id,flyer_id FROM household_flyer_events
+           WHERE flyer_delivered=1 AND substr(occurred_at,1,10)=?`,
+        )
+        .all(date) as Array<{
+        id: string;
+        household_id: string;
+        flyer_id: string | null;
+      }>;
+      const changes = [
+        ...visits.map((row) => ({ ...row, table: "visits" })),
+        ...flyerEvents.map((row) => ({ ...row, table: "household_flyer_events" })),
+      ];
+      if (!changes.length)
+        return json(res, 200, {
+          date,
+          flyer_id: flyer.id,
+          flyer_name: flyer.short_name,
+          delivery_count: 0,
+          household_count: 0,
+          changed_count: 0,
+        });
+      const backupPath = await performBackup("before-flyer-reassignment");
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        const updateVisit = db.prepare("UPDATE visits SET flyer_id=? WHERE id=?");
+        for (const row of visits) updateVisit.run(flyer.id, row.id);
+        const updateFlyerEvent = db.prepare(
+          "UPDATE household_flyer_events SET flyer_id=? WHERE id=?",
+        );
+        for (const row of flyerEvents) updateFlyerEvent.run(flyer.id, row.id);
+        db.exec("COMMIT");
+      } catch (error) {
+        try {
+          db.exec("ROLLBACK");
+        } catch {}
+        throw error;
+      }
+      const detail = {
+        date,
+        flyer_id: flyer.id,
+        flyer_name: flyer.short_name,
+        reason,
+        delivery_count: changes.length,
+        household_count: new Set(changes.map((row) => row.household_id)).size,
+        changed_count: changes.filter((row) => row.flyer_id !== flyer.id).length,
+        previous_flyer_ids: Object.fromEntries(
+          [...new Set(changes.map((row) => row.flyer_id ?? "unknown"))].map(
+            (id) => [id, changes.filter((row) => (row.flyer_id ?? "unknown") === id).length],
+          ),
+        ),
+        delivery_event_ids: changes.map((row) => ({
+          table: row.table,
+          id: row.id,
+          household_id: row.household_id,
+          previous_flyer_id: row.flyer_id,
+        })),
+        backup_file: basename(backupPath),
+      };
+      audit(user, "reassign", "flyer_delivery_date", date, detail);
+      await recordEvent({
+        type: "canvassing.flyer_deliveries.reassigned",
+        user_id: user,
+        ...detail,
+      });
+      return json(res, 200, detail);
     }
     if (req.method === "POST" && url.pathname === "/api/canvassing/visits") {
       const input = JSON.parse(await body(req));
