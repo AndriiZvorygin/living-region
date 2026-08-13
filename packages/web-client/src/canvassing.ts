@@ -336,7 +336,7 @@ export async function canvassingMain() {
   };
   document.title = "Owen Sound Canvassing | Living Region";
   document.body.innerHTML = `<div class="canvass-shell">
-    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="flyer-catalogue-open">Flyer catalogue</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><button id="mobile-next-area" class="mobile-next-area" aria-label="Open next underflyered area" title="Open next underflyered area" hidden>Next</button><span class="mobile-active-flyer-chip" id="mobile-active-flyer-chip">Flyer: choose</span><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
+    <header><div><strong>Owen Sound Canvassing</strong><span>Private campaign workspace</span></div><nav><button id="coverage-toggle">Coverage</button><button id="find-next-area">Find next area</button><button id="followup-open">Follow-ups</button><button id="conversation-open">Conversation</button><button id="recruitment-open">Recruitment</button><button id="quality-open">Address quality</button><button id="flyer-catalogue-open">Flyer catalogue</button><button id="print-route">Print</button><a class="button" href="/api/canvassing/export/routes.csv">Export CSV</a><button id="import-open">Import</button></nav><span class="backup-warning" id="backup-warning"></span><div class="mobile-topbar" aria-label="Canvassing map controls"><button id="mobile-menu" class="mobile-control" aria-label="Open map menu" title="Open map menu">Menu</button><button id="mobile-coverage" class="mobile-coverage-chip" aria-label="Open coverage legend" title="Coverage legend"><span aria-hidden="true"></span>Coverage</button><button id="mobile-next-area" class="mobile-next-area" aria-label="Open next underflyered area" title="Finding next underflyered area">Next</button><span class="mobile-active-flyer-chip" id="mobile-active-flyer-chip">Flyer: choose</span><button id="mobile-locate" class="mobile-control" aria-label="Show current location" title="Show current location">Locate</button></div></header>
     <aside class="summary" id="summary"></aside><main id="canvass-map"></main>
     <aside class="cluster-key" id="cluster-key" hidden><strong id="cluster-key-title">Grouped civic addresses</strong><span id="cluster-key-description">Number = household stops; colour = most common status. Tap to zoom in.</span><div class="coverage-legend" id="coverage-legend" hidden><div class="coverage-swatches"><i style="background:#000004"></i><i style="background:#420A68"></i><i style="background:#FCA50A"></i><i style="background:#FCFFA4"></i></div><div class="coverage-legend-labels"><span>Untouched</span><span>Partly covered</span><span>Fully covered</span></div><small>Bubble number = eligible households remaining</small><small class="next-area-status" id="next-area-status"></small></div></aside>
     <div class="mobile-scrim" id="mobile-scrim" hidden></div>
@@ -890,8 +890,9 @@ export async function canvassingMain() {
       "text-halo-color",
       enabled ? coverageClusterTextHalo : "#445158",
     );
-    if (enabled) scheduleNextAreaUpdate();
-    else clearNextAreaHighlight();
+    // The recommendation is useful in both bubble view and individual-roof
+    // view. Switching views should not discard the pinned work area.
+    scheduleNextAreaUpdate();
   };
   const updateClusterKey = () => {
     const key = document.querySelector<HTMLElement>("#cluster-key")!;
@@ -904,9 +905,10 @@ export async function canvassingMain() {
       "#mobile-next-area",
     );
     if (mobileButton) {
-      mobileButton.hidden = !nextAreaRecommendation;
-      mobileButton.textContent = nextAreaRecommendation ? "Next" : "";
-      mobileButton.title = message || "Open next underflyered area";
+      mobileButton.hidden = false;
+      mobileButton.disabled = message === "Citywide coverage complete";
+      mobileButton.textContent = "Next";
+      mobileButton.title = message || "Find next underflyered area";
     }
   };
   function clearNextAreaHighlight() {
@@ -966,8 +968,27 @@ export async function canvassingMain() {
   function showNextAreaPopup(event: any) {
     showNextAreaPopupAt([event.lngLat.lng, event.lngLat.lat]);
   }
-  function openNextAreaPopup() {
-    if (!nextAreaRecommendation) return toast("No next underflyered area yet");
+  async function waitForMapStyle() {
+    if (map.isStyleLoaded()) return;
+    await new Promise<void>((resolve) => {
+      const started = Date.now();
+      const check = () => {
+        if (map.isStyleLoaded() || Date.now() - started >= 30_000) {
+          resolve();
+          return;
+        }
+        window.setTimeout(check, 100);
+      };
+      check();
+    });
+  }
+  async function openNextAreaPopup() {
+    await waitForMapStyle();
+    if (!nextAreaRecommendation) await findNextArea();
+    if (!nextAreaRecommendation) {
+      toast("No next underflyered area is available yet");
+      return;
+    }
     const center = coverageLocations().find(
       (location) =>
         location.household_id === nextAreaRecommendation!.center_household_id,
@@ -1018,10 +1039,7 @@ export async function canvassingMain() {
   }
   async function updateNextAreaHighlight() {
     const revision = ++nextAreaRevision;
-    if (!coverage || !map.isStyleLoaded()) {
-      if (!coverage) clearNextAreaHighlight();
-      return;
-    }
+    if (!map.isStyleLoaded()) return;
     const eligibleLocations = coverageLocations().filter((location) => location.eligible);
     if (eligibleLocations.length && eligibleLocations.every((location) => location.covered)) {
       nextAreaRecommendation = null;

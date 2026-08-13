@@ -113,13 +113,15 @@ async function clickRoofs(page: Page, count = 2) {
 
 test.describe("Owen Sound canvassing field workflows", () => {
   test("mobile next area opens its diagnostic popup", async ({ page }) => {
-    await openCanvassing(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/canvassing/?e2e=1", { waitUntil: "domcontentloaded" });
     await expect(page.locator("#mobile-next-area")).toBeVisible({
       timeout: 30_000,
     });
     await page.locator("#mobile-next-area").click();
     await expect(page.locator(".maplibregl-popup")).toContainText(
       "Next underflyered area",
+      { timeout: 30_000 },
     );
     await expect(page.locator(".maplibregl-popup")).toContainText(
       "Local remaining",
@@ -134,6 +136,9 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await page.locator("#mobile-bulk-open").click();
     await expect(page.locator("#multi-select")).toHaveText("Done selecting");
     await expect(page.locator("#coverage-toggle")).toHaveText("Coverage");
+    await expect(page.locator("#mobile-next-area")).toBeVisible({
+      timeout: 30_000,
+    });
     await clickRoofs(page, 2);
     await expect(page.locator("#bulk-selection-status")).toContainText(
       "2 households selected",
