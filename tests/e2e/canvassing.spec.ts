@@ -142,6 +142,15 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await expect(page.locator(".maplibregl-popup")).toContainText(
       "Local remaining",
     );
+    await expect(page.locator(".maplibregl-popup")).toContainText(
+      "nearest 300",
+    );
+    await expect(page.locator(".maplibregl-popup")).toContainText(
+      "nearest 600",
+    );
+    await expect(page.locator(".maplibregl-popup")).toContainText(
+      "Broad undercoverage score",
+    );
   });
 
   test("mobile bulk delivery selects roofs, requires a flyer, and marks them", async ({

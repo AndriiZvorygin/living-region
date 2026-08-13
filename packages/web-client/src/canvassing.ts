@@ -7,7 +7,7 @@ import "./canvassing.css";
 import { WalkingRoadGraph, metresBetween } from "./canvassing-routing";
 import {
   buildHouseholdAdjacencyGraph,
-  calculateLocalCoverageArea,
+  calculateNestedCoverageArea,
   isCoverageCovered,
   isCoverageEligible,
   selectNextUnderflyeredAreaAsync,
@@ -951,25 +951,26 @@ export async function canvassingMain() {
     coverageLocations(),
     roads.features,
   );
-  const recommendationFromLocalArea = (area: ReturnType<typeof calculateLocalCoverageArea>) =>
+  const recommendationFromLocalArea = (area: ReturnType<typeof calculateNestedCoverageArea>) =>
     area
       ? {
           ...area,
           remaining: area.localRemaining,
-          totalEligible: area.sampleSize,
-          coverage: area.sampleSize ? area.localCovered / area.sampleSize : 0,
-          tieBreakResult: `remaining ${area.localRemaining}; average hops ${area.averageHouseholdHops.toFixed(1)}; maximum hops ${area.maxHouseholdHops}`,
+          totalEligible: area.inner.sampleSize,
+          coverage: area.inner.coverage,
+          tieBreakResult: `score ${(area.nestedUndercoverageScore * 100).toFixed(1)}%; nearest covered hops ${area.nearestCoveredHouseholdHops == null ? "unconnected" : area.nearestCoveredHouseholdHops}; inner average hops ${area.inner.averageHouseholdHops.toFixed(1)}`,
           reason: "local_coverage" as const,
         }
       : null;
   function showNextAreaPopupAt(coordinates: [number, number]) {
     if (!nextAreaRecommendation) return;
     const result = nextAreaRecommendation;
+    const scorePercent = Math.round(result.nestedUndercoverageScore * 1000) / 10;
     nextAreaPopup?.remove();
     nextAreaPopup = new maplibregl.Popup({ closeButton: true, offset: 16 })
       .setLngLat(coordinates)
       .setHTML(
-        `<strong>Next underflyered area</strong><dl><div><dt>Local remaining</dt><dd>${result.localRemaining.toLocaleString()} of the nearest ${result.sampleSize.toLocaleString()} households</dd></div><div><dt>Local covered</dt><dd>${result.localCovered.toLocaleString()}</dd></div><div><dt>Coverage</dt><dd>${Math.round(result.coverage * 100)}%</dd></div><div><dt>Graph component</dt><dd>${result.graphComponent}</dd></div><div><dt>Household-hop radius</dt><dd>${result.householdHopRadius}</dd></div><div><dt>Average / maximum hops</dt><dd>${result.averageHouseholdHops.toFixed(1)} / ${result.maxHouseholdHops}</dd></div></dl><p>Centre household ${result.center_household_id}. The focus is pinned until you explicitly find the next area.</p><small>Tie-break: ${result.tieBreakResult}</small>`,
+        `<strong>Next underflyered area</strong><h4>Next area</h4><ul><li>Local remaining: ${result.inner.localRemaining.toLocaleString()} of nearest ${result.inner.targetSize.toLocaleString()} remain</li><li>${result.middle.localRemaining.toLocaleString()} of nearest ${result.middle.targetSize.toLocaleString()} remain</li><li>${result.broad.localRemaining.toLocaleString()} of nearest ${result.broad.targetSize.toLocaleString()} remain</li></ul><dl><div><dt>Broad undercoverage score</dt><dd>${scorePercent}%</dd></div><div><dt>Nearest covered area</dt><dd>${result.nearestCoveredHouseholdHops == null ? "not connected" : `${result.nearestCoveredHouseholdHops} household steps`}</dd></div><div><dt>Graph component</dt><dd>${result.graphComponent}</dd></div><div><dt>150-household average / maximum hops</dt><dd>${result.inner.averageHouseholdHops.toFixed(1)} / ${result.inner.maxHouseholdHops}</dd></div><div><dt>Incomplete samples</dt><dd>${result.incompleteSamples.length ? result.incompleteSamples.join(", ") : "none"}</dd></div></dl><p>Centre household ${result.center_household_id}. The focus is pinned until you explicitly find the next area.</p><small>Tie-break: ${result.tieBreakResult}</small>`,
       )
       .addTo(map);
   }
@@ -1113,8 +1114,9 @@ export async function canvassingMain() {
         },
       ],
     });
+    const scorePercent = Math.round(nextAreaRecommendation.nestedUndercoverageScore * 1000) / 10;
     setNextAreaStatus(
-      `Next area: ${nextAreaRecommendation.localRemaining.toLocaleString()} of the nearest ${nextAreaRecommendation.sampleSize.toLocaleString()} households remain`,
+      `Next area: ${nextAreaRecommendation.inner.localRemaining.toLocaleString()} of the nearest ${nextAreaRecommendation.inner.targetSize.toLocaleString()} households remain (${scorePercent}% broad score)`,
     );
   }
   async function recalculateNextArea() {
@@ -2603,7 +2605,7 @@ export async function canvassingMain() {
     );
     if (nextAreaPinned && nextAreaRecommendation) {
       const updated = recommendationFromLocalArea(
-        calculateLocalCoverageArea(
+        calculateNestedCoverageArea(
           nextAreaRecommendation.center_household_id,
           coverageLocations(),
           coverageAdjacencyGraph,

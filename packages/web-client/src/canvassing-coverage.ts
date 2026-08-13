@@ -82,6 +82,7 @@ export type NextUnderflyeredArea = {
   cluster_id?: string;
   center_household_id: string;
   center_stop_id: string;
+  /** Legacy aliases for the practical inner (150-household) window. */
   remaining: number;
   totalEligible: number;
   coverage: number;
@@ -92,9 +93,27 @@ export type NextUnderflyeredArea = {
   averageHouseholdHops: number;
   maxHouseholdHops: number;
   householdHopRadius: number;
+  inner: LocalCoverageScale;
+  middle: LocalCoverageScale;
+  broad: LocalCoverageScale;
+  nestedUndercoverageScore: number;
+  nearestCoveredHouseholdHops: number | null;
   graphComponent: string;
+  incompleteSamples: number[];
   tieBreakResult: string;
   reason: "local_coverage";
+};
+
+export type LocalCoverageScale = {
+  targetSize: number;
+  sampleSize: number;
+  localCovered: number;
+  localRemaining: number;
+  coverage: number;
+  uncoveredProportion: number;
+  averageHouseholdHops: number;
+  maxHouseholdHops: number;
+  complete: boolean;
 };
 
 export type LocalCoverageArea = {
@@ -108,6 +127,12 @@ export type LocalCoverageArea = {
   maxHouseholdHops: number;
   householdHopRadius: number;
   graphComponent: string;
+  inner: LocalCoverageScale;
+  middle: LocalCoverageScale;
+  broad: LocalCoverageScale;
+  nestedUndercoverageScore: number;
+  nearestCoveredHouseholdHops: number | null;
+  incompleteSamples: number[];
 };
 
 type RoadSegment = {
@@ -471,7 +496,8 @@ export function calculateInterveningHouseholdCosts(
   );
 }
 
-const LOCAL_COVERAGE_TARGET = 150;
+export const NESTED_COVERAGE_TARGETS = [150, 300, 600] as const;
+const LOCAL_COVERAGE_TARGET = NESTED_COVERAGE_TARGETS[0];
 
 type StopCoverageStats = {
   eligible: Array<{ household_id: string; covered: boolean }>;
@@ -482,6 +508,7 @@ type LocalCoverageContext = {
   locations: Map<string, CoverageLocation>;
   statsByStop: Map<string, StopCoverageStats>;
   componentByStop: Map<string, string>;
+  interveningHouseholdHops: Map<string, number>;
 };
 
 const uniqueCoverageLocations = (locations: CoverageLocation[]) => {
@@ -539,6 +566,10 @@ const buildLocalCoverageContext = (
     locations: unique,
     statsByStop,
     componentByStop: buildGraphComponents(graph),
+    interveningHouseholdHops: calculateInterveningHouseholdCosts(
+      [...unique.values()],
+      graph,
+    ),
   };
 };
 
@@ -580,11 +611,49 @@ const queuePop = (queue: QueueEntry[]) => {
   return first;
 };
 
-const calculateLocalCoverageAreaWithContext = (
+const coverageScale = (
+  sampled: Array<{ covered: boolean; distance: number }>,
+  targetSize: number,
+): LocalCoverageScale => {
+  const selected = sampled.slice(0, targetSize);
+  const localCovered = selected.filter((household) => household.covered).length;
+  const averageHouseholdHops = selected.length
+    ? selected.reduce((sum, household) => sum + household.distance, 0) /
+      selected.length
+    : 0;
+  const maxHouseholdHops = selected.reduce(
+    (max, household) => Math.max(max, household.distance),
+    0,
+  );
+  return {
+    targetSize,
+    sampleSize: selected.length,
+    localCovered,
+    localRemaining: selected.length - localCovered,
+    coverage: selected.length ? localCovered / selected.length : 0,
+    uncoveredProportion: selected.length
+      ? (selected.length - localCovered) / selected.length
+      : 0,
+    averageHouseholdHops,
+    maxHouseholdHops,
+    complete: selected.length >= targetSize,
+  };
+};
+
+const nestedCoverageScore = (
+  inner: LocalCoverageScale,
+  middle: LocalCoverageScale,
+  broad: LocalCoverageScale,
+) =>
+  0.5 * inner.uncoveredProportion +
+  0.3 * middle.uncoveredProportion +
+  0.2 * broad.uncoveredProportion;
+
+const calculateCoverageAreaWithTargets = (
   centerHouseholdId: string,
   graph: HouseholdAdjacencyGraph,
   context: LocalCoverageContext,
-  targetSize: number,
+  targetSizes: readonly number[],
 ): LocalCoverageArea | null => {
   const center = context.locations.get(centerHouseholdId);
   if (!center) return null;
@@ -594,23 +663,22 @@ const calculateLocalCoverageAreaWithContext = (
   const queue: QueueEntry[] = [];
   queuePush(queue, { stopId: centerStopId, distance: 0 });
   const visited = new Set<string>();
-  let sampleSize = 0;
-  let localCovered = 0;
-  let weightedHops = 0;
-  let maxHouseholdHops = 0;
-  while (queue.length && sampleSize < targetSize) {
+  const maxTarget = Math.max(...targetSizes);
+  const sampled: Array<{ covered: boolean; distance: number }> = [];
+  while (queue.length && sampled.length < maxTarget) {
     const current = queuePop(queue)!;
     if (visited.has(current.stopId)) continue;
     visited.add(current.stopId);
     const stats = context.statsByStop.get(current.stopId);
     if (stats) {
-      const take = Math.min(targetSize - sampleSize, stats.eligible.length);
+      const take = Math.min(maxTarget - sampled.length, stats.eligible.length);
       const selected = stats.eligible.slice(0, take);
-      const covered = selected.filter((household) => household.covered).length;
-      sampleSize += take;
-      localCovered += covered;
-      weightedHops += current.distance * take;
-      maxHouseholdHops = Math.max(maxHouseholdHops, current.distance);
+      sampled.push(
+        ...selected.map((household) => ({
+          covered: household.covered,
+          distance: current.distance,
+        })),
+      );
     }
     for (const neighbor of graph.neighbors.get(current.stopId) ?? []) {
       if (visited.has(neighbor)) continue;
@@ -622,26 +690,59 @@ const calculateLocalCoverageAreaWithContext = (
       }
     }
   }
-  if (!sampleSize) return null;
+  if (!sampled.length) return null;
+  const [innerTarget, middleTarget, broadTarget] = targetSizes;
+  const inner = coverageScale(sampled, innerTarget);
+  const middle = coverageScale(sampled, middleTarget ?? innerTarget);
+  const broad = coverageScale(
+    sampled,
+    broadTarget ?? middleTarget ?? innerTarget,
+  );
+  const nearestCoveredHouseholdHops = context.interveningHouseholdHops.get(
+    centerHouseholdId,
+  );
+  const finiteNearestCoveredHouseholdHops = Number.isFinite(
+    nearestCoveredHouseholdHops,
+  )
+    ? nearestCoveredHouseholdHops!
+    : null;
+  const nestedUndercoverageScore = nestedCoverageScore(inner, middle, broad);
+  const incompleteSamples = [inner, middle, broad]
+    .filter((scale) => !scale.complete)
+    .map((scale) => scale.targetSize);
   return {
     center_household_id: centerHouseholdId,
     center_stop_id: centerStopId,
-    localCovered,
-    localRemaining: sampleSize - localCovered,
-    sampleSize,
-    targetSize,
-    averageHouseholdHops: weightedHops / sampleSize,
-    maxHouseholdHops,
-    householdHopRadius: maxHouseholdHops,
+    localCovered: inner.localCovered,
+    localRemaining: inner.localRemaining,
+    sampleSize: inner.sampleSize,
+    targetSize: inner.targetSize,
+    averageHouseholdHops: inner.averageHouseholdHops,
+    maxHouseholdHops: inner.maxHouseholdHops,
+    householdHopRadius: inner.maxHouseholdHops,
     graphComponent: context.componentByStop.get(centerStopId) ?? centerStopId,
+    inner,
+    middle,
+    broad,
+    nestedUndercoverageScore,
+    nearestCoveredHouseholdHops: finiteNearestCoveredHouseholdHops,
+    incompleteSamples,
   };
 };
+
+const calculateLocalCoverageAreaWithContext = (
+  centerHouseholdId: string,
+  graph: HouseholdAdjacencyGraph,
+  context: LocalCoverageContext,
+  targetSize: number,
+) =>
+  calculateCoverageAreaWithTargets(centerHouseholdId, graph, context, [targetSize]);
 
 export function calculateLocalCoverageArea(
   centerHouseholdId: string,
   locations: CoverageLocation[],
   graph: HouseholdAdjacencyGraph,
-  targetSize = LOCAL_COVERAGE_TARGET,
+  targetSize: number = LOCAL_COVERAGE_TARGET,
 ): LocalCoverageArea | null {
   return calculateLocalCoverageAreaWithContext(
     centerHouseholdId,
@@ -651,19 +752,39 @@ export function calculateLocalCoverageArea(
   );
 }
 
+export function calculateNestedCoverageArea(
+  centerHouseholdId: string,
+  locations: CoverageLocation[],
+  graph: HouseholdAdjacencyGraph,
+): LocalCoverageArea | null {
+  return calculateCoverageAreaWithTargets(
+    centerHouseholdId,
+    graph,
+    buildLocalCoverageContext(locations, graph),
+    NESTED_COVERAGE_TARGETS,
+  );
+}
+
 const chooseNextUnderflyeredArea = (
   scored: LocalCoverageArea[],
 ): NextUnderflyeredArea | null => {
-  const chosen = [...scored].sort(
+  // A tiny disconnected component can otherwise report 100% undercoverage
+  // from one available household and outrank a city-sized neighbourhood.
+  // Keep those areas scored and visible in diagnostics, but only let them
+  // compete when no candidate has a complete practical 150-household window.
+  const completeInner = scored.filter((area) => area.inner.complete);
+  const candidates = completeInner.length ? completeInner : scored;
+  const chosen = [...candidates].sort(
     (left, right) =>
-      right.localRemaining - left.localRemaining ||
-      left.averageHouseholdHops - right.averageHouseholdHops ||
-      left.maxHouseholdHops - right.maxHouseholdHops ||
+      right.nestedUndercoverageScore - left.nestedUndercoverageScore ||
+      (right.nearestCoveredHouseholdHops == null ? -1 : right.nearestCoveredHouseholdHops) -
+        (left.nearestCoveredHouseholdHops == null ? -1 : left.nearestCoveredHouseholdHops) ||
+      left.inner.averageHouseholdHops - right.inner.averageHouseholdHops ||
       left.center_household_id.localeCompare(right.center_household_id),
   )[0];
   if (!chosen) return null;
   const tieBreakResult =
-    `remaining ${chosen.localRemaining}; average hops ${chosen.averageHouseholdHops.toFixed(1)}; maximum hops ${chosen.maxHouseholdHops}`;
+    `score ${(chosen.nestedUndercoverageScore * 100).toFixed(1)}%; nearest covered hops ${chosen.nearestCoveredHouseholdHops == null ? "unconnected" : chosen.nearestCoveredHouseholdHops}; inner average hops ${chosen.inner.averageHouseholdHops.toFixed(1)}`;
   return {
     ...chosen,
     remaining: chosen.localRemaining,
@@ -684,14 +805,23 @@ const chooseNextUnderflyeredArea = (
 export function selectNextUnderflyeredArea(
   locations: CoverageLocation[],
   graph: HouseholdAdjacencyGraph,
-  targetSize = LOCAL_COVERAGE_TARGET,
+  _targetSize: number = LOCAL_COVERAGE_TARGET,
 ): NextUnderflyeredArea | null {
   const context = buildLocalCoverageContext(locations, graph);
   const eligible = [...context.locations.values()].filter((location) => location.eligible);
   if (!eligible.length || eligible.every((location) => location.covered)) return null;
+  const targetSizes =
+    _targetSize === LOCAL_COVERAGE_TARGET
+      ? NESTED_COVERAGE_TARGETS
+      : [_targetSize, _targetSize * 2, _targetSize * 4];
   const scored = eligible
     .map((location) =>
-      calculateLocalCoverageAreaWithContext(location.household_id, graph, context, targetSize),
+      calculateCoverageAreaWithTargets(
+        location.household_id,
+        graph,
+        context,
+        targetSizes,
+      ),
     )
     .filter((area): area is LocalCoverageArea => Boolean(area));
   return chooseNextUnderflyeredArea(scored);
@@ -705,18 +835,22 @@ export function selectNextUnderflyeredArea(
 export async function selectNextUnderflyeredAreaAsync(
   locations: CoverageLocation[],
   graph: HouseholdAdjacencyGraph,
-  targetSize = LOCAL_COVERAGE_TARGET,
+  _targetSize: number = LOCAL_COVERAGE_TARGET,
 ): Promise<NextUnderflyeredArea | null> {
   const context = buildLocalCoverageContext(locations, graph);
   const eligible = [...context.locations.values()].filter((location) => location.eligible);
   if (!eligible.length || eligible.every((location) => location.covered)) return null;
+  const targetSizes =
+    _targetSize === LOCAL_COVERAGE_TARGET
+      ? NESTED_COVERAGE_TARGETS
+      : [_targetSize, _targetSize * 2, _targetSize * 4];
   const scored: LocalCoverageArea[] = [];
   for (let index = 0; index < eligible.length; index += 1) {
-    const area = calculateLocalCoverageAreaWithContext(
+    const area = calculateCoverageAreaWithTargets(
       eligible[index].household_id,
       graph,
       context,
-      targetSize,
+      targetSizes,
     );
     if (area) scored.push(area);
     if ((index + 1) % 32 === 0)

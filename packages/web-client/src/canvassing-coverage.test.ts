@@ -3,6 +3,7 @@ import {
   aggregateCoverage,
   buildHouseholdAdjacencyGraph,
   calculateLocalCoverageArea,
+  calculateNestedCoverageArea,
   calculateInterveningHouseholdCosts,
   calculateCoverage,
   type CoverageLocation,
@@ -220,17 +221,60 @@ describe("flyer coverage", () => {
     const edges: Array<[string, string]> = [];
     for (let index = 1; index <= 180; index++) {
       const id = `main-${index}`;
-      locations.push(location(id, index <= 40));
+      locations.push(location(id, index <= 5));
       edges.push([`main-${index - 1}`, id]);
     }
     for (let index = 0; index < 8; index++) {
       const id = `small-${index}`;
-      locations.push(location(id));
+      locations.push(location(id, index < 2));
       if (index) edges.push([`small-${index - 1}`, id]);
     }
     const result = selectNextUnderflyeredArea(locations, graphFor(locations, edges));
     expect(result?.center_household_id.startsWith("main-")).toBe(true);
     expect(result?.localRemaining).toBeGreaterThan(8);
+  });
+
+  it("uses the middle and broad windows when compact pockets tie at 150", () => {
+    const locations: CoverageLocation[] = [];
+    const edges: Array<[string, string]> = [];
+    for (const prefix of ["pocket", "broad"]) {
+      for (let index = 0; index < 600; index++) {
+        const id = `${prefix}-${index}`;
+        const covered = prefix === "pocket" && index < 300;
+        locations.push(location(id, covered));
+        if (index) edges.push([`${prefix}-${index - 1}`, id]);
+      }
+    }
+    const result = selectNextUnderflyeredArea(
+      locations,
+      graphFor(locations, edges),
+    );
+    expect(result?.center_household_id.startsWith("broad-")).toBe(true);
+    expect(result?.inner.localRemaining).toBe(150);
+    expect(result?.middle.localRemaining).toBe(300);
+    expect(result?.broad.localRemaining).toBe(600);
+    expect(result?.nestedUndercoverageScore).toBe(1);
+  });
+
+  it("prefers a broadly underserved partial area over a small fringe", () => {
+    const locations: CoverageLocation[] = [];
+    const edges: Array<[string, string]> = [];
+    for (let index = 0; index < 700; index++) {
+      const id = `main-${index}`;
+      locations.push(location(id, index < 5));
+      if (index) edges.push([`main-${index - 1}`, id]);
+    }
+    for (let index = 0; index < 20; index++) {
+      const id = `fringe-${index}`;
+      locations.push(location(id, index < 10));
+      if (index) edges.push([`fringe-${index - 1}`, id]);
+    }
+    const result = selectNextUnderflyeredArea(
+      locations,
+      graphFor(locations, edges),
+    );
+    expect(result?.center_household_id.startsWith("main-")).toBe(true);
+    expect(result?.nestedUndercoverageScore).toBeGreaterThan(0.9);
   });
 
   it("uses household hops and ignores straight-line closeness", () => {
@@ -274,6 +318,42 @@ describe("flyer coverage", () => {
     expect(Number.isFinite(result?.householdHopRadius ?? Infinity)).toBe(true);
   });
 
+  it("flags incomplete nested samples without assigning infinite separation", () => {
+    const locations = Array.from({ length: 42 }, (_, index) =>
+      location(`small-${index}`),
+    );
+    const edges = locations.slice(1).map((item, index) => [
+      `small-${index}`,
+      item.household_id,
+    ] as [string, string]);
+    const result = selectNextUnderflyeredArea(
+      locations,
+      graphFor(locations, edges),
+    );
+    expect(result?.broad.sampleSize).toBe(42);
+    expect(result?.broad.complete).toBe(false);
+    expect(result?.incompleteSamples).toEqual([150, 300, 600]);
+    expect(result?.nearestCoveredHouseholdHops).toBeNull();
+    expect(Number.isFinite(result?.nestedUndercoverageScore ?? NaN)).toBe(true);
+  });
+
+  it("does not let a one-household disconnected component outrank a complete area", () => {
+    const locations: CoverageLocation[] = [];
+    const edges: Array<[string, string]> = [];
+    for (let index = 0; index < 220; index++) {
+      const id = `city-${index}`;
+      locations.push(location(id));
+      if (index) edges.push([`city-${index - 1}`, id]);
+    }
+    locations.push(location("isolated"));
+    const result = selectNextUnderflyeredArea(
+      locations,
+      graphFor(locations, edges),
+    );
+    expect(result?.center_household_id.startsWith("city-")).toBe(true);
+    expect(result?.inner.complete).toBe(true);
+  });
+
   it("returns no recommendation when every eligible household is covered", () => {
     const locations = [location("a", true), location("b", true)];
     expect(selectNextUnderflyeredArea(locations, graphFor(locations, [["a", "b"]]))).toBeNull();
@@ -287,5 +367,25 @@ describe("flyer coverage", () => {
     const pinned = calculateLocalCoverageArea(first.center_household_id, locations, graph, 3)!;
     expect(pinned.center_household_id).toBe(first.center_household_id);
     expect(pinned.localRemaining).toBeLessThan(first.localRemaining);
+  });
+
+  it("recalculates the same nested figures deterministically", () => {
+    const locations = Array.from({ length: 620 }, (_, index) =>
+      location(`stable-${index}`, index < 20),
+    );
+    const edges = locations.slice(1).map((item, index) => [
+      `stable-${index}`,
+      item.household_id,
+    ] as [string, string]);
+    const graph = graphFor(locations, edges);
+    const first = selectNextUnderflyeredArea(locations, graph)!;
+    const second = selectNextUnderflyeredArea(locations, graph)!;
+    expect(second).toEqual(first);
+    const area = calculateNestedCoverageArea(
+      first.center_household_id,
+      locations,
+      graph,
+    )!;
+    expect(area.nestedUndercoverageScore).toBe(first.nestedUndercoverageScore);
   });
 });
