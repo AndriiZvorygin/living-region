@@ -20,7 +20,11 @@ project land recovery, household site leases and shared infrastructure
 services. It does not use the obsolete combined dwelling-plus-land shortcut.
 Run `npm run report:arc:site-lease` and
 `npm run report:arc:site-lease:sensitivity` from the Living Region root for the
-machine-readable and Markdown outputs.
+machine-readable and Markdown outputs. The infrastructure audit is generated
+with `npm run report:arc:infrastructure-audit`; it preserves the former
+shared-services baseline, compares minimal-compliant, shared-services and
+amenity-rich scenarios, and reports component-level reserves and distributed
+servicing alternatives.
 
 ## Run
 

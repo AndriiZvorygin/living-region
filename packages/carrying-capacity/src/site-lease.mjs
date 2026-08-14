@@ -15,7 +15,7 @@ const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.0.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.1.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
   base_plus_hectare: 'Recommended: land-specific costs follow productive hectares; shared land-holding costs are divided equally.',
@@ -42,6 +42,140 @@ export const SITE_LEASE_EVIDENCE = {
     status: 'planning_assumption',
     source: 'No site design, servicing quote, or ARC infrastructure bill of quantities was found in the repository',
     notes: 'Capital and operating values are transparent placeholders for scenario comparison, not local procurement estimates.'
+  }
+};
+
+const REQUIREDNESS_LABELS = {
+  legally_required: 'legally required',
+  physically_necessary: 'physically necessary',
+  cost_saving_option: 'cost-saving option',
+  convenience_amenity: 'convenience/amenity',
+  unresolved_site_specific: 'unresolved/site-specific'
+};
+
+const infrastructureComponent = (id, label, {
+  capital_cost_cad = 0,
+  annual_operating_cost_cad = 0,
+  requiredness = 'unresolved_site_specific',
+  source_status = 'planning assumption; site-specific legal/design review required',
+  distributed_capital_cost_per_household_cad = 0,
+  distributed_annual_operating_cost_per_household_cad = 0,
+  notes = ''
+} = {}) => ({
+  id,
+  label,
+  capital_cost_cad,
+  annual_operating_cost_cad,
+  requiredness: REQUIREDNESS_LABELS[requiredness] ?? requiredness,
+  source_status,
+  distributed_capital_cost_per_household_cad,
+  distributed_annual_operating_cost_per_household_cad,
+  notes
+});
+
+const infrastructureFinancing = {ownership: 'financed', down_payment_rate: .20, interest_rate_annual: .06, amortization_years: 30};
+
+/**
+ * Infrastructure alternatives are deliberately explicit. A zero centralized
+ * cost can mean that the function is distributed to households, not that the
+ * physical requirement disappeared.
+ */
+export const INFRASTRUCTURE_SCENARIOS = {
+  legacy_current: {
+    id: 'legacy_current',
+    label: 'Legacy current shared-services baseline',
+    affordability_default: false,
+    description: 'The pre-audit configuration, retained to explain the former $1,162/month result.',
+    reserve_policy: {default_mode: 'full_lifecycle', early_life_rate_annual: .005, full_lifecycle_rate_annual: .01, starts_year: 1},
+    maintenance_rate_annual: .02,
+    financing: infrastructureFinancing,
+    capital_components: {
+      internal_access: infrastructureComponent('internal_access', 'Internal road/access', {capital_cost_cad: 250000, requiredness: 'physically_necessary', notes: 'Road/access capital was a single legacy placeholder.'}),
+      road_maintenance: infrastructureComponent('road_maintenance', 'Road maintenance', {annual_operating_cost_cad: 10000, requiredness: 'physically_necessary', notes: 'Split from the legacy road/snow operating pool for audit display.'}),
+      snow_clearing: infrastructureComponent('snow_clearing', 'Snow clearing', {annual_operating_cost_cad: 8000, requiredness: 'physically_necessary', notes: 'Split from the legacy road/snow operating pool for audit display.'}),
+      shared_water: infrastructureComponent('shared_water', 'Shared water supply/treatment', {capital_cost_cad: 180000, annual_operating_cost_cad: 5000, requiredness: 'unresolved_site_specific'}),
+      shared_sewage: infrastructureComponent('shared_sewage', 'Shared sewage/greywater', {capital_cost_cad: 250000, annual_operating_cost_cad: 7000, requiredness: 'unresolved_site_specific'}),
+      electrical_distribution: infrastructureComponent('electrical_distribution', 'Electrical distribution', {requiredness: 'unresolved_site_specific', notes: 'Not separately costed in the legacy configuration.'}),
+      common_laundry: infrastructureComponent('common_laundry', 'Common laundry', {requiredness: 'convenience_amenity', notes: 'Not separately costed in the legacy configuration.'}),
+      common_building: infrastructureComponent('common_building', 'Workshop/common building', {capital_cost_cad: 250000, annual_operating_cost_cad: 12000, requiredness: 'convenience_amenity'}),
+      shared_equipment: infrastructureComponent('shared_equipment', 'Shared equipment', {capital_cost_cad: 75000, requiredness: 'convenience_amenity'}),
+      waste_system: infrastructureComponent('waste_system', 'Waste handling', {capital_cost_cad: 50000, requiredness: 'physically_necessary', notes: 'Capital placeholder; no separate operating cost in legacy pool.'}),
+      insurance: infrastructureComponent('insurance', 'Infrastructure insurance', {annual_operating_cost_cad: 15000, requiredness: 'physically_necessary'}),
+      administration: infrastructureComponent('administration', 'Infrastructure administration', {annual_operating_cost_cad: 18000, requiredness: 'physically_necessary', notes: 'Potentially overlaps with land-holding administration; retained for baseline audit.'}),
+      shared_heating: infrastructureComponent('shared_heating', 'Centralized heating', {requiredness: 'unresolved_site_specific', notes: 'Heating remains household/building-based in the canonical model.'})
+    }
+  },
+  minimal_compliant: {
+    id: 'minimal_compliant',
+    label: 'Minimal compliant ARC',
+    affordability_default: true,
+    description: 'Only a basic access route, small waste/compost function and essential project insurance are centralized; water, wastewater and electricity remain site-specific distributed options.',
+    reserve_policy: {default_mode: 'early_life', early_life_rate_annual: .005, full_lifecycle_rate_annual: .01, starts_year: 1},
+    maintenance_rate_annual: .015,
+    financing: infrastructureFinancing,
+    capital_components: {
+      internal_access: infrastructureComponent('internal_access', 'Gravel internal road/access', {capital_cost_cad: 120000, annual_operating_cost_cad: 0, requiredness: 'physically_necessary', notes: 'Gravel/emergency access placeholder; road standard must be confirmed with the municipality and fire authority.'}),
+      road_maintenance: infrastructureComponent('road_maintenance', 'Road maintenance', {annual_operating_cost_cad: 6000, requiredness: 'physically_necessary'}),
+      snow_clearing: infrastructureComponent('snow_clearing', 'Snow clearing', {annual_operating_cost_cad: 4000, requiredness: 'physically_necessary'}),
+      shared_water: infrastructureComponent('shared_water', 'Shared water supply/treatment', {requiredness: 'unresolved_site_specific', distributed_capital_cost_per_household_cad: 14000, distributed_annual_operating_cost_per_household_cad: 600, notes: 'Distributed well/rainwater/treatment alternative; legal feasibility is site-specific.'}),
+      shared_sewage: infrastructureComponent('shared_sewage', 'Shared sewage/greywater', {requiredness: 'unresolved_site_specific', distributed_capital_cost_per_household_cad: 16000, distributed_annual_operating_cost_per_household_cad: 750, notes: 'Distributed septic/greywater/composting alternative; legal feasibility is site-specific.'}),
+      electrical_distribution: infrastructureComponent('electrical_distribution', 'Electrical distribution', {requiredness: 'unresolved_site_specific', distributed_capital_cost_per_household_cad: 12000, distributed_annual_operating_cost_per_household_cad: 900, notes: 'Household grid connection or individual solar/storage alternative; not a measured quote.'}),
+      common_laundry: infrastructureComponent('common_laundry', 'Common laundry', {requiredness: 'convenience_amenity', notes: 'No common laundry in the minimal scenario; household laundry is not priced as shared infrastructure.'}),
+      common_building: infrastructureComponent('common_building', 'Workshop/common building', {requiredness: 'convenience_amenity', notes: 'No common building in the minimal scenario.'}),
+      shared_equipment: infrastructureComponent('shared_equipment', 'Shared equipment', {requiredness: 'convenience_amenity', notes: 'No shared equipment in the minimal scenario.'}),
+      waste_system: infrastructureComponent('waste_system', 'Waste and compost systems', {capital_cost_cad: 20000, annual_operating_cost_cad: 4000, requiredness: 'physically_necessary'}),
+      insurance: infrastructureComponent('insurance', 'Infrastructure insurance', {annual_operating_cost_cad: 8000, requiredness: 'physically_necessary'}),
+      administration: infrastructureComponent('administration', 'Infrastructure administration', {requiredness: 'physically_necessary', notes: 'Land-holding administration remains in the site-lease layer; not charged again here.'}),
+      shared_heating: infrastructureComponent('shared_heating', 'Centralized heating', {requiredness: 'unresolved_site_specific', notes: 'Household building heat and woody hectares remain the canonical baseline; no central heating capital is assumed.'})
+    }
+  },
+  shared_services: {
+    id: 'shared_services',
+    label: 'Shared-services ARC',
+    affordability_default: false,
+    description: 'Adds centralized services where sharing may create an economy of scale, while keeping optional facilities visible.',
+    reserve_policy: {default_mode: 'early_life', early_life_rate_annual: .005, full_lifecycle_rate_annual: .01, starts_year: 1},
+    maintenance_rate_annual: .02,
+    financing: infrastructureFinancing,
+    capital_components: {
+      internal_access: infrastructureComponent('internal_access', 'Internal road/access', {capital_cost_cad: 180000, requiredness: 'physically_necessary'}),
+      road_maintenance: infrastructureComponent('road_maintenance', 'Road maintenance', {annual_operating_cost_cad: 10000, requiredness: 'physically_necessary'}),
+      snow_clearing: infrastructureComponent('snow_clearing', 'Snow clearing', {annual_operating_cost_cad: 8000, requiredness: 'physically_necessary'}),
+      shared_water: infrastructureComponent('shared_water', 'Shared water supply/treatment', {capital_cost_cad: 180000, annual_operating_cost_cad: 5000, requiredness: 'cost_saving_option', distributed_capital_cost_per_household_cad: 14000, distributed_annual_operating_cost_per_household_cad: 600}),
+      shared_sewage: infrastructureComponent('shared_sewage', 'Shared sewage/greywater', {capital_cost_cad: 220000, annual_operating_cost_cad: 7000, requiredness: 'cost_saving_option', distributed_capital_cost_per_household_cad: 16000, distributed_annual_operating_cost_per_household_cad: 750}),
+      electrical_distribution: infrastructureComponent('electrical_distribution', 'Electrical distribution', {capital_cost_cad: 80000, annual_operating_cost_cad: 2000, requiredness: 'cost_saving_option', distributed_capital_cost_per_household_cad: 12000, distributed_annual_operating_cost_per_household_cad: 900}),
+      common_laundry: infrastructureComponent('common_laundry', 'Common laundry', {capital_cost_cad: 90000, annual_operating_cost_cad: 6000, requiredness: 'cost_saving_option', distributed_capital_cost_per_household_cad: 1500, distributed_annual_operating_cost_per_household_cad: 150}),
+      common_building: infrastructureComponent('common_building', 'Workshop/common building', {capital_cost_cad: 150000, annual_operating_cost_cad: 10000, requiredness: 'convenience_amenity'}),
+      shared_equipment: infrastructureComponent('shared_equipment', 'Shared equipment', {capital_cost_cad: 75000, annual_operating_cost_cad: 2000, requiredness: 'cost_saving_option'}),
+      waste_system: infrastructureComponent('waste_system', 'Waste handling', {capital_cost_cad: 30000, annual_operating_cost_cad: 3000, requiredness: 'physically_necessary'}),
+      insurance: infrastructureComponent('insurance', 'Infrastructure insurance', {annual_operating_cost_cad: 12000, requiredness: 'physically_necessary'}),
+      administration: infrastructureComponent('administration', 'Infrastructure administration', {requiredness: 'physically_necessary', notes: 'Shared operational administration is covered by the land-holding administration allowance in the central case.'}),
+      shared_heating: infrastructureComponent('shared_heating', 'Centralized heating', {requiredness: 'unresolved_site_specific', notes: 'No central heating cost credited without a local design and fuel-price evidence.'})
+    }
+  },
+  amenity_rich: {
+    id: 'amenity_rich',
+    label: 'Amenity-rich ARC',
+    affordability_default: false,
+    description: 'Adds a larger common building, laundry, electrical distribution and shared equipment beyond the minimal housing/productive-land requirement.',
+    reserve_policy: {default_mode: 'full_lifecycle', early_life_rate_annual: .005, full_lifecycle_rate_annual: .01, starts_year: 1},
+    maintenance_rate_annual: .02,
+    financing: infrastructureFinancing,
+    capital_components: {
+      internal_access: infrastructureComponent('internal_access', 'Internal road/access', {capital_cost_cad: 250000, requiredness: 'physically_necessary'}),
+      road_maintenance: infrastructureComponent('road_maintenance', 'Road maintenance', {annual_operating_cost_cad: 10000, requiredness: 'physically_necessary'}),
+      snow_clearing: infrastructureComponent('snow_clearing', 'Snow clearing', {annual_operating_cost_cad: 8000, requiredness: 'physically_necessary'}),
+      shared_water: infrastructureComponent('shared_water', 'Shared water supply/treatment', {capital_cost_cad: 180000, annual_operating_cost_cad: 5000, requiredness: 'cost_saving_option'}),
+      shared_sewage: infrastructureComponent('shared_sewage', 'Shared sewage/greywater', {capital_cost_cad: 250000, annual_operating_cost_cad: 7000, requiredness: 'cost_saving_option'}),
+      electrical_distribution: infrastructureComponent('electrical_distribution', 'Electrical distribution', {capital_cost_cad: 100000, annual_operating_cost_cad: 2000, requiredness: 'cost_saving_option'}),
+      common_laundry: infrastructureComponent('common_laundry', 'Common laundry', {capital_cost_cad: 120000, annual_operating_cost_cad: 7000, requiredness: 'convenience_amenity'}),
+      common_building: infrastructureComponent('common_building', 'Workshop/common building', {capital_cost_cad: 250000, annual_operating_cost_cad: 12000, requiredness: 'convenience_amenity'}),
+      shared_equipment: infrastructureComponent('shared_equipment', 'Shared equipment', {capital_cost_cad: 75000, annual_operating_cost_cad: 2000, requiredness: 'convenience_amenity'}),
+      waste_system: infrastructureComponent('waste_system', 'Waste handling', {capital_cost_cad: 50000, annual_operating_cost_cad: 4000, requiredness: 'physically_necessary'}),
+      insurance: infrastructureComponent('insurance', 'Infrastructure insurance', {annual_operating_cost_cad: 15000, requiredness: 'physically_necessary'}),
+      administration: infrastructureComponent('administration', 'Infrastructure administration', {requiredness: 'physically_necessary', notes: 'Shared operational administration remains separate from land-holding administration in this sensitivity.'}),
+      shared_heating: infrastructureComponent('shared_heating', 'Centralized heating', {requiredness: 'unresolved_site_specific', notes: 'No central heating cost credited without a local design and fuel-price evidence.'})
+    }
   }
 };
 
@@ -83,31 +217,9 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     amortization_years: 30,
     recovery_mode: 'debt_service'
   },
-  infrastructure: {
-    financing: {
-      ownership: 'financed',
-      down_payment_rate: 0.20,
-      interest_rate_annual: 0.06,
-      amortization_years: 30
-    },
-    capital_components: {
-      internal_access: {label: 'Internal road/access', included: true, capital_cost_cad: 250000},
-      shared_water: {label: 'Shared water infrastructure', included: true, capital_cost_cad: 180000},
-      shared_sewage: {label: 'Shared sewage infrastructure', included: true, capital_cost_cad: 250000},
-      common_building: {label: 'Common building / amenity', included: true, capital_cost_cad: 250000},
-      waste_system: {label: 'Waste and compost systems', included: true, capital_cost_cad: 50000},
-      shared_equipment: {label: 'Shared equipment', included: true, capital_cost_cad: 75000}
-    },
-    annual_operating_costs_cad: {
-      road_access_and_snow: 18000,
-      water_sewage_operations: 12000,
-      common_building_utilities: 12000,
-      insurance: 15000,
-      administration: 18000
-    },
-    maintenance_rate_annual: 0.02,
-    replacement_reserve_rate_annual: 0.01
-  }
+  land_reservation_basis: 'maximum_transition_exclusive_footprint',
+  infrastructure_scenario_id: 'minimal_compliant',
+  infrastructure: deepClone(INFRASTRUCTURE_SCENARIOS.minimal_compliant)
 };
 
 const SITE_IDS = new Set(Object.keys(siteClasses));
@@ -200,7 +312,16 @@ function householdCapacity({household, siteId, inputs}) {
   });
   const transition = result.establishment_land?.strategy_comparison?.progressive_handoff;
   if (!transition) throw new Error('Site-lease calculation requires the canonical establishment transition');
-  return {household_id: household.household_id ?? 'household-1', label: household.label ?? 'ARC household', members, buildings, result, transition};
+  return {
+    household_id: household.household_id ?? 'household-1',
+    label: household.label ?? 'ARC household',
+    members,
+    buildings,
+    result,
+    transition,
+    establishment_land_requirement_ha: finite(transition.establishment_land_requirement_ha),
+    mature_land_requirement_ha: finite(transition.mature_land_requirement_ha)
+  };
 }
 
 function normalizeHouseholds(scenario) {
@@ -218,14 +339,43 @@ function sumObjectValues(object = {}) {
 
 function projectInfrastructure(scenario, householdCount) {
   const infrastructure = scenario.infrastructure ?? {};
-  const components = Object.fromEntries(Object.entries(infrastructure.capital_components ?? {}).map(([id, row]) => [id, {
-    id,
-    label: row.label ?? id,
-    included: row.included !== false,
-    capital_cost_cad: row.included === false ? 0 : Math.max(0, finite(row.capital_cost_cad))
-  }]));
-  const capitalValue = sumObjectValues(Object.fromEntries(Object.entries(components).map(([id, row]) => [id, row.capital_cost_cad])));
   const financing = infrastructure.financing ?? DEFAULT_SITE_LEASE_SCENARIO.infrastructure.financing;
+  const operatingOverrides = infrastructure.annual_operating_costs_cad ?? {};
+  const operatingAliases = {
+    road_maintenance: operatingOverrides.road_access_and_snow == null ? null : finite(operatingOverrides.road_access_and_snow) * 10 / 18,
+    snow_clearing: operatingOverrides.road_access_and_snow == null ? null : finite(operatingOverrides.road_access_and_snow) * 8 / 18,
+    shared_water: operatingOverrides.water_sewage_operations == null ? null : finite(operatingOverrides.water_sewage_operations) * 5 / 12,
+    shared_sewage: operatingOverrides.water_sewage_operations == null ? null : finite(operatingOverrides.water_sewage_operations) * 7 / 12,
+    common_building: operatingOverrides.common_building_utilities,
+    insurance: operatingOverrides.insurance,
+    administration: operatingOverrides.administration
+  };
+  const reservePolicy = infrastructure.reserve_policy ?? {};
+  const reserveMode = infrastructure.replacement_reserve_mode ?? reservePolicy.default_mode ?? 'full_lifecycle';
+  const reserveRate = infrastructure.replacement_reserve_rate_annual == null
+    ? Math.max(0, finite(reservePolicy[reserveMode === 'early_life' ? 'early_life_rate_annual' : 'full_lifecycle_rate_annual'], .01))
+    : Math.max(0, finite(infrastructure.replacement_reserve_rate_annual));
+  const maintenanceRate = Math.max(0, finite(infrastructure.maintenance_rate_annual));
+  const components = Object.fromEntries(Object.entries(infrastructure.capital_components ?? {}).map(([id, row]) => {
+    const included = row.included !== false;
+    const explicitOperating = row.annual_operating_cost_cad;
+    const operating = explicitOperating == null
+      ? (operatingOverrides[id] == null ? operatingAliases[id] : operatingOverrides[id])
+      : explicitOperating;
+    return [id, {
+      ...row,
+      id,
+      label: row.label ?? id,
+      included,
+      capital_cost_cad: included ? Math.max(0, finite(row.capital_cost_cad)) : 0,
+      annual_operating_cost_cad: included ? Math.max(0, finite(operating)) : 0,
+      maintenance_rate_annual: Math.max(0, finite(row.maintenance_rate_annual, maintenanceRate)),
+      distributed_capital_cost_per_household_cad: Math.max(0, finite(row.distributed_capital_cost_per_household_cad)),
+      distributed_annual_operating_cost_per_household_cad: Math.max(0, finite(row.distributed_annual_operating_cost_per_household_cad))
+    }];
+  }));
+  const rows = Object.values(components);
+  const capitalValue = rows.reduce((sum, row) => sum + row.capital_cost_cad, 0);
   const finance = financeCapital({
     value: capitalValue,
     ownership: financing.ownership ?? 'financed',
@@ -234,34 +384,141 @@ function projectInfrastructure(scenario, householdCount) {
     interestRateAnnual: financing.interest_rate_annual,
     amortizationYears: financing.amortization_years
   });
-  const operating = {...(infrastructure.annual_operating_costs_cad ?? {})};
-  const operatingAnnual = sumObjectValues(operating);
-  const maintenanceAnnual = capitalValue * Math.max(0, finite(infrastructure.maintenance_rate_annual));
-  const replacementAnnual = capitalValue * Math.max(0, finite(infrastructure.replacement_reserve_rate_annual));
-  const capitalDebtAnnual = finance.monthly_debt_service_cad * 12;
-  const totalAnnual = capitalDebtAnnual + operatingAnnual + maintenanceAnnual + replacementAnnual;
+  const lineItems = rows.map((row) => {
+    const lineFinance = financeCapital({
+      value: row.capital_cost_cad,
+      ownership: financing.ownership ?? 'financed',
+      downPaymentRate: financing.down_payment_rate,
+      downPaymentCad: financing.down_payment_cad == null ? null : finite(financing.down_payment_cad) * row.capital_cost_cad / Math.max(.000001, capitalValue),
+      interestRateAnnual: financing.interest_rate_annual,
+      amortizationYears: financing.amortization_years
+    });
+    const debtServiceAnnual = lineFinance.monthly_debt_service_cad * 12;
+    const maintenanceAnnual = row.capital_cost_cad * row.maintenance_rate_annual;
+    const replacementAnnual = row.capital_cost_cad * reserveRate;
+    const annualTotal = debtServiceAnnual + row.annual_operating_cost_cad + maintenanceAnnual + replacementAnnual;
+    return {
+      id: row.id,
+      component: row.label,
+      label: row.label,
+      included: row.included,
+      capital_cost_cad: round(row.capital_cost_cad),
+      financing_term: {
+        ownership: lineFinance.ownership,
+        down_payment_cad: lineFinance.down_payment_cad,
+        financed_principal_cad: lineFinance.financed_principal_cad,
+        interest_rate_annual: lineFinance.interest_rate_annual,
+        amortization_years: lineFinance.amortization_years,
+        debt_service_annual_cad: round(debtServiceAnnual)
+      },
+      annual_operating_cost_cad: round(row.annual_operating_cost_cad),
+      annual_maintenance_cad: round(maintenanceAnnual),
+      replacement_reserve_annual_cad: round(replacementAnnual),
+      annual_total_cad: round(annualTotal),
+      monthly_household_allocation_cad: round(annualTotal / householdCount / 12),
+      requiredness: row.requiredness,
+      source_status: row.source_status,
+      notes: row.notes,
+      distributed_alternative: {
+        capital_cost_per_household_cad: round(row.distributed_capital_cost_per_household_cad),
+        annual_operating_cost_per_household_cad: round(row.distributed_annual_operating_cost_per_household_cad)
+      }
+    };
+  });
+  const annualCosts = {
+    capital_debt_service: lineItems.reduce((sum, row) => sum + row.financing_term.debt_service_annual_cad, 0),
+    operating: lineItems.reduce((sum, row) => sum + row.annual_operating_cost_cad, 0),
+    maintenance: lineItems.reduce((sum, row) => sum + row.annual_maintenance_cad, 0),
+    replacement_reserve: lineItems.reduce((sum, row) => sum + row.replacement_reserve_annual_cad, 0)
+  };
+  annualCosts.total = Object.values(annualCosts).reduce((sum, value) => sum + value, 0);
+  const reserveSensitivity = ['early_life', 'full_lifecycle'].map((mode) => {
+    const rate = Math.max(0, finite(reservePolicy[mode === 'early_life' ? 'early_life_rate_annual' : 'full_lifecycle_rate_annual'], mode === 'early_life' ? .005 : .01));
+    const reserve = capitalValue * rate;
+    const annualTotal = annualCosts.capital_debt_service + annualCosts.operating + annualCosts.maintenance + reserve;
+    return {
+      mode,
+      reserve_rate_annual: rate,
+      reserve_starts_year: finite(reservePolicy.starts_year, 1),
+      annual_reserve_cad: round(reserve),
+      annual_total_cad: round(annualTotal),
+      monthly_household_allocation_cad: round(annualTotal / householdCount / 12)
+    };
+  });
+  const distributed_vs_centralized = lineItems.map((row) => {
+    const distributedCapital = row.distributed_alternative.capital_cost_per_household_cad * householdCount;
+    const distributedFinance = financeCapital({
+      value: distributedCapital,
+      ownership: financing.ownership ?? 'financed',
+      downPaymentRate: financing.down_payment_rate,
+      downPaymentCad: financing.down_payment_cad == null ? null : finite(financing.down_payment_cad) * distributedCapital,
+      interestRateAnnual: financing.interest_rate_annual,
+      amortizationYears: financing.amortization_years
+    });
+    const distributedDebtAnnual = distributedFinance.monthly_debt_service_cad * 12;
+    const distributedMaintenance = distributedCapital * maintenanceRate;
+    const distributedReserve = distributedCapital * reserveRate;
+    const distributedOperating = row.distributed_alternative.annual_operating_cost_per_household_cad * householdCount;
+    const distributedAnnual = distributedDebtAnnual + distributedOperating + distributedMaintenance + distributedReserve;
+    const centralAnnualPerHousehold = row.annual_total_cad / householdCount;
+    const distributedAnnualPerHousehold = distributedAnnual / householdCount;
+    const hasComparison = distributedCapital > 0 || distributedOperating > 0 || row.capital_cost_cad > 0 || row.annual_operating_cost_cad > 0;
+    return {
+      component_id: row.id,
+      component: row.component,
+      household_count: householdCount,
+      centralized_annual_per_household_cad: round(centralAnnualPerHousehold),
+      distributed_capital_total_cad: round(distributedCapital),
+      distributed_annual_operating_total_cad: round(distributedOperating),
+      distributed_annual_per_household_cad: round(distributedAnnualPerHousehold),
+      distributed_monthly_per_household_cad: round(distributedAnnualPerHousehold / 12),
+      result: row.id === 'shared_heating'
+        ? 'unresolved'
+        : hasComparison && distributedAnnualPerHousehold < centralAnnualPerHousehold
+          ? 'distributed_placeholder_lower'
+          : hasComparison ? 'centralized_placeholder_lower_or_equal' : 'no_cost_comparison',
+      source_status: row.id === 'shared_heating' ? 'unresolved; canonical model prices household/building heating separately' : row.source_status,
+      caveat: 'Distributed values are planning placeholders and do not establish legal feasibility or a procurement preference.'
+    };
+  });
+  const distributedCapitalTotal = distributed_vs_centralized.reduce((sum, row) => sum + row.distributed_capital_total_cad, 0);
+  const distributedOperatingTotal = distributed_vs_centralized.reduce((sum, row) => sum + row.distributed_annual_operating_total_cad, 0);
   return {
+    scenario_id: scenario.infrastructure_scenario_id,
+    scenario_label: infrastructure.label,
+    description: infrastructure.description,
     capital_components: components,
+    line_items: lineItems,
     capital_value_cad: round(capitalValue),
     financing: finance,
-    annual_costs_cad: {
-      capital_debt_service: round(capitalDebtAnnual),
-      operating: round(operatingAnnual),
-      maintenance: round(maintenanceAnnual),
-      replacement_reserve: round(replacementAnnual),
-      total: round(totalAnnual)
+    reserve_policy: {
+      mode: reserveMode,
+      rate_annual: reserveRate,
+      starts_year: finite(reservePolicy.starts_year, 1),
+      early_life_rate_annual: finite(reservePolicy.early_life_rate_annual, .005),
+      full_lifecycle_rate_annual: finite(reservePolicy.full_lifecycle_rate_annual, .01),
+      explanation: 'Debt service repays the financed capital. Replacement reserve accumulates separately for future renewal and does not reduce the debt balance.'
     },
+    annual_costs_cad: Object.fromEntries(Object.entries(annualCosts).map(([key, value]) => [key, round(value)])),
     costs_classification: {capital_debt_service: 'capital recovery', operating: 'operating expense', maintenance: 'operating expense', replacement_reserve: 'reserve'},
-    service_charge_per_household_month_cad: round(totalAnnual / householdCount),
-    reserve_contribution_annual_cad: round(replacementAnnual),
+    service_charge_per_household_month_cad: round(annualCosts.total / householdCount / 12),
+    annual_cost_per_household_cad: round(annualCosts.total / householdCount),
+    reserve_contribution_annual_cad: round(annualCosts.replacement_reserve),
+    reserve_sensitivity: reserveSensitivity,
+    distributed_alternatives: {
+      capital_total_cad: round(distributedCapitalTotal),
+      annual_operating_total_cad: round(distributedOperatingTotal),
+      comparisons: distributed_vs_centralized
+    },
     evidence: SITE_LEASE_EVIDENCE.infrastructure
   };
 }
 
 function allocatePool({households, pools, method}) {
-  const totalHectares = households.reduce((sum, row) => sum + row.establishment_land_requirement_ha, 0);
+  const areaOf = (row) => finite(row.reserved_land_requirement_ha ?? row.establishment_land_requirement_ha ?? row.transition?.establishment_land_requirement_ha);
+  const totalHectares = households.reduce((sum, row) => sum + areaOf(row), 0);
   const count = households.length;
-  const byHectare = (value, household) => totalHectares > 0 ? value * household.establishment_land_requirement_ha / totalHectares : value / count;
+  const byHectare = (value, household) => totalHectares > 0 ? value * areaOf(household) / totalHectares : value / count;
   const byHousehold = (value) => value / count;
   return households.map((household) => {
     const preliminary = method === 'proportional_hectares'
@@ -290,8 +547,11 @@ function allocatePool({households, pools, method}) {
 
 function normalizedScenario(options = {}) {
   const source = options.scenario ? deepClone(options.scenario) : deepClone(options);
-  const defaultInfrastructure = DEFAULT_SITE_LEASE_SCENARIO.infrastructure;
-  const sourceInfrastructure = source.infrastructure ?? {};
+  const infrastructureScenarioId = source.infrastructure_scenario_id ?? source.infrastructure_scenario ?? DEFAULT_SITE_LEASE_SCENARIO.infrastructure_scenario_id;
+  const infrastructureScenario = INFRASTRUCTURE_SCENARIOS[infrastructureScenarioId];
+  if (!infrastructureScenario) throw new Error(`Unknown ARC infrastructure scenario: ${infrastructureScenarioId}`);
+  const defaultInfrastructure = infrastructureScenario;
+  const sourceInfrastructure = source.infrastructure && JSON.stringify(source.infrastructure) !== JSON.stringify(DEFAULT_SITE_LEASE_SCENARIO.infrastructure) ? source.infrastructure : {};
   const merged = {
     ...deepClone(DEFAULT_SITE_LEASE_SCENARIO),
     ...source,
@@ -304,9 +564,10 @@ function normalizedScenario(options = {}) {
       ...sourceInfrastructure,
       financing: {...deepClone(defaultInfrastructure.financing), ...(sourceInfrastructure.financing ?? {})},
       capital_components: {...deepClone(defaultInfrastructure.capital_components), ...(sourceInfrastructure.capital_components ?? {})},
-      annual_operating_costs_cad: {...deepClone(defaultInfrastructure.annual_operating_costs_cad), ...(sourceInfrastructure.annual_operating_costs_cad ?? {})}
+      annual_operating_costs_cad: {...deepClone(defaultInfrastructure.annual_operating_costs_cad ?? {}), ...(sourceInfrastructure.annual_operating_costs_cad ?? {})}
     }
   };
+  merged.infrastructure_scenario_id = infrastructureScenarioId;
   merged.site_id = source.site_id ?? source.siteId ?? merged.site_id;
   if (!SITE_IDS.has(merged.site_id)) throw new Error(`Unknown carrying-capacity site for lease economics: ${merged.site_id}`);
   merged.community.allocation_method = source.community?.allocation_method ?? source.allocation_method ?? merged.community.allocation_method;
@@ -324,8 +585,15 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
   const inputs = loadCanonicalSiteLeaseInputs();
   const households = normalizeHouseholds(scenario).map((household) => householdCapacity({household, siteId: scenario.site_id, inputs}));
   const count = households.length;
-  const productive = households.reduce((sum, row) => sum + finite(row.transition.establishment_land_requirement_ha), 0);
-  const matureProductive = households.reduce((sum, row) => sum + finite(row.transition.mature_land_requirement_ha), 0);
+  const landReservationBasis = scenario.land_reservation_basis ?? 'maximum_transition_exclusive_footprint';
+  const reservedAreaOf = (row) => landReservationBasis === 'mature_requirement'
+    ? row.mature_land_requirement_ha
+    : landReservationBasis === 'fixed_planning_allocation'
+      ? finite(scenario.fixed_planning_allocation_ha ?? scenario.land.fixed_planning_allocation_ha, 1)
+      : row.establishment_land_requirement_ha;
+  households.forEach((row) => { row.reserved_land_requirement_ha = finite(reservedAreaOf(row)); });
+  const productive = households.reduce((sum, row) => sum + finite(row.reserved_land_requirement_ha), 0);
+  const matureProductive = households.reduce((sum, row) => sum + finite(row.mature_land_requirement_ha), 0);
   const commonArea = Math.max(0, finite(scenario.community.common_area_ha));
   const totalPropertyArea = productive + commonArea;
   const landValue = totalPropertyArea * Math.max(0, finite(scenario.land.price_cad_per_ha));
@@ -378,17 +646,25 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       members: household.members,
       buildings: household.buildings,
       site_id: scenario.site_id,
-      calculated_productive_land_ha: round(household.transition.establishment_land_requirement_ha, 6),
+      calculated_productive_land_ha: round(household.reserved_land_requirement_ha, 6),
+      canonical_establishment_peak_land_requirement_ha: round(household.transition.establishment_land_requirement_ha, 6),
+      reserved_productive_land_ha: round(household.reserved_land_requirement_ha, 6),
       mature_productive_land_requirement_ha: round(household.transition.mature_land_requirement_ha, 6),
       establishment_peak_year: household.transition.establishment_peak_year,
       household_food_demand_gj_year: household.result.household_food_gj_year,
       dwelling: {capital_cost_cad: round(scenario.dwelling.capital_cost_cad), financing: dwellingFinance, maintenance_replacement_annual_cad: round(dwellingMaintenanceAnnual)},
       site_lease: {...siteLease, allocation_method: scenario.community.allocation_method, allocation_method_description: SITE_LEASE_ALLOCATION_METHODS[scenario.community.allocation_method]},
-      shared_infrastructure_service: {annual_cad: round(sharedServiceAnnual), monthly_cad: round(sharedServiceAnnual / 12)},
+      shared_infrastructure_service: {
+        scenario_id: infrastructure.scenario_id,
+        annual_cad: round(sharedServiceAnnual),
+        monthly_cad: round(sharedServiceAnnual / 12),
+        replacement_reserve_annual_cad: round(infrastructure.reserve_contribution_annual_cad / count)
+      },
       recurring_monthly_cost_cad: Object.fromEntries(Object.entries(recurring).map(([key, value]) => [key, round(value)])),
       total_recurring_monthly_cost_cad: round(sumObjectValues(recurring)),
       physical_carrying_capacity: {
-        establishment_land_requirement_ha: round(household.transition.establishment_land_requirement_ha, 6),
+        establishment_land_requirement_ha: round(household.reserved_land_requirement_ha, 6),
+        canonical_establishment_peak_land_requirement_ha: round(household.transition.establishment_land_requirement_ha, 6),
         mature_land_requirement_ha: round(household.transition.mature_land_requirement_ha, 6),
         heating_area_ha: round(household.result.heating_area_ha, 6),
         household_food_demand_gj_year: household.result.household_food_gj_year
@@ -411,11 +687,13 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       household_count: count,
       common_area_ha: round(commonArea, 6),
       allocation_method: scenario.community.allocation_method,
+      land_reservation_basis: landReservationBasis,
+      infrastructure_scenario_id: scenario.infrastructure_scenario_id,
       legal_lease_term_years: finite(scenario.land.legal_lease_term_years),
       debt_amortization_is_separate_from_legal_lease_term: true
     },
     physical_inputs: {
-      household_productive_area_basis: 'canonical carrying-capacity establishment peak exclusive land requirement',
+      household_productive_area_basis: landReservationBasis,
       productive_household_area_ha: round(productive, 6),
       mature_productive_household_area_ha: round(matureProductive, 6),
       total_property_area_ha: round(totalPropertyArea, 6),
@@ -438,7 +716,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       },
       costs_classification: {land_finance_recovery: 'capital recovery', property_tax: 'operating expense', land_insurance: 'operating expense', common_land_costs: 'operating expense', administration: 'operating expense', vacancy_reserve: 'reserve'}
     },
-    infrastructure,
+      infrastructure,
     households: householdOutput,
     project: {
       annual_revenue_cad: {site_leases: round(annualLeaseRevenue), shared_services: round(annualSharedRevenue), total: round(totalProjectRevenue)},
@@ -480,11 +758,52 @@ export function buildSiteLeasePresentationContract() {
   const family = calculateArcSiteLeaseEconomics({
     scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), household: {household_id: 'family-1', label: '2 adults + 2 children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], buildings: [defaultBuilding()]}, community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 1}}
   });
+  const infrastructureScenarioMetadata = Object.values(INFRASTRUCTURE_SCENARIOS).map((scenario) => ({
+    id: scenario.id,
+    label: scenario.label,
+    description: scenario.description,
+    affordability_default: scenario.affordability_default,
+    reserve_policy: scenario.reserve_policy,
+    maintenance_rate_annual: scenario.maintenance_rate_annual,
+    financing: scenario.financing,
+    components: Object.values(scenario.capital_components).map((row) => ({
+      id: row.id,
+      label: row.label,
+      capital_cost_cad: row.capital_cost_cad ?? 0,
+      annual_operating_cost_cad: row.annual_operating_cost_cad ?? 0,
+      requiredness: row.requiredness,
+      source_status: row.source_status,
+      distributed_capital_cost_per_household_cad: row.distributed_capital_cost_per_household_cad ?? 0,
+      distributed_annual_operating_cost_per_household_cad: row.distributed_annual_operating_cost_per_household_cad ?? 0,
+      notes: row.notes
+    }))
+  }));
+  const infrastructureScaleExamples = Object.fromEntries(Object.values(INFRASTRUCTURE_SCENARIOS).map((scenario) => [scenario.id, [12, 16, 25, 50].map((householdCount) => {
+    const result = calculateArcSiteLeaseEconomics({scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), infrastructure_scenario_id: scenario.id, community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: householdCount}}});
+    const household = result.households[0];
+    return {
+      household_count: householdCount,
+      infrastructure_capital_cad: result.infrastructure.capital_value_cad,
+      infrastructure_annual_operating_cad: result.infrastructure.annual_costs_cad.operating,
+      infrastructure_annual_reserve_cad: result.infrastructure.annual_costs_cad.replacement_reserve,
+      shared_services_monthly_per_household_cad: household.shared_infrastructure_service.monthly_cad,
+      site_lease_monthly_per_household_cad: household.site_lease.monthly_total_cad,
+      resident_total_monthly_cad: household.total_recurring_monthly_cost_cad
+    };
+  })]));
   return {
     contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
     api: 'calculateArcSiteLeaseEconomics',
     planning_guideline: {productive_land_per_adult_ha: 1, label: 'Approximately 1 ha of productive land per adult is an early ARC planning benchmark; the property/household model refines it.'},
     allocation_methods: SITE_LEASE_ALLOCATION_METHODS,
+    recommended_infrastructure_scenario: 'minimal_compliant',
+    land_reservation_basis: {
+      default: DEFAULT_SITE_LEASE_SCENARIO.land_reservation_basis,
+      options: ['maximum_transition_exclusive_footprint', 'mature_requirement', 'fixed_planning_allocation'],
+      explanation: 'The project reserves the maximum exclusive footprint needed during establishment; mature annual cropping reductions do not make the underlying parcel disposable.'
+    },
+    infrastructure_scenarios: infrastructureScenarioMetadata,
+    infrastructure_scale_examples: infrastructureScaleExamples,
     evidence: SITE_LEASE_EVIDENCE,
     default_inputs: {land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha, dwelling_capital_cost_cad: DEFAULT_SITE_LEASE_SCENARIO.dwelling.capital_cost_cad, legal_lease_term_years: DEFAULT_SITE_LEASE_SCENARIO.land.legal_lease_term_years},
     examples: {

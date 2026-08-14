@@ -12,7 +12,7 @@
     "site_classes": {"type": "object", "minProperties": 3},
     "environment": {"type": "object", "required": ["contract_version", "region", "climate", "soil_framework", "site_capabilities", "sources"]},
     "establishment": {"type": "object", "required": ["starting_condition", "years", "annual_intercrop_overlap_by_year", "site_models"]},
-    "site_lease_economics": {"type": "object", "required": ["contract_version", "api", "planning_guideline", "allocation_methods", "examples"]},
+    "site_lease_economics": {"type": "object", "required": ["contract_version", "api", "planning_guideline", "allocation_methods", "examples", "recommended_infrastructure_scenario", "land_reservation_basis", "infrastructure_scenarios", "infrastructure_scale_examples"]},
     "household_presets": {"type": "array", "minItems": 6},
     "mature_rows": {"type": "array", "minItems": 18},
     "transition_rows": {"type": "array", "minItems": 18},

@@ -1,6 +1,6 @@
 # ARC site-lease economics audit
 
-Audit date: 2026-08-13. This audit covers the Living Region checkout only. HelpOS
+Audit date: 2026-08-14. This audit covers the Living Region checkout only. HelpOS
 was not inspected or modified for this milestone.
 
 ## Existing components reused
@@ -77,3 +77,44 @@ figures.
 - Project break-even compares site-lease plus shared-service revenue with
   project land and shared-infrastructure costs. Resident dwelling finance is
   outside project revenue.
+
+## Infrastructure audit and scenario boundary
+
+The infrastructure model now preserves four explicit configurations:
+
+| Scenario | Intended use | Default reserve mode | Centralized scope |
+|---|---|---|---|
+| `minimal_compliant` | Recommended affordability case | 0.5% early-life reserve, 1.0% full-lifecycle sensitivity | Basic access, snow/road maintenance, waste/compost and infrastructure insurance |
+| `shared_services` | Shared-service sensitivity | 0.5% early-life reserve, 1.0% full-lifecycle sensitivity | Adds water, wastewater, electrical distribution, laundry and selected shared facilities |
+| `amenity_rich` | Optional amenity sensitivity | 1.0% full-lifecycle reserve | Larger common building, laundry, equipment and expanded central systems |
+| `legacy_current` | Reproduction/audit only | 1.0% full-lifecycle reserve | Former aggregate configuration that produced the approximately `$1,162/month` 12-household charge |
+
+Each infrastructure component is exposed with capital cost, debt service term,
+annual operating cost, maintenance, replacement reserve, requiredness and
+source status. Debt service repays financed capital; a replacement reserve is a
+separate fund for future renewal. The early-life reserve is a sensitivity, not a
+claim that replacement liability disappears.
+
+The former `$1,162.31/month` charge is reproduced by `$1,055,000` of capital,
+`$75,000/year` operations, `$21,100/year` maintenance and
+`$10,550/year` reserve, for `$167,372.40/year / 12 / 12`. The legacy baseline
+also contains infrastructure administration and land-holding administration as
+separate `$18,000/year` allowances. That is the main identified overlap risk;
+recommended scenarios keep administration in the land layer and do not charge
+it again in shared services.
+
+Water, wastewater and electricity have distributed alternatives in the API.
+Those placeholders are shown for lifecycle comparison only and are not silently
+added to the central service charge or the existing household utility allowance.
+Legal servicing, hydrogeology, road/fire standards, insurance, tax treatment,
+actual replacement schedules and procurement quotes remain site-specific.
+
+The generated detail report is:
+
+`packages/carrying-capacity/outputs/arc-infrastructure-audit.md`
+
+and can be regenerated with:
+
+```bash
+npm run report:arc:infrastructure-audit
+```
