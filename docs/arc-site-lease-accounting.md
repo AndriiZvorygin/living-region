@@ -29,6 +29,10 @@ For the current reference adult in a 12-household project, the common-property l
 
 The productive land rate is $206.89/ha/month: productive land debt service, productive property tax and productive vacancy reserve. The default reference case uses 1.135199 ha, producing a $234.86 productive portion and a $457.60 site lease. The initial 20% land down payment is acquisition equity; it is exposed separately and is not charged again as recurring lease recovery or an equity return.
 
+The former $18,000/year administration input was exactly $125/household/month at 12 households, but had no documented service-capacity basis. It is now a project-scale budget with fixed project work, resident-variable billing/records and an event-driven professional allowance. The conventional scenario remains $18,000/year at 12 households; software-assisted and lean self-managed scenarios reduce cash cost while retaining human oversight and professional work. Common-land operations similarly decompose the former $6,000/year into vegetation, drainage/road-edge, paths, ecological-buffer and common-repair allowances. Snow, road maintenance, waste and infrastructure insurance remain shared-infrastructure costs.
+
+The current 1.5 ha common-property input remains a pooled planning assumption. The API now accepts explicit residential footprint, internal road/access, common-building, ecological/water-buffer, shared productive and other common-land areas. It uses those areas only when a complete site-plan takeoff is supplied; current hamlet fixtures are not yet a validated parcel-clipped area source. See `arc-common-property-audit.md` for administration scale, operation decomposition, evidence statuses and the spatial accounting pathway.
+
 The default reservation basis is `maximum_transition_exclusive_footprint`: the project keeps enough land available for the peak bare-land establishment requirement even after mature perennial production reduces annual bridge acreage. Mature hectares are exposed separately for biological comparison.
 
 ## Public page and canonical charge
@@ -57,4 +61,4 @@ Sources: [FCC borrowing basics](https://www.fcc-fac.ca/en/knowledge/borrowing-ba
 
 ## Evidence status
 
-CAD 35,000/ha remains a planning midpoint from the existing repository working range, not a current parcel-matched Grey County market value. Property tax, insurance, legal structure, common-land operations and infrastructure financing remain explicit scenario inputs requiring site-specific evidence. Heated building inputs may affect the upstream biological hectares, but building cost is outside this economics page.
+CAD 35,000/ha remains a planning midpoint from the existing repository working range, not a current parcel-matched Grey County market value. Property tax, land insurance, legal structure, common-land operations and infrastructure financing remain explicit scenario inputs requiring site-specific evidence. MPAC/Ontario tax classification and OFA insurance guidance are recorded in the contract, but no parcel assessment or insurance quote is loaded. Heated building inputs may affect the upstream biological hectares, but building cost is outside this economics page.

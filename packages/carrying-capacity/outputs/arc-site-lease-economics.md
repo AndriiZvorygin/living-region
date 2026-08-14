@@ -24,10 +24,12 @@ For the central 12-household ordinary-land case, the one-adult land + infrastruc
 | Households | Productive site area | Total property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo |
 |---:|---:|---:|---:|---:|---:|---:|
 | 12 | 20.98 ha | 22.48 ha | $786828 | $584 | $228 | $813 |
-| 16 | 27.97 ha | 29.47 ha | $1031603 | $529 | $171 | $700 |
-| 25 | 43.71 ha | 45.21 ha | $1582349 | $469 | $110 | $578 |
+| 16 | 27.97 ha | 29.47 ha | $1031603 | $539 | $171 | $710 |
+| 25 | 43.71 ha | 45.21 ha | $1582349 | $490 | $110 | $600 |
 
 The shared-service charge falls as households share the same capital and operating base. Productive site area and land value still scale with household requirements.
+
+Administration is now a project-scale budget: conventional administration is $18,000/year at 12 households and declines per household as fixed project work is shared across 16, 25 and 50 households. Software-assisted and lean self-managed alternatives are available in the common-property audit.
 
 ## Project recovery
 
@@ -36,8 +38,8 @@ The shared-service charge falls as households share the same capital and operati
 | 1 adult · ordinary land · 12 households | $65895 | $65895 | $32858 | $32858 | break-even | break-even |
 | 1 adult · marginal land · 12 households | $95985 | $95985 | $32858 | $32858 | break-even | break-even |
 | 2 adults + 2 children · ordinary land · 12 households | $84163 | $84163 | $32858 | $32858 | break-even | break-even |
-| 2 adults + 2 children · ordinary land · 16 households | $101527 | $101527 | $32858 | $32858 | break-even | break-even |
-| 2 adults + 2 children · ordinary land · 25 households | $140593 | $140593 | $32858 | $32858 | break-even | break-even |
+| 2 adults + 2 children · ordinary land · 16 households | $103543 | $103543 | $32858 | $32858 | break-even | break-even |
+| 2 adults + 2 children · ordinary land · 25 households | $147145 | $147145 | $32858 | $32858 | break-even | break-even |
 
 Full machine-readable rows are in `arc-site-lease-economics.json` and `arc-site-lease-economics.csv`.
 

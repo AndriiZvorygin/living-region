@@ -32,6 +32,125 @@ export function financeCapital({value, ownership = 'owned_out_right', downPaymen
   };
 }
 
+// Administration is a project operating budget, not a permanent $125 household
+// coefficient. Fixed work is divided across households; resident records/billing
+// scale with household count; professional work remains an annual allowance.
+export const ADMINISTRATION_SCENARIOS = {
+  conventional: {
+    id: 'conventional',
+    label: 'Conventional administration',
+    evidence_status: 'working_planning_assumption',
+    description: 'Part-time project administration with ordinary bookkeeping, compliance, maintenance coordination and professional-service allowance.',
+    automation_level: 'low',
+    components: {
+      lease_accounting_bookkeeping_fixed_annual_cad: {label: 'Lease, accounting and bookkeeping administration', kind: 'fixed_project', annual_cad: 3600, activities: ['lease billing', 'accounting close', 'reserve ledger']},
+      tax_payment_administration_fixed_annual_cad: {label: 'Tax and payment administration', kind: 'fixed_project', annual_cad: 1800, activities: ['tax/payment calendar', 'bank reconciliation', 'annual filings']},
+      compliance_records_fixed_annual_cad: {label: 'Compliance and site records', kind: 'fixed_project', annual_cad: 2400, activities: ['resident records', 'rule/checklist records', 'document control']},
+      maintenance_coordination_fixed_annual_cad: {label: 'Maintenance coordination and inspections', kind: 'fixed_project', annual_cad: 1800, activities: ['work orders', 'inspection scheduling', 'contractor coordination']},
+      resident_billing_records_variable_annual_cad_per_household: {label: 'Resident billing and records', kind: 'variable_per_household', annual_cad_per_household: 480, activities: ['household account changes', 'statements', 'routine correspondence']},
+      legal_accounting_professional_allowance_annual_cad: {label: 'Legal/accounting professional allowance', kind: 'event_driven_allowance', annual_cad: 2640, activities: ['occasional legal review', 'year-end professional review', 'compliance questions']}
+    }
+  },
+  software_assisted: {
+    id: 'software_assisted',
+    label: 'Software-assisted / self-managed',
+    evidence_status: 'policy_design_choice_with_planning_costs',
+    description: 'Open-source workflows automate repetitive records, billing, reserve ledgers, maintenance checklists, site-plan checks and document generation while retaining human oversight and professional review.',
+    automation_level: 'medium_high',
+    automation_capabilities: ['lease billing/accounting', 'reserve accounting', 'maintenance schedules', 'resident/site records', 'site-plan rule checking', 'carrying-capacity calculations', 'productive-land plans', 'inspection/checklist workflows', 'document generation'],
+    components: {
+      software_hosting_backup_security_fixed_annual_cad: {label: 'Software hosting, backup and security oversight', kind: 'fixed_project', annual_cad: 2400, activities: ['offline-capable records', 'backups', 'access review']},
+      lease_accounting_workflow_fixed_annual_cad: {label: 'Lease/accounting workflow oversight', kind: 'fixed_project', annual_cad: 1800, activities: ['review automated statements', 'reserve reconciliation', 'year-end close']},
+      compliance_document_generation_fixed_annual_cad: {label: 'Compliance and document workflow oversight', kind: 'fixed_project', annual_cad: 1200, activities: ['generated checklists', 'site-plan validation', 'document retention']},
+      resident_billing_records_variable_annual_cad_per_household: {label: 'Resident records and exception handling', kind: 'variable_per_household', annual_cad_per_household: 240, activities: ['exceptions', 'account changes', 'routine correspondence']},
+      legal_accounting_professional_allowance_annual_cad: {label: 'Legal/accounting professional allowance', kind: 'event_driven_allowance', annual_cad: 1800, activities: ['occasional legal review', 'year-end professional review', 'compliance questions']}
+    }
+  },
+  lean_self_managed: {
+    id: 'lean_self_managed',
+    label: 'Lean self-managed sensitivity',
+    evidence_status: 'sensitivity_assumption',
+    description: 'Lower-cash scenario assuming residents perform routine coordination and open-source workflows handle most repeatable administration; it is not a zero-labour case.',
+    automation_level: 'high',
+    automation_capabilities: ['same as software-assisted, with more resident time and less paid coordination'],
+    components: {
+      software_hosting_backup_security_fixed_annual_cad: {label: 'Software hosting, backup and security oversight', kind: 'fixed_project', annual_cad: 1800, activities: ['backups', 'access review']},
+      resident_governance_compliance_fixed_annual_cad: {label: 'Resident governance and compliance coordination', kind: 'fixed_project', annual_cad: 1800, activities: ['resident rota', 'checklists', 'document control']},
+      lease_accounting_workflow_fixed_annual_cad: {label: 'Lease/accounting workflow oversight', kind: 'fixed_project', annual_cad: 1200, activities: ['review automated statements', 'reserve reconciliation']},
+      resident_billing_records_variable_annual_cad_per_household: {label: 'Resident records and exception handling', kind: 'variable_per_household', annual_cad_per_household: 120, activities: ['exceptions', 'account changes']},
+      legal_accounting_professional_allowance_annual_cad: {label: 'Legal/accounting professional allowance', kind: 'event_driven_allowance', annual_cad: 1200, activities: ['occasional legal review', 'annual professional check']}
+    }
+  }
+};
+
+export function calculateAdministrationBudget({scenario_id = 'custom', household_count = 1, override_annual_cad = null, annual_cad = 0} = {}) {
+  const count = Math.max(1, Math.round(finite(household_count, 1)));
+  const scenario = ADMINISTRATION_SCENARIOS[scenario_id];
+  if (!scenario) {
+    const total = Math.max(0, finite(override_annual_cad ?? annual_cad));
+    return {
+      scenario_id: 'custom',
+      scenario_label: 'Custom administration budget',
+      evidence_status: 'custom_scenario',
+      household_count: count,
+      annual_total_cad: round(total),
+      monthly_per_household_cad: round(total / count / 12),
+      fixed_project_annual_cad: null,
+      variable_household_annual_cad: null,
+      event_driven_allowance_annual_cad: null,
+      components: [],
+      allocation_basis: 'explicit_custom_annual_budget'
+    };
+  }
+  const components = Object.entries(scenario.components).map(([id, row]) => {
+    const annual = row.kind === 'variable_per_household' ? row.annual_cad_per_household * count : row.annual_cad;
+    return {id, label: row.label, kind: row.kind, annual_cad: round(annual), annual_cad_per_household: row.kind === 'variable_per_household' ? row.annual_cad_per_household : null, activities: row.activities, evidence_status: scenario.evidence_status};
+  });
+  const fixed = components.filter((row) => row.kind === 'fixed_project').reduce((sum, row) => sum + row.annual_cad, 0);
+  const variable = components.filter((row) => row.kind === 'variable_per_household').reduce((sum, row) => sum + row.annual_cad, 0);
+  const eventDriven = components.filter((row) => row.kind === 'event_driven_allowance').reduce((sum, row) => sum + row.annual_cad, 0);
+  const total = fixed + variable + eventDriven;
+  return {
+    scenario_id: scenario.id,
+    scenario_label: scenario.label,
+    description: scenario.description,
+    evidence_status: scenario.evidence_status,
+    automation_level: scenario.automation_level,
+    automation_capabilities: scenario.automation_capabilities ?? [],
+    household_count: count,
+    annual_total_cad: round(total),
+    monthly_per_household_cad: round(total / count / 12),
+    fixed_project_annual_cad: round(fixed),
+    variable_household_annual_cad: round(variable),
+    event_driven_allowance_annual_cad: round(eventDriven),
+    components,
+    allocation_basis: 'fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance'
+  };
+}
+
+export const COMMON_PROPERTY_OPERATIONS_SCENARIOS = {
+  contracted_baseline: {
+    id: 'contracted_baseline',
+    label: 'Common-property operations baseline',
+    evidence_status: 'working_planning_assumption',
+    description: 'Cash operating allowance for common grounds and buffers. Snow clearing, road maintenance, waste handling and infrastructure insurance remain in the shared-infrastructure layer.',
+    components: {
+      vegetation_management_annual_cad: {label: 'Common-land mowing and vegetation management', annual_cad: 1800},
+      road_edge_drainage_annual_cad: {label: 'Road-edge and drainage maintenance', annual_cad: 1200},
+      common_paths_annual_cad: {label: 'Common paths and access-side grounds', annual_cad: 600},
+      ecological_buffer_maintenance_annual_cad: {label: 'Ecological and water-buffer maintenance', annual_cad: 1200},
+      common_area_repairs_miscellaneous_annual_cad: {label: 'Common-area repairs and miscellaneous grounds work', annual_cad: 1200}
+    }
+  }
+};
+
+export function calculateCommonPropertyOperations({scenario_id = 'contracted_baseline', override_annual_cad = null} = {}) {
+  const scenario = COMMON_PROPERTY_OPERATIONS_SCENARIOS[scenario_id];
+  if (!scenario) return {scenario_id: 'custom', scenario_label: 'Custom common-property operations', evidence_status: 'custom_scenario', annual_total_cad: round(Math.max(0, finite(override_annual_cad))), components: []};
+  const components = Object.entries(scenario.components).map(([id, row]) => ({id, label: row.label, annual_cad: round(row.annual_cad), evidence_status: scenario.evidence_status}));
+  return {scenario_id: scenario.id, scenario_label: scenario.label, description: scenario.description, evidence_status: scenario.evidence_status, annual_total_cad: round(components.reduce((sum, row) => sum + row.annual_cad, 0)), components, excludes: ['snow clearing', 'road maintenance', 'waste handling', 'infrastructure insurance', 'land-holding administration']};
+}
+
 function recoveryForValue(value, land) {
   if (land.recovery_mode === 'capital_recovery') {
     return monthlyDebtService(value, land.capital_recovery_rate_annual ?? land.interest_rate_annual, land.capital_recovery_years ?? land.amortization_years) * 12;
@@ -73,6 +192,8 @@ export function calculateLandLeaseAccounting({
   land_insurance_annual_cad = 0,
   common_land_costs_annual_cad = 0,
   administration_annual_cad = 0,
+  administration_scenario_id = 'custom',
+  administration_override_annual_cad = null,
   fixed_land_reserve_annual_cad = 0,
   vacancy_reserve_rate_annual = 0,
   allocation_method = 'base_plus_hectare'
@@ -80,6 +201,7 @@ export function calculateLandLeaseAccounting({
   const rows = Array.isArray(households) && households.length ? households : [{household_id: 'household-1', reserved_land_requirement_ha: 0}];
   const areaOf = (row) => Math.max(0, finite(row.reserved_land_requirement_ha ?? row.productive_land_ha ?? row.establishment_land_requirement_ha));
   const count = rows.length;
+  const administration = calculateAdministrationBudget({scenario_id: administration_scenario_id, household_count: count, override_annual_cad: administration_override_annual_cad, annual_cad: administration_annual_cad});
   const productiveArea = rows.reduce((total, row) => total + areaOf(row), 0);
   const commonArea = Math.max(0, finite(common_property_land_ha));
   const totalPropertyArea = productiveArea + commonArea;
@@ -109,7 +231,7 @@ export function calculateLandLeaseAccounting({
     common_property_tax_annual_cad: commonTax,
     land_insurance_annual_cad: Math.max(0, finite(land_insurance_annual_cad)),
     common_land_costs_annual_cad: Math.max(0, finite(common_land_costs_annual_cad)),
-    administration_annual_cad: Math.max(0, finite(administration_annual_cad)),
+    administration_annual_cad: administration.annual_total_cad,
     fixed_land_reserve_annual_cad: Math.max(0, finite(fixed_land_reserve_annual_cad))
   };
   const areaBeforeVacancy = {
@@ -186,6 +308,7 @@ export function calculateLandLeaseAccounting({
       includes: ['common property/access/ecological land acquisition and debt', 'common property tax', 'land insurance', 'common-land operating costs', 'land-holding administration', 'fixed land reserve', 'common-property vacancy reserve'],
       excludes: ['productive/exclusive land acquisition and tax', 'shared infrastructure', 'resident dwelling and household expenses']
     },
+    administration,
     productive_land_charge: {
       annual_components_cad: Object.fromEntries(Object.entries(areaComponents).map(([key, value]) => [key, round(value)])),
       annual_project_cost_before_vacancy_cad: round(sum(areaBeforeVacancy)),

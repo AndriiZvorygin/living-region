@@ -2,7 +2,7 @@
   "contract_version": "1.2.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-14T17:48:07.671Z",
+  "generated_at": "2026-08-14T19:24:27.306Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -1688,7 +1688,7 @@
     }
   },
   "site_lease_economics": {
-    "contract_version": "1.3.0",
+    "contract_version": "1.4.0",
     "api": "calculateArcSiteLeaseEconomics",
     "planning_guideline": {
       "productive_land_per_adult_ha": 1,
@@ -2391,8 +2391,8 @@
           "infrastructure_annual_capital_debt_service_cad": 60722.4,
           "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 871.73,
-          "site_lease_monthly_per_household_cad": 401.92,
-          "land_infrastructure_monthly_per_household_cad": 1273.65,
+          "site_lease_monthly_per_household_cad": 412.42,
+          "land_infrastructure_monthly_per_household_cad": 1284.15,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -2405,8 +2405,8 @@
           "infrastructure_annual_capital_debt_service_cad": 60722.4,
           "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 557.91,
-          "site_lease_monthly_per_household_cad": 341.78,
-          "land_infrastructure_monthly_per_household_cad": 899.69,
+          "site_lease_monthly_per_household_cad": 363.62,
+          "land_infrastructure_monthly_per_household_cad": 921.53,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -2419,8 +2419,8 @@
           "infrastructure_annual_capital_debt_service_cad": 60722.4,
           "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 278.95,
-          "site_lease_monthly_per_household_cad": 288.32,
-          "land_infrastructure_monthly_per_household_cad": 567.27,
+          "site_lease_monthly_per_household_cad": 320.24,
+          "land_infrastructure_monthly_per_household_cad": 599.19,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -2449,8 +2449,8 @@
           "infrastructure_annual_capital_debt_service_cad": 8058,
           "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 171.14,
-          "site_lease_monthly_per_household_cad": 401.92,
-          "land_infrastructure_monthly_per_household_cad": 573.06,
+          "site_lease_monthly_per_household_cad": 412.42,
+          "land_infrastructure_monthly_per_household_cad": 583.56,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -2463,8 +2463,8 @@
           "infrastructure_annual_capital_debt_service_cad": 8058,
           "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 109.53,
-          "site_lease_monthly_per_household_cad": 341.78,
-          "land_infrastructure_monthly_per_household_cad": 451.31,
+          "site_lease_monthly_per_household_cad": 363.62,
+          "land_infrastructure_monthly_per_household_cad": 473.15,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -2477,8 +2477,8 @@
           "infrastructure_annual_capital_debt_service_cad": 8058,
           "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 54.76,
-          "site_lease_monthly_per_household_cad": 288.32,
-          "land_infrastructure_monthly_per_household_cad": 343.08,
+          "site_lease_monthly_per_household_cad": 320.24,
+          "land_infrastructure_monthly_per_household_cad": 375,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -2507,8 +2507,8 @@
           "infrastructure_annual_capital_debt_service_cad": 57844.56,
           "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 770.67,
-          "site_lease_monthly_per_household_cad": 401.92,
-          "land_infrastructure_monthly_per_household_cad": 1172.59,
+          "site_lease_monthly_per_household_cad": 412.42,
+          "land_infrastructure_monthly_per_household_cad": 1183.09,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -2521,8 +2521,8 @@
           "infrastructure_annual_capital_debt_service_cad": 57844.56,
           "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 493.23,
-          "site_lease_monthly_per_household_cad": 341.78,
-          "land_infrastructure_monthly_per_household_cad": 835.01,
+          "site_lease_monthly_per_household_cad": 363.62,
+          "land_infrastructure_monthly_per_household_cad": 856.85,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -2535,8 +2535,8 @@
           "infrastructure_annual_capital_debt_service_cad": 57844.56,
           "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 246.62,
-          "site_lease_monthly_per_household_cad": 288.32,
-          "land_infrastructure_monthly_per_household_cad": 534.94,
+          "site_lease_monthly_per_household_cad": 320.24,
+          "land_infrastructure_monthly_per_household_cad": 566.86,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -2565,8 +2565,8 @@
           "infrastructure_annual_capital_debt_service_cad": 73384.92,
           "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 956.43,
-          "site_lease_monthly_per_household_cad": 401.92,
-          "land_infrastructure_monthly_per_household_cad": 1358.35,
+          "site_lease_monthly_per_household_cad": 412.42,
+          "land_infrastructure_monthly_per_household_cad": 1368.85,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
@@ -2579,8 +2579,8 @@
           "infrastructure_annual_capital_debt_service_cad": 73384.92,
           "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 612.12,
-          "site_lease_monthly_per_household_cad": 341.78,
-          "land_infrastructure_monthly_per_household_cad": 953.9,
+          "site_lease_monthly_per_household_cad": 363.62,
+          "land_infrastructure_monthly_per_household_cad": 975.74,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
@@ -2593,13 +2593,1435 @@
           "infrastructure_annual_capital_debt_service_cad": 73384.92,
           "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 306.06,
-          "site_lease_monthly_per_household_cad": 288.32,
-          "land_infrastructure_monthly_per_household_cad": 594.38,
+          "site_lease_monthly_per_household_cad": 320.24,
+          "land_infrastructure_monthly_per_household_cad": 626.3,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
         }
       ]
+    },
+    "administration_scenarios": [
+      {
+        "id": "conventional",
+        "label": "Conventional administration",
+        "description": "Part-time project administration with ordinary bookkeeping, compliance, maintenance coordination and professional-service allowance.",
+        "evidence_status": "working_planning_assumption",
+        "automation_level": "low",
+        "automation_capabilities": [],
+        "components": [
+          {
+            "id": "lease_accounting_bookkeeping_fixed_annual_cad",
+            "label": "Lease, accounting and bookkeeping administration",
+            "kind": "fixed_project",
+            "annual_cad": 3600,
+            "activities": [
+              "lease billing",
+              "accounting close",
+              "reserve ledger"
+            ]
+          },
+          {
+            "id": "tax_payment_administration_fixed_annual_cad",
+            "label": "Tax and payment administration",
+            "kind": "fixed_project",
+            "annual_cad": 1800,
+            "activities": [
+              "tax/payment calendar",
+              "bank reconciliation",
+              "annual filings"
+            ]
+          },
+          {
+            "id": "compliance_records_fixed_annual_cad",
+            "label": "Compliance and site records",
+            "kind": "fixed_project",
+            "annual_cad": 2400,
+            "activities": [
+              "resident records",
+              "rule/checklist records",
+              "document control"
+            ]
+          },
+          {
+            "id": "maintenance_coordination_fixed_annual_cad",
+            "label": "Maintenance coordination and inspections",
+            "kind": "fixed_project",
+            "annual_cad": 1800,
+            "activities": [
+              "work orders",
+              "inspection scheduling",
+              "contractor coordination"
+            ]
+          },
+          {
+            "id": "resident_billing_records_variable_annual_cad_per_household",
+            "label": "Resident billing and records",
+            "kind": "variable_per_household",
+            "annual_cad_per_household": 480,
+            "activities": [
+              "household account changes",
+              "statements",
+              "routine correspondence"
+            ]
+          },
+          {
+            "id": "legal_accounting_professional_allowance_annual_cad",
+            "label": "Legal/accounting professional allowance",
+            "kind": "event_driven_allowance",
+            "annual_cad": 2640,
+            "activities": [
+              "occasional legal review",
+              "year-end professional review",
+              "compliance questions"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "software_assisted",
+        "label": "Software-assisted / self-managed",
+        "description": "Open-source workflows automate repetitive records, billing, reserve ledgers, maintenance checklists, site-plan checks and document generation while retaining human oversight and professional review.",
+        "evidence_status": "policy_design_choice_with_planning_costs",
+        "automation_level": "medium_high",
+        "automation_capabilities": [
+          "lease billing/accounting",
+          "reserve accounting",
+          "maintenance schedules",
+          "resident/site records",
+          "site-plan rule checking",
+          "carrying-capacity calculations",
+          "productive-land plans",
+          "inspection/checklist workflows",
+          "document generation"
+        ],
+        "components": [
+          {
+            "id": "software_hosting_backup_security_fixed_annual_cad",
+            "label": "Software hosting, backup and security oversight",
+            "kind": "fixed_project",
+            "annual_cad": 2400,
+            "activities": [
+              "offline-capable records",
+              "backups",
+              "access review"
+            ]
+          },
+          {
+            "id": "lease_accounting_workflow_fixed_annual_cad",
+            "label": "Lease/accounting workflow oversight",
+            "kind": "fixed_project",
+            "annual_cad": 1800,
+            "activities": [
+              "review automated statements",
+              "reserve reconciliation",
+              "year-end close"
+            ]
+          },
+          {
+            "id": "compliance_document_generation_fixed_annual_cad",
+            "label": "Compliance and document workflow oversight",
+            "kind": "fixed_project",
+            "annual_cad": 1200,
+            "activities": [
+              "generated checklists",
+              "site-plan validation",
+              "document retention"
+            ]
+          },
+          {
+            "id": "resident_billing_records_variable_annual_cad_per_household",
+            "label": "Resident records and exception handling",
+            "kind": "variable_per_household",
+            "annual_cad_per_household": 240,
+            "activities": [
+              "exceptions",
+              "account changes",
+              "routine correspondence"
+            ]
+          },
+          {
+            "id": "legal_accounting_professional_allowance_annual_cad",
+            "label": "Legal/accounting professional allowance",
+            "kind": "event_driven_allowance",
+            "annual_cad": 1800,
+            "activities": [
+              "occasional legal review",
+              "year-end professional review",
+              "compliance questions"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "lean_self_managed",
+        "label": "Lean self-managed sensitivity",
+        "description": "Lower-cash scenario assuming residents perform routine coordination and open-source workflows handle most repeatable administration; it is not a zero-labour case.",
+        "evidence_status": "sensitivity_assumption",
+        "automation_level": "high",
+        "automation_capabilities": [
+          "same as software-assisted, with more resident time and less paid coordination"
+        ],
+        "components": [
+          {
+            "id": "software_hosting_backup_security_fixed_annual_cad",
+            "label": "Software hosting, backup and security oversight",
+            "kind": "fixed_project",
+            "annual_cad": 1800,
+            "activities": [
+              "backups",
+              "access review"
+            ]
+          },
+          {
+            "id": "resident_governance_compliance_fixed_annual_cad",
+            "label": "Resident governance and compliance coordination",
+            "kind": "fixed_project",
+            "annual_cad": 1800,
+            "activities": [
+              "resident rota",
+              "checklists",
+              "document control"
+            ]
+          },
+          {
+            "id": "lease_accounting_workflow_fixed_annual_cad",
+            "label": "Lease/accounting workflow oversight",
+            "kind": "fixed_project",
+            "annual_cad": 1200,
+            "activities": [
+              "review automated statements",
+              "reserve reconciliation"
+            ]
+          },
+          {
+            "id": "resident_billing_records_variable_annual_cad_per_household",
+            "label": "Resident records and exception handling",
+            "kind": "variable_per_household",
+            "annual_cad_per_household": 120,
+            "activities": [
+              "exceptions",
+              "account changes"
+            ]
+          },
+          {
+            "id": "legal_accounting_professional_allowance_annual_cad",
+            "label": "Legal/accounting professional allowance",
+            "kind": "event_driven_allowance",
+            "annual_cad": 1200,
+            "activities": [
+              "occasional legal review",
+              "annual professional check"
+            ]
+          }
+        ]
+      }
+    ],
+    "administration_scale_examples": {
+      "conventional": [
+        {
+          "scenario_id": "conventional",
+          "scenario_label": "Conventional administration",
+          "description": "Part-time project administration with ordinary bookkeeping, compliance, maintenance coordination and professional-service allowance.",
+          "evidence_status": "working_planning_assumption",
+          "automation_level": "low",
+          "automation_capabilities": [],
+          "household_count": 12,
+          "annual_total_cad": 18000,
+          "monthly_per_household_cad": 125,
+          "fixed_project_annual_cad": 9600,
+          "variable_household_annual_cad": 5760,
+          "event_driven_allowance_annual_cad": 2640,
+          "components": [
+            {
+              "id": "lease_accounting_bookkeeping_fixed_annual_cad",
+              "label": "Lease, accounting and bookkeeping administration",
+              "kind": "fixed_project",
+              "annual_cad": 3600,
+              "annual_cad_per_household": null,
+              "activities": [
+                "lease billing",
+                "accounting close",
+                "reserve ledger"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "tax_payment_administration_fixed_annual_cad",
+              "label": "Tax and payment administration",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "tax/payment calendar",
+                "bank reconciliation",
+                "annual filings"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "compliance_records_fixed_annual_cad",
+              "label": "Compliance and site records",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident records",
+                "rule/checklist records",
+                "document control"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "maintenance_coordination_fixed_annual_cad",
+              "label": "Maintenance coordination and inspections",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "work orders",
+                "inspection scheduling",
+                "contractor coordination"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident billing and records",
+              "kind": "variable_per_household",
+              "annual_cad": 5760,
+              "annual_cad_per_household": 480,
+              "activities": [
+                "household account changes",
+                "statements",
+                "routine correspondence"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 2640,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "working_planning_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "conventional",
+          "scenario_label": "Conventional administration",
+          "description": "Part-time project administration with ordinary bookkeeping, compliance, maintenance coordination and professional-service allowance.",
+          "evidence_status": "working_planning_assumption",
+          "automation_level": "low",
+          "automation_capabilities": [],
+          "household_count": 16,
+          "annual_total_cad": 19920,
+          "monthly_per_household_cad": 103.75,
+          "fixed_project_annual_cad": 9600,
+          "variable_household_annual_cad": 7680,
+          "event_driven_allowance_annual_cad": 2640,
+          "components": [
+            {
+              "id": "lease_accounting_bookkeeping_fixed_annual_cad",
+              "label": "Lease, accounting and bookkeeping administration",
+              "kind": "fixed_project",
+              "annual_cad": 3600,
+              "annual_cad_per_household": null,
+              "activities": [
+                "lease billing",
+                "accounting close",
+                "reserve ledger"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "tax_payment_administration_fixed_annual_cad",
+              "label": "Tax and payment administration",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "tax/payment calendar",
+                "bank reconciliation",
+                "annual filings"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "compliance_records_fixed_annual_cad",
+              "label": "Compliance and site records",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident records",
+                "rule/checklist records",
+                "document control"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "maintenance_coordination_fixed_annual_cad",
+              "label": "Maintenance coordination and inspections",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "work orders",
+                "inspection scheduling",
+                "contractor coordination"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident billing and records",
+              "kind": "variable_per_household",
+              "annual_cad": 7680,
+              "annual_cad_per_household": 480,
+              "activities": [
+                "household account changes",
+                "statements",
+                "routine correspondence"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 2640,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "working_planning_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "conventional",
+          "scenario_label": "Conventional administration",
+          "description": "Part-time project administration with ordinary bookkeeping, compliance, maintenance coordination and professional-service allowance.",
+          "evidence_status": "working_planning_assumption",
+          "automation_level": "low",
+          "automation_capabilities": [],
+          "household_count": 25,
+          "annual_total_cad": 24240,
+          "monthly_per_household_cad": 80.8,
+          "fixed_project_annual_cad": 9600,
+          "variable_household_annual_cad": 12000,
+          "event_driven_allowance_annual_cad": 2640,
+          "components": [
+            {
+              "id": "lease_accounting_bookkeeping_fixed_annual_cad",
+              "label": "Lease, accounting and bookkeeping administration",
+              "kind": "fixed_project",
+              "annual_cad": 3600,
+              "annual_cad_per_household": null,
+              "activities": [
+                "lease billing",
+                "accounting close",
+                "reserve ledger"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "tax_payment_administration_fixed_annual_cad",
+              "label": "Tax and payment administration",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "tax/payment calendar",
+                "bank reconciliation",
+                "annual filings"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "compliance_records_fixed_annual_cad",
+              "label": "Compliance and site records",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident records",
+                "rule/checklist records",
+                "document control"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "maintenance_coordination_fixed_annual_cad",
+              "label": "Maintenance coordination and inspections",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "work orders",
+                "inspection scheduling",
+                "contractor coordination"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident billing and records",
+              "kind": "variable_per_household",
+              "annual_cad": 12000,
+              "annual_cad_per_household": 480,
+              "activities": [
+                "household account changes",
+                "statements",
+                "routine correspondence"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 2640,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "working_planning_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "conventional",
+          "scenario_label": "Conventional administration",
+          "description": "Part-time project administration with ordinary bookkeeping, compliance, maintenance coordination and professional-service allowance.",
+          "evidence_status": "working_planning_assumption",
+          "automation_level": "low",
+          "automation_capabilities": [],
+          "household_count": 50,
+          "annual_total_cad": 36240,
+          "monthly_per_household_cad": 60.4,
+          "fixed_project_annual_cad": 9600,
+          "variable_household_annual_cad": 24000,
+          "event_driven_allowance_annual_cad": 2640,
+          "components": [
+            {
+              "id": "lease_accounting_bookkeeping_fixed_annual_cad",
+              "label": "Lease, accounting and bookkeeping administration",
+              "kind": "fixed_project",
+              "annual_cad": 3600,
+              "annual_cad_per_household": null,
+              "activities": [
+                "lease billing",
+                "accounting close",
+                "reserve ledger"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "tax_payment_administration_fixed_annual_cad",
+              "label": "Tax and payment administration",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "tax/payment calendar",
+                "bank reconciliation",
+                "annual filings"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "compliance_records_fixed_annual_cad",
+              "label": "Compliance and site records",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident records",
+                "rule/checklist records",
+                "document control"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "maintenance_coordination_fixed_annual_cad",
+              "label": "Maintenance coordination and inspections",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "work orders",
+                "inspection scheduling",
+                "contractor coordination"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident billing and records",
+              "kind": "variable_per_household",
+              "annual_cad": 24000,
+              "annual_cad_per_household": 480,
+              "activities": [
+                "household account changes",
+                "statements",
+                "routine correspondence"
+              ],
+              "evidence_status": "working_planning_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 2640,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "working_planning_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        }
+      ],
+      "software_assisted": [
+        {
+          "scenario_id": "software_assisted",
+          "scenario_label": "Software-assisted / self-managed",
+          "description": "Open-source workflows automate repetitive records, billing, reserve ledgers, maintenance checklists, site-plan checks and document generation while retaining human oversight and professional review.",
+          "evidence_status": "policy_design_choice_with_planning_costs",
+          "automation_level": "medium_high",
+          "automation_capabilities": [
+            "lease billing/accounting",
+            "reserve accounting",
+            "maintenance schedules",
+            "resident/site records",
+            "site-plan rule checking",
+            "carrying-capacity calculations",
+            "productive-land plans",
+            "inspection/checklist workflows",
+            "document generation"
+          ],
+          "household_count": 12,
+          "annual_total_cad": 10080,
+          "monthly_per_household_cad": 70,
+          "fixed_project_annual_cad": 5400,
+          "variable_household_annual_cad": 2880,
+          "event_driven_allowance_annual_cad": 1800,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "offline-capable records",
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation",
+                "year-end close"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "compliance_document_generation_fixed_annual_cad",
+              "label": "Compliance and document workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "generated checklists",
+                "site-plan validation",
+                "document retention"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 2880,
+              "annual_cad_per_household": 240,
+              "activities": [
+                "exceptions",
+                "account changes",
+                "routine correspondence"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "software_assisted",
+          "scenario_label": "Software-assisted / self-managed",
+          "description": "Open-source workflows automate repetitive records, billing, reserve ledgers, maintenance checklists, site-plan checks and document generation while retaining human oversight and professional review.",
+          "evidence_status": "policy_design_choice_with_planning_costs",
+          "automation_level": "medium_high",
+          "automation_capabilities": [
+            "lease billing/accounting",
+            "reserve accounting",
+            "maintenance schedules",
+            "resident/site records",
+            "site-plan rule checking",
+            "carrying-capacity calculations",
+            "productive-land plans",
+            "inspection/checklist workflows",
+            "document generation"
+          ],
+          "household_count": 16,
+          "annual_total_cad": 11040,
+          "monthly_per_household_cad": 57.5,
+          "fixed_project_annual_cad": 5400,
+          "variable_household_annual_cad": 3840,
+          "event_driven_allowance_annual_cad": 1800,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "offline-capable records",
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation",
+                "year-end close"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "compliance_document_generation_fixed_annual_cad",
+              "label": "Compliance and document workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "generated checklists",
+                "site-plan validation",
+                "document retention"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 3840,
+              "annual_cad_per_household": 240,
+              "activities": [
+                "exceptions",
+                "account changes",
+                "routine correspondence"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "software_assisted",
+          "scenario_label": "Software-assisted / self-managed",
+          "description": "Open-source workflows automate repetitive records, billing, reserve ledgers, maintenance checklists, site-plan checks and document generation while retaining human oversight and professional review.",
+          "evidence_status": "policy_design_choice_with_planning_costs",
+          "automation_level": "medium_high",
+          "automation_capabilities": [
+            "lease billing/accounting",
+            "reserve accounting",
+            "maintenance schedules",
+            "resident/site records",
+            "site-plan rule checking",
+            "carrying-capacity calculations",
+            "productive-land plans",
+            "inspection/checklist workflows",
+            "document generation"
+          ],
+          "household_count": 25,
+          "annual_total_cad": 13200,
+          "monthly_per_household_cad": 44,
+          "fixed_project_annual_cad": 5400,
+          "variable_household_annual_cad": 6000,
+          "event_driven_allowance_annual_cad": 1800,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "offline-capable records",
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation",
+                "year-end close"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "compliance_document_generation_fixed_annual_cad",
+              "label": "Compliance and document workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "generated checklists",
+                "site-plan validation",
+                "document retention"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 6000,
+              "annual_cad_per_household": 240,
+              "activities": [
+                "exceptions",
+                "account changes",
+                "routine correspondence"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "software_assisted",
+          "scenario_label": "Software-assisted / self-managed",
+          "description": "Open-source workflows automate repetitive records, billing, reserve ledgers, maintenance checklists, site-plan checks and document generation while retaining human oversight and professional review.",
+          "evidence_status": "policy_design_choice_with_planning_costs",
+          "automation_level": "medium_high",
+          "automation_capabilities": [
+            "lease billing/accounting",
+            "reserve accounting",
+            "maintenance schedules",
+            "resident/site records",
+            "site-plan rule checking",
+            "carrying-capacity calculations",
+            "productive-land plans",
+            "inspection/checklist workflows",
+            "document generation"
+          ],
+          "household_count": 50,
+          "annual_total_cad": 19200,
+          "monthly_per_household_cad": 32,
+          "fixed_project_annual_cad": 5400,
+          "variable_household_annual_cad": 12000,
+          "event_driven_allowance_annual_cad": 1800,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 2400,
+              "annual_cad_per_household": null,
+              "activities": [
+                "offline-capable records",
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation",
+                "year-end close"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "compliance_document_generation_fixed_annual_cad",
+              "label": "Compliance and document workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "generated checklists",
+                "site-plan validation",
+                "document retention"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 12000,
+              "annual_cad_per_household": 240,
+              "activities": [
+                "exceptions",
+                "account changes",
+                "routine correspondence"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "year-end professional review",
+                "compliance questions"
+              ],
+              "evidence_status": "policy_design_choice_with_planning_costs"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        }
+      ],
+      "lean_self_managed": [
+        {
+          "scenario_id": "lean_self_managed",
+          "scenario_label": "Lean self-managed sensitivity",
+          "description": "Lower-cash scenario assuming residents perform routine coordination and open-source workflows handle most repeatable administration; it is not a zero-labour case.",
+          "evidence_status": "sensitivity_assumption",
+          "automation_level": "high",
+          "automation_capabilities": [
+            "same as software-assisted, with more resident time and less paid coordination"
+          ],
+          "household_count": 12,
+          "annual_total_cad": 7440,
+          "monthly_per_household_cad": 51.67,
+          "fixed_project_annual_cad": 4800,
+          "variable_household_annual_cad": 1440,
+          "event_driven_allowance_annual_cad": 1200,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_governance_compliance_fixed_annual_cad",
+              "label": "Resident governance and compliance coordination",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident rota",
+                "checklists",
+                "document control"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 1440,
+              "annual_cad_per_household": 120,
+              "activities": [
+                "exceptions",
+                "account changes"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "annual professional check"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "lean_self_managed",
+          "scenario_label": "Lean self-managed sensitivity",
+          "description": "Lower-cash scenario assuming residents perform routine coordination and open-source workflows handle most repeatable administration; it is not a zero-labour case.",
+          "evidence_status": "sensitivity_assumption",
+          "automation_level": "high",
+          "automation_capabilities": [
+            "same as software-assisted, with more resident time and less paid coordination"
+          ],
+          "household_count": 16,
+          "annual_total_cad": 7920,
+          "monthly_per_household_cad": 41.25,
+          "fixed_project_annual_cad": 4800,
+          "variable_household_annual_cad": 1920,
+          "event_driven_allowance_annual_cad": 1200,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_governance_compliance_fixed_annual_cad",
+              "label": "Resident governance and compliance coordination",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident rota",
+                "checklists",
+                "document control"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 1920,
+              "annual_cad_per_household": 120,
+              "activities": [
+                "exceptions",
+                "account changes"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "annual professional check"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "lean_self_managed",
+          "scenario_label": "Lean self-managed sensitivity",
+          "description": "Lower-cash scenario assuming residents perform routine coordination and open-source workflows handle most repeatable administration; it is not a zero-labour case.",
+          "evidence_status": "sensitivity_assumption",
+          "automation_level": "high",
+          "automation_capabilities": [
+            "same as software-assisted, with more resident time and less paid coordination"
+          ],
+          "household_count": 25,
+          "annual_total_cad": 9000,
+          "monthly_per_household_cad": 30,
+          "fixed_project_annual_cad": 4800,
+          "variable_household_annual_cad": 3000,
+          "event_driven_allowance_annual_cad": 1200,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_governance_compliance_fixed_annual_cad",
+              "label": "Resident governance and compliance coordination",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident rota",
+                "checklists",
+                "document control"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 3000,
+              "annual_cad_per_household": 120,
+              "activities": [
+                "exceptions",
+                "account changes"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "annual professional check"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        },
+        {
+          "scenario_id": "lean_self_managed",
+          "scenario_label": "Lean self-managed sensitivity",
+          "description": "Lower-cash scenario assuming residents perform routine coordination and open-source workflows handle most repeatable administration; it is not a zero-labour case.",
+          "evidence_status": "sensitivity_assumption",
+          "automation_level": "high",
+          "automation_capabilities": [
+            "same as software-assisted, with more resident time and less paid coordination"
+          ],
+          "household_count": 50,
+          "annual_total_cad": 12000,
+          "monthly_per_household_cad": 20,
+          "fixed_project_annual_cad": 4800,
+          "variable_household_annual_cad": 6000,
+          "event_driven_allowance_annual_cad": 1200,
+          "components": [
+            {
+              "id": "software_hosting_backup_security_fixed_annual_cad",
+              "label": "Software hosting, backup and security oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "backups",
+                "access review"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_governance_compliance_fixed_annual_cad",
+              "label": "Resident governance and compliance coordination",
+              "kind": "fixed_project",
+              "annual_cad": 1800,
+              "annual_cad_per_household": null,
+              "activities": [
+                "resident rota",
+                "checklists",
+                "document control"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "lease_accounting_workflow_fixed_annual_cad",
+              "label": "Lease/accounting workflow oversight",
+              "kind": "fixed_project",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "review automated statements",
+                "reserve reconciliation"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "resident_billing_records_variable_annual_cad_per_household",
+              "label": "Resident records and exception handling",
+              "kind": "variable_per_household",
+              "annual_cad": 6000,
+              "annual_cad_per_household": 120,
+              "activities": [
+                "exceptions",
+                "account changes"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            },
+            {
+              "id": "legal_accounting_professional_allowance_annual_cad",
+              "label": "Legal/accounting professional allowance",
+              "kind": "event_driven_allowance",
+              "annual_cad": 1200,
+              "annual_cad_per_household": null,
+              "activities": [
+                "occasional legal review",
+                "annual professional check"
+              ],
+              "evidence_status": "sensitivity_assumption"
+            }
+          ],
+          "allocation_basis": "fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance"
+        }
+      ]
+    },
+    "common_property_operations": [
+      {
+        "id": "contracted_baseline",
+        "label": "Common-property operations baseline",
+        "description": "Cash operating allowance for common grounds and buffers. Snow clearing, road maintenance, waste handling and infrastructure insurance remain in the shared-infrastructure layer.",
+        "evidence_status": "working_planning_assumption",
+        "components": [
+          {
+            "id": "vegetation_management_annual_cad",
+            "label": "Common-land mowing and vegetation management",
+            "annual_cad": 1800
+          },
+          {
+            "id": "road_edge_drainage_annual_cad",
+            "label": "Road-edge and drainage maintenance",
+            "annual_cad": 1200
+          },
+          {
+            "id": "common_paths_annual_cad",
+            "label": "Common paths and access-side grounds",
+            "annual_cad": 600
+          },
+          {
+            "id": "ecological_buffer_maintenance_annual_cad",
+            "label": "Ecological and water-buffer maintenance",
+            "annual_cad": 1200
+          },
+          {
+            "id": "common_area_repairs_miscellaneous_annual_cad",
+            "label": "Common-area repairs and miscellaneous grounds work",
+            "annual_cad": 1200
+          }
+        ],
+        "excludes": [
+          "snow clearing",
+          "road maintenance",
+          "waste handling",
+          "infrastructure insurance",
+          "land-holding administration"
+        ]
+      }
+    ],
+    "common_area_accounting": {
+      "mode": "pooled_planning_assumption",
+      "source": "No parcel-level ARC site layout is currently connected to the economics API",
+      "evidence_status": "working_planning_assumption",
+      "total_common_area_ha": 1.5,
+      "components": [
+        {
+          "id": "residential_footprints",
+          "label": "Residential footprints",
+          "status": "site_plan_required",
+          "area_ha": null
+        },
+        {
+          "id": "internal_road_access",
+          "label": "Internal road/access area",
+          "status": "site_plan_required",
+          "area_ha": null
+        },
+        {
+          "id": "common_buildings_infrastructure",
+          "label": "Common buildings/infrastructure footprints",
+          "status": "site_plan_required",
+          "area_ha": null
+        },
+        {
+          "id": "ecological_water_buffers",
+          "label": "Ecological and water buffers",
+          "status": "site_plan_required",
+          "area_ha": null
+        },
+        {
+          "id": "shared_productive_areas",
+          "label": "Shared productive areas",
+          "status": "site_plan_required",
+          "area_ha": null
+        },
+        {
+          "id": "other_required_common_land",
+          "label": "Other required common land",
+          "status": "site_plan_required",
+          "area_ha": null
+        }
+      ],
+      "missing_components": [
+        "residential_footprints",
+        "internal_road_access",
+        "common_buildings_infrastructure",
+        "ecological_water_buffers",
+        "shared_productive_areas",
+        "other_required_common_land"
+      ],
+      "explanation": "The site plan does not yet provide all non-productive polygons, so the explicit pooled common-area assumption is used and the component areas remain unresolved.",
+      "component_definitions": [
+        {
+          "id": "residential_footprints",
+          "label": "Residential footprints",
+          "status": "site_plan_required"
+        },
+        {
+          "id": "internal_road_access",
+          "label": "Internal road/access area",
+          "status": "site_plan_required"
+        },
+        {
+          "id": "common_buildings_infrastructure",
+          "label": "Common buildings/infrastructure footprints",
+          "status": "site_plan_required"
+        },
+        {
+          "id": "ecological_water_buffers",
+          "label": "Ecological and water buffers",
+          "status": "site_plan_required"
+        },
+        {
+          "id": "shared_productive_areas",
+          "label": "Shared productive areas",
+          "status": "site_plan_required"
+        },
+        {
+          "id": "other_required_common_land",
+          "label": "Other required common land",
+          "status": "site_plan_required"
+        }
+      ],
+      "spatial_pipeline": "parcel -> buildings/residential footprints -> roads/access -> servicing -> productive layout -> ecological buffers -> explicit common hectares",
+      "spatial_pipeline_status": "not_connected_to_current_ARC_economics",
+      "spatial_pipeline_gap": "Current hamlet layout fixtures contain points, lines and rectangles for proposed elements but do not yet provide a validated parcel-clipped polygon area takeoff for each common-land category."
     },
     "land_financing_evidence": {
       "status": "planning_range_not_product_specific",
@@ -2709,8 +4131,30 @@
       },
       "property_tax": {
         "status": "planning_assumption",
-        "source": "No parcel assessment/tax roll was found in the repository",
-        "notes": "The tax rate is an explicit scenario input and should be replaced by the applicable municipal/assessment basis for a real property."
+        "source": "MPAC farm property assessment guidance and Ontario tax-rate legislation",
+        "urls": [
+          "https://www.mpac.ca/en/PropertyTypes/FarmPropertyAssessments",
+          "https://www.ontario.ca/laws/regulation/090224"
+        ],
+        "notes": "The model currently applies an explicit percentage to land value. MPAC indicates portions can be classified differently and Ontario farm-class eligibility can materially change the rate; no parcel assessment/tax roll is loaded."
+      },
+      "land_insurance": {
+        "status": "unresolved_site_specific",
+        "source": "Ontario Federation of Agriculture insurance guidance",
+        "urls": [
+          "https://ofa.on.ca/resources/insurance-coverage-for-ontario-farmers-a-summary-prepared-by-ofa/"
+        ],
+        "notes": "Property and liability premiums depend on buildings, contents, activities, visitors, location, limits and risk. The CAD 3,000 input is a working planning allowance, not an insurance quote."
+      },
+      "administration": {
+        "status": "policy_design_choice_with_planning_costs",
+        "source": "Living Region operating-budget decomposition; no actual ARC entity staffing plan supplied",
+        "notes": "The former CAD 18,000/year was a round planning input. It is now represented by fixed project work, household-variable records/billing and event-driven professional allowance scenarios."
+      },
+      "common_property_operations": {
+        "status": "working_planning_assumption",
+        "source": "Living Region common-property operations decomposition; no site maintenance plan or bids supplied",
+        "notes": "The former CAD 6,000/year is decomposed into grounds, drainage, paths, ecological buffers and common repairs. Snow, road maintenance, waste and infrastructure insurance remain separate shared-infrastructure lines."
       },
       "infrastructure": {
         "status": "planning_assumption",
@@ -2735,7 +4179,10 @@
         "property_tax_rate_annual": 0.01,
         "insurance_annual_cad": 3000,
         "common_land_costs_annual_cad": 6000,
+        "administration_scenario_id": "conventional",
         "administration_annual_cad": 18000,
+        "common_property_operations_scenario_id": "contracted_baseline",
+        "common_property_operations_annual_cad": 6000,
         "fixed_land_reserve_annual_cad": 0,
         "vacancy_reserve_rate_annual": 0.05
       }

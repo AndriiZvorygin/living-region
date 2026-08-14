@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildSiteLeasePresentationContract, calculateArcSiteLeaseEconomics, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
+import {ADMINISTRATION_SCENARIOS, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
 
 function scenario(overrides = {}) {
   return {
@@ -215,6 +215,11 @@ test('presentation contract includes household-first land accounting inputs and 
   assert.equal(contract.default_inputs.dwelling_financing, undefined);
   assert.equal(contract.default_inputs.dwelling_costs, undefined);
   assert.equal(contract.evidence.dwelling_capital_cost, undefined);
+  assert.equal(contract.default_inputs.land_costs?.administration_scenario_id, 'conventional');
+  assert.equal(contract.administration_scale_examples.conventional[0].monthly_per_household_cad, 125);
+  assert.equal(contract.administration_scale_examples.conventional[3].monthly_per_household_cad, 60.4);
+  assert.equal(contract.common_area_accounting.mode, 'pooled_planning_assumption');
+  assert.equal(contract.common_area_accounting.spatial_pipeline_status, 'not_connected_to_current_ARC_economics');
 });
 
 test('public ARC charge is exactly site lease plus shared infrastructure', () => {
@@ -260,4 +265,56 @@ test('public contract labels illustrative financing and exposes neutral comparis
     financing_scenario_id: 'illustrative_current',
     evidence_status: 'illustrative_not_canonical'
   });
+});
+
+test('administration budget explains the former $125 household charge and scales fixed work', () => {
+  const twelve = calculateAdministrationBudget({scenario_id: 'conventional', household_count: 12});
+  assert.equal(twelve.annual_total_cad, 18000);
+  assert.equal(twelve.monthly_per_household_cad, 125);
+  assert.equal(twelve.fixed_project_annual_cad, 9600);
+  assert.equal(twelve.variable_household_annual_cad, 5760);
+  assert.equal(twelve.event_driven_allowance_annual_cad, 2640);
+  const sixteen = calculateAdministrationBudget({scenario_id: 'conventional', household_count: 16});
+  const twentyFive = calculateAdministrationBudget({scenario_id: 'conventional', household_count: 25});
+  const fifty = calculateAdministrationBudget({scenario_id: 'conventional', household_count: 50});
+  assert.deepEqual([sixteen.annual_total_cad, twentyFive.annual_total_cad, fifty.annual_total_cad], [19920, 24240, 36240]);
+  assert.ok(fifty.monthly_per_household_cad < sixteen.monthly_per_household_cad);
+  assert.equal(Object.keys(ADMINISTRATION_SCENARIOS).sort().join(','), 'conventional,lean_self_managed,software_assisted');
+});
+
+test('software-assisted administration remains non-zero and exposes automation scope', () => {
+  const budget = calculateAdministrationBudget({scenario_id: 'software_assisted', household_count: 12});
+  assert.equal(budget.annual_total_cad, 10080);
+  assert.ok(budget.monthly_per_household_cad > 0);
+  assert.ok(budget.automation_capabilities.includes('lease billing/accounting'));
+  assert.ok(budget.components.some((row) => row.kind === 'event_driven_allowance'));
+});
+
+test('common-property operations are decomposed and exclude infrastructure operations', () => {
+  const operations = calculateCommonPropertyOperations({scenario_id: 'contracted_baseline'});
+  assert.equal(operations.annual_total_cad, 6000);
+  assert.equal(operations.components.length, 5);
+  assert.ok(operations.components.some((row) => row.id === 'road_edge_drainage_annual_cad'));
+  assert.ok(operations.excludes.includes('snow clearing'));
+  assert.ok(operations.excludes.includes('infrastructure insurance'));
+});
+
+test('common property can move from pooled planning hectares to explicit site-plan areas', () => {
+  const pooled = calculateCommonPropertyAreaAccounting({common_area_ha: 1.5, components: {residential_footprints: null}});
+  assert.equal(pooled.mode, 'pooled_planning_assumption');
+  assert.equal(pooled.total_common_area_ha, 1.5);
+  const components = {
+    residential_footprints: .12,
+    internal_road_access: .38,
+    common_buildings_infrastructure: .08,
+    ecological_water_buffers: .55,
+    shared_productive_areas: .22,
+    other_required_common_land: .15
+  };
+  const explicit = calculateCommonPropertyAreaAccounting({components});
+  assert.equal(explicit.mode, 'spatial_or_layout_derived');
+  assert.equal(explicit.total_common_area_ha, 1.5);
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {common_area_ha: 0, common_area_accounting: {components}}}));
+  assert.equal(result.scenario.common_area_ha, 1.5);
+  assert.equal(result.physical_inputs.common_area_accounting.mode, 'spatial_or_layout_derived');
 });

@@ -54,6 +54,7 @@
     "report:arc:site-lease": "node command/report_arc_site_lease.mjs",
     "report:arc:site-lease:sensitivity": "node command/report_arc_site_lease_sensitivity.mjs",
     "report:arc:infrastructure-audit": "node command/report_arc_infrastructure_audit.mjs",
+    "report:arc:common-property-audit": "node command/report_arc_common_property_audit.mjs",
     "report:arc:household-affordability": "node command/report_arc_household_affordability.mjs",
     "build:carrying-capacity-contract": "node command/build_carrying_capacity_presentation.mjs",
     "build:carrying-capacity-web": "npm run build:carrying-capacity-contract && vite build --config packages/education-web/vite.config.ts && node packages/education-web/scripts/write-pages-artifacts.mjs",

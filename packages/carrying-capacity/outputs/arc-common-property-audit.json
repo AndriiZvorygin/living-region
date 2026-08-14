@@ -1,0 +1,244 @@
+{
+  "contract_version": "1.4.0",
+  "generated_at": "2026-08-14T19:20:51.633Z",
+  "scope": "Common-property administration, common-property operations and land-layer evidence audit; private dwelling excluded.",
+  "administration_scale": [
+    {
+      "scenario_id": "conventional",
+      "scenario": "Conventional administration",
+      "household_count": 12,
+      "fixed_project_annual_cad": 9600,
+      "variable_household_annual_cad": 5760,
+      "event_driven_allowance_annual_cad": 2640,
+      "total_annual_cad": 18000,
+      "monthly_per_household_cad": 125,
+      "evidence_status": "working_planning_assumption",
+      "automation_level": "low"
+    },
+    {
+      "scenario_id": "conventional",
+      "scenario": "Conventional administration",
+      "household_count": 16,
+      "fixed_project_annual_cad": 9600,
+      "variable_household_annual_cad": 7680,
+      "event_driven_allowance_annual_cad": 2640,
+      "total_annual_cad": 19920,
+      "monthly_per_household_cad": 103.75,
+      "evidence_status": "working_planning_assumption",
+      "automation_level": "low"
+    },
+    {
+      "scenario_id": "conventional",
+      "scenario": "Conventional administration",
+      "household_count": 25,
+      "fixed_project_annual_cad": 9600,
+      "variable_household_annual_cad": 12000,
+      "event_driven_allowance_annual_cad": 2640,
+      "total_annual_cad": 24240,
+      "monthly_per_household_cad": 80.8,
+      "evidence_status": "working_planning_assumption",
+      "automation_level": "low"
+    },
+    {
+      "scenario_id": "conventional",
+      "scenario": "Conventional administration",
+      "household_count": 50,
+      "fixed_project_annual_cad": 9600,
+      "variable_household_annual_cad": 24000,
+      "event_driven_allowance_annual_cad": 2640,
+      "total_annual_cad": 36240,
+      "monthly_per_household_cad": 60.4,
+      "evidence_status": "working_planning_assumption",
+      "automation_level": "low"
+    },
+    {
+      "scenario_id": "software_assisted",
+      "scenario": "Software-assisted / self-managed",
+      "household_count": 12,
+      "fixed_project_annual_cad": 5400,
+      "variable_household_annual_cad": 2880,
+      "event_driven_allowance_annual_cad": 1800,
+      "total_annual_cad": 10080,
+      "monthly_per_household_cad": 70,
+      "evidence_status": "policy_design_choice_with_planning_costs",
+      "automation_level": "medium_high"
+    },
+    {
+      "scenario_id": "software_assisted",
+      "scenario": "Software-assisted / self-managed",
+      "household_count": 16,
+      "fixed_project_annual_cad": 5400,
+      "variable_household_annual_cad": 3840,
+      "event_driven_allowance_annual_cad": 1800,
+      "total_annual_cad": 11040,
+      "monthly_per_household_cad": 57.5,
+      "evidence_status": "policy_design_choice_with_planning_costs",
+      "automation_level": "medium_high"
+    },
+    {
+      "scenario_id": "software_assisted",
+      "scenario": "Software-assisted / self-managed",
+      "household_count": 25,
+      "fixed_project_annual_cad": 5400,
+      "variable_household_annual_cad": 6000,
+      "event_driven_allowance_annual_cad": 1800,
+      "total_annual_cad": 13200,
+      "monthly_per_household_cad": 44,
+      "evidence_status": "policy_design_choice_with_planning_costs",
+      "automation_level": "medium_high"
+    },
+    {
+      "scenario_id": "software_assisted",
+      "scenario": "Software-assisted / self-managed",
+      "household_count": 50,
+      "fixed_project_annual_cad": 5400,
+      "variable_household_annual_cad": 12000,
+      "event_driven_allowance_annual_cad": 1800,
+      "total_annual_cad": 19200,
+      "monthly_per_household_cad": 32,
+      "evidence_status": "policy_design_choice_with_planning_costs",
+      "automation_level": "medium_high"
+    },
+    {
+      "scenario_id": "lean_self_managed",
+      "scenario": "Lean self-managed sensitivity",
+      "household_count": 12,
+      "fixed_project_annual_cad": 4800,
+      "variable_household_annual_cad": 1440,
+      "event_driven_allowance_annual_cad": 1200,
+      "total_annual_cad": 7440,
+      "monthly_per_household_cad": 51.67,
+      "evidence_status": "sensitivity_assumption",
+      "automation_level": "high"
+    },
+    {
+      "scenario_id": "lean_self_managed",
+      "scenario": "Lean self-managed sensitivity",
+      "household_count": 16,
+      "fixed_project_annual_cad": 4800,
+      "variable_household_annual_cad": 1920,
+      "event_driven_allowance_annual_cad": 1200,
+      "total_annual_cad": 7920,
+      "monthly_per_household_cad": 41.25,
+      "evidence_status": "sensitivity_assumption",
+      "automation_level": "high"
+    },
+    {
+      "scenario_id": "lean_self_managed",
+      "scenario": "Lean self-managed sensitivity",
+      "household_count": 25,
+      "fixed_project_annual_cad": 4800,
+      "variable_household_annual_cad": 3000,
+      "event_driven_allowance_annual_cad": 1200,
+      "total_annual_cad": 9000,
+      "monthly_per_household_cad": 30,
+      "evidence_status": "sensitivity_assumption",
+      "automation_level": "high"
+    },
+    {
+      "scenario_id": "lean_self_managed",
+      "scenario": "Lean self-managed sensitivity",
+      "household_count": 50,
+      "fixed_project_annual_cad": 4800,
+      "variable_household_annual_cad": 6000,
+      "event_driven_allowance_annual_cad": 1200,
+      "total_annual_cad": 12000,
+      "monthly_per_household_cad": 20,
+      "evidence_status": "sensitivity_assumption",
+      "automation_level": "high"
+    }
+  ],
+  "common_property_operations": {
+    "scenario_id": "contracted_baseline",
+    "scenario_label": "Common-property operations baseline",
+    "description": "Cash operating allowance for common grounds and buffers. Snow clearing, road maintenance, waste handling and infrastructure insurance remain in the shared-infrastructure layer.",
+    "evidence_status": "working_planning_assumption",
+    "annual_total_cad": 6000,
+    "components": [
+      {
+        "id": "vegetation_management_annual_cad",
+        "label": "Common-land mowing and vegetation management",
+        "annual_cad": 1800,
+        "evidence_status": "working_planning_assumption"
+      },
+      {
+        "id": "road_edge_drainage_annual_cad",
+        "label": "Road-edge and drainage maintenance",
+        "annual_cad": 1200,
+        "evidence_status": "working_planning_assumption"
+      },
+      {
+        "id": "common_paths_annual_cad",
+        "label": "Common paths and access-side grounds",
+        "annual_cad": 600,
+        "evidence_status": "working_planning_assumption"
+      },
+      {
+        "id": "ecological_buffer_maintenance_annual_cad",
+        "label": "Ecological and water-buffer maintenance",
+        "annual_cad": 1200,
+        "evidence_status": "working_planning_assumption"
+      },
+      {
+        "id": "common_area_repairs_miscellaneous_annual_cad",
+        "label": "Common-area repairs and miscellaneous grounds work",
+        "annual_cad": 1200,
+        "evidence_status": "working_planning_assumption"
+      }
+    ],
+    "excludes": [
+      "snow clearing",
+      "road maintenance",
+      "waste handling",
+      "infrastructure insurance",
+      "land-holding administration"
+    ]
+  },
+  "common_property_area": {
+    "total_common_area_ha": 1.5,
+    "mode": "pooled_planning_assumption",
+    "component_definitions": {
+      "residential_footprints": null,
+      "internal_road_access": null,
+      "common_buildings_infrastructure": null,
+      "ecological_water_buffers": null,
+      "shared_productive_areas": null,
+      "other_required_common_land": null
+    },
+    "spatial_pipeline_status": "not_connected_to_current_ARC_economics"
+  },
+  "tax": {
+    "status": "planning_assumption",
+    "source": "MPAC farm property assessment guidance and Ontario tax-rate legislation",
+    "urls": [
+      "https://www.mpac.ca/en/PropertyTypes/FarmPropertyAssessments",
+      "https://www.ontario.ca/laws/regulation/090224"
+    ],
+    "notes": "The model currently applies an explicit percentage to land value. MPAC indicates portions can be classified differently and Ontario farm-class eligibility can materially change the rate; no parcel assessment/tax roll is loaded."
+  },
+  "insurance": {
+    "status": "unresolved_site_specific",
+    "source": "Ontario Federation of Agriculture insurance guidance",
+    "urls": [
+      "https://ofa.on.ca/resources/insurance-coverage-for-ontario-farmers-a-summary-prepared-by-ofa/"
+    ],
+    "notes": "Property and liability premiums depend on buildings, contents, activities, visitors, location, limits and risk. The CAD 3,000 input is a working planning allowance, not an insurance quote."
+  },
+  "vacancy": {
+    "rate_annual": 0.05,
+    "treatment": "separate common-property and productive-land pre-reserve pools; applied once to each pool",
+    "surplus_policy": "retained for vacancies and future land-layer costs"
+  },
+  "affordability_examples": {
+    "one_adult_ordinary": {
+      "site_lease_monthly_cad": 457.6,
+      "shared_infrastructure_monthly_cad": 228.18,
+      "combined_land_infrastructure_monthly_cad": 685.78
+    },
+    "family_ordinary": {
+      "site_lease_monthly_cad": 584.47,
+      "shared_infrastructure_monthly_cad": 228.18,
+      "combined_land_infrastructure_monthly_cad": 812.65
+    }
+  }
+}

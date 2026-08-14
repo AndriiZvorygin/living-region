@@ -9,14 +9,14 @@ import {
 } from './core.mjs';
 import {representativeProfiles} from './health-canada.mjs';
 import {selectPerennialMixForSite} from './environment.mjs';
-import {calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
+import {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.3.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.4.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
   base_plus_hectare: 'Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.',
@@ -36,8 +36,25 @@ export const SITE_LEASE_EVIDENCE = {
   },
   property_tax: {
     status: 'planning_assumption',
-    source: 'No parcel assessment/tax roll was found in the repository',
-    notes: 'The tax rate is an explicit scenario input and should be replaced by the applicable municipal/assessment basis for a real property.'
+    source: 'MPAC farm property assessment guidance and Ontario tax-rate legislation',
+    urls: ['https://www.mpac.ca/en/PropertyTypes/FarmPropertyAssessments', 'https://www.ontario.ca/laws/regulation/090224'],
+    notes: 'The model currently applies an explicit percentage to land value. MPAC indicates portions can be classified differently and Ontario farm-class eligibility can materially change the rate; no parcel assessment/tax roll is loaded.'
+  },
+  land_insurance: {
+    status: 'unresolved_site_specific',
+    source: 'Ontario Federation of Agriculture insurance guidance',
+    urls: ['https://ofa.on.ca/resources/insurance-coverage-for-ontario-farmers-a-summary-prepared-by-ofa/'],
+    notes: 'Property and liability premiums depend on buildings, contents, activities, visitors, location, limits and risk. The CAD 3,000 input is a working planning allowance, not an insurance quote.'
+  },
+  administration: {
+    status: 'policy_design_choice_with_planning_costs',
+    source: 'Living Region operating-budget decomposition; no actual ARC entity staffing plan supplied',
+    notes: 'The former CAD 18,000/year was a round planning input. It is now represented by fixed project work, household-variable records/billing and event-driven professional allowance scenarios.'
+  },
+  common_property_operations: {
+    status: 'working_planning_assumption',
+    source: 'Living Region common-property operations decomposition; no site maintenance plan or bids supplied',
+    notes: 'The former CAD 6,000/year is decomposed into grounds, drainage, paths, ecological buffers and common repairs. Snow, road maintenance, waste and infrastructure insurance remain separate shared-infrastructure lines.'
   },
   infrastructure: {
     status: 'planning_assumption',
@@ -129,6 +146,35 @@ export const LAND_FINANCING_SCENARIOS = {
     note: 'Illustrates a 15-year land repayment horizon consistent with CALA limits; eligibility and lender terms must be confirmed.'
   }
 };
+
+export const COMMON_PROPERTY_AREA_COMPONENTS = [
+  {id: 'residential_footprints', label: 'Residential footprints', status: 'site_plan_required'},
+  {id: 'internal_road_access', label: 'Internal road/access area', status: 'site_plan_required'},
+  {id: 'common_buildings_infrastructure', label: 'Common buildings/infrastructure footprints', status: 'site_plan_required'},
+  {id: 'ecological_water_buffers', label: 'Ecological and water buffers', status: 'site_plan_required'},
+  {id: 'shared_productive_areas', label: 'Shared productive areas', status: 'site_plan_required'},
+  {id: 'other_required_common_land', label: 'Other required common land', status: 'site_plan_required'}
+];
+
+export function calculateCommonPropertyAreaAccounting({common_area_ha = 0, components = null, source = 'pooled_planning_assumption'} = {}) {
+  const rows = COMMON_PROPERTY_AREA_COMPONENTS.map((definition) => ({
+    ...definition,
+    area_ha: components && components[definition.id] != null && Number.isFinite(Number(components[definition.id])) ? round(components[definition.id], 6) : null
+  }));
+  const hasCompleteSpatialBreakdown = rows.every((row) => row.area_ha != null);
+  const derivedTotal = hasCompleteSpatialBreakdown ? rows.reduce((sum, row) => sum + row.area_ha, 0) : Math.max(0, finite(common_area_ha));
+  return {
+    mode: hasCompleteSpatialBreakdown ? 'spatial_or_layout_derived' : 'pooled_planning_assumption',
+    source,
+    evidence_status: hasCompleteSpatialBreakdown ? 'derived_from_explicit_site_layout_inputs' : 'working_planning_assumption',
+    total_common_area_ha: round(derivedTotal, 6),
+    components: rows,
+    missing_components: rows.filter((row) => row.area_ha == null).map((row) => row.id),
+    explanation: hasCompleteSpatialBreakdown
+      ? 'Common property is the sum of explicit non-productive site-plan areas; productive household allocations remain a separate land pool.'
+      : 'The site plan does not yet provide all non-productive polygons, so the explicit pooled common-area assumption is used and the component areas remain unresolved.'
+  };
+}
 
 const REQUIREDNESS_LABELS = {
   legally_required: 'legally required',
@@ -277,6 +323,11 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     label: '12-household ARC project',
     household_count: 12,
     common_area_ha: 1.5,
+    common_area_accounting: {
+      mode: 'pooled_planning_assumption',
+      source: 'No parcel-level ARC site layout is currently connected to the economics API',
+      components: Object.fromEntries(COMMON_PROPERTY_AREA_COMPONENTS.map((row) => [row.id, null]))
+    },
     allocation_method: 'base_plus_hectare'
   },
   dwelling: {
@@ -294,6 +345,8 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     insurance_annual_cad: 3000,
     common_land_costs_annual_cad: 6000,
     administration_annual_cad: 18000,
+    administration_scenario_id: 'conventional',
+    common_property_operations_scenario_id: 'contracted_baseline',
     fixed_land_reserve_annual_cad: 0,
     vacancy_reserve_rate_annual: 0.05,
     legal_lease_term_years: 49,
@@ -637,6 +690,14 @@ function normalizedScenario(options = {}) {
   const declaredFinancingId = merged.land.financing_scenario_id;
   const declaredFinancing = LAND_FINANCING_SCENARIOS[declaredFinancingId];
   if (declaredFinancing && ['down_payment_rate', 'interest_rate_annual', 'amortization_years', 'loan_term_years'].some((key) => Number(merged.land[key]) !== Number(declaredFinancing[key]))) merged.land.financing_scenario_id = 'custom';
+  if (source.land?.administration_annual_cad != null && source.land?.administration_scenario_id == null) {
+    merged.land.administration_scenario_id = 'custom';
+    merged.land.administration_override_annual_cad = finite(source.land.administration_annual_cad);
+  }
+  if (source.land?.common_land_costs_annual_cad != null && source.land?.common_property_operations_scenario_id == null) {
+    merged.land.common_property_operations_scenario_id = 'custom';
+    merged.land.common_property_operations_override_annual_cad = finite(source.land.common_land_costs_annual_cad);
+  }
   merged.community.allocation_method = source.community?.allocation_method ?? source.allocation_method ?? merged.community.allocation_method;
   if (!SITE_LEASE_ALLOCATION_METHODS[merged.community.allocation_method]) throw new Error(`Unknown site-lease allocation method: ${merged.community.allocation_method}`);
   return merged;
@@ -663,7 +724,22 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
   households.forEach((row) => { row.reserved_land_requirement_ha = finite(reservedAreaOf(row)); });
   const productive = households.reduce((sum, row) => sum + finite(row.reserved_land_requirement_ha), 0);
   const matureProductive = households.reduce((sum, row) => sum + finite(row.mature_land_requirement_ha), 0);
-  const commonArea = Math.max(0, finite(scenario.community.common_area_ha));
+  const commonAreaAccounting = calculateCommonPropertyAreaAccounting({
+    common_area_ha: scenario.community.common_area_ha,
+    components: scenario.community.common_area_accounting?.components,
+    source: scenario.community.common_area_accounting?.source
+  });
+  const commonArea = commonAreaAccounting.total_common_area_ha;
+  const administration = calculateAdministrationBudget({
+    scenario_id: scenario.land.administration_scenario_id,
+    household_count: count,
+    override_annual_cad: scenario.land.administration_override_annual_cad,
+    annual_cad: scenario.land.administration_annual_cad
+  });
+  const commonOperations = calculateCommonPropertyOperations({
+    scenario_id: scenario.land.common_property_operations_scenario_id,
+    override_annual_cad: scenario.land.common_property_operations_override_annual_cad ?? scenario.land.common_land_costs_annual_cad
+  });
   const totalPropertyArea = productive + commonArea;
   const landAccounting = calculateLandLeaseAccounting({
     households,
@@ -680,8 +756,8 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     capital_recovery_years: scenario.land.capital_recovery_years,
     property_tax_rate_annual: scenario.land.property_tax_rate_annual,
     land_insurance_annual_cad: scenario.land.insurance_annual_cad,
-    common_land_costs_annual_cad: scenario.land.common_land_costs_annual_cad,
-    administration_annual_cad: scenario.land.administration_annual_cad,
+    common_land_costs_annual_cad: commonOperations.annual_total_cad,
+    administration_annual_cad: administration.annual_total_cad,
     fixed_land_reserve_annual_cad: scenario.land.fixed_land_reserve_annual_cad,
     vacancy_reserve_rate_annual: scenario.land.vacancy_reserve_rate_annual,
     allocation_method: scenario.community.allocation_method
@@ -692,8 +768,8 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     land_finance_recovery_annual_cad: landAccounting.acquisition.productive_land_finance_recovery_annual_cad + landAccounting.acquisition.common_land_finance_recovery_annual_cad,
     property_tax_annual_cad: landAccounting.common_property_land_holding.annual_components_cad.common_property_tax_annual_cad + landAccounting.productive_land_charge.annual_components_cad.productive_property_tax_annual_cad,
     land_insurance_annual_cad: finite(scenario.land.insurance_annual_cad),
-    common_land_costs_annual_cad: finite(scenario.land.common_land_costs_annual_cad),
-    administration_annual_cad: finite(scenario.land.administration_annual_cad),
+    common_land_costs_annual_cad: commonOperations.annual_total_cad,
+    administration_annual_cad: administration.annual_total_cad,
     fixed_land_reserve_annual_cad: finite(scenario.land.fixed_land_reserve_annual_cad),
     vacancy_reserve_annual_cad: landAccounting.common_property_land_holding.annual_vacancy_allowance_cad + landAccounting.productive_land_charge.annual_vacancy_allowance_cad
   };
@@ -828,6 +904,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       site_label: siteClasses[scenario.site_id].label,
       household_count: count,
       common_area_ha: round(commonArea, 6),
+      common_area_accounting: commonAreaAccounting,
       allocation_method: scenario.community.allocation_method,
       land_reservation_basis: landReservationBasis,
       infrastructure_scenario_id: scenario.infrastructure_scenario_id,
@@ -841,6 +918,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       mature_productive_household_area_ha: round(matureProductive, 6),
       total_property_area_ha: round(totalPropertyArea, 6),
       common_area_ha: round(commonArea, 6),
+      common_area_accounting: commonAreaAccounting,
       household_results: householdOutput.map((row) => row.physical_carrying_capacity)
     },
     project_land: {
@@ -865,7 +943,9 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
         total: round(annualLandCosts)
       },
       costs_classification: {land_finance_recovery: 'capital recovery', property_tax: 'operating expense', land_insurance: 'operating expense', common_land_costs: 'operating expense', administration: 'operating expense', fixed_land_reserve: 'reserve', vacancy_reserve: 'reserve'},
-      land_accounting: landAccounting
+      land_accounting: landAccounting,
+      administration,
+      common_property_operations: commonOperations
     },
     land_financing: {
       scenario_id: scenario.land.financing_scenario_id ?? 'custom',
@@ -879,6 +959,25 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       initial_equity_contribution_cad: landFinance.down_payment_cad,
       equity_recovery_annual_cad: 0,
       equity_recovery_policy: 'Initial equity is not included in recurring site-lease recovery.'
+    },
+    operating_assumptions: {
+      administration,
+      common_property_operations: commonOperations,
+      property_tax: {
+        rate_annual: scenario.land.property_tax_rate_annual,
+        evidence_status: SITE_LEASE_EVIDENCE.property_tax.status,
+        calculation: 'land value × explicit scenario rate; actual tax class and assessment are site-specific'
+      },
+      land_insurance: {
+        annual_cad: scenario.land.insurance_annual_cad,
+        evidence_status: SITE_LEASE_EVIDENCE.land_insurance.status,
+        calculation: 'explicit planning allowance; replace with entity/property quote'
+      },
+      vacancy_reserve: {
+        rate_annual: scenario.land.vacancy_reserve_rate_annual,
+        allocation: 'separate common-property and productive-land pools; each reserve is applied once to its pre-reserve cost pool',
+        surplus_policy: 'retained by the land-holding entity for vacancies and future land-layer costs; not treated as current profit'
+      }
     },
       infrastructure,
     households: householdOutput,
@@ -907,7 +1006,10 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       land_price_is_not_a_current_observed_grey_county_market_value: true,
       infrastructure_values_require_site_design_and_quotes: true,
       resident_owns_dwelling_and_does_not_own_project_land: true,
-      carrying_capacity_is_physical_requirement_not_a_financing_coefficient: true
+      carrying_capacity_is_physical_requirement_not_a_financing_coefficient: true,
+      common_area_is_spatially_derived: commonAreaAccounting.mode === 'spatial_or_layout_derived',
+      administration_is_project_scale_budget: true,
+      common_property_operations_are_separate_from_shared_infrastructure: true
     }
   };
   return result;
@@ -972,6 +1074,18 @@ export function buildSiteLeasePresentationContract() {
       infrastructure_layer_break_even: result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery
     };
   })]));
+  const administrationScenarioMetadata = Object.values(ADMINISTRATION_SCENARIOS).map((scenario) => ({
+    id: scenario.id,
+    label: scenario.label,
+    description: scenario.description,
+    evidence_status: scenario.evidence_status,
+    automation_level: scenario.automation_level,
+    automation_capabilities: scenario.automation_capabilities ?? [],
+    components: Object.entries(scenario.components).map(([id, row]) => ({id, ...row}))
+  }));
+  const administrationScaleExamples = Object.fromEntries(Object.values(ADMINISTRATION_SCENARIOS).map((scenario) => [scenario.id, [12, 16, 25, 50].map((householdCount) => calculateAdministrationBudget({scenario_id: scenario.id, household_count: householdCount}))]));
+  const commonPropertyOperationsMetadata = Object.values(COMMON_PROPERTY_OPERATIONS_SCENARIOS).map((scenario) => ({id: scenario.id, label: scenario.label, description: scenario.description, evidence_status: scenario.evidence_status, components: Object.entries(scenario.components).map(([id, row]) => ({id, ...row})), excludes: ['snow clearing', 'road maintenance', 'waste handling', 'infrastructure insurance', 'land-holding administration']}));
+  const defaultCommonAreaAccounting = calculateCommonPropertyAreaAccounting({common_area_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha, components: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.components, source: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.source});
   const publicEvidence = Object.fromEntries(Object.entries(SITE_LEASE_EVIDENCE).filter(([key]) => key !== 'dwelling_capital_cost'));
   return {
     contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
@@ -986,6 +1100,16 @@ export function buildSiteLeasePresentationContract() {
     },
     infrastructure_scenarios: infrastructureScenarioMetadata,
     infrastructure_scale_examples: infrastructureScaleExamples,
+    administration_scenarios: administrationScenarioMetadata,
+    administration_scale_examples: administrationScaleExamples,
+    common_property_operations: commonPropertyOperationsMetadata,
+    common_area_accounting: {
+      ...defaultCommonAreaAccounting,
+      component_definitions: COMMON_PROPERTY_AREA_COMPONENTS,
+      spatial_pipeline: 'parcel -> buildings/residential footprints -> roads/access -> servicing -> productive layout -> ecological buffers -> explicit common hectares',
+      spatial_pipeline_status: 'not_connected_to_current_ARC_economics',
+      spatial_pipeline_gap: 'Current hamlet layout fixtures contain points, lines and rectangles for proposed elements but do not yet provide a validated parcel-clipped polygon area takeoff for each common-land category.'
+    },
     land_financing_evidence: LAND_FINANCING_EVIDENCE,
     land_financing_scenarios: LAND_FINANCING_SCENARIOS,
     evidence: publicEvidence,
@@ -1006,7 +1130,10 @@ export function buildSiteLeasePresentationContract() {
         property_tax_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.property_tax_rate_annual,
         insurance_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.insurance_annual_cad,
         common_land_costs_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.common_land_costs_annual_cad,
-        administration_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.administration_annual_cad,
+        administration_scenario_id: DEFAULT_SITE_LEASE_SCENARIO.land.administration_scenario_id,
+        administration_annual_cad: calculateAdministrationBudget({scenario_id: DEFAULT_SITE_LEASE_SCENARIO.land.administration_scenario_id, household_count: DEFAULT_SITE_LEASE_SCENARIO.community.household_count}).annual_total_cad,
+        common_property_operations_scenario_id: DEFAULT_SITE_LEASE_SCENARIO.land.common_property_operations_scenario_id,
+        common_property_operations_annual_cad: calculateCommonPropertyOperations({scenario_id: DEFAULT_SITE_LEASE_SCENARIO.land.common_property_operations_scenario_id}).annual_total_cad,
         fixed_land_reserve_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.fixed_land_reserve_annual_cad,
         vacancy_reserve_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.vacancy_reserve_rate_annual
       }

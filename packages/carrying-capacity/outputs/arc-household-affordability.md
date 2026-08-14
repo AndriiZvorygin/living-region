@@ -33,9 +33,9 @@ The common-property land holding share is broadly unchanged as household hectare
 | Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 2 adults + 2 children · ordinary land | 12 | 1.75 ha | $222.74 | $206.89 | $361.73 | $584.47 | $228.18 | $812.65 |
-| 2 adults + 2 children · ordinary land | 16 | 1.75 ha | $167.05 | $206.89 | $361.73 | $528.78 | $171.14 | $699.92 |
-| 2 adults + 2 children · ordinary land | 25 | 1.75 ha | $106.91 | $206.89 | $361.73 | $468.64 | $109.53 | $578.17 |
-| 2 adults + 2 children · ordinary land | 50 | 1.75 ha | $53.46 | $206.89 | $361.73 | $415.19 | $54.76 | $469.95 |
+| 2 adults + 2 children · ordinary land | 16 | 1.75 ha | $177.55 | $206.89 | $361.73 | $539.28 | $171.14 | $710.42 |
+| 2 adults + 2 children · ordinary land | 25 | 1.75 ha | $128.75 | $206.89 | $361.73 | $490.48 | $109.53 | $600.01 |
+| 2 adults + 2 children · ordinary land | 50 | 1.75 ha | $85.38 | $206.89 | $361.73 | $447.11 | $54.76 | $501.87 |
 
 Community size lowers fixed/common charges and shared infrastructure per household. It does not change the selected household's carrying-capacity hectares or the productive-land rate itself.
 
@@ -46,7 +46,7 @@ The underlying property is one title. Productive/exclusive land value and proper
 ## Assumption status
 
 - CAD 35,000/ha is a planning midpoint, not established current Grey County market evidence.
-- Property tax, insurance, legal structure, administration and reserves require property-specific review.
+- Property tax, insurance, legal structure, administration and reserves require property-specific review. Administration is now decomposed into fixed project, per-household and event-driven components; see `arc-common-property-audit.md`.
 - Infrastructure costs remain explicit scenario placeholders pending a site design, legal review and procurement quotes.
 - The model preserves legal lease term, debt amortization and replacement reserve horizons as separate concepts.
 
