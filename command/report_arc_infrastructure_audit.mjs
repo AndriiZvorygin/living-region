@@ -162,7 +162,7 @@ const markdown = [
   '',
   'The following comparison uses the 12-household shared-services placeholders. It annualizes distributed capital with the same financing/reserve convention only to make the alternatives visible. It is not a procurement conclusion; well yield, septic feasibility, electrical connection distance, source-water rules, fire protection, maintenance labour and municipal approvals can change the result.',
   '',
-  '| Function | Centralized annual / household | Distributed capital total | Distributed annual / household | Placeholder result | Source / status |',
+  '| Function | Centralized monthly / household | Distributed capital total | Distributed monthly / household | Placeholder result | Source / status |',
   '|---|---:|---:|---:|---|---|',
   distributedMarkdown,
   '',
