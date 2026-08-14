@@ -73,4 +73,3 @@ Sources:
 - https://www.fcc-fac.ca/en/financing/agriculture/land-buildings
 - https://www.fcc-fac.ca/en/knowledge/economics/deteriorating-farmland-affordability
 - https://agriculture.canada.ca/en/programs/canadian-agricultural-loans-act/step-3-before-apply
-
