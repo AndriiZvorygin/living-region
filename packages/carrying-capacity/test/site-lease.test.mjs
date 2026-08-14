@@ -157,3 +157,56 @@ test('land reservation basis changes the reserved project area without changing 
   assert.ok(peak.households[0].reserved_productive_land_ha >= mature.households[0].reserved_productive_land_ha);
   assert.ok(peak.project_land.total_property_area_ha >= mature.project_land.total_property_area_ha);
 });
+
+test('recommended site lease exposes a stable base charge and a hectare charge', () => {
+  const adult = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 1}})).households[0];
+  const family = calculateArcSiteLeaseEconomics(scenario({
+    community: {household_count: 1},
+    household: {members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}
+  })).households[0];
+  assert.equal(adult.site_lease.base_household_land_holding_charge_monthly_cad, family.site_lease.base_household_land_holding_charge_monthly_cad);
+  assert.equal(adult.site_lease.land_charge_per_hectare_month_cad, family.site_lease.land_charge_per_hectare_month_cad);
+  assert.ok(family.site_lease.hectare_portion_monthly_cad > adult.site_lease.hectare_portion_monthly_cad);
+});
+
+test('common property is recovered by the base layer and not the hectare layer', () => {
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const accounting = result.project_land.land_accounting;
+  assert.ok(accounting.acquisition.common_land_value_cad > 0);
+  assert.ok(accounting.base_household_land_holding.annual_components_cad.common_land_finance_recovery_annual_cad > 0);
+  assert.ok(accounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad > 0);
+  assert.equal(accounting.hectare_charge.annual_components_cad.common_property_tax_annual_cad, undefined);
+  assert.equal(result.project.land_layer_break_even.revenue_equals_required_cost_recovery, true);
+});
+
+test('land leases recover the land layer without shared-infrastructure revenue', () => {
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 16}}));
+  const landBreakEven = result.project.land_layer_break_even;
+  assert.ok(Math.abs(landBreakEven.site_lease_revenue_cad - landBreakEven.land_layer_cost_cad) < 0.2);
+  assert.ok(Math.abs(landBreakEven.site_lease_revenue_cad - result.project.annual_costs_cad.land) < 0.2);
+  assert.notEqual(result.project.annual_revenue_cad.shared_services, 0);
+});
+
+test('shared infrastructure does not enter the site lease', () => {
+  const minimal = calculateArcSiteLeaseEconomics(scenario({infrastructure_scenario_id: 'minimal_compliant', community: {household_count: 12}}));
+  const amenity = calculateArcSiteLeaseEconomics(scenario({infrastructure_scenario_id: 'amenity_rich', community: {household_count: 12}}));
+  assert.equal(minimal.households[0].site_lease.monthly_total_cad, amenity.households[0].site_lease.monthly_total_cad);
+  assert.notEqual(minimal.households[0].shared_infrastructure_service.monthly_cad, amenity.households[0].shared_infrastructure_service.monthly_cad);
+});
+
+test('visible household monthly cost stack has no hidden residual', () => {
+  const household = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}})).households[0];
+  const stack = household.monthly_cost_stack;
+  const explicit = stack.dwelling_financing_monthly_cad + stack.site_lease_monthly_cad + stack.shared_infrastructure_monthly_cad + stack.dwelling_maintenance_replacement_monthly_cad + stack.household_utilities_maintenance_monthly_cad;
+  assert.equal(stack.residual_monthly_cad, 0);
+  assert.equal(stack.visible_component_total_monthly_cad, stack.total_monthly_cad);
+  assert.ok(Math.abs(explicit - stack.total_monthly_cad) < 0.02);
+});
+
+test('presentation contract includes household-first land accounting inputs and examples', () => {
+  const contract = buildSiteLeasePresentationContract();
+  assert.equal(contract.default_inputs.common_property_land_ha, 1.5);
+  assert.equal(contract.default_inputs.land_financing.interest_rate_annual, .06);
+  assert.ok(contract.household_examples.one_adult_ordinary.monthly_cost_stack.site_lease_base_monthly_cad > 0);
+  assert.equal(contract.household_examples.one_adult_ordinary.monthly_cost_stack.residual_monthly_cad, 0);
+});

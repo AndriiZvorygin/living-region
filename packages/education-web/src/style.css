@@ -109,6 +109,30 @@ main { max-width: 1180px; }
 .status.excluded { color: var(--red); background: #fae8e3; }
 .back-top { display: inline-block; margin-top: 24px; color: var(--teal); font-size: .8rem; font-weight: 700; }
 .solar-method { margin-top: 32px; padding: 20px; border-top: 3px solid var(--amber); background: #edf2ec; }
+.affordability-hero { border-bottom: 4px solid var(--amber); }
+.mobile-affordability-answer { display: none; }
+.affordability-scenario { background: #fff; }
+.affordability-infrastructure-control { max-width: 420px; margin: 16px 0 0; }
+.affordability-stack { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .8fr); gap: 24px; align-items: start; }
+.cost-stack-primary { border: 1px solid var(--line); background: #fff; box-shadow: 0 10px 25px rgba(20, 48, 42, .08); }
+.cost-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: baseline; padding: 17px 20px; border-bottom: 1px solid var(--line); }
+.cost-row > span { font-weight: 800; }
+.cost-row > strong { color: var(--teal); font-size: 1.12rem; }
+.cost-row.site-cost { border-left: 4px solid var(--teal); }
+.cost-row.other-cost { border-left: 4px solid var(--amber); }
+.cost-subrow { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .88rem; }
+.cost-subrow b { color: var(--ink); font-weight: 800; }
+.cost-total { display: flex; justify-content: space-between; gap: 16px; padding: 20px; background: var(--ink); color: #fff; }
+.cost-total strong { color: #f6d67b; font-size: 1.55rem; }
+.result-rail { display: grid; gap: 12px; }
+.result-rail .metric { background: #fff; border: 1px solid var(--line); padding: 17px; }
+.result-rail .land-primary strong { font-size: 2.35rem; }
+.dependency-diagram { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 24px 0; }
+.dependency-diagram > div { display: grid; gap: 8px; align-content: center; min-height: 88px; padding: 14px; border: 1px solid var(--line); background: #f7f7f2; font-weight: 800; }
+.dependency-diagram span { color: var(--amber); font-size: 1.2rem; }
+.affordability-scenario .input-details { margin-top: 16px; }
+@media (max-width: 900px) { .affordability-stack { grid-template-columns: 1fr; } .dependency-diagram { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 430px) { .mobile-affordability-answer { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 12px 18px; background: var(--ink); color: #fff; } .mobile-affordability-answer span { font-size: .78rem; font-weight: 800; } .mobile-affordability-answer strong { color: #f6d67b; font-size: 1.1rem; white-space: nowrap; } .cost-row { grid-template-columns: 1fr; } .cost-row > strong { font-size: 1.05rem; } .cost-subrow { font-size: .82rem; } .dependency-diagram { grid-template-columns: 1fr; } .affordability-infrastructure-control { max-width: none; } }
 @media (max-width: 900px) {
   .scenario-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .demand-scope { grid-template-columns: repeat(2, minmax(0, 1fr)); }

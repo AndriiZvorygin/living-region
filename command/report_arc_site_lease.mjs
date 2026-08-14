@@ -68,7 +68,7 @@ const markdown = [
   '## Central accounting',
   '',
   '- Productive hectares come from the canonical carrying-capacity establishment peak for the household, site and heated buildings.',
-  '- The recommended site-lease allocation is **base plus hectare**: land finance recovery and property tax follow productive hectares; common land-holding costs are divided equally.',
+  '- The recommended site-lease allocation is **base plus hectare**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally as the base household charge.',
   '- Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; debt amortization is 30 years.',
   '- Default monetary inputs are planning assumptions pending a site design, current land evidence, assessment/tax data and construction/servicing quotes.',
   '',

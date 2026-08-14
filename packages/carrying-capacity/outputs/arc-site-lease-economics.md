@@ -5,7 +5,7 @@ This report models a resident-owned dwelling on a project-owned ARC property. Th
 ## Central accounting
 
 - Productive hectares come from the canonical carrying-capacity establishment peak for the household, site and heated buildings.
-- The recommended site-lease allocation is **base plus hectare**: land finance recovery and property tax follow productive hectares; common land-holding costs are divided equally.
+- The recommended site-lease allocation is **base plus hectare**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally as the base household charge.
 - Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; debt amortization is 30 years.
 - Default monetary inputs are planning assumptions pending a site design, current land evidence, assessment/tax data and construction/servicing quotes.
 
@@ -37,7 +37,7 @@ The shared-service charge falls as households share the same capital and operati
 | 1 adult · marginal land · 12 households | $128843 | $128843 | $0 | break_even_or_surplus |
 | 2 adults + 2 children · ordinary land · 12 households | $117021 | $117021 | $0 | break_even_or_surplus |
 | 2 adults + 2 children · ordinary land · 16 households | $134385 | $134385 | $0 | break_even_or_surplus |
-| 2 adults + 2 children · ordinary land · 25 households | $173452 | $173452 | $0 | break_even_or_surplus |
+| 2 adults + 2 children · ordinary land · 25 households | $173451 | $173451 | $0 | shortfall |
 
 Full machine-readable rows are in `arc-site-lease-economics.json` and `arc-site-lease-economics.csv`.
 

@@ -9,16 +9,17 @@ import {
 } from './core.mjs';
 import {representativeProfiles} from './health-canada.mjs';
 import {selectPerennialMixForSite} from './environment.mjs';
+import {calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.1.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.2.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
-  base_plus_hectare: 'Recommended: land-specific costs follow productive hectares; shared land-holding costs are divided equally.',
+  base_plus_hectare: 'Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.',
   equal_shared_and_hectare_land: 'Property tax and shared land-holding costs are equal; land finance recovery follows productive hectares.'
 };
 
@@ -209,6 +210,7 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     insurance_annual_cad: 3000,
     common_land_costs_annual_cad: 6000,
     administration_annual_cad: 18000,
+    fixed_land_reserve_annual_cad: 0,
     vacancy_reserve_rate_annual: 0.05,
     legal_lease_term_years: 49,
     ownership: 'financed',
@@ -268,30 +270,6 @@ function matchingProfileId(members) {
   return Object.entries(householdProfiles).find(([, profile]) => profile.member_ids.slice().sort().join('|') === ids)?.[0] ?? null;
 }
 
-function monthlyDebtService(principal, annualRate, years) {
-  const amount = Math.max(0, finite(principal));
-  const months = Math.max(1, Math.round(finite(years, 1) * 12));
-  const monthlyRate = Math.max(0, finite(annualRate)) / 12;
-  if (!amount) return 0;
-  if (!monthlyRate) return amount / months;
-  return amount * monthlyRate / (1 - (1 + monthlyRate) ** -months);
-}
-
-function financeCapital({value, ownership = 'owned_out_right', downPaymentRate = 0, downPaymentCad = null, interestRateAnnual = 0, amortizationYears = 1} = {}) {
-  const capitalValue = Math.max(0, finite(value));
-  const explicitDownPayment = downPaymentCad == null ? capitalValue * Math.max(0, finite(downPaymentRate)) : finite(downPaymentCad);
-  const downPayment = ownership === 'financed' || ownership === 'partial_equity' ? Math.min(capitalValue, Math.max(0, explicitDownPayment)) : ownership === 'owned_out_right' ? capitalValue : 0;
-  const financedPrincipal = ownership === 'financed' || ownership === 'partial_equity' ? Math.max(0, capitalValue - downPayment) : 0;
-  return {
-    capital_value_cad: round(capitalValue),
-    ownership,
-    down_payment_cad: round(downPayment),
-    financed_principal_cad: round(financedPrincipal),
-    interest_rate_annual: finite(interestRateAnnual),
-    amortization_years: finite(amortizationYears),
-    monthly_debt_service_cad: round(monthlyDebtService(financedPrincipal, interestRateAnnual, amortizationYears))
-  };
-}
 
 function householdCapacity({household, siteId, inputs}) {
   const members = (household.members ?? ['adult_man']).map(normalizeMember);
@@ -596,30 +574,40 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
   const matureProductive = households.reduce((sum, row) => sum + finite(row.mature_land_requirement_ha), 0);
   const commonArea = Math.max(0, finite(scenario.community.common_area_ha));
   const totalPropertyArea = productive + commonArea;
-  const landValue = totalPropertyArea * Math.max(0, finite(scenario.land.price_cad_per_ha));
-  const landFinance = financeCapital({
-    value: landValue,
+  const landAccounting = calculateLandLeaseAccounting({
+    households,
+    common_property_land_ha: commonArea,
+    land_price_cad_per_ha: scenario.land.price_cad_per_ha,
     ownership: scenario.land.ownership,
-    downPaymentRate: scenario.land.down_payment_rate,
-    downPaymentCad: scenario.land.down_payment_cad,
-    interestRateAnnual: scenario.land.interest_rate_annual,
-    amortizationYears: scenario.land.amortization_years
+    down_payment_rate: scenario.land.down_payment_rate,
+    down_payment_cad: scenario.land.down_payment_cad,
+    interest_rate_annual: scenario.land.interest_rate_annual,
+    amortization_years: scenario.land.amortization_years,
+    recovery_mode: scenario.land.recovery_mode,
+    capital_recovery_rate_annual: scenario.land.capital_recovery_rate_annual,
+    capital_recovery_years: scenario.land.capital_recovery_years,
+    property_tax_rate_annual: scenario.land.property_tax_rate_annual,
+    land_insurance_annual_cad: scenario.land.insurance_annual_cad,
+    common_land_costs_annual_cad: scenario.land.common_land_costs_annual_cad,
+    administration_annual_cad: scenario.land.administration_annual_cad,
+    fixed_land_reserve_annual_cad: scenario.land.fixed_land_reserve_annual_cad,
+    vacancy_reserve_rate_annual: scenario.land.vacancy_reserve_rate_annual,
+    allocation_method: scenario.community.allocation_method
   });
-  const landRecoveryAnnual = scenario.land.recovery_mode === 'capital_recovery'
-    ? monthlyDebtService(landValue, scenario.land.capital_recovery_rate_annual ?? scenario.land.interest_rate_annual, scenario.land.capital_recovery_years ?? scenario.land.amortization_years) * 12
-    : scenario.land.recovery_mode === 'none' ? 0 : landFinance.monthly_debt_service_cad * 12;
-  const propertyTaxAnnual = landValue * Math.max(0, finite(scenario.land.property_tax_rate_annual));
-  const landPoolsBeforeReserve = {
-    land_finance_recovery_annual_cad: landRecoveryAnnual,
-    property_tax_annual_cad: propertyTaxAnnual,
-    land_insurance_annual_cad: Math.max(0, finite(scenario.land.insurance_annual_cad)),
-    common_land_costs_annual_cad: Math.max(0, finite(scenario.land.common_land_costs_annual_cad)),
-    administration_annual_cad: Math.max(0, finite(scenario.land.administration_annual_cad)),
-    vacancy_reserve_annual_cad: 0
+  const landValue = landAccounting.acquisition.total_land_value_cad;
+  const landFinance = landAccounting.acquisition.financing;
+  const landPools = {
+    land_finance_recovery_annual_cad: landAccounting.acquisition.productive_land_finance_recovery_annual_cad + landAccounting.acquisition.common_land_finance_recovery_annual_cad,
+    property_tax_annual_cad: landAccounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad + landAccounting.hectare_charge.annual_components_cad.productive_property_tax_annual_cad,
+    land_insurance_annual_cad: finite(scenario.land.insurance_annual_cad),
+    common_land_costs_annual_cad: finite(scenario.land.common_land_costs_annual_cad),
+    administration_annual_cad: finite(scenario.land.administration_annual_cad),
+    fixed_land_reserve_annual_cad: finite(scenario.land.fixed_land_reserve_annual_cad),
+    vacancy_reserve_annual_cad: landAccounting.base_household_land_holding.annual_vacancy_allowance_cad + landAccounting.hectare_charge.annual_vacancy_allowance_cad
   };
-  const reserveBaseAnnual = sumObjectValues(landPoolsBeforeReserve);
-  const landPools = {...landPoolsBeforeReserve, vacancy_reserve_annual_cad: reserveBaseAnnual * Math.max(0, finite(scenario.land.vacancy_reserve_rate_annual))};
-  const leaseAllocations = allocatePool({households, pools: landPools, method: scenario.community.allocation_method});
+  const leaseAllocations = scenario.community.allocation_method === 'base_plus_hectare'
+    ? landAccounting.allocations
+    : allocatePool({households, pools: landPools, method: scenario.community.allocation_method});
   const infrastructure = projectInfrastructure(scenario, count);
   const householdOutput = households.map((household, index) => {
     const dwellingFinance = financeCapital({
@@ -633,13 +621,25 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     const dwellingMaintenanceAnnual = Math.max(0, finite(scenario.dwelling.capital_cost_cad)) * Math.max(0, finite(scenario.dwelling.maintenance_replacement_rate_annual));
     const siteLease = leaseAllocations[index];
     const sharedServiceAnnual = infrastructure.annual_costs_cad.total / count;
+    const landAllocation = landAccounting.allocations[index];
+    const siteLeaseMonthly = scenario.community.allocation_method === 'base_plus_hectare'
+      ? landAllocation.monthly_total_cad
+      : siteLease.monthly_total_cad;
     const recurring = {
       dwelling_financing_monthly_cad: dwellingFinance.monthly_debt_service_cad,
       dwelling_maintenance_replacement_monthly_cad: dwellingMaintenanceAnnual / 12,
-      site_lease_monthly_cad: siteLease.monthly_total_cad,
+      site_lease_monthly_cad: siteLeaseMonthly,
       shared_infrastructure_service_monthly_cad: sharedServiceAnnual / 12,
       household_utilities_maintenance_monthly_cad: Math.max(0, finite(scenario.dwelling.household_utilities_annual_cad)) / 12
     };
+    const baseLandMonthly = scenario.community.allocation_method === 'base_plus_hectare'
+      ? landAllocation.base_household_land_holding_charge_monthly_cad
+      : siteLeaseMonthly;
+    const hectareLandMonthly = scenario.community.allocation_method === 'base_plus_hectare'
+      ? landAllocation.hectare_portion_monthly_cad
+      : 0;
+    const visibleTotal = sumObjectValues(recurring);
+    const detailedSiteLease = scenario.community.allocation_method === 'base_plus_hectare' ? landAllocation : siteLease;
     return {
       household_id: household.household_id,
       label: household.label,
@@ -653,7 +653,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       establishment_peak_year: household.transition.establishment_peak_year,
       household_food_demand_gj_year: household.result.household_food_gj_year,
       dwelling: {capital_cost_cad: round(scenario.dwelling.capital_cost_cad), financing: dwellingFinance, maintenance_replacement_annual_cad: round(dwellingMaintenanceAnnual)},
-      site_lease: {...siteLease, allocation_method: scenario.community.allocation_method, allocation_method_description: SITE_LEASE_ALLOCATION_METHODS[scenario.community.allocation_method]},
+      site_lease: {...detailedSiteLease, monthly_total_cad: round(siteLeaseMonthly), annual_total_cad: round(siteLeaseMonthly * 12), allocation_method: scenario.community.allocation_method, allocation_method_description: SITE_LEASE_ALLOCATION_METHODS[scenario.community.allocation_method]},
       shared_infrastructure_service: {
         scenario_id: infrastructure.scenario_id,
         annual_cad: round(sharedServiceAnnual),
@@ -661,7 +661,19 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
         replacement_reserve_annual_cad: round(infrastructure.reserve_contribution_annual_cad / count)
       },
       recurring_monthly_cost_cad: Object.fromEntries(Object.entries(recurring).map(([key, value]) => [key, round(value)])),
-      total_recurring_monthly_cost_cad: round(sumObjectValues(recurring)),
+      monthly_cost_stack: {
+        dwelling_financing_monthly_cad: round(recurring.dwelling_financing_monthly_cad),
+        site_lease_monthly_cad: round(siteLeaseMonthly),
+        site_lease_base_monthly_cad: round(baseLandMonthly),
+        site_lease_hectare_monthly_cad: round(hectareLandMonthly),
+        shared_infrastructure_monthly_cad: round(recurring.shared_infrastructure_service_monthly_cad),
+        dwelling_maintenance_replacement_monthly_cad: round(recurring.dwelling_maintenance_replacement_monthly_cad),
+        household_utilities_maintenance_monthly_cad: round(recurring.household_utilities_maintenance_monthly_cad),
+        total_monthly_cad: round(visibleTotal),
+        visible_component_total_monthly_cad: round(visibleTotal),
+        residual_monthly_cad: 0
+      },
+      total_recurring_monthly_cost_cad: round(visibleTotal),
       physical_carrying_capacity: {
         establishment_land_requirement_ha: round(household.reserved_land_requirement_ha, 6),
         canonical_establishment_peak_land_requirement_ha: round(household.transition.establishment_land_requirement_ha, 6),
@@ -671,9 +683,11 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       }
     };
   });
-  const annualLeaseRevenue = leaseAllocations.reduce((sum, row) => sum + row.annual_total_cad, 0);
+  const annualLeaseRevenue = scenario.community.allocation_method === 'base_plus_hectare'
+    ? landAccounting.revenue_recovery.annual_site_lease_revenue_cad
+    : leaseAllocations.reduce((sum, row) => sum + row.annual_total_cad, 0);
   const annualSharedRevenue = infrastructure.annual_costs_cad.total;
-  const annualLandCosts = landRecoveryAnnual + propertyTaxAnnual + landPools.land_insurance_annual_cad + landPools.common_land_costs_annual_cad + landPools.administration_annual_cad + landPools.vacancy_reserve_annual_cad;
+  const annualLandCosts = landAccounting.annual_land_layer_cost_cad;
   const annualProjectCosts = annualLandCosts + infrastructure.annual_costs_cad.total;
   const totalProjectRevenue = annualLeaseRevenue + annualSharedRevenue;
   const result = {
@@ -702,19 +716,27 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     },
     project_land: {
       total_property_area_ha: round(totalPropertyArea, 6),
+      productive_land_value_cad: landAccounting.acquisition.productive_land_value_cad,
+      common_land_value_cad: landAccounting.acquisition.common_land_value_cad,
       land_price_cad_per_ha: round(scenario.land.price_cad_per_ha),
       total_land_value_cad: round(landValue),
       financing: landFinance,
       annual_costs_cad: {
-        land_finance_recovery: round(landRecoveryAnnual),
-        property_tax: round(propertyTaxAnnual),
+        land_finance_recovery: round(landAccounting.acquisition.productive_land_finance_recovery_annual_cad + landAccounting.acquisition.common_land_finance_recovery_annual_cad),
+        productive_land_finance_recovery: landAccounting.acquisition.productive_land_finance_recovery_annual_cad,
+        common_land_finance_recovery: landAccounting.acquisition.common_land_finance_recovery_annual_cad,
+        property_tax: round(landAccounting.hectare_charge.annual_components_cad.productive_property_tax_annual_cad + landAccounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad),
+        productive_property_tax: landAccounting.hectare_charge.annual_components_cad.productive_property_tax_annual_cad,
+        common_property_tax: landAccounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad,
         land_insurance: round(landPools.land_insurance_annual_cad),
         common_land_costs: round(landPools.common_land_costs_annual_cad),
         administration: round(landPools.administration_annual_cad),
+        fixed_land_reserve: round(landPools.fixed_land_reserve_annual_cad),
         vacancy_reserve: round(landPools.vacancy_reserve_annual_cad),
         total: round(annualLandCosts)
       },
-      costs_classification: {land_finance_recovery: 'capital recovery', property_tax: 'operating expense', land_insurance: 'operating expense', common_land_costs: 'operating expense', administration: 'operating expense', vacancy_reserve: 'reserve'}
+      costs_classification: {land_finance_recovery: 'capital recovery', property_tax: 'operating expense', land_insurance: 'operating expense', common_land_costs: 'operating expense', administration: 'operating expense', fixed_land_reserve: 'reserve', vacancy_reserve: 'reserve'},
+      land_accounting: landAccounting
     },
       infrastructure,
     households: householdOutput,
@@ -722,6 +744,12 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       annual_revenue_cad: {site_leases: round(annualLeaseRevenue), shared_services: round(annualSharedRevenue), total: round(totalProjectRevenue)},
       annual_costs_cad: {land: round(annualLandCosts), shared_infrastructure: round(infrastructure.annual_costs_cad.total), total: round(annualProjectCosts)},
       annual_reserves_cad: round(landPools.vacancy_reserve_annual_cad + infrastructure.reserve_contribution_annual_cad),
+      land_layer_break_even: {
+        site_lease_revenue_cad: round(annualLeaseRevenue),
+        land_layer_cost_cad: round(annualLandCosts),
+        annual_surplus_or_shortfall_cad: round(annualLeaseRevenue - annualLandCosts),
+        revenue_equals_required_cost_recovery: Math.abs(annualLeaseRevenue - annualLandCosts) < .2
+      },
       break_even: {status: totalProjectRevenue + 0.1 >= annualProjectCosts ? 'break_even_or_surplus' : 'shortfall', annual_surplus_or_shortfall_cad: round(totalProjectRevenue - annualProjectCosts), revenue_equals_required_cost_recovery: Math.abs(totalProjectRevenue - annualProjectCosts) < .1}
     },
     allocation_sensitivity: calculateSiteLeaseAllocationSensitivity({scenario, households, pools: landPools}),
@@ -805,7 +833,40 @@ export function buildSiteLeasePresentationContract() {
     infrastructure_scenarios: infrastructureScenarioMetadata,
     infrastructure_scale_examples: infrastructureScaleExamples,
     evidence: SITE_LEASE_EVIDENCE,
-    default_inputs: {land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha, dwelling_capital_cost_cad: DEFAULT_SITE_LEASE_SCENARIO.dwelling.capital_cost_cad, legal_lease_term_years: DEFAULT_SITE_LEASE_SCENARIO.land.legal_lease_term_years},
+    default_inputs: {
+      land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha,
+      common_property_land_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
+      dwelling_capital_cost_cad: DEFAULT_SITE_LEASE_SCENARIO.dwelling.capital_cost_cad,
+      legal_lease_term_years: DEFAULT_SITE_LEASE_SCENARIO.land.legal_lease_term_years,
+      land_financing: {
+        ownership: DEFAULT_SITE_LEASE_SCENARIO.land.ownership,
+        down_payment_rate: DEFAULT_SITE_LEASE_SCENARIO.land.down_payment_rate,
+        interest_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.interest_rate_annual,
+        amortization_years: DEFAULT_SITE_LEASE_SCENARIO.land.amortization_years
+      },
+      dwelling_financing: {
+        ownership: DEFAULT_SITE_LEASE_SCENARIO.dwelling.ownership,
+        down_payment_rate: DEFAULT_SITE_LEASE_SCENARIO.dwelling.down_payment_rate,
+        interest_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.dwelling.interest_rate_annual,
+        amortization_years: DEFAULT_SITE_LEASE_SCENARIO.dwelling.amortization_years
+      },
+      land_costs: {
+        property_tax_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.property_tax_rate_annual,
+        insurance_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.insurance_annual_cad,
+        common_land_costs_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.common_land_costs_annual_cad,
+        administration_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.administration_annual_cad,
+        fixed_land_reserve_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.fixed_land_reserve_annual_cad,
+        vacancy_reserve_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.vacancy_reserve_rate_annual
+      },
+      dwelling_costs: {
+        maintenance_replacement_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.dwelling.maintenance_replacement_rate_annual,
+        household_utilities_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.dwelling.household_utilities_annual_cad
+      }
+    },
+    household_examples: {
+      one_adult_ordinary: ordinary.households[0],
+      family_ordinary: family.households[0]
+    },
     examples: {
       one_adult_ordinary: {productive_land_ha: ordinary.households[0].calculated_productive_land_ha, mature_land_ha: ordinary.households[0].mature_productive_land_requirement_ha, total_recurring_monthly_cost_cad: ordinary.households[0].total_recurring_monthly_cost_cad},
       family_ordinary: {productive_land_ha: family.households[0].calculated_productive_land_ha, mature_land_ha: family.households[0].mature_productive_land_requirement_ha, total_recurring_monthly_cost_cad: family.households[0].total_recurring_monthly_cost_cad}

@@ -45,6 +45,7 @@ jobs:
           grep -q 'href="/living-region/assets/' packages/education-web/dist/index.html
           test -f packages/education-web/dist/carrying-capacity/index.html
           test -f packages/education-web/dist/grey-county-transition/index.html
+          test -f packages/education-web/dist/arc-affordability/index.html
           test -f packages/education-web/dist/404.html
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

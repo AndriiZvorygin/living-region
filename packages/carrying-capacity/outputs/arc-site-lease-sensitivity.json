@@ -80,7 +80,7 @@
       "shared_service_month_cad": 228.18,
       "resident_monthly_cost_cad": 1840.45,
       "annual_project_cost_cad": 109048.05,
-      "annual_reserve_cad": 4328.1
+      "annual_reserve_cad": 4328.09
     },
     {
       "households": 12,
@@ -157,7 +157,7 @@
       "site_lease_month_cad": 639.84,
       "shared_service_month_cad": 228.18,
       "resident_monthly_cost_cad": 1951.19,
-      "annual_project_cost_cad": 124994.74,
+      "annual_project_cost_cad": 124994.61,
       "annual_reserve_cad": 5087.46
     },
     {
@@ -236,7 +236,7 @@
       "shared_service_month_cad": 171.14,
       "resident_monthly_cost_cad": 1619.75,
       "annual_project_cost_cad": 103023.11,
-      "annual_reserve_cad": 4041.2
+      "annual_reserve_cad": 4041.19
     },
     {
       "households": 16,
@@ -391,8 +391,8 @@
       "site_lease_month_cad": 801.02,
       "shared_service_month_cad": 171.14,
       "resident_monthly_cost_cad": 2055.33,
-      "annual_project_cost_cad": 186653.34,
-      "annual_reserve_cad": 8023.59
+      "annual_project_cost_cad": 186653.46,
+      "annual_reserve_cad": 8023.6
     },
     {
       "households": 16,
@@ -430,8 +430,8 @@
       "site_lease_month_cad": 308.3,
       "shared_service_month_cad": 109.53,
       "resident_monthly_cost_cad": 1501,
-      "annual_project_cost_cad": 125347.16,
-      "annual_reserve_cad": 5104.25
+      "annual_project_cost_cad": 125347.03,
+      "annual_reserve_cad": 5104.24
     },
     {
       "households": 25,
@@ -470,7 +470,7 @@
       "shared_service_month_cad": 109.53,
       "resident_monthly_cost_cad": 1607.9,
       "annual_project_cost_cad": 157416.68,
-      "annual_reserve_cad": 6631.37
+      "annual_reserve_cad": 6631.36
     },
     {
       "households": 25,
@@ -508,7 +508,7 @@
       "site_lease_month_cad": 468.64,
       "shared_service_month_cad": 109.53,
       "resident_monthly_cost_cad": 1661.34,
-      "annual_project_cost_cad": 173451.5,
+      "annual_project_cost_cad": 173451.37,
       "annual_reserve_cad": 7394.93
     },
     {

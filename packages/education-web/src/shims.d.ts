@@ -6,6 +6,8 @@ declare module '@living-region/carrying-capacity/browser' {
   export function calculatePersonVisualMetrics(profile?: Record<string, unknown>): any;
   export function calculateHeatingLoads(options?: Record<string, unknown>): any;
   export function calculateHouseholdLabourCapacity(members?: Array<Record<string, unknown>>): any;
+  export function calculateLandLeaseAccounting(options?: Record<string, unknown>): any;
+  export function financeCapital(options?: Record<string, unknown>): any;
   export function calculateExclusiveLandAllocation(options?: Record<string, unknown>): any;
   export function defaultBuilding(): any;
   export const labourCapacityLevels: Record<string, any>;

@@ -58,21 +58,17 @@ const lineMarkdown = lineRows.map((row) => {
   const source = [row.source_status, row.notes].filter(Boolean).join(' ');
   return `| ${row.component} | ${wholeMoney(row.capital_cost_cad)} | ${financing} | ${wholeMoney(row.annual_operating_cost_cad)} | ${wholeMoney(row.annual_maintenance_cad)} | ${wholeMoney(row.replacement_reserve_annual_cad)} | ${money(row.monthly_household_allocation_cad)} | ${row.requiredness} | ${source} |`;
 }).join('\n');
-const landComponents = ['land_finance_recovery_annual_cad', 'property_tax_annual_cad', 'land_insurance_annual_cad', 'common_land_costs_annual_cad', 'administration_annual_cad', 'vacancy_reserve_annual_cad'];
-const landLabels = {
-  land_finance_recovery_annual_cad: 'Underlying land finance recovery',
-  property_tax_annual_cad: 'Property tax',
-  land_insurance_annual_cad: 'Land insurance',
-  common_land_costs_annual_cad: 'Common land costs',
-  administration_annual_cad: 'Land-holding administration',
-  vacancy_reserve_annual_cad: 'Vacancy allowance'
-};
-const landLineMarkdown = landComponents.map((id) => {
-  const annualProject = legacy.project_land.annual_costs_cad[id.replace('_annual_cad', '')] ?? 0;
-  const annualHousehold = legacyHousehold.site_lease.annual_components_cad[id] ?? 0;
-  const status = id === 'property_tax_annual_cad' ? 'planning assumption; parcel assessment required' : id === 'vacancy_reserve_annual_cad' ? 'reserve; applied once at the site-lease layer' : 'site-lease layer; separate from infrastructure service';
-  return `| ${landLabels[id]} | ${wholeMoney(id === 'land_finance_recovery_annual_cad' ? legacy.project_land.total_land_value_cad : 0)} | ${id === 'land_finance_recovery_annual_cad' ? `${pct(legacy.project_land.financing.interest_rate_annual)} / ${legacy.project_land.financing.amortization_years} y` : 'none'} | ${wholeMoney(annualProject)} | $0 | $0 | ${money(annualHousehold / 12)} | site lease | ${status} |`;
-}).join('\n');
+const landAccounting = legacy.project_land.land_accounting;
+const landLineRows = [
+  ['Common land acquisition/debt recovery', landAccounting.acquisition.common_land_value_cad, `${pct(legacy.project_land.financing.interest_rate_annual)} / ${legacy.project_land.financing.amortization_years} y`, landAccounting.acquisition.common_land_finance_recovery_annual_cad, 0, 0, landAccounting.base_household_land_holding.annual_components_cad.common_land_finance_recovery_annual_cad / 12, 'base household charge', 'common property is recovered equally'],
+  ['Productive land acquisition/debt recovery', landAccounting.acquisition.productive_land_value_cad, `${pct(legacy.project_land.financing.interest_rate_annual)} / ${legacy.project_land.financing.amortization_years} y`, landAccounting.acquisition.productive_land_finance_recovery_annual_cad, 0, 0, legacyHousehold.site_lease.annual_components_cad.productive_land_finance_recovery_annual_cad / 12, 'hectare charge', 'productive land follows calculated hectares'],
+  ['Common and productive property tax', legacy.project_land.total_land_value_cad, 'none', legacy.project_land.annual_costs_cad.property_tax, 0, 0, (legacyHousehold.site_lease.annual_components_cad.common_property_tax_annual_cad + legacyHousehold.site_lease.annual_components_cad.productive_property_tax_annual_cad) / 12, 'base + hectare', 'planning assumption; parcel assessment required'],
+  ['Land insurance', 0, 'none', legacy.project_land.annual_costs_cad.land_insurance, 0, 0, legacyHousehold.site_lease.annual_components_cad.land_insurance_annual_cad / 12, 'base household charge', 'site-lease layer; separate from infrastructure service'],
+  ['Common land costs', 0, 'none', legacy.project_land.annual_costs_cad.common_land_costs, 0, 0, legacyHousehold.site_lease.annual_components_cad.common_land_costs_annual_cad / 12, 'base household charge', 'common-property operating cost'],
+  ['Land-holding administration', 0, 'none', legacy.project_land.annual_costs_cad.administration, 0, 0, legacyHousehold.site_lease.annual_components_cad.administration_annual_cad / 12, 'base household charge', 'charged once in land layer'],
+  ['Vacancy allowance', 0, 'none', legacy.project_land.annual_costs_cad.vacancy_reserve, 0, legacy.project_land.annual_costs_cad.vacancy_reserve, legacyHousehold.site_lease.annual_components_cad.vacancy_reserve_annual_cad / 12, 'base + hectare', 'reserve; applied once at the site-lease layer']
+];
+const landLineMarkdown = landLineRows.map(([label, capital, financing, annual, maintenance, reserve, monthly, layer, status]) => `| ${label} | ${wholeMoney(capital)} | ${financing} | ${wholeMoney(annual)} | ${wholeMoney(maintenance)} | ${wholeMoney(reserve)} | ${money(monthly)} | ${layer} | ${status} |`).join('\n');
 const componentCheck = legacy.infrastructure.line_items.reduce((sum, row) => sum + row.annual_total_cad, 0);
 const oldMonthly = legacy.infrastructure.annual_costs_cad.total / 12 / 12;
 const scenarioSummary = Object.keys(INFRASTRUCTURE_SCENARIOS).map((scenarioId) => {

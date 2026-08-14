@@ -17,6 +17,7 @@ export {calculatePersonVisualMetrics} from './people.mjs';
 export {calculatePerennialMixTimeline} from './perennial.mjs';
 export {HOUSEHOLD_LAND_ADULT_AGE, HOUSEHOLD_TRANSITION_YEAR_CONVENTION, householdLandRole, calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
 export {ARC_SITE_LEASE_CONTRACT_VERSION, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS, SITE_LEASE_ALLOCATION_METHODS, SITE_LEASE_EVIDENCE, calculateArcSiteLeaseEconomics, calculateSiteLeaseAllocationSensitivity, buildSiteLeasePresentationContract} from './site-lease.mjs';
+export {calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 
 export const CARRYING_CAPACITY_CONTRACT_VERSION = '1.0.0';
 export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

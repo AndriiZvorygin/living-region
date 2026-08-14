@@ -2,7 +2,7 @@
   "contract_version": "1.2.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-14T09:53:30.692Z",
+  "generated_at": "2026-08-14T15:54:44.394Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -1688,7 +1688,7 @@
     }
   },
   "site_lease_economics": {
-    "contract_version": "1.1.0",
+    "contract_version": "1.2.0",
     "api": "calculateArcSiteLeaseEconomics",
     "planning_guideline": {
       "productive_land_per_adult_ha": 1,
@@ -1696,7 +1696,7 @@
     },
     "allocation_methods": {
       "proportional_hectares": "All allocable site-lease pools are proportional to calculated productive hectares.",
-      "base_plus_hectare": "Recommended: land-specific costs follow productive hectares; shared land-holding costs are divided equally.",
+      "base_plus_hectare": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.",
       "equal_shared_and_hectare_land": "Property tax and shared land-holding costs are equal; land finance recovery follows productive hectares."
     },
     "recommended_infrastructure_scenario": "minimal_compliant",
@@ -2545,8 +2545,264 @@
     },
     "default_inputs": {
       "land_price_cad_per_ha": 35000,
+      "common_property_land_ha": 1.5,
       "dwelling_capital_cost_cad": 125000,
-      "legal_lease_term_years": 49
+      "legal_lease_term_years": 49,
+      "land_financing": {
+        "ownership": "financed",
+        "down_payment_rate": 0.2,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 30
+      },
+      "dwelling_financing": {
+        "ownership": "resident_owned",
+        "down_payment_rate": 0.1,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 25
+      },
+      "land_costs": {
+        "property_tax_rate_annual": 0.01,
+        "insurance_annual_cad": 3000,
+        "common_land_costs_annual_cad": 6000,
+        "administration_annual_cad": 18000,
+        "fixed_land_reserve_annual_cad": 0,
+        "vacancy_reserve_rate_annual": 0.05
+      },
+      "dwelling_costs": {
+        "maintenance_replacement_rate_annual": 0.02,
+        "household_utilities_annual_cad": 1800
+      }
+    },
+    "household_examples": {
+      "one_adult_ordinary": {
+        "household_id": "household-1-1",
+        "label": "Reference adult man",
+        "members": [
+          {
+            "id": "adult_man",
+            "label": "Representative adult man",
+            "age_y": 35,
+            "sex": "male",
+            "weight_kg": 80,
+            "height_cm": 178,
+            "activity": "low"
+          }
+        ],
+        "buildings": [
+          {
+            "id": "building-1",
+            "label": "ARC yurt",
+            "floor_area_m2": 65.6,
+            "archetype": "arc_yurt",
+            "insulation": "good"
+          }
+        ],
+        "site_id": "ordinary_mesic",
+        "calculated_productive_land_ha": 1.135199,
+        "canonical_establishment_peak_land_requirement_ha": 1.135199,
+        "reserved_productive_land_ha": 1.135199,
+        "mature_productive_land_requirement_ha": 1.063861,
+        "establishment_peak_year": 5,
+        "household_food_demand_gj_year": 4.393623,
+        "dwelling": {
+          "capital_cost_cad": 125000,
+          "financing": {
+            "capital_value_cad": 125000,
+            "ownership": "financed",
+            "down_payment_cad": 12500,
+            "financed_principal_cad": 112500,
+            "interest_rate_annual": 0.06,
+            "amortization_years": 25,
+            "monthly_debt_service_cad": 724.84
+          },
+          "maintenance_replacement_annual_cad": 2500
+        },
+        "site_lease": {
+          "household_id": "household-1-1",
+          "reserved_land_requirement_ha": 1.135199,
+          "base_household_land_holding_charge_annual_cad": 32074.06,
+          "hectare_land_charge_annual_cad": 2818.37,
+          "base_household_land_holding_charge_monthly_cad": 2672.84,
+          "land_charge_per_hectare_month_cad": 206.89,
+          "hectare_portion_monthly_cad": 234.86,
+          "annual_components_cad": {
+            "common_land_finance_recovery_annual_cad": 3021.72,
+            "common_property_tax_annual_cad": 525,
+            "land_insurance_annual_cad": 3000,
+            "common_land_costs_annual_cad": 6000,
+            "administration_annual_cad": 18000,
+            "fixed_land_reserve_annual_cad": 0,
+            "vacancy_reserve_annual_cad": 134.21,
+            "productive_land_finance_recovery_annual_cad": 2286.84,
+            "productive_property_tax_annual_cad": 397.32
+          },
+          "annual_total_cad": 34892.4,
+          "monthly_total_cad": 2907.7,
+          "allocation_method": "base_plus_hectare",
+          "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally."
+        },
+        "shared_infrastructure_service": {
+          "scenario_id": "minimal_compliant",
+          "annual_cad": 32858,
+          "monthly_cad": 2738.17,
+          "replacement_reserve_annual_cad": 700
+        },
+        "recurring_monthly_cost_cad": {
+          "dwelling_financing_monthly_cad": 724.84,
+          "dwelling_maintenance_replacement_monthly_cad": 208.33,
+          "site_lease_monthly_cad": 2907.7,
+          "shared_infrastructure_service_monthly_cad": 2738.17,
+          "household_utilities_maintenance_monthly_cad": 150
+        },
+        "monthly_cost_stack": {
+          "dwelling_financing_monthly_cad": 724.84,
+          "site_lease_monthly_cad": 2907.7,
+          "site_lease_base_monthly_cad": 2672.84,
+          "site_lease_hectare_monthly_cad": 234.86,
+          "shared_infrastructure_monthly_cad": 2738.17,
+          "dwelling_maintenance_replacement_monthly_cad": 208.33,
+          "household_utilities_maintenance_monthly_cad": 150,
+          "total_monthly_cad": 6729.04,
+          "visible_component_total_monthly_cad": 6729.04,
+          "residual_monthly_cad": 0
+        },
+        "total_recurring_monthly_cost_cad": 6729.04,
+        "physical_carrying_capacity": {
+          "establishment_land_requirement_ha": 1.135199,
+          "canonical_establishment_peak_land_requirement_ha": 1.135199,
+          "mature_land_requirement_ha": 1.063861,
+          "heating_area_ha": 0.347969,
+          "household_food_demand_gj_year": 4.393623
+        }
+      },
+      "family_ordinary": {
+        "household_id": "family-1-1",
+        "label": "2 adults + 2 children",
+        "members": [
+          {
+            "id": "adult_woman",
+            "label": "Representative adult woman",
+            "age_y": 35,
+            "sex": "female",
+            "weight_kg": 65,
+            "height_cm": 165,
+            "activity": "low"
+          },
+          {
+            "id": "adult_man",
+            "label": "Representative adult man",
+            "age_y": 35,
+            "sex": "male",
+            "weight_kg": 80,
+            "height_cm": 178,
+            "activity": "low"
+          },
+          {
+            "id": "child_girl_8",
+            "label": "Representative 8-year-old girl",
+            "age_y": 8,
+            "sex": "female",
+            "weight_kg": 28,
+            "height_cm": 130,
+            "activity": "low"
+          },
+          {
+            "id": "adolescent_boy_14",
+            "label": "Representative 14-year-old boy",
+            "age_y": 14,
+            "sex": "male",
+            "weight_kg": 50,
+            "height_cm": 165,
+            "activity": "low"
+          }
+        ],
+        "buildings": [
+          {
+            "id": "building-1",
+            "label": "ARC yurt",
+            "floor_area_m2": 65.6,
+            "archetype": "arc_yurt",
+            "insulation": "good"
+          }
+        ],
+        "site_id": "ordinary_mesic",
+        "calculated_productive_land_ha": 1.748399,
+        "canonical_establishment_peak_land_requirement_ha": 1.748399,
+        "reserved_productive_land_ha": 1.748399,
+        "mature_productive_land_requirement_ha": 1.52161,
+        "establishment_peak_year": 3,
+        "household_food_demand_gj_year": 14.050693,
+        "dwelling": {
+          "capital_cost_cad": 125000,
+          "financing": {
+            "capital_value_cad": 125000,
+            "ownership": "financed",
+            "down_payment_cad": 12500,
+            "financed_principal_cad": 112500,
+            "interest_rate_annual": 0.06,
+            "amortization_years": 25,
+            "monthly_debt_service_cad": 724.84
+          },
+          "maintenance_replacement_annual_cad": 2500
+        },
+        "site_lease": {
+          "household_id": "family-1-1",
+          "reserved_land_requirement_ha": 1.748399,
+          "base_household_land_holding_charge_annual_cad": 32074.06,
+          "hectare_land_charge_annual_cad": 4340.76,
+          "base_household_land_holding_charge_monthly_cad": 2672.84,
+          "land_charge_per_hectare_month_cad": 206.89,
+          "hectare_portion_monthly_cad": 361.73,
+          "annual_components_cad": {
+            "common_land_finance_recovery_annual_cad": 3021.72,
+            "common_property_tax_annual_cad": 525,
+            "land_insurance_annual_cad": 3000,
+            "common_land_costs_annual_cad": 6000,
+            "administration_annual_cad": 18000,
+            "fixed_land_reserve_annual_cad": 0,
+            "vacancy_reserve_annual_cad": 206.7,
+            "productive_land_finance_recovery_annual_cad": 3522.12,
+            "productive_property_tax_annual_cad": 611.94
+          },
+          "annual_total_cad": 36414.84,
+          "monthly_total_cad": 3034.57,
+          "allocation_method": "base_plus_hectare",
+          "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally."
+        },
+        "shared_infrastructure_service": {
+          "scenario_id": "minimal_compliant",
+          "annual_cad": 32858,
+          "monthly_cad": 2738.17,
+          "replacement_reserve_annual_cad": 700
+        },
+        "recurring_monthly_cost_cad": {
+          "dwelling_financing_monthly_cad": 724.84,
+          "dwelling_maintenance_replacement_monthly_cad": 208.33,
+          "site_lease_monthly_cad": 3034.57,
+          "shared_infrastructure_service_monthly_cad": 2738.17,
+          "household_utilities_maintenance_monthly_cad": 150
+        },
+        "monthly_cost_stack": {
+          "dwelling_financing_monthly_cad": 724.84,
+          "site_lease_monthly_cad": 3034.57,
+          "site_lease_base_monthly_cad": 2672.84,
+          "site_lease_hectare_monthly_cad": 361.73,
+          "shared_infrastructure_monthly_cad": 2738.17,
+          "dwelling_maintenance_replacement_monthly_cad": 208.33,
+          "household_utilities_maintenance_monthly_cad": 150,
+          "total_monthly_cad": 6855.91,
+          "visible_component_total_monthly_cad": 6855.91,
+          "residual_monthly_cad": 0
+        },
+        "total_recurring_monthly_cost_cad": 6855.91,
+        "physical_carrying_capacity": {
+          "establishment_land_requirement_ha": 1.748399,
+          "canonical_establishment_peak_land_requirement_ha": 1.748399,
+          "mature_land_requirement_ha": 1.52161,
+          "heating_area_ha": 0.347969,
+          "household_food_demand_gj_year": 14.050693
+        }
+      }
     },
     "examples": {
       "one_adult_ordinary": {
