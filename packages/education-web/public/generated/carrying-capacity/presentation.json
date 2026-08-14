@@ -2,7 +2,7 @@
   "contract_version": "1.2.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-14T16:27:52.854Z",
+  "generated_at": "2026-08-14T17:48:07.671Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -1688,7 +1688,7 @@
     }
   },
   "site_lease_economics": {
-    "contract_version": "1.2.0",
+    "contract_version": "1.3.0",
     "api": "calculateArcSiteLeaseEconomics",
     "planning_guideline": {
       "productive_land_per_adult_ha": 1,
@@ -2601,16 +2601,111 @@
         }
       ]
     },
+    "land_financing_evidence": {
+      "status": "planning_range_not_product_specific",
+      "sources": [
+        {
+          "institution": "Farm Credit Canada",
+          "title": "Borrowing basics - 3 ways to prepare for your next loan",
+          "date": "current web guidance accessed 2026-08-14",
+          "url": "https://www.fcc-fac.ca/en/knowledge/borrowing-basics",
+          "finding": "FCC says land loans typically require 25% down, land loans can reach up to 29 years, and most are in the 20-25-year range. It distinguishes a loan term, such as 5 or 10 years, from the amortization period.",
+          "evidence_status": "primary lender guidance; not a binding quote or universal requirement"
+        },
+        {
+          "institution": "Farm Credit Canada",
+          "title": "Land and Buildings",
+          "date": "current web product page accessed 2026-08-14",
+          "url": "https://www.fcc-fac.ca/en/financing/agriculture/land-buildings",
+          "finding": "FCC offers producer land/building financing with lender-selected interest terms, maturity dates, amortization periods and repayment schedules.",
+          "evidence_status": "primary lender product description; entity eligibility and pricing require underwriting"
+        },
+        {
+          "institution": "Agriculture and Agri-Food Canada",
+          "title": "Canadian Agricultural Loans Act Program: Before you apply",
+          "date": "2020-01-14 page; current program page accessed 2026-08-14",
+          "url": "https://agriculture.canada.ca/en/programs/canadian-agricultural-loans-act/step-3-before-apply",
+          "finding": "CALA loans are administered by lenders for eligible farmers and agricultural co-operatives. The maximum repayment term for land purchases is 15 years, although a lender may amortize longer with a balloon payment at year 15; floating and fixed rate caps are defined relative to lender rates.",
+          "evidence_status": "government program rule; eligibility for an ARC land-holding entity must be confirmed"
+        },
+        {
+          "institution": "Farm Credit Canada",
+          "title": "Deteriorating farmland affordability presents challenges",
+          "date": "2024 web analysis accessed 2026-08-14",
+          "url": "https://www.fcc-fac.ca/en/knowledge/economics/deteriorating-farmland-affordability",
+          "finding": "FCC uses 25% down and 25-year amortization as an analytical farmland-purchase assumption.",
+          "evidence_status": "primary lender analytical convention; not a product promise"
+        }
+      ],
+      "interpretation": {
+        "down_payment": "25% is the best-supported neutral planning case found; actual equity, collateral and lender policy may differ.",
+        "amortization": "20-25 years is the neutral planning band in FCC guidance. A 30-year amortization is possible in some land products but is not established here for an ARC land-holding entity.",
+        "loan_term": "Loan term/renewal is separate from amortization. The project must refinance or renew at the term end unless it has an open or fully amortizing structure.",
+        "interest_rate": "No current public lender quote was found for this specific entity and security structure. Use lender-quoted rates or explicit sensitivity cases, not a canonical expected rate.",
+        "eligibility": "The ARC entity must be assessed as an agricultural producer/co-operative, commercial borrower, land trust/non-profit or another eligible borrower; residential mortgage assumptions do not establish eligibility."
+      },
+      "planning_sensitivities": {
+        "down_payment_rates": [
+          0.1,
+          0.2,
+          0.25,
+          0.3
+        ],
+        "interest_rate_annual": [
+          0.04,
+          0.06,
+          0.08
+        ],
+        "amortization_years": [
+          15,
+          20,
+          25,
+          30
+        ],
+        "loan_terms_years": [
+          5,
+          10,
+          15
+        ]
+      }
+    },
+    "land_financing_scenarios": {
+      "illustrative_current": {
+        "id": "illustrative_current",
+        "label": "Illustrative current case",
+        "down_payment_rate": 0.2,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 30,
+        "loan_term_years": 5,
+        "status": "illustrative_not_canonical",
+        "note": "Retained for continuity with the existing public URL and reports; not a forecast of ARC land financing."
+      },
+      "neutral_land_planning": {
+        "id": "neutral_land_planning",
+        "label": "Neutral land-planning comparison",
+        "down_payment_rate": 0.25,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 25,
+        "loan_term_years": 5,
+        "status": "planning_comparison",
+        "note": "25% down and 25-year amortization follow FCC land-financing analytical conventions; the interest rate remains an explicit scenario input."
+      },
+      "cala_land_purchase": {
+        "id": "cala_land_purchase",
+        "label": "CALA-style land comparison",
+        "down_payment_rate": 0.2,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 15,
+        "loan_term_years": 15,
+        "status": "eligibility_dependent",
+        "note": "Illustrates a 15-year land repayment horizon consistent with CALA limits; eligibility and lender terms must be confirmed."
+      }
+    },
     "evidence": {
       "land_price": {
         "status": "working_scenario_assumption",
         "source": "Living Region repository audit and the existing task-specified Grey County working range",
         "notes": "No current, parcel-matched Grey County rural land-sale series was found in the repository. The 30,000–40,000 CAD/ha working range is retained as a sensitivity input, not a canonical market value."
-      },
-      "dwelling_capital_cost": {
-        "status": "working_scenario_assumption",
-        "source": "No current ARC dwelling construction-cost benchmark was found in the Living Region repository",
-        "notes": "The default is intentionally replaceable and is not the obsolete HelpOS combined housing-plus-land figure."
       },
       "property_tax": {
         "status": "planning_assumption",
@@ -2631,7 +2726,10 @@
         "ownership": "financed",
         "down_payment_rate": 0.2,
         "interest_rate_annual": 0.06,
-        "amortization_years": 30
+        "amortization_years": 30,
+        "loan_term_years": 5,
+        "financing_scenario_id": "illustrative_current",
+        "evidence_status": "illustrative_not_canonical"
       },
       "land_costs": {
         "property_tax_rate_annual": 0.01,
@@ -2646,40 +2744,84 @@
       "one_adult_ordinary": {
         "land_infrastructure": {
           "productive_allocation_ha": 1.135199,
-          "site_lease_monthly_cad": 2907.7,
-          "shared_infrastructure_monthly_cad": 2738.17,
-          "combined_monthly_cad": 5645.87,
+          "site_lease_monthly_cad": 457.6,
+          "shared_infrastructure_monthly_cad": 228.18,
+          "combined_monthly_cad": 685.78,
           "formula": "site lease + shared infrastructure fee; dwelling and household expenses excluded"
         },
         "site_lease": {
           "household_id": "household-1-1",
           "reserved_land_requirement_ha": 1.135199,
-          "base_household_land_holding_charge_annual_cad": 32074.06,
-          "hectare_land_charge_annual_cad": 2818.37,
-          "base_household_land_holding_charge_monthly_cad": 2672.84,
-          "land_charge_per_hectare_month_cad": 206.89,
-          "hectare_portion_monthly_cad": 234.86,
+          "productive_land_charge_annual_cad": 2818.38,
           "annual_components_cad": {
-            "common_land_finance_recovery_annual_cad": 3021.72,
-            "common_property_tax_annual_cad": 525,
-            "land_insurance_annual_cad": 3000,
-            "common_land_costs_annual_cad": 6000,
-            "administration_annual_cad": 18000,
+            "common_land_finance_recovery_annual_cad": 251.81,
+            "common_property_tax_annual_cad": 43.75,
+            "land_insurance_annual_cad": 250,
+            "common_land_costs_annual_cad": 500,
+            "administration_annual_cad": 1500,
             "fixed_land_reserve_annual_cad": 0,
-            "vacancy_reserve_annual_cad": 134.21,
-            "productive_land_finance_recovery_annual_cad": 2286.84,
-            "productive_property_tax_annual_cad": 397.32
+            "common_vacancy_reserve_annual_cad": 127.28,
+            "productive_land_finance_recovery_annual_cad": 2286.85,
+            "productive_property_tax_annual_cad": 397.32,
+            "productive_vacancy_reserve_annual_cad": 134.21
           },
-          "annual_total_cad": 34892.4,
-          "monthly_total_cad": 2907.7,
+          "common_property_land_holding_annual_components_cad": {
+            "common_land_finance_recovery_annual_cad": 251.81,
+            "common_property_tax_annual_cad": 43.75,
+            "land_insurance_annual_cad": 250,
+            "common_land_costs_annual_cad": 500,
+            "administration_annual_cad": 1500,
+            "fixed_land_reserve_annual_cad": 0,
+            "common_vacancy_reserve_annual_cad": 127.28
+          },
+          "productive_land_annual_components_cad": {
+            "productive_land_finance_recovery_annual_cad": 2286.85,
+            "productive_property_tax_annual_cad": 397.32,
+            "productive_vacancy_reserve_annual_cad": 134.21
+          },
+          "common_property_land_holding_charge_monthly_cad": 222.74,
+          "productive_land_charge_per_hectare_monthly_cad": 206.89,
+          "productive_land_portion_monthly_cad": 234.86,
+          "annual_total_cad": 5491.2,
+          "monthly_total_cad": 457.6,
           "allocation_method": "base_plus_hectare",
-          "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally."
+          "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.",
+          "common_property_land_holding_share_monthly_cad": 222.74,
+          "productive_land_allocation_ha": 1.135199,
+          "common_property_land_holding": {
+            "allocation_basis": "equal_per_household",
+            "monthly_components_cad": {
+              "common_land_finance_recovery_monthly_cad": 20.98,
+              "common_property_tax_monthly_cad": 3.65,
+              "land_insurance_monthly_cad": 20.83,
+              "common_land_costs_monthly_cad": 41.67,
+              "administration_monthly_cad": 125,
+              "fixed_land_reserve_monthly_cad": 0,
+              "common_vacancy_reserve_monthly_cad": 10.61
+            },
+            "monthly_total_cad": 222.74
+          },
+          "productive_land_charge": {
+            "allocation_basis": "proportional_to_reserved_productive_hectares",
+            "monthly_components_cad": {
+              "productive_land_finance_recovery_monthly_cad": 190.57,
+              "productive_property_tax_monthly_cad": 33.11,
+              "productive_vacancy_reserve_monthly_cad": 11.18
+            },
+            "monthly_total_cad": 234.86
+          },
+          "financing": {
+            "debt_service_monthly_cad": 211.56,
+            "initial_equity_contribution_cad": 8821.39,
+            "equity_recovery_monthly_cad": 0,
+            "equity_recovery_policy": "Initial project equity is not recovered again as recurring site-lease revenue."
+          }
         },
         "shared_infrastructure_service": {
           "scenario_id": "minimal_compliant",
-          "annual_cad": 32858,
-          "monthly_cad": 2738.17,
-          "replacement_reserve_annual_cad": 700
+          "annual_cad": 2738.17,
+          "monthly_cad": 228.18,
+          "replacement_reserve_annual_cad": 58.33
         },
         "physical_carrying_capacity": {
           "establishment_land_requirement_ha": 1.135199,
@@ -2692,40 +2834,84 @@
       "family_ordinary": {
         "land_infrastructure": {
           "productive_allocation_ha": 1.748399,
-          "site_lease_monthly_cad": 3034.57,
-          "shared_infrastructure_monthly_cad": 2738.17,
-          "combined_monthly_cad": 5772.74,
+          "site_lease_monthly_cad": 584.47,
+          "shared_infrastructure_monthly_cad": 228.18,
+          "combined_monthly_cad": 812.65,
           "formula": "site lease + shared infrastructure fee; dwelling and household expenses excluded"
         },
         "site_lease": {
           "household_id": "family-1-1",
           "reserved_land_requirement_ha": 1.748399,
-          "base_household_land_holding_charge_annual_cad": 32074.06,
-          "hectare_land_charge_annual_cad": 4340.76,
-          "base_household_land_holding_charge_monthly_cad": 2672.84,
-          "land_charge_per_hectare_month_cad": 206.89,
-          "hectare_portion_monthly_cad": 361.73,
+          "productive_land_charge_annual_cad": 4340.77,
           "annual_components_cad": {
-            "common_land_finance_recovery_annual_cad": 3021.72,
-            "common_property_tax_annual_cad": 525,
-            "land_insurance_annual_cad": 3000,
-            "common_land_costs_annual_cad": 6000,
-            "administration_annual_cad": 18000,
+            "common_land_finance_recovery_annual_cad": 251.81,
+            "common_property_tax_annual_cad": 43.75,
+            "land_insurance_annual_cad": 250,
+            "common_land_costs_annual_cad": 500,
+            "administration_annual_cad": 1500,
             "fixed_land_reserve_annual_cad": 0,
-            "vacancy_reserve_annual_cad": 206.7,
-            "productive_land_finance_recovery_annual_cad": 3522.12,
-            "productive_property_tax_annual_cad": 611.94
+            "common_vacancy_reserve_annual_cad": 127.28,
+            "productive_land_finance_recovery_annual_cad": 3522.13,
+            "productive_property_tax_annual_cad": 611.94,
+            "productive_vacancy_reserve_annual_cad": 206.7
           },
-          "annual_total_cad": 36414.84,
-          "monthly_total_cad": 3034.57,
+          "common_property_land_holding_annual_components_cad": {
+            "common_land_finance_recovery_annual_cad": 251.81,
+            "common_property_tax_annual_cad": 43.75,
+            "land_insurance_annual_cad": 250,
+            "common_land_costs_annual_cad": 500,
+            "administration_annual_cad": 1500,
+            "fixed_land_reserve_annual_cad": 0,
+            "common_vacancy_reserve_annual_cad": 127.28
+          },
+          "productive_land_annual_components_cad": {
+            "productive_land_finance_recovery_annual_cad": 3522.13,
+            "productive_property_tax_annual_cad": 611.94,
+            "productive_vacancy_reserve_annual_cad": 206.7
+          },
+          "common_property_land_holding_charge_monthly_cad": 222.74,
+          "productive_land_charge_per_hectare_monthly_cad": 206.89,
+          "productive_land_portion_monthly_cad": 361.73,
+          "annual_total_cad": 7013.64,
+          "monthly_total_cad": 584.47,
           "allocation_method": "base_plus_hectare",
-          "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally."
+          "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.",
+          "common_property_land_holding_share_monthly_cad": 222.74,
+          "productive_land_allocation_ha": 1.748399,
+          "common_property_land_holding": {
+            "allocation_basis": "equal_per_household",
+            "monthly_components_cad": {
+              "common_land_finance_recovery_monthly_cad": 20.98,
+              "common_property_tax_monthly_cad": 3.65,
+              "land_insurance_monthly_cad": 20.83,
+              "common_land_costs_monthly_cad": 41.67,
+              "administration_monthly_cad": 125,
+              "fixed_land_reserve_monthly_cad": 0,
+              "common_vacancy_reserve_monthly_cad": 10.61
+            },
+            "monthly_total_cad": 222.74
+          },
+          "productive_land_charge": {
+            "allocation_basis": "proportional_to_reserved_productive_hectares",
+            "monthly_components_cad": {
+              "productive_land_finance_recovery_monthly_cad": 293.51,
+              "productive_property_tax_monthly_cad": 51,
+              "productive_vacancy_reserve_monthly_cad": 17.22
+            },
+            "monthly_total_cad": 361.73
+          },
+          "financing": {
+            "debt_service_monthly_cad": 314.5,
+            "initial_equity_contribution_cad": 13113.79,
+            "equity_recovery_monthly_cad": 0,
+            "equity_recovery_policy": "Initial project equity is not recovered again as recurring site-lease revenue."
+          }
         },
         "shared_infrastructure_service": {
           "scenario_id": "minimal_compliant",
-          "annual_cad": 32858,
-          "monthly_cad": 2738.17,
-          "replacement_reserve_annual_cad": 700
+          "annual_cad": 2738.17,
+          "monthly_cad": 228.18,
+          "replacement_reserve_annual_cad": 58.33
         },
         "physical_carrying_capacity": {
           "establishment_land_requirement_ha": 1.748399,
@@ -2740,16 +2926,16 @@
       "one_adult_ordinary": {
         "productive_land_ha": 1.135199,
         "mature_land_ha": 1.063861,
-        "land_infrastructure_monthly_cad": 5645.87
+        "land_infrastructure_monthly_cad": 685.78
       },
       "family_ordinary": {
         "productive_land_ha": 1.748399,
         "mature_land_ha": 1.52161,
-        "land_infrastructure_monthly_cad": 5772.74
+        "land_infrastructure_monthly_cad": 812.65
       }
     },
     "notes": [
-      "Resident-owned dwelling capital is separate from project land and is never included in land principal.",
+      "The private dwelling is outside this public land-and-infrastructure comparison and is never included in land principal.",
       "Site lease recovers project land costs; shared infrastructure is reported as a separate service charge.",
       "Community size, land price, tax, infrastructure and financing are scenario inputs pending property-specific evidence."
     ]

@@ -5,8 +5,8 @@ This report covers the ARC site lease and selected shared infrastructure only. T
 ## Central accounting
 
 - Productive hectares come from the canonical carrying-capacity establishment peak for the household, site and heated buildings.
-- The recommended site-lease allocation is **base plus hectare**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally as the base household charge.
-- Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; debt amortization is 30 years.
+- The recommended site-lease allocation is **common-property land holding share plus productive land**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally.
+- Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; the default 6% / 30-year / 20% land financing case is illustrative and its loan term/renewal is separate from amortization.
 - Default monetary inputs are planning assumptions pending a site design, current land evidence, assessment/tax data and construction/servicing quotes.
 
 ## Household comparison

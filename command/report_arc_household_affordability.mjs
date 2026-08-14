@@ -50,9 +50,9 @@ function rowFor(householdCase, result, {price = 35000, ownership = 'financed'} =
     peak_year: row.establishment_peak_year,
     total_property_area_ha: result.project_land.total_property_area_ha,
     total_land_value_cad: result.project_land.total_land_value_cad,
-    base_household_land_charge_monthly_cad: row.site_lease.base_household_land_holding_charge_monthly_cad,
-    land_charge_per_hectare_monthly_cad: row.site_lease.land_charge_per_hectare_month_cad,
-    hectare_portion_monthly_cad: row.site_lease.hectare_portion_monthly_cad,
+    common_property_land_holding_share_monthly_cad: row.site_lease.common_property_land_holding_share_monthly_cad,
+    productive_land_charge_per_hectare_monthly_cad: row.site_lease.productive_land_charge_per_hectare_monthly_cad,
+    productive_land_portion_monthly_cad: row.site_lease.productive_land_portion_monthly_cad,
     site_lease_monthly_cad: landInfrastructure.site_lease_monthly_cad,
     shared_infrastructure_monthly_cad: landInfrastructure.shared_infrastructure_monthly_cad,
     combined_land_infrastructure_monthly_cad: landInfrastructure.combined_monthly_cad,
@@ -81,21 +81,36 @@ for (const householdCount of sizes) for (const price of prices) for (const mode 
 }
 
 const allRows = [...rows, ...sensitivity];
+const auditExample = calculateArcSiteLeaseEconomics({scenario: makeScenario({household: householdCases[0]})});
+const auditHousehold = auditExample.households[0];
+const decomposition = {
+  household: householdCases[0].label,
+  common_property_land_holding_share_monthly_cad: auditHousehold.site_lease.common_property_land_holding_share_monthly_cad,
+  common_property_land_holding_components_monthly_cad: auditHousehold.site_lease.common_property_land_holding.monthly_components_cad,
+  productive_land_allocation_ha: auditHousehold.site_lease.productive_land_allocation_ha,
+  productive_land_charge_per_hectare_monthly_cad: auditHousehold.site_lease.productive_land_charge_per_hectare_monthly_cad,
+  productive_land_components_monthly_cad: auditHousehold.site_lease.productive_land_charge.monthly_components_cad,
+  productive_land_components_monthly_per_hectare_cad: auditHousehold.site_lease.productive_land_charge.monthly_components_per_hectare_cad,
+  productive_land_portion_monthly_cad: auditHousehold.site_lease.productive_land_portion_monthly_cad,
+  site_lease_monthly_cad: auditHousehold.site_lease.monthly_total_cad,
+  land_financing: auditExample.land_financing
+};
 const headers = Object.keys(allRows[0]);
 fs.writeFileSync(path.join(outputDir, 'arc-household-affordability.csv'), [headers.join(','), ...allRows.map((row) => headers.map((key) => csvEscape(row[key])).join(','))].join('\n') + '\n');
 fs.writeFileSync(path.join(outputDir, 'arc-household-affordability.json'), JSON.stringify({
-  contract_version: '2.0.0',
+  contract_version: '2.1.0',
   generated_at: new Date().toISOString(),
-  accounting_rule: 'site lease = equal household base land-holding charge + productive hectares × land charge per hectare; shared infrastructure is separate',
+  accounting_rule: 'site lease = equal common-property land holding share + productive hectares × productive land charge per hectare; shared infrastructure is separate',
   biology_source: 'calculateArcSiteLeaseEconomics carrying-capacity outputs',
   household_comparison: rows,
+  decomposition_example: decomposition,
   community_size_sensitivity: rows.filter((row) => row.id.startsWith('family_two_children_') && sizes.some((size) => row.id.endsWith(`_${size}`))),
   land_price_ownership_sensitivity: sensitivity
 }, null, 2) + '\n');
 
 const baseRows = rows.filter((row) => householdCases.some((item) => item.id === row.id));
 const sizeRows = rows.filter((row) => row.id.startsWith('family_two_children_'));
-const table = (items) => items.map((row) => `| ${row.scenario} | ${row.households_in_project} | ${row.establishment_allocation_ha.toFixed(2)} ha | $${money(row.base_household_land_charge_monthly_cad)} | $${money(row.land_charge_per_hectare_monthly_cad)} | $${money(row.hectare_portion_monthly_cad)} | $${money(row.site_lease_monthly_cad)} | $${money(row.shared_infrastructure_monthly_cad)} | $${money(row.combined_land_infrastructure_monthly_cad)} |`).join('\n');
+const table = (items) => items.map((row) => `| ${row.scenario} | ${row.households_in_project} | ${row.establishment_allocation_ha.toFixed(2)} ha | $${money(row.common_property_land_holding_share_monthly_cad)} | $${money(row.productive_land_charge_per_hectare_monthly_cad)} | $${money(row.productive_land_portion_monthly_cad)} | $${money(row.site_lease_monthly_cad)} | $${money(row.shared_infrastructure_monthly_cad)} | $${money(row.combined_land_infrastructure_monthly_cad)} |`).join('\n');
 const markdown = [
   '# ARC household affordability and land lease',
   '',
@@ -104,21 +119,27 @@ const markdown = [
   '## Accounting structure',
   '',
   '- **Biology determines hectares:** establishment peak land is reserved; mature productive need remains visible separately.',
-  '- **Site lease:** equal base household land-holding charge plus productive hectares multiplied by the land charge per hectare.',
+  '- **Site lease:** equal common-property land holding share plus productive hectares multiplied by the productive land charge per hectare.',
   '- **Shared infrastructure:** selected minimal, shared-services or amenity-rich fee, kept outside the site lease.',
   '- **Public scope:** only the site lease and selected shared infrastructure are included. The private dwelling and household expenses are outside this comparison.',
   '',
+  '## Site-lease decomposition · reference adult',
+  '',
+  `- Common-property land holding share: **$${money(decomposition.common_property_land_holding_share_monthly_cad)}/month**, allocated equally across the 12-household project. It recovers common-property/access/ecological land debt and tax, land insurance, common-land costs, administration and the common vacancy reserve.`,
+  `- Productive land: **${decomposition.productive_land_allocation_ha.toFixed(2)} ha × $${money(decomposition.productive_land_charge_per_hectare_monthly_cad)}/ha/month = $${money(decomposition.productive_land_portion_monthly_cad)}/month**. It recovers productive-land debt service, productive-land tax and the productive vacancy reserve.`,
+  `- Total site lease: **$${money(decomposition.site_lease_monthly_cad)}/month**. Initial land equity is **$${money(decomposition.land_financing.initial_equity_contribution_cad)}** project capital and has **$0 recurring equity recovery** in this model.`,
+  '',
   '## Household comparison · default 12-household community',
   '',
-  '| Household | Community | Reserved hectares | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Land + infrastructure/mo |',
+  '| Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo |',
   '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
   table(baseRows),
   '',
-  'The base charge is broadly unchanged as household hectares vary. The hectare portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.',
+  'The common-property land holding share is broadly unchanged as household hectares vary. The productive land portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.',
   '',
   '## Community-size sensitivity · 2 adults + 2 children',
   '',
-  '| Household | Community | Reserved hectares | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Land + infrastructure/mo |',
+  '| Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo |',
   '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
   table(sizeRows),
   '',
@@ -126,7 +147,7 @@ const markdown = [
   '',
   '## Whole-property recovery',
   '',
-  'The underlying property is one title. Productive/exclusive land value and property tax are recovered through the hectare portion. Common property value, roads/access land, common buffers, land insurance, common-land costs, administration and fixed land reserves are recovered through the base household charge. The sum of site leases is independently checked against the land-layer break-even requirement before shared-service revenue is considered.',
+  'The underlying property is one title. Productive/exclusive land value and property tax are recovered through the productive land portion. Common property value, roads/access land, common buffers, land insurance, common-land costs, administration and fixed land reserves are recovered through the common-property land holding share. The sum of site leases is independently checked against the land-layer break-even requirement before shared-service revenue is considered.',
   '',
   '## Assumption status',
   '',

@@ -41,9 +41,16 @@ const compactRows = results.map(({id, label, result}) => {
     mature_land_ha: household.mature_productive_land_requirement_ha,
     property_area_ha: result.project_land.total_property_area_ha,
     land_value_cad: result.project_land.total_land_value_cad,
-    base_land_charge_month_cad: household.site_lease.base_household_land_holding_charge_monthly_cad,
-    land_charge_per_ha_month_cad: household.site_lease.land_charge_per_hectare_month_cad,
-    hectare_portion_month_cad: household.site_lease.hectare_portion_monthly_cad,
+    land_financing_scenario: result.land_financing.scenario_id,
+    land_down_payment_rate: result.land_financing.down_payment_rate,
+    land_interest_rate_annual: result.land_financing.interest_rate_annual,
+    land_amortization_years: result.land_financing.amortization_years,
+    land_loan_term_years: result.land_financing.loan_term_years,
+    land_initial_equity_cad: result.land_financing.initial_equity_contribution_cad,
+    land_debt_service_monthly_cad: result.land_financing.debt_service_monthly_cad,
+    common_property_land_holding_share_month_cad: household.site_lease.common_property_land_holding_share_monthly_cad,
+    productive_land_charge_per_ha_month_cad: household.site_lease.productive_land_charge_per_hectare_monthly_cad,
+    productive_land_portion_month_cad: household.site_lease.productive_land_portion_monthly_cad,
     site_lease_month_cad: household.site_lease.monthly_total_cad,
     shared_service_month_cad: household.shared_infrastructure_service.monthly_cad,
     land_infrastructure_month_cad: household.land_infrastructure.combined_monthly_cad,
@@ -58,7 +65,7 @@ const compactRows = results.map(({id, label, result}) => {
 const csvEscape = (value) => { const text = value == null ? '' : String(value); return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text; };
 const headers = Object.keys(compactRows[0]);
 fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.csv'), [headers.join(','), ...compactRows.map((row) => headers.map((key) => csvEscape(row[key])).join(','))].join('\n') + '\n');
-fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.json'), JSON.stringify({contract_version: '1.1.0', generated_at: new Date().toISOString(), scope: 'ARC land lease plus shared infrastructure only; private dwelling and household expenses excluded', scenarios: compactRows, comparison_rows: compactRows}, null, 2) + '\n');
+fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.json'), JSON.stringify({contract_version: '1.3.0', generated_at: new Date().toISOString(), scope: 'ARC land lease plus shared infrastructure only; private dwelling and household expenses excluded', scenarios: compactRows, comparison_rows: compactRows}, null, 2) + '\n');
 
 const family = results.find((row) => row.id === 'family_ordinary_12');
 const ordinaryAdult = results.find((row) => row.id === 'one_adult_ordinary_12');
@@ -72,8 +79,8 @@ const markdown = [
   '## Central accounting',
   '',
   '- Productive hectares come from the canonical carrying-capacity establishment peak for the household, site and heated buildings.',
-  '- The recommended site-lease allocation is **base plus hectare**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally as the base household charge.',
-  '- Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; debt amortization is 30 years.',
+  '- The recommended site-lease allocation is **common-property land holding share plus productive land**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally.',
+  '- Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; the default 6% / 30-year / 20% land financing case is illustrative and its loan term/renewal is separate from amortization.',
   '- Default monetary inputs are planning assumptions pending a site design, current land evidence, assessment/tax data and construction/servicing quotes.',
   '',
   '## Household comparison',

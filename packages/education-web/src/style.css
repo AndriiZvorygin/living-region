@@ -123,6 +123,9 @@ main { max-width: 1180px; }
 .cost-row > strong { color: var(--teal); font-size: 1.12rem; }
 .cost-row.site-cost { border-left: 4px solid var(--teal); }
 .cost-row.other-cost { border-left: 4px solid var(--amber); }
+.component-detail { display: grid; gap: 6px; margin-top: 14px; }
+.component-detail h3 { margin: 14px 0 0; font-size: .9rem; }
+.component-detail > div { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: .82rem; }
 .cost-subrow { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .88rem; }
 .cost-subrow b { color: var(--ink); font-weight: 800; }
 .cost-total { display: flex; justify-content: space-between; gap: 16px; padding: 20px; background: var(--ink); color: #fff; }

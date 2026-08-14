@@ -5,13 +5,19 @@ This household-first report starts with canonical carrying-capacity hectares and
 ## Accounting structure
 
 - **Biology determines hectares:** establishment peak land is reserved; mature productive need remains visible separately.
-- **Site lease:** equal base household land-holding charge plus productive hectares multiplied by the land charge per hectare.
+- **Site lease:** equal common-property land holding share plus productive hectares multiplied by the productive land charge per hectare.
 - **Shared infrastructure:** selected minimal, shared-services or amenity-rich fee, kept outside the site lease.
 - **Public scope:** only the site lease and selected shared infrastructure are included. The private dwelling and household expenses are outside this comparison.
 
+## Site-lease decomposition · reference adult
+
+- Common-property land holding share: **$222.74/month**, allocated equally across the 12-household project. It recovers common-property/access/ecological land debt and tax, land insurance, common-land costs, administration and the common vacancy reserve.
+- Productive land: **1.14 ha × $206.89/ha/month = $234.86/month**. It recovers productive-land debt service, productive-land tax and the productive vacancy reserve.
+- Total site lease: **$457.60/month**. Initial land equity is **$105856.72** project capital and has **$0 recurring equity recovery** in this model.
+
 ## Household comparison · default 12-household community
 
-| Household | Community | Reserved hectares | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Land + infrastructure/mo |
+| Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 adult · ordinary land | 12 | 1.14 ha | $222.74 | $206.89 | $234.86 | $457.60 | $228.18 | $685.78 |
 | 1 adult · marginal land | 12 | 2.15 ha | $222.74 | $206.89 | $443.82 | $666.56 | $228.18 | $894.74 |
@@ -20,11 +26,11 @@ This household-first report starts with canonical carrying-capacity hectares and
 | 2 adults + 2 children · ordinary land | 12 | 1.75 ha | $222.74 | $206.89 | $361.73 | $584.47 | $228.18 | $812.65 |
 | 2 adults + 3 children · ordinary land | 12 | 1.81 ha | $222.74 | $206.89 | $375.45 | $598.19 | $228.18 | $826.37 |
 
-The base charge is broadly unchanged as household hectares vary. The hectare portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.
+The common-property land holding share is broadly unchanged as household hectares vary. The productive land portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.
 
 ## Community-size sensitivity · 2 adults + 2 children
 
-| Household | Community | Reserved hectares | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Land + infrastructure/mo |
+| Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 2 adults + 2 children · ordinary land | 12 | 1.75 ha | $222.74 | $206.89 | $361.73 | $584.47 | $228.18 | $812.65 |
 | 2 adults + 2 children · ordinary land | 16 | 1.75 ha | $167.05 | $206.89 | $361.73 | $528.78 | $171.14 | $699.92 |
@@ -35,7 +41,7 @@ Community size lowers fixed/common charges and shared infrastructure per househo
 
 ## Whole-property recovery
 
-The underlying property is one title. Productive/exclusive land value and property tax are recovered through the hectare portion. Common property value, roads/access land, common buffers, land insurance, common-land costs, administration and fixed land reserves are recovered through the base household charge. The sum of site leases is independently checked against the land-layer break-even requirement before shared-service revenue is considered.
+The underlying property is one title. Productive/exclusive land value and property tax are recovered through the productive land portion. Common property value, roads/access land, common buffers, land insurance, common-land costs, administration and fixed land reserves are recovered through the common-property land holding share. The sum of site leases is independently checked against the land-layer break-even requirement before shared-service revenue is considered.
 
 ## Assumption status
 

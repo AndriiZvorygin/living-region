@@ -16,7 +16,7 @@ const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.2.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.3.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
   base_plus_hectare: 'Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.',
@@ -43,6 +43,90 @@ export const SITE_LEASE_EVIDENCE = {
     status: 'planning_assumption',
     source: 'No site design, servicing quote, or ARC infrastructure bill of quantities was found in the repository',
     notes: 'Capital and operating values are transparent placeholders for scenario comparison, not local procurement estimates.'
+  }
+};
+
+export const LAND_FINANCING_EVIDENCE = {
+  status: 'planning_range_not_product_specific',
+  sources: [
+    {
+      institution: 'Farm Credit Canada',
+      title: 'Borrowing basics - 3 ways to prepare for your next loan',
+      date: 'current web guidance accessed 2026-08-14',
+      url: 'https://www.fcc-fac.ca/en/knowledge/borrowing-basics',
+      finding: 'FCC says land loans typically require 25% down, land loans can reach up to 29 years, and most are in the 20-25-year range. It distinguishes a loan term, such as 5 or 10 years, from the amortization period.',
+      evidence_status: 'primary lender guidance; not a binding quote or universal requirement'
+    },
+    {
+      institution: 'Farm Credit Canada',
+      title: 'Land and Buildings',
+      date: 'current web product page accessed 2026-08-14',
+      url: 'https://www.fcc-fac.ca/en/financing/agriculture/land-buildings',
+      finding: 'FCC offers producer land/building financing with lender-selected interest terms, maturity dates, amortization periods and repayment schedules.',
+      evidence_status: 'primary lender product description; entity eligibility and pricing require underwriting'
+    },
+    {
+      institution: 'Agriculture and Agri-Food Canada',
+      title: 'Canadian Agricultural Loans Act Program: Before you apply',
+      date: '2020-01-14 page; current program page accessed 2026-08-14',
+      url: 'https://agriculture.canada.ca/en/programs/canadian-agricultural-loans-act/step-3-before-apply',
+      finding: 'CALA loans are administered by lenders for eligible farmers and agricultural co-operatives. The maximum repayment term for land purchases is 15 years, although a lender may amortize longer with a balloon payment at year 15; floating and fixed rate caps are defined relative to lender rates.',
+      evidence_status: 'government program rule; eligibility for an ARC land-holding entity must be confirmed'
+    },
+    {
+      institution: 'Farm Credit Canada',
+      title: 'Deteriorating farmland affordability presents challenges',
+      date: '2024 web analysis accessed 2026-08-14',
+      url: 'https://www.fcc-fac.ca/en/knowledge/economics/deteriorating-farmland-affordability',
+      finding: 'FCC uses 25% down and 25-year amortization as an analytical farmland-purchase assumption.',
+      evidence_status: 'primary lender analytical convention; not a product promise'
+    }
+  ],
+  interpretation: {
+    down_payment: '25% is the best-supported neutral planning case found; actual equity, collateral and lender policy may differ.',
+    amortization: '20-25 years is the neutral planning band in FCC guidance. A 30-year amortization is possible in some land products but is not established here for an ARC land-holding entity.',
+    loan_term: 'Loan term/renewal is separate from amortization. The project must refinance or renew at the term end unless it has an open or fully amortizing structure.',
+    interest_rate: 'No current public lender quote was found for this specific entity and security structure. Use lender-quoted rates or explicit sensitivity cases, not a canonical expected rate.',
+    eligibility: 'The ARC entity must be assessed as an agricultural producer/co-operative, commercial borrower, land trust/non-profit or another eligible borrower; residential mortgage assumptions do not establish eligibility.'
+  },
+  planning_sensitivities: {
+    down_payment_rates: [.10, .20, .25, .30],
+    interest_rate_annual: [.04, .06, .08],
+    amortization_years: [15, 20, 25, 30],
+    loan_terms_years: [5, 10, 15]
+  }
+};
+
+export const LAND_FINANCING_SCENARIOS = {
+  illustrative_current: {
+    id: 'illustrative_current',
+    label: 'Illustrative current case',
+    down_payment_rate: .20,
+    interest_rate_annual: .06,
+    amortization_years: 30,
+    loan_term_years: 5,
+    status: 'illustrative_not_canonical',
+    note: 'Retained for continuity with the existing public URL and reports; not a forecast of ARC land financing.'
+  },
+  neutral_land_planning: {
+    id: 'neutral_land_planning',
+    label: 'Neutral land-planning comparison',
+    down_payment_rate: .25,
+    interest_rate_annual: .06,
+    amortization_years: 25,
+    loan_term_years: 5,
+    status: 'planning_comparison',
+    note: '25% down and 25-year amortization follow FCC land-financing analytical conventions; the interest rate remains an explicit scenario input.'
+  },
+  cala_land_purchase: {
+    id: 'cala_land_purchase',
+    label: 'CALA-style land comparison',
+    down_payment_rate: .20,
+    interest_rate_annual: .06,
+    amortization_years: 15,
+    loan_term_years: 15,
+    status: 'eligibility_dependent',
+    note: 'Illustrates a 15-year land repayment horizon consistent with CALA limits; eligibility and lender terms must be confirmed.'
   }
 };
 
@@ -217,6 +301,8 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     down_payment_rate: 0.20,
     interest_rate_annual: 0.06,
     amortization_years: 30,
+    loan_term_years: 5,
+    financing_scenario_id: 'illustrative_current',
     recovery_mode: 'debt_service'
   },
   land_reservation_basis: 'maximum_transition_exclusive_footprint',
@@ -548,13 +634,18 @@ function normalizedScenario(options = {}) {
   merged.infrastructure_scenario_id = infrastructureScenarioId;
   merged.site_id = source.site_id ?? source.siteId ?? merged.site_id;
   if (!SITE_IDS.has(merged.site_id)) throw new Error(`Unknown carrying-capacity site for lease economics: ${merged.site_id}`);
+  const declaredFinancingId = merged.land.financing_scenario_id;
+  const declaredFinancing = LAND_FINANCING_SCENARIOS[declaredFinancingId];
+  if (declaredFinancing && ['down_payment_rate', 'interest_rate_annual', 'amortization_years', 'loan_term_years'].some((key) => Number(merged.land[key]) !== Number(declaredFinancing[key]))) merged.land.financing_scenario_id = 'custom';
   merged.community.allocation_method = source.community?.allocation_method ?? source.allocation_method ?? merged.community.allocation_method;
   if (!SITE_LEASE_ALLOCATION_METHODS[merged.community.allocation_method]) throw new Error(`Unknown site-lease allocation method: ${merged.community.allocation_method}`);
   return merged;
 }
 
 /**
- * Calculate resident-owned dwelling plus project-owned land and shared-service economics.
+ * Calculate project-owned land and shared-service economics. Legacy dwelling fields
+ * remain in the raw internal result for compatibility, but the public contract and
+ * reports expose only land lease plus shared infrastructure.
  * All hectares and heat loads come from the canonical carrying-capacity API; monetary
  * values are explicit scenario inputs until local project quotes are available.
  */
@@ -583,6 +674,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     down_payment_cad: scenario.land.down_payment_cad,
     interest_rate_annual: scenario.land.interest_rate_annual,
     amortization_years: scenario.land.amortization_years,
+    loan_term_years: scenario.land.loan_term_years,
     recovery_mode: scenario.land.recovery_mode,
     capital_recovery_rate_annual: scenario.land.capital_recovery_rate_annual,
     capital_recovery_years: scenario.land.capital_recovery_years,
@@ -598,12 +690,12 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
   const landFinance = landAccounting.acquisition.financing;
   const landPools = {
     land_finance_recovery_annual_cad: landAccounting.acquisition.productive_land_finance_recovery_annual_cad + landAccounting.acquisition.common_land_finance_recovery_annual_cad,
-    property_tax_annual_cad: landAccounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad + landAccounting.hectare_charge.annual_components_cad.productive_property_tax_annual_cad,
+    property_tax_annual_cad: landAccounting.common_property_land_holding.annual_components_cad.common_property_tax_annual_cad + landAccounting.productive_land_charge.annual_components_cad.productive_property_tax_annual_cad,
     land_insurance_annual_cad: finite(scenario.land.insurance_annual_cad),
     common_land_costs_annual_cad: finite(scenario.land.common_land_costs_annual_cad),
     administration_annual_cad: finite(scenario.land.administration_annual_cad),
     fixed_land_reserve_annual_cad: finite(scenario.land.fixed_land_reserve_annual_cad),
-    vacancy_reserve_annual_cad: landAccounting.base_household_land_holding.annual_vacancy_allowance_cad + landAccounting.hectare_charge.annual_vacancy_allowance_cad
+    vacancy_reserve_annual_cad: landAccounting.common_property_land_holding.annual_vacancy_allowance_cad + landAccounting.productive_land_charge.annual_vacancy_allowance_cad
   };
   const leaseAllocations = scenario.community.allocation_method === 'base_plus_hectare'
     ? landAccounting.allocations
@@ -633,10 +725,10 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       household_utilities_maintenance_monthly_cad: Math.max(0, finite(scenario.dwelling.household_utilities_annual_cad)) / 12
     };
     const baseLandMonthly = scenario.community.allocation_method === 'base_plus_hectare'
-      ? landAllocation.base_household_land_holding_charge_monthly_cad
+      ? landAllocation.common_property_land_holding_charge_monthly_cad
       : siteLeaseMonthly;
     const hectareLandMonthly = scenario.community.allocation_method === 'base_plus_hectare'
-      ? landAllocation.hectare_portion_monthly_cad
+      ? landAllocation.productive_land_portion_monthly_cad
       : 0;
     const visibleTotal = sumObjectValues(recurring);
     const detailedSiteLease = scenario.community.allocation_method === 'base_plus_hectare' ? landAllocation : siteLease;
@@ -655,7 +747,34 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       establishment_peak_year: household.transition.establishment_peak_year,
       household_food_demand_gj_year: household.result.household_food_gj_year,
       dwelling: {capital_cost_cad: round(scenario.dwelling.capital_cost_cad), financing: dwellingFinance, maintenance_replacement_annual_cad: round(dwellingMaintenanceAnnual)},
-      site_lease: {...detailedSiteLease, monthly_total_cad: round(siteLeaseMonthly), annual_total_cad: round(siteLeaseMonthly * 12), allocation_method: scenario.community.allocation_method, allocation_method_description: SITE_LEASE_ALLOCATION_METHODS[scenario.community.allocation_method]},
+      site_lease: {
+        ...detailedSiteLease,
+        monthly_total_cad: round(siteLeaseMonthly),
+        annual_total_cad: round(siteLeaseMonthly * 12),
+        allocation_method: scenario.community.allocation_method,
+        allocation_method_description: SITE_LEASE_ALLOCATION_METHODS[scenario.community.allocation_method],
+        common_property_land_holding_share_monthly_cad: round(baseLandMonthly),
+        productive_land_allocation_ha: round(household.reserved_land_requirement_ha, 6),
+        productive_land_charge_per_hectare_monthly_cad: round(detailedSiteLease.productive_land_charge_per_hectare_monthly_cad),
+        productive_land_portion_monthly_cad: round(hectareLandMonthly),
+        common_property_land_holding: {
+          allocation_basis: 'equal_per_household',
+          monthly_components_cad: Object.fromEntries(Object.entries(detailedSiteLease.common_property_land_holding_annual_components_cad ?? {}).map(([key, value]) => [key.replace(/_annual_cad$/, '_monthly_cad'), round(value / 12)])),
+          monthly_total_cad: round(baseLandMonthly)
+        },
+        productive_land_charge: {
+          allocation_basis: 'proportional_to_reserved_productive_hectares',
+          monthly_components_cad: Object.fromEntries(Object.entries(detailedSiteLease.productive_land_annual_components_cad ?? {}).map(([key, value]) => [key.replace(/_annual_cad$/, '_monthly_cad'), round(value / 12)])),
+          monthly_components_per_hectare_cad: detailedSiteLease.monthly_components_per_hectare_cad,
+          monthly_total_cad: round(hectareLandMonthly)
+        },
+        financing: {
+          debt_service_monthly_cad: round(landFinance.monthly_debt_service_cad * (finite(household.reserved_land_requirement_ha) + commonArea / count) / Math.max(.000001, totalPropertyArea)),
+          initial_equity_contribution_cad: round(landFinance.down_payment_cad * (finite(household.reserved_land_requirement_ha) + commonArea / count) / Math.max(.000001, totalPropertyArea)),
+          equity_recovery_monthly_cad: 0,
+          equity_recovery_policy: 'Initial project equity is not recovered again as recurring site-lease revenue.'
+        }
+      },
       shared_infrastructure_service: {
         scenario_id: infrastructure.scenario_id,
         annual_cad: round(sharedServiceAnnual),
@@ -701,7 +820,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
   const totalProjectRevenue = annualLeaseRevenue + annualSharedRevenue;
   const result = {
     contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
-    model: 'resident-owned dwelling + project-owned ARC land + household site lease + shared infrastructure/service charge',
+    model: 'project-owned ARC land + household site lease + shared infrastructure/service charge; private dwelling excluded from public economics',
     scenario: {
       project_id: scenario.community.project_id,
       project_label: scenario.community.label,
@@ -712,6 +831,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       allocation_method: scenario.community.allocation_method,
       land_reservation_basis: landReservationBasis,
       infrastructure_scenario_id: scenario.infrastructure_scenario_id,
+      land_financing_scenario_id: scenario.land.financing_scenario_id ?? 'custom',
       legal_lease_term_years: finite(scenario.land.legal_lease_term_years),
       debt_amortization_is_separate_from_legal_lease_term: true
     },
@@ -734,9 +854,9 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
         land_finance_recovery: round(landAccounting.acquisition.productive_land_finance_recovery_annual_cad + landAccounting.acquisition.common_land_finance_recovery_annual_cad),
         productive_land_finance_recovery: landAccounting.acquisition.productive_land_finance_recovery_annual_cad,
         common_land_finance_recovery: landAccounting.acquisition.common_land_finance_recovery_annual_cad,
-        property_tax: round(landAccounting.hectare_charge.annual_components_cad.productive_property_tax_annual_cad + landAccounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad),
-        productive_property_tax: landAccounting.hectare_charge.annual_components_cad.productive_property_tax_annual_cad,
-        common_property_tax: landAccounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad,
+        property_tax: round(landAccounting.productive_land_charge.annual_components_cad.productive_property_tax_annual_cad + landAccounting.common_property_land_holding.annual_components_cad.common_property_tax_annual_cad),
+        productive_property_tax: landAccounting.productive_land_charge.annual_components_cad.productive_property_tax_annual_cad,
+        common_property_tax: landAccounting.common_property_land_holding.annual_components_cad.common_property_tax_annual_cad,
         land_insurance: round(landPools.land_insurance_annual_cad),
         common_land_costs: round(landPools.common_land_costs_annual_cad),
         administration: round(landPools.administration_annual_cad),
@@ -746,6 +866,19 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       },
       costs_classification: {land_finance_recovery: 'capital recovery', property_tax: 'operating expense', land_insurance: 'operating expense', common_land_costs: 'operating expense', administration: 'operating expense', fixed_land_reserve: 'reserve', vacancy_reserve: 'reserve'},
       land_accounting: landAccounting
+    },
+    land_financing: {
+      scenario_id: scenario.land.financing_scenario_id ?? 'custom',
+      scenario_label: LAND_FINANCING_SCENARIOS[scenario.land.financing_scenario_id]?.label ?? 'Custom land-financing inputs',
+      evidence_status: LAND_FINANCING_SCENARIOS[scenario.land.financing_scenario_id]?.status ?? 'custom_scenario',
+      loan_term_years: scenario.land.loan_term_years ?? null,
+      amortization_years: scenario.land.amortization_years,
+      interest_rate_annual: scenario.land.interest_rate_annual,
+      down_payment_rate: scenario.land.down_payment_rate,
+      debt_service_monthly_cad: landFinance.monthly_debt_service_cad,
+      initial_equity_contribution_cad: landFinance.down_payment_cad,
+      equity_recovery_annual_cad: 0,
+      equity_recovery_policy: 'Initial equity is not included in recurring site-lease recovery.'
     },
       infrastructure,
     households: householdOutput,
@@ -796,10 +929,10 @@ export function calculateSiteLeaseAllocationSensitivity({scenario, households, p
 
 export function buildSiteLeasePresentationContract() {
   const ordinary = calculateArcSiteLeaseEconomics({
-    scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 1}, household: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.household), label: 'Reference adult man'}}
+    scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 12}, household: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.household), label: 'Reference adult man'}}
   });
   const family = calculateArcSiteLeaseEconomics({
-    scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), household: {household_id: 'family-1', label: '2 adults + 2 children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], buildings: [defaultBuilding()]}, community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 1}}
+    scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), household: {household_id: 'family-1', label: '2 adults + 2 children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], buildings: [defaultBuilding()]}, community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 12}}
   });
   const infrastructureScenarioMetadata = Object.values(INFRASTRUCTURE_SCENARIOS).map((scenario) => ({
     id: scenario.id,
@@ -839,6 +972,7 @@ export function buildSiteLeasePresentationContract() {
       infrastructure_layer_break_even: result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery
     };
   })]));
+  const publicEvidence = Object.fromEntries(Object.entries(SITE_LEASE_EVIDENCE).filter(([key]) => key !== 'dwelling_capital_cost'));
   return {
     contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
     api: 'calculateArcSiteLeaseEconomics',
@@ -852,7 +986,9 @@ export function buildSiteLeasePresentationContract() {
     },
     infrastructure_scenarios: infrastructureScenarioMetadata,
     infrastructure_scale_examples: infrastructureScaleExamples,
-    evidence: SITE_LEASE_EVIDENCE,
+    land_financing_evidence: LAND_FINANCING_EVIDENCE,
+    land_financing_scenarios: LAND_FINANCING_SCENARIOS,
+    evidence: publicEvidence,
     default_inputs: {
       land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha,
       common_property_land_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
@@ -861,7 +997,10 @@ export function buildSiteLeasePresentationContract() {
         ownership: DEFAULT_SITE_LEASE_SCENARIO.land.ownership,
         down_payment_rate: DEFAULT_SITE_LEASE_SCENARIO.land.down_payment_rate,
         interest_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.interest_rate_annual,
-        amortization_years: DEFAULT_SITE_LEASE_SCENARIO.land.amortization_years
+        amortization_years: DEFAULT_SITE_LEASE_SCENARIO.land.amortization_years,
+        loan_term_years: DEFAULT_SITE_LEASE_SCENARIO.land.loan_term_years,
+        financing_scenario_id: DEFAULT_SITE_LEASE_SCENARIO.land.financing_scenario_id,
+        evidence_status: LAND_FINANCING_SCENARIOS[DEFAULT_SITE_LEASE_SCENARIO.land.financing_scenario_id].status
       },
       land_costs: {
         property_tax_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.property_tax_rate_annual,
@@ -881,7 +1020,7 @@ export function buildSiteLeasePresentationContract() {
       family_ordinary: {productive_land_ha: family.households[0].calculated_productive_land_ha, mature_land_ha: family.households[0].mature_productive_land_requirement_ha, land_infrastructure_monthly_cad: family.households[0].land_infrastructure.combined_monthly_cad}
     },
     notes: [
-      'Resident-owned dwelling capital is separate from project land and is never included in land principal.',
+      'The private dwelling is outside this public land-and-infrastructure comparison and is never included in land principal.',
       'Site lease recovers project land costs; shared infrastructure is reported as a separate service charge.',
       'Community size, land price, tax, infrastructure and financing are scenario inputs pending property-specific evidence.'
     ]

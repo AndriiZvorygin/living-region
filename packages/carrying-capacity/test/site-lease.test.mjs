@@ -158,24 +158,26 @@ test('land reservation basis changes the reserved project area without changing 
   assert.ok(peak.project_land.total_property_area_ha >= mature.project_land.total_property_area_ha);
 });
 
-test('recommended site lease exposes a stable base charge and a hectare charge', () => {
+test('recommended site lease exposes a stable common-property share and a productive land charge', () => {
   const adult = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 1}})).households[0];
   const family = calculateArcSiteLeaseEconomics(scenario({
     community: {household_count: 1},
     household: {members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}
   })).households[0];
-  assert.equal(adult.site_lease.base_household_land_holding_charge_monthly_cad, family.site_lease.base_household_land_holding_charge_monthly_cad);
-  assert.equal(adult.site_lease.land_charge_per_hectare_month_cad, family.site_lease.land_charge_per_hectare_month_cad);
-  assert.ok(family.site_lease.hectare_portion_monthly_cad > adult.site_lease.hectare_portion_monthly_cad);
+  assert.equal(adult.site_lease.common_property_land_holding_share_monthly_cad, family.site_lease.common_property_land_holding_share_monthly_cad);
+  assert.equal(adult.site_lease.productive_land_charge_per_hectare_monthly_cad, family.site_lease.productive_land_charge_per_hectare_monthly_cad);
+  assert.ok(family.site_lease.productive_land_portion_monthly_cad > adult.site_lease.productive_land_portion_monthly_cad);
 });
 
-test('common property is recovered by the base layer and not the hectare layer', () => {
+test('common property is recovered by the common-property layer and not the productive land layer', () => {
   const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
   const accounting = result.project_land.land_accounting;
   assert.ok(accounting.acquisition.common_land_value_cad > 0);
-  assert.ok(accounting.base_household_land_holding.annual_components_cad.common_land_finance_recovery_annual_cad > 0);
-  assert.ok(accounting.base_household_land_holding.annual_components_cad.common_property_tax_annual_cad > 0);
-  assert.equal(accounting.hectare_charge.annual_components_cad.common_property_tax_annual_cad, undefined);
+  assert.ok(accounting.common_property_land_holding.annual_components_cad.common_land_finance_recovery_annual_cad > 0);
+  assert.ok(accounting.common_property_land_holding.annual_components_cad.common_property_tax_annual_cad > 0);
+  assert.equal(accounting.productive_land_charge.annual_components_cad.common_property_tax_annual_cad, undefined);
+  assert.equal(accounting.common_property_land_holding.annual_components_cad.common_vacancy_reserve_annual_cad > 0, true);
+  assert.equal(accounting.productive_land_charge.annual_components_cad.productive_vacancy_reserve_annual_cad > 0, true);
   assert.equal(result.project.land_layer_break_even.revenue_equals_required_cost_recovery, true);
 });
 
@@ -212,6 +214,7 @@ test('presentation contract includes household-first land accounting inputs and 
   assert.equal(contract.default_inputs.dwelling_capital_cost_cad, undefined);
   assert.equal(contract.default_inputs.dwelling_financing, undefined);
   assert.equal(contract.default_inputs.dwelling_costs, undefined);
+  assert.equal(contract.evidence.dwelling_capital_cost, undefined);
 });
 
 test('public ARC charge is exactly site lease plus shared infrastructure', () => {
@@ -229,4 +232,32 @@ test('dwelling and household expense inputs cannot alter the public land-infrast
     dwelling: {capital_cost_cad: 999999, down_payment_rate: 0, interest_rate_annual: .2, maintenance_replacement_rate_annual: .5, household_utilities_annual_cad: 99999}
   }));
   assert.equal(base.households[0].land_infrastructure.combined_monthly_cad, altered.households[0].land_infrastructure.combined_monthly_cad);
+});
+
+test('site lease decomposition exposes debt, equity, tax, overhead and reserves without double recovery', () => {
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const household = result.households[0];
+  const common = household.site_lease.common_property_land_holding.monthly_components_cad;
+  const productive = household.site_lease.productive_land_charge.monthly_components_cad;
+  assert.equal(Number((Object.values(common).reduce((sum, value) => sum + value, 0)).toFixed(2)), household.site_lease.common_property_land_holding_share_monthly_cad);
+  assert.equal(Number((Object.values(productive).reduce((sum, value) => sum + value, 0)).toFixed(2)), household.site_lease.productive_land_portion_monthly_cad);
+  assert.equal(household.site_lease.financing.equity_recovery_monthly_cad, 0);
+  assert.ok(Math.abs(result.project_land.annual_costs_cad.land_finance_recovery - (result.project_land.annual_costs_cad.productive_land_finance_recovery + result.project_land.annual_costs_cad.common_land_finance_recovery)) < 0.01);
+  assert.equal(result.project_land.annual_costs_cad.vacancy_reserve, result.project_land.land_accounting.common_property_land_holding.annual_vacancy_allowance_cad + result.project_land.land_accounting.productive_land_charge.annual_vacancy_allowance_cad);
+});
+
+test('public contract labels illustrative financing and exposes neutral comparisons', () => {
+  const contract = buildSiteLeasePresentationContract();
+  assert.equal(contract.land_financing_scenarios.illustrative_current.status, 'illustrative_not_canonical');
+  assert.equal(contract.land_financing_scenarios.neutral_land_planning.amortization_years, 25);
+  assert.equal(contract.land_financing_evidence.interpretation.loan_term.includes('separate'), true);
+  assert.deepEqual(contract.default_inputs.land_financing, {
+    ownership: 'financed',
+    down_payment_rate: .2,
+    interest_rate_annual: .06,
+    amortization_years: 30,
+    loan_term_years: 5,
+    financing_scenario_id: 'illustrative_current',
+    evidence_status: 'illustrative_not_canonical'
+  });
 });

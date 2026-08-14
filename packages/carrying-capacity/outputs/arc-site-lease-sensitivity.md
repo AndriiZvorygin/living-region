@@ -27,9 +27,20 @@ Family case: 2 adults + 2 children on an ordinary site. Prices and infrastructur
 
 The financed land case has a land-capital recovery payment; outright and donated/land-trust cases do not. Their land value remains visible even when no acquisition debt is charged.
 
+## Land-financing comparison
+
+The current 6% / 30-year / 20% case is illustrative. Loan term is shown separately from amortization. The neutral comparison follows the FCC 25% down / 25-year analytical convention; the CALA-style comparison is eligibility-dependent and uses a 15-year land horizon.
+
+| Scenario | Down | Interest | Amortization | Loan term | Initial equity | Project debt service/mo | Site lease/mo | Land + infrastructure/mo | Status |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| Illustrative current case | 20% | 6.0% | 30 y | 5 y | $157366 | $3774 | $584 | $813 | illustrative_not_canonical |
+| Neutral land-planning comparison | 25% | 6.0% | 25 y | 5 y | $196707 | $3802 | $587 | $815 | planning_comparison |
+| CALA-style land comparison | 20% | 6.0% | 15 y | 15 y | $157366 | $5312 | $719 | $947 | eligibility_dependent |
+
 ## Inputs still needing local evidence
 
 - Grey County parcel-matched rural land values and the relevant assessment/tax treatment.
 - Site-specific road, water, sewage, common-building, waste and equipment designs and quotes.
 - Resident dwelling construction costs and financing are outside this land-and-infrastructure comparison.
 - Insurance, maintenance, reserve and administration budgets for the land-holding entity.
+- A lender quote and eligibility determination for the ARC land-holding entity, including security, renewal term and any balloon payment.

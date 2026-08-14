@@ -1,4 +1,4 @@
-households,land_price_cad_per_ha,land_ownership,property_area_ha,land_value_cad,land_finance_month_cad,base_land_charge_month_cad,land_charge_per_ha_month_cad,hectare_portion_month_cad,site_lease_month_cad,shared_service_month_cad,land_infrastructure_month_cad
+households,land_price_cad_per_ha,land_ownership,property_area_ha,land_value_cad,land_finance_month_cad,common_property_land_holding_share_month_cad,productive_land_charge_per_ha_month_cad,productive_land_portion_month_cad,site_lease_month_cad,shared_service_month_cad,land_infrastructure_month_cad
 12,20000,financed,22.480788,449615.76,2156.54,211.65,118.22,206.7,418.36,228.18,646.54
 12,20000,owned_out_right,22.480788,449615.76,0,199.06,17.5,30.6,229.66,228.18,457.84
 12,20000,donated_land_trust,22.480788,449615.76,0,199.06,17.5,30.6,229.66,228.18,457.84

@@ -32,13 +32,13 @@ The monthly allocation includes that component’s debt service, operating cost,
 
 | Component | Capital basis | Financing term | Annual operating/recovery | Annual maintenance | Replacement reserve | Monthly household allocation | Layer | Source / status |
 |---|---:|---|---:|---:|---:|---:|---|---|
-| Common land acquisition/debt recovery | $52500 | 6.0% / 30 y | $3022 | $0 | $0 | $251.81 | base household charge | common property is recovered equally |
-| Productive land acquisition/debt recovery | $734328 | 6.0% / 30 y | $42266 | $0 | $0 | $293.51 | hectare charge | productive land follows calculated hectares |
-| Common and productive property tax | $786828 | none | $7868 | $0 | $0 | $54.64 | base + hectare | planning assumption; parcel assessment required |
-| Land insurance | $0 | none | $3000 | $0 | $0 | $20.83 | base household charge | site-lease layer; separate from infrastructure service |
-| Common land costs | $0 | none | $6000 | $0 | $0 | $41.67 | base household charge | common-property operating cost |
-| Land-holding administration | $0 | none | $18000 | $0 | $0 | $125.00 | base household charge | charged once in land layer |
-| Vacancy allowance | $0 | none | $4008 | $0 | $4008 | $17.22 | base + hectare | reserve; applied once at the site-lease layer |
+| Common land acquisition/debt recovery | $52500 | 6.0% / 5 y term / 30 y amortization | $3022 | $0 | $0 | $20.98 | common-property land holding share | common property is recovered equally |
+| Productive land acquisition/debt recovery | $734328 | 6.0% / 5 y term / 30 y amortization | $42266 | $0 | $0 | $293.51 | productive land charge | productive land follows calculated hectares |
+| Common and productive property tax | $786828 | none | $7868 | $0 | $0 | $54.65 | common share + productive land charge | planning assumption; parcel assessment required |
+| Land insurance | $0 | none | $3000 | $0 | $0 | $20.83 | common-property land holding share | site-lease layer; separate from infrastructure service |
+| Common land costs | $0 | none | $6000 | $0 | $0 | $41.67 | common-property land holding share | common-property operating cost |
+| Land-holding administration | $0 | none | $18000 | $0 | $0 | $125.00 | common-property land holding share | charged once in land layer |
+| Vacancy allowance | $0 | none | $4008 | $0 | $4008 | $27.83 | common share + productive land charge | reserve; common and productive portions are separate and applied once |
 
 Property tax, land insurance, land-holding administration and vacancy allowance are site-lease items. They are not part of the shared-infrastructure service charge. The underlying land remains one project asset; households do not receive individually financed land principals.
 

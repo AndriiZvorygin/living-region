@@ -13,7 +13,7 @@ export function monthlyDebtService(principal, annualRate, years) {
   return amount * monthlyRate / (1 - (1 + monthlyRate) ** -months);
 }
 
-export function financeCapital({value, ownership = 'owned_out_right', downPaymentRate = 0, downPaymentCad = null, interestRateAnnual = 0, amortizationYears = 1} = {}) {
+export function financeCapital({value, ownership = 'owned_out_right', downPaymentRate = 0, downPaymentCad = null, interestRateAnnual = 0, amortizationYears = 1, loanTermYears = null} = {}) {
   const capitalValue = Math.max(0, finite(value));
   const explicitDownPayment = downPaymentCad == null ? capitalValue * Math.max(0, finite(downPaymentRate)) : finite(downPaymentCad);
   const downPayment = ownership === 'financed' || ownership === 'partial_equity'
@@ -27,6 +27,7 @@ export function financeCapital({value, ownership = 'owned_out_right', downPaymen
     financed_principal_cad: round(financedPrincipal),
     interest_rate_annual: finite(interestRateAnnual),
     amortization_years: finite(amortizationYears),
+    loan_term_years: loanTermYears == null ? null : finite(loanTermYears),
     monthly_debt_service_cad: round(monthlyDebtService(financedPrincipal, interestRateAnnual, amortizationYears))
   };
 }
@@ -52,8 +53,8 @@ const sum = (object) => Object.values(object).reduce((total, value) => total + f
 
 /**
  * Recover the whole purchased property through two visible land-lease layers:
- * an equal household base charge for common property and a productive-hectare
- * charge for exclusive land. Shared infrastructure is deliberately absent.
+ * an equal common-property land holding share and a productive-hectare charge
+ * for exclusive land. Shared infrastructure is deliberately absent.
  */
 export function calculateLandLeaseAccounting({
   households = [],
@@ -64,6 +65,7 @@ export function calculateLandLeaseAccounting({
   down_payment_cad = null,
   interest_rate_annual = 0,
   amortization_years = 1,
+  loan_term_years = null,
   recovery_mode = 'debt_service',
   capital_recovery_rate_annual,
   capital_recovery_years,
@@ -91,12 +93,13 @@ export function calculateLandLeaseAccounting({
     down_payment_cad,
     interest_rate_annual,
     amortization_years,
+    loan_term_years,
     recovery_mode,
     capital_recovery_rate_annual,
     capital_recovery_years,
     total_property_value_cad: totalValue
   };
-  const financing = financeCapital({value: totalValue, ownership, downPaymentRate: down_payment_rate, downPaymentCad: down_payment_cad, interestRateAnnual: interest_rate_annual, amortizationYears: amortization_years});
+  const financing = financeCapital({value: totalValue, ownership, downPaymentRate: down_payment_rate, downPaymentCad: down_payment_cad, interestRateAnnual: interest_rate_annual, amortizationYears: amortization_years, loanTermYears: loan_term_years});
   const productiveFinance = recoveryForValue(productiveValue, land);
   const commonFinance = recoveryForValue(commonValue, land);
   const productiveTax = productiveValue * Math.max(0, finite(property_tax_rate_annual));
@@ -116,8 +119,11 @@ export function calculateLandLeaseAccounting({
   const rate = Math.max(0, finite(vacancy_reserve_rate_annual));
   const baseVacancy = sum(baseBeforeVacancy) * rate;
   const areaVacancy = sum(areaBeforeVacancy) * rate;
-  const baseComponents = {...baseBeforeVacancy, vacancy_reserve_annual_cad: baseVacancy};
-  const areaComponents = {...areaBeforeVacancy, vacancy_reserve_annual_cad: areaVacancy};
+  // Keep common and productive vacancy reserves distinct. A shared key here
+  // would make the spread below silently overwrite one reserve in the detail
+  // output even though the project totals remained correct.
+  const baseComponents = {...baseBeforeVacancy, common_vacancy_reserve_annual_cad: baseVacancy};
+  const areaComponents = {...areaBeforeVacancy, productive_vacancy_reserve_annual_cad: areaVacancy};
   const baseAnnual = sum(baseComponents);
   const areaAnnual = sum(areaComponents);
   const totalAnnual = baseAnnual + areaAnnual;
@@ -131,18 +137,21 @@ export function calculateLandLeaseAccounting({
     const annual = baseAnnualForHousehold + areaAnnualForHousehold;
     const baseMonthly = baseAnnualForHousehold / 12;
     const hectareMonthly = hectares * areaPerHectare / 12;
+    const commonComponents = Object.fromEntries(Object.entries(baseComponents).map(([key, value]) => [key, round(allocation_method === 'proportional_hectares' ? value * areaShare : value / count)]));
+    const productiveComponents = Object.fromEntries(Object.entries(areaComponents).map(([key, value]) => [key, round(value * areaShare)]));
     return {
       household_id: row.household_id,
       reserved_land_requirement_ha: round(hectares, 6),
-      base_household_land_holding_charge_annual_cad: round(baseAnnualForHousehold),
-      hectare_land_charge_annual_cad: round(areaAnnualForHousehold),
-      base_household_land_holding_charge_monthly_cad: round(baseMonthly),
-      land_charge_per_hectare_month_cad: round(areaPerHectare / 12),
-      hectare_portion_monthly_cad: round(hectareMonthly),
+      productive_land_charge_annual_cad: round(areaAnnualForHousehold),
       annual_components_cad: {
-        ...Object.fromEntries(Object.entries(baseComponents).map(([key, value]) => [key, round(allocation_method === 'proportional_hectares' ? value * areaShare : value / count)])),
-        ...Object.fromEntries(Object.entries(areaComponents).map(([key, value]) => [key, round(value * areaShare)]))
+        ...commonComponents,
+        ...productiveComponents
       },
+      common_property_land_holding_annual_components_cad: commonComponents,
+      productive_land_annual_components_cad: productiveComponents,
+      common_property_land_holding_charge_monthly_cad: round(baseMonthly),
+      productive_land_charge_per_hectare_monthly_cad: round(areaPerHectare / 12),
+      productive_land_portion_monthly_cad: round(hectareMonthly),
       annual_total_cad: round(annual),
       monthly_total_cad: round(annual / 12)
     };
@@ -160,25 +169,35 @@ export function calculateLandLeaseAccounting({
       common_land_value_cad: round(commonValue),
       total_land_value_cad: round(totalValue),
       financing,
+      initial_equity_contribution_cad: round(financing.down_payment_cad),
+      equity_recovery_annual_cad: 0,
+      equity_recovery_policy: 'Initial project equity is a source of acquisition capital; it is not charged again as recurring lease recovery or opportunity-cost return.',
       productive_land_finance_recovery_annual_cad: round(productiveFinance),
       common_land_finance_recovery_annual_cad: round(commonFinance)
     },
-    base_household_land_holding: {
+    common_property_land_holding: {
       annual_components_cad: Object.fromEntries(Object.entries(baseComponents).map(([key, value]) => [key, round(value)])),
       annual_project_cost_before_vacancy_cad: round(sum(baseBeforeVacancy)),
       annual_vacancy_allowance_cad: round(baseVacancy),
       annual_project_cost_cad: round(baseAnnual),
       monthly_per_household_cad: round(basePerHousehold / 12),
-      formula: 'equal household share of common-property land holding costs and fixed reserves'
+      allocation_basis: 'equal_per_household',
+      formula: 'equal household share of common-property land holding costs and fixed reserves',
+      includes: ['common property/access/ecological land acquisition and debt', 'common property tax', 'land insurance', 'common-land operating costs', 'land-holding administration', 'fixed land reserve', 'common-property vacancy reserve'],
+      excludes: ['productive/exclusive land acquisition and tax', 'shared infrastructure', 'resident dwelling and household expenses']
     },
-    hectare_charge: {
+    productive_land_charge: {
       annual_components_cad: Object.fromEntries(Object.entries(areaComponents).map(([key, value]) => [key, round(value)])),
       annual_project_cost_before_vacancy_cad: round(sum(areaBeforeVacancy)),
       annual_vacancy_allowance_cad: round(areaVacancy),
       annual_project_cost_cad: round(areaAnnual),
       productive_hectares: round(productiveArea, 6),
       monthly_per_hectare_cad: round(areaPerHectare / 12),
-      formula: 'productive/exclusive hectares × area-dependent land cost per hectare'
+      monthly_components_per_hectare_cad: Object.fromEntries(Object.entries(areaComponents).map(([key, value]) => [key.replace(/_annual_cad$/, '_monthly_per_hectare_cad'), round(value / Math.max(.000001, productiveArea) / 12)])),
+      allocation_basis: 'proportional_to_reserved_productive_hectares',
+      formula: 'productive/exclusive hectares × area-dependent land cost per hectare',
+      includes: ['productive/exclusive land acquisition and debt', 'productive-land tax', 'productive-land vacancy reserve'],
+      excludes: ['common property/access/ecological land', 'shared infrastructure', 'resident dwelling and household expenses']
     },
     annual_land_layer_cost_cad: round(totalAnnual),
     monthly_land_layer_cost_cad: round(totalAnnual / 12),
@@ -191,4 +210,3 @@ export function calculateLandLeaseAccounting({
     }
   };
 }
-
