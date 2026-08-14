@@ -12,6 +12,7 @@ if (!contract.regional.grey.scenarios?.length) throw new Error('presentation con
 if (contract.environment.climate.growing_degree_days?.value_degree_days == null || contract.environment.climate.heating_degree_days?.value_degree_days == null) throw new Error('presentation contract is missing local climate context');
 if (contract.environment.solar?.status !== 'unresolved') throw new Error('local solar status must remain explicitly unresolved until sourced');
 if (contract.establishment.starting_condition !== 'bare_land_new_planting') throw new Error('establishment contract must default to bare-land new planting');
+if (contract.site_lease_economics?.api !== 'calculateArcSiteLeaseEconomics') throw new Error('presentation contract is missing the canonical ARC site-lease API contract');
 if (!contract.establishment.site_models || Object.keys(contract.establishment.site_models).length < 3) throw new Error('establishment contract is missing site models');
 if (!contract.perennial_food_evidence.rows.some((row) => row.evidence_status === 'reference only')) throw new Error('perennial contract must preserve reference-only evidence rows');
 if (!contract.perennial_food_evidence.rows.some((row) => row.species.toLowerCase().includes('hazelnut') && Number(row.mature_food_gj_ha_year) > 0)) throw new Error('perennial contract is missing canonical hazelnut evidence');

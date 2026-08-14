@@ -1,8 +1,8 @@
 {
-  "contract_version": "1.1.0",
+  "contract_version": "1.2.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-10T12:58:21.235Z",
+  "generated_at": "2026-08-14T02:43:27.493Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -1686,6 +1686,63 @@
         "annual_reserve_fraction": 0.25
       }
     }
+  },
+  "site_lease_economics": {
+    "contract_version": "1.0.0",
+    "api": "calculateArcSiteLeaseEconomics",
+    "planning_guideline": {
+      "productive_land_per_adult_ha": 1,
+      "label": "Approximately 1 ha of productive land per adult is an early ARC planning benchmark; the property/household model refines it."
+    },
+    "allocation_methods": {
+      "proportional_hectares": "All allocable site-lease pools are proportional to calculated productive hectares.",
+      "base_plus_hectare": "Recommended: land-specific costs follow productive hectares; shared land-holding costs are divided equally.",
+      "equal_shared_and_hectare_land": "Property tax and shared land-holding costs are equal; land finance recovery follows productive hectares."
+    },
+    "evidence": {
+      "land_price": {
+        "status": "working_scenario_assumption",
+        "source": "Living Region repository audit and the existing task-specified Grey County working range",
+        "notes": "No current, parcel-matched Grey County rural land-sale series was found in the repository. The 30,000–40,000 CAD/ha working range is retained as a sensitivity input, not a canonical market value."
+      },
+      "dwelling_capital_cost": {
+        "status": "working_scenario_assumption",
+        "source": "No current ARC dwelling construction-cost benchmark was found in the Living Region repository",
+        "notes": "The default is intentionally replaceable and is not the obsolete HelpOS combined housing-plus-land figure."
+      },
+      "property_tax": {
+        "status": "planning_assumption",
+        "source": "No parcel assessment/tax roll was found in the repository",
+        "notes": "The tax rate is an explicit scenario input and should be replaced by the applicable municipal/assessment basis for a real property."
+      },
+      "infrastructure": {
+        "status": "planning_assumption",
+        "source": "No site design, servicing quote, or ARC infrastructure bill of quantities was found in the repository",
+        "notes": "Capital and operating values are transparent placeholders for scenario comparison, not local procurement estimates."
+      }
+    },
+    "default_inputs": {
+      "land_price_cad_per_ha": 35000,
+      "dwelling_capital_cost_cad": 125000,
+      "legal_lease_term_years": 49
+    },
+    "examples": {
+      "one_adult_ordinary": {
+        "productive_land_ha": 1.135199,
+        "mature_land_ha": 1.063861,
+        "total_recurring_monthly_cost_cad": 17938.58
+      },
+      "family_ordinary": {
+        "productive_land_ha": 1.748399,
+        "mature_land_ha": 1.52161,
+        "total_recurring_monthly_cost_cad": 18065.45
+      }
+    },
+    "notes": [
+      "Resident-owned dwelling capital is separate from project land and is never included in land principal.",
+      "Site lease recovers project land costs; shared infrastructure is reported as a separate service charge.",
+      "Community size, land price, tax, infrastructure and financing are scenario inputs pending property-specific evidence."
+    ]
   },
   "household_profiles": {
     "one_adult": {

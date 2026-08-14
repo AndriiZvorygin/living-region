@@ -34,6 +34,16 @@ keeps the standalone scripts reproducible without depending on the old checkout.
 - `calculateLabourRequirements`
 - `calculateMultifunctionalLandAccounting`
 - `calculateRobustMinimumVsOptionalProductiveSurplus`
+- `calculateArcSiteLeaseEconomics`
+
+The ARC site-lease layer in `src/site-lease.mjs` is the monetary/project
+boundary above the physical household model. It takes calculated
+establishment and mature productive hectares plus building heat loads as
+inputs; it never replaces them with a per-adult hectare coefficient. It keeps
+resident-owned dwelling finance, project land recovery, household site lease
+and shared infrastructure/service charge separate. The generated education
+contract includes `site_lease_economics` as a stable future-facing data
+contract; the browser does not duplicate the financial formulas.
 
 `src/regional.mjs` exposes `calculateRegionalCarryingCapacity`. It reports
 household composition, favourable/ordinary/marginal site sensitivity, mature
@@ -67,6 +77,8 @@ it.
 npm run report:carrying-capacity
 npm run report:grey:carrying-capacity
 npm run report:grey:household-transition
+npm run report:arc:site-lease
+npm run report:arc:site-lease:sensitivity
 ```
 
 The first command preserves the ARC standalone headline and canonical outputs

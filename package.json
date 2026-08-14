@@ -51,6 +51,8 @@
     "report:carrying-capacity": "node command/report_carrying_capacity.mjs",
     "report:grey:carrying-capacity": "node command/report_grey_carrying_capacity.mjs",
     "report:grey:household-transition": "node command/report_grey_household_transition.mjs",
+    "report:arc:site-lease": "node command/report_arc_site_lease.mjs",
+    "report:arc:site-lease:sensitivity": "node command/report_arc_site_lease_sensitivity.mjs",
     "build:carrying-capacity-contract": "node command/build_carrying_capacity_presentation.mjs",
     "build:carrying-capacity-web": "npm run build:carrying-capacity-contract && vite build --config packages/education-web/vite.config.ts && node packages/education-web/scripts/write-pages-artifacts.mjs",
     "dev:education": "npm run build:carrying-capacity-contract && vite --config packages/education-web/vite.config.ts",

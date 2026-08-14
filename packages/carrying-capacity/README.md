@@ -13,6 +13,15 @@ This repository is an independent, reproducible Phase 2 model for Affordable Rur
 
 The original files under `/home/htaf/lyis/` are read-only inputs and were not modified.
 
+The canonical ARC site-lease economics layer is in `src/site-lease.mjs`. It
+consumes household/site productive hectares and building heating from the
+carrying-capacity model, then separately calculates resident dwelling finance,
+project land recovery, household site leases and shared infrastructure
+services. It does not use the obsolete combined dwelling-plus-land shortcut.
+Run `npm run report:arc:site-lease` and
+`npm run report:arc:site-lease:sensitivity` from the Living Region root for the
+machine-readable and Markdown outputs.
+
 ## Run
 
 Requirements: Node.js 20+ and `unzip`.

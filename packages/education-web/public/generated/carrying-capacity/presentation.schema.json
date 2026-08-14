@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "reference_profile", "site_classes", "environment", "establishment", "household_presets", "mature_rows", "transition_rows", "heating", "perennial_food_evidence", "regional", "sources"],
+  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "reference_profile", "site_classes", "environment", "establishment", "site_lease_economics", "household_presets", "mature_rows", "transition_rows", "heating", "perennial_food_evidence", "regional", "sources"],
   "properties": {
     "contract_version": {"type": "string"},
     "model_contract_version": {"type": "string"},
@@ -12,6 +12,7 @@
     "site_classes": {"type": "object", "minProperties": 3},
     "environment": {"type": "object", "required": ["contract_version", "region", "climate", "soil_framework", "site_capabilities", "sources"]},
     "establishment": {"type": "object", "required": ["starting_condition", "years", "annual_intercrop_overlap_by_year", "site_models"]},
+    "site_lease_economics": {"type": "object", "required": ["contract_version", "api", "planning_guideline", "allocation_methods", "examples"]},
     "household_presets": {"type": "array", "minItems": 6},
     "mature_rows": {"type": "array", "minItems": 18},
     "transition_rows": {"type": "array", "minItems": 18},
