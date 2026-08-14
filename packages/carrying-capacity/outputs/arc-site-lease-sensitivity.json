@@ -37,11 +37,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 449615.76,
       "land_finance_month_cad": 2156.54,
+      "base_land_charge_month_cad": 211.65,
+      "land_charge_per_ha_month_cad": 118.22,
+      "hectare_portion_month_cad": 206.7,
       "site_lease_month_cad": 418.36,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1729.71,
-      "annual_project_cost_cad": 93101.37,
-      "annual_reserve_cad": 3568.73
+      "land_infrastructure_month_cad": 646.54
     },
     {
       "households": 12,
@@ -50,11 +51,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 449615.76,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 199.06,
+      "land_charge_per_ha_month_cad": 17.5,
+      "hectare_portion_month_cad": 30.6,
       "site_lease_month_cad": 229.66,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1541.01,
-      "annual_project_cost_cad": 65928.97,
-      "annual_reserve_cad": 2274.81
+      "land_infrastructure_month_cad": 457.84
     },
     {
       "households": 12,
@@ -63,11 +65,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 449615.76,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 199.06,
+      "land_charge_per_ha_month_cad": 17.5,
+      "hectare_portion_month_cad": 30.6,
       "site_lease_month_cad": 229.66,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1541.01,
-      "annual_project_cost_cad": 65928.97,
-      "annual_reserve_cad": 2274.81
+      "land_infrastructure_month_cad": 457.84
     },
     {
       "households": 12,
@@ -76,11 +79,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 674423.64,
       "land_finance_month_cad": 3234.81,
+      "base_land_charge_month_cad": 219.04,
+      "land_charge_per_ha_month_cad": 177.34,
+      "hectare_portion_month_cad": 310.06,
       "site_lease_month_cad": 529.1,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1840.45,
-      "annual_project_cost_cad": 109048.05,
-      "annual_reserve_cad": 4328.09
+      "land_infrastructure_month_cad": 757.28
     },
     {
       "households": 12,
@@ -89,11 +93,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 674423.64,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 200.16,
+      "land_charge_per_ha_month_cad": 26.25,
+      "hectare_portion_month_cad": 45.9,
       "site_lease_month_cad": 246.05,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1557.4,
-      "annual_project_cost_cad": 68289.45,
-      "annual_reserve_cad": 2387.21
+      "land_infrastructure_month_cad": 474.23
     },
     {
       "households": 12,
@@ -102,11 +107,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 674423.64,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 200.16,
+      "land_charge_per_ha_month_cad": 26.25,
+      "hectare_portion_month_cad": 45.9,
       "site_lease_month_cad": 246.05,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1557.4,
-      "annual_project_cost_cad": 68289.45,
-      "annual_reserve_cad": 2387.21
+      "land_infrastructure_month_cad": 474.23
     },
     {
       "households": 12,
@@ -115,11 +121,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 786827.58,
       "land_finance_month_cad": 3773.94,
+      "base_land_charge_month_cad": 222.74,
+      "land_charge_per_ha_month_cad": 206.89,
+      "hectare_portion_month_cad": 361.73,
       "site_lease_month_cad": 584.47,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1895.82,
-      "annual_project_cost_cad": 117021.33,
-      "annual_reserve_cad": 4707.78
+      "land_infrastructure_month_cad": 812.65
     },
     {
       "households": 12,
@@ -128,11 +135,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 786827.58,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 200.7,
+      "land_charge_per_ha_month_cad": 30.63,
+      "hectare_portion_month_cad": 53.54,
       "site_lease_month_cad": 254.25,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1565.6,
-      "annual_project_cost_cad": 69469.69,
-      "annual_reserve_cad": 2443.41
+      "land_infrastructure_month_cad": 482.43
     },
     {
       "households": 12,
@@ -141,11 +149,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 786827.58,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 200.7,
+      "land_charge_per_ha_month_cad": 30.63,
+      "hectare_portion_month_cad": 53.54,
       "site_lease_month_cad": 254.25,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1565.6,
-      "annual_project_cost_cad": 69469.69,
-      "annual_reserve_cad": 2443.41
+      "land_infrastructure_month_cad": 482.43
     },
     {
       "households": 12,
@@ -154,11 +163,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 899231.52,
       "land_finance_month_cad": 4313.08,
+      "base_land_charge_month_cad": 226.43,
+      "land_charge_per_ha_month_cad": 236.45,
+      "hectare_portion_month_cad": 413.41,
       "site_lease_month_cad": 639.84,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1951.19,
-      "annual_project_cost_cad": 124994.61,
-      "annual_reserve_cad": 5087.46
+      "land_infrastructure_month_cad": 868.02
     },
     {
       "households": 12,
@@ -167,11 +177,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 899231.52,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 201.25,
+      "land_charge_per_ha_month_cad": 35,
+      "hectare_portion_month_cad": 61.19,
       "site_lease_month_cad": 262.44,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1573.79,
-      "annual_project_cost_cad": 70649.93,
-      "annual_reserve_cad": 2499.62
+      "land_infrastructure_month_cad": 490.62
     },
     {
       "households": 12,
@@ -180,11 +191,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 899231.52,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 201.25,
+      "land_charge_per_ha_month_cad": 35,
+      "hectare_portion_month_cad": 61.19,
       "site_lease_month_cad": 262.44,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1573.79,
-      "annual_project_cost_cad": 70649.93,
-      "annual_reserve_cad": 2499.62
+      "land_infrastructure_month_cad": 490.62
     },
     {
       "households": 12,
@@ -193,11 +205,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 1348847.28,
       "land_finance_month_cad": 6469.62,
+      "base_land_charge_month_cad": 241.21,
+      "land_charge_per_ha_month_cad": 354.67,
+      "hectare_portion_month_cad": 620.11,
       "site_lease_month_cad": 861.32,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 2172.67,
-      "annual_project_cost_cad": 156888.11,
-      "annual_reserve_cad": 6606.2
+      "land_infrastructure_month_cad": 1089.5
     },
     {
       "households": 12,
@@ -206,11 +219,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 1348847.28,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 203.44,
+      "land_charge_per_ha_month_cad": 52.5,
+      "hectare_portion_month_cad": 91.79,
       "site_lease_month_cad": 295.23,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1606.58,
-      "annual_project_cost_cad": 75370.9,
-      "annual_reserve_cad": 2724.42
+      "land_infrastructure_month_cad": 523.41
     },
     {
       "households": 12,
@@ -219,11 +233,12 @@
       "property_area_ha": 22.480788,
       "land_value_cad": 1348847.28,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 203.44,
+      "land_charge_per_ha_month_cad": 52.5,
+      "hectare_portion_month_cad": 91.79,
       "site_lease_month_cad": 295.23,
       "shared_service_month_cad": 228.18,
-      "resident_monthly_cost_cad": 1606.58,
-      "annual_project_cost_cad": 75370.9,
-      "annual_reserve_cad": 2724.42
+      "land_infrastructure_month_cad": 523.41
     },
     {
       "households": 16,
@@ -232,11 +247,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 589487.68,
       "land_finance_month_cad": 2827.42,
+      "base_land_charge_month_cad": 158.74,
+      "land_charge_per_ha_month_cad": 118.22,
+      "hectare_portion_month_cad": 206.7,
       "site_lease_month_cad": 365.44,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1619.75,
-      "annual_project_cost_cad": 103023.11,
-      "annual_reserve_cad": 4041.19
+      "land_infrastructure_month_cad": 536.58
     },
     {
       "households": 16,
@@ -245,11 +261,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 589487.68,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 149.3,
+      "land_charge_per_ha_month_cad": 17.5,
+      "hectare_portion_month_cad": 30.6,
       "site_lease_month_cad": 179.89,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1434.2,
-      "annual_project_cost_cad": 67397.62,
-      "annual_reserve_cad": 2344.74
+      "land_infrastructure_month_cad": 351.03
     },
     {
       "households": 16,
@@ -258,11 +275,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 589487.68,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 149.3,
+      "land_charge_per_ha_month_cad": 17.5,
+      "hectare_portion_month_cad": 30.6,
       "site_lease_month_cad": 179.89,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1434.2,
-      "annual_project_cost_cad": 67397.62,
-      "annual_reserve_cad": 2344.74
+      "land_infrastructure_month_cad": 351.03
     },
     {
       "households": 16,
@@ -271,11 +289,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 884231.52,
       "land_finance_month_cad": 4241.13,
+      "base_land_charge_month_cad": 164.28,
+      "land_charge_per_ha_month_cad": 177.34,
+      "hectare_portion_month_cad": 310.06,
       "site_lease_month_cad": 474.34,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1728.65,
-      "annual_project_cost_cad": 123930.67,
-      "annual_reserve_cad": 5036.79
+      "land_infrastructure_month_cad": 645.48
     },
     {
       "households": 16,
@@ -284,11 +303,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 884231.52,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 150.12,
+      "land_charge_per_ha_month_cad": 26.25,
+      "hectare_portion_month_cad": 45.9,
       "site_lease_month_cad": 196.01,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1450.32,
-      "annual_project_cost_cad": 70492.43,
-      "annual_reserve_cad": 2492.12
+      "land_infrastructure_month_cad": 367.15
     },
     {
       "households": 16,
@@ -297,11 +317,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 884231.52,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 150.12,
+      "land_charge_per_ha_month_cad": 26.25,
+      "hectare_portion_month_cad": 45.9,
       "site_lease_month_cad": 196.01,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1450.32,
-      "annual_project_cost_cad": 70492.43,
-      "annual_reserve_cad": 2492.12
+      "land_infrastructure_month_cad": 367.15
     },
     {
       "households": 16,
@@ -310,11 +331,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1031603.44,
       "land_finance_month_cad": 4947.99,
+      "base_land_charge_month_cad": 167.05,
+      "land_charge_per_ha_month_cad": 206.89,
+      "hectare_portion_month_cad": 361.73,
       "site_lease_month_cad": 528.78,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1783.09,
-      "annual_project_cost_cad": 134384.51,
-      "annual_reserve_cad": 5534.6
+      "land_infrastructure_month_cad": 699.92
     },
     {
       "households": 16,
@@ -323,11 +345,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1031603.44,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 150.53,
+      "land_charge_per_ha_month_cad": 30.63,
+      "hectare_portion_month_cad": 53.54,
       "site_lease_month_cad": 204.07,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1458.38,
-      "annual_project_cost_cad": 72039.84,
-      "annual_reserve_cad": 2565.8
+      "land_infrastructure_month_cad": 375.21
     },
     {
       "households": 16,
@@ -336,11 +359,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1031603.44,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 150.53,
+      "land_charge_per_ha_month_cad": 30.63,
+      "hectare_portion_month_cad": 53.54,
       "site_lease_month_cad": 204.07,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1458.38,
-      "annual_project_cost_cad": 72039.84,
-      "annual_reserve_cad": 2565.8
+      "land_infrastructure_month_cad": 375.21
     },
     {
       "households": 16,
@@ -349,11 +373,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1178975.36,
       "land_finance_month_cad": 5654.84,
+      "base_land_charge_month_cad": 169.82,
+      "land_charge_per_ha_month_cad": 236.45,
+      "hectare_portion_month_cad": 413.41,
       "site_lease_month_cad": 583.23,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1837.54,
-      "annual_project_cost_cad": 144838.23,
-      "annual_reserve_cad": 6032.39
+      "land_infrastructure_month_cad": 754.37
     },
     {
       "households": 16,
@@ -362,11 +387,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1178975.36,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 150.94,
+      "land_charge_per_ha_month_cad": 35,
+      "hectare_portion_month_cad": 61.19,
       "site_lease_month_cad": 212.13,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1466.44,
-      "annual_project_cost_cad": 73587.24,
-      "annual_reserve_cad": 2639.49
+      "land_infrastructure_month_cad": 383.27
     },
     {
       "households": 16,
@@ -375,11 +401,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1178975.36,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 150.94,
+      "land_charge_per_ha_month_cad": 35,
+      "hectare_portion_month_cad": 61.19,
       "site_lease_month_cad": 212.13,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1466.44,
-      "annual_project_cost_cad": 73587.24,
-      "annual_reserve_cad": 2639.49
+      "land_infrastructure_month_cad": 383.27
     },
     {
       "households": 16,
@@ -388,11 +415,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1768463.04,
       "land_finance_month_cad": 8482.26,
+      "base_land_charge_month_cad": 180.91,
+      "land_charge_per_ha_month_cad": 354.67,
+      "hectare_portion_month_cad": 620.11,
       "site_lease_month_cad": 801.02,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 2055.33,
-      "annual_project_cost_cad": 186653.46,
-      "annual_reserve_cad": 8023.6
+      "land_infrastructure_month_cad": 972.16
     },
     {
       "households": 16,
@@ -401,11 +429,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1768463.04,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 152.58,
+      "land_charge_per_ha_month_cad": 52.5,
+      "hectare_portion_month_cad": 91.79,
       "site_lease_month_cad": 244.37,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1498.68,
-      "annual_project_cost_cad": 79776.86,
-      "annual_reserve_cad": 2934.23
+      "land_infrastructure_month_cad": 415.51
     },
     {
       "households": 16,
@@ -414,11 +443,12 @@
       "property_area_ha": 29.474384,
       "land_value_cad": 1768463.04,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 152.58,
+      "land_charge_per_ha_month_cad": 52.5,
+      "hectare_portion_month_cad": 91.79,
       "site_lease_month_cad": 244.37,
       "shared_service_month_cad": 171.14,
-      "resident_monthly_cost_cad": 1498.68,
-      "annual_project_cost_cad": 79776.86,
-      "annual_reserve_cad": 2934.23
+      "land_infrastructure_month_cad": 415.51
     },
     {
       "households": 25,
@@ -427,11 +457,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 904199.5,
       "land_finance_month_cad": 4336.91,
+      "base_land_charge_month_cad": 101.59,
+      "land_charge_per_ha_month_cad": 118.22,
+      "hectare_portion_month_cad": 206.7,
       "site_lease_month_cad": 308.3,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1501,
-      "annual_project_cost_cad": 125347.03,
-      "annual_reserve_cad": 5104.24
+      "land_infrastructure_month_cad": 417.83
     },
     {
       "households": 25,
@@ -440,11 +471,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 904199.5,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 95.55,
+      "land_charge_per_ha_month_cad": 17.5,
+      "hectare_portion_month_cad": 30.6,
       "site_lease_month_cad": 126.15,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1318.85,
-      "annual_project_cost_cad": 70702.09,
-      "annual_reserve_cad": 2502.1
+      "land_infrastructure_month_cad": 235.68
     },
     {
       "households": 25,
@@ -453,11 +485,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 904199.5,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 95.55,
+      "land_charge_per_ha_month_cad": 17.5,
+      "hectare_portion_month_cad": 30.6,
       "site_lease_month_cad": 126.15,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1318.85,
-      "annual_project_cost_cad": 70702.09,
-      "annual_reserve_cad": 2502.1
+      "land_infrastructure_month_cad": 235.68
     },
     {
       "households": 25,
@@ -466,11 +499,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1356299.25,
       "land_finance_month_cad": 6505.36,
+      "base_land_charge_month_cad": 105.14,
+      "land_charge_per_ha_month_cad": 177.34,
+      "hectare_portion_month_cad": 310.06,
       "site_lease_month_cad": 415.2,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1607.9,
-      "annual_project_cost_cad": 157416.68,
-      "annual_reserve_cad": 6631.36
+      "land_infrastructure_month_cad": 524.73
     },
     {
       "households": 25,
@@ -479,11 +513,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1356299.25,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 96.08,
+      "land_charge_per_ha_month_cad": 26.25,
+      "hectare_portion_month_cad": 45.9,
       "site_lease_month_cad": 141.97,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1334.67,
-      "annual_project_cost_cad": 75449.14,
-      "annual_reserve_cad": 2728.15
+      "land_infrastructure_month_cad": 251.5
     },
     {
       "households": 25,
@@ -492,11 +527,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1356299.25,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 96.08,
+      "land_charge_per_ha_month_cad": 26.25,
+      "hectare_portion_month_cad": 45.9,
       "site_lease_month_cad": 141.97,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1334.67,
-      "annual_project_cost_cad": 75449.14,
-      "annual_reserve_cad": 2728.15
+      "land_infrastructure_month_cad": 251.5
     },
     {
       "households": 25,
@@ -505,11 +541,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1582349.12,
       "land_finance_month_cad": 7589.59,
+      "base_land_charge_month_cad": 106.91,
+      "land_charge_per_ha_month_cad": 206.89,
+      "hectare_portion_month_cad": 361.73,
       "site_lease_month_cad": 468.64,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1661.34,
-      "annual_project_cost_cad": 173451.37,
-      "annual_reserve_cad": 7394.93
+      "land_infrastructure_month_cad": 578.17
     },
     {
       "households": 25,
@@ -518,11 +555,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1582349.12,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 96.34,
+      "land_charge_per_ha_month_cad": 30.63,
+      "hectare_portion_month_cad": 53.54,
       "site_lease_month_cad": 149.88,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1342.58,
-      "annual_project_cost_cad": 77822.67,
-      "annual_reserve_cad": 2841.17
+      "land_infrastructure_month_cad": 259.41
     },
     {
       "households": 25,
@@ -531,11 +569,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1582349.12,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 96.34,
+      "land_charge_per_ha_month_cad": 30.63,
+      "hectare_portion_month_cad": 53.54,
       "site_lease_month_cad": 149.88,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1342.58,
-      "annual_project_cost_cad": 77822.67,
-      "annual_reserve_cad": 2841.17
+      "land_infrastructure_month_cad": 259.41
     },
     {
       "households": 25,
@@ -544,11 +583,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1808399,
       "land_finance_month_cad": 8673.81,
+      "base_land_charge_month_cad": 108.69,
+      "land_charge_per_ha_month_cad": 236.45,
+      "hectare_portion_month_cad": 413.41,
       "site_lease_month_cad": 522.09,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1714.79,
-      "annual_project_cost_cad": 189486.2,
-      "annual_reserve_cad": 8158.49
+      "land_infrastructure_month_cad": 631.62
     },
     {
       "households": 25,
@@ -557,11 +597,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1808399,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 96.6,
+      "land_charge_per_ha_month_cad": 35,
+      "hectare_portion_month_cad": 61.19,
       "site_lease_month_cad": 157.79,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1350.49,
-      "annual_project_cost_cad": 80196.19,
-      "annual_reserve_cad": 2954.2
+      "land_infrastructure_month_cad": 267.32
     },
     {
       "households": 25,
@@ -570,11 +611,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 1808399,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 96.6,
+      "land_charge_per_ha_month_cad": 35,
+      "hectare_portion_month_cad": 61.19,
       "site_lease_month_cad": 157.79,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1350.49,
-      "annual_project_cost_cad": 80196.19,
-      "annual_reserve_cad": 2954.2
+      "land_infrastructure_month_cad": 267.32
     },
     {
       "households": 25,
@@ -583,11 +625,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 2712598.5,
       "land_finance_month_cad": 13010.72,
+      "base_land_charge_month_cad": 115.78,
+      "land_charge_per_ha_month_cad": 354.67,
+      "hectare_portion_month_cad": 620.11,
       "site_lease_month_cad": 735.89,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1928.59,
-      "annual_project_cost_cad": 253625.36,
-      "annual_reserve_cad": 11212.73
+      "land_infrastructure_month_cad": 845.42
     },
     {
       "households": 25,
@@ -596,11 +639,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 2712598.5,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 97.65,
+      "land_charge_per_ha_month_cad": 52.5,
+      "hectare_portion_month_cad": 91.79,
       "site_lease_month_cad": 189.44,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1382.14,
-      "annual_project_cost_cad": 89690.28,
-      "annual_reserve_cad": 3406.3
+      "land_infrastructure_month_cad": 298.97
     },
     {
       "households": 25,
@@ -609,11 +653,12 @@
       "property_area_ha": 45.209975,
       "land_value_cad": 2712598.5,
       "land_finance_month_cad": 0,
+      "base_land_charge_month_cad": 97.65,
+      "land_charge_per_ha_month_cad": 52.5,
+      "hectare_portion_month_cad": 91.79,
       "site_lease_month_cad": 189.44,
       "shared_service_month_cad": 109.53,
-      "resident_monthly_cost_cad": 1382.14,
-      "annual_project_cost_cad": 89690.28,
-      "annual_reserve_cad": 3406.3
+      "land_infrastructure_month_cad": 298.97
     }
   ]
 }

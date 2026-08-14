@@ -67,6 +67,7 @@
 main, #app, .split > *, .land-layout > *, .hero > *, .sticky-panel, .labour-panel, .building-list, .member-card { min-width: 0; max-width: 100%; }
 .metric, .metric span, .metric small, .metric strong { min-width: 0; overflow-wrap: anywhere; }
 body { overflow-x: clip; }
+h1, h2, h3 { overflow-wrap: anywhere; }
 main { max-width: 1180px; }
 
 /* Answer-first carrying-capacity layout. */
@@ -115,6 +116,8 @@ main { max-width: 1180px; }
 .affordability-infrastructure-control { max-width: 420px; margin: 16px 0 0; }
 .affordability-stack { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .8fr); gap: 24px; align-items: start; }
 .cost-stack-primary { border: 1px solid var(--line); background: #fff; box-shadow: 0 10px 25px rgba(20, 48, 42, .08); }
+.layer-label { margin: 0; padding: 14px 20px 8px; color: var(--teal); font-size: .74rem; font-weight: 900; letter-spacing: .12em; }
+.arc-total { border-top: 4px solid var(--amber); }
 .cost-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: baseline; padding: 17px 20px; border-bottom: 1px solid var(--line); }
 .cost-row > span { font-weight: 800; }
 .cost-row > strong { color: var(--teal); font-size: 1.12rem; }

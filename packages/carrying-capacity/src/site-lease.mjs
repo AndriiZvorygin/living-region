@@ -640,6 +640,8 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       : 0;
     const visibleTotal = sumObjectValues(recurring);
     const detailedSiteLease = scenario.community.allocation_method === 'base_plus_hectare' ? landAllocation : siteLease;
+    const sharedInfrastructureMonthly = sharedServiceAnnual / 12;
+    const landInfrastructureMonthly = siteLeaseMonthly + sharedInfrastructureMonthly;
     return {
       household_id: household.household_id,
       label: household.label,
@@ -657,8 +659,15 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       shared_infrastructure_service: {
         scenario_id: infrastructure.scenario_id,
         annual_cad: round(sharedServiceAnnual),
-        monthly_cad: round(sharedServiceAnnual / 12),
+        monthly_cad: round(sharedInfrastructureMonthly),
         replacement_reserve_annual_cad: round(infrastructure.reserve_contribution_annual_cad / count)
+      },
+      land_infrastructure: {
+        productive_allocation_ha: round(household.reserved_land_requirement_ha, 6),
+        site_lease_monthly_cad: round(siteLeaseMonthly),
+        shared_infrastructure_monthly_cad: round(sharedInfrastructureMonthly),
+        combined_monthly_cad: round(landInfrastructureMonthly),
+        formula: 'site lease + shared infrastructure fee; dwelling and household expenses excluded'
       },
       recurring_monthly_cost_cad: Object.fromEntries(Object.entries(recurring).map(([key, value]) => [key, round(value)])),
       monthly_cost_stack: {
@@ -750,6 +759,12 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
         annual_surplus_or_shortfall_cad: round(annualLeaseRevenue - annualLandCosts),
         revenue_equals_required_cost_recovery: Math.abs(annualLeaseRevenue - annualLandCosts) < .2
       },
+      infrastructure_layer_break_even: {
+        shared_service_revenue_cad: round(annualSharedRevenue),
+        infrastructure_layer_cost_cad: round(infrastructure.annual_costs_cad.total),
+        annual_surplus_or_shortfall_cad: round(annualSharedRevenue - infrastructure.annual_costs_cad.total),
+        revenue_equals_required_cost_recovery: Math.abs(annualSharedRevenue - infrastructure.annual_costs_cad.total) < .2
+      },
       break_even: {status: totalProjectRevenue + 0.1 >= annualProjectCosts ? 'break_even_or_surplus' : 'shortfall', annual_surplus_or_shortfall_cad: round(totalProjectRevenue - annualProjectCosts), revenue_equals_required_cost_recovery: Math.abs(totalProjectRevenue - annualProjectCosts) < .1}
     },
     allocation_sensitivity: calculateSiteLeaseAllocationSensitivity({scenario, households, pools: landPools}),
@@ -814,9 +829,14 @@ export function buildSiteLeasePresentationContract() {
       infrastructure_capital_cad: result.infrastructure.capital_value_cad,
       infrastructure_annual_operating_cad: result.infrastructure.annual_costs_cad.operating,
       infrastructure_annual_reserve_cad: result.infrastructure.annual_costs_cad.replacement_reserve,
+      infrastructure_annual_capital_debt_service_cad: result.infrastructure.annual_costs_cad.capital_debt_service,
+      infrastructure_annual_total_cad: result.infrastructure.annual_costs_cad.total,
       shared_services_monthly_per_household_cad: household.shared_infrastructure_service.monthly_cad,
       site_lease_monthly_per_household_cad: household.site_lease.monthly_total_cad,
-      resident_total_monthly_cad: household.total_recurring_monthly_cost_cad
+      land_infrastructure_monthly_per_household_cad: household.land_infrastructure.combined_monthly_cad,
+      annual_shared_service_revenue_cad: result.project.infrastructure_layer_break_even.shared_service_revenue_cad,
+      annual_infrastructure_layer_cost_cad: result.project.infrastructure_layer_break_even.infrastructure_layer_cost_cad,
+      infrastructure_layer_break_even: result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery
     };
   })]));
   return {
@@ -836,19 +856,12 @@ export function buildSiteLeasePresentationContract() {
     default_inputs: {
       land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha,
       common_property_land_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
-      dwelling_capital_cost_cad: DEFAULT_SITE_LEASE_SCENARIO.dwelling.capital_cost_cad,
       legal_lease_term_years: DEFAULT_SITE_LEASE_SCENARIO.land.legal_lease_term_years,
       land_financing: {
         ownership: DEFAULT_SITE_LEASE_SCENARIO.land.ownership,
         down_payment_rate: DEFAULT_SITE_LEASE_SCENARIO.land.down_payment_rate,
         interest_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.interest_rate_annual,
         amortization_years: DEFAULT_SITE_LEASE_SCENARIO.land.amortization_years
-      },
-      dwelling_financing: {
-        ownership: DEFAULT_SITE_LEASE_SCENARIO.dwelling.ownership,
-        down_payment_rate: DEFAULT_SITE_LEASE_SCENARIO.dwelling.down_payment_rate,
-        interest_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.dwelling.interest_rate_annual,
-        amortization_years: DEFAULT_SITE_LEASE_SCENARIO.dwelling.amortization_years
       },
       land_costs: {
         property_tax_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.property_tax_rate_annual,
@@ -857,19 +870,15 @@ export function buildSiteLeasePresentationContract() {
         administration_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.administration_annual_cad,
         fixed_land_reserve_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.land.fixed_land_reserve_annual_cad,
         vacancy_reserve_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.land.vacancy_reserve_rate_annual
-      },
-      dwelling_costs: {
-        maintenance_replacement_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.dwelling.maintenance_replacement_rate_annual,
-        household_utilities_annual_cad: DEFAULT_SITE_LEASE_SCENARIO.dwelling.household_utilities_annual_cad
       }
     },
     household_examples: {
-      one_adult_ordinary: ordinary.households[0],
-      family_ordinary: family.households[0]
+      one_adult_ordinary: {land_infrastructure: ordinary.households[0].land_infrastructure, site_lease: ordinary.households[0].site_lease, shared_infrastructure_service: ordinary.households[0].shared_infrastructure_service, physical_carrying_capacity: ordinary.households[0].physical_carrying_capacity},
+      family_ordinary: {land_infrastructure: family.households[0].land_infrastructure, site_lease: family.households[0].site_lease, shared_infrastructure_service: family.households[0].shared_infrastructure_service, physical_carrying_capacity: family.households[0].physical_carrying_capacity}
     },
     examples: {
-      one_adult_ordinary: {productive_land_ha: ordinary.households[0].calculated_productive_land_ha, mature_land_ha: ordinary.households[0].mature_productive_land_requirement_ha, total_recurring_monthly_cost_cad: ordinary.households[0].total_recurring_monthly_cost_cad},
-      family_ordinary: {productive_land_ha: family.households[0].calculated_productive_land_ha, mature_land_ha: family.households[0].mature_productive_land_requirement_ha, total_recurring_monthly_cost_cad: family.households[0].total_recurring_monthly_cost_cad}
+      one_adult_ordinary: {productive_land_ha: ordinary.households[0].calculated_productive_land_ha, mature_land_ha: ordinary.households[0].mature_productive_land_requirement_ha, land_infrastructure_monthly_cad: ordinary.households[0].land_infrastructure.combined_monthly_cad},
+      family_ordinary: {productive_land_ha: family.households[0].calculated_productive_land_ha, mature_land_ha: family.households[0].mature_productive_land_requirement_ha, land_infrastructure_monthly_cad: family.households[0].land_infrastructure.combined_monthly_cad}
     },
     notes: [
       'Resident-owned dwelling capital is separate from project land and is never included in land principal.',

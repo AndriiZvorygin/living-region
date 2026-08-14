@@ -2,7 +2,7 @@
   "contract_version": "1.2.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-14T15:54:44.394Z",
+  "generated_at": "2026-08-14T16:27:52.854Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -2374,36 +2374,56 @@
           "infrastructure_capital_cad": 1055000,
           "infrastructure_annual_operating_cad": 75000,
           "infrastructure_annual_reserve_cad": 10550,
+          "infrastructure_annual_capital_debt_service_cad": 60722.4,
+          "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 1162.31,
           "site_lease_monthly_per_household_cad": 457.6,
-          "resident_total_monthly_cad": 2703.08
+          "land_infrastructure_monthly_per_household_cad": 1619.91,
+          "annual_shared_service_revenue_cad": 167372.4,
+          "annual_infrastructure_layer_cost_cad": 167372.4,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 16,
           "infrastructure_capital_cad": 1055000,
           "infrastructure_annual_operating_cad": 75000,
           "infrastructure_annual_reserve_cad": 10550,
+          "infrastructure_annual_capital_debt_service_cad": 60722.4,
+          "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 871.73,
           "site_lease_monthly_per_household_cad": 401.92,
-          "resident_total_monthly_cad": 2356.82
+          "land_infrastructure_monthly_per_household_cad": 1273.65,
+          "annual_shared_service_revenue_cad": 167372.4,
+          "annual_infrastructure_layer_cost_cad": 167372.4,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 25,
           "infrastructure_capital_cad": 1055000,
           "infrastructure_annual_operating_cad": 75000,
           "infrastructure_annual_reserve_cad": 10550,
+          "infrastructure_annual_capital_debt_service_cad": 60722.4,
+          "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 557.91,
           "site_lease_monthly_per_household_cad": 341.78,
-          "resident_total_monthly_cad": 1982.86
+          "land_infrastructure_monthly_per_household_cad": 899.69,
+          "annual_shared_service_revenue_cad": 167372.4,
+          "annual_infrastructure_layer_cost_cad": 167372.4,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 50,
           "infrastructure_capital_cad": 1055000,
           "infrastructure_annual_operating_cad": 75000,
           "infrastructure_annual_reserve_cad": 10550,
+          "infrastructure_annual_capital_debt_service_cad": 60722.4,
+          "infrastructure_annual_total_cad": 167372.4,
           "shared_services_monthly_per_household_cad": 278.95,
           "site_lease_monthly_per_household_cad": 288.32,
-          "resident_total_monthly_cad": 1650.45
+          "land_infrastructure_monthly_per_household_cad": 567.27,
+          "annual_shared_service_revenue_cad": 167372.4,
+          "annual_infrastructure_layer_cost_cad": 167372.4,
+          "infrastructure_layer_break_even": true
         }
       ],
       "minimal_compliant": [
@@ -2412,36 +2432,56 @@
           "infrastructure_capital_cad": 140000,
           "infrastructure_annual_operating_cad": 22000,
           "infrastructure_annual_reserve_cad": 700,
+          "infrastructure_annual_capital_debt_service_cad": 8058,
+          "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 228.18,
           "site_lease_monthly_per_household_cad": 457.6,
-          "resident_total_monthly_cad": 1768.95
+          "land_infrastructure_monthly_per_household_cad": 685.78,
+          "annual_shared_service_revenue_cad": 32858,
+          "annual_infrastructure_layer_cost_cad": 32858,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 16,
           "infrastructure_capital_cad": 140000,
           "infrastructure_annual_operating_cad": 22000,
           "infrastructure_annual_reserve_cad": 700,
+          "infrastructure_annual_capital_debt_service_cad": 8058,
+          "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 171.14,
           "site_lease_monthly_per_household_cad": 401.92,
-          "resident_total_monthly_cad": 1656.23
+          "land_infrastructure_monthly_per_household_cad": 573.06,
+          "annual_shared_service_revenue_cad": 32858,
+          "annual_infrastructure_layer_cost_cad": 32858,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 25,
           "infrastructure_capital_cad": 140000,
           "infrastructure_annual_operating_cad": 22000,
           "infrastructure_annual_reserve_cad": 700,
+          "infrastructure_annual_capital_debt_service_cad": 8058,
+          "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 109.53,
           "site_lease_monthly_per_household_cad": 341.78,
-          "resident_total_monthly_cad": 1534.48
+          "land_infrastructure_monthly_per_household_cad": 451.31,
+          "annual_shared_service_revenue_cad": 32858,
+          "annual_infrastructure_layer_cost_cad": 32858,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 50,
           "infrastructure_capital_cad": 140000,
           "infrastructure_annual_operating_cad": 22000,
           "infrastructure_annual_reserve_cad": 700,
+          "infrastructure_annual_capital_debt_service_cad": 8058,
+          "infrastructure_annual_total_cad": 32858,
           "shared_services_monthly_per_household_cad": 54.76,
           "site_lease_monthly_per_household_cad": 288.32,
-          "resident_total_monthly_cad": 1426.26
+          "land_infrastructure_monthly_per_household_cad": 343.08,
+          "annual_shared_service_revenue_cad": 32858,
+          "annual_infrastructure_layer_cost_cad": 32858,
+          "infrastructure_layer_break_even": true
         }
       ],
       "shared_services": [
@@ -2450,36 +2490,56 @@
           "infrastructure_capital_cad": 1005000,
           "infrastructure_annual_operating_cad": 65000,
           "infrastructure_annual_reserve_cad": 5025,
+          "infrastructure_annual_capital_debt_service_cad": 57844.56,
+          "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 1027.57,
           "site_lease_monthly_per_household_cad": 457.6,
-          "resident_total_monthly_cad": 2568.34
+          "land_infrastructure_monthly_per_household_cad": 1485.17,
+          "annual_shared_service_revenue_cad": 147969.56,
+          "annual_infrastructure_layer_cost_cad": 147969.56,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 16,
           "infrastructure_capital_cad": 1005000,
           "infrastructure_annual_operating_cad": 65000,
           "infrastructure_annual_reserve_cad": 5025,
+          "infrastructure_annual_capital_debt_service_cad": 57844.56,
+          "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 770.67,
           "site_lease_monthly_per_household_cad": 401.92,
-          "resident_total_monthly_cad": 2255.77
+          "land_infrastructure_monthly_per_household_cad": 1172.59,
+          "annual_shared_service_revenue_cad": 147969.56,
+          "annual_infrastructure_layer_cost_cad": 147969.56,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 25,
           "infrastructure_capital_cad": 1005000,
           "infrastructure_annual_operating_cad": 65000,
           "infrastructure_annual_reserve_cad": 5025,
+          "infrastructure_annual_capital_debt_service_cad": 57844.56,
+          "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 493.23,
           "site_lease_monthly_per_household_cad": 341.78,
-          "resident_total_monthly_cad": 1918.19
+          "land_infrastructure_monthly_per_household_cad": 835.01,
+          "annual_shared_service_revenue_cad": 147969.56,
+          "annual_infrastructure_layer_cost_cad": 147969.56,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 50,
           "infrastructure_capital_cad": 1005000,
           "infrastructure_annual_operating_cad": 65000,
           "infrastructure_annual_reserve_cad": 5025,
+          "infrastructure_annual_capital_debt_service_cad": 57844.56,
+          "infrastructure_annual_total_cad": 147969.56,
           "shared_services_monthly_per_household_cad": 246.62,
           "site_lease_monthly_per_household_cad": 288.32,
-          "resident_total_monthly_cad": 1618.11
+          "land_infrastructure_monthly_per_household_cad": 534.94,
+          "annual_shared_service_revenue_cad": 147969.56,
+          "annual_infrastructure_layer_cost_cad": 147969.56,
+          "infrastructure_layer_break_even": true
         }
       ],
       "amenity_rich": [
@@ -2488,36 +2548,56 @@
           "infrastructure_capital_cad": 1275000,
           "infrastructure_annual_operating_cad": 72000,
           "infrastructure_annual_reserve_cad": 12750,
+          "infrastructure_annual_capital_debt_service_cad": 73384.92,
+          "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 1275.24,
           "site_lease_monthly_per_household_cad": 457.6,
-          "resident_total_monthly_cad": 2816.02
+          "land_infrastructure_monthly_per_household_cad": 1732.84,
+          "annual_shared_service_revenue_cad": 183634.92,
+          "annual_infrastructure_layer_cost_cad": 183634.92,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 16,
           "infrastructure_capital_cad": 1275000,
           "infrastructure_annual_operating_cad": 72000,
           "infrastructure_annual_reserve_cad": 12750,
+          "infrastructure_annual_capital_debt_service_cad": 73384.92,
+          "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 956.43,
           "site_lease_monthly_per_household_cad": 401.92,
-          "resident_total_monthly_cad": 2441.53
+          "land_infrastructure_monthly_per_household_cad": 1358.35,
+          "annual_shared_service_revenue_cad": 183634.92,
+          "annual_infrastructure_layer_cost_cad": 183634.92,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 25,
           "infrastructure_capital_cad": 1275000,
           "infrastructure_annual_operating_cad": 72000,
           "infrastructure_annual_reserve_cad": 12750,
+          "infrastructure_annual_capital_debt_service_cad": 73384.92,
+          "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 612.12,
           "site_lease_monthly_per_household_cad": 341.78,
-          "resident_total_monthly_cad": 2037.07
+          "land_infrastructure_monthly_per_household_cad": 953.9,
+          "annual_shared_service_revenue_cad": 183634.92,
+          "annual_infrastructure_layer_cost_cad": 183634.92,
+          "infrastructure_layer_break_even": true
         },
         {
           "household_count": 50,
           "infrastructure_capital_cad": 1275000,
           "infrastructure_annual_operating_cad": 72000,
           "infrastructure_annual_reserve_cad": 12750,
+          "infrastructure_annual_capital_debt_service_cad": 73384.92,
+          "infrastructure_annual_total_cad": 183634.92,
           "shared_services_monthly_per_household_cad": 306.06,
           "site_lease_monthly_per_household_cad": 288.32,
-          "resident_total_monthly_cad": 1677.55
+          "land_infrastructure_monthly_per_household_cad": 594.38,
+          "annual_shared_service_revenue_cad": 183634.92,
+          "annual_infrastructure_layer_cost_cad": 183634.92,
+          "infrastructure_layer_break_even": true
         }
       ]
     },
@@ -2546,19 +2626,12 @@
     "default_inputs": {
       "land_price_cad_per_ha": 35000,
       "common_property_land_ha": 1.5,
-      "dwelling_capital_cost_cad": 125000,
       "legal_lease_term_years": 49,
       "land_financing": {
         "ownership": "financed",
         "down_payment_rate": 0.2,
         "interest_rate_annual": 0.06,
         "amortization_years": 30
-      },
-      "dwelling_financing": {
-        "ownership": "resident_owned",
-        "down_payment_rate": 0.1,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25
       },
       "land_costs": {
         "property_tax_rate_annual": 0.01,
@@ -2567,55 +2640,16 @@
         "administration_annual_cad": 18000,
         "fixed_land_reserve_annual_cad": 0,
         "vacancy_reserve_rate_annual": 0.05
-      },
-      "dwelling_costs": {
-        "maintenance_replacement_rate_annual": 0.02,
-        "household_utilities_annual_cad": 1800
       }
     },
     "household_examples": {
       "one_adult_ordinary": {
-        "household_id": "household-1-1",
-        "label": "Reference adult man",
-        "members": [
-          {
-            "id": "adult_man",
-            "label": "Representative adult man",
-            "age_y": 35,
-            "sex": "male",
-            "weight_kg": 80,
-            "height_cm": 178,
-            "activity": "low"
-          }
-        ],
-        "buildings": [
-          {
-            "id": "building-1",
-            "label": "ARC yurt",
-            "floor_area_m2": 65.6,
-            "archetype": "arc_yurt",
-            "insulation": "good"
-          }
-        ],
-        "site_id": "ordinary_mesic",
-        "calculated_productive_land_ha": 1.135199,
-        "canonical_establishment_peak_land_requirement_ha": 1.135199,
-        "reserved_productive_land_ha": 1.135199,
-        "mature_productive_land_requirement_ha": 1.063861,
-        "establishment_peak_year": 5,
-        "household_food_demand_gj_year": 4.393623,
-        "dwelling": {
-          "capital_cost_cad": 125000,
-          "financing": {
-            "capital_value_cad": 125000,
-            "ownership": "financed",
-            "down_payment_cad": 12500,
-            "financed_principal_cad": 112500,
-            "interest_rate_annual": 0.06,
-            "amortization_years": 25,
-            "monthly_debt_service_cad": 724.84
-          },
-          "maintenance_replacement_annual_cad": 2500
+        "land_infrastructure": {
+          "productive_allocation_ha": 1.135199,
+          "site_lease_monthly_cad": 2907.7,
+          "shared_infrastructure_monthly_cad": 2738.17,
+          "combined_monthly_cad": 5645.87,
+          "formula": "site lease + shared infrastructure fee; dwelling and household expenses excluded"
         },
         "site_lease": {
           "household_id": "household-1-1",
@@ -2647,26 +2681,6 @@
           "monthly_cad": 2738.17,
           "replacement_reserve_annual_cad": 700
         },
-        "recurring_monthly_cost_cad": {
-          "dwelling_financing_monthly_cad": 724.84,
-          "dwelling_maintenance_replacement_monthly_cad": 208.33,
-          "site_lease_monthly_cad": 2907.7,
-          "shared_infrastructure_service_monthly_cad": 2738.17,
-          "household_utilities_maintenance_monthly_cad": 150
-        },
-        "monthly_cost_stack": {
-          "dwelling_financing_monthly_cad": 724.84,
-          "site_lease_monthly_cad": 2907.7,
-          "site_lease_base_monthly_cad": 2672.84,
-          "site_lease_hectare_monthly_cad": 234.86,
-          "shared_infrastructure_monthly_cad": 2738.17,
-          "dwelling_maintenance_replacement_monthly_cad": 208.33,
-          "household_utilities_maintenance_monthly_cad": 150,
-          "total_monthly_cad": 6729.04,
-          "visible_component_total_monthly_cad": 6729.04,
-          "residual_monthly_cad": 0
-        },
-        "total_recurring_monthly_cost_cad": 6729.04,
         "physical_carrying_capacity": {
           "establishment_land_requirement_ha": 1.135199,
           "canonical_establishment_peak_land_requirement_ha": 1.135199,
@@ -2676,74 +2690,12 @@
         }
       },
       "family_ordinary": {
-        "household_id": "family-1-1",
-        "label": "2 adults + 2 children",
-        "members": [
-          {
-            "id": "adult_woman",
-            "label": "Representative adult woman",
-            "age_y": 35,
-            "sex": "female",
-            "weight_kg": 65,
-            "height_cm": 165,
-            "activity": "low"
-          },
-          {
-            "id": "adult_man",
-            "label": "Representative adult man",
-            "age_y": 35,
-            "sex": "male",
-            "weight_kg": 80,
-            "height_cm": 178,
-            "activity": "low"
-          },
-          {
-            "id": "child_girl_8",
-            "label": "Representative 8-year-old girl",
-            "age_y": 8,
-            "sex": "female",
-            "weight_kg": 28,
-            "height_cm": 130,
-            "activity": "low"
-          },
-          {
-            "id": "adolescent_boy_14",
-            "label": "Representative 14-year-old boy",
-            "age_y": 14,
-            "sex": "male",
-            "weight_kg": 50,
-            "height_cm": 165,
-            "activity": "low"
-          }
-        ],
-        "buildings": [
-          {
-            "id": "building-1",
-            "label": "ARC yurt",
-            "floor_area_m2": 65.6,
-            "archetype": "arc_yurt",
-            "insulation": "good"
-          }
-        ],
-        "site_id": "ordinary_mesic",
-        "calculated_productive_land_ha": 1.748399,
-        "canonical_establishment_peak_land_requirement_ha": 1.748399,
-        "reserved_productive_land_ha": 1.748399,
-        "mature_productive_land_requirement_ha": 1.52161,
-        "establishment_peak_year": 3,
-        "household_food_demand_gj_year": 14.050693,
-        "dwelling": {
-          "capital_cost_cad": 125000,
-          "financing": {
-            "capital_value_cad": 125000,
-            "ownership": "financed",
-            "down_payment_cad": 12500,
-            "financed_principal_cad": 112500,
-            "interest_rate_annual": 0.06,
-            "amortization_years": 25,
-            "monthly_debt_service_cad": 724.84
-          },
-          "maintenance_replacement_annual_cad": 2500
+        "land_infrastructure": {
+          "productive_allocation_ha": 1.748399,
+          "site_lease_monthly_cad": 3034.57,
+          "shared_infrastructure_monthly_cad": 2738.17,
+          "combined_monthly_cad": 5772.74,
+          "formula": "site lease + shared infrastructure fee; dwelling and household expenses excluded"
         },
         "site_lease": {
           "household_id": "family-1-1",
@@ -2775,26 +2727,6 @@
           "monthly_cad": 2738.17,
           "replacement_reserve_annual_cad": 700
         },
-        "recurring_monthly_cost_cad": {
-          "dwelling_financing_monthly_cad": 724.84,
-          "dwelling_maintenance_replacement_monthly_cad": 208.33,
-          "site_lease_monthly_cad": 3034.57,
-          "shared_infrastructure_service_monthly_cad": 2738.17,
-          "household_utilities_maintenance_monthly_cad": 150
-        },
-        "monthly_cost_stack": {
-          "dwelling_financing_monthly_cad": 724.84,
-          "site_lease_monthly_cad": 3034.57,
-          "site_lease_base_monthly_cad": 2672.84,
-          "site_lease_hectare_monthly_cad": 361.73,
-          "shared_infrastructure_monthly_cad": 2738.17,
-          "dwelling_maintenance_replacement_monthly_cad": 208.33,
-          "household_utilities_maintenance_monthly_cad": 150,
-          "total_monthly_cad": 6855.91,
-          "visible_component_total_monthly_cad": 6855.91,
-          "residual_monthly_cad": 0
-        },
-        "total_recurring_monthly_cost_cad": 6855.91,
         "physical_carrying_capacity": {
           "establishment_land_requirement_ha": 1.748399,
           "canonical_establishment_peak_land_requirement_ha": 1.748399,
@@ -2808,12 +2740,12 @@
       "one_adult_ordinary": {
         "productive_land_ha": 1.135199,
         "mature_land_ha": 1.063861,
-        "total_recurring_monthly_cost_cad": 6729.04
+        "land_infrastructure_monthly_cad": 5645.87
       },
       "family_ordinary": {
         "productive_land_ha": 1.748399,
         "mature_land_ha": 1.52161,
-        "total_recurring_monthly_cost_cad": 6855.91
+        "land_infrastructure_monthly_cad": 5772.74
       }
     },
     "notes": [

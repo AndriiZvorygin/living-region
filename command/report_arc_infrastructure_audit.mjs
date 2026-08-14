@@ -44,8 +44,7 @@ const scaleRows = Object.keys(INFRASTRUCTURE_SCENARIOS).flatMap((scenarioId) => 
     infrastructureReserve: result.infrastructure.annual_costs_cad.replacement_reserve,
     sharedMonthly: household.shared_infrastructure_service.monthly_cad,
     siteLeaseMonthly: household.site_lease.monthly_total_cad,
-    dwellingMonthly: household.recurring_monthly_cost_cad.dwelling_financing_monthly_cad,
-    totalMonthly: household.total_recurring_monthly_cost_cad,
+    landInfrastructureMonthly: household.land_infrastructure.combined_monthly_cad,
     landHectares: result.project_land.total_property_area_ha
   };
 }));
@@ -73,16 +72,16 @@ const componentCheck = legacy.infrastructure.line_items.reduce((sum, row) => sum
 const oldMonthly = legacy.infrastructure.annual_costs_cad.total / 12 / 12;
 const scenarioSummary = Object.keys(INFRASTRUCTURE_SCENARIOS).map((scenarioId) => {
   const row = rowFor(scenarioId, 12);
-  return `| ${row.scenarioLabel} | ${wholeMoney(row.infrastructureCapital)} | ${wholeMoney(row.infrastructureOperating)} | ${wholeMoney(row.infrastructureReserve)} | ${money(row.sharedMonthly)} | ${money(row.siteLeaseMonthly)} | ${money(row.dwellingMonthly)} | ${money(row.totalMonthly)} |`;
+  return `| ${row.scenarioLabel} | ${wholeMoney(row.infrastructureCapital)} | ${wholeMoney(row.infrastructureOperating)} | ${wholeMoney(row.infrastructureReserve)} | ${money(row.sharedMonthly)} | ${money(row.siteLeaseMonthly)} | ${money(row.landInfrastructureMonthly)} |`;
 }).join('\n');
 const scaleMarkdown = ['legacy_current', 'minimal_compliant', 'shared_services', 'amenity_rich'].flatMap((scenarioId) => {
   const label = INFRASTRUCTURE_SCENARIOS[scenarioId].label;
   return [
     `### ${label}`,
     '',
-    '| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |',
-    '|---:|---:|---:|---:|---:|---:|---:|---:|',
-    ...[12, 16, 25, 50].map((count) => { const row = rowFor(scenarioId, count); return `| ${count} | ${wholeMoney(row.infrastructureCapital)} | ${wholeMoney(row.infrastructureOperating)} | ${wholeMoney(row.infrastructureReserve)} | ${money(row.sharedMonthly)} | ${money(row.siteLeaseMonthly)} | ${money(row.dwellingMonthly)} | ${money(row.totalMonthly)} |`; }),
+    '| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |',
+    '|---:|---:|---:|---:|---:|---:|---:|',
+    ...[12, 16, 25, 50].map((count) => { const row = rowFor(scenarioId, count); return `| ${count} | ${wholeMoney(row.infrastructureCapital)} | ${wholeMoney(row.infrastructureOperating)} | ${wholeMoney(row.infrastructureReserve)} | ${money(row.sharedMonthly)} | ${money(row.siteLeaseMonthly)} | ${money(row.landInfrastructureMonthly)} |`; }),
     ''
   ];
 }).join('\n');
@@ -137,8 +136,8 @@ const markdown = [
   '',
   '## Infrastructure scenarios',
   '',
-  '| Scenario | Capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |',
-  '|---|---:|---:|---:|---:|---:|---:|---:|',
+  '| Scenario | Capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |',
+  '|---|---:|---:|---:|---:|---:|---:|',
   scenarioSummary,
   '',
   '- **Minimal compliant ARC** is the recommended affordability default. It centralizes only a basic access route, snow/road maintenance, waste/compost handling and project infrastructure insurance. Water, wastewater and electricity remain distributed/site-specific alternatives unless legal and engineering review supports a shared system.',

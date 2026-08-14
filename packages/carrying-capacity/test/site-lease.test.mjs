@@ -207,6 +207,26 @@ test('presentation contract includes household-first land accounting inputs and 
   const contract = buildSiteLeasePresentationContract();
   assert.equal(contract.default_inputs.common_property_land_ha, 1.5);
   assert.equal(contract.default_inputs.land_financing.interest_rate_annual, .06);
-  assert.ok(contract.household_examples.one_adult_ordinary.monthly_cost_stack.site_lease_base_monthly_cad > 0);
-  assert.equal(contract.household_examples.one_adult_ordinary.monthly_cost_stack.residual_monthly_cad, 0);
+  assert.ok(contract.household_examples.one_adult_ordinary.land_infrastructure.site_lease_monthly_cad > 0);
+  assert.equal(contract.household_examples.one_adult_ordinary.land_infrastructure.combined_monthly_cad, Number((contract.household_examples.one_adult_ordinary.site_lease.monthly_total_cad + contract.household_examples.one_adult_ordinary.shared_infrastructure_service.monthly_cad).toFixed(2)));
+  assert.equal(contract.default_inputs.dwelling_capital_cost_cad, undefined);
+  assert.equal(contract.default_inputs.dwelling_financing, undefined);
+  assert.equal(contract.default_inputs.dwelling_costs, undefined);
+});
+
+test('public ARC charge is exactly site lease plus shared infrastructure', () => {
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const household = result.households[0];
+  assert.equal(household.land_infrastructure.combined_monthly_cad, Number((household.site_lease.monthly_total_cad + household.shared_infrastructure_service.monthly_cad).toFixed(2)));
+  assert.equal(result.project.land_layer_break_even.revenue_equals_required_cost_recovery, true);
+  assert.equal(result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery, true);
+});
+
+test('dwelling and household expense inputs cannot alter the public land-infrastructure charge', () => {
+  const base = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const altered = calculateArcSiteLeaseEconomics(scenario({
+    community: {household_count: 12},
+    dwelling: {capital_cost_cad: 999999, down_payment_rate: 0, interest_rate_annual: .2, maintenance_replacement_rate_annual: .5, household_utilities_annual_cad: 99999}
+  }));
+  assert.equal(base.households[0].land_infrastructure.combined_monthly_cad, altered.households[0].land_infrastructure.combined_monthly_cad);
 });

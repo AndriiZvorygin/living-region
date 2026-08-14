@@ -37,7 +37,7 @@ function makeScenario({household, householdCount = 12, price = 35000, ownership 
 
 function rowFor(householdCase, result, {price = 35000, ownership = 'financed'} = {}) {
   const row = result.households[0];
-  const stack = row.monthly_cost_stack;
+  const landInfrastructure = row.land_infrastructure;
   return {
     id: householdCase.id,
     scenario: householdCase.label,
@@ -50,18 +50,13 @@ function rowFor(householdCase, result, {price = 35000, ownership = 'financed'} =
     peak_year: row.establishment_peak_year,
     total_property_area_ha: result.project_land.total_property_area_ha,
     total_land_value_cad: result.project_land.total_land_value_cad,
-    dwelling_capital_cost_cad: row.dwelling.capital_cost_cad,
-    dwelling_financing_monthly_cad: stack.dwelling_financing_monthly_cad,
-    base_household_land_charge_monthly_cad: stack.site_lease_base_monthly_cad,
+    base_household_land_charge_monthly_cad: row.site_lease.base_household_land_holding_charge_monthly_cad,
     land_charge_per_hectare_monthly_cad: row.site_lease.land_charge_per_hectare_month_cad,
-    hectare_portion_monthly_cad: stack.site_lease_hectare_monthly_cad,
-    site_lease_monthly_cad: stack.site_lease_monthly_cad,
-    shared_infrastructure_monthly_cad: stack.shared_infrastructure_monthly_cad,
-    dwelling_maintenance_replacement_monthly_cad: stack.dwelling_maintenance_replacement_monthly_cad,
-    household_utilities_monthly_cad: stack.household_utilities_maintenance_monthly_cad,
-    total_monthly_household_cost_cad: stack.total_monthly_cad,
-    visible_component_total_monthly_cad: stack.visible_component_total_monthly_cad,
-    residual_monthly_cad: stack.residual_monthly_cad,
+    hectare_portion_monthly_cad: row.site_lease.hectare_portion_monthly_cad,
+    site_lease_monthly_cad: landInfrastructure.site_lease_monthly_cad,
+    shared_infrastructure_monthly_cad: landInfrastructure.shared_infrastructure_monthly_cad,
+    combined_land_infrastructure_monthly_cad: landInfrastructure.combined_monthly_cad,
+    infrastructure_scenario: result.scenario.infrastructure_scenario_id,
     annual_site_lease_revenue_cad: result.project.annual_revenue_cad.site_leases,
     annual_land_layer_cost_cad: result.project.land_layer_break_even.land_layer_cost_cad,
     land_layer_break_even: result.project.land_layer_break_even.revenue_equals_required_cost_recovery
@@ -100,7 +95,7 @@ fs.writeFileSync(path.join(outputDir, 'arc-household-affordability.json'), JSON.
 
 const baseRows = rows.filter((row) => householdCases.some((item) => item.id === row.id));
 const sizeRows = rows.filter((row) => row.id.startsWith('family_two_children_'));
-const table = (items) => items.map((row) => `| ${row.scenario} | ${row.households_in_project} | ${row.establishment_allocation_ha.toFixed(2)} ha | $${money(row.base_household_land_charge_monthly_cad)} | $${money(row.land_charge_per_hectare_monthly_cad)} | $${money(row.hectare_portion_monthly_cad)} | $${money(row.site_lease_monthly_cad)} | $${money(row.shared_infrastructure_monthly_cad)} | $${money(row.dwelling_financing_monthly_cad)} | $${money(row.total_monthly_household_cost_cad)} |`).join('\n');
+const table = (items) => items.map((row) => `| ${row.scenario} | ${row.households_in_project} | ${row.establishment_allocation_ha.toFixed(2)} ha | $${money(row.base_household_land_charge_monthly_cad)} | $${money(row.land_charge_per_hectare_monthly_cad)} | $${money(row.hectare_portion_monthly_cad)} | $${money(row.site_lease_monthly_cad)} | $${money(row.shared_infrastructure_monthly_cad)} | $${money(row.combined_land_infrastructure_monthly_cad)} |`).join('\n');
 const markdown = [
   '# ARC household affordability and land lease',
   '',
@@ -111,21 +106,20 @@ const markdown = [
   '- **Biology determines hectares:** establishment peak land is reserved; mature productive need remains visible separately.',
   '- **Site lease:** equal base household land-holding charge plus productive hectares multiplied by the land charge per hectare.',
   '- **Shared infrastructure:** selected minimal, shared-services or amenity-rich fee, kept outside the site lease.',
-  '- **Dwelling financing:** resident-owned dwelling payment, separate from project land.',
-  '- **Other recurring costs:** dwelling maintenance/replacement and household utilities are shown explicitly.',
+  '- **Public scope:** only the site lease and selected shared infrastructure are included. The private dwelling and household expenses are outside this comparison.',
   '',
   '## Household comparison · default 12-household community',
   '',
-  '| Household | Community | Establishment allocation | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Dwelling financing | Total household/mo |',
-  '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+  '| Household | Community | Reserved hectares | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Land + infrastructure/mo |',
+  '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
   table(baseRows),
   '',
   'The base charge is broadly unchanged as household hectares vary. The hectare portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.',
   '',
   '## Community-size sensitivity · 2 adults + 2 children',
   '',
-  '| Household | Community | Establishment allocation | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Dwelling financing | Total household/mo |',
-  '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+  '| Household | Community | Reserved hectares | Base land charge | Land charge/ha/mo | Hectare portion | Site lease | Shared infrastructure | Land + infrastructure/mo |',
+  '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
   table(sizeRows),
   '',
   'Community size lowers fixed/common charges and shared infrastructure per household. It does not change the selected household\'s carrying-capacity hectares or the productive-land rate itself.',

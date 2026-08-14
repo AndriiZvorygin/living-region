@@ -59,12 +59,12 @@ The legacy administration configuration is the material identified overlap risk.
 
 ## Infrastructure scenarios
 
-| Scenario | Capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Legacy current shared-services baseline | $1055000 | $75000 | $10550 | $1162.31 | $584.47 | $724.84 | $2829.95 |
-| Minimal compliant ARC | $140000 | $22000 | $700 | $228.18 | $584.47 | $724.84 | $1895.82 |
-| Shared-services ARC | $1005000 | $65000 | $5025 | $1027.57 | $584.47 | $724.84 | $2695.21 |
-| Amenity-rich ARC | $1275000 | $72000 | $12750 | $1275.24 | $584.47 | $724.84 | $2942.89 |
+| Scenario | Capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
+|---|---:|---:|---:|---:|---:|---:|
+| Legacy current shared-services baseline | $1055000 | $75000 | $10550 | $1162.31 | $584.47 | $1746.78 |
+| Minimal compliant ARC | $140000 | $22000 | $700 | $228.18 | $584.47 | $812.65 |
+| Shared-services ARC | $1005000 | $65000 | $5025 | $1027.57 | $584.47 | $1612.04 |
+| Amenity-rich ARC | $1275000 | $72000 | $12750 | $1275.24 | $584.47 | $1859.71 |
 
 - **Minimal compliant ARC** is the recommended affordability default. It centralizes only a basic access route, snow/road maintenance, waste/compost handling and project infrastructure insurance. Water, wastewater and electricity remain distributed/site-specific alternatives unless legal and engineering review supports a shared system.
 - **Shared-services ARC** adds centralized water, wastewater, electrical distribution, laundry and selected equipment/common facilities where an economy of scale may exist. These are not all legally required.
@@ -72,39 +72,39 @@ The legacy administration configuration is the material identified overlap risk.
 
 ### Legacy current shared-services baseline
 
-| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 12 | $1055000 | $75000 | $10550 | $1162.31 | $584.47 | $724.84 | $2829.95 |
-| 16 | $1055000 | $75000 | $10550 | $871.73 | $528.78 | $724.84 | $2483.68 |
-| 25 | $1055000 | $75000 | $10550 | $557.91 | $468.64 | $724.84 | $2109.72 |
-| 50 | $1055000 | $75000 | $10550 | $278.95 | $415.19 | $724.84 | $1777.32 |
+| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
+|---:|---:|---:|---:|---:|---:|---:|
+| 12 | $1055000 | $75000 | $10550 | $1162.31 | $584.47 | $1746.78 |
+| 16 | $1055000 | $75000 | $10550 | $871.73 | $528.78 | $1400.51 |
+| 25 | $1055000 | $75000 | $10550 | $557.91 | $468.64 | $1026.55 |
+| 50 | $1055000 | $75000 | $10550 | $278.95 | $415.19 | $694.14 |
 
 ### Minimal compliant ARC
 
-| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 12 | $140000 | $22000 | $700 | $228.18 | $584.47 | $724.84 | $1895.82 |
-| 16 | $140000 | $22000 | $700 | $171.14 | $528.78 | $724.84 | $1783.09 |
-| 25 | $140000 | $22000 | $700 | $109.53 | $468.64 | $724.84 | $1661.34 |
-| 50 | $140000 | $22000 | $700 | $54.76 | $415.19 | $724.84 | $1553.13 |
+| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
+|---:|---:|---:|---:|---:|---:|---:|
+| 12 | $140000 | $22000 | $700 | $228.18 | $584.47 | $812.65 |
+| 16 | $140000 | $22000 | $700 | $171.14 | $528.78 | $699.92 |
+| 25 | $140000 | $22000 | $700 | $109.53 | $468.64 | $578.17 |
+| 50 | $140000 | $22000 | $700 | $54.76 | $415.19 | $469.95 |
 
 ### Shared-services ARC
 
-| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 12 | $1005000 | $65000 | $5025 | $1027.57 | $584.47 | $724.84 | $2695.21 |
-| 16 | $1005000 | $65000 | $5025 | $770.67 | $528.78 | $724.84 | $2382.63 |
-| 25 | $1005000 | $65000 | $5025 | $493.23 | $468.64 | $724.84 | $2045.05 |
-| 50 | $1005000 | $65000 | $5025 | $246.62 | $415.19 | $724.84 | $1744.98 |
+| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
+|---:|---:|---:|---:|---:|---:|---:|
+| 12 | $1005000 | $65000 | $5025 | $1027.57 | $584.47 | $1612.04 |
+| 16 | $1005000 | $65000 | $5025 | $770.67 | $528.78 | $1299.45 |
+| 25 | $1005000 | $65000 | $5025 | $493.23 | $468.64 | $961.87 |
+| 50 | $1005000 | $65000 | $5025 | $246.62 | $415.19 | $661.81 |
 
 ### Amenity-rich ARC
 
-| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Dwelling finance / month | Total resident / month |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 12 | $1275000 | $72000 | $12750 | $1275.24 | $584.47 | $724.84 | $2942.89 |
-| 16 | $1275000 | $72000 | $12750 | $956.43 | $528.78 | $724.84 | $2568.39 |
-| 25 | $1275000 | $72000 | $12750 | $612.12 | $468.64 | $724.84 | $2163.93 |
-| 50 | $1275000 | $72000 | $12750 | $306.06 | $415.19 | $724.84 | $1804.42 |
+| Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
+|---:|---:|---:|---:|---:|---:|---:|
+| 12 | $1275000 | $72000 | $12750 | $1275.24 | $584.47 | $1859.71 |
+| 16 | $1275000 | $72000 | $12750 | $956.43 | $528.78 | $1485.21 |
+| 25 | $1275000 | $72000 | $12750 | $612.12 | $468.64 | $1080.76 |
+| 50 | $1275000 | $72000 | $12750 | $306.06 | $415.19 | $721.25 |
 
 ## Replacement reserve sensitivity
 
