@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {calculateArcSiteLeaseEconomics, DEFAULT_SITE_LEASE_SCENARIO} from '../packages/carrying-capacity/src/index.mjs';
+import {ARC_SITE_LEASE_CONTRACT_VERSION, calculateArcSiteLeaseEconomics, DEFAULT_SITE_LEASE_SCENARIO} from '../packages/carrying-capacity/src/index.mjs';
 
 const outputDir = path.resolve('packages/carrying-capacity/outputs');
 fs.mkdirSync(outputDir, {recursive: true});
@@ -23,8 +23,8 @@ const scenario = ({id, label, siteId = 'ordinary_mesic', members, householdCount
 };
 
 const definitions = [
-  scenario({id: 'one_adult_ordinary_12', label: '1 adult · ordinary land · 12 households', members: ['adult_man']}),
-  scenario({id: 'one_adult_marginal_12', label: '1 adult · marginal land · 12 households', siteId: 'shallow_rocky_marginal', members: ['adult_man']}),
+  scenario({id: 'one_adult_ordinary_12', label: '1 adult · ordinary land · 12 households', members: ['reference_adult_man']}),
+  scenario({id: 'one_adult_marginal_12', label: '1 adult · marginal land · 12 households', siteId: 'shallow_rocky_marginal', members: ['reference_adult_man']}),
   scenario({id: 'family_ordinary_12', label: '2 adults + 2 children · ordinary land · 12 households', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}),
   ...[16, 25].map((householdCount) => scenario({id: `family_ordinary_${householdCount}`, label: `2 adults + 2 children · ordinary land · ${householdCount} households`, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], householdCount}))
 ];
@@ -48,6 +48,8 @@ const compactRows = results.map(({id, label, result}) => {
     land_loan_term_years: result.land_financing.loan_term_years,
     land_initial_equity_cad: result.land_financing.initial_equity_contribution_cad,
     land_debt_service_monthly_cad: result.land_financing.debt_service_monthly_cad,
+    affordability_scenario: result.scenario.arc_affordability_scenario_id,
+    infrastructure_scenario: result.scenario.infrastructure_scenario_id,
     administration_scenario_id: result.project_land.administration.scenario_id,
     administration_annual_cad: result.project_land.administration.annual_total_cad,
     administration_monthly_per_household_cad: result.project_land.administration.monthly_per_household_cad,
@@ -64,13 +66,15 @@ const compactRows = results.map(({id, label, result}) => {
     infrastructure_layer_annual_revenue_cad: result.project.infrastructure_layer_break_even.shared_service_revenue_cad,
     infrastructure_layer_annual_cost_cad: result.project.infrastructure_layer_break_even.infrastructure_layer_cost_cad,
     land_layer_break_even: result.project.land_layer_break_even.revenue_equals_required_cost_recovery,
-    infrastructure_layer_break_even: result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery
+    infrastructure_layer_break_even: result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery,
+    resident_labour_hours_year: result.infrastructure.resident_labour_hours_year + result.project_land.administration.resident_labour_hours_year + result.project_land.common_property_operations.resident_labour_hours_year,
+    future_replacement_liability_cad: result.infrastructure.future_replacement_liability_cad
   };
 });
 const csvEscape = (value) => { const text = value == null ? '' : String(value); return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text; };
 const headers = Object.keys(compactRows[0]);
 fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.csv'), [headers.join(','), ...compactRows.map((row) => headers.map((key) => csvEscape(row[key])).join(','))].join('\n') + '\n');
-fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.json'), JSON.stringify({contract_version: '1.4.0', generated_at: new Date().toISOString(), scope: 'ARC land lease plus shared infrastructure only; private dwelling and household expenses excluded', scenarios: compactRows, comparison_rows: compactRows}, null, 2) + '\n');
+fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.json'), JSON.stringify({contract_version: ARC_SITE_LEASE_CONTRACT_VERSION, generated_at: new Date().toISOString(), scope: 'ARC land lease plus shared infrastructure only; private dwelling and household expenses excluded', scenarios: compactRows, comparison_rows: compactRows}, null, 2) + '\n');
 
 const family = results.find((row) => row.id === 'family_ordinary_12');
 const ordinaryAdult = results.find((row) => row.id === 'one_adult_ordinary_12');
@@ -84,7 +88,8 @@ const markdown = [
   '## Central accounting',
   '',
   '- Productive hectares come from the canonical carrying-capacity establishment peak for the household, site and heated buildings.',
-  '- The recommended site-lease allocation is **common-property land holding share plus productive land**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally.',
+  '- The legal-minimum site-lease allocation is **common-property land holding share plus productive land**: productive/exclusive land finance recovery and property tax follow productive hectares; common-property land value, common tax and fixed land-holding costs are divided equally once a site-plan takeoff exists.',
+  '- Legal-minimum cash excludes paid administration, vacancy reserve, optional insurance, contracted grounds work, maintenance cash and replacement reserves. Resident labour and future replacement liability are shown separately.',
   '- Shared infrastructure is financed and recovered separately from land lease. Legal lease term is 49 years; the default 6% / 30-year / 20% land financing case is illustrative and its loan term/renewal is separate from amortization.',
   '- Default monetary inputs are planning assumptions pending a site design, current land evidence, assessment/tax data and construction/servicing quotes.',
   '',
@@ -104,7 +109,7 @@ const markdown = [
   '',
   'The shared-service charge falls as households share the same capital and operating base. Productive site area and land value still scale with household requirements.',
   '',
-  'Administration is now a project-scale budget: conventional administration is $18,000/year at 12 households and declines per household as fixed project work is shared across 16, 25 and 50 households. Software-assisted and lean self-managed alternatives are available in the common-property audit.',
+  'The public default is legal-minimum/self-managed. Conventional administration remains a separately selectable comparison: its former $18,000/year at 12 households is an operating-budget scenario, not an unavoidable recurring legal charge. Software-assisted and lean self-managed alternatives are available in the common-property audit.',
   '',
   '## Project recovery',
   '',

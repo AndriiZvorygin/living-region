@@ -76,6 +76,57 @@ test('site allocation flows from canonical carrying capacity without a second he
   assert.equal(result.physical_inputs.total_property_area_ha, Number((household.calculated_productive_land_ha + result.scenario.common_area_ha).toFixed(6)));
 });
 
+test('legal-minimum baseline excludes discretionary recurring cash and separates labour and future liability', () => {
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  assert.equal(result.scenario.arc_affordability_scenario_id, 'legal_minimum');
+  assert.equal(result.infrastructure.scenario_id, 'legal_minimum');
+  assert.ok(result.project_land.annual_costs_cad.land_finance_recovery > 0);
+  assert.ok(result.project_land.annual_costs_cad.property_tax > 0);
+  assert.equal(result.project_land.annual_costs_cad.land_insurance, 0);
+  assert.equal(result.project_land.annual_costs_cad.administration, 0);
+  assert.equal(result.project_land.annual_costs_cad.common_land_costs, 0);
+  assert.equal(result.project_land.annual_costs_cad.vacancy_reserve, 0);
+  assert.equal(result.infrastructure.annual_costs_cad.operating, 0);
+  assert.equal(result.infrastructure.annual_costs_cad.maintenance, 0);
+  assert.equal(result.infrastructure.annual_costs_cad.replacement_reserve, 0);
+  assert.equal(result.infrastructure.resident_labour_hours_year, 264);
+  assert.equal(result.project_land.administration.resident_labour_hours_year, 60);
+  assert.equal(result.project_land.common_property_operations.resident_labour_hours_year, 64);
+  assert.equal(result.infrastructure.future_replacement_liability_cad, 120000);
+  assert.equal(result.households[0].land_infrastructure.combined_monthly_cad, Number((result.households[0].site_lease.monthly_total_cad + result.households[0].shared_infrastructure_service.monthly_cad).toFixed(2)));
+});
+
+test('public affordability baseline uses the canonical 75 kg reference adult profile', () => {
+  const result = calculateArcSiteLeaseEconomics();
+  assert.equal(result.households[0].members[0].id, 'reference_adult_man');
+  assert.equal(result.households[0].members[0].weight_kg, 75);
+});
+
+test('legal-minimum access labour is not duplicated in common-property operations', () => {
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const total = result.infrastructure.resident_labour_hours_year + result.project_land.administration.resident_labour_hours_year + result.project_land.common_property_operations.resident_labour_hours_year;
+  assert.equal(total, 388);
+  assert.equal(result.project_land.common_property_operations.components.some((row) => /snow|road passability|garbage/i.test(row.label)), false);
+});
+
+test('optional cash scenarios remain available without becoming the legal-minimum default', () => {
+  const legal = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const managed = calculateArcSiteLeaseEconomics(scenario({arc_affordability_scenario_id: 'professionally_managed', community: {household_count: 12}}));
+  assert.equal(legal.scenario.infrastructure_scenario_id, 'legal_minimum');
+  assert.equal(managed.scenario.infrastructure_scenario_id, 'shared_services');
+  assert.ok(managed.households[0].shared_infrastructure_service.monthly_cad > legal.households[0].shared_infrastructure_service.monthly_cad);
+  assert.ok(managed.project_land.administration.annual_total_cad > legal.project_land.administration.annual_total_cad);
+});
+
+test('common-area lower bound is visible and adding actual common area does not change productive hectares', () => {
+  const lower = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const explicit = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12, common_area_ha: 1.5}}));
+  assert.equal(lower.scenario.common_area_ha, 0);
+  assert.equal(explicit.scenario.common_area_ha, 1.5);
+  assert.equal(lower.households[0].reserved_productive_land_ha, explicit.households[0].reserved_productive_land_ha);
+  assert.ok(explicit.households[0].site_lease.monthly_total_cad > lower.households[0].site_lease.monthly_total_cad);
+});
+
 test('legacy shared-services charge is reproducible and decomposes to line items', () => {
   const result = calculateArcSiteLeaseEconomics(scenario({infrastructure_scenario_id: 'legacy_current', community: {household_count: 12}}));
   assert.equal(result.infrastructure.capital_value_cad, 1055000);
@@ -143,7 +194,7 @@ test('land reservation basis is explicit and policy allocation cannot alter biol
 
 test('site-lease presentation contract exposes auditable infrastructure scenarios and scale outputs', () => {
   const contract = buildSiteLeasePresentationContract();
-  assert.equal(contract.recommended_infrastructure_scenario, 'minimal_compliant');
+  assert.equal(contract.recommended_infrastructure_scenario, 'legal_minimum');
   assert.deepEqual(contract.infrastructure_scenarios.map((row) => row.id), Object.keys(INFRASTRUCTURE_SCENARIOS));
   assert.equal(contract.infrastructure_scale_examples.shared_services.length, 4);
   assert.equal(contract.infrastructure_scale_examples.shared_services[0].household_count, 12);
@@ -170,7 +221,7 @@ test('recommended site lease exposes a stable common-property share and a produc
 });
 
 test('common property is recovered by the common-property layer and not the productive land layer', () => {
-  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const result = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12, common_area_ha: 1.5}, land: {vacancy_reserve_rate_annual: .05}}));
   const accounting = result.project_land.land_accounting;
   assert.ok(accounting.acquisition.common_land_value_cad > 0);
   assert.ok(accounting.common_property_land_holding.annual_components_cad.common_land_finance_recovery_annual_cad > 0);
@@ -207,7 +258,7 @@ test('visible household monthly cost stack has no hidden residual', () => {
 
 test('presentation contract includes household-first land accounting inputs and examples', () => {
   const contract = buildSiteLeasePresentationContract();
-  assert.equal(contract.default_inputs.common_property_land_ha, 1.5);
+  assert.equal(contract.default_inputs.common_property_land_ha, 0);
   assert.equal(contract.default_inputs.land_financing.interest_rate_annual, .06);
   assert.ok(contract.household_examples.one_adult_ordinary.land_infrastructure.site_lease_monthly_cad > 0);
   assert.equal(contract.household_examples.one_adult_ordinary.land_infrastructure.combined_monthly_cad, Number((contract.household_examples.one_adult_ordinary.site_lease.monthly_total_cad + contract.household_examples.one_adult_ordinary.shared_infrastructure_service.monthly_cad).toFixed(2)));
@@ -215,7 +266,7 @@ test('presentation contract includes household-first land accounting inputs and 
   assert.equal(contract.default_inputs.dwelling_financing, undefined);
   assert.equal(contract.default_inputs.dwelling_costs, undefined);
   assert.equal(contract.evidence.dwelling_capital_cost, undefined);
-  assert.equal(contract.default_inputs.land_costs?.administration_scenario_id, 'conventional');
+  assert.equal(contract.default_inputs.land_costs?.administration_scenario_id, 'legal_minimum');
   assert.equal(contract.administration_scale_examples.conventional[0].monthly_per_household_cad, 125);
   assert.equal(contract.administration_scale_examples.conventional[3].monthly_per_household_cad, 60.4);
   assert.equal(contract.common_area_accounting.mode, 'pooled_planning_assumption');
@@ -279,7 +330,7 @@ test('administration budget explains the former $125 household charge and scales
   const fifty = calculateAdministrationBudget({scenario_id: 'conventional', household_count: 50});
   assert.deepEqual([sixteen.annual_total_cad, twentyFive.annual_total_cad, fifty.annual_total_cad], [19920, 24240, 36240]);
   assert.ok(fifty.monthly_per_household_cad < sixteen.monthly_per_household_cad);
-  assert.equal(Object.keys(ADMINISTRATION_SCENARIOS).sort().join(','), 'conventional,lean_self_managed,software_assisted');
+  assert.equal(Object.keys(ADMINISTRATION_SCENARIOS).sort().join(','), 'conventional,lean_self_managed,legal_minimum,software_assisted');
 });
 
 test('software-assisted administration remains non-zero and exposes automation scope', () => {
@@ -295,7 +346,7 @@ test('common-property operations are decomposed and exclude infrastructure opera
   assert.equal(operations.annual_total_cad, 6000);
   assert.equal(operations.components.length, 5);
   assert.ok(operations.components.some((row) => row.id === 'road_edge_drainage_annual_cad'));
-  assert.ok(operations.excludes.includes('snow clearing'));
+  assert.ok(operations.excludes.includes('snow clearing contracts'));
   assert.ok(operations.excludes.includes('infrastructure insurance'));
 });
 

@@ -74,7 +74,7 @@ const scenarioSummary = Object.keys(INFRASTRUCTURE_SCENARIOS).map((scenarioId) =
   const row = rowFor(scenarioId, 12);
   return `| ${row.scenarioLabel} | ${wholeMoney(row.infrastructureCapital)} | ${wholeMoney(row.infrastructureOperating)} | ${wholeMoney(row.infrastructureReserve)} | ${money(row.sharedMonthly)} | ${money(row.siteLeaseMonthly)} | ${money(row.landInfrastructureMonthly)} |`;
 }).join('\n');
-const scaleMarkdown = ['legacy_current', 'minimal_compliant', 'shared_services', 'amenity_rich'].flatMap((scenarioId) => {
+const scaleMarkdown = ['legacy_current', 'legal_minimum', 'minimal_compliant', 'shared_services', 'amenity_rich'].flatMap((scenarioId) => {
   const label = INFRASTRUCTURE_SCENARIOS[scenarioId].label;
   return [
     `### ${label}`,
@@ -102,13 +102,13 @@ const doubleCountRows = [
 const markdown = [
   '# ARC infrastructure economics audit',
   '',
-  'Generated from the canonical calculateArcSiteLeaseEconomics API. The audit preserves the former configuration as legacy_current, but the recommended affordability default is minimal_compliant. All monetary values are CAD; they are planning assumptions until a property-specific design, legal review and procurement quotes exist.',
+  'Generated from the canonical calculateArcSiteLeaseEconomics API. The audit preserves the former configuration as legacy_current, but the recommended affordability default is legal_minimum. All monetary values are CAD; they are planning assumptions until a property-specific design, legal review and procurement quotes exist.',
   '',
   '## Executive finding',
   '',
   `The former 12-household shared-services charge was **${money(oldMonthly)}/household/month** because the legacy configuration carried **${wholeMoney(legacy.infrastructure.capital_value_cad)}** of centralized capital, **${wholeMoney(legacy.infrastructure.annual_costs_cad.operating)}** of annual operations, **${wholeMoney(legacy.infrastructure.annual_costs_cad.maintenance)}** of maintenance and **${wholeMoney(legacy.infrastructure.annual_costs_cad.replacement_reserve)}** of replacement reserve. Its annual total was **${wholeMoney(legacy.infrastructure.annual_costs_cad.total)}**, divided by 12 households and 12 months.`,
   '',
-  `The line-item total independently sums to ${wholeMoney(componentCheck)}. The exact old result is retained for audit, not recommended for affordability. The new default minimal-compliant central charge is **${money(rowFor('minimal_compliant', 12).sharedMonthly)}/household/month** before household-specific utility alternatives.`,
+  `The line-item total independently sums to ${wholeMoney(componentCheck)}. The exact old result is retained for audit, not recommended for affordability. The new legal-minimum central charge is **${money(rowFor('legal_minimum', 12).sharedMonthly)}/household/month** before household-specific distributed servicing alternatives. The former minimal-compliant tier remains an optional comparison.`,
   '',
   '## Legacy shared-services line-by-line breakdown',
   '',
@@ -140,7 +140,8 @@ const markdown = [
   '|---|---:|---:|---:|---:|---:|---:|',
   scenarioSummary,
   '',
-  '- **Minimal compliant ARC** is the recommended affordability default. It centralizes only a basic access route, snow/road maintenance, waste/compost handling and project infrastructure insurance. Water, wastewater and electricity remain distributed/site-specific alternatives unless legal and engineering review supports a shared system.',
+  '- **Legal minimum ARC** is the recommended affordability default. It includes only the basic access capital debt placeholder in recurring shared cash; road/snow/waste labour and future replacement are shown separately. Water, wastewater and electricity remain distributed/site-specific alternatives unless legal and engineering review supports a shared system.',
+  '- **Minimal compliant ARC** is an optional resilience/compliance comparison that adds paid maintenance, early reserves and insurance assumptions.',
   '- **Shared-services ARC** adds centralized water, wastewater, electrical distribution, laundry and selected equipment/common facilities where an economy of scale may exist. These are not all legally required.',
   '- **Amenity-rich ARC** adds a larger common building, laundry and shared equipment. Those costs are convenience/amenity or optional cost-saving choices, not part of the basic headline affordability case.',
   '',

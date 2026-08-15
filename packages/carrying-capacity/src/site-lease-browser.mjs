@@ -36,6 +36,20 @@ export function financeCapital({value, ownership = 'owned_out_right', downPaymen
 // coefficient. Fixed work is divided across households; resident records/billing
 // scale with household count; professional work remains an annual allowance.
 export const ADMINISTRATION_SCENARIOS = {
+  legal_minimum: {
+    id: 'legal_minimum',
+    label: 'Legal minimum / resident self-managed',
+    evidence_status: 'legal_minimum_candidate',
+    description: 'Open-source records and resident governance. No recurring paid management budget is assumed; unavoidable external fees remain irregular and site-specific.',
+    automation_level: 'open_source_self_managed',
+    resident_labour_hours_year: 60,
+    irregular_external_cash: {
+      status: 'site_specific',
+      annualized_in_monthly_charge: false,
+      items: ['formation and filing fees', 'occasional required professional review', 'site-specific compliance advice']
+    },
+    components: {}
+  },
   conventional: {
     id: 'conventional',
     label: 'Conventional administration',
@@ -98,6 +112,8 @@ export function calculateAdministrationBudget({scenario_id = 'custom', household
       fixed_project_annual_cad: null,
       variable_household_annual_cad: null,
       event_driven_allowance_annual_cad: null,
+      resident_labour_hours_year: 0,
+      irregular_external_cash: {status: 'site_specific', annualized_in_monthly_charge: false, items: []},
       components: [],
       allocation_basis: 'explicit_custom_annual_budget'
     };
@@ -123,12 +139,26 @@ export function calculateAdministrationBudget({scenario_id = 'custom', household
     fixed_project_annual_cad: round(fixed),
     variable_household_annual_cad: round(variable),
     event_driven_allowance_annual_cad: round(eventDriven),
+    resident_labour_hours_year: round(scenario.resident_labour_hours_year ?? 0),
+    irregular_external_cash: scenario.irregular_external_cash ?? {status: 'not_applicable', annualized_in_monthly_charge: false, items: []},
     components,
-    allocation_basis: 'fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance'
+    allocation_basis: scenario.id === 'legal_minimum'
+      ? 'zero_recurring_external_cash; resident labour and irregular site-specific costs shown separately'
+      : 'fixed_project_cost + variable_per_household_cost + event_driven_professional_allowance'
   };
 }
 
 export const COMMON_PROPERTY_OPERATIONS_SCENARIOS = {
+  legal_minimum: {
+    id: 'legal_minimum',
+    label: 'Legal minimum / resident-maintained',
+    evidence_status: 'legal_minimum_candidate',
+    description: 'No contractor budget. Residents maintain only common-property drainage and minimum grounds/hazard standards here. Internal-road passability, snow/obstruction control and sanitary waste handling are represented in the separate infrastructure layer so the same work is not counted twice.',
+    components: {
+      drainage_excavation_repair: {label: 'Drainage and excavation repair', annual_cad: 0, resident_labour_hours_year: 40, requiredness: 'physically_necessary', source_status: 'O. Reg. 517/06 s. 6 and 32; site-specific condition assessment required'},
+      minimum_grounds_and_weeds: {label: 'Minimum grounds, weeds and hazard removal', annual_cad: 0, resident_labour_hours_year: 24, requiredness: 'legally_required', source_status: 'Owen Sound Property Standards By-law 1999-030; active agricultural/gardening areas are treated separately'}
+    }
+  },
   contracted_baseline: {
     id: 'contracted_baseline',
     label: 'Common-property operations baseline',
@@ -146,9 +176,9 @@ export const COMMON_PROPERTY_OPERATIONS_SCENARIOS = {
 
 export function calculateCommonPropertyOperations({scenario_id = 'contracted_baseline', override_annual_cad = null} = {}) {
   const scenario = COMMON_PROPERTY_OPERATIONS_SCENARIOS[scenario_id];
-  if (!scenario) return {scenario_id: 'custom', scenario_label: 'Custom common-property operations', evidence_status: 'custom_scenario', annual_total_cad: round(Math.max(0, finite(override_annual_cad))), components: []};
-  const components = Object.entries(scenario.components).map(([id, row]) => ({id, label: row.label, annual_cad: round(row.annual_cad), evidence_status: scenario.evidence_status}));
-  return {scenario_id: scenario.id, scenario_label: scenario.label, description: scenario.description, evidence_status: scenario.evidence_status, annual_total_cad: round(components.reduce((sum, row) => sum + row.annual_cad, 0)), components, excludes: ['snow clearing', 'road maintenance', 'waste handling', 'infrastructure insurance', 'land-holding administration']};
+  if (!scenario) return {scenario_id: 'custom', scenario_label: 'Custom common-property operations', evidence_status: 'custom_scenario', annual_total_cad: round(Math.max(0, finite(override_annual_cad))), resident_labour_hours_year: 0, future_replacement_liability_cad: 0, components: []};
+  const components = Object.entries(scenario.components).map(([id, row]) => ({id, label: row.label, annual_cad: round(row.annual_cad), resident_labour_hours_year: round(row.resident_labour_hours_year ?? 0), requiredness: row.requiredness ?? 'working planning assumption', source_status: row.source_status ?? scenario.evidence_status, evidence_status: scenario.evidence_status}));
+  return {scenario_id: scenario.id, scenario_label: scenario.label, description: scenario.description, evidence_status: scenario.evidence_status, annual_total_cad: round(components.reduce((sum, row) => sum + row.annual_cad, 0)), resident_labour_hours_year: round(components.reduce((sum, row) => sum + row.resident_labour_hours_year, 0)), future_replacement_liability_cad: 0, components, excludes: ['snow clearing contracts', 'road maintenance contracts', 'centralized water/sewage/electricity', 'infrastructure insurance', 'land-holding administration', 'vacancy reserve']};
 }
 
 function recoveryForValue(value, land) {

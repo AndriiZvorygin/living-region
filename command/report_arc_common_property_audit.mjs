@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ADMINISTRATION_SCENARIOS,
+  ARC_SITE_LEASE_CONTRACT_VERSION,
   calculateAdministrationBudget,
   calculateArcSiteLeaseEconomics,
   calculateCommonPropertyOperations,
@@ -16,7 +17,7 @@ const money = (value) => `$${Number(value ?? 0).toFixed(2)}`;
 const wholeMoney = (value) => `$${Number(value ?? 0).toFixed(0)}`;
 const sizes = [12, 16, 25, 50];
 
-const makeScenario = (householdCount, members = ['adult_man']) => ({
+const makeScenario = (householdCount, members = ['reference_adult_man']) => ({
   ...clone(DEFAULT_SITE_LEASE_SCENARIO),
   household: {...clone(DEFAULT_SITE_LEASE_SCENARIO.household), members},
   community: {...clone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: householdCount}
@@ -38,7 +39,8 @@ const adminRows = Object.values(ADMINISTRATION_SCENARIOS).flatMap((scenario) => 
   };
 }));
 
-const operationBudget = calculateCommonPropertyOperations({scenario_id: DEFAULT_SITE_LEASE_SCENARIO.land.common_property_operations_scenario_id});
+const operationBudget = calculateCommonPropertyOperations({scenario_id: 'contracted_baseline'});
+const legalMinimumOperations = calculateCommonPropertyOperations({scenario_id: 'legal_minimum'});
 const scaleRows = sizes.map((householdCount) => {
   const result = calculateArcSiteLeaseEconomics({scenario: makeScenario(householdCount)});
   const household = result.households[0];
@@ -65,11 +67,11 @@ const ordinary = calculateArcSiteLeaseEconomics({scenario: makeScenario(12)}).ho
 const family = calculateArcSiteLeaseEconomics({scenario: {...makeScenario(12, ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']), household: {...makeScenario(12).household, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}}}).households[0];
 const lineItems = operationBudget.components;
 const json = {
-  contract_version: '1.4.0',
+  contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
   generated_at: new Date().toISOString(),
   scope: 'Common-property administration, common-property operations and land-layer evidence audit; private dwelling excluded.',
   administration_scale: adminRows,
-  common_property_operations: operationBudget,
+  common_property_operations: {legal_minimum: legalMinimumOperations, contracted_baseline: operationBudget},
   common_property_area: {
     total_common_area_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
     mode: 'pooled_planning_assumption',
@@ -150,7 +152,7 @@ const markdown = [
   '|---:|---|---:|---:|---:|---:|---:|---:|',
   ...scaleRows.map((row) => `| ${row.household_count} | ${row.common_area_mode} | ${wholeMoney(row.administration_annual_cad)} | ${money(row.administration_monthly_per_household_cad)} | ${money(row.common_operations_monthly_per_household_cad)} | ${money(row.common_property_share_monthly_cad)} | ${money(row.site_lease_monthly_cad)} | ${money(row.combined_land_infrastructure_monthly_cad)} |`),
   '',
-  'The one-adult and family 12-household headline charges remain unchanged because the conventional scenario reproduces the former $18,000 and $6,000 annual inputs at 12 households. Larger projects now receive lower per-household administration allocation while common operations remain a physical cash allowance divided across households.',
+  'The legal-minimum headline uses zero recurring cash for paid administration and common-property operations; resident labour is shown separately. The conventional scenario remains available for comparison and reproduces the former $18,000 administration and $6,000 operations inputs. It is not the legal-minimum baseline.',
   '',
   '## Tax, insurance and vacancy status',
   '',

@@ -1,8 +1,56 @@
 {
-  "contract_version": "1.4.0",
-  "generated_at": "2026-08-14T19:20:51.633Z",
+  "contract_version": "1.5.0",
+  "generated_at": "2026-08-15T10:02:08.800Z",
   "scope": "Common-property administration, common-property operations and land-layer evidence audit; private dwelling excluded.",
   "administration_scale": [
+    {
+      "scenario_id": "legal_minimum",
+      "scenario": "Legal minimum / resident self-managed",
+      "household_count": 12,
+      "fixed_project_annual_cad": 0,
+      "variable_household_annual_cad": 0,
+      "event_driven_allowance_annual_cad": 0,
+      "total_annual_cad": 0,
+      "monthly_per_household_cad": 0,
+      "evidence_status": "legal_minimum_candidate",
+      "automation_level": "open_source_self_managed"
+    },
+    {
+      "scenario_id": "legal_minimum",
+      "scenario": "Legal minimum / resident self-managed",
+      "household_count": 16,
+      "fixed_project_annual_cad": 0,
+      "variable_household_annual_cad": 0,
+      "event_driven_allowance_annual_cad": 0,
+      "total_annual_cad": 0,
+      "monthly_per_household_cad": 0,
+      "evidence_status": "legal_minimum_candidate",
+      "automation_level": "open_source_self_managed"
+    },
+    {
+      "scenario_id": "legal_minimum",
+      "scenario": "Legal minimum / resident self-managed",
+      "household_count": 25,
+      "fixed_project_annual_cad": 0,
+      "variable_household_annual_cad": 0,
+      "event_driven_allowance_annual_cad": 0,
+      "total_annual_cad": 0,
+      "monthly_per_household_cad": 0,
+      "evidence_status": "legal_minimum_candidate",
+      "automation_level": "open_source_self_managed"
+    },
+    {
+      "scenario_id": "legal_minimum",
+      "scenario": "Legal minimum / resident self-managed",
+      "household_count": 50,
+      "fixed_project_annual_cad": 0,
+      "variable_household_annual_cad": 0,
+      "event_driven_allowance_annual_cad": 0,
+      "total_annual_cad": 0,
+      "monthly_per_household_cad": 0,
+      "evidence_status": "legal_minimum_candidate",
+      "automation_level": "open_source_self_managed"
+    },
     {
       "scenario_id": "conventional",
       "scenario": "Conventional administration",
@@ -149,53 +197,110 @@
     }
   ],
   "common_property_operations": {
-    "scenario_id": "contracted_baseline",
-    "scenario_label": "Common-property operations baseline",
-    "description": "Cash operating allowance for common grounds and buffers. Snow clearing, road maintenance, waste handling and infrastructure insurance remain in the shared-infrastructure layer.",
-    "evidence_status": "working_planning_assumption",
-    "annual_total_cad": 6000,
-    "components": [
-      {
-        "id": "vegetation_management_annual_cad",
-        "label": "Common-land mowing and vegetation management",
-        "annual_cad": 1800,
-        "evidence_status": "working_planning_assumption"
-      },
-      {
-        "id": "road_edge_drainage_annual_cad",
-        "label": "Road-edge and drainage maintenance",
-        "annual_cad": 1200,
-        "evidence_status": "working_planning_assumption"
-      },
-      {
-        "id": "common_paths_annual_cad",
-        "label": "Common paths and access-side grounds",
-        "annual_cad": 600,
-        "evidence_status": "working_planning_assumption"
-      },
-      {
-        "id": "ecological_buffer_maintenance_annual_cad",
-        "label": "Ecological and water-buffer maintenance",
-        "annual_cad": 1200,
-        "evidence_status": "working_planning_assumption"
-      },
-      {
-        "id": "common_area_repairs_miscellaneous_annual_cad",
-        "label": "Common-area repairs and miscellaneous grounds work",
-        "annual_cad": 1200,
-        "evidence_status": "working_planning_assumption"
-      }
-    ],
-    "excludes": [
-      "snow clearing",
-      "road maintenance",
-      "waste handling",
-      "infrastructure insurance",
-      "land-holding administration"
-    ]
+    "legal_minimum": {
+      "scenario_id": "legal_minimum",
+      "scenario_label": "Legal minimum / resident-maintained",
+      "description": "No contractor budget. Residents maintain only common-property drainage and minimum grounds/hazard standards here. Internal-road passability, snow/obstruction control and sanitary waste handling are represented in the separate infrastructure layer so the same work is not counted twice.",
+      "evidence_status": "legal_minimum_candidate",
+      "annual_total_cad": 0,
+      "resident_labour_hours_year": 64,
+      "future_replacement_liability_cad": 0,
+      "components": [
+        {
+          "id": "drainage_excavation_repair",
+          "label": "Drainage and excavation repair",
+          "annual_cad": 0,
+          "resident_labour_hours_year": 40,
+          "requiredness": "physically_necessary",
+          "source_status": "O. Reg. 517/06 s. 6 and 32; site-specific condition assessment required",
+          "evidence_status": "legal_minimum_candidate"
+        },
+        {
+          "id": "minimum_grounds_and_weeds",
+          "label": "Minimum grounds, weeds and hazard removal",
+          "annual_cad": 0,
+          "resident_labour_hours_year": 24,
+          "requiredness": "legally_required",
+          "source_status": "Owen Sound Property Standards By-law 1999-030; active agricultural/gardening areas are treated separately",
+          "evidence_status": "legal_minimum_candidate"
+        }
+      ],
+      "excludes": [
+        "snow clearing contracts",
+        "road maintenance contracts",
+        "centralized water/sewage/electricity",
+        "infrastructure insurance",
+        "land-holding administration",
+        "vacancy reserve"
+      ]
+    },
+    "contracted_baseline": {
+      "scenario_id": "contracted_baseline",
+      "scenario_label": "Common-property operations baseline",
+      "description": "Cash operating allowance for common grounds and buffers. Snow clearing, road maintenance, waste handling and infrastructure insurance remain in the shared-infrastructure layer.",
+      "evidence_status": "working_planning_assumption",
+      "annual_total_cad": 6000,
+      "resident_labour_hours_year": 0,
+      "future_replacement_liability_cad": 0,
+      "components": [
+        {
+          "id": "vegetation_management_annual_cad",
+          "label": "Common-land mowing and vegetation management",
+          "annual_cad": 1800,
+          "resident_labour_hours_year": 0,
+          "requiredness": "working planning assumption",
+          "source_status": "working_planning_assumption",
+          "evidence_status": "working_planning_assumption"
+        },
+        {
+          "id": "road_edge_drainage_annual_cad",
+          "label": "Road-edge and drainage maintenance",
+          "annual_cad": 1200,
+          "resident_labour_hours_year": 0,
+          "requiredness": "working planning assumption",
+          "source_status": "working_planning_assumption",
+          "evidence_status": "working_planning_assumption"
+        },
+        {
+          "id": "common_paths_annual_cad",
+          "label": "Common paths and access-side grounds",
+          "annual_cad": 600,
+          "resident_labour_hours_year": 0,
+          "requiredness": "working planning assumption",
+          "source_status": "working_planning_assumption",
+          "evidence_status": "working_planning_assumption"
+        },
+        {
+          "id": "ecological_buffer_maintenance_annual_cad",
+          "label": "Ecological and water-buffer maintenance",
+          "annual_cad": 1200,
+          "resident_labour_hours_year": 0,
+          "requiredness": "working planning assumption",
+          "source_status": "working_planning_assumption",
+          "evidence_status": "working_planning_assumption"
+        },
+        {
+          "id": "common_area_repairs_miscellaneous_annual_cad",
+          "label": "Common-area repairs and miscellaneous grounds work",
+          "annual_cad": 1200,
+          "resident_labour_hours_year": 0,
+          "requiredness": "working planning assumption",
+          "source_status": "working_planning_assumption",
+          "evidence_status": "working_planning_assumption"
+        }
+      ],
+      "excludes": [
+        "snow clearing contracts",
+        "road maintenance contracts",
+        "centralized water/sewage/electricity",
+        "infrastructure insurance",
+        "land-holding administration",
+        "vacancy reserve"
+      ]
+    }
   },
   "common_property_area": {
-    "total_common_area_ha": 1.5,
+    "total_common_area_ha": 0,
     "mode": "pooled_planning_assumption",
     "component_definitions": {
       "residential_footprints": null,
@@ -225,20 +330,20 @@
     "notes": "Property and liability premiums depend on buildings, contents, activities, visitors, location, limits and risk. The CAD 3,000 input is a working planning allowance, not an insurance quote."
   },
   "vacancy": {
-    "rate_annual": 0.05,
+    "rate_annual": 0,
     "treatment": "separate common-property and productive-land pre-reserve pools; applied once to each pool",
     "surplus_policy": "retained for vacancies and future land-layer costs"
   },
   "affordability_examples": {
     "one_adult_ordinary": {
-      "site_lease_monthly_cad": 457.6,
-      "shared_infrastructure_monthly_cad": 228.18,
-      "combined_land_infrastructure_monthly_cad": 685.78
+      "site_lease_monthly_cad": 220.26,
+      "shared_infrastructure_monthly_cad": 47.96,
+      "combined_land_infrastructure_monthly_cad": 268.22
     },
     "family_ordinary": {
-      "site_lease_monthly_cad": 584.47,
-      "shared_infrastructure_monthly_cad": 228.18,
-      "combined_land_infrastructure_monthly_cad": 812.65
+      "site_lease_monthly_cad": 344.51,
+      "shared_infrastructure_monthly_cad": 47.96,
+      "combined_land_infrastructure_monthly_cad": 392.47
     }
   }
 }

@@ -22,10 +22,10 @@ The fixed work is not multiplied by household count. Resident records/billing sc
 
 | Households | Administration scenarios: monthly per household |
 |---:|---|
-| 12 | Conventional administration: $125.00<br>Software-assisted / self-managed: $70.00<br>Lean self-managed sensitivity: $51.67 |
-| 16 | Conventional administration: $103.75<br>Software-assisted / self-managed: $57.50<br>Lean self-managed sensitivity: $41.25 |
-| 25 | Conventional administration: $80.80<br>Software-assisted / self-managed: $44.00<br>Lean self-managed sensitivity: $30.00 |
-| 50 | Conventional administration: $60.40<br>Software-assisted / self-managed: $32.00<br>Lean self-managed sensitivity: $20.00 |
+| 12 | Legal minimum / resident self-managed: $0.00<br>Conventional administration: $125.00<br>Software-assisted / self-managed: $70.00<br>Lean self-managed sensitivity: $51.67 |
+| 16 | Legal minimum / resident self-managed: $0.00<br>Conventional administration: $103.75<br>Software-assisted / self-managed: $57.50<br>Lean self-managed sensitivity: $41.25 |
+| 25 | Legal minimum / resident self-managed: $0.00<br>Conventional administration: $80.80<br>Software-assisted / self-managed: $44.00<br>Lean self-managed sensitivity: $30.00 |
+| 50 | Legal minimum / resident self-managed: $0.00<br>Conventional administration: $60.40<br>Software-assisted / self-managed: $32.00<br>Lean self-managed sensitivity: $20.00 |
 
 The software-assisted scenario assumes open-source tools can automate billing/accounting workflows, reserve ledgers, maintenance schedules, resident/site records, site-plan checks, carrying-capacity calculations, productive-land plans, inspection checklists and document generation. It retains human exception handling and professional legal/accounting work. The lean sensitivity adds resident time and lowers cash cost; it is not zero administration.
 
@@ -45,7 +45,7 @@ Snow clearing, road maintenance, waste handling and infrastructure insurance rem
 
 ## Common-property area
 
-The current **1.50 ha** is a pooled planning assumption. Current Living Region hamlet fixtures provide proposed points, lines and rectangles, but not a validated parcel-clipped area takeoff for residential footprints, roads/access, common buildings, ecological/water buffers, shared productive areas and other required common land. The API now accepts all six categories explicitly and switches to spatial/layout-derived mode only when all are supplied.
+The current **0.00 ha** is a pooled planning assumption. Current Living Region hamlet fixtures provide proposed points, lines and rectangles, but not a validated parcel-clipped area takeoff for residential footprints, roads/access, common buildings, ecological/water buffers, shared productive areas and other required common land. The API now accepts all six categories explicitly and switches to spatial/layout-derived mode only when all are supplied.
 
 Desired pipeline:
 
@@ -57,18 +57,18 @@ Until that takeoff exists, the pooled area is visible and must not be mistaken f
 
 | Households | Common area mode | Administration/year | Administration/month/household | Common operations/month/household | Common-property share/month | Site lease/month | Land + infrastructure/month |
 |---:|---|---:|---:|---:|---:|---:|---:|
-| 12 | pooled_planning_assumption | $18000 | $125.00 | $41.67 | $222.74 | $457.60 | $685.78 |
-| 16 | pooled_planning_assumption | $19920 | $103.75 | $31.25 | $177.55 | $412.42 | $583.56 |
-| 25 | pooled_planning_assumption | $24240 | $80.80 | $20.00 | $128.75 | $363.62 | $473.15 |
-| 50 | pooled_planning_assumption | $36240 | $60.40 | $10.00 | $85.38 | $320.24 | $375.00 |
+| 12 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $268.22 |
+| 16 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $256.23 |
+| 25 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $243.28 |
+| 50 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $231.77 |
 
-The one-adult and family 12-household headline charges remain unchanged because the conventional scenario reproduces the former $18,000 and $6,000 annual inputs at 12 households. Larger projects now receive lower per-household administration allocation while common operations remain a physical cash allowance divided across households.
+The legal-minimum headline uses zero recurring cash for paid administration and common-property operations; resident labour is shown separately. The conventional scenario remains available for comparison and reproduces the former $18,000 administration and $6,000 operations inputs. It is not the legal-minimum baseline.
 
 ## Tax, insurance and vacancy status
 
 - **Property tax:** the model currently applies an explicit 1% of land value. MPAC guidance shows that farm land, residences, buildings and non-farm/common uses can be classified differently, and Ontario farm-class eligibility can materially change the applicable rate. The 1% value is therefore a planning assumption, not an assessed Grey County tax result.
 - **Land insurance:** the CAD 3,000/year allowance has no quote. Ontario farm-insurance guidance confirms that property and liability premiums depend on buildings, equipment, activities, visitors, location, limits and risk. This remains unresolved/site-specific.
-- **Vacancy reserve:** the 5.0% rate is applied separately to common-property and productive-land pre-reserve pools. This is intentional because the pools have different allocation bases; neither reserve is applied twice. The reserve is retained by the land-holding entity for vacancy and future land-layer costs.
+- **Vacancy reserve:** the 0.0% rate is applied separately to common-property and productive-land pre-reserve pools. This is intentional because the pools have different allocation bases; neither reserve is applied twice. The reserve is retained by the land-holding entity for vacancy and future land-layer costs.
 
 ## Evidence-status classification
 

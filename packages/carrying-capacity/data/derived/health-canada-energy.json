@@ -7,6 +7,24 @@
     "kcal_day": 2541.77
   },
   "scenarios": {
+    "reference_adult_man": {
+      "id": "reference_adult_man",
+      "label": "Reference adult man",
+      "age_y": 35,
+      "sex": "male",
+      "weight_kg": 75,
+      "height_cm": 178,
+      "activity": "low",
+      "equation": "581.47 -10.83*age_y 8.3*height_cm 14.94*weight_kg",
+      "base_kcal_day": 2800.32,
+      "pregnancy_adjustment_kcal_day": 0,
+      "lactation_adjustment_kcal_day": 0,
+      "kcal_day": 2800.32,
+      "mj_day": 11.716539,
+      "gj_year": 4.279466,
+      "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/equations-estimate-energy-requirement.html",
+      "status": "current canonical Health Canada EER calculation"
+    },
     "adult_woman": {
       "id": "adult_woman",
       "label": "Representative adult woman",

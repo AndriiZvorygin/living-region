@@ -1,5 +1,7 @@
 # ARC site-lease economics audit
 
+> **Historical audit note:** this document records the original broader site-lease/infrastructure model and its legacy comparison cases. The current canonical affordability baseline is `legal_minimum`, documented in `docs/arc-site-lease-accounting.md` and `packages/carrying-capacity/outputs/arc-legal-minimum.md`. The legal-minimum public scope excludes the private dwelling and household expenses, excludes discretionary paid administration/vacancy/insurance/reserves, separates resident labour and future replacement liability, and uses a zero common-area lower bound until a parcel/site-plan takeoff is available.
+
 Audit date: 2026-08-14. This audit covers the Living Region checkout only. HelpOS
 was not inspected or modified for this milestone.
 
@@ -84,7 +86,8 @@ The infrastructure model now preserves four explicit configurations:
 
 | Scenario | Intended use | Default reserve mode | Centralized scope |
 |---|---|---|---|
-| `minimal_compliant` | Recommended affordability case | 0.5% early-life reserve, 1.0% full-lifecycle sensitivity | Basic access, snow/road maintenance, waste/compost and infrastructure insurance |
+| `legal_minimum` | Current canonical affordability case | No recurring replacement reserve; future liability shown separately | Basic access placeholder, resident-maintained passability/snow/waste; distributed servicing remains site-specific |
+| `minimal_compliant` | Optional resilient comparison | 0.5% early-life reserve, 1.0% full-lifecycle sensitivity | Basic access, snow/road maintenance, waste/compost and infrastructure insurance |
 | `shared_services` | Shared-service sensitivity | 0.5% early-life reserve, 1.0% full-lifecycle sensitivity | Adds water, wastewater, electrical distribution, laundry and selected shared facilities |
 | `amenity_rich` | Optional amenity sensitivity | 1.0% full-lifecycle reserve | Larger common building, laundry, equipment and expanded central systems |
 | `legacy_current` | Reproduction/audit only | 1.0% full-lifecycle reserve | Former aggregate configuration that produced the approximately `$1,162/month` 12-household charge |
