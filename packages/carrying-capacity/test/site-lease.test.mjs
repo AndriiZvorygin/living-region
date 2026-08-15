@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ADMINISTRATION_SCENARIOS, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
+import {ADMINISTRATION_SCENARIOS, buildArcDwellingPresentationContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcDwellingCost, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
 
 function scenario(overrides = {}) {
   return {
@@ -19,8 +19,8 @@ function scenario(overrides = {}) {
 test('resident land is never included in dwelling finance principal', () => {
   const result = calculateArcSiteLeaseEconomics(scenario());
   const household = result.households[0];
-  assert.equal(household.dwelling.financing.capital_value_cad, 125000);
-  assert.equal(household.dwelling.financing.financed_principal_cad, 112500);
+  assert.equal(household.dwelling.financing.capital_value_cad, 61000);
+  assert.equal(household.dwelling.financing.financed_principal_cad, 54900);
   assert.equal(result.project_land.financing.capital_value_cad, result.project_land.total_land_value_cad);
   assert.notEqual(household.dwelling.financing.capital_value_cad, result.project_land.total_land_value_cad);
 });
@@ -161,11 +161,14 @@ test('debt service and replacement reserves are separate lifecycle costs', () =>
 
 test('distributed alternatives are reported without being added to central shared charges', () => {
   const result = calculateArcSiteLeaseEconomics(scenario({infrastructure_scenario_id: 'minimal_compliant', community: {household_count: 12}}));
-  const water = result.infrastructure.distributed_alternatives.comparisons.find((row) => row.component_id === 'shared_water');
-  assert.ok(water.distributed_capital_total_cad > 0);
-  assert.ok(water.distributed_annual_per_household_cad > 0);
+  const legal = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const generic = calculateArcDwellingCost({servicingMode: 'generic_distributed_alternatives'});
+  assert.ok(result.infrastructure.distributed_alternatives.comparisons.find((row) => row.component_id === 'shared_water').distributed_capital_total_cad > 0);
+  assert.equal(legal.infrastructure.distributed_alternatives.comparisons.find((row) => row.component_id === 'shared_water').distributed_capital_total_cad, 0);
+  assert.equal(generic.components.find((row) => row.id === 'water_plumbing_sanitation').capital_cost_cad, 30000);
+  assert.equal(generic.components.find((row) => row.id === 'electrical').capital_cost_cad, 12000);
   assert.equal(result.households[0].shared_infrastructure_service.monthly_cad, result.infrastructure.service_charge_per_household_month_cad);
-  assert.equal(result.households[0].recurring_monthly_cost_cad.household_utilities_maintenance_monthly_cad, 150);
+  assert.equal(result.households[0].recurring_monthly_cost_cad.household_utilities_maintenance_monthly_cad, 0);
 });
 
 test('heterogeneous household site allocations use calculated reserved hectares', () => {
@@ -266,6 +269,8 @@ test('presentation contract includes household-first land accounting inputs and 
   assert.equal(contract.default_inputs.dwelling_financing, undefined);
   assert.equal(contract.default_inputs.dwelling_costs, undefined);
   assert.equal(contract.evidence.dwelling_capital_cost, undefined);
+  assert.equal(contract.evidence.dwelling_cost_model.status, 'legacy_planning_evidence_not_recovered_in_current_checkout');
+  assert.equal(contract.dwelling_cost_model.bands.central.completed_dwelling_capital_cad, 61000);
   assert.equal(contract.default_inputs.land_costs?.administration_scenario_id, 'legal_minimum');
   assert.equal(contract.administration_scale_examples.conventional[0].monthly_per_household_cad, 125);
   assert.equal(contract.administration_scale_examples.conventional[3].monthly_per_household_cad, 60.4);
@@ -279,6 +284,44 @@ test('public ARC charge is exactly site lease plus shared infrastructure', () =>
   assert.equal(household.land_infrastructure.combined_monthly_cad, Number((household.site_lease.monthly_total_cad + household.shared_infrastructure_service.monthly_cad).toFixed(2)));
   assert.equal(result.project.land_layer_break_even.revenue_equals_required_cost_recovery, true);
   assert.equal(result.project.infrastructure_layer_break_even.revenue_equals_required_cost_recovery, true);
+});
+
+test('the ARC dwelling package prices every required household utility exactly once', () => {
+  const dwelling = calculateArcDwellingCost();
+  assert.equal(dwelling.component_sum_check, true);
+  assert.deepEqual(dwelling.components.map((row) => row.id), ['structure_envelope', 'heating_system', 'water_plumbing_sanitation', 'hot_water', 'electrical']);
+  assert.deepEqual(dwelling.accounting_boundary.shared_infrastructure_components, []);
+  assert.equal(dwelling.utility_package_capital_cad, 11240);
+  assert.equal(dwelling.completed_dwelling_capital_cad, 61000);
+  assert.equal(dwelling.required_system_costs_complete, true);
+});
+
+test('centralized servicing moves the system boundary without duplicating resident utility capital', () => {
+  const distributed = calculateArcDwellingCost({servicingMode: 'arc_household_systems'});
+  const centralized = calculateArcDwellingCost({servicingMode: 'centralized_shared_services'});
+  assert.equal(distributed.components.find((row) => row.id === 'water_plumbing_sanitation').layer, 'resident_dwelling');
+  assert.equal(centralized.components.find((row) => row.id === 'water_plumbing_sanitation').layer, 'shared_infrastructure');
+  assert.equal(centralized.components.find((row) => row.id === 'water_plumbing_sanitation').capital_cost_cad, 0);
+  assert.equal(centralized.components.find((row) => row.id === 'electrical').layer, 'shared_infrastructure');
+  assert.equal(centralized.components.find((row) => row.id === 'electrical').capital_cost_cad, 0);
+  assert.equal(centralized.required_system_costs_complete, false);
+  assert.equal(centralized.unpriced_required_systems.length, 4);
+  assert.equal(distributed.components.filter((row) => row.capital_cost_cad > 0).length, 5);
+  assert.equal(centralized.components.filter((row) => row.capital_cost_cad > 0).length, 3);
+});
+
+test('dwelling utility capital does not enter the legal-minimum land or shared-access charge', () => {
+  const baseline = calculateArcSiteLeaseEconomics(scenario());
+  const changedDwelling = calculateArcSiteLeaseEconomics(scenario({dwelling: {component_overrides: {water_plumbing_sanitation: 50000, electrical: 25000}}}));
+  assert.equal(baseline.households[0].land_infrastructure.combined_monthly_cad, changedDwelling.households[0].land_infrastructure.combined_monthly_cad);
+  assert.notEqual(baseline.households[0].completed_dwelling.completed_dwelling_capital_cad, changedDwelling.households[0].completed_dwelling.completed_dwelling_capital_cad);
+});
+
+test('dwelling presentation exposes provenance and the inclusive legacy range', () => {
+  const contract = buildArcDwellingPresentationContract();
+  assert.deepEqual(contract.completed_dwelling_range_cad, {low: 51000, central: 61000, high: 74000});
+  assert.equal(contract.source_record.utility_package_inclusive, true);
+  assert.equal(contract.generic_alternatives.length, 3);
 });
 
 test('dwelling and household expense inputs cannot alter the public land-infrastructure charge', () => {

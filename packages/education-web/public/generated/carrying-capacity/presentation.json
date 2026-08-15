@@ -1,8 +1,8 @@
 {
-  "contract_version": "1.2.0",
+  "contract_version": "1.3.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-15T10:01:18.643Z",
+  "generated_at": "2026-08-15T10:41:18.077Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -1688,7 +1688,7 @@
     }
   },
   "site_lease_economics": {
-    "contract_version": "1.5.0",
+    "contract_version": "1.6.0",
     "api": "calculateArcSiteLeaseEconomics",
     "planning_guideline": {
       "productive_land_per_adult_ha": 1,
@@ -1804,14 +1804,14 @@
             "capital_cost_cad": 0,
             "annual_operating_cost_cad": 0,
             "requiredness": "legally required",
-            "source_status": "legal requirement; servicing method and cost unresolved/site-specific",
-            "distributed_capital_cost_per_household_cad": 14000,
-            "distributed_annual_operating_cost_per_household_cad": 600,
+            "source_status": "resident dwelling package; not a shared fee",
+            "distributed_capital_cost_per_household_cad": 0,
+            "distributed_annual_operating_cost_per_household_cad": 0,
             "resident_labour_hours_year": 0,
             "future_replacement_years": null,
-            "cash_treatment": "distributed_external",
+            "cash_treatment": "resident_dwelling_cost_model",
             "legal_basis": "O. Reg. 517/06 s. 31; system may be distributed if approved and adequate.",
-            "notes": "No centralized water capital or recurring shared fee is assumed. Each dwelling/site still needs an approved potable and fire-water solution."
+            "notes": "The ARC household package includes water collection, storage and treatment once. Generic well or other approved alternatives remain outside the legal-minimum shared charge."
           },
           {
             "id": "shared_sewage",
@@ -1819,14 +1819,14 @@
             "capital_cost_cad": 0,
             "annual_operating_cost_cad": 0,
             "requiredness": "legally required",
-            "source_status": "legal requirement; servicing method and cost unresolved/site-specific",
-            "distributed_capital_cost_per_household_cad": 16000,
-            "distributed_annual_operating_cost_per_household_cad": 750,
+            "source_status": "resident dwelling package; not a shared fee",
+            "distributed_capital_cost_per_household_cad": 0,
+            "distributed_annual_operating_cost_per_household_cad": 0,
             "resident_labour_hours_year": 0,
             "future_replacement_years": null,
-            "cash_treatment": "distributed_external",
+            "cash_treatment": "resident_dwelling_cost_model",
             "legal_basis": "O. Reg. 517/06 s. 35 and Building Code sewage requirements.",
-            "notes": "No centralized sewage capital or recurring shared fee is assumed. Approved septic, holding-tank or other lawful systems remain necessary."
+            "notes": "The ARC household package includes sanitation/greywater capital once. Generic septic or other approved alternatives remain a separate resident-dwelling/site option."
           },
           {
             "id": "electrical_distribution",
@@ -1834,14 +1834,14 @@
             "capital_cost_cad": 0,
             "annual_operating_cost_cad": 0,
             "requiredness": "physically necessary",
-            "source_status": "dwelling/site requirement; not a centralized ARC fee",
-            "distributed_capital_cost_per_household_cad": 12000,
-            "distributed_annual_operating_cost_per_household_cad": 900,
+            "source_status": "resident dwelling package; not a shared fee",
+            "distributed_capital_cost_per_household_cad": 0,
+            "distributed_annual_operating_cost_per_household_cad": 0,
             "resident_labour_hours_year": 0,
             "future_replacement_years": null,
-            "cash_treatment": "distributed_external",
+            "cash_treatment": "resident_dwelling_cost_model",
             "legal_basis": "O. Reg. 517/06 s. 36 applies where electricity is supplied by the landlord; Building Code/ESA requirements remain applicable to dwellings.",
-            "notes": "Individual utility/grid or off-grid systems are outside this shared-infrastructure charge."
+            "notes": "The ARC off-grid electrical package includes household generation/storage once. Grid or generic electrical alternatives remain outside the legal-minimum shared charge."
           },
           {
             "id": "road_maintenance",
@@ -5022,11 +5022,23 @@
         "note": "Illustrates a 15-year land repayment horizon consistent with CALA limits; eligibility and lender terms must be confirmed."
       }
     },
+    "dwelling_financing": {
+      "ownership": "resident_owned",
+      "down_payment_rate": 0.1,
+      "interest_rate_annual": 0.06,
+      "amortization_years": 25,
+      "evidence_status": "illustrative_resident_dwelling_financing_scenario"
+    },
     "evidence": {
       "land_price": {
         "status": "working_scenario_assumption",
         "source": "Living Region repository audit and the existing task-specified Grey County working range",
         "notes": "No current, parcel-matched Grey County rural land-sale series was found in the repository. The 30,000–40,000 CAD/ha working range is retained as a sensitivity input, not a canonical market value."
+      },
+      "dwelling_cost_model": {
+        "status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+        "source": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+        "notes": "The componentized ARC package is retained as a transparent planning model. The original quote/spreadsheet was not recovered; current procurement and code review remain required."
       },
       "property_tax": {
         "status": "planning_assumption",
@@ -5096,6 +5108,637 @@
         ],
         "notes": "The scenario is a cash floor candidate, not legal advice. It includes unavoidable land debt/tax and explicitly financed access capital, but excludes discretionary management, vacancy, insurance without a lender requirement, paid maintenance and full lifecycle reserves. Distributed water, sewage, electric and site approvals remain required feasibility checks outside the shared fee."
       }
+    },
+    "dwelling_cost_model": {
+      "contract_version": "1.0.0",
+      "package_id": "arc_low_cost_four_season",
+      "title": "ARC low-cost four-season dwelling and distributed utility package",
+      "source_record": {
+        "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+        "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+        "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+        "utility_package_inclusive": true,
+        "legacy_completed_dwelling_range_cad": {
+          "low": 51000,
+          "central": 61000,
+          "high": 74000
+        }
+      },
+      "servicing_modes": {
+        "arc_household_systems": {
+          "label": "ARC household systems",
+          "layer": "resident_dwelling",
+          "status": "legacy_design_specification_reconciled_planning_assumption",
+          "description": "Roof rainwater, household treatment/storage, household sanitation/greywater and off-grid electrical systems are part of the resident-owned dwelling package.",
+          "systems": [
+            "water_collection_and_treatment",
+            "sanitation_and_greywater",
+            "household_electrical"
+          ]
+        },
+        "generic_distributed_alternatives": {
+          "label": "Generic well/septic/grid alternatives",
+          "layer": "resident_dwelling_or_site_capital",
+          "status": "working_alternative_placeholder",
+          "description": "Generic alternatives remain available for sites where the ARC package cannot be approved. They are not the legal-minimum ARC baseline.",
+          "systems": [
+            "well_or_approved_water",
+            "septic_or_approved_sewage",
+            "grid_or_approved_electrical"
+          ]
+        },
+        "centralized_shared_services": {
+          "label": "Centralized project services",
+          "layer": "shared_infrastructure",
+          "status": "site_specific_alternative",
+          "description": "Use only when a project selects and designs centralized water, sewage or electrical infrastructure. Its capital belongs in shared infrastructure, not in the resident dwelling package.",
+          "systems": [
+            "centralized_water",
+            "centralized_sewage",
+            "centralized_electrical"
+          ]
+        }
+      },
+      "bands": {
+        "low": {
+          "contract_version": "1.0.0",
+          "package_id": "arc_low_cost_four_season",
+          "package_label": "ARC low-cost four-season dwelling and distributed utility package",
+          "band": "low",
+          "servicing_mode": "arc_household_systems",
+          "servicing_mode_label": "ARC household systems",
+          "components": [
+            {
+              "id": "structure_envelope",
+              "label": "Structure and envelope",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 36760,
+              "cost_status": "derived_residual_from_inclusive_legacy_range",
+              "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "heating_system",
+              "label": "Heating appliance and system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3000,
+              "cost_status": "derived_planning_allocation",
+              "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "water_plumbing_sanitation",
+              "label": "Water, plumbing and sanitation",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+              "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "hot_water",
+              "label": "Hot water",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+              "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "electrical",
+              "label": "Off-grid electrical system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+              "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            }
+          ],
+          "resident_dwelling_capital_cad": 51000,
+          "shared_infrastructure_capital_cad": 0,
+          "completed_dwelling_capital_cad": 51000,
+          "utility_package_capital_cad": 11240,
+          "required_systems": [
+            {
+              "id": "potable_water",
+              "label": "Potable water collection, storage and treatment",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "plumbing_and_bathing",
+              "label": "Household plumbing, sink and private shower",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "sanitation_and_greywater",
+              "label": "Sanitation and greywater handling",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "hot_water",
+              "label": "Domestic hot water",
+              "component_id": "hot_water",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000
+            },
+            {
+              "id": "household_electrical",
+              "label": "Household electrical supply",
+              "component_id": "electrical",
+              "requirement_status": "code_and_safety_review_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300
+            },
+            {
+              "id": "space_heating",
+              "label": "Space-heating appliance/system",
+              "component_id": "heating_system",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3000
+            }
+          ],
+          "required_systems_have_single_accounting_home": true,
+          "unpriced_required_systems": [],
+          "required_system_costs_complete": true,
+          "total_component_capital_cad": 51000,
+          "component_sum_check": true,
+          "accounting_boundary": {
+            "resident_dwelling_components": [
+              "structure_envelope",
+              "heating_system",
+              "water_plumbing_sanitation",
+              "hot_water",
+              "electrical"
+            ],
+            "shared_infrastructure_components": [],
+            "excluded_from_this_model": [
+              "household operating utilities",
+              "dwelling maintenance",
+              "insurance",
+              "land lease",
+              "shared infrastructure operating cost"
+            ]
+          },
+          "source_record": {
+            "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+            "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+            "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+            "utility_package_inclusive": true,
+            "legacy_completed_dwelling_range_cad": {
+              "low": 51000,
+              "central": 61000,
+              "high": 74000
+            }
+          },
+          "notes": [
+            "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+            "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+            "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+            "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+          ]
+        },
+        "central": {
+          "contract_version": "1.0.0",
+          "package_id": "arc_low_cost_four_season",
+          "package_label": "ARC low-cost four-season dwelling and distributed utility package",
+          "band": "central",
+          "servicing_mode": "arc_household_systems",
+          "servicing_mode_label": "ARC household systems",
+          "components": [
+            {
+              "id": "structure_envelope",
+              "label": "Structure and envelope",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 44760,
+              "cost_status": "derived_residual_from_inclusive_legacy_range",
+              "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "heating_system",
+              "label": "Heating appliance and system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5000,
+              "cost_status": "derived_planning_allocation",
+              "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "water_plumbing_sanitation",
+              "label": "Water, plumbing and sanitation",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+              "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "hot_water",
+              "label": "Hot water",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+              "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "electrical",
+              "label": "Off-grid electrical system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+              "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            }
+          ],
+          "resident_dwelling_capital_cad": 61000,
+          "shared_infrastructure_capital_cad": 0,
+          "completed_dwelling_capital_cad": 61000,
+          "utility_package_capital_cad": 11240,
+          "required_systems": [
+            {
+              "id": "potable_water",
+              "label": "Potable water collection, storage and treatment",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "plumbing_and_bathing",
+              "label": "Household plumbing, sink and private shower",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "sanitation_and_greywater",
+              "label": "Sanitation and greywater handling",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "hot_water",
+              "label": "Domestic hot water",
+              "component_id": "hot_water",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000
+            },
+            {
+              "id": "household_electrical",
+              "label": "Household electrical supply",
+              "component_id": "electrical",
+              "requirement_status": "code_and_safety_review_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300
+            },
+            {
+              "id": "space_heating",
+              "label": "Space-heating appliance/system",
+              "component_id": "heating_system",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5000
+            }
+          ],
+          "required_systems_have_single_accounting_home": true,
+          "unpriced_required_systems": [],
+          "required_system_costs_complete": true,
+          "total_component_capital_cad": 61000,
+          "component_sum_check": true,
+          "accounting_boundary": {
+            "resident_dwelling_components": [
+              "structure_envelope",
+              "heating_system",
+              "water_plumbing_sanitation",
+              "hot_water",
+              "electrical"
+            ],
+            "shared_infrastructure_components": [],
+            "excluded_from_this_model": [
+              "household operating utilities",
+              "dwelling maintenance",
+              "insurance",
+              "land lease",
+              "shared infrastructure operating cost"
+            ]
+          },
+          "source_record": {
+            "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+            "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+            "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+            "utility_package_inclusive": true,
+            "legacy_completed_dwelling_range_cad": {
+              "low": 51000,
+              "central": 61000,
+              "high": 74000
+            }
+          },
+          "notes": [
+            "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+            "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+            "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+            "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+          ]
+        },
+        "high": {
+          "contract_version": "1.0.0",
+          "package_id": "arc_low_cost_four_season",
+          "package_label": "ARC low-cost four-season dwelling and distributed utility package",
+          "band": "high",
+          "servicing_mode": "arc_household_systems",
+          "servicing_mode_label": "ARC household systems",
+          "components": [
+            {
+              "id": "structure_envelope",
+              "label": "Structure and envelope",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 54760,
+              "cost_status": "derived_residual_from_inclusive_legacy_range",
+              "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "heating_system",
+              "label": "Heating appliance and system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 8000,
+              "cost_status": "derived_planning_allocation",
+              "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "water_plumbing_sanitation",
+              "label": "Water, plumbing and sanitation",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+              "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "hot_water",
+              "label": "Hot water",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+              "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "electrical",
+              "label": "Off-grid electrical system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+              "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            }
+          ],
+          "resident_dwelling_capital_cad": 74000,
+          "shared_infrastructure_capital_cad": 0,
+          "completed_dwelling_capital_cad": 74000,
+          "utility_package_capital_cad": 11240,
+          "required_systems": [
+            {
+              "id": "potable_water",
+              "label": "Potable water collection, storage and treatment",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "plumbing_and_bathing",
+              "label": "Household plumbing, sink and private shower",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "sanitation_and_greywater",
+              "label": "Sanitation and greywater handling",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "hot_water",
+              "label": "Domestic hot water",
+              "component_id": "hot_water",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000
+            },
+            {
+              "id": "household_electrical",
+              "label": "Household electrical supply",
+              "component_id": "electrical",
+              "requirement_status": "code_and_safety_review_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300
+            },
+            {
+              "id": "space_heating",
+              "label": "Space-heating appliance/system",
+              "component_id": "heating_system",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 8000
+            }
+          ],
+          "required_systems_have_single_accounting_home": true,
+          "unpriced_required_systems": [],
+          "required_system_costs_complete": true,
+          "total_component_capital_cad": 74000,
+          "component_sum_check": true,
+          "accounting_boundary": {
+            "resident_dwelling_components": [
+              "structure_envelope",
+              "heating_system",
+              "water_plumbing_sanitation",
+              "hot_water",
+              "electrical"
+            ],
+            "shared_infrastructure_components": [],
+            "excluded_from_this_model": [
+              "household operating utilities",
+              "dwelling maintenance",
+              "insurance",
+              "land lease",
+              "shared infrastructure operating cost"
+            ]
+          },
+          "source_record": {
+            "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+            "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+            "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+            "utility_package_inclusive": true,
+            "legacy_completed_dwelling_range_cad": {
+              "low": 51000,
+              "central": 61000,
+              "high": 74000
+            }
+          },
+          "notes": [
+            "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+            "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+            "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+            "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+          ]
+        }
+      },
+      "completed_dwelling_range_cad": {
+        "low": 51000,
+        "central": 61000,
+        "high": 74000
+      },
+      "component_evidence": [
+        {
+          "id": "structure_envelope",
+          "label": "Structure and envelope",
+          "layer": "resident_dwelling",
+          "capital_cost_cad": {
+            "low": 36760,
+            "central": 44760,
+            "high": 54760
+          },
+          "cost_status": "derived_residual_from_inclusive_legacy_range",
+          "derivation": "Inclusive legacy completed-dwelling range less the separately specified heating, water/plumbing/sanitation, hot-water and electrical allocations. No independent structure quote was recovered.",
+          "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available."
+        },
+        {
+          "id": "heating_system",
+          "label": "Heating appliance and system",
+          "layer": "resident_dwelling",
+          "capital_cost_cad": {
+            "low": 3000,
+            "central": 5000,
+            "high": 8000
+          },
+          "cost_status": "derived_planning_allocation",
+          "derivation": "Transparent allocation within the inclusive legacy range; the existing thermal model supplies heat demand but not a current appliance quote.",
+          "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific."
+        },
+        {
+          "id": "water_plumbing_sanitation",
+          "label": "Water, plumbing and sanitation",
+          "layer": "resident_dwelling",
+          "capital_cost_cad": {
+            "low": 5940,
+            "central": 5940,
+            "high": 5940
+          },
+          "cost_status": "legacy_design_package_planning_value",
+          "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+          "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction."
+        },
+        {
+          "id": "hot_water",
+          "label": "Hot water",
+          "layer": "resident_dwelling",
+          "capital_cost_cad": {
+            "low": 2000,
+            "central": 2000,
+            "high": 2000
+          },
+          "cost_status": "legacy_design_package_planning_value",
+          "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+          "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review."
+        },
+        {
+          "id": "electrical",
+          "label": "Off-grid electrical system",
+          "layer": "resident_dwelling",
+          "capital_cost_cad": {
+            "low": 3300,
+            "central": 3300,
+            "high": 3300
+          },
+          "cost_status": "legacy_design_package_planning_value",
+          "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+          "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific."
+        }
+      ],
+      "generic_alternatives": [
+        {
+          "id": "generic_water",
+          "label": "Generic well or approved water system",
+          "system": "water_collection_and_treatment",
+          "capital_cost_cad": 14000,
+          "layer": "resident_dwelling_or_site_capital",
+          "status": "working_alternative_placeholder"
+        },
+        {
+          "id": "generic_sewage",
+          "label": "Generic septic or approved sewage system",
+          "system": "sanitation_and_greywater",
+          "capital_cost_cad": 16000,
+          "layer": "resident_dwelling_or_site_capital",
+          "status": "working_alternative_placeholder"
+        },
+        {
+          "id": "generic_electrical",
+          "label": "Generic grid connection or electrical system",
+          "system": "household_electrical",
+          "capital_cost_cad": 12000,
+          "layer": "resident_dwelling_or_site_capital",
+          "status": "working_alternative_placeholder"
+        }
+      ],
+      "accounting_rules": [
+        "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+        "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+        "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+        "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+      ]
     },
     "default_inputs": {
       "land_price_cad_per_ha": 35000,
@@ -5219,6 +5862,177 @@
           "mature_land_requirement_ha": 1.048378,
           "heating_area_ha": 0.347969,
           "household_food_demand_gj_year": 4.279466
+        },
+        "completed_dwelling": {
+          "contract_version": "1.0.0",
+          "package_id": "arc_low_cost_four_season",
+          "package_label": "ARC low-cost four-season dwelling and distributed utility package",
+          "band": "central",
+          "servicing_mode": "arc_household_systems",
+          "servicing_mode_label": "ARC household systems",
+          "components": [
+            {
+              "id": "structure_envelope",
+              "label": "Structure and envelope",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 44760,
+              "cost_status": "derived_residual_from_inclusive_legacy_range",
+              "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "heating_system",
+              "label": "Heating appliance and system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5000,
+              "cost_status": "derived_planning_allocation",
+              "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "water_plumbing_sanitation",
+              "label": "Water, plumbing and sanitation",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+              "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "hot_water",
+              "label": "Hot water",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+              "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "electrical",
+              "label": "Off-grid electrical system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+              "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            }
+          ],
+          "resident_dwelling_capital_cad": 61000,
+          "shared_infrastructure_capital_cad": 0,
+          "completed_dwelling_capital_cad": 61000,
+          "utility_package_capital_cad": 11240,
+          "required_systems": [
+            {
+              "id": "potable_water",
+              "label": "Potable water collection, storage and treatment",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "plumbing_and_bathing",
+              "label": "Household plumbing, sink and private shower",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "sanitation_and_greywater",
+              "label": "Sanitation and greywater handling",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "hot_water",
+              "label": "Domestic hot water",
+              "component_id": "hot_water",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000
+            },
+            {
+              "id": "household_electrical",
+              "label": "Household electrical supply",
+              "component_id": "electrical",
+              "requirement_status": "code_and_safety_review_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300
+            },
+            {
+              "id": "space_heating",
+              "label": "Space-heating appliance/system",
+              "component_id": "heating_system",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5000
+            }
+          ],
+          "required_systems_have_single_accounting_home": true,
+          "unpriced_required_systems": [],
+          "required_system_costs_complete": true,
+          "total_component_capital_cad": 61000,
+          "component_sum_check": true,
+          "accounting_boundary": {
+            "resident_dwelling_components": [
+              "structure_envelope",
+              "heating_system",
+              "water_plumbing_sanitation",
+              "hot_water",
+              "electrical"
+            ],
+            "shared_infrastructure_components": [],
+            "excluded_from_this_model": [
+              "household operating utilities",
+              "dwelling maintenance",
+              "insurance",
+              "land lease",
+              "shared infrastructure operating cost"
+            ]
+          },
+          "source_record": {
+            "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+            "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+            "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+            "utility_package_inclusive": true,
+            "legacy_completed_dwelling_range_cad": {
+              "low": 51000,
+              "central": 61000,
+              "high": 74000
+            }
+          },
+          "notes": [
+            "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+            "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+            "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+            "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+          ]
+        },
+        "affordability": {
+          "completed_resident_owned_dwelling_capital_cad": 61000,
+          "completed_resident_owned_dwelling_range_cad": {
+            "low": 51000,
+            "central": 61000,
+            "high": 74000
+          },
+          "illustrative_dwelling_financing_monthly_cad": 353.72,
+          "land_shared_infrastructure_monthly_cad": 268.22,
+          "illustrative_dwelling_financing_plus_land_shared_monthly_cad": 621.94,
+          "household_operating_costs_excluded": true,
+          "formula": "illustrative dwelling financing + site lease + shared infrastructure; household operating costs excluded"
         }
       },
       "family_ordinary": {
@@ -5309,6 +6123,177 @@
           "mature_land_requirement_ha": 1.52161,
           "heating_area_ha": 0.347969,
           "household_food_demand_gj_year": 14.050693
+        },
+        "completed_dwelling": {
+          "contract_version": "1.0.0",
+          "package_id": "arc_low_cost_four_season",
+          "package_label": "ARC low-cost four-season dwelling and distributed utility package",
+          "band": "central",
+          "servicing_mode": "arc_household_systems",
+          "servicing_mode_label": "ARC household systems",
+          "components": [
+            {
+              "id": "structure_envelope",
+              "label": "Structure and envelope",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 44760,
+              "cost_status": "derived_residual_from_inclusive_legacy_range",
+              "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "heating_system",
+              "label": "Heating appliance and system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5000,
+              "cost_status": "derived_planning_allocation",
+              "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific.",
+              "approval_note": null,
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "water_plumbing_sanitation",
+              "label": "Water, plumbing and sanitation",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+              "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "hot_water",
+              "label": "Hot water",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+              "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            },
+            {
+              "id": "electrical",
+              "label": "Off-grid electrical system",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300,
+              "cost_status": "legacy_design_package_planning_value",
+              "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+              "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific.",
+              "servicing_mode": "arc_household_systems",
+              "included_once": true
+            }
+          ],
+          "resident_dwelling_capital_cad": 61000,
+          "shared_infrastructure_capital_cad": 0,
+          "completed_dwelling_capital_cad": 61000,
+          "utility_package_capital_cad": 11240,
+          "required_systems": [
+            {
+              "id": "potable_water",
+              "label": "Potable water collection, storage and treatment",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "plumbing_and_bathing",
+              "label": "Household plumbing, sink and private shower",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "sanitation_and_greywater",
+              "label": "Sanitation and greywater handling",
+              "component_id": "water_plumbing_sanitation",
+              "requirement_status": "site_approval_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5940
+            },
+            {
+              "id": "hot_water",
+              "label": "Domestic hot water",
+              "component_id": "hot_water",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 2000
+            },
+            {
+              "id": "household_electrical",
+              "label": "Household electrical supply",
+              "component_id": "electrical",
+              "requirement_status": "code_and_safety_review_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 3300
+            },
+            {
+              "id": "space_heating",
+              "label": "Space-heating appliance/system",
+              "component_id": "heating_system",
+              "requirement_status": "building_design_required",
+              "layer": "resident_dwelling",
+              "capital_cost_cad": 5000
+            }
+          ],
+          "required_systems_have_single_accounting_home": true,
+          "unpriced_required_systems": [],
+          "required_system_costs_complete": true,
+          "total_component_capital_cad": 61000,
+          "component_sum_check": true,
+          "accounting_boundary": {
+            "resident_dwelling_components": [
+              "structure_envelope",
+              "heating_system",
+              "water_plumbing_sanitation",
+              "hot_water",
+              "electrical"
+            ],
+            "shared_infrastructure_components": [],
+            "excluded_from_this_model": [
+              "household operating utilities",
+              "dwelling maintenance",
+              "insurance",
+              "land lease",
+              "shared infrastructure operating cost"
+            ]
+          },
+          "source_record": {
+            "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+            "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+            "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+            "utility_package_inclusive": true,
+            "legacy_completed_dwelling_range_cad": {
+              "low": 51000,
+              "central": 61000,
+              "high": 74000
+            }
+          },
+          "notes": [
+            "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+            "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+            "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+            "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+          ]
+        },
+        "affordability": {
+          "completed_resident_owned_dwelling_capital_cad": 61000,
+          "completed_resident_owned_dwelling_range_cad": {
+            "low": 51000,
+            "central": 61000,
+            "high": 74000
+          },
+          "illustrative_dwelling_financing_monthly_cad": 353.72,
+          "land_shared_infrastructure_monthly_cad": 392.47,
+          "illustrative_dwelling_financing_plus_land_shared_monthly_cad": 746.19,
+          "household_operating_costs_excluded": true,
+          "formula": "illustrative dwelling financing + site lease + shared infrastructure; household operating costs excluded"
         }
       }
     },

@@ -1,6 +1,6 @@
 # ARC legal-minimum affordability audit
 
-Generated from the canonical `calculateArcSiteLeaseEconomics` API. This is a lower-bound cash scenario candidate, not legal advice or a claim that every site can be approved at these values. It prices only the leased productive site and shared infrastructure. The private dwelling, household utilities, heating fuel, personal insurance and dwelling reserves are outside scope.
+Generated from the canonical `calculateArcSiteLeaseEconomics` API. This is a lower-bound cash scenario candidate, not legal advice or a claim that every site can be approved at these values. The land + infrastructure charge prices only the leased productive site and shared infrastructure. The completed resident-owned dwelling is shown as a separate capital/illustrative financing layer; household operating utilities, heating fuel, personal insurance and operating expenses remain outside scope.
 
 ## Governing rule
 
@@ -26,9 +26,9 @@ Sources: [Ontario Residential Tenancies Act](https://www.ontario.ca/laws/statute
 | Fixed land reserve | scenario input | no | no | future liability is real but reserve timing is policy | yes | $0 legal-min cash; future liability disclosed |
 | Basic internal access capital | $120,000 placeholder | passable access/fire access subject to approval | debt service if financed | yes if existing compliant access unavailable | capital amount is site-specific | retain explicit access capital/debt placeholder; set to $0 when existing access is compliant |
 | Road maintenance and snow clearing | $10,000/year former paid baseline | passability/clearance outcome required | no | yes | paid contractor is optional | $0 recurring cash; 120 resident hours/year in infrastructure layer |
-| Water supply | centralized scenario placeholder | potable/fire water required | site-specific | yes | centralization optional | $0 shared cash; distributed servicing capital/operating cost remains outside this charge and must be approved |
-| Sewage/greywater | centralized scenario placeholder | lawful sewage handling required | site-specific | yes | centralization optional | $0 shared cash; distributed system remains outside this charge and must be approved |
-| Electrical distribution | centralized scenario placeholder | safe electrical service/building compliance | site-specific | yes | centralization optional | $0 shared cash; dwelling/site connection remains outside this charge |
+| Household water/plumbing/sanitation package | $5,940 ARC dwelling component | potable/fire water and lawful sanitation required | resident dwelling capital | yes | centralization optional | retained once in resident-owned dwelling capital; excluded from shared infrastructure |
+| Household hot water | $2,000 ARC dwelling component | safe plumbing/hot-water installation where provided | resident dwelling capital | yes for the selected dwelling design | system design is optional | retained once in resident-owned dwelling capital; no separate shared fee |
+| Household electrical system | $3,300 ARC dwelling component | safe electrical installation required | resident dwelling capital | yes | centralization optional | retained once in resident-owned dwelling capital; excluded from shared infrastructure |
 | Waste handling | centralized scenario placeholder | sanitary storage/handling | no | yes | collection contract optional | $0 recurring cash; 24 resident hours/year in infrastructure layer |
 | Infrastructure insurance | $8,000/year legacy infrastructure line | no general statutory minimum identified | possible lender/entity requirement | risk exists, policy not established | yes unless contract requires | $0 in legal minimum; site-specific quote/lender requirement |
 | Infrastructure maintenance cash | percentage of capital in prior scenarios | maintenance outcome required | no | yes over asset life | paid method optional | $0 legal-min cash; resident labour and future liability separate |
@@ -49,7 +49,7 @@ Sources: [Ontario Residential Tenancies Act](https://www.ontario.ca/laws/statute
 
 ## Retained cash and separate non-cash obligations
 
-For the default 12-household ordinary case, financed land debt service is $187.66/household/month in the productive land charge, and the modeled property-tax proxy is $32.60/household/month. The combined productive-land rate is $197.04/ha/month. The access-capital placeholder produces $47.96/household/month of legal-minimum shared cash; this falls to zero only if an existing compliant access arrangement is confirmed or the capital is otherwise funded.
+For the default 12-household ordinary case, financed land debt service is $187.66/household/month in the productive land charge, and the modeled property-tax proxy is $32.60/household/month. The combined productive-land rate is $197.04/ha/month. The access-capital placeholder produces $47.96/household/month of legal-minimum shared cash; this falls to zero only if an existing compliant access arrangement is confirmed or the capital is otherwise funded. The resident-owned ARC dwelling central case is $61000.00, including the $11240.00 household utility package once.
 
 The legal-minimum scenario reports 388 h/year of resident/community labour per year: 60 h/year administration, 64 h/year common-property drainage/grounds, and 264 h/year infrastructure access/snow/waste. These are not converted into a monthly fee.
 
@@ -57,12 +57,12 @@ Future replacement liability is shown separately as $120000 for the modeled acce
 
 ## Default ordinary-land household results
 
-| Household | Reserved establishment land | Mature land | Site lease/month | Shared infrastructure/month | Combined land + infrastructure/month | Labour | Future replacement liability |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| One adult | 1.12 ha | 1.05 ha | $220.26 | $47.96 | $268.22 | 388 h/year | $120000 |
-| 2 adults + 2 dependent children | 1.75 ha | 1.52 ha | $344.51 | $47.96 | $392.47 | 388 h/year | $120000 |
+| Household | Reserved establishment land | Mature land | Site lease/month | Shared infrastructure/month | Land + infrastructure/month | Dwelling capital | Dwelling finance/month | Dwelling finance + land/shared | Labour | Future replacement liability |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| One adult | 1.12 ha | 1.05 ha | $220.26 | $47.96 | $268.22 | $61000.00 | $353.72 | $621.94 | 388 h/year | $120000 |
+| 2 adults + 2 dependent children | 1.75 ha | 1.52 ha | $344.51 | $47.96 | $392.47 | $61000.00 | $353.72 | $746.19 | 388 h/year | $120000 |
 
-These are legal-minimum cash figures under the current illustrative land-financing case and zero common-area lower bound. They are not a promise that a real site can omit required distributed servicing costs; water, sewage and electrical systems remain outside the shared charge until the site design determines how they are provided.
+These are legal-minimum land/infrastructure cash figures under the current illustrative land-financing case and zero common-area lower bound. The ARC dwelling package places household water, sanitation/greywater, hot water and electrical systems in resident dwelling capital once. A real site may require a different approved system or a centralized project service; that alternative must replace, not stack on top of, the corresponding package component.
 
 ## Owen Sound affordability comparison
 

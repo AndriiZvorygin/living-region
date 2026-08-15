@@ -1,0 +1,97 @@
+{
+  "contract_version": "1.0.0",
+  "package_id": "arc_low_cost_four_season",
+  "title": "ARC low-cost four-season dwelling and distributed utility package",
+  "source_record": {
+    "source_status": "legacy_planning_evidence_not_recovered_in_current_checkout",
+    "provenance": "Prior ARC design specification supplied to Living Region; the original quote/spreadsheet was not found in the current Living Region checkout, its git history, or the standalone ARC carrying-capacity checkout.",
+    "retrieval_note": "Values are retained as a transparent planning package until original quotations or current procurement evidence are restored.",
+    "utility_package_inclusive": true,
+    "legacy_completed_dwelling_range_cad": {
+      "low": 51000,
+      "central": 61000,
+      "high": 74000
+    }
+  },
+  "servicing_modes": {
+    "arc_household_systems": {
+      "label": "ARC household systems",
+      "layer": "resident_dwelling",
+      "status": "legacy_design_specification_reconciled_planning_assumption",
+      "description": "Roof rainwater, household treatment/storage, household sanitation/greywater and off-grid electrical systems are part of the resident-owned dwelling package.",
+      "systems": ["water_collection_and_treatment", "sanitation_and_greywater", "household_electrical"]
+    },
+    "generic_distributed_alternatives": {
+      "label": "Generic well/septic/grid alternatives",
+      "layer": "resident_dwelling_or_site_capital",
+      "status": "working_alternative_placeholder",
+      "description": "Generic alternatives remain available for sites where the ARC package cannot be approved. They are not the legal-minimum ARC baseline.",
+      "systems": ["well_or_approved_water", "septic_or_approved_sewage", "grid_or_approved_electrical"]
+    },
+    "centralized_shared_services": {
+      "label": "Centralized project services",
+      "layer": "shared_infrastructure",
+      "status": "site_specific_alternative",
+      "description": "Use only when a project selects and designs centralized water, sewage or electrical infrastructure. Its capital belongs in shared infrastructure, not in the resident dwelling package.",
+      "systems": ["centralized_water", "centralized_sewage", "centralized_electrical"]
+    }
+  },
+  "components": [
+    {
+      "id": "structure_envelope",
+      "label": "Structure and envelope",
+      "layer": "resident_dwelling",
+      "capital_cost_cad": {"low": 36760, "central": 44760, "high": 54760},
+      "cost_status": "derived_residual_from_inclusive_legacy_range",
+      "derivation": "Inclusive legacy completed-dwelling range less the separately specified heating, water/plumbing/sanitation, hot-water and electrical allocations. No independent structure quote was recovered.",
+      "design_basis": "Four-season ARC dwelling envelope; replace with an as-designed bill of materials when available."
+    },
+    {
+      "id": "heating_system",
+      "label": "Heating appliance and system",
+      "layer": "resident_dwelling",
+      "capital_cost_cad": {"low": 3000, "central": 5000, "high": 8000},
+      "cost_status": "derived_planning_allocation",
+      "derivation": "Transparent allocation within the inclusive legacy range; the existing thermal model supplies heat demand but not a current appliance quote.",
+      "design_basis": "Winter masonry-heater concept with thermosiphon hot-water integration; actual appliance, code and installation costs remain site/design-specific."
+    },
+    {
+      "id": "water_plumbing_sanitation",
+      "label": "Water, plumbing and sanitation",
+      "layer": "resident_dwelling",
+      "capital_cost_cad": {"low": 5940, "central": 5940, "high": 5940},
+      "cost_status": "legacy_design_package_planning_value",
+      "design_basis": "Roof rainwater collection; first flush; indoor food-grade storage; demand pump; sediment filtration; UV; under-sink reverse osmosis; compact PEX plumbing; sink and private shower; drainless composting toilet; permitted Class 2 greywater system under the applicable flow limit.",
+      "approval_note": "Water source, potable treatment, sanitation and greywater approval remain site-specific and must be confirmed before construction."
+    },
+    {
+      "id": "hot_water",
+      "label": "Hot water",
+      "layer": "resident_dwelling",
+      "capital_cost_cad": {"low": 2000, "central": 2000, "high": 2000},
+      "cost_status": "legacy_design_package_planning_value",
+      "design_basis": "Winter masonry-heater thermosiphon hot water and summer solar-thermal hot water.",
+      "approval_note": "Plumbing, pressure, temperature and seasonal system design require code review."
+    },
+    {
+      "id": "electrical",
+      "label": "Off-grid electrical system",
+      "layer": "resident_dwelling",
+      "capital_cost_cad": {"low": 3300, "central": 3300, "high": 3300},
+      "cost_status": "legacy_design_package_planning_value",
+      "design_basis": "Approximately 400 Wh/day planning load; approximately 400 W PV; MPPT charge controller; approximately 2.52 kWh nominal flooded lead-acid storage; 1,000 W pure-sine inverter.",
+      "approval_note": "Electrical design, battery safety and any ESA/utility requirements remain site-specific."
+    }
+  ],
+  "generic_alternatives": [
+    {"id": "generic_water", "label": "Generic well or approved water system", "system": "water_collection_and_treatment", "capital_cost_cad": 14000, "layer": "resident_dwelling_or_site_capital", "status": "working_alternative_placeholder"},
+    {"id": "generic_sewage", "label": "Generic septic or approved sewage system", "system": "sanitation_and_greywater", "capital_cost_cad": 16000, "layer": "resident_dwelling_or_site_capital", "status": "working_alternative_placeholder"},
+    {"id": "generic_electrical", "label": "Generic grid connection or electrical system", "system": "household_electrical", "capital_cost_cad": 12000, "layer": "resident_dwelling_or_site_capital", "status": "working_alternative_placeholder"}
+  ],
+  "accounting_rules": [
+    "Every household water, sanitation/greywater, hot-water and electrical component is included once in resident dwelling capital when arc_household_systems is selected.",
+    "Centralized services are alternatives in the shared-infrastructure layer and must not be combined with the corresponding household system component.",
+    "Land lease and shared infrastructure do not absorb resident dwelling utility capital.",
+    "The legacy approximately 11,230 CAD utility total reconciles to 11,240 CAD when the listed 5,940 + 2,000 + 3,300 component values are added; the 10 CAD difference is treated as source rounding, not hidden cost."
+  ]
+}

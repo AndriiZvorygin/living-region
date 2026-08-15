@@ -15,9 +15,13 @@ The original files under `/home/htaf/lyis/` are read-only inputs and were not mo
 
 The canonical ARC site-lease economics layer is in `src/site-lease.mjs`. It
 consumes household/site productive hectares and building heating from the
-carrying-capacity model, then separately calculates resident dwelling finance,
-project land recovery, household site leases and shared infrastructure
-services. It does not use the obsolete combined dwelling-plus-land shortcut.
+carrying-capacity model, then separately calculates the componentized resident
+dwelling package, project land recovery, household site leases and shared
+infrastructure services. The dwelling package is in `src/dwelling.mjs`; its
+water/plumbing/sanitation, hot-water and electrical systems are resident-owned
+capital in the ARC household-system mode. It does not use the obsolete
+combined dwelling-plus-land shortcut or the old generic $125,000 dwelling
+baseline. Generic well/septic/grid figures remain explicit alternatives only.
 Run `npm run report:arc:site-lease` and
 `npm run report:arc:site-lease:sensitivity` from the Living Region root for the
 machine-readable and Markdown outputs. The infrastructure audit is generated

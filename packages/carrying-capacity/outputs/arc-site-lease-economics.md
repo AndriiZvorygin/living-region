@@ -1,6 +1,6 @@
 # ARC site-lease economics
 
-This report covers the ARC site lease and selected shared infrastructure only. The private dwelling is acquired separately and is outside the public land-and-infrastructure charge.
+This report covers the ARC site lease and selected shared infrastructure only. The completed resident-owned dwelling is reported separately as capital and illustrative financing; it is outside the land-and-infrastructure charge.
 
 ## Central accounting
 
@@ -12,13 +12,13 @@ This report covers the ARC site lease and selected shared infrastructure only. T
 
 ## Household comparison
 
-| Scenario | Establishment site | Mature site | Project property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 1 adult · ordinary land · 12 households | 1.12 ha | 1.05 ha | 13.41 ha | $469502 | $220 | $48 | $268 |
-| 1 adult · marginal land · 12 households | 2.12 ha | 2.00 ha | 25.40 ha | $889075 | $417 | $48 | $465 |
-| 2 adults + 2 children · ordinary land · 12 households | 1.75 ha | 1.52 ha | 20.98 ha | $734328 | $345 | $48 | $392 |
+| Scenario | Establishment site | Mature site | Project property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo | Dwelling capital | Dwelling finance/mo | Dwelling finance + land/shared/mo |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 adult · ordinary land · 12 households | 1.12 ha | 1.05 ha | 13.41 ha | $469502 | $220 | $48 | $268 | $61000 | $354 | $622 |
+| 1 adult · marginal land · 12 households | 2.12 ha | 2.00 ha | 25.40 ha | $889075 | $417 | $48 | $465 | $61000 | $354 | $819 |
+| 2 adults + 2 children · ordinary land · 12 households | 1.75 ha | 1.52 ha | 20.98 ha | $734328 | $345 | $48 | $392 | $61000 | $354 | $746 |
 
-For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **$268/month**. The 2-adult + 2-child case is **$392/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.
+For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **$268/month** and the 2-adult + 2-child case is **$392/month**. The componentized resident-owned dwelling central case is **$61000** with an illustrative financing payment of **$354/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.
 
 ## Community scale: 2 adults + 2 children per household
 

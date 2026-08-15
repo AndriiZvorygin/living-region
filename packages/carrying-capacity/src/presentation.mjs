@@ -9,7 +9,7 @@ import {GROWING_ENVIRONMENT_CONTRACT_VERSION, owenSoundGrowingEnvironment, siteC
 import {HOUSEHOLD_LAND_ADULT_AGE, HOUSEHOLD_TRANSITION_YEAR_CONVENTION} from './household-demand.mjs';
 import {buildSiteLeasePresentationContract} from './site-lease.mjs';
 
-export const PRESENTATION_CONTRACT_VERSION = '1.2.0';
+export const PRESENTATION_CONTRACT_VERSION = '1.3.0';
 
 function readJson(filePath, fallback = {}) { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : fallback; }
 function finite(value, fallback = 0) { return Number.isFinite(Number(value)) ? Number(value) : fallback; }

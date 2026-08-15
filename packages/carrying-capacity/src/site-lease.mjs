@@ -10,13 +10,14 @@ import {
 import {representativeProfiles} from './health-canada.mjs';
 import {selectPerennialMixForSite} from './environment.mjs';
 import {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
+import {ARC_DWELLING_COST_EVIDENCE, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.5.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.6.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
   base_plus_hectare: 'Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.',
@@ -29,10 +30,10 @@ export const SITE_LEASE_EVIDENCE = {
     source: 'Living Region repository audit and the existing task-specified Grey County working range',
     notes: 'No current, parcel-matched Grey County rural land-sale series was found in the repository. The 30,000–40,000 CAD/ha working range is retained as a sensitivity input, not a canonical market value.'
   },
-  dwelling_capital_cost: {
-    status: 'working_scenario_assumption',
-    source: 'No current ARC dwelling construction-cost benchmark was found in the Living Region repository',
-    notes: 'The default is intentionally replaceable and is not the obsolete HelpOS combined housing-plus-land figure.'
+  dwelling_cost_model: {
+    status: ARC_DWELLING_COST_EVIDENCE.source_record.source_status,
+    source: ARC_DWELLING_COST_EVIDENCE.source_record.provenance,
+    notes: 'The componentized ARC package is retained as a transparent planning model. The original quote/spreadsheet was not recovered; current procurement and code review remain required.'
   },
   property_tax: {
     status: 'planning_assumption',
@@ -243,9 +244,9 @@ export const INFRASTRUCTURE_SCENARIOS = {
     financing: infrastructureFinancing,
     capital_components: {
       internal_access: infrastructureComponent('internal_access', 'Basic gravel access / internal road', {capital_cost_cad: 120000, requiredness: 'physically_necessary', source_status: 'working planning assumption; municipal/fire access design and existing-road reuse must be confirmed', resident_labour_hours_year: 120, future_replacement_years: 20, legal_basis: 'O. Reg. 517/06 s. 32 requires roads in a land lease community to remain passable, clear and dust-controlled.', notes: 'Capital is included only as an explicit financed access placeholder. If an existing compliant access serves the site, set capital to zero; if a new engineered road is required, replace with the approved quote.'}),
-      shared_water: infrastructureComponent('shared_water', 'Potable/fire water arrangement', {requiredness: 'legally_required', cash_treatment: 'distributed_external', distributed_capital_cost_per_household_cad: 14000, distributed_annual_operating_cost_per_household_cad: 600, legal_basis: 'O. Reg. 517/06 s. 31; system may be distributed if approved and adequate.', source_status: 'legal requirement; servicing method and cost unresolved/site-specific', notes: 'No centralized water capital or recurring shared fee is assumed. Each dwelling/site still needs an approved potable and fire-water solution.'}),
-      shared_sewage: infrastructureComponent('shared_sewage', 'Sewage disposal arrangement', {requiredness: 'legally_required', cash_treatment: 'distributed_external', distributed_capital_cost_per_household_cad: 16000, distributed_annual_operating_cost_per_household_cad: 750, legal_basis: 'O. Reg. 517/06 s. 35 and Building Code sewage requirements.', source_status: 'legal requirement; servicing method and cost unresolved/site-specific', notes: 'No centralized sewage capital or recurring shared fee is assumed. Approved septic, holding-tank or other lawful systems remain necessary.'}),
-      electrical_distribution: infrastructureComponent('electrical_distribution', 'Dwelling electrical supply', {requiredness: 'physically_necessary', cash_treatment: 'distributed_external', distributed_capital_cost_per_household_cad: 12000, distributed_annual_operating_cost_per_household_cad: 900, legal_basis: 'O. Reg. 517/06 s. 36 applies where electricity is supplied by the landlord; Building Code/ESA requirements remain applicable to dwellings.', source_status: 'dwelling/site requirement; not a centralized ARC fee', notes: 'Individual utility/grid or off-grid systems are outside this shared-infrastructure charge.'}),
+      shared_water: infrastructureComponent('shared_water', 'Potable/fire water arrangement', {requiredness: 'legally_required', cash_treatment: 'resident_dwelling_cost_model', distributed_capital_cost_per_household_cad: 0, distributed_annual_operating_cost_per_household_cad: 0, legal_basis: 'O. Reg. 517/06 s. 31; system may be distributed if approved and adequate.', source_status: 'resident dwelling package; not a shared fee', notes: 'The ARC household package includes water collection, storage and treatment once. Generic well or other approved alternatives remain outside the legal-minimum shared charge.'}),
+      shared_sewage: infrastructureComponent('shared_sewage', 'Sewage disposal arrangement', {requiredness: 'legally_required', cash_treatment: 'resident_dwelling_cost_model', distributed_capital_cost_per_household_cad: 0, distributed_annual_operating_cost_per_household_cad: 0, legal_basis: 'O. Reg. 517/06 s. 35 and Building Code sewage requirements.', source_status: 'resident dwelling package; not a shared fee', notes: 'The ARC household package includes sanitation/greywater capital once. Generic septic or other approved alternatives remain a separate resident-dwelling/site option.'}),
+      electrical_distribution: infrastructureComponent('electrical_distribution', 'Dwelling electrical supply', {requiredness: 'physically_necessary', cash_treatment: 'resident_dwelling_cost_model', distributed_capital_cost_per_household_cad: 0, distributed_annual_operating_cost_per_household_cad: 0, legal_basis: 'O. Reg. 517/06 s. 36 applies where electricity is supplied by the landlord; Building Code/ESA requirements remain applicable to dwellings.', source_status: 'resident dwelling package; not a shared fee', notes: 'The ARC off-grid electrical package includes household generation/storage once. Grid or generic electrical alternatives remain outside the legal-minimum shared charge.'}),
       road_maintenance: infrastructureComponent('road_maintenance', 'Road maintenance materials', {requiredness: 'legally_required', cash_treatment: 'resident_labour', resident_labour_hours_year: 60, legal_basis: 'O. Reg. 517/06 s. 32', source_status: 'legal duty; cash method not mandated', notes: 'Resident labour is shown separately; contractor cash is zero in this baseline.'}),
       snow_clearing: infrastructureComponent('snow_clearing', 'Snow and obstruction clearing', {requiredness: 'legally_required', cash_treatment: 'resident_labour', resident_labour_hours_year: 60, legal_basis: 'O. Reg. 517/06 s. 32 and applicable local property standards', source_status: 'legal duty; cash method not mandated', notes: 'Resident/community clearing is the modeled minimum method, subject to municipal/fire feasibility.'}),
       waste_system: infrastructureComponent('waste_system', 'Sanitary waste storage/handling', {requiredness: 'physically_necessary', cash_treatment: 'resident_labour', resident_labour_hours_year: 24, legal_basis: 'O. Reg. 517/06 general maintenance and Owen Sound Property Standards By-law', source_status: 'physical/maintenance requirement; collection arrangement unresolved', notes: 'No centralized waste contract or capital is assumed.'}),
@@ -424,12 +425,11 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     allocation_method: 'base_plus_hectare'
   },
   dwelling: {
-    capital_cost_cad: 125000,
+    package_id: 'arc_low_cost_four_season',
+    servicing_mode: 'arc_household_systems',
     down_payment_rate: 0.10,
     interest_rate_annual: 0.06,
     amortization_years: 25,
-    maintenance_replacement_rate_annual: 0.02,
-    household_utilities_annual_cad: 1800,
     ownership: 'resident_owned'
   },
   land: {
@@ -571,7 +571,22 @@ function projectInfrastructure(scenario, householdCount) {
   const cashPolicy = infrastructure.cash_policy ?? {};
   const includeMaintenanceCash = cashPolicy.include_maintenance_cash !== false;
   const includeReplacementReserve = cashPolicy.include_replacement_reserve !== false;
-  const components = Object.fromEntries(Object.entries(infrastructure.capital_components ?? {}).map(([id, row]) => {
+  const configuredComponents = {...(infrastructure.capital_components ?? {})};
+  const dwellingCost = calculateArcDwellingCost({
+    packageId: scenario.dwelling.package_id,
+    servicingMode: scenario.dwelling.servicing_mode,
+    componentOverrides: scenario.dwelling.component_overrides
+  });
+  if (dwellingCost.shared_infrastructure_capital_cad > 0) {
+    configuredComponents.dwelling_centralized_services = infrastructureComponent('dwelling_centralized_services', 'Centralized dwelling water/sanitation/electrical', {
+      capital_cost_cad: dwellingCost.shared_infrastructure_capital_cad * householdCount,
+      requiredness: 'site_specific_alternative',
+      cash_treatment: 'shared_cash',
+      source_status: 'derived_from_selected_ARC_dwelling_package',
+      notes: 'Only selected centralized household systems move into shared infrastructure. Do not also price the corresponding resident-dwelling components.'
+    });
+  }
+  const components = Object.fromEntries(Object.entries(configuredComponents).map(([id, row]) => {
     const included = row.included !== false;
     const explicitOperating = row.annual_operating_cost_cad;
     const operating = explicitOperating == null
@@ -918,16 +933,21 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     ? landAccounting.allocations
     : allocatePool({households, pools: landPools, method: scenario.community.allocation_method});
   const infrastructure = projectInfrastructure(scenario, count);
+  const dwellingCost = calculateArcDwellingCost({
+    packageId: scenario.dwelling.package_id,
+    servicingMode: scenario.dwelling.servicing_mode,
+    componentOverrides: scenario.dwelling.component_overrides
+  });
   const householdOutput = households.map((household, index) => {
     const dwellingFinance = financeCapital({
-      value: scenario.dwelling.capital_cost_cad,
+      value: dwellingCost.completed_dwelling_capital_cad,
       ownership: scenario.dwelling.ownership === 'owned_out_right' ? 'owned_out_right' : 'financed',
       downPaymentRate: scenario.dwelling.down_payment_rate,
       downPaymentCad: scenario.dwelling.down_payment_cad,
       interestRateAnnual: scenario.dwelling.interest_rate_annual,
       amortizationYears: scenario.dwelling.amortization_years
     });
-    const dwellingMaintenanceAnnual = Math.max(0, finite(scenario.dwelling.capital_cost_cad)) * Math.max(0, finite(scenario.dwelling.maintenance_replacement_rate_annual));
+    const dwellingMaintenanceAnnual = 0;
     const siteLease = leaseAllocations[index];
     const sharedServiceAnnual = infrastructure.annual_costs_cad.total / count;
     const landAllocation = landAccounting.allocations[index];
@@ -939,7 +959,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       dwelling_maintenance_replacement_monthly_cad: dwellingMaintenanceAnnual / 12,
       site_lease_monthly_cad: siteLeaseMonthly,
       shared_infrastructure_service_monthly_cad: sharedServiceAnnual / 12,
-      household_utilities_maintenance_monthly_cad: Math.max(0, finite(scenario.dwelling.household_utilities_annual_cad)) / 12
+      household_utilities_maintenance_monthly_cad: 0
     };
     const baseLandMonthly = scenario.community.allocation_method === 'base_plus_hectare'
       ? landAllocation.common_property_land_holding_charge_monthly_cad
@@ -963,7 +983,8 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       mature_productive_land_requirement_ha: round(household.transition.mature_land_requirement_ha, 6),
       establishment_peak_year: household.transition.establishment_peak_year,
       household_food_demand_gj_year: household.result.household_food_gj_year,
-      dwelling: {capital_cost_cad: round(scenario.dwelling.capital_cost_cad), financing: dwellingFinance, maintenance_replacement_annual_cad: round(dwellingMaintenanceAnnual)},
+      dwelling: {capital_cost_cad: round(dwellingCost.completed_dwelling_capital_cad), financing: dwellingFinance, maintenance_replacement_annual_cad: round(dwellingMaintenanceAnnual), cost_model: dwellingCost},
+      completed_dwelling: dwellingCost,
       site_lease: {
         ...detailedSiteLease,
         monthly_total_cad: round(siteLeaseMonthly),
@@ -1004,6 +1025,15 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
         shared_infrastructure_monthly_cad: round(sharedInfrastructureMonthly),
         combined_monthly_cad: round(landInfrastructureMonthly),
         formula: 'site lease + shared infrastructure fee; dwelling and household expenses excluded'
+      },
+      affordability: {
+        completed_resident_owned_dwelling_capital_cad: round(dwellingCost.completed_dwelling_capital_cad),
+        completed_resident_owned_dwelling_range_cad: ARC_DWELLING_COST_EVIDENCE.source_record.legacy_completed_dwelling_range_cad,
+        illustrative_dwelling_financing_monthly_cad: round(dwellingFinance.monthly_debt_service_cad),
+        land_shared_infrastructure_monthly_cad: round(landInfrastructureMonthly),
+        illustrative_dwelling_financing_plus_land_shared_monthly_cad: round(dwellingFinance.monthly_debt_service_cad + landInfrastructureMonthly),
+        household_operating_costs_excluded: true,
+        formula: 'illustrative dwelling financing + site lease + shared infrastructure; household operating costs excluded'
       },
       recurring_monthly_cost_cad: Object.fromEntries(Object.entries(recurring).map(([key, value]) => [key, round(value)])),
       monthly_cost_stack: {
@@ -1145,7 +1175,8 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
     allocation_sensitivity: calculateSiteLeaseAllocationSensitivity({scenario, households, pools: landPools}),
     evidence: SITE_LEASE_EVIDENCE,
     assumptions: {
-      dwelling_cost_is_not_from_a_current_local_build_quote: true,
+      dwelling_cost_model_is_componentized: true,
+      dwelling_utility_capital_is_not_shared_infrastructure_when_distributed: true,
       land_price_is_not_a_current_observed_grey_county_market_value: true,
       infrastructure_values_require_site_design_and_quotes: true,
       resident_owns_dwelling_and_does_not_own_project_land: true,
@@ -1240,7 +1271,7 @@ export function buildSiteLeasePresentationContract() {
   const administrationScaleExamples = Object.fromEntries(Object.values(ADMINISTRATION_SCENARIOS).map((scenario) => [scenario.id, [12, 16, 25, 50].map((householdCount) => calculateAdministrationBudget({scenario_id: scenario.id, household_count: householdCount}))]));
   const commonPropertyOperationsMetadata = Object.values(COMMON_PROPERTY_OPERATIONS_SCENARIOS).map((scenario) => ({id: scenario.id, label: scenario.label, description: scenario.description, evidence_status: scenario.evidence_status, components: Object.entries(scenario.components).map(([id, row]) => ({id, ...row})), excludes: ['snow clearing contracts', 'road maintenance contracts', 'centralized water/sewage/electricity', 'infrastructure insurance', 'land-holding administration', 'vacancy reserve']}));
   const defaultCommonAreaAccounting = calculateCommonPropertyAreaAccounting({common_area_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha, components: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.components, source: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.source});
-  const publicEvidence = Object.fromEntries(Object.entries(SITE_LEASE_EVIDENCE).filter(([key]) => key !== 'dwelling_capital_cost'));
+  const publicEvidence = SITE_LEASE_EVIDENCE;
   return {
     contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
     api: 'calculateArcSiteLeaseEconomics',
@@ -1267,7 +1298,15 @@ export function buildSiteLeasePresentationContract() {
     },
     land_financing_evidence: LAND_FINANCING_EVIDENCE,
     land_financing_scenarios: LAND_FINANCING_SCENARIOS,
+    dwelling_financing: {
+      ownership: DEFAULT_SITE_LEASE_SCENARIO.dwelling.ownership,
+      down_payment_rate: DEFAULT_SITE_LEASE_SCENARIO.dwelling.down_payment_rate,
+      interest_rate_annual: DEFAULT_SITE_LEASE_SCENARIO.dwelling.interest_rate_annual,
+      amortization_years: DEFAULT_SITE_LEASE_SCENARIO.dwelling.amortization_years,
+      evidence_status: 'illustrative_resident_dwelling_financing_scenario'
+    },
     evidence: publicEvidence,
+    dwelling_cost_model: buildArcDwellingPresentationContract(),
     default_inputs: {
       land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha,
       common_property_land_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
@@ -1297,8 +1336,8 @@ export function buildSiteLeasePresentationContract() {
       }
     },
     household_examples: {
-      one_adult_ordinary: {land_infrastructure: ordinary.households[0].land_infrastructure, site_lease: ordinary.households[0].site_lease, shared_infrastructure_service: ordinary.households[0].shared_infrastructure_service, physical_carrying_capacity: ordinary.households[0].physical_carrying_capacity},
-      family_ordinary: {land_infrastructure: family.households[0].land_infrastructure, site_lease: family.households[0].site_lease, shared_infrastructure_service: family.households[0].shared_infrastructure_service, physical_carrying_capacity: family.households[0].physical_carrying_capacity}
+      one_adult_ordinary: {land_infrastructure: ordinary.households[0].land_infrastructure, site_lease: ordinary.households[0].site_lease, shared_infrastructure_service: ordinary.households[0].shared_infrastructure_service, physical_carrying_capacity: ordinary.households[0].physical_carrying_capacity, completed_dwelling: ordinary.households[0].completed_dwelling, affordability: ordinary.households[0].affordability},
+      family_ordinary: {land_infrastructure: family.households[0].land_infrastructure, site_lease: family.households[0].site_lease, shared_infrastructure_service: family.households[0].shared_infrastructure_service, physical_carrying_capacity: family.households[0].physical_carrying_capacity, completed_dwelling: family.households[0].completed_dwelling, affordability: family.households[0].affordability}
     },
     examples: {
       one_adult_ordinary: {productive_land_ha: ordinary.households[0].calculated_productive_land_ha, mature_land_ha: ordinary.households[0].mature_productive_land_requirement_ha, land_infrastructure_monthly_cad: ordinary.households[0].land_infrastructure.combined_monthly_cad},

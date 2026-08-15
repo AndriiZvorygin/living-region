@@ -61,6 +61,11 @@ const compactRows = results.map(({id, label, result}) => {
     site_lease_month_cad: household.site_lease.monthly_total_cad,
     shared_service_month_cad: household.shared_infrastructure_service.monthly_cad,
     land_infrastructure_month_cad: household.land_infrastructure.combined_monthly_cad,
+    completed_dwelling_capital_cad: household.completed_dwelling.completed_dwelling_capital_cad,
+    completed_dwelling_low_cad: household.completed_dwelling.source_record.legacy_completed_dwelling_range_cad.low,
+    completed_dwelling_high_cad: household.completed_dwelling.source_record.legacy_completed_dwelling_range_cad.high,
+    illustrative_dwelling_financing_month_cad: household.affordability.illustrative_dwelling_financing_monthly_cad,
+    illustrative_dwelling_plus_land_shared_month_cad: household.affordability.illustrative_dwelling_financing_plus_land_shared_monthly_cad,
     land_layer_annual_revenue_cad: result.project.land_layer_break_even.site_lease_revenue_cad,
     land_layer_annual_cost_cad: result.project.land_layer_break_even.land_layer_cost_cad,
     infrastructure_layer_annual_revenue_cad: result.project.infrastructure_layer_break_even.shared_service_revenue_cad,
@@ -74,7 +79,7 @@ const compactRows = results.map(({id, label, result}) => {
 const csvEscape = (value) => { const text = value == null ? '' : String(value); return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text; };
 const headers = Object.keys(compactRows[0]);
 fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.csv'), [headers.join(','), ...compactRows.map((row) => headers.map((key) => csvEscape(row[key])).join(','))].join('\n') + '\n');
-fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.json'), JSON.stringify({contract_version: ARC_SITE_LEASE_CONTRACT_VERSION, generated_at: new Date().toISOString(), scope: 'ARC land lease plus shared infrastructure only; private dwelling and household expenses excluded', scenarios: compactRows, comparison_rows: compactRows}, null, 2) + '\n');
+fs.writeFileSync(path.join(outputDir, 'arc-site-lease-economics.json'), JSON.stringify({contract_version: ARC_SITE_LEASE_CONTRACT_VERSION, generated_at: new Date().toISOString(), scope: 'ARC land lease plus shared infrastructure only; completed resident-owned dwelling is a separate capital/illustrative financing layer; household expenses excluded', dwelling_scope: 'completed resident-owned ARC dwelling package is reported separately from land and shared infrastructure', scenarios: compactRows, comparison_rows: compactRows}, null, 2) + '\n');
 
 const family = results.find((row) => row.id === 'family_ordinary_12');
 const ordinaryAdult = results.find((row) => row.id === 'one_adult_ordinary_12');
@@ -83,7 +88,7 @@ const communityRows = compactRows.filter((row) => row.id.startsWith('family_ordi
 const markdown = [
   '# ARC site-lease economics',
   '',
-  'This report covers the ARC site lease and selected shared infrastructure only. The private dwelling is acquired separately and is outside the public land-and-infrastructure charge.',
+  'This report covers the ARC site lease and selected shared infrastructure only. The completed resident-owned dwelling is reported separately as capital and illustrative financing; it is outside the land-and-infrastructure charge.',
   '',
   '## Central accounting',
   '',
@@ -95,11 +100,11 @@ const markdown = [
   '',
   '## Household comparison',
   '',
-  '| Scenario | Establishment site | Mature site | Project property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo |',
-  '|---|---:|---:|---:|---:|---:|---:|---:|',
-...[ordinaryAdult, marginalAdult, family].map(({label, result}) => { const row = compactRows.find((candidate) => candidate.scenario === label); return `| ${label} | ${ha(row.productive_land_ha)} | ${ha(row.mature_land_ha)} | ${ha(row.property_area_ha)} | ${money(row.land_value_cad)} | ${money(row.site_lease_month_cad)} | ${money(row.shared_service_month_cad)} | ${money(row.land_infrastructure_month_cad)} |`; }),
+  '| Scenario | Establishment site | Mature site | Project property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo | Dwelling capital | Dwelling finance/mo | Dwelling finance + land/shared/mo |',
+  '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+...[ordinaryAdult, marginalAdult, family].map(({label, result}) => { const row = compactRows.find((candidate) => candidate.scenario === label); return `| ${label} | ${ha(row.productive_land_ha)} | ${ha(row.mature_land_ha)} | ${ha(row.property_area_ha)} | ${money(row.land_value_cad)} | ${money(row.site_lease_month_cad)} | ${money(row.shared_service_month_cad)} | ${money(row.land_infrastructure_month_cad)} | ${money(row.completed_dwelling_capital_cad)} | ${money(row.illustrative_dwelling_financing_month_cad)} | ${money(row.illustrative_dwelling_plus_land_shared_month_cad)} |`; }),
   '',
-  `For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').land_infrastructure_month_cad)}/month**. The 2-adult + 2-child case is **${money(compactRows.find((row) => row.id === 'family_ordinary_12').land_infrastructure_month_cad)}/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.`,
+  `For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').land_infrastructure_month_cad)}/month** and the 2-adult + 2-child case is **${money(compactRows.find((row) => row.id === 'family_ordinary_12').land_infrastructure_month_cad)}/month**. The componentized resident-owned dwelling central case is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').completed_dwelling_capital_cad)}** with an illustrative financing payment of **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').illustrative_dwelling_financing_month_cad)}/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.`,
   '',
   '## Community scale: 2 adults + 2 children per household',
   '',

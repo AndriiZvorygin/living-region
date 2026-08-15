@@ -18,6 +18,7 @@ export {calculatePerennialMixTimeline} from './perennial.mjs';
 export {HOUSEHOLD_LAND_ADULT_AGE, HOUSEHOLD_TRANSITION_YEAR_CONVENTION, householdLandRole, calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
 export {ARC_AFFORDABILITY_SCENARIOS, ARC_SITE_LEASE_CONTRACT_VERSION, COMMON_PROPERTY_AREA_COMPONENTS, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS, LAND_FINANCING_EVIDENCE, LAND_FINANCING_SCENARIOS, SITE_LEASE_ALLOCATION_METHODS, SITE_LEASE_EVIDENCE, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateSiteLeaseAllocationSensitivity, buildSiteLeasePresentationContract} from './site-lease.mjs';
 export {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
+export {ARC_DWELLING_COST_EVIDENCE, ARC_DWELLING_COST_CONTRACT_VERSION, ARC_DWELLING_SERVICING_MODES, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
 
 export const CARRYING_CAPACITY_CONTRACT_VERSION = '1.0.0';
 export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
