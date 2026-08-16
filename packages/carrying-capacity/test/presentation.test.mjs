@@ -11,8 +11,11 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.reference_profile.height_cm, 178);
   assert.equal(contract.environment.climate.growing_degree_days.value_degree_days, 2073.5);
   assert.equal(contract.environment.solar.status, 'unresolved');
-  assert.equal(contract.nutrition.contract_version, '1.1.0');
-  assert.equal(contract.livestock.contract_version, '1.8.0');
+  assert.equal(contract.nutrition.contract_version, '1.2.0');
+  assert.equal(contract.livestock.contract_version, '1.9.0');
+  assert.equal(contract.nutrition.days_per_year, 365.25);
+  assert.ok(contract.nutrition.goals.minimum_property_b12);
+  assert.ok(contract.nutrition.food_portfolio.some((row) => row.id === 'carrot_raw'));
   assert.equal(contract.livestock.labour_scaling.method, 'task_based_species_specific_planning_model');
   assert.match(contract.livestock.labour_scaling.formula, /processing setup/);
   assert.match(contract.livestock.labour_scaling.note, /unsupported fixed\/variable percentage/i);
@@ -26,6 +29,9 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(familyRabbit.animals[0].labour.scaling_method, contract.livestock.labour_scaling.method);
   assert.equal(familyRabbit.animals[0].labour.recurring_hours_year, 180);
   assert.equal(familyRabbit.animals[0].labour.slaughter_processing_hours_year, 45);
+  assert.equal(familyRabbit.nutrient_completeness.demand.aggregate.annual.b12, 3506.4);
+  assert.equal(familyRabbit.nutrient_completeness.nutrients.b12.target_daily, 9.6);
+  assert.equal(familyRabbit.nutrient_completeness.nutrients.b12.target_annual, 3506.4);
   assert.equal(contract.nutrition.food_composition_source.includes('open.canada.ca'), true);
   assert.equal(contract.public_arc_contract.publication_ready, true);
   assert.equal(contract.public_arc_contract.contract_version, '1.1.0');

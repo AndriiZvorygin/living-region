@@ -15,6 +15,8 @@ import {
   CHICKEN_SYSTEM_COMPARISON,
   LIVESTOCK_SPECIES,
   calculateFoodNutrientAdequacy,
+  calculateHealthCanadaNutrientDemand,
+  DAYS_PER_YEAR,
   derivePropertyFeedSupply,
   calculateFoodSystem,
   siteClasses,
@@ -183,13 +185,72 @@ test('nutrient completeness reports amino-acid pattern and external nutrient bou
   assert.equal(result.feed.purchased_feed_dm_kg_year, 0);
 });
 
-test('chicken adds food-form B12 while plants-only leaves it unresolved', () => {
+test('daily micronutrient targets are explicit and annual adequacy uses 365.25 days', () => {
+  const family = [
+    member({id: 'adult-woman', sex: 'female'}),
+    member({id: 'adult-man'}),
+    member({id: 'child-girl', age_y: 8, sex: 'female', weight_kg: 28, height_cm: 130}),
+    member({id: 'teen-boy', age_y: 14, sex: 'male', weight_kg: 48, height_cm: 160}),
+    member({id: 'child-boy', age_y: 8, sex: 'male', weight_kg: 28, height_cm: 130})
+  ];
+  const demand = family.reduce((sum, person) => {
+    const row = calculateHealthCanadaNutrientDemand(person);
+    return sum + row.vitamin_b12_ug_day;
+  }, 0);
+  const rows = family.map(calculateHealthCanadaNutrientDemand);
+  const total = rows.reduce((sum, row) => ({
+    b12: sum.b12 + row.vitamin_b12_ug_day,
+    d: sum.d + row.vitamin_d_ug_day,
+    a: sum.a + row.vitamin_a_rae_ug_day,
+    iron: sum.iron + row.iron_mg_day
+  }), {b12: 0, d: 0, a: 0, iron: 0});
+  assert.equal(demand, 9.6);
+  assert.equal(total.b12, 9.6);
+  assert.equal(total.d, 75);
+  assert.equal(total.a, 3300);
+  assert.equal(total.iron, 57);
+  assert.equal(total.b12 * DAYS_PER_YEAR, 3506.4);
+  assert.equal(total.d * DAYS_PER_YEAR, 27393.75);
+  assert.equal(total.a * DAYS_PER_YEAR, 1205325);
+  assert.equal(total.iron * DAYS_PER_YEAR, 20819.25);
+});
+
+test('chicken adds food-form B12 but annualized demand remains explicit', () => {
   const demand = calculateHealthCanadaEER(member()).gj_year;
   const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
   const plants = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site()});
   const chickens = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site(), livestockMode: 'chicken_eggs'});
   assert.notEqual(plants.nutrient_completeness.nutrients.b12.status, 'adequate from property-produced food');
-  assert.equal(chickens.nutrient_completeness.nutrients.b12.status, 'adequate from property-produced food');
+  assert.ok(chickens.nutrient_completeness.nutrients.b12.supplied_annual > plants.nutrient_completeness.nutrients.b12.supplied_annual);
+  assert.ok(chickens.nutrient_completeness.nutrients.b12.target_annual > chickens.nutrient_completeness.nutrients.b12.target_daily);
+  assert.equal(chickens.nutrient_completeness.nutrients.b12.target_annual, chickens.nutrient_completeness.nutrients.b12.target_daily * DAYS_PER_YEAR);
+  assert.ok(chickens.nutrient_completeness.nutrients.b12.adequacy_ratio > 0);
+  assert.equal(chickens.nutrient_completeness.dimensional_analysis.legacy_ambiguous_target_removed, true);
+});
+
+test('whole-diet macros combine plant and animal food after energy displacement', () => {
+  const family = [member({id: 'adult-woman', sex: 'female'}), member({id: 'adult-man'}), member({id: 'child-girl', age_y: 8, sex: 'female', weight_kg: 28, height_cm: 130}), member({id: 'teen-boy', age_y: 14, sex: 'male', weight_kg: 48, height_cm: 160}), member({id: 'child-boy', age_y: 8, sex: 'male', weight_kg: 28, height_cm: 130})];
+  const demand = family.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(family).household_protein_kg_year, members: family, siteCapability: site()});
+  const macros = result.nutrient_completeness.whole_diet.macros;
+  assert.ok(macros.energy_percent.carbohydrate > 55 && macros.energy_percent.carbohydrate < 70);
+  assert.ok(macros.energy_percent.protein > 10 && macros.energy_percent.protein < 20);
+  assert.ok(macros.energy_percent.fat > 20 && macros.energy_percent.fat < 30);
+  assert.ok(macros.grams_per_day.unsaturated_fat >= macros.grams_per_day.saturated_fat);
+  assert.equal(macros.flags.children_fat_floor_met, false);
+  assert.ok(macros.amdr.household_intersection.fat_percent_energy.min >= 25);
+});
+
+test('nutrition goals resolve to explicit canonical food systems without hiding the selected basis', () => {
+  const people = [member(), member({id: 'adult-2', sex: 'female', weight_kg: 65, height_cm: 165})];
+  const demand = people.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+  const args = {foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(people).household_protein_kg_year, members: people, siteCapability: site()};
+  const b12 = calculateNutrientFoodSystem({...args, nutritionGoal: 'minimum_property_b12'});
+  const mixed = calculateNutrientFoodSystem({...args, nutritionGoal: 'nutrient_dense_mixed'});
+  assert.equal(b12.nutrition_goal_resolution.id, 'minimum_property_b12');
+  assert.equal(b12.livestock_scaling_basis, 'minimum_property_b12_discrete_search');
+  assert.equal(mixed.mode, 'mixed_rabbit_eggs');
+  assert.equal(mixed.nutrition_goal_resolution.id, 'nutrient_dense_mixed');
 });
 
 test('amino-acid quality pattern is separate from absolute household adequacy', () => {

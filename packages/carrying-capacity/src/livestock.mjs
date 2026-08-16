@@ -1,10 +1,10 @@
 import {calculateHouseholdProteinDemand} from './protein.mjs';
-import {calculateFoodNutrientAdequacy, FOOD_NUTRIENT_PROFILES} from './nutrition.mjs';
+import {calculateFoodNutrientAdequacy, FOOD_NUTRIENT_PROFILES, NUTRITION_GOAL_DEFINITIONS} from './nutrition.mjs';
 import {FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './food-adult-equivalent.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const LIVESTOCK_CONTRACT_VERSION = '1.8.0';
+export const LIVESTOCK_CONTRACT_VERSION = '1.9.0';
 
 // The reference livestock system is sized for the canonical two-adult plus
 // three-dependent-child planning household. Other households resize the
@@ -480,10 +480,66 @@ export function calculateMinimumSelfReplacingLivestockSystem({speciesId = 'rabbi
   return calculateLivestockScenario({speciesId, rationId, scale: definition.minimum_scale, propertyFeedSupply, siteCapability, requireSelfSufficient: true});
 }
 
-export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
+function findMinimumPropertyB12Scale({foodEvidence, demandGJ, members, siteCapability, rationId = 'arc_integrated'} = {}) {
+  const plantOnly = siteCapability.calculateFoodSystem(foodEvidence, demandGJ, siteCapability);
+  for (let scale = 1; scale <= 12; scale += 1) {
+    const candidate = calculateLivestockScenario({speciesId: 'rabbit_meat', rationId, scale, propertyFeedSupply: {}, siteCapability});
+    const plantDemand = Math.max(0, Number(demandGJ) - Number(candidate.output.food_energy_gj_year ?? 0));
+    const plantFood = plantDemand === Number(demandGJ) ? plantOnly : siteCapability.calculateFoodSystem(foodEvidence, plantDemand, siteCapability);
+    const adequacy = calculateFoodNutrientAdequacy({members, plantFood, animals: [candidate], energyGJ: demandGJ});
+    if (Number(adequacy.nutrients?.b12?.adequacy_ratio ?? 0) >= 1) return {scale, scenario: candidate, adequacy};
+  }
+  return {scale: null, scenario: null, adequacy: null};
+}
+
+function buildMarginalNutrientValue({before, after, animals = [], feed, labour, demandGJ = 0} = {}) {
+  const rows = Object.fromEntries(Object.entries(after.nutrients ?? {}).map(([id, row]) => {
+    const base = before.nutrients?.[id] ?? {};
+    return [id, {
+      before_supplied_annual: base.supplied_annual ?? 0,
+      after_supplied_annual: row.supplied_annual ?? 0,
+      before_coverage_ratio: base.adequacy_ratio ?? null,
+      after_coverage_ratio: row.adequacy_ratio ?? null,
+      coverage_gained: base.adequacy_ratio == null || row.adequacy_ratio == null ? null : round(row.adequacy_ratio - base.adequacy_ratio),
+      status_after: row.status
+    }];
+  }));
+  return {
+    rows,
+    animal_food_kg_year: round(animals.reduce((sum, row) => sum + Number(row.output?.edible_meat_kg_year ?? 0) + Number(row.output?.eggs_kg_year ?? 0), 0)),
+    animal_energy_share_percent: round(animals.reduce((sum, row) => sum + Number(row.output?.food_energy_gj_year ?? 0), 0) / Math.max(1e-9, Number(demandGJ)) * 100),
+    extra_feed_land_ha: round(feed?.additional_dedicated_feed_land_ha ?? 0),
+    labour_hours_year: round(labour?.livestock_hours_year ?? 0),
+    human_edible_feed_protein_kg_year: round(feed?.human_edible_feed_protein_consumed_kg ?? 0),
+    interpretation: 'Marginal nutrient value is the change from the same household on the plants-only portfolio. It is not a claim that animal food is nutritionally necessary.'
+  };
+}
+
+function goalSummary({members, demandGJ, selectedMode, selectedScale, selectedGoal, minimumB12, finalAdequacy, pregnancyAdequacy} = {}) {
+  const pregnancyMembers = members.map((member, index) => index === 0 && member.sex === 'female' ? {...member, pregnancy: member.pregnancy && member.pregnancy !== 'none' ? member.pregnancy : 'trimester_2'} : member);
+  const goals = Object.values(NUTRITION_GOAL_DEFINITIONS).map((goal) => ({
+    ...goal,
+    selected: goal.id === selectedGoal,
+    resolved_mode: goal.id === 'minimum_property_b12' ? 'rabbit_meat' : goal.id === 'nutrient_dense_mixed' ? 'mixed_rabbit_eggs' : goal.id === 'user_selected_animal_share' ? selectedMode : 'plants_only',
+    resolved_scale: goal.id === 'minimum_property_b12' ? minimumB12.scale : goal.id === 'user_selected_animal_share' ? selectedScale : 0,
+    b12_goal_scale: goal.id === 'minimum_property_b12' ? minimumB12.scale : null,
+    pregnancy_iron_note: goal.id === 'pregnancy_iron_sensitivity' ? 'Pregnancy is applied to the first female member for sensitivity only; menstruation and pregnancy are not interchangeable clinical states.' : null,
+    current_result: goal.id === 'pregnancy_iron_sensitivity' ? {iron: pregnancyAdequacy?.nutrients?.iron ?? null, iron_assessment: pregnancyAdequacy?.iron_assessment ?? null} : null,
+    status: goal.id === 'minimum_property_b12' && minimumB12.scale == null ? 'unresolved at tested scale range' : 'resolved planning comparison'
+  }));
+  return {goals, pregnancy_sensitivity_members: pregnancyMembers};
+}
+
+export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, nutritionGoal = 'user_selected_animal_share', establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
   if (!foodEvidence) throw new Error('nutrient food system requires canonical food evidence');
   const {calculateFoodSystem} = siteCapability?.calculateFoodSystem ? siteCapability : {};
   if (typeof calculateFoodSystem !== 'function') throw new Error('nutrient food system requires calculateFoodSystem in siteCapability');
+  const minimumB12 = findMinimumPropertyB12Scale({foodEvidence, demandGJ, members, siteCapability, rationId});
+  const explicitLivestockScale = livestockScale !== undefined && livestockScale !== null;
+  const goalMode = nutritionGoal === 'plants_plus_external' || nutritionGoal === 'pregnancy_iron_sensitivity' ? 'plants_only' : nutritionGoal === 'minimum_property_b12' ? 'rabbit_meat' : nutritionGoal === 'nutrient_dense_mixed' ? 'mixed_rabbit_eggs' : livestockMode;
+  const goalScale = nutritionGoal === 'minimum_property_b12' && livestockScale == null ? minimumB12.scale : livestockScale;
+  livestockMode = goalMode;
+  livestockScale = goalScale;
   const plantOnly = calculateFoodSystem(foodEvidence, demandGJ, siteCapability);
   const proteinTarget = Number(proteinDemandKgYear ?? 0);
   const modes = livestockMode === 'plants_only' ? [] : livestockMode === 'mixed_rabbit_eggs' ? ['rabbit_meat', 'chicken_eggs'] : [livestockMode];
@@ -491,8 +547,10 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   const livestockSystemCount = deriveLivestockSystemCount({livestockMode});
   const livestockScalingBasis = livestockMode === 'plants_only'
     ? 'plants_only_zero_systems'
-    : livestockScale !== undefined && livestockScale !== null
+    : explicitLivestockScale
       ? 'explicit_sensitivity_override'
+      : nutritionGoal === 'minimum_property_b12'
+        ? 'minimum_property_b12_discrete_search'
       : LIVESTOCK_SCALING_BASIS;
   const animalOutputs = modes.map((speciesId) => calculateLivestockScenario({speciesId, rationId, scale: effectiveLivestockScale, propertyFeedSupply: {}, siteCapability}));
   const animalEnergy = animalOutputs.reduce((sum, row) => sum + Number(row.output.food_energy_gj_year ?? 0), 0);
@@ -518,6 +576,11 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   const reproductiveSelfSufficiency = animals.every((row) => row.reproduction?.self_replacing === true && row.reproduction?.feed_all_generations_included === true);
   const proteinCoverage = proteinTarget > 0 ? totalProtein / proteinTarget : 1;
   const nutrientCompleteness = calculateFoodNutrientAdequacy({members, plantFood, animals, energyGJ: demandGJ});
+  const plantsOnlyAdequacy = calculateFoodNutrientAdequacy({members, plantFood: plantOnly, animals: [], energyGJ: demandGJ});
+  const pregnancyMembers = members.map((member, index) => index === 0 && member.sex === 'female' ? {...member, pregnancy: member.pregnancy && member.pregnancy !== 'none' ? member.pregnancy : 'trimester_2'} : member);
+  const pregnancyAdequacy = pregnancyMembers.some((member, index) => member !== members[index]) ? calculateFoodNutrientAdequacy({members: pregnancyMembers, plantFood, animals, energyGJ: demandGJ}) : null;
+  const marginalNutrientValue = buildMarginalNutrientValue({before: plantsOnlyAdequacy, after: nutrientCompleteness, animals, demandGJ, feed: {additional_dedicated_feed_land_ha: dedicatedFeedLand, human_edible_feed_protein_consumed_kg: animals.reduce((sum, row) => sum + row.feed.human_edible_feed_protein_kg_year, 0)}, labour: {livestock_hours_year: animals.reduce((sum, row) => sum + row.labour.total_hours_year, 0)}});
+  const goalResults = goalSummary({members, demandGJ, selectedMode: livestockMode, selectedScale: effectiveLivestockScale, selectedGoal: nutritionGoal, minimumB12, finalAdequacy: nutrientCompleteness, pregnancyAdequacy});
   const animalOutputByYear = Object.fromEntries(establishmentYears.map((year) => {
     const activeAnimals = animals.filter((animal) => year === 'mature' || Number(year) >= Number(animal.production_start_year ?? 1));
     return [String(year), {
@@ -533,6 +596,8 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   return {
     contract_version: LIVESTOCK_CONTRACT_VERSION,
     mode: livestockMode,
+    nutrition_goal: nutritionGoal,
+    nutrition_goal_resolution: goalResults.goals.find((goal) => goal.id === nutritionGoal) ?? null,
     ration_id: rationId,
     livestock_system_count: livestockSystemCount,
     livestock_scale: round(effectiveLivestockScale),
@@ -562,6 +627,10 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
     feed_self_sufficiency: feedSelfSufficiency,
     energy_adequacy: Number(plantFood.delivered_food_energy_gj ?? 0) + animalEnergy >= Number(demandGJ) - 1e-9,
     nutrient_completeness: nutrientCompleteness,
+    plants_only_nutrient_completeness: plantsOnlyAdequacy,
+    pregnancy_sensitivity_nutrient_completeness: pregnancyAdequacy,
+    marginal_nutrient_value: marginalNutrientValue,
+    nutrition_goals: goalResults.goals,
     reproductive_self_sufficiency: reproductiveSelfSufficiency,
     optimizer_eligible: proteinCoverage >= 1 && absoluteAminoAdequacy && Number(demandGJ) > 0 && feedSelfSufficiency && (livestockMode === 'plants_only' || reproductiveSelfSufficiency) && purchasedFeed === 0 && feedDeficit === 0,
     optimizer_note: livestockMode === 'plants_only' ? 'Plants-only is a valid baseline. Livestock is not required unless it improves a selected nutrient, land or labour objective.' : (!reproductiveSelfSufficiency ? 'This livestock option is non-canonical because the production population is not self-replacing or all generations are not fed.' : (!feedSelfSufficiency ? 'This livestock option is not ARC-feasible because the property cannot supply all dietary feed without imports.' : (deficit > 0 ? 'This on-site animal option supplies part of the remaining total-protein deficit; quality and micronutrients remain unresolved.' : 'This explicit on-site animal option meets the modeled total-protein target, but it is not automatically land-optimal.'))),
