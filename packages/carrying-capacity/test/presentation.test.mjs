@@ -12,6 +12,8 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.environment.climate.growing_degree_days.value_degree_days, 2073.5);
   assert.equal(contract.environment.solar.status, 'unresolved');
   assert.equal(contract.nutrition.contract_version, '1.1.0');
+  assert.equal(contract.livestock.contract_version, '1.5.0');
+  assert.equal(contract.livestock.examples['two_adults_plus_three_children:ordinary_mesic'].rows.find((row) => row.mode === 'rabbit_meat' && row.ration_id === 'arc_integrated').livestock_system_count, 4);
   assert.equal(contract.nutrition.food_composition_source.includes('open.canada.ca'), true);
   assert.equal(contract.public_arc_contract.publication_ready, true);
   assert.equal(contract.public_arc_contract.contract_version, '1.1.0');
