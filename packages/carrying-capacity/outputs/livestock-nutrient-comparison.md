@@ -1,6 +1,6 @@
 # Nutrient-aware livestock comparison
 
-Generated 2026-08-16T14:38:27.995Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
+Generated 2026-08-16T14:45:05.901Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
 
 ## Results
 
