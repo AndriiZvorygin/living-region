@@ -1,10 +1,272 @@
 {
-  "report_version": "2.2.0",
-  "generated_at": "2026-08-16T20:10:29.768Z",
+  "report_version": "2.3.0",
+  "generated_at": "2026-08-16T21:16:32.322Z",
   "household": "two_adults_plus_three_children",
   "site": "ordinary_mesic",
   "ration": "arc_integrated",
   "baseline_note": "Plants-only remains the policy baseline. Livestock rows are eligible only when feed is property-grown, winter supply is closed and the production population is self-replacing. No single row is universally optimal.",
+  "labour_scaling": {
+    "method": "task_based_species_specific_planning_model",
+    "formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+    "note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+    "task_definitions": {
+      "rabbit_meat": {
+        "evidence_status": "planning_assumption_bounded_by_smallholder_extension_sources; local time study unresolved",
+        "sources": [
+          "https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf"
+        ],
+        "growout": {
+          "inventory_source_field": "kits_surviving_year",
+          "growout_days": 70,
+          "frequency": "average growing inventory",
+          "unit": "animal-days/year"
+        },
+        "seasonal": {
+          "batch_basis": "litters_year",
+          "frequency": "one preparation/cleanout cycle per litter"
+        },
+        "processing": {
+          "harvest_source_field": "animals_available_for_harvest_year",
+          "batch_capacity_animals": 21,
+          "frequency": "batch capacity planning assumption"
+        },
+        "sensitivities": {
+          "low": {
+            "fixed_system_hours_year": 60,
+            "breeding_female_hours_year": 3,
+            "breeding_male_hours_year": 3,
+            "growout_hours_per_average_animal_year": 0.35,
+            "seasonal_hours_per_batch": 3,
+            "processing_setup_hours_per_batch": 1.5,
+            "processing_hours_per_animal": 0.3
+          },
+          "central": {
+            "fixed_system_hours_year": 90,
+            "breeding_female_hours_year": 4,
+            "breeding_male_hours_year": 4,
+            "growout_hours_per_average_animal_year": 0.5,
+            "seasonal_hours_per_batch": 3.8715753424657535,
+            "processing_setup_hours_per_batch": 2.5,
+            "processing_hours_per_animal": 0.4229607250755287
+          },
+          "high": {
+            "fixed_system_hours_year": 120,
+            "breeding_female_hours_year": 6,
+            "breeding_male_hours_year": 6,
+            "growout_hours_per_average_animal_year": 0.75,
+            "seasonal_hours_per_batch": 5,
+            "processing_setup_hours_per_batch": 4,
+            "processing_hours_per_animal": 0.6
+          }
+        }
+      },
+      "chicken_eggs": {
+        "evidence_status": "planning_assumption_bounded_by_smallholder_poultry_extension_sources; local time study unresolved",
+        "sources": [
+          "https://www.ontario.ca/page/introduction-poultry-nutrition; https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs",
+          "https://afs.mgcafe.uky.edu/research/poultry/use-heritage-breeds-alternative-poultry-production; https://extension.umd.edu/sites/extension.umd.edu/files/publications/FS-987%20Choosing%20the%20Best%20Poultry%20Breeds%20for%20your%20Small%20Farm_0.pdf; https://pmc.ncbi.nlm.nih.gov/articles/PMC8858978/"
+        ],
+        "growout": {
+          "inventory_source_field": "chicks_hatched_and_surviving_year",
+          "growout_days": 120,
+          "frequency": "average juvenile growing inventory",
+          "unit": "animal-days/year"
+        },
+        "seasonal": {
+          "batch_basis": "fixed_batch_count",
+          "batches_year": 4,
+          "frequency": "quarterly hatch/cleanout planning cycles"
+        },
+        "processing": {
+          "harvest_source_field": "poultry_harvest_animals_year",
+          "batch_capacity_animals": 8,
+          "frequency": "small-batch poultry processing planning assumption"
+        },
+        "sensitivities": {
+          "low": {
+            "fixed_system_hours_year": 75,
+            "breeding_female_hours_year": 3,
+            "breeding_male_hours_year": 3,
+            "growout_hours_per_average_animal_year": 0.35,
+            "seasonal_hours_per_batch": 12,
+            "processing_setup_hours_per_batch": 3,
+            "processing_hours_per_animal": 1.5
+          },
+          "central": {
+            "fixed_system_hours_year": 90,
+            "breeding_female_hours_year": 5,
+            "breeding_male_hours_year": 5,
+            "growout_hours_per_average_animal_year": 0.4,
+            "seasonal_hours_per_batch": 18.2,
+            "processing_setup_hours_per_batch": 4,
+            "processing_hours_per_animal": 2.5577557788778877
+          },
+          "high": {
+            "fixed_system_hours_year": 120,
+            "breeding_female_hours_year": 7,
+            "breeding_male_hours_year": 7,
+            "growout_hours_per_average_animal_year": 0.65,
+            "seasonal_hours_per_batch": 28,
+            "processing_setup_hours_per_batch": 7,
+            "processing_hours_per_animal": 3.5
+          }
+        }
+      },
+      "chicken_meat": {
+        "evidence_status": "non_canonical_sensitivity_planning_assumption; recurring production birds are not self-replacing",
+        "sources": [
+          "https://www.ontario.ca/page/introduction-poultry-nutrition; https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs"
+        ],
+        "growout": {
+          "inventory_source_field": "production_animals_year",
+          "growout_days": 56,
+          "frequency": "average growing inventory",
+          "unit": "animal-days/year"
+        },
+        "seasonal": {
+          "batch_basis": "fixed_batch_count",
+          "batches_year": 4,
+          "frequency": "quarterly production batches"
+        },
+        "processing": {
+          "harvest_source_field": "production_animals_year",
+          "batch_capacity_animals": 10,
+          "frequency": "small-batch processing planning assumption"
+        },
+        "sensitivities": {
+          "low": {
+            "fixed_system_hours_year": 50,
+            "breeding_female_hours_year": 0,
+            "breeding_male_hours_year": 0,
+            "growout_hours_per_average_animal_year": 0.35,
+            "seasonal_hours_per_batch": 12,
+            "processing_setup_hours_per_batch": 3,
+            "processing_hours_per_animal": 1.5
+          },
+          "central": {
+            "fixed_system_hours_year": 70,
+            "breeding_female_hours_year": 0,
+            "breeding_male_hours_year": 0,
+            "growout_hours_per_average_animal_year": 0.5,
+            "seasonal_hours_per_batch": 18,
+            "processing_setup_hours_per_batch": 5,
+            "processing_hours_per_animal": 1.8
+          },
+          "high": {
+            "fixed_system_hours_year": 100,
+            "breeding_female_hours_year": 0,
+            "breeding_male_hours_year": 0,
+            "growout_hours_per_average_animal_year": 0.75,
+            "seasonal_hours_per_batch": 28,
+            "processing_setup_hours_per_batch": 8,
+            "processing_hours_per_animal": 2.5
+          }
+        }
+      },
+      "goose_meat": {
+        "evidence_status": "planning_assumption_bounded_by_smallholder_waterfowl_extension_sources; local time study unresolved",
+        "sources": [
+          "https://extension.psu.edu/poultry-nutrition-and-feeding; https://extension.psu.edu/geese-ducks-and-swans"
+        ],
+        "growout": {
+          "inventory_source_field": "goslings_hatched_and_surviving_year",
+          "growout_days": 90,
+          "frequency": "average gosling growing inventory",
+          "unit": "animal-days/year"
+        },
+        "seasonal": {
+          "batch_basis": "fixed_batch_count",
+          "batches_year": 2,
+          "frequency": "spring and summer flock cycles"
+        },
+        "processing": {
+          "harvest_source_field": "animals_available_for_harvest_year",
+          "batch_capacity_animals": 8,
+          "frequency": "seasonal waterfowl processing planning assumption"
+        },
+        "sensitivities": {
+          "low": {
+            "fixed_system_hours_year": 55,
+            "breeding_female_hours_year": 5,
+            "breeding_male_hours_year": 5,
+            "growout_hours_per_average_animal_year": 0.35,
+            "seasonal_hours_per_batch": 15,
+            "processing_setup_hours_per_batch": 2,
+            "processing_hours_per_animal": 1.5
+          },
+          "central": {
+            "fixed_system_hours_year": 80,
+            "breeding_female_hours_year": 8,
+            "breeding_male_hours_year": 6,
+            "growout_hours_per_average_animal_year": 0.5,
+            "seasonal_hours_per_batch": 24.1,
+            "processing_setup_hours_per_batch": 3,
+            "processing_hours_per_animal": 2.280608365019011
+          },
+          "high": {
+            "fixed_system_hours_year": 110,
+            "breeding_female_hours_year": 11,
+            "breeding_male_hours_year": 9,
+            "growout_hours_per_average_animal_year": 0.75,
+            "seasonal_hours_per_batch": 36,
+            "processing_setup_hours_per_batch": 5,
+            "processing_hours_per_animal": 3.5
+          }
+        }
+      },
+      "goat_meat": {
+        "evidence_status": "planning_assumption_bounded_by_pasture_and_goat_extension_sources; local time study unresolved",
+        "sources": [
+          "https://files.ontario.ca/omafra-pasture-production-en-2022-12-08.pdf; https://www.gov.mb.ca/agriculture/livestock/goat/pubs/goats-and-their-nutrition.pdf"
+        ],
+        "growout": {
+          "inventory_source_field": "kids_surviving_year",
+          "growout_days": 180,
+          "frequency": "average kid growing inventory",
+          "unit": "animal-days/year"
+        },
+        "seasonal": {
+          "batch_basis": "fixed_batch_count",
+          "batches_year": 2,
+          "frequency": "seasonal breeding, kidding and winter-preparation cycles"
+        },
+        "processing": {
+          "harvest_source_field": "animals_available_for_harvest_year",
+          "batch_capacity_animals": 4,
+          "frequency": "small-ruminant processing planning assumption"
+        },
+        "sensitivities": {
+          "low": {
+            "fixed_system_hours_year": 80,
+            "breeding_female_hours_year": 12,
+            "breeding_male_hours_year": 8,
+            "growout_hours_per_average_animal_year": 0.75,
+            "seasonal_hours_per_batch": 30,
+            "processing_setup_hours_per_batch": 6,
+            "processing_hours_per_animal": 12
+          },
+          "central": {
+            "fixed_system_hours_year": 120,
+            "breeding_female_hours_year": 20,
+            "breeding_male_hours_year": 10,
+            "growout_hours_per_average_animal_year": 1,
+            "seasonal_hours_per_batch": 45,
+            "processing_setup_hours_per_batch": 10,
+            "processing_hours_per_animal": 20.51282051282051
+          },
+          "high": {
+            "fixed_system_hours_year": 170,
+            "breeding_female_hours_year": 28,
+            "breeding_male_hours_year": 16,
+            "growout_hours_per_average_animal_year": 1.5,
+            "seasonal_hours_per_batch": 70,
+            "processing_setup_hours_per_batch": 16,
+            "processing_hours_per_animal": 30
+          }
+        }
+      }
+    }
+  },
   "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
   "nutrient_sources": {
     "health_canada_dri": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
@@ -80,6 +342,13 @@
       "edible_protein_per_human_edible_feed_protein_kg": null,
       "prior_purchased_feed_dm_kg_year": 0,
       "livestock_labour_hours_year": 0,
+      "livestock_recurring_labour_hours_year": 0,
+      "livestock_processing_labour_hours_year": 0,
+      "labour_hours_per_kg_edible_product": null,
+      "labour_hours_per_kg_animal_protein": null,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [],
       "establishment_productive_land_ha": 1.814724,
       "mature_productive_land_ha": 1.52161,
       "establishment_peak_year": 8,
@@ -576,6 +845,131 @@
       "edible_protein_per_human_edible_feed_protein_kg": 11.28888888888889,
       "prior_purchased_feed_dm_kg_year": 102.06834,
       "livestock_labour_hours_year": 225,
+      "livestock_recurring_labour_hours_year": 180,
+      "livestock_processing_labour_hours_year": 45,
+      "labour_hours_per_kg_edible_product": 5.5147,
+      "labour_hours_per_kg_animal_protein": 25.3093,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [
+        {
+          "species_id": "rabbit_meat",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 180,
+            "processing_hours_year": 45,
+            "total_hours_year": 225,
+            "components": {
+              "recurring": {
+                "fixed_system": 90,
+                "breeding_females": 16,
+                "breeding_males": 4,
+                "growout_inventory": 8.054795,
+                "seasonal_batches": 61.945205
+              },
+              "processing": {
+                "batch_setup": 10,
+                "harvested_animals": 35
+              }
+            },
+            "activity": {
+              "breeding_females": 4,
+              "breeding_males": 1,
+              "growout_source_animals_year": 84,
+              "growout_days": 70,
+              "average_growout_inventory": 16.109589,
+              "seasonal_batches_year": 16,
+              "harvest_animals_year": 82.75,
+              "processing_batches_year": 4
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 90,
+              "breeding_female_hours_year": 4,
+              "breeding_male_hours_year": 4,
+              "growout_hours_per_average_animal_year": 0.5,
+              "seasonal_hours_per_batch": 3.8715753424657535,
+              "processing_setup_hours_per_batch": 2.5,
+              "processing_hours_per_animal": 0.4229607250755287
+            },
+            "task_definition": {
+              "evidence_status": "planning_assumption_bounded_by_smallholder_extension_sources; local time study unresolved",
+              "sources": [
+                "https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf"
+              ],
+              "growout": {
+                "inventory_source_field": "kits_surviving_year",
+                "growout_days": 70,
+                "frequency": "average growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "litters_year",
+                "frequency": "one preparation/cleanout cycle per litter"
+              },
+              "processing": {
+                "harvest_source_field": "animals_available_for_harvest_year",
+                "batch_capacity_animals": 21,
+                "frequency": "batch capacity planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 60,
+                  "breeding_female_hours_year": 3,
+                  "breeding_male_hours_year": 3,
+                  "growout_hours_per_average_animal_year": 0.35,
+                  "seasonal_hours_per_batch": 3,
+                  "processing_setup_hours_per_batch": 1.5,
+                  "processing_hours_per_animal": 0.3
+                },
+                "central": {
+                  "fixed_system_hours_year": 90,
+                  "breeding_female_hours_year": 4,
+                  "breeding_male_hours_year": 4,
+                  "growout_hours_per_average_animal_year": 0.5,
+                  "seasonal_hours_per_batch": 3.8715753424657535,
+                  "processing_setup_hours_per_batch": 2.5,
+                  "processing_hours_per_animal": 0.4229607250755287
+                },
+                "high": {
+                  "fixed_system_hours_year": 120,
+                  "breeding_female_hours_year": 6,
+                  "breeding_male_hours_year": 6,
+                  "growout_hours_per_average_animal_year": 0.75,
+                  "seasonal_hours_per_batch": 5,
+                  "processing_setup_hours_per_batch": 4,
+                  "processing_hours_per_animal": 0.6
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 128.638356,
+                "processing_hours_year": 30.825,
+                "total_hours_year": 159.463356
+              },
+              "central": {
+                "recurring_hours_year": 180,
+                "processing_hours_year": 45,
+                "total_hours_year": 225
+              },
+              "high": {
+                "recurring_hours_year": 242.082192,
+                "processing_hours_year": 65.65,
+                "total_hours_year": 307.732192
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 45,
+            "physical_intensity": "moderate-high",
+            "edible_product_kg_year": 40.8,
+            "animal_protein_kg_year": 8.89,
+            "hours_per_kg_edible_product": 5.5147,
+            "hours_per_kg_animal_protein": 25.3093
+          }
+        }
+      ],
       "establishment_productive_land_ha": 1.827634,
       "mature_productive_land_ha": 1.537767,
       "establishment_peak_year": 8,
@@ -1096,7 +1490,134 @@
       "edible_protein_per_human_inedible_feed_dm_kg": 0.0923983316580291,
       "edible_protein_per_human_edible_feed_protein_kg": 0.10880395840527293,
       "prior_purchased_feed_dm_kg_year": 295.278902,
-      "livestock_labour_hours_year": 245,
+      "livestock_labour_hours_year": 249.457743,
+      "livestock_recurring_labour_hours_year": 209.946192,
+      "livestock_processing_labour_hours_year": 39.511551,
+      "labour_hours_per_kg_edible_product": 3.0875,
+      "labour_hours_per_kg_animal_protein": 22.331,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [
+        {
+          "species_id": "chicken_eggs",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 209.946192,
+            "processing_hours_year": 39.511551,
+            "total_hours_year": 249.457743,
+            "components": {
+              "recurring": {
+                "fixed_system": 90,
+                "breeding_females": 40,
+                "breeding_males": 5,
+                "growout_inventory": 2.146192,
+                "seasonal_batches": 72.8
+              },
+              "processing": {
+                "batch_setup": 8,
+                "harvested_animals": 31.511551
+              }
+            },
+            "activity": {
+              "breeding_females": 8,
+              "breeding_males": 1,
+              "growout_source_animals_year": 16.32,
+              "growout_days": 120,
+              "average_growout_inventory": 5.365479,
+              "seasonal_batches_year": 4,
+              "harvest_animals_year": 12.32,
+              "processing_batches_year": 2
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 90,
+              "breeding_female_hours_year": 5,
+              "breeding_male_hours_year": 5,
+              "growout_hours_per_average_animal_year": 0.4,
+              "seasonal_hours_per_batch": 18.2,
+              "processing_setup_hours_per_batch": 4,
+              "processing_hours_per_animal": 2.5577557788778877
+            },
+            "task_definition": {
+              "evidence_status": "planning_assumption_bounded_by_smallholder_poultry_extension_sources; local time study unresolved",
+              "sources": [
+                "https://www.ontario.ca/page/introduction-poultry-nutrition; https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs",
+                "https://afs.mgcafe.uky.edu/research/poultry/use-heritage-breeds-alternative-poultry-production; https://extension.umd.edu/sites/extension.umd.edu/files/publications/FS-987%20Choosing%20the%20Best%20Poultry%20Breeds%20for%20your%20Small%20Farm_0.pdf; https://pmc.ncbi.nlm.nih.gov/articles/PMC8858978/"
+              ],
+              "growout": {
+                "inventory_source_field": "chicks_hatched_and_surviving_year",
+                "growout_days": 120,
+                "frequency": "average juvenile growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "fixed_batch_count",
+                "batches_year": 4,
+                "frequency": "quarterly hatch/cleanout planning cycles"
+              },
+              "processing": {
+                "harvest_source_field": "poultry_harvest_animals_year",
+                "batch_capacity_animals": 8,
+                "frequency": "small-batch poultry processing planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 75,
+                  "breeding_female_hours_year": 3,
+                  "breeding_male_hours_year": 3,
+                  "growout_hours_per_average_animal_year": 0.35,
+                  "seasonal_hours_per_batch": 12,
+                  "processing_setup_hours_per_batch": 3,
+                  "processing_hours_per_animal": 1.5
+                },
+                "central": {
+                  "fixed_system_hours_year": 90,
+                  "breeding_female_hours_year": 5,
+                  "breeding_male_hours_year": 5,
+                  "growout_hours_per_average_animal_year": 0.4,
+                  "seasonal_hours_per_batch": 18.2,
+                  "processing_setup_hours_per_batch": 4,
+                  "processing_hours_per_animal": 2.5577557788778877
+                },
+                "high": {
+                  "fixed_system_hours_year": 120,
+                  "breeding_female_hours_year": 7,
+                  "breeding_male_hours_year": 7,
+                  "growout_hours_per_average_animal_year": 0.65,
+                  "seasonal_hours_per_batch": 28,
+                  "processing_setup_hours_per_batch": 7,
+                  "processing_hours_per_animal": 3.5
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 151.877918,
+                "processing_hours_year": 24.48,
+                "total_hours_year": 176.357918
+              },
+              "central": {
+                "recurring_hours_year": 209.946192,
+                "processing_hours_year": 39.511551,
+                "total_hours_year": 249.457743
+              },
+              "high": {
+                "recurring_hours_year": 298.487562,
+                "processing_hours_year": 57.12,
+                "total_hours_year": 355.607562
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 39.511551,
+            "physical_intensity": "moderate",
+            "edible_product_kg_year": 80.796,
+            "animal_protein_kg_year": 11.170906,
+            "hours_per_kg_edible_product": 3.0875,
+            "hours_per_kg_animal_protein": 22.331
+          }
+        }
+      ],
       "establishment_productive_land_ha": 1.894728,
       "mature_productive_land_ha": 1.616171,
       "establishment_peak_year": 8,
@@ -1137,6 +1658,7 @@
             "replacement_males_year": 1,
             "surplus_males_year": 7.16,
             "surplus_females_year": 4.16,
+            "poultry_harvest_animals_year": 12.32,
             "gross_eggs_year": 1440,
             "edible_eggs_year": 1373.52,
             "edible_eggs_kg_year": 68.676,
@@ -1620,7 +2142,133 @@
       "edible_protein_per_human_inedible_feed_dm_kg": 0.12375690607734807,
       "edible_protein_per_human_edible_feed_protein_kg": 0.5921226539783241,
       "prior_purchased_feed_dm_kg_year": 75,
-      "livestock_labour_hours_year": 210,
+      "livestock_labour_hours_year": 203.917808,
+      "livestock_recurring_labour_hours_year": 143.917808,
+      "livestock_processing_labour_hours_year": 60,
+      "labour_hours_per_kg_edible_product": 5.8262,
+      "labour_hours_per_kg_animal_protein": 29.1311,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [
+        {
+          "species_id": "chicken_meat",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 143.917808,
+            "processing_hours_year": 60,
+            "total_hours_year": 203.917808,
+            "components": {
+              "recurring": {
+                "fixed_system": 70,
+                "breeding_females": 0,
+                "breeding_males": 0,
+                "growout_inventory": 1.917808,
+                "seasonal_batches": 72
+              },
+              "processing": {
+                "batch_setup": 15,
+                "harvested_animals": 45
+              }
+            },
+            "activity": {
+              "breeding_females": 0,
+              "breeding_males": 0,
+              "growout_source_animals_year": 25,
+              "growout_days": 56,
+              "average_growout_inventory": 3.835616,
+              "seasonal_batches_year": 4,
+              "harvest_animals_year": 25,
+              "processing_batches_year": 3
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 70,
+              "breeding_female_hours_year": 0,
+              "breeding_male_hours_year": 0,
+              "growout_hours_per_average_animal_year": 0.5,
+              "seasonal_hours_per_batch": 18,
+              "processing_setup_hours_per_batch": 5,
+              "processing_hours_per_animal": 1.8
+            },
+            "task_definition": {
+              "evidence_status": "non_canonical_sensitivity_planning_assumption; recurring production birds are not self-replacing",
+              "sources": [
+                "https://www.ontario.ca/page/introduction-poultry-nutrition; https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs"
+              ],
+              "growout": {
+                "inventory_source_field": "production_animals_year",
+                "growout_days": 56,
+                "frequency": "average growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "fixed_batch_count",
+                "batches_year": 4,
+                "frequency": "quarterly production batches"
+              },
+              "processing": {
+                "harvest_source_field": "production_animals_year",
+                "batch_capacity_animals": 10,
+                "frequency": "small-batch processing planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 50,
+                  "breeding_female_hours_year": 0,
+                  "breeding_male_hours_year": 0,
+                  "growout_hours_per_average_animal_year": 0.35,
+                  "seasonal_hours_per_batch": 12,
+                  "processing_setup_hours_per_batch": 3,
+                  "processing_hours_per_animal": 1.5
+                },
+                "central": {
+                  "fixed_system_hours_year": 70,
+                  "breeding_female_hours_year": 0,
+                  "breeding_male_hours_year": 0,
+                  "growout_hours_per_average_animal_year": 0.5,
+                  "seasonal_hours_per_batch": 18,
+                  "processing_setup_hours_per_batch": 5,
+                  "processing_hours_per_animal": 1.8
+                },
+                "high": {
+                  "fixed_system_hours_year": 100,
+                  "breeding_female_hours_year": 0,
+                  "breeding_male_hours_year": 0,
+                  "growout_hours_per_average_animal_year": 0.75,
+                  "seasonal_hours_per_batch": 28,
+                  "processing_setup_hours_per_batch": 8,
+                  "processing_hours_per_animal": 2.5
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 99.342466,
+                "processing_hours_year": 46.5,
+                "total_hours_year": 145.842466
+              },
+              "central": {
+                "recurring_hours_year": 143.917808,
+                "processing_hours_year": 60,
+                "total_hours_year": 203.917808
+              },
+              "high": {
+                "recurring_hours_year": 214.876712,
+                "processing_hours_year": 86.5,
+                "total_hours_year": 301.376712
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 60,
+            "physical_intensity": "moderate",
+            "edible_product_kg_year": 35,
+            "animal_protein_kg_year": 7,
+            "hours_per_kg_edible_product": 5.8262,
+            "hours_per_kg_animal_protein": 29.1311
+          }
+        }
+      ],
       "establishment_productive_land_ha": 1.776882,
       "mature_productive_land_ha": 1.489647,
       "establishment_peak_year": 8,
@@ -2138,7 +2786,133 @@
       "edible_protein_per_human_inedible_feed_dm_kg": 0.00503140701870371,
       "edible_protein_per_human_edible_feed_protein_kg": 0.5299277210384167,
       "prior_purchased_feed_dm_kg_year": 882.502595,
-      "livestock_labour_hours_year": 196,
+      "livestock_labour_hours_year": 195.965342,
+      "livestock_recurring_labour_hours_year": 159.975342,
+      "livestock_processing_labour_hours_year": 35.99,
+      "labour_hours_per_kg_edible_product": 8.1652,
+      "labour_hours_per_kg_animal_protein": 39.1931,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [
+        {
+          "species_id": "goose_meat",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 159.975342,
+            "processing_hours_year": 35.99,
+            "total_hours_year": 195.965342,
+            "components": {
+              "recurring": {
+                "fixed_system": 80,
+                "breeding_females": 24,
+                "breeding_males": 6,
+                "growout_inventory": 1.775342,
+                "seasonal_batches": 48.2
+              },
+              "processing": {
+                "batch_setup": 6,
+                "harvested_animals": 29.99
+              }
+            },
+            "activity": {
+              "breeding_females": 3,
+              "breeding_males": 1,
+              "growout_source_animals_year": 14.4,
+              "growout_days": 90,
+              "average_growout_inventory": 3.550685,
+              "seasonal_batches_year": 2,
+              "harvest_animals_year": 13.15,
+              "processing_batches_year": 2
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 80,
+              "breeding_female_hours_year": 8,
+              "breeding_male_hours_year": 6,
+              "growout_hours_per_average_animal_year": 0.5,
+              "seasonal_hours_per_batch": 24.1,
+              "processing_setup_hours_per_batch": 3,
+              "processing_hours_per_animal": 2.280608365019011
+            },
+            "task_definition": {
+              "evidence_status": "planning_assumption_bounded_by_smallholder_waterfowl_extension_sources; local time study unresolved",
+              "sources": [
+                "https://extension.psu.edu/poultry-nutrition-and-feeding; https://extension.psu.edu/geese-ducks-and-swans"
+              ],
+              "growout": {
+                "inventory_source_field": "goslings_hatched_and_surviving_year",
+                "growout_days": 90,
+                "frequency": "average gosling growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "fixed_batch_count",
+                "batches_year": 2,
+                "frequency": "spring and summer flock cycles"
+              },
+              "processing": {
+                "harvest_source_field": "animals_available_for_harvest_year",
+                "batch_capacity_animals": 8,
+                "frequency": "seasonal waterfowl processing planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 55,
+                  "breeding_female_hours_year": 5,
+                  "breeding_male_hours_year": 5,
+                  "growout_hours_per_average_animal_year": 0.35,
+                  "seasonal_hours_per_batch": 15,
+                  "processing_setup_hours_per_batch": 2,
+                  "processing_hours_per_animal": 1.5
+                },
+                "central": {
+                  "fixed_system_hours_year": 80,
+                  "breeding_female_hours_year": 8,
+                  "breeding_male_hours_year": 6,
+                  "growout_hours_per_average_animal_year": 0.5,
+                  "seasonal_hours_per_batch": 24.1,
+                  "processing_setup_hours_per_batch": 3,
+                  "processing_hours_per_animal": 2.280608365019011
+                },
+                "high": {
+                  "fixed_system_hours_year": 110,
+                  "breeding_female_hours_year": 11,
+                  "breeding_male_hours_year": 9,
+                  "growout_hours_per_average_animal_year": 0.75,
+                  "seasonal_hours_per_batch": 36,
+                  "processing_setup_hours_per_batch": 5,
+                  "processing_hours_per_animal": 3.5
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 106.24274,
+                "processing_hours_year": 23.725,
+                "total_hours_year": 129.96774
+              },
+              "central": {
+                "recurring_hours_year": 159.975342,
+                "processing_hours_year": 35.99,
+                "total_hours_year": 195.965342
+              },
+              "high": {
+                "recurring_hours_year": 226.663014,
+                "processing_hours_year": 56.025,
+                "total_hours_year": 282.688014
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 35.99,
+            "physical_intensity": "moderate",
+            "edible_product_kg_year": 24,
+            "animal_protein_kg_year": 5,
+            "hours_per_kg_edible_product": 8.1652,
+            "hours_per_kg_animal_protein": 39.1931
+          }
+        }
+      ],
       "establishment_productive_land_ha": 2.089425,
       "mature_productive_land_ha": 1.80107,
       "establishment_peak_year": 8,
@@ -2658,7 +3432,133 @@
       "edible_protein_per_human_inedible_feed_dm_kg": 0.005,
       "edible_protein_per_human_edible_feed_protein_kg": null,
       "prior_purchased_feed_dm_kg_year": 1063.0893,
-      "livestock_labour_hours_year": 310,
+      "livestock_labour_hours_year": 301.001124,
+      "livestock_recurring_labour_hours_year": 261.257534,
+      "livestock_processing_labour_hours_year": 39.74359,
+      "labour_hours_per_kg_edible_product": 10.0334,
+      "labour_hours_per_kg_animal_protein": 50.1669,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [
+        {
+          "species_id": "goat_meat",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 261.257534,
+            "processing_hours_year": 39.74359,
+            "total_hours_year": 301.001124,
+            "components": {
+              "recurring": {
+                "fixed_system": 120,
+                "breeding_females": 40,
+                "breeding_males": 10,
+                "growout_inventory": 1.257534,
+                "seasonal_batches": 90
+              },
+              "processing": {
+                "batch_setup": 10,
+                "harvested_animals": 29.74359
+              }
+            },
+            "activity": {
+              "breeding_females": 2,
+              "breeding_males": 1,
+              "growout_source_animals_year": 2.55,
+              "growout_days": 180,
+              "average_growout_inventory": 1.257534,
+              "seasonal_batches_year": 2,
+              "harvest_animals_year": 1.45,
+              "processing_batches_year": 1
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 120,
+              "breeding_female_hours_year": 20,
+              "breeding_male_hours_year": 10,
+              "growout_hours_per_average_animal_year": 1,
+              "seasonal_hours_per_batch": 45,
+              "processing_setup_hours_per_batch": 10,
+              "processing_hours_per_animal": 20.51282051282051
+            },
+            "task_definition": {
+              "evidence_status": "planning_assumption_bounded_by_pasture_and_goat_extension_sources; local time study unresolved",
+              "sources": [
+                "https://files.ontario.ca/omafra-pasture-production-en-2022-12-08.pdf; https://www.gov.mb.ca/agriculture/livestock/goat/pubs/goats-and-their-nutrition.pdf"
+              ],
+              "growout": {
+                "inventory_source_field": "kids_surviving_year",
+                "growout_days": 180,
+                "frequency": "average kid growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "fixed_batch_count",
+                "batches_year": 2,
+                "frequency": "seasonal breeding, kidding and winter-preparation cycles"
+              },
+              "processing": {
+                "harvest_source_field": "animals_available_for_harvest_year",
+                "batch_capacity_animals": 4,
+                "frequency": "small-ruminant processing planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 80,
+                  "breeding_female_hours_year": 12,
+                  "breeding_male_hours_year": 8,
+                  "growout_hours_per_average_animal_year": 0.75,
+                  "seasonal_hours_per_batch": 30,
+                  "processing_setup_hours_per_batch": 6,
+                  "processing_hours_per_animal": 12
+                },
+                "central": {
+                  "fixed_system_hours_year": 120,
+                  "breeding_female_hours_year": 20,
+                  "breeding_male_hours_year": 10,
+                  "growout_hours_per_average_animal_year": 1,
+                  "seasonal_hours_per_batch": 45,
+                  "processing_setup_hours_per_batch": 10,
+                  "processing_hours_per_animal": 20.51282051282051
+                },
+                "high": {
+                  "fixed_system_hours_year": 170,
+                  "breeding_female_hours_year": 28,
+                  "breeding_male_hours_year": 16,
+                  "growout_hours_per_average_animal_year": 1.5,
+                  "seasonal_hours_per_batch": 70,
+                  "processing_setup_hours_per_batch": 16,
+                  "processing_hours_per_animal": 30
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 172.943151,
+                "processing_hours_year": 23.4,
+                "total_hours_year": 196.343151
+              },
+              "central": {
+                "recurring_hours_year": 261.257534,
+                "processing_hours_year": 39.74359,
+                "total_hours_year": 301.001124
+              },
+              "high": {
+                "recurring_hours_year": 383.886301,
+                "processing_hours_year": 59.5,
+                "total_hours_year": 443.386301
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 39.74359,
+            "physical_intensity": "high",
+            "edible_product_kg_year": 30,
+            "animal_protein_kg_year": 6,
+            "hours_per_kg_edible_product": 10.0334,
+            "hours_per_kg_animal_protein": 50.1669
+          }
+        }
+      ],
       "establishment_productive_land_ha": 2.596419,
       "mature_productive_land_ha": 2.309324,
       "establishment_peak_year": 8,
@@ -3183,7 +4083,251 @@
       "edible_protein_per_human_inedible_feed_dm_kg": 0.04815322827010283,
       "edible_protein_per_human_edible_feed_protein_kg": 0.17837278251009905,
       "prior_purchased_feed_dm_kg_year": 453.214465,
-      "livestock_labour_hours_year": 470,
+      "livestock_labour_hours_year": 474.457743,
+      "livestock_recurring_labour_hours_year": 389.946192,
+      "livestock_processing_labour_hours_year": 84.511551,
+      "labour_hours_per_kg_edible_product": 3.9019,
+      "labour_hours_per_kg_animal_protein": 23.6509,
+      "labour_scaling_method": "task_based_species_specific_planning_model",
+      "labour_scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+      "labour_task_ledgers": [
+        {
+          "species_id": "rabbit_meat",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 180,
+            "processing_hours_year": 45,
+            "total_hours_year": 225,
+            "components": {
+              "recurring": {
+                "fixed_system": 90,
+                "breeding_females": 16,
+                "breeding_males": 4,
+                "growout_inventory": 8.054795,
+                "seasonal_batches": 61.945205
+              },
+              "processing": {
+                "batch_setup": 10,
+                "harvested_animals": 35
+              }
+            },
+            "activity": {
+              "breeding_females": 4,
+              "breeding_males": 1,
+              "growout_source_animals_year": 84,
+              "growout_days": 70,
+              "average_growout_inventory": 16.109589,
+              "seasonal_batches_year": 16,
+              "harvest_animals_year": 82.75,
+              "processing_batches_year": 4
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 90,
+              "breeding_female_hours_year": 4,
+              "breeding_male_hours_year": 4,
+              "growout_hours_per_average_animal_year": 0.5,
+              "seasonal_hours_per_batch": 3.8715753424657535,
+              "processing_setup_hours_per_batch": 2.5,
+              "processing_hours_per_animal": 0.4229607250755287
+            },
+            "task_definition": {
+              "evidence_status": "planning_assumption_bounded_by_smallholder_extension_sources; local time study unresolved",
+              "sources": [
+                "https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf"
+              ],
+              "growout": {
+                "inventory_source_field": "kits_surviving_year",
+                "growout_days": 70,
+                "frequency": "average growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "litters_year",
+                "frequency": "one preparation/cleanout cycle per litter"
+              },
+              "processing": {
+                "harvest_source_field": "animals_available_for_harvest_year",
+                "batch_capacity_animals": 21,
+                "frequency": "batch capacity planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 60,
+                  "breeding_female_hours_year": 3,
+                  "breeding_male_hours_year": 3,
+                  "growout_hours_per_average_animal_year": 0.35,
+                  "seasonal_hours_per_batch": 3,
+                  "processing_setup_hours_per_batch": 1.5,
+                  "processing_hours_per_animal": 0.3
+                },
+                "central": {
+                  "fixed_system_hours_year": 90,
+                  "breeding_female_hours_year": 4,
+                  "breeding_male_hours_year": 4,
+                  "growout_hours_per_average_animal_year": 0.5,
+                  "seasonal_hours_per_batch": 3.8715753424657535,
+                  "processing_setup_hours_per_batch": 2.5,
+                  "processing_hours_per_animal": 0.4229607250755287
+                },
+                "high": {
+                  "fixed_system_hours_year": 120,
+                  "breeding_female_hours_year": 6,
+                  "breeding_male_hours_year": 6,
+                  "growout_hours_per_average_animal_year": 0.75,
+                  "seasonal_hours_per_batch": 5,
+                  "processing_setup_hours_per_batch": 4,
+                  "processing_hours_per_animal": 0.6
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 128.638356,
+                "processing_hours_year": 30.825,
+                "total_hours_year": 159.463356
+              },
+              "central": {
+                "recurring_hours_year": 180,
+                "processing_hours_year": 45,
+                "total_hours_year": 225
+              },
+              "high": {
+                "recurring_hours_year": 242.082192,
+                "processing_hours_year": 65.65,
+                "total_hours_year": 307.732192
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 45,
+            "physical_intensity": "moderate-high",
+            "edible_product_kg_year": 40.8,
+            "animal_protein_kg_year": 8.89,
+            "hours_per_kg_edible_product": 5.5147,
+            "hours_per_kg_animal_protein": 25.3093
+          }
+        },
+        {
+          "species_id": "chicken_eggs",
+          "labour": {
+            "sensitivity": "central",
+            "recurring_hours_year": 209.946192,
+            "processing_hours_year": 39.511551,
+            "total_hours_year": 249.457743,
+            "components": {
+              "recurring": {
+                "fixed_system": 90,
+                "breeding_females": 40,
+                "breeding_males": 5,
+                "growout_inventory": 2.146192,
+                "seasonal_batches": 72.8
+              },
+              "processing": {
+                "batch_setup": 8,
+                "harvested_animals": 31.511551
+              }
+            },
+            "activity": {
+              "breeding_females": 8,
+              "breeding_males": 1,
+              "growout_source_animals_year": 16.32,
+              "growout_days": 120,
+              "average_growout_inventory": 5.365479,
+              "seasonal_batches_year": 4,
+              "harvest_animals_year": 12.32,
+              "processing_batches_year": 2
+            },
+            "assumptions": {
+              "fixed_system_hours_year": 90,
+              "breeding_female_hours_year": 5,
+              "breeding_male_hours_year": 5,
+              "growout_hours_per_average_animal_year": 0.4,
+              "seasonal_hours_per_batch": 18.2,
+              "processing_setup_hours_per_batch": 4,
+              "processing_hours_per_animal": 2.5577557788778877
+            },
+            "task_definition": {
+              "evidence_status": "planning_assumption_bounded_by_smallholder_poultry_extension_sources; local time study unresolved",
+              "sources": [
+                "https://www.ontario.ca/page/introduction-poultry-nutrition; https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs",
+                "https://afs.mgcafe.uky.edu/research/poultry/use-heritage-breeds-alternative-poultry-production; https://extension.umd.edu/sites/extension.umd.edu/files/publications/FS-987%20Choosing%20the%20Best%20Poultry%20Breeds%20for%20your%20Small%20Farm_0.pdf; https://pmc.ncbi.nlm.nih.gov/articles/PMC8858978/"
+              ],
+              "growout": {
+                "inventory_source_field": "chicks_hatched_and_surviving_year",
+                "growout_days": 120,
+                "frequency": "average juvenile growing inventory",
+                "unit": "animal-days/year"
+              },
+              "seasonal": {
+                "batch_basis": "fixed_batch_count",
+                "batches_year": 4,
+                "frequency": "quarterly hatch/cleanout planning cycles"
+              },
+              "processing": {
+                "harvest_source_field": "poultry_harvest_animals_year",
+                "batch_capacity_animals": 8,
+                "frequency": "small-batch poultry processing planning assumption"
+              },
+              "sensitivities": {
+                "low": {
+                  "fixed_system_hours_year": 75,
+                  "breeding_female_hours_year": 3,
+                  "breeding_male_hours_year": 3,
+                  "growout_hours_per_average_animal_year": 0.35,
+                  "seasonal_hours_per_batch": 12,
+                  "processing_setup_hours_per_batch": 3,
+                  "processing_hours_per_animal": 1.5
+                },
+                "central": {
+                  "fixed_system_hours_year": 90,
+                  "breeding_female_hours_year": 5,
+                  "breeding_male_hours_year": 5,
+                  "growout_hours_per_average_animal_year": 0.4,
+                  "seasonal_hours_per_batch": 18.2,
+                  "processing_setup_hours_per_batch": 4,
+                  "processing_hours_per_animal": 2.5577557788778877
+                },
+                "high": {
+                  "fixed_system_hours_year": 120,
+                  "breeding_female_hours_year": 7,
+                  "breeding_male_hours_year": 7,
+                  "growout_hours_per_average_animal_year": 0.65,
+                  "seasonal_hours_per_batch": 28,
+                  "processing_setup_hours_per_batch": 7,
+                  "processing_hours_per_animal": 3.5
+                }
+              }
+            },
+            "sensitivities": {
+              "low": {
+                "recurring_hours_year": 151.877918,
+                "processing_hours_year": 24.48,
+                "total_hours_year": 176.357918
+              },
+              "central": {
+                "recurring_hours_year": 209.946192,
+                "processing_hours_year": 39.511551,
+                "total_hours_year": 249.457743
+              },
+              "high": {
+                "recurring_hours_year": 298.487562,
+                "processing_hours_year": 57.12,
+                "total_hours_year": 355.607562
+              }
+            },
+            "scaling_method": "task_based_species_specific_planning_model",
+            "scaling_formula": "fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest",
+            "scaling_note": "Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.",
+            "slaughter_processing_hours_year": 39.511551,
+            "physical_intensity": "moderate",
+            "edible_product_kg_year": 80.796,
+            "animal_protein_kg_year": 11.170906,
+            "hours_per_kg_edible_product": 3.0875,
+            "hours_per_kg_animal_protein": 22.331
+          }
+        }
+      ],
       "establishment_productive_land_ha": 1.936288,
       "mature_productive_land_ha": 1.660978,
       "establishment_peak_year": 8,
@@ -3253,6 +4397,7 @@
             "replacement_males_year": 1,
             "surplus_males_year": 7.16,
             "surplus_females_year": 4.16,
+            "poultry_harvest_animals_year": 12.32,
             "gross_eggs_year": 1440,
             "edible_eggs_year": 1373.52,
             "edible_eggs_kg_year": 68.676,
@@ -3794,7 +4939,7 @@
       "metrics": {
         "peak_land_ha": 1.894728,
         "mature_land_ha": 1.616171,
-        "labour_hours_year": 245,
+        "labour_hours_year": 249.457743,
         "external_nutrient_inputs": 2,
         "human_edible_feed_protein_kg_year": 102.670033,
         "nutritional_completeness": 22,
@@ -3807,7 +4952,7 @@
       "metrics": {
         "peak_land_ha": 2.089425,
         "mature_land_ha": 1.80107,
-        "labour_hours_year": 196,
+        "labour_hours_year": 195.965342,
         "external_nutrient_inputs": 4,
         "human_edible_feed_protein_kg_year": 9.435249,
         "nutritional_completeness": 20,

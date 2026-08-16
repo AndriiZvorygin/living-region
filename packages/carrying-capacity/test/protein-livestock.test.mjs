@@ -11,6 +11,7 @@ import {
   calculateNutrientFoodSystem,
   compareNutrientFoodSystems,
   calculateLivestockReproductiveLedger,
+  calculateLivestockLabour,
   CHICKEN_SYSTEM_COMPARISON,
   LIVESTOCK_SPECIES,
   calculateFoodNutrientAdequacy,
@@ -19,7 +20,10 @@ import {
   siteClasses,
   calculateInteractiveHousehold,
   CANONICAL_HOUSEHOLD_FAE,
-  FOOD_ADULT_EQUIVALENT_GJ_YEAR
+  FOOD_ADULT_EQUIVALENT_GJ_YEAR,
+  LIVESTOCK_LABOUR_SCALING_METHOD,
+  LIVESTOCK_LABOUR_SCALING_FORMULA,
+  LIVESTOCK_LABOUR_TASKS
 } from '../src/index.mjs';
 
 const foodEvidence = JSON.parse(readFileSync(new URL('../data/derived/evidence-food-yields.json', import.meta.url)));
@@ -258,6 +262,48 @@ test('all canonical livestock modes scale with the same household count', () => 
     assert.ok(result.animals.every((animal, index) => animal.housing.area_m2 >= adultResult.animals[index].housing.area_m2), mode);
     assert.ok(result.feed.additional_dedicated_feed_land_ha >= adultResult.feed.additional_dedicated_feed_land_ha, mode);
   }
+});
+
+test('task-based labour preserves the canonical rabbit ledger and exposes every task', () => {
+  const canonical = calculateLivestockScenario({speciesId: 'rabbit_meat', scale: 1, propertyFeedSupply: {}, requireSelfSufficient: false});
+  const oneDoe = calculateLivestockScenario({speciesId: 'rabbit_meat', scale: .25, propertyFeedSupply: {}, requireSelfSufficient: false});
+  const eightDoes = calculateLivestockScenario({speciesId: 'rabbit_meat', scale: 2, propertyFeedSupply: {}, requireSelfSufficient: false});
+  assert.equal(canonical.labour.recurring_hours_year, 180);
+  assert.equal(canonical.labour.slaughter_processing_hours_year, 45);
+  assert.equal(canonical.labour.total_hours_year, 225);
+  assert.ok(oneDoe.labour.recurring_hours_year > canonical.labour.recurring_hours_year * .25);
+  assert.ok(eightDoes.labour.recurring_hours_year < canonical.labour.recurring_hours_year * 2);
+  assert.equal(canonical.labour.scaling_method, LIVESTOCK_LABOUR_SCALING_METHOD);
+  assert.equal(canonical.labour.scaling_formula, LIVESTOCK_LABOUR_SCALING_FORMULA);
+  assert.equal(canonical.labour.components.recurring.fixed_system, 90);
+  assert.equal(canonical.labour.components.processing.batch_setup, 10);
+  assert.equal(canonical.labour.activity.average_growout_inventory, 16.109589);
+  assert.equal(canonical.labour.activity.processing_batches_year, 4);
+  assert.deepEqual(Object.keys(canonical.labour.sensitivities).sort(), ['central', 'high', 'low']);
+  assert.deepEqual(canonical.labour.task_definition, LIVESTOCK_LABOUR_TASKS.rabbit_meat);
+});
+
+test('task-based livestock labour rises with animal count while unit labour generally falls', () => {
+  for (const speciesId of ['rabbit_meat', 'chicken_eggs', 'goose_meat', 'goat_meat']) {
+    const small = calculateLivestockScenario({speciesId, scale: .5, propertyFeedSupply: {}, requireSelfSufficient: false});
+    const canonical = calculateLivestockScenario({speciesId, scale: 1, propertyFeedSupply: {}, requireSelfSufficient: false});
+    const large = calculateLivestockScenario({speciesId, scale: 2, propertyFeedSupply: {}, requireSelfSufficient: false});
+    assert.ok(small.labour.total_hours_year < canonical.labour.total_hours_year, speciesId);
+    assert.ok(canonical.labour.total_hours_year < large.labour.total_hours_year, speciesId);
+    assert.ok(large.labour.hours_per_kg_edible_product <= small.labour.hours_per_kg_edible_product, speciesId);
+  }
+});
+
+test('task labour helper matches the public labour method and processing equation', () => {
+  const row = calculateLivestockScenario({speciesId: 'rabbit_meat', scale: 1, propertyFeedSupply: {}, requireSelfSufficient: false});
+  const helper = calculateLivestockLabour({speciesId: 'rabbit_meat', population: row.population});
+  const processing = helper.components.processing.batch_setup + helper.components.processing.harvested_animals;
+  assert.equal(helper.scaling_method, LIVESTOCK_LABOUR_SCALING_METHOD);
+  assert.equal(helper.scaling_formula, LIVESTOCK_LABOUR_SCALING_FORMULA);
+  assert.equal(helper.processing_hours_year, processing);
+  assert.equal(row.labour.slaughter_processing_hours_year, helper.processing_hours_year);
+  assert.equal(row.labour.hours_per_kg_edible_product, 5.5147);
+  assert.equal(row.labour.hours_per_kg_animal_protein, 25.3093);
 });
 
 test('plants-only has no livestock systems and explicit sensitivity scale is respected', () => {

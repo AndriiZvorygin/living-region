@@ -4,13 +4,16 @@ import {FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './food-adult-equivalent.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const LIVESTOCK_CONTRACT_VERSION = '1.6.0';
+export const LIVESTOCK_CONTRACT_VERSION = '1.8.0';
 
 // The reference livestock system is sized for the canonical two-adult plus
 // three-dependent-child planning household. Other households resize the
 // animals inside that system; they do not receive several complete colonies.
 export const CANONICAL_HOUSEHOLD_FAE = 4.29;
 export const LIVESTOCK_SCALING_BASIS = 'household_food_adult_equivalents_divided_by_canonical_household_fae';
+export const LIVESTOCK_LABOUR_SCALING_METHOD = 'task_based_species_specific_planning_model';
+export const LIVESTOCK_LABOUR_SCALING_FORMULA = 'fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest';
+export const LIVESTOCK_LABOUR_SCALING_NOTE = 'Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted.';
 
 const SOURCE = {
   rabbit: 'https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf',
@@ -74,6 +77,73 @@ const species = {
 
 export const LIVESTOCK_SPECIES = species;
 
+// Labour is represented as a task ledger rather than a scale exponent. The
+// central values preserve the established reference-system totals; the low
+// and high rows are explicit planning sensitivities until local time studies
+// are available. The task fields are intentionally public in the contract.
+export const LIVESTOCK_LABOUR_TASKS = {
+  rabbit_meat: {
+    evidence_status: 'planning_assumption_bounded_by_smallholder_extension_sources; local time study unresolved',
+    sources: [SOURCE.rabbit],
+    growout: {inventory_source_field: 'kits_surviving_year', growout_days: 70, frequency: 'average growing inventory', unit: 'animal-days/year'},
+    seasonal: {batch_basis: 'litters_year', frequency: 'one preparation/cleanout cycle per litter'},
+    processing: {harvest_source_field: 'animals_available_for_harvest_year', batch_capacity_animals: 21, frequency: 'batch capacity planning assumption'},
+    sensitivities: {
+      low: {fixed_system_hours_year: 60, breeding_female_hours_year: 3, breeding_male_hours_year: 3, growout_hours_per_average_animal_year: .35, seasonal_hours_per_batch: 3, processing_setup_hours_per_batch: 1.5, processing_hours_per_animal: .30},
+      central: {fixed_system_hours_year: 90, breeding_female_hours_year: 4, breeding_male_hours_year: 4, growout_hours_per_average_animal_year: .50, seasonal_hours_per_batch: 3.8715753424657535, processing_setup_hours_per_batch: 2.5, processing_hours_per_animal: .4229607250755287},
+      high: {fixed_system_hours_year: 120, breeding_female_hours_year: 6, breeding_male_hours_year: 6, growout_hours_per_average_animal_year: .75, seasonal_hours_per_batch: 5, processing_setup_hours_per_batch: 4, processing_hours_per_animal: .60}
+    }
+  },
+  chicken_eggs: {
+    evidence_status: 'planning_assumption_bounded_by_smallholder_poultry_extension_sources; local time study unresolved',
+    sources: [SOURCE.poultry, SOURCE.chickenBreeds],
+    growout: {inventory_source_field: 'chicks_hatched_and_surviving_year', growout_days: 120, frequency: 'average juvenile growing inventory', unit: 'animal-days/year'},
+    seasonal: {batch_basis: 'fixed_batch_count', batches_year: 4, frequency: 'quarterly hatch/cleanout planning cycles'},
+    processing: {harvest_source_field: 'poultry_harvest_animals_year', batch_capacity_animals: 8, frequency: 'small-batch poultry processing planning assumption'},
+    sensitivities: {
+      low: {fixed_system_hours_year: 75, breeding_female_hours_year: 3, breeding_male_hours_year: 3, growout_hours_per_average_animal_year: .35, seasonal_hours_per_batch: 12, processing_setup_hours_per_batch: 3, processing_hours_per_animal: 1.5},
+      central: {fixed_system_hours_year: 90, breeding_female_hours_year: 5, breeding_male_hours_year: 5, growout_hours_per_average_animal_year: .40, seasonal_hours_per_batch: 18.2, processing_setup_hours_per_batch: 4, processing_hours_per_animal: 2.5577557788778877},
+      high: {fixed_system_hours_year: 120, breeding_female_hours_year: 7, breeding_male_hours_year: 7, growout_hours_per_average_animal_year: .65, seasonal_hours_per_batch: 28, processing_setup_hours_per_batch: 7, processing_hours_per_animal: 3.5}
+    }
+  },
+  chicken_meat: {
+    evidence_status: 'non_canonical_sensitivity_planning_assumption; recurring production birds are not self-replacing',
+    sources: [SOURCE.poultry],
+    growout: {inventory_source_field: 'production_animals_year', growout_days: 56, frequency: 'average growing inventory', unit: 'animal-days/year'},
+    seasonal: {batch_basis: 'fixed_batch_count', batches_year: 4, frequency: 'quarterly production batches'},
+    processing: {harvest_source_field: 'production_animals_year', batch_capacity_animals: 10, frequency: 'small-batch processing planning assumption'},
+    sensitivities: {
+      low: {fixed_system_hours_year: 50, breeding_female_hours_year: 0, breeding_male_hours_year: 0, growout_hours_per_average_animal_year: .35, seasonal_hours_per_batch: 12, processing_setup_hours_per_batch: 3, processing_hours_per_animal: 1.5},
+      central: {fixed_system_hours_year: 70, breeding_female_hours_year: 0, breeding_male_hours_year: 0, growout_hours_per_average_animal_year: .50, seasonal_hours_per_batch: 18, processing_setup_hours_per_batch: 5, processing_hours_per_animal: 1.8},
+      high: {fixed_system_hours_year: 100, breeding_female_hours_year: 0, breeding_male_hours_year: 0, growout_hours_per_average_animal_year: .75, seasonal_hours_per_batch: 28, processing_setup_hours_per_batch: 8, processing_hours_per_animal: 2.5}
+    }
+  },
+  goose_meat: {
+    evidence_status: 'planning_assumption_bounded_by_smallholder_waterfowl_extension_sources; local time study unresolved',
+    sources: [SOURCE.goose],
+    growout: {inventory_source_field: 'goslings_hatched_and_surviving_year', growout_days: 90, frequency: 'average gosling growing inventory', unit: 'animal-days/year'},
+    seasonal: {batch_basis: 'fixed_batch_count', batches_year: 2, frequency: 'spring and summer flock cycles'},
+    processing: {harvest_source_field: 'animals_available_for_harvest_year', batch_capacity_animals: 8, frequency: 'seasonal waterfowl processing planning assumption'},
+    sensitivities: {
+      low: {fixed_system_hours_year: 55, breeding_female_hours_year: 5, breeding_male_hours_year: 5, growout_hours_per_average_animal_year: .35, seasonal_hours_per_batch: 15, processing_setup_hours_per_batch: 2, processing_hours_per_animal: 1.5},
+      central: {fixed_system_hours_year: 80, breeding_female_hours_year: 8, breeding_male_hours_year: 6, growout_hours_per_average_animal_year: .50, seasonal_hours_per_batch: 24.1, processing_setup_hours_per_batch: 3, processing_hours_per_animal: 2.280608365019011},
+      high: {fixed_system_hours_year: 110, breeding_female_hours_year: 11, breeding_male_hours_year: 9, growout_hours_per_average_animal_year: .75, seasonal_hours_per_batch: 36, processing_setup_hours_per_batch: 5, processing_hours_per_animal: 3.5}
+    }
+  },
+  goat_meat: {
+    evidence_status: 'planning_assumption_bounded_by_pasture_and_goat_extension_sources; local time study unresolved',
+    sources: [SOURCE.goat],
+    growout: {inventory_source_field: 'kids_surviving_year', growout_days: 180, frequency: 'average kid growing inventory', unit: 'animal-days/year'},
+    seasonal: {batch_basis: 'fixed_batch_count', batches_year: 2, frequency: 'seasonal breeding, kidding and winter-preparation cycles'},
+    processing: {harvest_source_field: 'animals_available_for_harvest_year', batch_capacity_animals: 4, frequency: 'small-ruminant processing planning assumption'},
+    sensitivities: {
+      low: {fixed_system_hours_year: 80, breeding_female_hours_year: 12, breeding_male_hours_year: 8, growout_hours_per_average_animal_year: .75, seasonal_hours_per_batch: 30, processing_setup_hours_per_batch: 6, processing_hours_per_animal: 12},
+      central: {fixed_system_hours_year: 120, breeding_female_hours_year: 20, breeding_male_hours_year: 10, growout_hours_per_average_animal_year: 1, seasonal_hours_per_batch: 45, processing_setup_hours_per_batch: 10, processing_hours_per_animal: 20.51282051282051},
+      high: {fixed_system_hours_year: 170, breeding_female_hours_year: 28, breeding_male_hours_year: 16, growout_hours_per_average_animal_year: 1.5, seasonal_hours_per_batch: 70, processing_setup_hours_per_batch: 16, processing_hours_per_animal: 30}
+    }
+  }
+};
+
 // These are discrete minimum viable production units, not fractional nutrient
 // knobs. A smaller scale may be useful for a sensitivity calculation, but it
 // cannot represent a self-replacing ARC population.
@@ -135,7 +205,7 @@ function livestockPopulation(speciesId, scale = 1) {
     const grossEggs = breedingFemales * Number(reproduction.eggs_per_hen_year ?? 180);
     const edibleEggs = Math.max(0, (grossEggs - incubationEggs) * (1 - Number(reproduction.egg_loss_fraction ?? .03)));
     const edibleMeat = surplusMales * Number(reproduction.surplus_cockerel_edible_meat_kg ?? 1) + surplusFemales * Number(reproduction.cull_hen_edible_meat_kg ?? 1) + replacementMales * Number(reproduction.cull_rooster_edible_meat_kg ?? .8);
-    return {breeding_females: breedingFemales, breeding_males: breedingMales, fertile_eggs_year: incubationEggs, eggs_incubated_year: incubationEggs, chicks_hatched_and_surviving_year: chicks, replacement_females_year: replacementFemales, replacement_males_year: replacementMales, surplus_males_year: surplusMales, surplus_females_year: surplusFemales, gross_eggs_year: grossEggs, edible_eggs_year: edibleEggs, edible_eggs_kg_year: edibleEggs * Number(reproduction.egg_mass_kg ?? .05), edible_meat_kg_year: edibleMeat, feed_scale: breedingFemales / baseHens, output_scale: breedingFemales / baseHens, housing_scale: (breedingFemales + breedingMales) / 9, rooster_capacity_hens: 8, rooster_capacity_note: 'One breeding rooster is retained through eight hens before an additional rooster is planned.'};
+    return {breeding_females: breedingFemales, breeding_males: breedingMales, fertile_eggs_year: incubationEggs, eggs_incubated_year: incubationEggs, chicks_hatched_and_surviving_year: chicks, replacement_females_year: replacementFemales, replacement_males_year: replacementMales, surplus_males_year: surplusMales, surplus_females_year: surplusFemales, poultry_harvest_animals_year: surplusMales + surplusFemales + replacementMales, gross_eggs_year: grossEggs, edible_eggs_year: edibleEggs, edible_eggs_kg_year: edibleEggs * Number(reproduction.egg_mass_kg ?? .05), edible_meat_kg_year: edibleMeat, feed_scale: breedingFemales / baseHens, output_scale: breedingFemales / baseHens, housing_scale: (breedingFemales + breedingMales) / 9, rooster_capacity_hens: 8, rooster_capacity_note: 'One breeding rooster is retained through eight hens before an additional rooster is planned.'};
   }
   if (speciesId === 'goose_meat') {
     const baseFemales = Number(reproduction.breeding_females ?? 3);
@@ -166,6 +236,68 @@ function livestockPopulation(speciesId, scale = 1) {
     return {production_animals_year: productionAnimals, feed_scale: productionAnimals / 25, output_scale: productionAnimals / 25, housing_scale: productionAnimals / 25};
   }
   return {feed_scale: factor, output_scale: factor, housing_scale: factor};
+}
+
+function labourBreedingCounts(speciesId, population) {
+  return {
+    females: Number(population.breeding_females ?? population.breeding_does ?? population.breeding_hens ?? 0),
+    males: Number(population.breeding_males ?? population.breeding_bucks ?? population.breeding_roosters ?? 0)
+  };
+}
+
+function labourSeasonalBatches(task, population) {
+  if (task.seasonal.batch_basis === 'litters_year') return Number(population.litters_year ?? 0);
+  return Number(task.seasonal.batches_year ?? 0);
+}
+
+function labourHarvestAnimals(task, population) {
+  return Math.max(0, Number(population[task.processing.harvest_source_field] ?? 0));
+}
+
+function calculateLivestockLabourTotals({speciesId, population, sensitivity = 'central'} = {}) {
+  const task = LIVESTOCK_LABOUR_TASKS[speciesId];
+  const values = task?.sensitivities?.[sensitivity] ?? task?.sensitivities?.central;
+  if (!task || !values) return {recurring_hours_year: 0, processing_hours_year: 0, total_hours_year: 0, components: {recurring: {}, processing: {}}};
+  const active = Number(population.output_scale ?? population.feed_scale ?? 0) > 0;
+  const breeding = labourBreedingCounts(speciesId, population);
+  const growoutSource = Number(population[task.growout.inventory_source_field] ?? 0);
+  const averageGrowoutInventory = growoutSource * Number(task.growout.growout_days ?? 0) / 365;
+  const seasonalBatches = labourSeasonalBatches(task, population);
+  const harvestAnimals = labourHarvestAnimals(task, population);
+  const processingBatches = harvestAnimals > 0 ? Math.ceil(harvestAnimals / Number(task.processing.batch_capacity_animals)) : 0;
+  const recurring = {
+    fixed_system: active ? Number(values.fixed_system_hours_year) : 0,
+    breeding_females: active ? breeding.females * Number(values.breeding_female_hours_year) : 0,
+    breeding_males: active ? breeding.males * Number(values.breeding_male_hours_year) : 0,
+    growout_inventory: active ? averageGrowoutInventory * Number(values.growout_hours_per_average_animal_year) : 0,
+    seasonal_batches: active ? seasonalBatches * Number(values.seasonal_hours_per_batch) : 0
+  };
+  const processing = {
+    batch_setup: active ? processingBatches * Number(values.processing_setup_hours_per_batch) : 0,
+    harvested_animals: active ? harvestAnimals * Number(values.processing_hours_per_animal) : 0
+  };
+  const recurringHours = Object.values(recurring).reduce((sum, value) => sum + value, 0);
+  const processingHours = Object.values(processing).reduce((sum, value) => sum + value, 0);
+  return {
+    sensitivity,
+    recurring_hours_year: round(recurringHours),
+    processing_hours_year: round(processingHours),
+    total_hours_year: round(recurringHours + processingHours),
+    components: {recurring: Object.fromEntries(Object.entries(recurring).map(([key, value]) => [key, round(value)])), processing: Object.fromEntries(Object.entries(processing).map(([key, value]) => [key, round(value)]))},
+    activity: {breeding_females: round(breeding.females), breeding_males: round(breeding.males), growout_source_animals_year: round(growoutSource), growout_days: Number(task.growout.growout_days), average_growout_inventory: round(averageGrowoutInventory), seasonal_batches_year: round(seasonalBatches), harvest_animals_year: round(harvestAnimals), processing_batches_year: processingBatches},
+    assumptions: values
+  };
+}
+
+export function calculateLivestockLabour({speciesId, population, sensitivity = 'central'} = {}) {
+  const task = LIVESTOCK_LABOUR_TASKS[speciesId];
+  if (!task) return {recurring_hours_year: 0, processing_hours_year: 0, total_hours_year: 0, scaling_method: LIVESTOCK_LABOUR_SCALING_METHOD, scaling_formula: LIVESTOCK_LABOUR_SCALING_FORMULA, scaling_note: LIVESTOCK_LABOUR_SCALING_NOTE};
+  const central = calculateLivestockLabourTotals({speciesId, population, sensitivity});
+  const sensitivities = Object.fromEntries(Object.keys(task.sensitivities).map((id) => {
+    const row = calculateLivestockLabourTotals({speciesId, population, sensitivity: id});
+    return [id, {recurring_hours_year: row.recurring_hours_year, processing_hours_year: row.processing_hours_year, total_hours_year: row.total_hours_year}];
+  }));
+  return {...central, task_definition: task, sensitivities, scaling_method: LIVESTOCK_LABOUR_SCALING_METHOD, scaling_formula: LIVESTOCK_LABOUR_SCALING_FORMULA, scaling_note: LIVESTOCK_LABOUR_SCALING_NOTE};
 }
 
 export function calculateLivestockReproductiveLedger({speciesId, scale = 1} = {}) {
@@ -330,17 +462,9 @@ export function calculateLivestockScenario({speciesId, rationId = 'arc_integrate
     human_inedible_feed_fraction: feed.dry_matter_requirement_kg_year > 0 ? round(feed.human_inedible_feed_dm_kg_year / feed.dry_matter_requirement_kg_year) : 0,
     housing: {area_m2: round(animal.housing_area_m2 * Number(population.housing_scale ?? outputScale)), fencing_m: round(animal.fencing_m * Number(population.housing_scale ?? outputScale)), water_l_day: round(animal.water_l_day * Number(population.housing_scale ?? outputScale))},
     labour: (() => {
-      // Fixed/variable splits are planning assumptions where no species study
-      // reports household-scale labour directly. They preserve the canonical
-      // reference total while avoiding four copies of setup work.
-      const labourSplits = {rabbit_meat: {recurring_fixed: 60, recurring_variable: 120, processing_variable: 45}, chicken_eggs: {recurring_fixed: 70, recurring_variable: 140, processing_variable: 35}, chicken_meat: {recurring_fixed: 50, recurring_variable: 100, processing_variable: 60}, goose_meat: {recurring_fixed: 60, recurring_variable: 100, processing_variable: 36}, goat_meat: {recurring_fixed: 100, recurring_variable: 160, processing_variable: 50}};
-      const split = labourSplits[speciesId] ?? {recurring_fixed: 0, recurring_variable: animal.labour_hours_year, processing_variable: animal.slaughter_processing_hours_year};
-      const recurringScale = Number(scale) > 0 ? Number(population.feed_scale ?? outputScale) : 0;
-      const processingScale = Number(population.output_scale ?? outputScale);
-      const recurringFixed = split.recurring_fixed * (Number(scale) > 0 ? 1 : 0);
-      const recurringVariable = split.recurring_variable * recurringScale;
-      const processing = split.processing_variable * processingScale;
-      return {recurring_fixed_hours_year: round(recurringFixed), recurring_variable_hours_year: round(recurringVariable), recurring_hours_year: round(recurringFixed + recurringVariable), slaughter_processing_hours_year: round(processing), total_hours_year: round(recurringFixed + recurringVariable + processing), physical_intensity: animal.physical_labour, scaling_note: 'Fixed setup/care work is counted once per selected system; animal-dependent care and processing scale from the actual population.'};
+      const taskResult = calculateLivestockLabour({speciesId, population});
+      const edibleProduct = Number(output.edible_meat_kg_year ?? 0) + Number(output.eggs_kg_year ?? 0);
+      return {...taskResult, slaughter_processing_hours_year: taskResult.processing_hours_year, total_hours_year: taskResult.total_hours_year, physical_intensity: animal.physical_labour, edible_product_kg_year: round(edibleProduct), animal_protein_kg_year: round(edibleProtein), hours_per_kg_edible_product: edibleProduct > 0 ? round(taskResult.total_hours_year / edibleProduct, 4) : null, hours_per_kg_animal_protein: edibleProtein > 0 ? round(taskResult.total_hours_year / edibleProtein, 4) : null};
     })(),
     manure_kg_year: round(animal.manure_kg_year * Number(population.feed_scale ?? outputScale)),
     production_start_year: animal.production_start_year,
@@ -427,7 +551,14 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
     protein_adequacy: proteinCoverage >= 1,
     animals,
     feed: {property_supply: propertyFeed, annual_feed_required_kg: round(annualFeed), fresh_growing_season_feed_kg: round(Math.max(0, annualFeed - winterFeed)), winter_stored_feed_required_kg: round(winterFeed), winter_stored_feed_available_kg: round(animals.reduce((sum, row) => sum + row.feed.winter_stored_feed_available_kg_year, 0)), winter_feed_deficit_kg: round(animals.reduce((sum, row) => sum + row.feed.winter_feed_deficit_kg_year, 0)), storage_loss_kg: round(animals.reduce((sum, row) => sum + row.feed.storage_loss_kg_year, 0)), purchased_feed_required_kg: round(purchasedFeed), purchased_feed_dm_kg_year: round(purchasedFeed), property_grown_dedicated_feed_dm_kg_year: round(animals.reduce((sum, row) => sum + row.feed.property_grown_dedicated_feed_dm_kg_year, 0)), human_edible_feed_protein_consumed_kg: round(animals.reduce((sum, row) => sum + row.feed.human_edible_feed_protein_kg_year, 0)), human_inedible_feed_dm_kg: round(animals.reduce((sum, row) => sum + row.feed.human_inedible_feed_dm_kg_year, 0)), additional_dedicated_feed_land_ha: round(dedicatedFeedLand), feed_deficit_dm_kg_year: round(feedDeficit), feed_self_sufficiency: feedSelfSufficiency, external_feed_energy_gj_year: round(animals.reduce((sum, row) => sum + row.feed.feed_energy_import_gj_year, 0)), additional_dedicated_feed_land_if_no_purchased_substitution_ha: round(dedicatedFeedLand), double_counting_note: propertyFeed.double_counting_rule},
-    labour: {recurring_hours_year: round(animals.reduce((sum, row) => sum + row.labour.recurring_hours_year, 0)), slaughter_processing_hours_year: round(animals.reduce((sum, row) => sum + row.labour.slaughter_processing_hours_year, 0)), livestock_hours_year: round(animals.reduce((sum, row) => sum + row.labour.total_hours_year, 0))},
+    labour: (() => {
+      const recurring = animals.reduce((sum, row) => sum + row.labour.recurring_hours_year, 0);
+      const processing = animals.reduce((sum, row) => sum + row.labour.slaughter_processing_hours_year, 0);
+      const total = animals.reduce((sum, row) => sum + row.labour.total_hours_year, 0);
+      const edibleProduct = animals.reduce((sum, row) => sum + Number(row.labour.edible_product_kg_year ?? 0), 0);
+      const protein = animals.reduce((sum, row) => sum + Number(row.labour.animal_protein_kg_year ?? 0), 0);
+      return {recurring_hours_year: round(recurring), slaughter_processing_hours_year: round(processing), livestock_hours_year: round(total), edible_product_kg_year: round(edibleProduct), animal_protein_kg_year: round(protein), hours_per_kg_edible_product: edibleProduct > 0 ? round(total / edibleProduct, 4) : null, hours_per_kg_animal_protein: protein > 0 ? round(total / protein, 4) : null, scaling_method: LIVESTOCK_LABOUR_SCALING_METHOD, scaling_formula: LIVESTOCK_LABOUR_SCALING_FORMULA, scaling_note: LIVESTOCK_LABOUR_SCALING_NOTE};
+    })(),
     feed_self_sufficiency: feedSelfSufficiency,
     energy_adequacy: Number(plantFood.delivered_food_energy_gj ?? 0) + animalEnergy >= Number(demandGJ) - 1e-9,
     nutrient_completeness: nutrientCompleteness,

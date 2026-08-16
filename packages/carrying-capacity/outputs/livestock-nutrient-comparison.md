@@ -1,6 +1,6 @@
 # Nutrient-aware livestock comparison
 
-Generated 2026-08-16T20:10:29.768Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
+Generated 2026-08-16T21:16:32.322Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
 
 ## Results
 
@@ -8,11 +8,11 @@ Generated 2026-08-16T20:10:29.768Z. This report uses the canonical Health Canada
 | --- | :---: | ---: | ---: | :---: | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | Plants only | yes | 77.3 | 157.8 | yes | n/a | 97% lysine | 7826.5 / 3943.5 g (198%) | b12, d, a, iodine, alpha_linolenic_g | 0.0 | 0.000 | 0 | 1.815 | 1.522 |
 | Self-replacing rabbits | yes | 77.3 | 164.5 | yes | yes | 101% lysine | 8434.1 / 3943.5 g (214%) | d, a, iodine, alpha_linolenic_g | 0.8 | 0.048 | 225 | 1.828 | 1.538 |
-| Self-replacing dual-purpose chicken flock | yes | 77.3 | 159.2 | yes | yes | 101% lysine | 8157.5 / 3943.5 g (207%) | iodine, alpha_linolenic_g | 102.7 | 0.236 | 245 | 1.895 | 1.616 |
-| Fast-growing chicken sensitivity (non-canonical) | yes | 77.3 | 160.8 | yes | no | 100% lysine | 8259.4 / 3943.5 g (209%) | b12, d, a, iodine, alpha_linolenic_g | 11.8 | 0.025 | 210 | 1.777 | 1.490 |
+| Self-replacing dual-purpose chicken flock | yes | 77.3 | 159.2 | yes | yes | 101% lysine | 8157.5 / 3943.5 g (207%) | iodine, alpha_linolenic_g | 102.7 | 0.236 | 249 | 1.895 | 1.616 |
+| Fast-growing chicken sensitivity (non-canonical) | yes | 77.3 | 160.8 | yes | no | 100% lysine | 8259.4 / 3943.5 g (209%) | b12, d, a, iodine, alpha_linolenic_g | 11.8 | 0.025 | 204 | 1.777 | 1.490 |
 | Self-replacing grazing-biased geese | yes | 77.3 | 159.6 | yes | yes | 100% lysine | 8134.3 / 3943.5 g (206%) | d, a, iodine, alpha_linolenic_g | 9.4 | 0.326 | 196 | 2.089 | 1.801 |
-| Self-replacing browse-biased goats | yes | 77.3 | 159.8 | yes | yes | 97% lysine | 7624.7 / 3943.5 g (193%) | b12, d, a, iodine, alpha_linolenic_g | 0.0 | 0.846 | 310 | 2.596 | 2.309 |
-| Self-replacing rabbits + chicken flock | yes | 77.3 | 165.8 | yes | yes | 104% lysine | 8765.1 / 3943.5 g (222%) | iodine, alpha_linolenic_g | 112.5 | 0.312 | 470 | 1.936 | 1.661 |
+| Self-replacing browse-biased goats | yes | 77.3 | 159.8 | yes | yes | 97% lysine | 7624.7 / 3943.5 g (193%) | b12, d, a, iodine, alpha_linolenic_g | 0.0 | 0.846 | 301 | 2.596 | 2.309 |
+| Self-replacing rabbits + chicken flock | yes | 77.3 | 165.8 | yes | yes | 104% lysine | 8765.1 / 3943.5 g (222%) | iodine, alpha_linolenic_g | 112.5 | 0.312 | 474 | 1.936 | 1.661 |
 
 The pattern score is not an absolute amino-acid requirement ratio. A 97% lysine pattern score can coexist with absolute lysine intake above the household requirement when total protein is well above the RDA. Digestibility-adjusted quality remains unresolved where food-specific evidence is unavailable.
 
@@ -35,7 +35,7 @@ The plant-only result remains a valid low-complexity baseline, but it is not aut
 
 - **Plants only** (plants_only): peak 1.815 ha, mature 1.522 ha, 0 labour hours/year, 5 tracked external/unresolved nutrients, 0.0 kg human-edible feed protein, complexity 0.
 - **Self-replacing rabbits** (rabbit_meat): peak 1.828 ha, mature 1.538 ha, 225 labour hours/year, 4 tracked external/unresolved nutrients, 0.8 kg human-edible feed protein, complexity 1.
-- **Self-replacing dual-purpose chicken flock** (chicken_eggs): peak 1.895 ha, mature 1.616 ha, 245 labour hours/year, 2 tracked external/unresolved nutrients, 102.7 kg human-edible feed protein, complexity 1.
+- **Self-replacing dual-purpose chicken flock** (chicken_eggs): peak 1.895 ha, mature 1.616 ha, 249 labour hours/year, 2 tracked external/unresolved nutrients, 102.7 kg human-edible feed protein, complexity 1.
 - **Self-replacing grazing-biased geese** (goose_meat): peak 2.089 ha, mature 1.801 ha, 196 labour hours/year, 4 tracked external/unresolved nutrients, 9.4 kg human-edible feed protein, complexity 1.
 
 These are alternatives under distinct objectives, not a single universal optimum.
@@ -70,3 +70,19 @@ The previous report used purchased feed to close these annual deficits: **Self-r
 Sources: [Health Canada DRI tables](https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html), [Canadian Nutrient File](https://open.canada.ca/data/en/dataset/1b6139bd-ed7e-4043-bc28-ff00e10f3109), [Health Canada protein DRI](https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html), [heritage poultry comparison](https://afs.mgcafe.uky.edu/research/poultry/use-heritage-breeds-alternative-poultry-production), [free-range/heritage ranging study](https://pmc.ncbi.nlm.nih.gov/articles/PMC8858978/), [Ontario poultry nutrition](https://www.ontario.ca/page/introduction-poultry-nutrition), [Ontario pasture production](https://files.ontario.ca/omafra-pasture-production-en-2022-12-08.pdf), and [Ontario rabbit/farm guidance](https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf).
 
 Evidence status: crop yields, feed shares, feed-stream yields, species outputs and reproductive ledgers are bounded planning syntheses, not Grey-Bruce household trials.
+
+
+## Task-based labour ledger
+
+Labour is calculated from explicit task quantities and unit-time assumptions. Central task values are planning assumptions bounded by the listed sources; no unsupported fixed/variable percentage is asserted. Formula: `fixed system + breeding-animal + grow-out-inventory + seasonal-batch tasks; processing setup × batches + per-animal × harvest`.
+
+| Option | Recurring h/year | Processing h/year | Total h/year | h/kg edible product | h/kg animal protein | Task components |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Self-replacing rabbits | 180.0 | 45.0 | 225.0 | 5.51 | 25.31 | rabbit_meat: {"recurring":{"fixed_system":90,"breeding_females":16,"breeding_males":4,"growout_inventory":8.054795,"seasonal_batches":61.945205},"processing":{"batch_setup":10,"harvested_animals":35}} |
+| Self-replacing dual-purpose chicken flock | 209.9 | 39.5 | 249.5 | 3.09 | 22.33 | chicken_eggs: {"recurring":{"fixed_system":90,"breeding_females":40,"breeding_males":5,"growout_inventory":2.146192,"seasonal_batches":72.8},"processing":{"batch_setup":8,"harvested_animals":31.511551}} |
+| Fast-growing chicken sensitivity (non-canonical) | 143.9 | 60.0 | 203.9 | 5.83 | 29.13 | chicken_meat: {"recurring":{"fixed_system":70,"breeding_females":0,"breeding_males":0,"growout_inventory":1.917808,"seasonal_batches":72},"processing":{"batch_setup":15,"harvested_animals":45}} |
+| Self-replacing grazing-biased geese | 160.0 | 36.0 | 196.0 | 8.17 | 39.19 | goose_meat: {"recurring":{"fixed_system":80,"breeding_females":24,"breeding_males":6,"growout_inventory":1.775342,"seasonal_batches":48.2},"processing":{"batch_setup":6,"harvested_animals":29.99}} |
+| Self-replacing browse-biased goats | 261.3 | 39.7 | 301.0 | 10.03 | 50.17 | goat_meat: {"recurring":{"fixed_system":120,"breeding_females":40,"breeding_males":10,"growout_inventory":1.257534,"seasonal_batches":90},"processing":{"batch_setup":10,"harvested_animals":29.74359}} |
+| Self-replacing rabbits + chicken flock | 389.9 | 84.5 | 474.5 | 3.90 | 23.65 | rabbit_meat: {"recurring":{"fixed_system":90,"breeding_females":16,"breeding_males":4,"growout_inventory":8.054795,"seasonal_batches":61.945205},"processing":{"batch_setup":10,"harvested_animals":35}}<br>chicken_eggs: {"recurring":{"fixed_system":90,"breeding_females":40,"breeding_males":5,"growout_inventory":2.146192,"seasonal_batches":72.8},"processing":{"batch_setup":8,"harvested_animals":31.511551}} |
+
+Each row also contains low, central and high sensitivity totals plus the task frequencies and unit-time assumptions used to derive it.
