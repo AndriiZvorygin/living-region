@@ -1,10 +1,12 @@
 export {calculateHealthCanadaEER, representativeProfiles, HEALTH_CANADA_EER_SOURCE} from './health-canada.mjs';
+export {calculateHealthCanadaProtein, calculateHouseholdProteinDemand, HEALTH_CANADA_PROTEIN_DRI, HEALTH_CANADA_PROTEIN_QUALITY_REFERENCE, HEALTH_CANADA_PROTEIN_SOURCE} from './protein.mjs';
 export {calculateFoodSystem, calculateInteractiveHousehold, calculateEvidenceHeating, calculateBuildingHeatingDemand, calculateHeatingLoads, calculateHouseholdLabourCapacity, calculateExclusiveLandAllocation, defaultBuilding, buildingArchetypes, insulationPresets, labourCapacityLevels, heatingCases, siteClasses, householdProfiles, foodLossAssumptions} from './core.mjs';
 export {calculateEstablishmentLandRequirement, calculateEstablishmentLandAccounting, DEFAULT_ESTABLISHMENT_YEARS, DEFAULT_ANNUAL_INTERCROP_OVERLAP} from './establishment.mjs';
 export {GROWING_ENVIRONMENT_CONTRACT_VERSION, owenSoundGrowingEnvironment, siteCapabilityDefinitions, siteCapability, selectPerennialMixForSite, viableAnnualCropIds} from './environment.mjs';
 export {calculatePersonVisualMetrics} from './people.mjs';
 export {calculatePerennialMixTimeline} from './perennial.mjs';
 export {HOUSEHOLD_LAND_ADULT_AGE, HOUSEHOLD_TRANSITION_YEAR_CONVENTION, householdLandRole, calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
+export {LIVESTOCK_CONTRACT_VERSION, LIVESTOCK_FEED_STREAMS, LIVESTOCK_SPECIES, LIVESTOCK_RATION_SCENARIOS, PROPERTY_FEED_SUPPLY_RULES, derivePropertyFeedSupply, calculateFeedLedger, calculateLivestockScenario, calculateNutrientFoodSystem, compareNutrientFoodSystems} from './livestock.mjs';
 export {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 export {ARC_DWELLING_COST_EVIDENCE, ARC_DWELLING_COST_CONTRACT_VERSION, ARC_DWELLING_SERVICING_MODES, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
 export {ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION, DEFAULT_ARC_COMMON_AREA_GEOMETRY, calculateArcCommonAreaGeometry} from './common-area.mjs';

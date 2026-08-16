@@ -1,13 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "reference_profile", "site_classes", "environment", "establishment", "site_lease_economics", "household_presets", "mature_rows", "transition_rows", "heating", "perennial_food_evidence", "regional", "sources"],
+  "required": ["contract_version", "model_contract_version", "generated_at", "units", "health_canada", "protein", "livestock", "reference_profile", "site_classes", "environment", "establishment", "site_lease_economics", "household_presets", "mature_rows", "transition_rows", "heating", "perennial_food_evidence", "regional", "sources"],
   "properties": {
     "contract_version": {"type": "string"},
     "model_contract_version": {"type": "string"},
     "generated_at": {"type": "string"},
     "units": {"type": "object", "required": ["energy", "land", "labour"]},
     "health_canada": {"type": "object", "required": ["scenarios", "activity_categories"]},
+    "protein": {"type": "object", "required": ["source", "dri_rows", "quality_reference", "target"]},
+    "livestock": {"type": "object", "required": ["contract_version", "feed_streams", "species", "ration_scenarios", "property_feed_supply_rules", "examples"]},
     "reference_profile": {"type": "object", "required": ["sex", "age_y", "weight_kg", "height_cm", "activity", "mj_day", "gj_year"]},
     "site_classes": {"type": "object", "minProperties": 3},
     "environment": {"type": "object", "required": ["contract_version", "region", "climate", "soil_framework", "site_capabilities", "sources"]},

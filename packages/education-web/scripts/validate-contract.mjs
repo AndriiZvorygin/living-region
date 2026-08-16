@@ -9,6 +9,8 @@ if (contract.units.energy !== 'MJ/day and GJ/year') throw new Error('presentatio
 if (contract.household_presets.length < schema.properties.household_presets.minItems) throw new Error('presentation contract is missing household presets');
 if (contract.mature_rows.length < schema.properties.mature_rows.minItems || contract.transition_rows.length < schema.properties.transition_rows.minItems) throw new Error('presentation contract is missing canonical rows');
 if (!contract.regional.grey.scenarios?.length) throw new Error('presentation contract is missing regional scenarios');
+if (!contract.protein?.dri_rows || Object.keys(contract.protein.dri_rows).length < 5) throw new Error('presentation contract is missing Health Canada protein DRI rows');
+if (!contract.livestock?.species?.rabbit_meat || !contract.livestock?.species?.chicken_eggs || !contract.livestock?.species?.goose_meat || !contract.livestock?.species?.goat_meat) throw new Error('presentation contract is missing required livestock candidates');
 if (contract.environment.climate.growing_degree_days?.value_degree_days == null || contract.environment.climate.heating_degree_days?.value_degree_days == null) throw new Error('presentation contract is missing local climate context');
 if (contract.environment.solar?.status !== 'unresolved') throw new Error('local solar status must remain explicitly unresolved until sourced');
 if (contract.establishment.starting_condition !== 'bare_land_new_planting') throw new Error('establishment contract must default to bare-land new planting');

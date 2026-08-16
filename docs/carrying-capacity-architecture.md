@@ -79,9 +79,27 @@ npm run report:grey:carrying-capacity
 npm run report:grey:household-transition
 npm run report:arc:site-lease
 npm run report:arc:site-lease:sensitivity
+npm run report:carrying-capacity:livestock
 ```
 
 The first command preserves the ARC standalone headline and canonical outputs
 under `know/produce/`. The Grey commands aggregate the same canonical rows over
 the existing Grey food-land and population/dwelling proxies; they do not create
 a second set of ARC coefficients.
+
+## Nutrient and livestock extension
+
+`src/protein.mjs` adds the Health Canada protein DRI as a constraint separate
+from the EER energy calculation. `src/livestock.mjs` then compares plants-only
+and optional rabbit, chicken, goose and goat systems through explicit feed
+streams. Feed is partitioned into human-edible and human-inedible fractions,
+and mixed systems consume a shared finite property-feed pool rather than
+reusing the same residue or browse stream for every species.
+
+The livestock coefficients and feed shares are bounded planning syntheses from
+government and extension evidence. They report edible output, winter storage,
+purchased supplementation, housing and labour, but do not claim Grey-Bruce
+household trial performance. Plants-only remains a first-class baseline. The
+generated comparison for the ordinary two-adult/three-child family-capacity
+case is written to
+`packages/carrying-capacity/outputs/livestock-nutrient-comparison.md`.

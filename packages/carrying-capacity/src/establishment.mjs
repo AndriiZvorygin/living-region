@@ -53,6 +53,7 @@ export function calculateEstablishmentLandRequirement({
   annualReserveFraction = .25,
   strategy = 'progressive_handoff',
   heatingAreaHa = 0,
+  additionalExclusiveLandHa = 0,
   exclusiveReserveHa = .12,
   yieldMultiplier = 1,
   arcPolicyAllocationHa = null
@@ -86,7 +87,7 @@ export function calculateEstablishmentLandRequirement({
     const overlapFraction = Number(annualIntercropOverlap[year] ?? 0);
     const overlap = Math.min(requestedAnnualArea, plantedPerennialFootprintHa) * overlapFraction;
     const occupiedFood = requestedAnnualArea + plantedPerennialFootprintHa - overlap;
-    const totalExclusive = occupiedFood + Number(heatingAreaHa) + Number(exclusiveReserveHa);
+    const totalExclusive = occupiedFood + Number(heatingAreaHa) + Number(exclusiveReserveHa) + Number(additionalExclusiveLandHa);
     const annualGross = requestedAnnualArea * annualYield;
     const annualUsable = annualGross * (1 - Number(loss));
     const adultResidual = Math.max(0, permanentDemand - perennialUsable);
@@ -119,6 +120,7 @@ export function calculateEstablishmentLandRequirement({
       land_double_counted_as_if_separate_ha: round(overlap),
       occupied_food_production_area_ha: round(occupiedFood),
       heating_area_ha: round(heatingAreaHa),
+      additional_exclusive_land_ha: round(additionalExclusiveLandHa),
       exclusive_resilience_reserve_ha: round(exclusiveReserveHa),
       total_exclusive_land_requirement_ha: round(totalExclusive),
       annual_land_limited: false,
@@ -147,6 +149,7 @@ export function calculateEstablishmentLandRequirement({
     mature_land_requirement_ha: mature.total_exclusive_land_requirement_ha,
     mature_food_production_footprint_ha: mature.occupied_food_production_area_ha,
     heating_area_ha: round(heatingAreaHa),
+    additional_exclusive_land_ha: round(additionalExclusiveLandHa),
     exclusive_resilience_reserve_ha: round(exclusiveReserveHa),
     arc_policy_allocation_ha: arcPolicyAllocationHa == null ? null : round(arcPolicyAllocationHa),
     arc_policy_surplus_or_deficit_ha: arcPolicyAllocationHa == null ? null : round(Number(arcPolicyAllocationHa) - peak.total_exclusive_land_requirement_ha),

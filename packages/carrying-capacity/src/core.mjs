@@ -2,6 +2,8 @@ import {calculateHealthCanadaEER, representativeProfiles} from './health-canada.
 import {siteCapabilityDefinitions, siteCapability, owenSoundGrowingEnvironment} from './environment.mjs';
 import {calculateEstablishmentLandRequirement, calculateEstablishmentLandAccounting} from './establishment.mjs';
 import {calculateHouseholdFoodDemandProfile, householdLandRole} from './household-demand.mjs';
+import {calculateHouseholdProteinDemand} from './protein.mjs';
+import {calculateNutrientFoodSystem} from './livestock.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 export const siteClasses = Object.entries(siteCapabilityDefinitions).filter(([id]) => id !== 'wet_land').map(([id, capability]) => ({
@@ -92,8 +94,8 @@ export function calculateHouseholdLabourCapacity(members = []) {
   return {members: rows, available_hours_year: rows.reduce((sum, row) => sum + row.available_hours_year, 0), heavy_work_hours_year: rows.reduce((sum, row) => sum + row.heavy_work_hours_year, 0)};
 }
 
-export function calculateExclusiveLandAllocation({foodAreaHa = 0, heatingAreaHa = 0, reserveHa = 0} = {}) {
-  const parts = [{id: 'annual', label: 'Annual food', area_ha: foodAreaHa * .25}, {id: 'perennial', label: 'Perennial food', area_ha: foodAreaHa * .75}, {id: 'wood', label: 'Renewable heating biomass', area_ha: heatingAreaHa}, {id: 'reserve', label: 'Exclusive reserve', area_ha: reserveHa}];
+export function calculateExclusiveLandAllocation({foodAreaHa = 0, heatingAreaHa = 0, reserveHa = 0, feedAreaHa = 0} = {}) {
+  const parts = [{id: 'annual', label: 'Annual food', area_ha: foodAreaHa * .25}, {id: 'perennial', label: 'Perennial food', area_ha: foodAreaHa * .75}, ...(Number(feedAreaHa) > 0 ? [{id: 'feed', label: 'Dedicated livestock feed', area_ha: feedAreaHa}] : []), {id: 'wood', label: 'Renewable heating biomass', area_ha: heatingAreaHa}, {id: 'reserve', label: 'Exclusive reserve', area_ha: reserveHa}];
   return {parts, exclusive_total_ha: parts.reduce((sum, part) => sum + part.area_ha, 0), ecological_overlays: ['soil and water function', 'wildlife and habitat', 'fibre and diversity']};
 }
 
@@ -117,26 +119,36 @@ export function calculateFoodSystem(foodEvidence, demandGJ, siteMultiplierOrCapa
   return {diet_energy_shares: wanted, viable_crop_ids: rows.map((row) => row.id), excluded_crop_ids: Object.keys(wanted).filter((id) => !rows.some((row) => row.id === id)), rows, gross_energy_per_ha: round(grossEnergyPerHa), raw_calorie_area_ha: round(rawArea), delivery_factor_after_losses_and_reserves: round(householdDeliveryFactor), required_food_area_ha: round(requiredArea), gross_food_energy_at_required_area_gj: round(grossEnergyPerHa * requiredArea), delivered_food_energy_gj: round(grossEnergyPerHa * requiredArea * householdDeliveryFactor), macro_output_at_required_area: Object.fromEntries(Object.entries(macro).map(([key, value]) => [key, round(value)])), macro_delivered_to_household: Object.fromEntries(Object.entries(deliveredMacro).map(([key, value]) => [key, round(value)])), macro_energy_shares_percent: macroShares, protein_g_day: round(deliveredMacro.protein_kg * 1000 / 365.25, 3), protein_reference_target_g_day: round(proteinReferenceWeightKg * .8, 3), protein_threshold_met: deliveredMacro.protein_kg * 1000 / 365.25 >= proteinReferenceWeightKg * .8, macro_range_check: {protein_10_to_35_percent: macroShares.protein >= 10 && macroShares.protein <= 35, fat_20_to_35_percent: macroShares.fat >= 20 && macroShares.fat <= 35, carbohydrate_45_to_65_percent: macroShares.carbohydrate >= 45 && macroShares.carbohydrate <= 65, status: 'screening check only; does not establish micronutrient sufficiency'}, assumptions: {...foodLossAssumptions, protein_reference_g_per_kg: .8, macro_energy_factors: '0.016736 GJ/kg protein and carbohydrate; 0.037656 GJ/kg fat'}};
 }
 
-export function calculateInteractiveHousehold({members = [], buildings = [defaultBuilding()], siteId = 'ordinary_mesic', foodEvidence, woodyCases, matureReferenceRow, establishmentModel = null, arcPolicyAllocationHa = null} = {}) {
+function calculateInteractiveHouseholdLegacy({members = [], buildings = [defaultBuilding()], siteId = 'ordinary_mesic', foodEvidence, woodyCases, matureReferenceRow, establishmentModel = null, arcPolicyAllocationHa = null, livestockMode = 'plants_only', livestockRation = 'arc_integrated', livestockScale = 1} = {}) {
   const demandProfile = calculateHouseholdFoodDemandProfile(members, establishmentModel?.years);
   const demand = demandProfile.current_household_food_demand_gj_year;
   const referenceWeight = members.reduce((sum, member) => sum + Number(member.weight_kg), 0);
   const site = siteClasses[siteId] ?? siteClasses.ordinary_mesic;
-  const food = calculateFoodSystem(foodEvidence, demand, site, referenceWeight);
-  const permanentAdultFood = calculateFoodSystem(foodEvidence, demandProfile.permanent_adult_food_demand_gj_year, site, members.filter((member) => householdLandRole(member) === 'permanent_adult').reduce((sum, member) => sum + Number(member.weight_kg), 0));
+  const proteinDemand = calculateHouseholdProteinDemand(members);
+  const nutrientFood = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: proteinDemand.household_protein_kg_year, siteCapability: {...site, calculateFoodSystem}, livestockMode, rationId: livestockRation, livestockScale, establishmentYears: establishmentModel?.years});
+  const food = nutrientFood.plant_food;
+  const matureAnimalEnergy = nutrientFood.animal_food_energy_gj_year;
+  const permanentAdultFood = calculateFoodSystem(foodEvidence, Math.max(0, demandProfile.permanent_adult_food_demand_gj_year - matureAnimalEnergy), site, members.filter((member) => householdLandRole(member) === 'permanent_adult').reduce((sum, member) => sum + Number(member.weight_kg), 0));
   const heating = calculateHeatingLoads({buildings});
   const woodBand = woodyCases?.central?.[site.woody_band];
   const baseWoodYield = Number(woodBand?.usable_gross_energy_gj_ha_year ?? woodBand?.usable_gross_energy_gj_year ?? 0);
   const woodYield = baseWoodYield * Number(site.woody_yield_multiplier ?? 1);
   const heatingArea = woodYield > 0 ? heating.total_gross_wood_energy_gj_year / woodYield : 0;
   const resilience = {diversity_and_rotation_ha: round(Math.max(.12, permanentAdultFood.required_food_area_ha * .25)), soil_water_perennial_buffer_ha: .15, fibre_habitat_wildlife_buffer_ha: .1};
-  const landAllocation = calculateExclusiveLandAllocation({foodAreaHa: food.required_food_area_ha, heatingAreaHa: heatingArea, reserveHa: resilience.diversity_and_rotation_ha});
+  const landAllocation = calculateExclusiveLandAllocation({foodAreaHa: food.required_food_area_ha, heatingAreaHa: heatingArea, reserveHa: resilience.diversity_and_rotation_ha, feedAreaHa: nutrientFood.feed.additional_dedicated_feed_land_ha});
   const robustMinimum = landAllocation.exclusive_total_ha;
   const adultCount = Math.max(1, demandProfile.permanent_adult_count);
   const policyAllocation = arcPolicyAllocationHa ?? adultCount;
   let establishmentLand = null;
   if (establishmentModel) {
-    const modelInputs = {demandGJ: demand, permanentAdultDemandGJ: demandProfile.permanent_adult_food_demand_gj_year, demandByYear: demandProfile.demand_by_year, demandScopeByYear: demandProfile.scope_by_year, annualYieldGJHaYear: food.gross_energy_per_ha, perennialMix: establishmentModel.perennial_mix, curveAnchors: establishmentModel.curve_anchors, years: establishmentModel.years, annualIntercropOverlap: establishmentModel.annual_intercrop_overlap_by_year, loss: establishmentModel.loss_or_reserve_fraction ?? .30, annualReserveFraction: establishmentModel.annual_reserve_fraction ?? .25, heatingAreaHa: heatingArea, exclusiveReserveHa: resilience.diversity_and_rotation_ha, arcPolicyAllocationHa: policyAllocation};
+    const animalOutputByYear = nutrientFood.animal_output_by_year ?? {};
+    const plantDemandByYear = Object.fromEntries(Object.entries(demandProfile.demand_by_year).map(([year, yearDemand]) => [year, Math.max(0, Number(yearDemand) - Number(animalOutputByYear[String(year)]?.food_energy_gj_year ?? matureAnimalEnergy))]));
+    const plantScopeByYear = Object.fromEntries(Object.entries(demandProfile.scope_by_year).map(([year, scope]) => {
+      const animalEnergy = Number(animalOutputByYear[String(year)]?.food_energy_gj_year ?? matureAnimalEnergy);
+      const adultDemand = Math.max(0, Number(scope.permanent_adult_food_demand_gj_year) - animalEnergy);
+      return [year, {...scope, permanent_adult_food_demand_gj_year: adultDemand, dependent_child_food_demand_gj_year: Math.max(0, plantDemandByYear[year] - adultDemand), household_food_demand_gj_year: plantDemandByYear[year]}];
+    }));
+    const modelInputs = {demandGJ: nutrientFood.plant_energy_demand_gj_year, permanentAdultDemandGJ: Math.max(0, demandProfile.permanent_adult_food_demand_gj_year - matureAnimalEnergy), demandByYear: plantDemandByYear, demandScopeByYear: plantScopeByYear, annualYieldGJHaYear: food.gross_energy_per_ha, perennialMix: establishmentModel.perennial_mix, curveAnchors: establishmentModel.curve_anchors, years: establishmentModel.years, annualIntercropOverlap: establishmentModel.annual_intercrop_overlap_by_year, loss: establishmentModel.loss_or_reserve_fraction ?? .30, annualReserveFraction: establishmentModel.annual_reserve_fraction ?? .25, heatingAreaHa: heatingArea, additionalExclusiveLandHa: nutrientFood.feed.additional_dedicated_feed_land_ha, exclusiveReserveHa: resilience.diversity_and_rotation_ha, arcPolicyAllocationHa: policyAllocation};
     const progressive = calculateEstablishmentLandRequirement({...modelInputs, strategy: 'progressive_handoff'});
     const constant = calculateEstablishmentLandRequirement({...modelInputs, strategy: 'constant_annual_reserve'});
     establishmentLand = calculateEstablishmentLandAccounting({progressive, constant});
@@ -147,4 +159,13 @@ export function calculateInteractiveHousehold({members = [], buildings = [defaul
   const scale = demand / referenceDemand;
   const labourRequired = {hours_year: Number(referenceLabour.total_recurring_labour_hours ?? 0) * scale, heavy_hours_year: Number(referenceLabour.physically_demanding_hours ?? 0) * scale};
   return {members, buildings, household_food_gj_year: round(demand), permanent_adult_food_demand_gj_year: round(demandProfile.permanent_adult_food_demand_gj_year), dependent_child_food_demand_gj_year: round(demandProfile.dependent_child_food_demand_gj_year), food_demand_profile: demandProfile, food_adult_equivalents: round(demand / FOOD_ADULT_EQUIVALENT_GJ_YEAR), food_adult_equivalent_basis_gj_year: round(FOOD_ADULT_EQUIVALENT_GJ_YEAR), adult_equivalent_scope: 'food-energy normalization only; not a total-land multiplier', food, food_area_ha: food.required_food_area_ha, heating_area_ha: round(heatingArea), heating, resilience_allowances_ha: resilience, land_allocation: {...landAllocation, exclusive_total_ha: round(landAllocation.exclusive_total_ha)}, robust_minimum_area_ha: round(robustMinimum), establishment_land: establishmentLand, arc_policy_allocation_ha: round(policyAllocation), reference_transition_scale: round(scale), labour: {required_hours_year: round(labourRequired.hours_year), required_heavy_hours_year: round(labourRequired.heavy_hours_year), available_hours_year: round(labourCapacity.available_hours_year), available_heavy_hours_year: round(labourCapacity.heavy_work_hours_year), surplus_hours_year: round(labourCapacity.available_hours_year - labourRequired.hours_year), surplus_heavy_hours_year: round(labourCapacity.heavy_work_hours_year - labourRequired.heavy_hours_year), capacity: labourCapacity}, site_id: siteId, caveat: 'Food-adult demand sizes the permanent perennial footprint; food-adult equivalents are a food-energy normalization only. Dependent children increase pooled current food demand and annual bridge requirements only while they remain under the household land-adult age. Annual and perennial outputs are pooled, and former dependent children transition to their own ARC allocation.'};
+}
+
+export function calculateInteractiveHousehold(options = {}) {
+  const result = calculateInteractiveHouseholdLegacy(options);
+  const members = options.members ?? [];
+  const site = siteClasses[options.siteId ?? 'ordinary_mesic'] ?? siteClasses.ordinary_mesic;
+  const proteinDemand = calculateHouseholdProteinDemand(members);
+  const nutrientFood = calculateNutrientFoodSystem({foodEvidence: options.foodEvidence, demandGJ: result.household_food_gj_year, proteinDemandKgYear: proteinDemand.household_protein_kg_year, siteCapability: {...site, calculateFoodSystem}, livestockMode: options.livestockMode ?? 'plants_only', rationId: options.livestockRation ?? 'arc_integrated', livestockScale: options.livestockScale ?? 1, establishmentYears: options.establishmentModel?.years});
+  return {...result, protein_demand: proteinDemand, nutrient_food_system: nutrientFood, livestock_mode: options.livestockMode ?? 'plants_only', livestock_ration: options.livestockRation ?? 'arc_integrated', livestock_feed_area_ha: nutrientFood.feed.additional_dedicated_feed_land_ha};
 }
