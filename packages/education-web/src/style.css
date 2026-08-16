@@ -140,6 +140,9 @@ main { max-width: 1180px; }
 .component-detail { display: grid; gap: 6px; margin-top: 14px; }
 .component-detail h3 { margin: 14px 0 0; font-size: .9rem; }
 .component-detail > div { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: .82rem; }
+.livestock-ledger { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.livestock-ledger h3 { margin: 0; font-size: 1rem; }
+.livestock-ledger h4 { margin: 0; font-size: .92rem; }
 .cost-subrow { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .88rem; }
 .cost-subrow b { color: var(--ink); font-weight: 800; }
 .cost-total { display: flex; justify-content: space-between; gap: 16px; padding: 20px; background: var(--ink); color: #fff; }
