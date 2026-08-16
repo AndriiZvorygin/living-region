@@ -14,19 +14,19 @@ This report covers the ARC site lease and selected shared infrastructure only. T
 
 | Scenario | Establishment site | Mature site | Project property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo | Dwelling capital | Dwelling finance/mo | Dwelling finance + land/shared/mo |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 adult · ordinary land · 12 households | 1.12 ha | 1.05 ha | 13.41 ha | $469502 | $220 | $48 | $268 | $61000 | $354 | $622 |
-| 1 adult · marginal land · 12 households | 2.12 ha | 2.00 ha | 25.40 ha | $889075 | $417 | $48 | $465 | $61000 | $354 | $819 |
-| 2 adults + 2 children · ordinary land · 12 households | 1.75 ha | 1.52 ha | 20.98 ha | $734328 | $345 | $48 | $392 | $61000 | $354 | $746 |
+| 1 adult · ordinary land · 12 households | 1.12 ha | 1.05 ha | 13.51 ha | $473000 | $222 | $48 | $270 | $61000 | $354 | $624 |
+| 1 adult · marginal land · 12 households | 2.12 ha | 2.00 ha | 25.50 ha | $892573 | $419 | $48 | $467 | $61000 | $354 | $820 |
+| 2 adults + 2 children · ordinary land · 12 households | 1.75 ha | 1.52 ha | 21.08 ha | $737825 | $346 | $48 | $394 | $61000 | $354 | $748 |
 
-For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **$268/month** and the 2-adult + 2-child case is **$392/month**. The componentized resident-owned dwelling central case is **$61000** with an illustrative financing payment of **$354/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.
+For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **$270/month** and the 2-adult + 2-child case is **$394/month**. The componentized resident-owned dwelling central case is **$61000** with an illustrative financing payment of **$354/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.
 
 ## Community scale: 2 adults + 2 children per household
 
 | Households | Productive site area | Total property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo |
 |---:|---:|---:|---:|---:|---:|---:|
-| 12 | 20.98 ha | 20.98 ha | $734328 | $345 | $48 | $392 |
-| 16 | 27.97 ha | 27.97 ha | $979103 | $345 | $36 | $380 |
-| 25 | 43.71 ha | 43.71 ha | $1529849 | $345 | $23 | $368 |
+| 12 | 20.98 ha | 21.08 ha | $737825 | $346 | $48 | $394 |
+| 16 | 27.97 ha | 28.07 ha | $982601 | $346 | $36 | $382 |
+| 25 | 43.71 ha | 43.81 ha | $1533347 | $345 | $23 | $368 |
 
 The shared-service charge falls as households share the same capital and operating base. Productive site area and land value still scale with household requirements.
 
@@ -36,11 +36,11 @@ The public default is legal-minimum/self-managed. Conventional administration re
 
 | Scenario | Land-layer revenue | Land-layer cost | Infrastructure revenue | Infrastructure cost | Land check | Infrastructure check |
 |---|---:|---:|---:|---:|---|---|
-| 1 adult · ordinary land · 12 households | $31718 | $31718 | $6907 | $6907 | break-even | break-even |
-| 1 adult · marginal land · 12 households | $60063 | $60063 | $6907 | $6907 | break-even | break-even |
-| 2 adults + 2 children · ordinary land · 12 households | $49609 | $49609 | $6907 | $6907 | break-even | break-even |
-| 2 adults + 2 children · ordinary land · 16 households | $66145 | $66145 | $6907 | $6907 | break-even | break-even |
-| 2 adults + 2 children · ordinary land · 25 households | $103352 | $103352 | $6907 | $6907 | break-even | break-even |
+| 1 adult · ordinary land · 12 households | $31954 | $31954 | $6907 | $6907 | break-even | break-even |
+| 1 adult · marginal land · 12 households | $60299 | $60299 | $6907 | $6907 | break-even | break-even |
+| 2 adults + 2 children · ordinary land · 12 households | $49845 | $49845 | $6907 | $6907 | break-even | break-even |
+| 2 adults + 2 children · ordinary land · 16 households | $66382 | $66382 | $6907 | $6907 | break-even | break-even |
+| 2 adults + 2 children · ordinary land · 25 households | $103588 | $103588 | $6907 | $6907 | break-even | break-even |
 
 Full machine-readable rows are in `arc-site-lease-economics.json` and `arc-site-lease-economics.csv`.
 

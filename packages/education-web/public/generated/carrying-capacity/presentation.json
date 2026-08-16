@@ -2,7 +2,7 @@
   "contract_version": "1.3.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-15T10:41:18.077Z",
+  "generated_at": "2026-08-16T00:42:47.446Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -1688,7 +1688,7 @@
     }
   },
   "site_lease_economics": {
-    "contract_version": "1.6.0",
+    "contract_version": "1.7.0",
     "api": "calculateArcSiteLeaseEconomics",
     "planning_guideline": {
       "productive_land_per_adult_ha": 1,
@@ -2837,8 +2837,8 @@
             "explanation": "Resident labour and future replacement liability are shown separately; they are not converted into the legal-minimum recurring cash charge."
           },
           "shared_services_monthly_per_household_cad": 47.96,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 268.22,
+          "site_lease_monthly_per_household_cad": 221.91,
+          "land_infrastructure_monthly_per_household_cad": 269.87,
           "annual_shared_service_revenue_cad": 6906.84,
           "annual_infrastructure_layer_cost_cad": 6906.84,
           "infrastructure_layer_break_even": true
@@ -2858,8 +2858,8 @@
             "explanation": "Resident labour and future replacement liability are shown separately; they are not converted into the legal-minimum recurring cash charge."
           },
           "shared_services_monthly_per_household_cad": 35.97,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 256.23,
+          "site_lease_monthly_per_household_cad": 221.5,
+          "land_infrastructure_monthly_per_household_cad": 257.47,
           "annual_shared_service_revenue_cad": 6906.84,
           "annual_infrastructure_layer_cost_cad": 6906.84,
           "infrastructure_layer_break_even": true
@@ -2879,8 +2879,8 @@
             "explanation": "Resident labour and future replacement liability are shown separately; they are not converted into the legal-minimum recurring cash charge."
           },
           "shared_services_monthly_per_household_cad": 23.02,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 243.28,
+          "site_lease_monthly_per_household_cad": 221.05,
+          "land_infrastructure_monthly_per_household_cad": 244.07,
           "annual_shared_service_revenue_cad": 6906.84,
           "annual_infrastructure_layer_cost_cad": 6906.84,
           "infrastructure_layer_break_even": true
@@ -2900,8 +2900,8 @@
             "explanation": "Resident labour and future replacement liability are shown separately; they are not converted into the legal-minimum recurring cash charge."
           },
           "shared_services_monthly_per_household_cad": 11.51,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 231.77,
+          "site_lease_monthly_per_household_cad": 220.66,
+          "land_infrastructure_monthly_per_household_cad": 232.17,
           "annual_shared_service_revenue_cad": 6906.84,
           "annual_infrastructure_layer_cost_cad": 6906.84,
           "infrastructure_layer_break_even": true
@@ -2923,8 +2923,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 1162.31,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 1382.57,
+          "site_lease_monthly_per_household_cad": 221.91,
+          "land_infrastructure_monthly_per_household_cad": 1384.22,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -2944,8 +2944,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 871.73,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 1091.99,
+          "site_lease_monthly_per_household_cad": 221.5,
+          "land_infrastructure_monthly_per_household_cad": 1093.23,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -2965,8 +2965,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 557.91,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 778.17,
+          "site_lease_monthly_per_household_cad": 221.05,
+          "land_infrastructure_monthly_per_household_cad": 778.96,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -2986,8 +2986,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 278.95,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 499.21,
+          "site_lease_monthly_per_household_cad": 220.66,
+          "land_infrastructure_monthly_per_household_cad": 499.61,
           "annual_shared_service_revenue_cad": 167372.4,
           "annual_infrastructure_layer_cost_cad": 167372.4,
           "infrastructure_layer_break_even": true
@@ -3009,8 +3009,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 228.18,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 448.44,
+          "site_lease_monthly_per_household_cad": 221.91,
+          "land_infrastructure_monthly_per_household_cad": 450.09,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -3030,8 +3030,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 171.14,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 391.4,
+          "site_lease_monthly_per_household_cad": 221.5,
+          "land_infrastructure_monthly_per_household_cad": 392.64,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -3051,8 +3051,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 109.53,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 329.79,
+          "site_lease_monthly_per_household_cad": 221.05,
+          "land_infrastructure_monthly_per_household_cad": 330.58,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -3072,8 +3072,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 54.76,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 275.02,
+          "site_lease_monthly_per_household_cad": 220.66,
+          "land_infrastructure_monthly_per_household_cad": 275.42,
           "annual_shared_service_revenue_cad": 32858,
           "annual_infrastructure_layer_cost_cad": 32858,
           "infrastructure_layer_break_even": true
@@ -3095,8 +3095,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 1027.57,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 1247.83,
+          "site_lease_monthly_per_household_cad": 221.91,
+          "land_infrastructure_monthly_per_household_cad": 1249.48,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -3116,8 +3116,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 770.67,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 990.93,
+          "site_lease_monthly_per_household_cad": 221.5,
+          "land_infrastructure_monthly_per_household_cad": 992.17,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -3137,8 +3137,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 493.23,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 713.49,
+          "site_lease_monthly_per_household_cad": 221.05,
+          "land_infrastructure_monthly_per_household_cad": 714.28,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -3158,8 +3158,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 246.62,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 466.88,
+          "site_lease_monthly_per_household_cad": 220.66,
+          "land_infrastructure_monthly_per_household_cad": 467.28,
           "annual_shared_service_revenue_cad": 147969.56,
           "annual_infrastructure_layer_cost_cad": 147969.56,
           "infrastructure_layer_break_even": true
@@ -3181,8 +3181,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 1275.24,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 1495.5,
+          "site_lease_monthly_per_household_cad": 221.91,
+          "land_infrastructure_monthly_per_household_cad": 1497.15,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
@@ -3202,8 +3202,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 956.43,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 1176.69,
+          "site_lease_monthly_per_household_cad": 221.5,
+          "land_infrastructure_monthly_per_household_cad": 1177.93,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
@@ -3223,8 +3223,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 612.12,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 832.38,
+          "site_lease_monthly_per_household_cad": 221.05,
+          "land_infrastructure_monthly_per_household_cad": 833.17,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
@@ -3244,8 +3244,8 @@
             "explanation": "Cash operating maintenance and replacement reserve are included in the selected service charge."
           },
           "shared_services_monthly_per_household_cad": 306.06,
-          "site_lease_monthly_per_household_cad": 220.26,
-          "land_infrastructure_monthly_per_household_cad": 526.32,
+          "site_lease_monthly_per_household_cad": 220.66,
+          "land_infrastructure_monthly_per_household_cad": 526.72,
           "annual_shared_service_revenue_cad": 183634.92,
           "annual_infrastructure_layer_cost_cad": 183634.92,
           "infrastructure_layer_break_even": true
@@ -4835,57 +4835,112 @@
       }
     ],
     "common_area_accounting": {
-      "mode": "pooled_planning_assumption",
-      "source": "Legal-minimum lower bound; parcel/site layout is required to determine actual common area",
-      "evidence_status": "working_planning_assumption",
-      "total_common_area_ha": 0,
+      "mode": "geometry_derived",
+      "source": "ARC conceptual public-road → common laneway → terminal loop → central amenity envelope prototype; site/fire/municipal validation required",
+      "evidence_status": "derived_from_ARC_conceptual_geometry; site/fire/municipal_validation_required",
+      "total_common_area_ha": 0.09994,
       "components": [
         {
           "id": "residential_footprints",
           "label": "Residential footprints",
           "status": "site_plan_required",
-          "area_ha": null
+          "area_ha": 0
         },
         {
           "id": "internal_road_access",
           "label": "Internal road/access area",
           "status": "site_plan_required",
-          "area_ha": null
+          "area_ha": 0.07494
         },
         {
           "id": "common_buildings_infrastructure",
           "label": "Common buildings/infrastructure footprints",
           "status": "site_plan_required",
-          "area_ha": null
+          "area_ha": 0.025
         },
         {
           "id": "ecological_water_buffers",
           "label": "Ecological and water buffers",
           "status": "site_plan_required",
-          "area_ha": null
+          "area_ha": 0
         },
         {
           "id": "shared_productive_areas",
           "label": "Shared productive areas",
           "status": "site_plan_required",
-          "area_ha": null
+          "area_ha": 0
         },
         {
           "id": "other_required_common_land",
           "label": "Other required common land",
           "status": "site_plan_required",
-          "area_ha": null
+          "area_ha": 0
         }
       ],
-      "missing_components": [
-        "residential_footprints",
-        "internal_road_access",
-        "common_buildings_infrastructure",
-        "ecological_water_buffers",
-        "shared_productive_areas",
-        "other_required_common_land"
-      ],
-      "explanation": "The site plan does not yet provide all non-productive polygons, so the explicit pooled common-area assumption is used and the component areas remain unresolved.",
+      "missing_components": [],
+      "geometry": {
+        "contract_version": "1.0.0",
+        "mode": "arc_lane_loop_amenity_prototype",
+        "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+        "access_road_construction_scenario": "basic_gravel",
+        "inputs": {
+          "laneway_length_m": 50,
+          "travelled_lane_width_m": 4,
+          "shoulders_drainage_width_m": 2,
+          "emergency_clearance_width_m": 0,
+          "common_corridor_width_m": 6,
+          "household_connection_count": 12,
+          "household_connection_length_m": 15,
+          "household_connection_width_m": 3,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_shape": "circle",
+          "amenity_building_footprint_area_m2": 0,
+          "circulating_lane_width_m": 6,
+          "other_required_common_area_m2": 0
+        },
+        "laneway": {
+          "travelled_surface_area_m2": 200,
+          "corridor_area_m2": 300,
+          "corridor_area_ha": 0.03,
+          "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+        },
+        "terminal_loop": {
+          "inner_radius_m": 8.921,
+          "circulating_lane_width_m": 6,
+          "outer_turning_radius_m": 14.921,
+          "circulation_lane_area_m2": 449.397,
+          "circulation_lane_area_ha": 0.04494,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_area_ha": 0.025,
+          "amenity_building_footprint_area_m2": 0,
+          "total_terminal_loop_common_area_m2": 699.397,
+          "total_terminal_loop_common_area_ha": 0.06994,
+          "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+        },
+        "household_connections": {
+          "count": 12,
+          "total_area_m2": 540,
+          "total_area_ha": 0.054,
+          "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+        },
+        "other_required_common_area_m2": 0,
+        "other_required_common_area_ha": 0,
+        "common_property_area_m2": 999.397,
+        "common_property_area_ha": 0.09994,
+        "common_area_components": {
+          "laneway_corridor_area_ha": 0.03,
+          "terminal_circulation_loop_area_ha": 0.04494,
+          "amenity_envelope_area_ha": 0.025,
+          "other_required_common_area_ha": 0
+        },
+        "notes": [
+          "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+          "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+          "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+          "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+        ]
+      },
+      "explanation": "Common property is the physical access corridor, terminal circulation lane, central amenity envelope and explicitly required shared drainage/servicing/buffer area. Productive vegetation bordering access remains in adjoining household leased allocations.",
       "component_definitions": [
         {
           "id": "residential_footprints",
@@ -4918,9 +4973,11 @@
           "status": "site_plan_required"
         }
       ],
-      "spatial_pipeline": "parcel -> buildings/residential footprints -> roads/access -> servicing -> productive layout -> ecological buffers -> explicit common hectares",
-      "spatial_pipeline_status": "not_connected_to_current_ARC_economics",
-      "spatial_pipeline_gap": "Current hamlet layout fixtures contain points, lines and rectangles for proposed elements but do not yet provide a validated parcel-clipped polygon area takeoff for each common-land category."
+      "geometry_contract_version": "1.0.0",
+      "spatial_pipeline": "public road -> common laneway -> terminal circulation loop -> central amenity envelope -> household leased productive allocations",
+      "spatial_pipeline_status": "conceptual_geometry_prototype_connected_to_ARC_economics",
+      "spatial_pipeline_gap": "The prototype is not a parcel-clipped engineering or fire-access approval. Actual alignment, drainage, setbacks, turning requirements and unavoidable shared buffers remain site-specific.",
+      "productive_edge_boundary": "Productive/permaculture vegetation outside vehicle clearances remains in adjoining household leased allocations and is not added to common hectares."
     },
     "land_financing_evidence": {
       "status": "planning_range_not_product_specific",
@@ -5742,13 +5799,105 @@
     },
     "default_inputs": {
       "land_price_cad_per_ha": 35000,
-      "common_property_land_ha": 0,
-      "common_property_land_area_status": "lower_bound_pending_site_plan",
+      "common_property_land_ha": 0.09994,
+      "common_property_land_area_status": "geometry_derived_conceptual_prototype_pending_site_validation",
       "common_property_land_sensitivity_ha": [
-        0,
-        0.5,
-        1,
-        1.5
+        0.03,
+        0.05,
+        0.075,
+        0.1
+      ],
+      "common_area_geometry": {
+        "contract_version": "1.0.0",
+        "mode": "arc_lane_loop_amenity_prototype",
+        "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+        "access_road_construction_scenario": "basic_gravel",
+        "inputs": {
+          "laneway_length_m": 50,
+          "travelled_lane_width_m": 4,
+          "shoulders_drainage_width_m": 2,
+          "emergency_clearance_width_m": 0,
+          "common_corridor_width_m": 6,
+          "household_connection_count": 12,
+          "household_connection_length_m": 15,
+          "household_connection_width_m": 3,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_shape": "circle",
+          "amenity_building_footprint_area_m2": 0,
+          "circulating_lane_width_m": 6,
+          "other_required_common_area_m2": 0
+        },
+        "laneway": {
+          "travelled_surface_area_m2": 200,
+          "corridor_area_m2": 300,
+          "corridor_area_ha": 0.03,
+          "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+        },
+        "terminal_loop": {
+          "inner_radius_m": 8.921,
+          "circulating_lane_width_m": 6,
+          "outer_turning_radius_m": 14.921,
+          "circulation_lane_area_m2": 449.397,
+          "circulation_lane_area_ha": 0.04494,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_area_ha": 0.025,
+          "amenity_building_footprint_area_m2": 0,
+          "total_terminal_loop_common_area_m2": 699.397,
+          "total_terminal_loop_common_area_ha": 0.06994,
+          "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+        },
+        "household_connections": {
+          "count": 12,
+          "total_area_m2": 540,
+          "total_area_ha": 0.054,
+          "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+        },
+        "other_required_common_area_m2": 0,
+        "other_required_common_area_ha": 0,
+        "common_property_area_m2": 999.397,
+        "common_property_area_ha": 0.09994,
+        "common_area_components": {
+          "laneway_corridor_area_ha": 0.03,
+          "terminal_circulation_loop_area_ha": 0.04494,
+          "amenity_envelope_area_ha": 0.025,
+          "other_required_common_area_ha": 0
+        },
+        "notes": [
+          "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+          "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+          "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+          "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+        ]
+      },
+      "common_area_geometry_sensitivity": [
+        {
+          "laneway_length_m": 30,
+          "common_property_area_ha": 0.08794,
+          "laneway_corridor_area_m2": 180,
+          "terminal_circulation_loop_area_m2": 449.397,
+          "amenity_envelope_area_m2": 250
+        },
+        {
+          "laneway_length_m": 50,
+          "common_property_area_ha": 0.09994,
+          "laneway_corridor_area_m2": 300,
+          "terminal_circulation_loop_area_m2": 449.397,
+          "amenity_envelope_area_m2": 250
+        },
+        {
+          "laneway_length_m": 75,
+          "common_property_area_ha": 0.11494,
+          "laneway_corridor_area_m2": 450,
+          "terminal_circulation_loop_area_m2": 449.397,
+          "amenity_envelope_area_m2": 250
+        },
+        {
+          "laneway_length_m": 100,
+          "common_property_area_ha": 0.12994,
+          "laneway_corridor_area_m2": 600,
+          "terminal_circulation_loop_area_m2": 449.397,
+          "amenity_envelope_area_m2": 250
+        }
       ],
       "legal_lease_term_years": 49,
       "land_financing": {
@@ -5777,9 +5926,9 @@
       "one_adult_ordinary": {
         "land_infrastructure": {
           "productive_allocation_ha": 1.117863,
-          "site_lease_monthly_cad": 220.26,
+          "site_lease_monthly_cad": 221.91,
           "shared_infrastructure_monthly_cad": 47.96,
-          "combined_monthly_cad": 268.22,
+          "combined_monthly_cad": 269.87,
           "formula": "site lease + shared infrastructure fee; dwelling and household expenses excluded"
         },
         "site_lease": {
@@ -5787,8 +5936,8 @@
           "reserved_land_requirement_ha": 1.117863,
           "productive_land_charge_annual_cad": 2643.17,
           "annual_components_cad": {
-            "common_land_finance_recovery_annual_cad": 0,
-            "common_property_tax_annual_cad": 0,
+            "common_land_finance_recovery_annual_cad": 16.78,
+            "common_property_tax_annual_cad": 2.91,
             "land_insurance_annual_cad": 0,
             "common_land_costs_annual_cad": 0,
             "administration_annual_cad": 0,
@@ -5799,8 +5948,8 @@
             "productive_vacancy_reserve_annual_cad": 0
           },
           "common_property_land_holding_annual_components_cad": {
-            "common_land_finance_recovery_annual_cad": 0,
-            "common_property_tax_annual_cad": 0,
+            "common_land_finance_recovery_annual_cad": 16.78,
+            "common_property_tax_annual_cad": 2.91,
             "land_insurance_annual_cad": 0,
             "common_land_costs_annual_cad": 0,
             "administration_annual_cad": 0,
@@ -5812,27 +5961,27 @@
             "productive_property_tax_annual_cad": 391.25,
             "productive_vacancy_reserve_annual_cad": 0
           },
-          "common_property_land_holding_charge_monthly_cad": 0,
+          "common_property_land_holding_charge_monthly_cad": 1.64,
           "productive_land_charge_per_hectare_monthly_cad": 197.04,
           "productive_land_portion_monthly_cad": 220.26,
-          "annual_total_cad": 2643.12,
-          "monthly_total_cad": 220.26,
+          "annual_total_cad": 2662.92,
+          "monthly_total_cad": 221.91,
           "allocation_method": "base_plus_hectare",
           "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.",
-          "common_property_land_holding_share_monthly_cad": 0,
+          "common_property_land_holding_share_monthly_cad": 1.64,
           "productive_land_allocation_ha": 1.117863,
           "common_property_land_holding": {
             "allocation_basis": "equal_per_household",
             "monthly_components_cad": {
-              "common_land_finance_recovery_monthly_cad": 0,
-              "common_property_tax_monthly_cad": 0,
+              "common_land_finance_recovery_monthly_cad": 1.4,
+              "common_property_tax_monthly_cad": 0.24,
               "land_insurance_monthly_cad": 0,
               "common_land_costs_monthly_cad": 0,
               "administration_monthly_cad": 0,
               "fixed_land_reserve_monthly_cad": 0,
               "common_vacancy_reserve_monthly_cad": 0
             },
-            "monthly_total_cad": 0
+            "monthly_total_cad": 1.64
           },
           "productive_land_charge": {
             "allocation_basis": "proportional_to_reserved_productive_hectares",
@@ -5844,8 +5993,8 @@
             "monthly_total_cad": 220.26
           },
           "financing": {
-            "debt_service_monthly_cad": 187.66,
-            "initial_equity_contribution_cad": 7825.04,
+            "debt_service_monthly_cad": 189.06,
+            "initial_equity_contribution_cad": 7883.34,
             "equity_recovery_monthly_cad": 0,
             "equity_recovery_policy": "Initial project equity is not recovered again as recurring site-lease revenue."
           }
@@ -6029,8 +6178,8 @@
             "high": 74000
           },
           "illustrative_dwelling_financing_monthly_cad": 353.72,
-          "land_shared_infrastructure_monthly_cad": 268.22,
-          "illustrative_dwelling_financing_plus_land_shared_monthly_cad": 621.94,
+          "land_shared_infrastructure_monthly_cad": 269.87,
+          "illustrative_dwelling_financing_plus_land_shared_monthly_cad": 623.59,
           "household_operating_costs_excluded": true,
           "formula": "illustrative dwelling financing + site lease + shared infrastructure; household operating costs excluded"
         }
@@ -6038,9 +6187,9 @@
       "family_ordinary": {
         "land_infrastructure": {
           "productive_allocation_ha": 1.748399,
-          "site_lease_monthly_cad": 344.51,
+          "site_lease_monthly_cad": 346.15,
           "shared_infrastructure_monthly_cad": 47.96,
-          "combined_monthly_cad": 392.47,
+          "combined_monthly_cad": 394.11,
           "formula": "site lease + shared infrastructure fee; dwelling and household expenses excluded"
         },
         "site_lease": {
@@ -6048,8 +6197,8 @@
           "reserved_land_requirement_ha": 1.748399,
           "productive_land_charge_annual_cad": 4134.07,
           "annual_components_cad": {
-            "common_land_finance_recovery_annual_cad": 0,
-            "common_property_tax_annual_cad": 0,
+            "common_land_finance_recovery_annual_cad": 16.78,
+            "common_property_tax_annual_cad": 2.91,
             "land_insurance_annual_cad": 0,
             "common_land_costs_annual_cad": 0,
             "administration_annual_cad": 0,
@@ -6060,8 +6209,8 @@
             "productive_vacancy_reserve_annual_cad": 0
           },
           "common_property_land_holding_annual_components_cad": {
-            "common_land_finance_recovery_annual_cad": 0,
-            "common_property_tax_annual_cad": 0,
+            "common_land_finance_recovery_annual_cad": 16.78,
+            "common_property_tax_annual_cad": 2.91,
             "land_insurance_annual_cad": 0,
             "common_land_costs_annual_cad": 0,
             "administration_annual_cad": 0,
@@ -6073,27 +6222,27 @@
             "productive_property_tax_annual_cad": 611.94,
             "productive_vacancy_reserve_annual_cad": 0
           },
-          "common_property_land_holding_charge_monthly_cad": 0,
+          "common_property_land_holding_charge_monthly_cad": 1.64,
           "productive_land_charge_per_hectare_monthly_cad": 197.04,
           "productive_land_portion_monthly_cad": 344.51,
-          "annual_total_cad": 4134.12,
-          "monthly_total_cad": 344.51,
+          "annual_total_cad": 4153.8,
+          "monthly_total_cad": 346.15,
           "allocation_method": "base_plus_hectare",
           "allocation_method_description": "Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.",
-          "common_property_land_holding_share_monthly_cad": 0,
+          "common_property_land_holding_share_monthly_cad": 1.64,
           "productive_land_allocation_ha": 1.748399,
           "common_property_land_holding": {
             "allocation_basis": "equal_per_household",
             "monthly_components_cad": {
-              "common_land_finance_recovery_monthly_cad": 0,
-              "common_property_tax_monthly_cad": 0,
+              "common_land_finance_recovery_monthly_cad": 1.4,
+              "common_property_tax_monthly_cad": 0.24,
               "land_insurance_monthly_cad": 0,
               "common_land_costs_monthly_cad": 0,
               "administration_monthly_cad": 0,
               "fixed_land_reserve_monthly_cad": 0,
               "common_vacancy_reserve_monthly_cad": 0
             },
-            "monthly_total_cad": 0
+            "monthly_total_cad": 1.64
           },
           "productive_land_charge": {
             "allocation_basis": "proportional_to_reserved_productive_hectares",
@@ -6105,8 +6254,8 @@
             "monthly_total_cad": 344.51
           },
           "financing": {
-            "debt_service_monthly_cad": 293.51,
-            "initial_equity_contribution_cad": 12238.79,
+            "debt_service_monthly_cad": 294.91,
+            "initial_equity_contribution_cad": 12297.09,
             "equity_recovery_monthly_cad": 0,
             "equity_recovery_policy": "Initial project equity is not recovered again as recurring site-lease revenue."
           }
@@ -6290,8 +6439,8 @@
             "high": 74000
           },
           "illustrative_dwelling_financing_monthly_cad": 353.72,
-          "land_shared_infrastructure_monthly_cad": 392.47,
-          "illustrative_dwelling_financing_plus_land_shared_monthly_cad": 746.19,
+          "land_shared_infrastructure_monthly_cad": 394.11,
+          "illustrative_dwelling_financing_plus_land_shared_monthly_cad": 747.83,
           "household_operating_costs_excluded": true,
           "formula": "illustrative dwelling financing + site lease + shared infrastructure; household operating costs excluded"
         }
@@ -6301,12 +6450,12 @@
       "one_adult_ordinary": {
         "productive_land_ha": 1.117863,
         "mature_land_ha": 1.048378,
-        "land_infrastructure_monthly_cad": 268.22
+        "land_infrastructure_monthly_cad": 269.87
       },
       "family_ordinary": {
         "productive_land_ha": 1.748399,
         "mature_land_ha": 1.52161,
-        "land_infrastructure_monthly_cad": 392.47
+        "land_infrastructure_monthly_cad": 394.11
       }
     },
     "notes": [

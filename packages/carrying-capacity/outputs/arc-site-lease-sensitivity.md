@@ -6,24 +6,24 @@ Family case: 2 adults + 2 children on an ordinary site. Prices and infrastructur
 
 | Households | Land price/ha | Land ownership | Land value | Land finance/mo | Site lease/mo | Shared service/mo | Land + infrastructure/mo |
 |---:|---:|---|---:|---:|---:|---:|---:|
-| 12 | $20000 | financed | $419616 | $2013 | $197 | $48 | $245 |
-| 12 | $20000 | owned_out_right | $419616 | $0 | $29 | $48 | $77 |
-| 12 | $20000 | donated_land_trust | $419616 | $0 | $29 | $48 | $77 |
-| 12 | $35000 | financed | $734328 | $3522 | $345 | $48 | $392 |
-| 12 | $35000 | owned_out_right | $734328 | $0 | $51 | $48 | $99 |
-| 12 | $35000 | donated_land_trust | $734328 | $0 | $51 | $48 | $99 |
-| 12 | $60000 | financed | $1258847 | $6038 | $591 | $48 | $639 |
-| 12 | $60000 | owned_out_right | $1258847 | $0 | $87 | $48 | $135 |
-| 12 | $60000 | donated_land_trust | $1258847 | $0 | $87 | $48 | $135 |
-| 25 | $20000 | financed | $874200 | $4193 | $197 | $23 | $220 |
-| 25 | $20000 | owned_out_right | $874200 | $0 | $29 | $23 | $52 |
-| 25 | $20000 | donated_land_trust | $874200 | $0 | $29 | $23 | $52 |
-| 25 | $35000 | financed | $1529849 | $7338 | $345 | $23 | $368 |
-| 25 | $35000 | owned_out_right | $1529849 | $0 | $51 | $23 | $74 |
-| 25 | $35000 | donated_land_trust | $1529849 | $0 | $51 | $23 | $74 |
-| 25 | $60000 | financed | $2622599 | $12579 | $591 | $23 | $614 |
-| 25 | $60000 | owned_out_right | $2622599 | $0 | $87 | $23 | $110 |
-| 25 | $60000 | donated_land_trust | $2622599 | $0 | $87 | $23 | $110 |
+| 12 | $20000 | financed | $421615 | $2022 | $198 | $48 | $246 |
+| 12 | $20000 | owned_out_right | $421615 | $0 | $29 | $48 | $77 |
+| 12 | $20000 | donated_land_trust | $421615 | $0 | $29 | $48 | $77 |
+| 12 | $35000 | financed | $737825 | $3539 | $346 | $48 | $394 |
+| 12 | $35000 | owned_out_right | $737825 | $0 | $51 | $48 | $99 |
+| 12 | $35000 | donated_land_trust | $737825 | $0 | $51 | $48 | $99 |
+| 12 | $60000 | financed | $1264844 | $6067 | $593 | $48 | $641 |
+| 12 | $60000 | owned_out_right | $1264844 | $0 | $88 | $48 | $136 |
+| 12 | $60000 | donated_land_trust | $1264844 | $0 | $88 | $48 | $136 |
+| 25 | $20000 | financed | $876198 | $4203 | $197 | $23 | $220 |
+| 25 | $20000 | owned_out_right | $876198 | $0 | $29 | $23 | $52 |
+| 25 | $20000 | donated_land_trust | $876198 | $0 | $29 | $23 | $52 |
+| 25 | $35000 | financed | $1533347 | $7355 | $345 | $23 | $368 |
+| 25 | $35000 | owned_out_right | $1533347 | $0 | $51 | $23 | $74 |
+| 25 | $35000 | donated_land_trust | $1533347 | $0 | $51 | $23 | $74 |
+| 25 | $60000 | financed | $2628595 | $12608 | $592 | $23 | $615 |
+| 25 | $60000 | owned_out_right | $2628595 | $0 | $88 | $23 | $111 |
+| 25 | $60000 | donated_land_trust | $2628595 | $0 | $88 | $23 | $111 |
 
 The financed land case has a land-capital recovery payment; outright and donated/land-trust cases do not. Their land value remains visible even when no acquisition debt is charged.
 
@@ -33,9 +33,9 @@ The current 6% / 30-year / 20% case is illustrative. Loan term is shown separate
 
 | Scenario | Down | Interest | Amortization | Loan term | Initial equity | Project debt service/mo | Site lease/mo | Land + infrastructure/mo | Status |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| Illustrative current case | 20% | 6.0% | 30 y | 5 y | $146866 | $3522 | $345 | $392 | illustrative_not_canonical |
-| Neutral land-planning comparison | 25% | 6.0% | 25 y | 5 y | $183582 | $3548 | $347 | $395 | planning_comparison |
-| CALA-style land comparison | 20% | 6.0% | 15 y | 15 y | $146866 | $4957 | $464 | $512 | eligibility_dependent |
+| Illustrative current case | 20% | 6.0% | 30 y | 5 y | $147565 | $3539 | $346 | $394 | illustrative_not_canonical |
+| Neutral land-planning comparison | 25% | 6.0% | 25 y | 5 y | $184456 | $3565 | $348 | $396 | planning_comparison |
+| CALA-style land comparison | 20% | 6.0% | 15 y | 15 y | $147565 | $4981 | $466 | $514 | eligibility_dependent |
 
 ## Inputs still needing local evidence
 

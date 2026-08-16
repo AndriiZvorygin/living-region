@@ -1,6 +1,6 @@
 # ARC site-lease decomposition and land-financing audit
 
-> **Current-baseline note:** the original figures in this audit are retained as a legacy decomposition. The canonical affordability baseline is now `legal_minimum`: paid administration, vacancy, optional insurance, paid common-property operations and replacement reserves are excluded from recurring cash; the common-area lower bound is 0 ha until a parcel/site-plan takeoff is available. See `packages/carrying-capacity/outputs/arc-legal-minimum.md` for regenerated values.
+> **Current-baseline note:** the original figures in this audit are retained as a legacy decomposition. The canonical affordability baseline is now `legal_minimum`: paid administration, vacancy, optional insurance, paid common-property operations and replacement reserves are excluded from recurring cash; common area is represented by the conceptual lane/loop/250 m² amenity prototype until a parcel/site-plan takeoff is available. See `packages/carrying-capacity/outputs/arc-legal-minimum.md` for regenerated values.
 
 ## Scope
 

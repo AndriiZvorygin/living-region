@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.5.0",
-  "generated_at": "2026-08-15T10:02:08.800Z",
+  "contract_version": "1.7.0",
+  "generated_at": "2026-08-16T00:34:52.995Z",
   "scope": "Common-property administration, common-property operations and land-layer evidence audit; private dwelling excluded.",
   "administration_scale": [
     {
@@ -300,8 +300,320 @@
     }
   },
   "common_property_area": {
-    "total_common_area_ha": 0,
-    "mode": "pooled_planning_assumption",
+    "total_common_area_ha": 0.09994,
+    "mode": "geometry_derived",
+    "geometry": {
+      "contract_version": "1.0.0",
+      "mode": "arc_lane_loop_amenity_prototype",
+      "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+      "access_road_construction_scenario": "basic_gravel",
+      "inputs": {
+        "laneway_length_m": 50,
+        "travelled_lane_width_m": 4,
+        "shoulders_drainage_width_m": 2,
+        "emergency_clearance_width_m": 0,
+        "common_corridor_width_m": 6,
+        "household_connection_count": 12,
+        "household_connection_length_m": 15,
+        "household_connection_width_m": 3,
+        "amenity_envelope_area_m2": 250,
+        "amenity_envelope_shape": "circle",
+        "amenity_building_footprint_area_m2": 0,
+        "circulating_lane_width_m": 6,
+        "other_required_common_area_m2": 0
+      },
+      "laneway": {
+        "travelled_surface_area_m2": 200,
+        "corridor_area_m2": 300,
+        "corridor_area_ha": 0.03,
+        "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+      },
+      "terminal_loop": {
+        "inner_radius_m": 8.921,
+        "circulating_lane_width_m": 6,
+        "outer_turning_radius_m": 14.921,
+        "circulation_lane_area_m2": 449.397,
+        "circulation_lane_area_ha": 0.04494,
+        "amenity_envelope_area_m2": 250,
+        "amenity_envelope_area_ha": 0.025,
+        "amenity_building_footprint_area_m2": 0,
+        "total_terminal_loop_common_area_m2": 699.397,
+        "total_terminal_loop_common_area_ha": 0.06994,
+        "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+      },
+      "household_connections": {
+        "count": 12,
+        "total_area_m2": 540,
+        "total_area_ha": 0.054,
+        "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+      },
+      "other_required_common_area_m2": 0,
+      "other_required_common_area_ha": 0,
+      "common_property_area_m2": 999.397,
+      "common_property_area_ha": 0.09994,
+      "common_area_components": {
+        "laneway_corridor_area_ha": 0.03,
+        "terminal_circulation_loop_area_ha": 0.04494,
+        "amenity_envelope_area_ha": 0.025,
+        "other_required_common_area_ha": 0
+      },
+      "notes": [
+        "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+        "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+        "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+        "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+      ]
+    },
+    "sensitivity": [
+      {
+        "contract_version": "1.0.0",
+        "mode": "arc_lane_loop_amenity_prototype",
+        "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+        "access_road_construction_scenario": "basic_gravel",
+        "inputs": {
+          "laneway_length_m": 30,
+          "travelled_lane_width_m": 4,
+          "shoulders_drainage_width_m": 2,
+          "emergency_clearance_width_m": 0,
+          "common_corridor_width_m": 6,
+          "household_connection_count": 12,
+          "household_connection_length_m": 15,
+          "household_connection_width_m": 3,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_shape": "circle",
+          "amenity_building_footprint_area_m2": 0,
+          "circulating_lane_width_m": 6,
+          "other_required_common_area_m2": 0
+        },
+        "laneway": {
+          "travelled_surface_area_m2": 120,
+          "corridor_area_m2": 180,
+          "corridor_area_ha": 0.018,
+          "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+        },
+        "terminal_loop": {
+          "inner_radius_m": 8.921,
+          "circulating_lane_width_m": 6,
+          "outer_turning_radius_m": 14.921,
+          "circulation_lane_area_m2": 449.397,
+          "circulation_lane_area_ha": 0.04494,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_area_ha": 0.025,
+          "amenity_building_footprint_area_m2": 0,
+          "total_terminal_loop_common_area_m2": 699.397,
+          "total_terminal_loop_common_area_ha": 0.06994,
+          "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+        },
+        "household_connections": {
+          "count": 12,
+          "total_area_m2": 540,
+          "total_area_ha": 0.054,
+          "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+        },
+        "other_required_common_area_m2": 0,
+        "other_required_common_area_ha": 0,
+        "common_property_area_m2": 879.397,
+        "common_property_area_ha": 0.08794,
+        "common_area_components": {
+          "laneway_corridor_area_ha": 0.018,
+          "terminal_circulation_loop_area_ha": 0.04494,
+          "amenity_envelope_area_ha": 0.025,
+          "other_required_common_area_ha": 0
+        },
+        "notes": [
+          "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+          "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+          "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+          "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+        ]
+      },
+      {
+        "contract_version": "1.0.0",
+        "mode": "arc_lane_loop_amenity_prototype",
+        "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+        "access_road_construction_scenario": "basic_gravel",
+        "inputs": {
+          "laneway_length_m": 50,
+          "travelled_lane_width_m": 4,
+          "shoulders_drainage_width_m": 2,
+          "emergency_clearance_width_m": 0,
+          "common_corridor_width_m": 6,
+          "household_connection_count": 12,
+          "household_connection_length_m": 15,
+          "household_connection_width_m": 3,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_shape": "circle",
+          "amenity_building_footprint_area_m2": 0,
+          "circulating_lane_width_m": 6,
+          "other_required_common_area_m2": 0
+        },
+        "laneway": {
+          "travelled_surface_area_m2": 200,
+          "corridor_area_m2": 300,
+          "corridor_area_ha": 0.03,
+          "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+        },
+        "terminal_loop": {
+          "inner_radius_m": 8.921,
+          "circulating_lane_width_m": 6,
+          "outer_turning_radius_m": 14.921,
+          "circulation_lane_area_m2": 449.397,
+          "circulation_lane_area_ha": 0.04494,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_area_ha": 0.025,
+          "amenity_building_footprint_area_m2": 0,
+          "total_terminal_loop_common_area_m2": 699.397,
+          "total_terminal_loop_common_area_ha": 0.06994,
+          "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+        },
+        "household_connections": {
+          "count": 12,
+          "total_area_m2": 540,
+          "total_area_ha": 0.054,
+          "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+        },
+        "other_required_common_area_m2": 0,
+        "other_required_common_area_ha": 0,
+        "common_property_area_m2": 999.397,
+        "common_property_area_ha": 0.09994,
+        "common_area_components": {
+          "laneway_corridor_area_ha": 0.03,
+          "terminal_circulation_loop_area_ha": 0.04494,
+          "amenity_envelope_area_ha": 0.025,
+          "other_required_common_area_ha": 0
+        },
+        "notes": [
+          "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+          "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+          "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+          "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+        ]
+      },
+      {
+        "contract_version": "1.0.0",
+        "mode": "arc_lane_loop_amenity_prototype",
+        "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+        "access_road_construction_scenario": "basic_gravel",
+        "inputs": {
+          "laneway_length_m": 75,
+          "travelled_lane_width_m": 4,
+          "shoulders_drainage_width_m": 2,
+          "emergency_clearance_width_m": 0,
+          "common_corridor_width_m": 6,
+          "household_connection_count": 12,
+          "household_connection_length_m": 15,
+          "household_connection_width_m": 3,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_shape": "circle",
+          "amenity_building_footprint_area_m2": 0,
+          "circulating_lane_width_m": 6,
+          "other_required_common_area_m2": 0
+        },
+        "laneway": {
+          "travelled_surface_area_m2": 300,
+          "corridor_area_m2": 450,
+          "corridor_area_ha": 0.045,
+          "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+        },
+        "terminal_loop": {
+          "inner_radius_m": 8.921,
+          "circulating_lane_width_m": 6,
+          "outer_turning_radius_m": 14.921,
+          "circulation_lane_area_m2": 449.397,
+          "circulation_lane_area_ha": 0.04494,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_area_ha": 0.025,
+          "amenity_building_footprint_area_m2": 0,
+          "total_terminal_loop_common_area_m2": 699.397,
+          "total_terminal_loop_common_area_ha": 0.06994,
+          "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+        },
+        "household_connections": {
+          "count": 12,
+          "total_area_m2": 540,
+          "total_area_ha": 0.054,
+          "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+        },
+        "other_required_common_area_m2": 0,
+        "other_required_common_area_ha": 0,
+        "common_property_area_m2": 1149.397,
+        "common_property_area_ha": 0.11494,
+        "common_area_components": {
+          "laneway_corridor_area_ha": 0.045,
+          "terminal_circulation_loop_area_ha": 0.04494,
+          "amenity_envelope_area_ha": 0.025,
+          "other_required_common_area_ha": 0
+        },
+        "notes": [
+          "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+          "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+          "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+          "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+        ]
+      },
+      {
+        "contract_version": "1.0.0",
+        "mode": "arc_lane_loop_amenity_prototype",
+        "source": "conceptual ARC common-area geometry prototype; site/fire/municipal validation required",
+        "access_road_construction_scenario": "basic_gravel",
+        "inputs": {
+          "laneway_length_m": 100,
+          "travelled_lane_width_m": 4,
+          "shoulders_drainage_width_m": 2,
+          "emergency_clearance_width_m": 0,
+          "common_corridor_width_m": 6,
+          "household_connection_count": 12,
+          "household_connection_length_m": 15,
+          "household_connection_width_m": 3,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_shape": "circle",
+          "amenity_building_footprint_area_m2": 0,
+          "circulating_lane_width_m": 6,
+          "other_required_common_area_m2": 0
+        },
+        "laneway": {
+          "travelled_surface_area_m2": 400,
+          "corridor_area_m2": 600,
+          "corridor_area_ha": 0.06,
+          "productive_edge_treatment": "excluded_from_common_property; assign adjoining thorny shrubs, trees, coppice, windbreaks and other productive/ecological strips to household leased sites outside vehicle clearances"
+        },
+        "terminal_loop": {
+          "inner_radius_m": 8.921,
+          "circulating_lane_width_m": 6,
+          "outer_turning_radius_m": 14.921,
+          "circulation_lane_area_m2": 449.397,
+          "circulation_lane_area_ha": 0.04494,
+          "amenity_envelope_area_m2": 250,
+          "amenity_envelope_area_ha": 0.025,
+          "amenity_building_footprint_area_m2": 0,
+          "total_terminal_loop_common_area_m2": 699.397,
+          "total_terminal_loop_common_area_ha": 0.06994,
+          "turnaround_validation_status": "conceptual_only; validate geometry against municipality and fire-service requirements"
+        },
+        "household_connections": {
+          "count": 12,
+          "total_area_m2": 540,
+          "total_area_ha": 0.054,
+          "accounting_treatment": "excluded from common property; assigned to adjoining household leased sites and not added to common hectares"
+        },
+        "other_required_common_area_m2": 0,
+        "other_required_common_area_ha": 0,
+        "common_property_area_m2": 1299.397,
+        "common_property_area_ha": 0.12994,
+        "common_area_components": {
+          "laneway_corridor_area_ha": 0.06,
+          "terminal_circulation_loop_area_ha": 0.04494,
+          "amenity_envelope_area_ha": 0.025,
+          "other_required_common_area_ha": 0
+        },
+        "notes": [
+          "The central 250 m² envelope is common ground reserved for a future shared use; amenity-building capital is not included here.",
+          "The loop radius is a transparent conceptual geometry, not an emergency-vehicle approval.",
+          "Only the physical common access corridor is counted. Productive/permaculture strips outside required clearance remain in adjoining household allocations.",
+          "The public-road connection, lane alignment, drainage, setbacks and fire access require parcel-specific site-plan validation."
+        ]
+      }
+    ],
     "component_definitions": {
       "residential_footprints": null,
       "internal_road_access": null,
@@ -310,7 +622,7 @@
       "shared_productive_areas": null,
       "other_required_common_land": null
     },
-    "spatial_pipeline_status": "not_connected_to_current_ARC_economics"
+    "spatial_pipeline_status": "conceptual_geometry_prototype_connected_to_ARC_economics"
   },
   "tax": {
     "status": "planning_assumption",
@@ -336,14 +648,14 @@
   },
   "affordability_examples": {
     "one_adult_ordinary": {
-      "site_lease_monthly_cad": 220.26,
+      "site_lease_monthly_cad": 221.91,
       "shared_infrastructure_monthly_cad": 47.96,
-      "combined_land_infrastructure_monthly_cad": 268.22
+      "combined_land_infrastructure_monthly_cad": 269.87
     },
     "family_ordinary": {
-      "site_lease_monthly_cad": 344.51,
+      "site_lease_monthly_cad": 346.15,
       "shared_infrastructure_monthly_cad": 47.96,
-      "combined_land_infrastructure_monthly_cad": 392.47
+      "combined_land_infrastructure_monthly_cad": 394.11
     }
   }
 }

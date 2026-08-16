@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ADMINISTRATION_SCENARIOS, buildArcDwellingPresentationContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcDwellingCost, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
+import {ADMINISTRATION_SCENARIOS, buildArcDwellingPresentationContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcCommonAreaGeometry, calculateArcDwellingCost, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
 
 function scenario(overrides = {}) {
   return {
@@ -121,10 +121,44 @@ test('optional cash scenarios remain available without becoming the legal-minimu
 test('common-area lower bound is visible and adding actual common area does not change productive hectares', () => {
   const lower = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
   const explicit = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12, common_area_ha: 1.5}}));
-  assert.equal(lower.scenario.common_area_ha, 0);
+  assert.equal(lower.scenario.common_area_ha, 0.09994);
   assert.equal(explicit.scenario.common_area_ha, 1.5);
   assert.equal(lower.households[0].reserved_productive_land_ha, explicit.households[0].reserved_productive_land_ha);
   assert.ok(explicit.households[0].site_lease.monthly_total_cad > lower.households[0].site_lease.monthly_total_cad);
+});
+
+test('ARC common-area prototype accounts for access, loop and central amenity envelope', () => {
+  const geometry = calculateArcCommonAreaGeometry();
+  assert.equal(geometry.inputs.laneway_length_m, 50);
+  assert.equal(geometry.laneway.corridor_area_m2, 300);
+  assert.equal(geometry.terminal_loop.amenity_envelope_area_m2, 250);
+  assert.ok(geometry.terminal_loop.circulation_lane_area_m2 > 400);
+  assert.equal(geometry.common_property_area_ha, 0.09994);
+  assert.equal(geometry.household_connections.accounting_treatment.includes('excluded from common property'), true);
+  assert.equal(geometry.terminal_loop.amenity_building_footprint_area_m2, 0);
+});
+
+test('common-area prototype responds linearly to configurable laneway length', () => {
+  const compact = calculateArcCommonAreaGeometry({laneway_length_m: 30});
+  const canonical = calculateArcCommonAreaGeometry({laneway_length_m: 50});
+  const long = calculateArcCommonAreaGeometry({laneway_length_m: 100});
+  assert.equal(compact.common_property_area_ha, 0.08794);
+  assert.equal(canonical.common_property_area_ha, 0.09994);
+  assert.equal(long.common_property_area_ha, 0.12994);
+  assert.equal(canonical.terminal_loop.circulation_lane_area_m2, long.terminal_loop.circulation_lane_area_m2);
+});
+
+test('common geometry keeps productive access-edge vegetation out of common hectares', () => {
+  const base = calculateArcSiteLeaseEconomics(scenario({community: {household_count: 12}}));
+  const widerConnections = calculateArcSiteLeaseEconomics(scenario({community: {
+    household_count: 12,
+    common_area_accounting: {
+      ...structuredClone(DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting),
+      geometry: {...structuredClone(DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.geometry), household_connection_width_m: 12}
+    }
+  }}));
+  assert.equal(widerConnections.scenario.common_area_ha, base.scenario.common_area_ha);
+  assert.equal(widerConnections.households[0].reserved_productive_land_ha, base.households[0].reserved_productive_land_ha);
 });
 
 test('legacy shared-services charge is reproducible and decomposes to line items', () => {
@@ -261,7 +295,7 @@ test('visible household monthly cost stack has no hidden residual', () => {
 
 test('presentation contract includes household-first land accounting inputs and examples', () => {
   const contract = buildSiteLeasePresentationContract();
-  assert.equal(contract.default_inputs.common_property_land_ha, 0);
+  assert.equal(contract.default_inputs.common_property_land_ha, 0.09994);
   assert.equal(contract.default_inputs.land_financing.interest_rate_annual, .06);
   assert.ok(contract.household_examples.one_adult_ordinary.land_infrastructure.site_lease_monthly_cad > 0);
   assert.equal(contract.household_examples.one_adult_ordinary.land_infrastructure.combined_monthly_cad, Number((contract.household_examples.one_adult_ordinary.site_lease.monthly_total_cad + contract.household_examples.one_adult_ordinary.shared_infrastructure_service.monthly_cad).toFixed(2)));
@@ -274,8 +308,10 @@ test('presentation contract includes household-first land accounting inputs and 
   assert.equal(contract.default_inputs.land_costs?.administration_scenario_id, 'legal_minimum');
   assert.equal(contract.administration_scale_examples.conventional[0].monthly_per_household_cad, 125);
   assert.equal(contract.administration_scale_examples.conventional[3].monthly_per_household_cad, 60.4);
-  assert.equal(contract.common_area_accounting.mode, 'pooled_planning_assumption');
-  assert.equal(contract.common_area_accounting.spatial_pipeline_status, 'not_connected_to_current_ARC_economics');
+  assert.equal(contract.common_area_accounting.mode, 'geometry_derived');
+  assert.equal(contract.common_area_accounting.spatial_pipeline_status, 'conceptual_geometry_prototype_connected_to_ARC_economics');
+  assert.equal(contract.common_area_accounting.geometry.terminal_loop.amenity_envelope_area_m2, 250);
+  assert.deepEqual(contract.default_inputs.common_area_geometry_sensitivity.map((row) => row.laneway_length_m), [30, 50, 75, 100]);
 });
 
 test('public ARC charge is exactly site lease plus shared infrastructure', () => {

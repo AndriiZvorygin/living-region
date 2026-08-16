@@ -1,6 +1,6 @@
 # ARC site-lease economics audit
 
-> **Historical audit note:** this document records the original broader site-lease/infrastructure model and its legacy comparison cases. The current canonical affordability baseline is `legal_minimum`, documented in `docs/arc-site-lease-accounting.md` and `packages/carrying-capacity/outputs/arc-legal-minimum.md`. The legal-minimum public scope excludes the private dwelling and household expenses, excludes discretionary paid administration/vacancy/insurance/reserves, separates resident labour and future replacement liability, and uses a zero common-area lower bound until a parcel/site-plan takeoff is available.
+> **Historical audit note:** this document records the original broader site-lease/infrastructure model and its legacy comparison cases. The current canonical affordability baseline is `legal_minimum`, documented in `docs/arc-site-lease-accounting.md` and `packages/carrying-capacity/outputs/arc-legal-minimum.md`. The legal-minimum public scope excludes the private dwelling and household expenses, excludes discretionary paid administration/vacancy/insurance/reserves, separates resident labour and future replacement liability, and uses the conceptual lane/loop/250 m² amenity geometry until a parcel/site-plan takeoff is available.
 
 Audit date: 2026-08-14. This audit covers the Living Region checkout only. HelpOS
 was not inspected or modified for this milestone.

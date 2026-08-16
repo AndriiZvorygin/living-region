@@ -5,6 +5,7 @@ import {
   ARC_SITE_LEASE_CONTRACT_VERSION,
   calculateAdministrationBudget,
   calculateArcSiteLeaseEconomics,
+  calculateArcCommonAreaGeometry,
   calculateCommonPropertyOperations,
   DEFAULT_SITE_LEASE_SCENARIO,
   SITE_LEASE_EVIDENCE
@@ -16,6 +17,8 @@ const clone = (value) => structuredClone(value);
 const money = (value) => `$${Number(value ?? 0).toFixed(2)}`;
 const wholeMoney = (value) => `$${Number(value ?? 0).toFixed(0)}`;
 const sizes = [12, 16, 25, 50];
+const defaultCommonArea = calculateArcCommonAreaGeometry(DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.geometry);
+const commonAreaSensitivity = [30, 50, 75, 100].map((lanewayLengthM) => calculateArcCommonAreaGeometry({...DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.geometry, laneway_length_m: lanewayLengthM}));
 
 const makeScenario = (householdCount, members = ['reference_adult_man']) => ({
   ...clone(DEFAULT_SITE_LEASE_SCENARIO),
@@ -73,10 +76,12 @@ const json = {
   administration_scale: adminRows,
   common_property_operations: {legal_minimum: legalMinimumOperations, contracted_baseline: operationBudget},
   common_property_area: {
-    total_common_area_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
-    mode: 'pooled_planning_assumption',
+    total_common_area_ha: defaultCommonArea.common_property_area_ha,
+    mode: 'geometry_derived',
+    geometry: defaultCommonArea,
+    sensitivity: commonAreaSensitivity,
     component_definitions: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.components,
-    spatial_pipeline_status: 'not_connected_to_current_ARC_economics'
+    spatial_pipeline_status: 'conceptual_geometry_prototype_connected_to_ARC_economics'
   },
   tax: SITE_LEASE_EVIDENCE.property_tax,
   insurance: SITE_LEASE_EVIDENCE.land_insurance,
@@ -138,13 +143,19 @@ const markdown = [
   '',
   '## Common-property area',
   '',
-  `The current **${DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha.toFixed(2)} ha** is a pooled planning assumption. Current Living Region hamlet fixtures provide proposed points, lines and rectangles, but not a validated parcel-clipped area takeoff for residential footprints, roads/access, common buildings, ecological/water buffers, shared productive areas and other required common land. The API now accepts all six categories explicitly and switches to spatial/layout-derived mode only when all are supplied.`,
+  `The default common-property prototype is **${defaultCommonArea.common_property_area_ha.toFixed(3)} ha** at a configurable 50 m entrance laneway: ${defaultCommonArea.laneway.corridor_area_m2.toFixed(0)} m² of physical laneway corridor, ${defaultCommonArea.terminal_loop.circulation_lane_area_m2.toFixed(0)} m² of terminal circulation, and a ${defaultCommonArea.terminal_loop.amenity_envelope_area_m2.toFixed(0)} m² central common envelope. This is conceptual geometry, not a parcel-clipped engineering or fire-access approval. Productive vegetation outside required clearances remains in adjoining household allocations and is not added to common hectares.`,
   '',
   'Desired pipeline:',
   '',
   '`parcel → buildings/residential footprints → roads/access → servicing → productive layout → ecological buffers → explicit common hectares → land holding cost`',
   '',
-  'Until that takeoff exists, the pooled area is visible and must not be mistaken for a measured site layout.',
+  'The prototype is now connected to ARC economics, but a real project must replace it with parcel-specific alignment, drainage, setback, servicing and fire-access geometry.',
+  '',
+  '### Laneway-length sensitivity',
+  '',
+  '| Entrance laneway | Laneway corridor | Terminal loop | Amenity envelope | Total common area |',
+  '|---:|---:|---:|---:|---:|',
+  ...commonAreaSensitivity.map((row) => `| ${row.inputs.laneway_length_m} m | ${row.laneway.corridor_area_m2.toFixed(0)} m² | ${row.terminal_loop.circulation_lane_area_m2.toFixed(0)} m² | ${row.terminal_loop.amenity_envelope_area_m2.toFixed(0)} m² | ${row.common_property_area_ha.toFixed(3)} ha |`),
   '',
   '## Scale: common-property and revised household charges',
   '',
@@ -165,7 +176,7 @@ const markdown = [
   '| Input | Status |',
   '|---|---|',
   '| Carrying-capacity hectares | derived from Living Region canonical model |',
-  '| Common area | working planning assumption until spatial takeoff |',
+  '| Common area | derived from conceptual lane/loop/amenity geometry; site validation required |',
   '| Administration scenarios | policy/design choice with explicit planning costs |',
   '| Common-property operations | working planning assumption pending maintenance plan/bids |',
   '| Property tax | planning assumption informed by MPAC/Ontario classification framework |',
