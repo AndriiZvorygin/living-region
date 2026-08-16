@@ -4,6 +4,7 @@ import {
   ARC_AFFORDABILITY_SCENARIOS,
   calculateAdministrationBudget,
   calculateArcSiteLeaseEconomics,
+  calculateArcCommonAreaGeometry,
   calculateCommonPropertyOperations,
   DEFAULT_SITE_LEASE_SCENARIO,
   INFRASTRUCTURE_SCENARIOS,
@@ -19,6 +20,7 @@ const hours = (value) => `${Number(value ?? 0).toFixed(0)} h/year`;
 const ha = (value) => `${Number(value ?? 0).toFixed(2)} ha`;
 const pct = (value) => `${(Number(value ?? 0) * 100).toFixed(1)}%`;
 const sizes = [12, 16, 25, 50];
+const commonAreaPrototype = calculateArcCommonAreaGeometry(DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.geometry);
 
 function makeScenario({members = ['reference_adult_man'], ownership = 'financed', householdCount = 12, siteId = 'ordinary_mesic'} = {}) {
   const base = clone(DEFAULT_SITE_LEASE_SCENARIO);
@@ -95,7 +97,7 @@ const scaleRows = ['one_adult', 'family'].flatMap((householdType) => sizes.map((
 const classification = [
   {expense: 'Productive land acquisition debt service', current_amount: 'derived; previously included', legal_requirement: 'only if land is financed', financing_requirement: 'yes, under selected loan', physical_necessity: 'land must be held', optional: 'no', treatment: 'retain only for financed land; zero for debt-free/trust land', basis: 'actual loan principal and contract'},
   {expense: 'Productive/common land property tax', current_amount: '1% of modeled land value', legal_requirement: 'yes, subject to assessment/classification', financing_requirement: 'no', physical_necessity: 'tax obligation', optional: 'no', treatment: 'retain as explicit tax-rate planning assumption pending parcel tax roll', basis: 'Ontario assessment/tax framework; site-specific'},
-  {expense: 'Common property area and acquisition', current_amount: 'former 1.50 ha planning pool', legal_requirement: 'site-plan dependent', financing_requirement: 'only if acquired/financed', physical_necessity: 'only actual access/setback/buffer/common area', optional: 'some portions', treatment: 'legal-minimum lower bound is 0 ha until spatial/site-plan takeoff; expose sensitivity', basis: 'not yet spatially derived'},
+  {expense: 'Common property area and acquisition', current_amount: `${commonAreaPrototype.common_property_area_ha.toFixed(3)} ha conceptual 50 m prototype`, legal_requirement: 'site-plan dependent', financing_requirement: 'only if acquired/financed', physical_necessity: 'physical access/loop/amenity envelope only', optional: 'extra portions are optional', treatment: 'retain geometry-derived lane/loop/amenity area; validate and replace with parcel takeoff', basis: 'ARC common-area geometry prototype; site/fire/municipal validation required'},
   {expense: 'Land-holding administration', current_amount: '$18,000/year conventional / $125 per household/month at 12', legal_requirement: 'tasks exist; recurring paid manager not identified as mandatory', financing_requirement: 'no', physical_necessity: 'records/governance required', optional: 'paid service is optional', treatment: '$0 recurring cash; 60 resident hours/year and irregular external fees shown separately', basis: 'self-managed planning scenario'},
   {expense: 'Common-property operations', current_amount: '$6,000/year contracted baseline', legal_requirement: 'outcomes required; contractor is not', financing_requirement: 'no', physical_necessity: 'drainage/grounds/hazard work where applicable', optional: 'contractor/landscaping is optional', treatment: '$0 recurring cash; 64 resident hours/year in the separated common-property layer', basis: 'O. Reg. 517/06 and Owen Sound property standards; site-specific'},
   {expense: 'Land insurance', current_amount: '$3,000/year planning allowance', legal_requirement: 'no general statutory minimum identified', financing_requirement: 'possible lender/entity requirement', physical_necessity: 'risk exists, policy not established', optional: 'yes unless contract requires', treatment: '$0 in legal minimum; site-specific quote/lender requirement', basis: 'unresolved insurance evidence'},
@@ -212,7 +214,7 @@ const markdown = [
   `| One adult | ${ha(ordinaryRow.establishment_ha)} | ${ha(ordinaryRow.mature_ha)} | ${money(ordinaryRow.site_lease_monthly_cad)} | ${money(ordinaryRow.shared_infrastructure_monthly_cad)} | ${money(ordinaryRow.combined_monthly_cad)} | ${money(ordinaryRow.completed_dwelling_capital_cad)} | ${money(ordinaryRow.dwelling_financing_monthly_cad)} | ${money(ordinaryRow.dwelling_plus_land_shared_monthly_cad)} | ${hours(ordinaryRow.resident_labour_hours_year)} | ${wholeMoney(ordinaryRow.infrastructure_future_replacement_liability_cad)} |`,
   `| 2 adults + 2 dependent children | ${ha(familyRow.establishment_ha)} | ${ha(familyRow.mature_ha)} | ${money(familyRow.site_lease_monthly_cad)} | ${money(familyRow.shared_infrastructure_monthly_cad)} | ${money(familyRow.combined_monthly_cad)} | ${money(familyRow.completed_dwelling_capital_cad)} | ${money(familyRow.dwelling_financing_monthly_cad)} | ${money(familyRow.dwelling_plus_land_shared_monthly_cad)} | ${hours(familyRow.resident_labour_hours_year)} | ${wholeMoney(familyRow.infrastructure_future_replacement_liability_cad)} |`,
   '',
-  'These are legal-minimum land/infrastructure cash figures under the current illustrative land-financing case and zero common-area lower bound. The ARC dwelling package places household water, sanitation/greywater, hot water and electrical systems in resident dwelling capital once. A real site may require a different approved system or a centralized project service; that alternative must replace, not stack on top of, the corresponding package component.',
+  `These are legal-minimum land/infrastructure cash figures under the current illustrative land-financing case and the conceptual ${commonAreaPrototype.common_property_area_ha.toFixed(3)} ha common-area prototype (${commonAreaPrototype.laneway.corridor_area_m2.toFixed(0)} m² laneway corridor + ${commonAreaPrototype.terminal_loop.circulation_lane_area_m2.toFixed(0)} m² terminal circulation + ${commonAreaPrototype.terminal_loop.amenity_envelope_area_m2.toFixed(0)} m² central common envelope). The ARC dwelling package places household water, sanitation/greywater, hot water and electrical systems in resident dwelling capital once. A real site may require a different approved system or a centralized project service; that alternative must replace, not stack on top of, the corresponding package component.`,
   '',
   '## Owen Sound affordability comparison',
   '',
@@ -234,7 +236,7 @@ const markdown = [
   '|---|---:|---:|---:|---:|---:|---:|---:|',
   scaleMarkdown,
   '',
-  'The access capital is fixed in this scenario, so its cash allocation declines with household count. Productive hectares and productive land charges remain household-dependent. The common-area lower bound is zero until the parcel/site plan supplies actual non-productive areas.',
+  'The access capital is fixed in this scenario, so its cash allocation declines with household count. Productive hectares and productive land charges remain household-dependent. The common-area prototype also varies with entrance-laneway length; productive edge vegetation remains in adjoining household leases rather than being added to common property.',
   '',
   '## Optional scenarios',
   '',
@@ -249,7 +251,7 @@ const markdown = [
   '',
   ...json.unresolved.map((item) => `- ${item};`),
   '',
-  'The next defensible refinement is a parcel-specific site-plan and servicing takeoff. It should replace the zero common-area lower bound, access placeholder, tax proxy and distributed servicing placeholders with approved geometry, assessments, engineering and quotes.'
+  'The next defensible refinement is a parcel-specific site-plan and servicing takeoff. It should replace the conceptual lane/loop geometry, access placeholder, tax proxy and distributed servicing placeholders with approved alignment, fire-access geometry, drainage, assessments, engineering and quotes.'
 ].join('\n') + '\n';
 
 fs.writeFileSync(path.join(outputDir, 'arc-legal-minimum.md'), markdown);

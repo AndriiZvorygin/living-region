@@ -45,22 +45,31 @@ Snow clearing, road maintenance, waste handling and infrastructure insurance rem
 
 ## Common-property area
 
-The current **0.00 ha** is a pooled planning assumption. Current Living Region hamlet fixtures provide proposed points, lines and rectangles, but not a validated parcel-clipped area takeoff for residential footprints, roads/access, common buildings, ecological/water buffers, shared productive areas and other required common land. The API now accepts all six categories explicitly and switches to spatial/layout-derived mode only when all are supplied.
+The default common-property prototype is **0.100 ha** at a configurable 50 m entrance laneway: 300 m² of physical laneway corridor, 449 m² of terminal circulation, and a 250 m² central common envelope. This is conceptual geometry, not a parcel-clipped engineering or fire-access approval. Productive vegetation outside required clearances remains in adjoining household allocations and is not added to common hectares.
 
 Desired pipeline:
 
 `parcel → buildings/residential footprints → roads/access → servicing → productive layout → ecological buffers → explicit common hectares → land holding cost`
 
-Until that takeoff exists, the pooled area is visible and must not be mistaken for a measured site layout.
+The prototype is now connected to ARC economics, but a real project must replace it with parcel-specific alignment, drainage, setback, servicing and fire-access geometry.
+
+### Laneway-length sensitivity
+
+| Entrance laneway | Laneway corridor | Terminal loop | Amenity envelope | Total common area |
+|---:|---:|---:|---:|---:|
+| 30 m | 180 m² | 449 m² | 250 m² | 0.088 ha |
+| 50 m | 300 m² | 449 m² | 250 m² | 0.100 ha |
+| 75 m | 450 m² | 449 m² | 250 m² | 0.115 ha |
+| 100 m | 600 m² | 449 m² | 250 m² | 0.130 ha |
 
 ## Scale: common-property and revised household charges
 
 | Households | Common area mode | Administration/year | Administration/month/household | Common operations/month/household | Common-property share/month | Site lease/month | Land + infrastructure/month |
 |---:|---|---:|---:|---:|---:|---:|---:|
-| 12 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $268.22 |
-| 16 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $256.23 |
-| 25 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $243.28 |
-| 50 | pooled_planning_assumption | $0 | $0.00 | $0.00 | $0.00 | $220.26 | $231.77 |
+| 12 | geometry_derived | $0 | $0.00 | $0.00 | $1.64 | $221.91 | $269.87 |
+| 16 | geometry_derived | $0 | $0.00 | $0.00 | $1.23 | $221.50 | $257.47 |
+| 25 | geometry_derived | $0 | $0.00 | $0.00 | $0.79 | $221.05 | $244.07 |
+| 50 | geometry_derived | $0 | $0.00 | $0.00 | $0.39 | $220.66 | $232.17 |
 
 The legal-minimum headline uses zero recurring cash for paid administration and common-property operations; resident labour is shown separately. The conventional scenario remains available for comparison and reproduces the former $18,000 administration and $6,000 operations inputs. It is not the legal-minimum baseline.
 
@@ -75,7 +84,7 @@ The legal-minimum headline uses zero recurring cash for paid administration and 
 | Input | Status |
 |---|---|
 | Carrying-capacity hectares | derived from Living Region canonical model |
-| Common area | working planning assumption until spatial takeoff |
+| Common area | derived from conceptual lane/loop/amenity geometry; site validation required |
 | Administration scenarios | policy/design choice with explicit planning costs |
 | Common-property operations | working planning assumption pending maintenance plan/bids |
 | Property tax | planning assumption informed by MPAC/Ontario classification framework |

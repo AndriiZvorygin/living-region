@@ -11,13 +11,14 @@ import {representativeProfiles} from './health-canada.mjs';
 import {selectPerennialMixForSite} from './environment.mjs';
 import {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 import {ARC_DWELLING_COST_EVIDENCE, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
+import {ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION, DEFAULT_ARC_COMMON_AREA_GEOMETRY, calculateArcCommonAreaGeometry} from './common-area.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.6.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.7.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
   base_plus_hectare: 'Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.',
@@ -168,7 +169,32 @@ export const COMMON_PROPERTY_AREA_COMPONENTS = [
   {id: 'other_required_common_land', label: 'Other required common land', status: 'site_plan_required'}
 ];
 
-export function calculateCommonPropertyAreaAccounting({common_area_ha = 0, components = null, source = 'pooled_planning_assumption'} = {}) {
+export function calculateCommonPropertyAreaAccounting({common_area_ha = 0, components = null, geometry = null, source = 'pooled_planning_assumption'} = {}) {
+  const hasCompleteExplicitBreakdown = COMMON_PROPERTY_AREA_COMPONENTS.every((definition) => components && components[definition.id] != null && Number.isFinite(Number(components[definition.id])));
+  // A complete site-plan takeoff or a positive legacy area override is an
+  // explicit caller choice. The default zero plus geometry selects the ARC
+  // prototype instead of silently reverting to the old zero-hectare bound.
+  if (geometry && !hasCompleteExplicitBreakdown && finite(common_area_ha) <= 0) {
+    const calculated = calculateArcCommonAreaGeometry(geometry);
+    const geometryComponents = {
+      residential_footprints: 0,
+      internal_road_access: (calculated.laneway.corridor_area_m2 + calculated.terminal_loop.circulation_lane_area_m2) / 10000,
+      common_buildings_infrastructure: calculated.terminal_loop.amenity_envelope_area_ha,
+      ecological_water_buffers: calculated.other_required_common_area_ha,
+      shared_productive_areas: 0,
+      other_required_common_land: 0
+    };
+    return {
+      mode: 'geometry_derived',
+      source: source ?? calculated.source,
+      evidence_status: 'derived_from_ARC_conceptual_geometry; site/fire/municipal_validation_required',
+      total_common_area_ha: calculated.common_property_area_ha,
+      components: COMMON_PROPERTY_AREA_COMPONENTS.map((definition) => ({...definition, area_ha: round(geometryComponents[definition.id] ?? 0, 6)})),
+      missing_components: [],
+      geometry: calculated,
+      explanation: 'Common property is the physical access corridor, terminal circulation lane, central amenity envelope and explicitly required shared drainage/servicing/buffer area. Productive vegetation bordering access remains in adjoining household leased allocations.'
+    };
+  }
   const rows = COMMON_PROPERTY_AREA_COMPONENTS.map((definition) => ({
     ...definition,
     area_ha: components && components[definition.id] != null && Number.isFinite(Number(components[definition.id])) ? round(components[definition.id], 6) : null
@@ -417,11 +443,12 @@ export const DEFAULT_SITE_LEASE_SCENARIO = {
     household_count: 12,
     common_area_ha: 0,
     common_area_accounting: {
-      mode: 'pooled_planning_assumption',
-      source: 'Legal-minimum lower bound; parcel/site layout is required to determine actual common area',
+      mode: 'geometry_derived',
+      source: 'ARC conceptual public-road → common laneway → terminal loop → central amenity envelope prototype; site/fire/municipal validation required',
+      geometry: deepClone(DEFAULT_ARC_COMMON_AREA_GEOMETRY),
       components: Object.fromEntries(COMMON_PROPERTY_AREA_COMPONENTS.map((row) => [row.id, null]))
     },
-    common_area_sensitivity_ha: [0, .5, 1, 1.5],
+    common_area_sensitivity_ha: [.03, .05, .075, .1],
     allocation_method: 'base_plus_hectare'
   },
   dwelling: {
@@ -883,6 +910,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
   const commonAreaAccounting = calculateCommonPropertyAreaAccounting({
     common_area_ha: scenario.community.common_area_ha,
     components: scenario.community.common_area_accounting?.components,
+    geometry: scenario.community.common_area_accounting?.geometry,
     source: scenario.community.common_area_accounting?.source
   });
   const commonArea = commonAreaAccounting.total_common_area_ha;
@@ -1181,7 +1209,7 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       infrastructure_values_require_site_design_and_quotes: true,
       resident_owns_dwelling_and_does_not_own_project_land: true,
       carrying_capacity_is_physical_requirement_not_a_financing_coefficient: true,
-      common_area_is_spatially_derived: commonAreaAccounting.mode === 'spatial_or_layout_derived',
+      common_area_is_spatially_derived: ['spatial_or_layout_derived', 'geometry_derived'].includes(commonAreaAccounting.mode),
       administration_is_project_scale_budget: true,
       common_property_operations_are_separate_from_shared_infrastructure: true
     }
@@ -1270,7 +1298,12 @@ export function buildSiteLeasePresentationContract() {
   }));
   const administrationScaleExamples = Object.fromEntries(Object.values(ADMINISTRATION_SCENARIOS).map((scenario) => [scenario.id, [12, 16, 25, 50].map((householdCount) => calculateAdministrationBudget({scenario_id: scenario.id, household_count: householdCount}))]));
   const commonPropertyOperationsMetadata = Object.values(COMMON_PROPERTY_OPERATIONS_SCENARIOS).map((scenario) => ({id: scenario.id, label: scenario.label, description: scenario.description, evidence_status: scenario.evidence_status, components: Object.entries(scenario.components).map(([id, row]) => ({id, ...row})), excludes: ['snow clearing contracts', 'road maintenance contracts', 'centralized water/sewage/electricity', 'infrastructure insurance', 'land-holding administration', 'vacancy reserve']}));
-  const defaultCommonAreaAccounting = calculateCommonPropertyAreaAccounting({common_area_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha, components: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.components, source: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.source});
+  const defaultCommonAreaAccounting = calculateCommonPropertyAreaAccounting({
+    common_area_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
+    components: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.components,
+    geometry: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.geometry,
+    source: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_accounting.source
+  });
   const publicEvidence = SITE_LEASE_EVIDENCE;
   return {
     contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,
@@ -1292,9 +1325,11 @@ export function buildSiteLeasePresentationContract() {
     common_area_accounting: {
       ...defaultCommonAreaAccounting,
       component_definitions: COMMON_PROPERTY_AREA_COMPONENTS,
-      spatial_pipeline: 'parcel -> buildings/residential footprints -> roads/access -> servicing -> productive layout -> ecological buffers -> explicit common hectares',
-      spatial_pipeline_status: 'not_connected_to_current_ARC_economics',
-      spatial_pipeline_gap: 'Current hamlet layout fixtures contain points, lines and rectangles for proposed elements but do not yet provide a validated parcel-clipped polygon area takeoff for each common-land category.'
+      geometry_contract_version: ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION,
+      spatial_pipeline: 'public road -> common laneway -> terminal circulation loop -> central amenity envelope -> household leased productive allocations',
+      spatial_pipeline_status: 'conceptual_geometry_prototype_connected_to_ARC_economics',
+      spatial_pipeline_gap: 'The prototype is not a parcel-clipped engineering or fire-access approval. Actual alignment, drainage, setbacks, turning requirements and unavoidable shared buffers remain site-specific.',
+      productive_edge_boundary: 'Productive/permaculture vegetation outside vehicle clearances remains in adjoining household leased allocations and is not added to common hectares.'
     },
     land_financing_evidence: LAND_FINANCING_EVIDENCE,
     land_financing_scenarios: LAND_FINANCING_SCENARIOS,
@@ -1309,9 +1344,14 @@ export function buildSiteLeasePresentationContract() {
     dwelling_cost_model: buildArcDwellingPresentationContract(),
     default_inputs: {
       land_price_cad_per_ha: DEFAULT_SITE_LEASE_SCENARIO.land.price_cad_per_ha,
-      common_property_land_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_ha,
-      common_property_land_area_status: 'lower_bound_pending_site_plan',
+      common_property_land_ha: defaultCommonAreaAccounting.total_common_area_ha,
+      common_property_land_area_status: 'geometry_derived_conceptual_prototype_pending_site_validation',
       common_property_land_sensitivity_ha: DEFAULT_SITE_LEASE_SCENARIO.community.common_area_sensitivity_ha,
+      common_area_geometry: defaultCommonAreaAccounting.geometry,
+      common_area_geometry_sensitivity: [30, 50, 75, 100].map((lanewayLength) => {
+        const geometry = calculateArcCommonAreaGeometry({...DEFAULT_ARC_COMMON_AREA_GEOMETRY, laneway_length_m: lanewayLength});
+        return {laneway_length_m: lanewayLength, common_property_area_ha: geometry.common_property_area_ha, laneway_corridor_area_m2: geometry.laneway.corridor_area_m2, terminal_circulation_loop_area_m2: geometry.terminal_loop.circulation_lane_area_m2, amenity_envelope_area_m2: geometry.terminal_loop.amenity_envelope_area_m2};
+      }),
       legal_lease_term_years: DEFAULT_SITE_LEASE_SCENARIO.land.legal_lease_term_years,
       land_financing: {
         ownership: DEFAULT_SITE_LEASE_SCENARIO.land.ownership,

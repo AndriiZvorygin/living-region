@@ -7,3 +7,4 @@ export {calculatePerennialMixTimeline} from './perennial.mjs';
 export {HOUSEHOLD_LAND_ADULT_AGE, HOUSEHOLD_TRANSITION_YEAR_CONVENTION, householdLandRole, calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
 export {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 export {ARC_DWELLING_COST_EVIDENCE, ARC_DWELLING_COST_CONTRACT_VERSION, ARC_DWELLING_SERVICING_MODES, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
+export {ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION, DEFAULT_ARC_COMMON_AREA_GEOMETRY, calculateArcCommonAreaGeometry} from './common-area.mjs';
