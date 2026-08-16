@@ -21,7 +21,7 @@ export {ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION, DEFAULT_ARC_COMMON_AREA_GEOME
 export {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 export {ARC_DWELLING_COST_EVIDENCE, ARC_DWELLING_COST_CONTRACT_VERSION, ARC_DWELLING_SERVICING_MODES, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
 export {ARC_LAND_MARKET_CONTRACT_VERSION, ARC_LAND_MARKET_SOURCES, ARC_LAND_SIZE_BANDS, DEFAULT_ARC_LAND_MARKET_DATA, buildLandMarketContract, classifyLandSize, estimateLandPriceForParcel, landMarketDataPath, loadArcLandMarketData, normalizeLandObservation, parseLandObservationCsv, summarizeLandObservations} from './land-market.mjs';
-export {ARC_ADULT_SCALE_SCENARIOS, ARC_FAMILY_CAPACITY_STANDARD, buildArcAdultScalePresentationContract, buildArcAdultScaleScenarios} from './arc-community-scale.mjs';
+export {ARC_ADULT_SCALE_SCENARIOS, ARC_ADULT_SCALE_CROSSOVER_SCENARIOS, ARC_FAMILY_CAPACITY_STANDARD, buildArcAdultScalePresentationContract, buildArcAdultScaleScenarios} from './arc-community-scale.mjs';
 
 export const CARRYING_CAPACITY_CONTRACT_VERSION = '1.0.0';
 export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

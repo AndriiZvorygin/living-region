@@ -29,7 +29,15 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.site_lease_economics.adult_scale.land_market.local_parcel_curve_status, 'partial_measured_whole_property_curve');
   assert.ok(contract.site_lease_economics.adult_scale.land_market.usable_whole_property_observation_count >= 30);
   assert.ok(contract.site_lease_economics.adult_scale.land_market.productive_land_comparators.some((row) => row.observation_id === 'grey-2024-tillable-benchmark'));
-  assert.equal(contract.site_lease_economics.adult_scale.economic_crossover.farm_scale_entry_adults, 28);
-  assert.equal(contract.site_lease_economics.adult_scale.economic_crossover.diminishing_savings_point_adults, 28);
+  const crossover = contract.site_lease_economics.adult_scale.economic_crossover;
+  assert.deepEqual(crossover.scan_adult_counts, [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56]);
+  assert.equal(crossover.first_evidence_backed_band_crossover.adult_residents, 4);
+  assert.equal(crossover.market_band_crossover.adult_residents, 22);
+  assert.equal(crossover.first_over_20_ha.adult_residents, 22);
+  assert.equal(crossover.first_over_20_ha.households, 11);
+  assert.equal(crossover.farm_scale_entry_adults, 22);
+  assert.equal(crossover.diminishing_savings_point_adults, 22);
+  assert.equal(crossover.economic_sweet_spot.next_adult_residents, 24);
+  assert.ok(crossover.market_band_crossings.some((row) => row.adult_residents === 22 && row.previous_land_band === '10–20 ha' && row.new_land_band === '20–40 ha'));
   assert.ok(contract.site_lease_economics.adult_scale.land_market.sources.some((source) => source.institution.includes('Ontario Farmland')));
 });

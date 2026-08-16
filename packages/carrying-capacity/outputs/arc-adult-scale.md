@@ -22,6 +22,24 @@ This is an adult-scale planning demonstration. Adult residents are the primary s
 - Shared infrastructure is the selected legal-minimum scenario and falls per household as fixed access capital is shared.
 - The dwelling-financing column is shown separately for planning comparison; the ARC land-and-infrastructure charge is the site lease plus shared infrastructure only.
 
+## Economic crossover diagnostic
+
+The public table above remains limited to the eight demonstration sizes. The diagnostic separately evaluates 29 scales: 1 adult plus every even count from 2 through 56 adults.
+**Market-band crossover:** The internal two-adult scan first enters the measured 20–40 ha band at 22 adults (20.06 ha), rather than at the first public demonstration row. The observed land-price change is -$25661.89/ha per hectare; the household charge changes by -$268.96/month.
+The first evidence-backed size-band change overall is 4 adults (<2 ha → 2–5 ha). The farm-scale 20–40 ha transition is the relevant comparison for the ARC scale question.
+**Economic sweet spot:** Within the measured 20–40 ha band, the first two-adult step with no more than 15% additional per-household savings is 22 to 24 adults: $4.45 per household, or 1.6%. This is a provisional economic sweet spot, not an optimization result.
+The exact first parcel above 20 ha is 22 adults / 11 households at 20.06 ha. The 20–40 ha band currently has four usable observations and the 40+ ha band remains unresolved, so both conclusions are provisional.
+
+| Adult count | Households | Parcel | Previous land band | New land band | $/ha change | Household monthly change |
+|---:|---:|---:|---|---|---:|---:|
+| 4 | 2 | 3.73 ha | <2 ha | 2–5 ha | -$266255.53 | -$3177.88 |
+| 6 | 3 | 5.54 ha | 2–5 ha | 5–10 ha | unresolved | unresolved |
+| 12 | 6 | 10.99 ha | 5–10 ha | 10–20 ha | unresolved | unresolved |
+| 22 | 11 | 20.06 ha | 10–20 ha | 20–40 ha | -$25661.89 | -$268.96 |
+| 44 | 22 | 40.02 ha | 20–40 ha | 40+ ha | unresolved | unresolved |
+
+The complete internal scan is retained in `arc-adult-scale.json` under `economic_crossover.internal_scan`; it is a diagnostic contract, not an expansion of the public demonstration table.
+
 ## Land-market evidence status
 
 The 2024 Ontario Farmland Value and Rental Value Survey reports a Grey County median of CAD 19,000 per tillable acre from 29 responses. That is retained as a productive-land comparator, not as a parcel-size observation. The loaded whole-property observation set contains 30 usable observations; asking prices, property-type mix and site constraints remain important limitations.
@@ -36,7 +54,7 @@ The 2024 Ontario Farmland Value and Rental Value Survey reports a Grey County me
 | 40+ ha | 2 | unresolved | $18107.88 | $32000.00 |
 
 The model selects the parcel band from total calculated parcel area. Bands below 3 observations remain unresolved rather than being filled from the planning sensitivity curve. Import observations with `npm run import:arc:land-observations -- --input=...`.
-The current economic-crossover status is **evidence_supported_20_to_40_ha_crossover_40_plus_unresolved**. The first priced ARC case in a measured farm-scale band is 28 adults. The next priced demonstration saves 4.8%, below the 15% diminishing-savings threshold. The 40+ ha band remains unresolved, so this is a provisional crossover rather than a citywide market conclusion.
+The current economic-crossover status is **provisional_20_to_40_market_crossover_40_plus_unresolved**. The market-band crossover occurs at 22 adults in the internal scan. The provisional economic sweet spot begins at 22 adults because the next two-adult step saves only 1.6%. The 20–40 ha band has 4 observations and the 40+ ha band remains unresolved.
 
 ## Sources
 

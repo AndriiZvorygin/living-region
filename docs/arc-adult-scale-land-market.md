@@ -32,7 +32,13 @@ The importer preserves source IDs, dates, property type, parcel area, improvemen
 
 ## Evidence-supported scale signal
 
-The first adult-scale demonstration that falls in a measured farm-scale band is 28 adults, requiring approximately 25.51 ha in the current family-capacity planning case. The 28-adult and 40-adult scenarios share the measured 20–40 ha band; moving from 28 to 40 adults reduces the combined land-plus-infrastructure charge by about 4.8%. The model therefore reports 28 adults as a provisional farm-scale entry / diminishing-savings point. The 40+ ha band is still sparse, so the result does not establish the global minimum or what happens at 56 adults. A completed crossover analysis needs more observations, especially large ordinary agricultural parcels and completed sale prices.
+The public adult-scale table remains deliberately limited to 1, 4, 12, 16, 20, 28, 40 and 56 adults. The economic-crossover diagnostic separately evaluates 1 adult plus every even count from 2 through 56, so a boundary is not rounded up to the next published demonstration row.
+
+The first internally tested parcel above 20 ha is **22 adults / 11 family-capacity households**, requiring approximately **20.06 ha**. This is the first entry into the measured 20–40 ha band; 28 adults is only the first public demonstration point inside that band. The 20-to-22 transition changes the observed size-band rate from approximately CAD 46,950/ha to CAD 21,288/ha and lowers the modelled combined land-plus-infrastructure charge by approximately CAD 268.96 per household per month. These figures are a provisional market-band signal, not a universal Grey County price curve.
+
+Within the measured 20–40 ha band, the first two-adult increment with no more than 15% additional per-household savings is 22 to 24 adults, a 1.6% reduction in the current model. This is reported as a provisional **economic sweet spot**: additional scale may still help, but the next increment has relatively small per-household savings under the current geometry and infrastructure assumptions. The 40+ ha band remains unresolved, so neither crossover conclusion should be treated as a final minimum or maximum scale recommendation.
+
+The complete market-band crossing table and internal scan are generated in `packages/carrying-capacity/outputs/arc-adult-scale.md`, `arc-adult-scale-crossovers.csv` and `arc-adult-scale.json` under `economic_crossover.internal_scan`. Crossings into sparse bands remain visible as unresolved rather than being assigned a planning fallback.
 
 The adult-scale rows currently calculate as follows when a band is sufficiently observed: 1 adult uses `<2 ha`; 4 adults uses `2–5 ha`; 12, 16 and 20 adults use `10–20 ha`; 28 and 40 adults use `20–40 ha`; 56 adults is unresolved because its calculated parcel falls in the sparse `40+ ha` band. The shared-infrastructure and dwelling columns remain separate; the evidence-driven land result changes the site lease only.
 
@@ -44,6 +50,7 @@ Most observations are active or recent asking prices rather than verified sale p
 
 - `packages/carrying-capacity/outputs/arc-adult-scale.md`
 - `packages/carrying-capacity/outputs/arc-adult-scale.csv`
+- `packages/carrying-capacity/outputs/arc-adult-scale-crossovers.csv`
 - `packages/carrying-capacity/outputs/arc-adult-scale.json`
 - `packages/carrying-capacity/outputs/arc-land-market.md`
 - `packages/carrying-capacity/outputs/arc-land-market.json`
