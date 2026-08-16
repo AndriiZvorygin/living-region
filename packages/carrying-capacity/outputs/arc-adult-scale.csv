@@ -1,9 +1,9 @@
-adult_residents,households,dependent_children_capacity,productive_hectares,common_hectares,total_parcel_hectares,land_market_band,land_price_cad_per_ha,land_price_status,estimated_parcel_acquisition_cad,site_lease_monthly_cad_per_household,shared_infrastructure_monthly_cad_per_household,dwelling_financing_monthly_cad_per_household,combined_land_infrastructure_monthly_cad_per_household,combined_illustrative_monthly_cad_per_household
-1,1,0,1.117863,0.09994,1.217803,<2 ha,60000,working_planning_sensitivity,73068.18,411.35,575.57,353.72,986.92,1340.64
-4,2,6,3.629448,0.09994,3.729388,2–5 ha,50000,working_planning_sensitivity,186469.4,524.89,287.79,353.72,812.68,1166.4
-12,6,18,10.888344,0.09994,10.988284,10–20 ha,42000,working_planning_sensitivity,461507.93,433.03,95.93,353.72,528.96,882.68
-16,8,24,14.517792,0.09994,14.617732,10–20 ha,42000,working_planning_sensitivity,613944.74,432.04,71.95,353.72,503.99,857.71
-20,10,30,18.14724,0.09994,18.24718,10–20 ha,42000,working_planning_sensitivity,766381.56,431.45,57.56,353.72,489.01,842.73
-28,14,42,25.406136,0.09994,25.506076,20–40 ha,36000,working_planning_sensitivity,918218.74,369.24,41.11,353.72,410.35,764.07
-40,20,60,36.29448,0.09994,36.39442,20–40 ha,36000,working_planning_sensitivity,1310199.12,368.8,28.78,353.72,397.58,751.3
-56,28,84,50.812272,0.09994,50.912212,40+ ha,32000,working_planning_sensitivity,1629190.78,327.57,20.56,353.72,348.13,701.85
+adult_residents,households,dependent_children_capacity,productive_hectares,common_hectares,total_parcel_hectares,land_market_band,land_price_cad_per_ha,land_price_status,land_price_sample_count,estimated_parcel_acquisition_cad,site_lease_monthly_cad_per_household,shared_infrastructure_monthly_cad_per_household,dwelling_financing_monthly_cad_per_household,combined_land_infrastructure_monthly_cad_per_household,combined_illustrative_monthly_cad_per_household
+1,1,0,1.117863,0.09994,1.217803,<2 ha,337743.44,measured_local_size_band,11,411304.97,2315.54,575.57,353.72,2891.11,3244.83
+4,2,6,3.629448,0.09994,3.729388,2–5 ha,71487.91,measured_local_size_band,6,266606.15,750.46,287.79,353.72,1038.25,1391.97
+12,6,18,10.888344,0.09994,10.988284,10–20 ha,46950.02,measured_local_size_band,5,515900.15,484.06,95.93,353.72,579.99,933.71
+16,8,24,14.517792,0.09994,14.617732,10–20 ha,46950.02,measured_local_size_band,5,686302.81,482.96,71.95,353.72,554.91,908.63
+20,10,30,18.14724,0.09994,18.24718,10–20 ha,46950.02,measured_local_size_band,5,856705.47,482.3,57.56,353.72,539.86,893.58
+28,14,42,25.406136,0.09994,25.506076,20–40 ha,21288.13,measured_local_size_band,4,542976.66,218.34,41.11,353.72,259.45,613.17
+40,20,60,36.29448,0.09994,36.39442,20–40 ha,21288.13,measured_local_size_band,4,774769.14,218.09,28.78,353.72,246.87,600.59
+56,28,84,50.812272,0.09994,50.912212,40+ ha,,unresolved_insufficient_local_size_band_evidence,2,,,20.56,353.72,,

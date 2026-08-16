@@ -7,7 +7,8 @@ const ACRE_TO_HECTARE = 2.4710538147;
 const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const finite = (value, fallback = null) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 
-export const ARC_LAND_MARKET_CONTRACT_VERSION = '1.0.0';
+export const ARC_LAND_MARKET_CONTRACT_VERSION = '1.1.0';
+export const ARC_LAND_MARKET_MINIMUM_BAND_SAMPLE = 3;
 
 export const ARC_LAND_SIZE_BANDS = [
   {id: 'under_2_ha', label: '<2 ha', min_ha: 0, max_ha: 2},
@@ -28,6 +29,36 @@ export const ARC_LAND_MARKET_SOURCES = [
     geography: 'Grey County and Ontario counties',
     evidence_status: 'survey_benchmark',
     limitation: 'Reports tillable-acre values and response counts, not whole-parcel size-tagged transactions or bare-land sale records.'
+  },
+  {
+    id: 'royal_lepage_rcr_public_listing_pages',
+    institution: 'Royal LePage RCR Realty / public brokerage listing pages',
+    title: 'Grey County vacant-land and farm listing observations',
+    date: '2025–2026 observations; retrieved 2026-08-15',
+    url: 'https://www.royallepage.ca/en/on/west-grey/land/properties/',
+    geography: 'Grey County municipalities including West Grey, Grey Highlands, Chatsworth, Georgian Bluffs and Southgate',
+    evidence_status: 'public_listing_observations',
+    limitation: 'Asking prices are not completed sale prices; listing descriptions and acreage should be independently verified before acquisition decisions.'
+  },
+  {
+    id: 'sutton_sound_public_listing_pages',
+    institution: 'Sutton-Sound Realty',
+    title: 'Grey County vacant-land listing observations',
+    date: '2025–2026 observations; retrieved 2026-08-15',
+    url: 'https://www.suttonsoundrealty.ca/office-listings?p=6',
+    geography: 'Georgian Bluffs and Grey County',
+    evidence_status: 'public_listing_observations',
+    limitation: 'Asking prices and listing status can change; observations are preserved with the source URL and retrieval date.'
+  },
+  {
+    id: 'grey_bruce_public_listing_aggregators',
+    institution: 'Public brokerage-fed listing pages',
+    title: 'REW, Zolo, Squareyards, One Percent Realty, Krib and comparable public listing pages',
+    date: '2025–2026 observations; retrieved 2026-08-15',
+    url: 'https://www.rew.ca/properties/areas/west-grey-on/type/land-lot',
+    geography: 'Grey County municipalities',
+    evidence_status: 'public_listing_observations',
+    limitation: 'Secondary listing displays may lag source brokerage records and are used as documented observations, not as a substitute for verified sale data.'
   },
   {
     id: 'ontario_farmland_value_open_data',
@@ -61,9 +92,9 @@ export const ARC_LAND_MARKET_SOURCES = [
   }
 ];
 
-// This is deliberately a benchmark plus an empty local observation slot. The
-// benchmark is useful for context; only parcel-size-tagged observations enter
-// the size curve. The planning curve is visibly provisional and replaceable.
+// The local observations are manually entered from lawful public listing and
+// sale pages. The planning curve remains only a fallback for a future band
+// whose evidence falls below the minimum sample threshold.
 export const DEFAULT_ARC_LAND_MARKET_DATA = {
   contract_version: ARC_LAND_MARKET_CONTRACT_VERSION,
   observations: [
@@ -100,8 +131,9 @@ export const DEFAULT_ARC_LAND_MARKET_DATA = {
     '20_to_40_ha': 36000,
     '40_plus_ha': 32000
   },
-  planning_curve_status: 'working_planning_sensitivity_not_market_evidence',
-  planning_curve_basis: 'The 5–10 ha anchor is the 2024 Grey County survey benchmark converted from CAD 19,000 per tillable acre. Other bands are explicit sensitivity assumptions for testing parcel-size effects until whole-parcel observations are imported.'
+  minimum_observations_for_curve: ARC_LAND_MARKET_MINIMUM_BAND_SAMPLE,
+  planning_curve_status: 'fallback_only_for_unresolved_or_sparse_bands',
+  planning_curve_basis: 'The 5–10 ha value is anchored to the 2024 Grey County survey benchmark converted from CAD 19,000 per tillable acre. Other values remain explicit fallback sensitivities and are not used when a parcel-size band has sufficient local observations.'
 };
 
 export function landMarketDataPath() {
@@ -120,19 +152,44 @@ export function loadArcLandMarketData(filePath = landMarketDataPath()) {
 }
 
 export function normalizeLandObservation(raw = {}) {
-  const pricePerHa = finite(raw.price_cad_per_ha ?? raw.price_per_ha_cad, null);
-  const price = finite(raw.price_cad ?? raw.price ?? null, null);
-  const pricePerAcre = finite(raw.price_cad_per_tillable_acre ?? raw.price_per_tillable_acre_cad, null);
+  const pricePerHaRaw = raw.price_cad_per_ha ?? raw.price_per_ha_cad;
+  const priceRaw = raw.price_cad ?? raw.price;
+  const adjustedPriceRaw = raw.adjusted_price_cad ?? raw.land_only_adjusted_price_cad;
+  const pricePerAcreRaw = raw.price_cad_per_tillable_acre ?? raw.price_per_tillable_acre_cad;
+  const pricePerHa = pricePerHaRaw == null ? null : finite(pricePerHaRaw, null);
+  const price = priceRaw == null ? null : finite(priceRaw, null);
+  const adjustedPrice = adjustedPriceRaw == null ? null : finite(adjustedPriceRaw, null);
+  const pricePerAcre = pricePerAcreRaw == null ? null : finite(pricePerAcreRaw, null);
   const acreBasis = ['per_acre', 'per_tillable_acre'].includes(raw.price_basis);
-  const derivedPricePerHa = pricePerHa ?? (pricePerAcre == null ? (acreBasis && price != null ? price * ACRE_TO_HECTARE : price) : pricePerAcre * ACRE_TO_HECTARE);
-  const parcelHa = finite(raw.total_parcel_area_ha ?? raw.parcel_area_ha, null);
+  const totalParcelAcresRaw = raw.total_parcel_area_acres ?? raw.parcel_area_acres;
+  const productiveAcresRaw = raw.estimated_productive_area_acres ?? raw.productive_area_acres;
+  const totalParcelAcres = totalParcelAcresRaw == null ? null : finite(totalParcelAcresRaw, null);
+  const productiveAcres = productiveAcresRaw == null ? null : finite(productiveAcresRaw, null);
+  const parcelHaRaw = raw.total_parcel_area_ha ?? raw.parcel_area_ha;
+  const productiveHaRaw = raw.estimated_productive_area_ha;
+  const parcelHa = parcelHaRaw == null
+    ? (totalParcelAcres == null ? null : totalParcelAcres / ACRE_TO_HECTARE)
+    : finite(parcelHaRaw, null);
+  const productiveHa = productiveHaRaw == null
+    ? (productiveAcres == null ? null : productiveAcres / ACRE_TO_HECTARE)
+    : finite(productiveHaRaw, null);
+  const wholePropertyBasis = ['whole_property_asking_price', 'whole_property_sale_price', 'whole_property_value'].includes(raw.price_basis);
+  const curvePrice = adjustedPrice ?? price;
+  const derivedPricePerHa = pricePerHa ?? (pricePerAcre == null
+    ? (wholePropertyBasis && curvePrice != null && parcelHa ? curvePrice / parcelHa : (acreBasis && curvePrice != null ? curvePrice * ACRE_TO_HECTARE : curvePrice))
+    : pricePerAcre * ACRE_TO_HECTARE);
   return {
     ...raw,
     observation_id: raw.observation_id ?? raw.id ?? null,
     observation_date: raw.observation_date ?? raw.date ?? null,
+    retrieval_date: raw.retrieval_date ?? raw.retrieved_on ?? null,
     municipality: raw.municipality ?? raw.county ?? null,
+    total_parcel_area_acres: totalParcelAcres,
     total_parcel_area_ha: parcelHa,
-    estimated_productive_area_ha: finite(raw.estimated_productive_area_ha, null),
+    estimated_productive_area_acres: productiveAcres,
+    estimated_productive_area_ha: productiveHa,
+    raw_price_cad: price,
+    adjusted_price_cad: adjustedPrice,
     price_cad_per_ha: derivedPricePerHa == null ? null : round(derivedPricePerHa, 2),
     price_cad: price,
     price_basis: raw.price_basis ?? (pricePerAcre != null ? 'per_tillable_acre' : 'per_ha'),
@@ -172,7 +229,13 @@ export function classifyLandSize(parcelHa) {
 }
 
 function qualifyingParcelObservation(row) {
-  return row.total_parcel_area_ha != null && row.price_cad_per_ha != null && row.improvement_adjustment_status !== 'improvements_not_removed' && row.value_basis !== 'farm_with_improvements';
+  if (row.total_parcel_area_ha == null || row.price_cad_per_ha == null) return false;
+  if (row.curve_eligibility === 'excluded_improved_property' || row.curve_eligibility === 'excluded_unverified' || row.curve_eligibility === 'excluded_strategic_or_development_premium') return false;
+  return row.improvement_adjustment_status !== 'improvements_not_removed' && row.value_basis !== 'farm_with_improvements';
+}
+
+function observationStatus(row) {
+  return row.transaction_status ?? (row.price_basis === 'whole_property_sale_price' ? 'sold_listing' : 'active_listing');
 }
 
 function quantile(values, fraction) {
@@ -198,23 +261,47 @@ export function summarizeLandObservations(observations = []) {
       min_price_cad_per_ha: prices.length ? Math.min(...prices) : null,
       max_price_cad_per_ha: prices.length ? Math.max(...prices) : null,
       property_type_composition: Object.fromEntries([...new Set(rows.map((row) => row.property_type).filter(Boolean))].map((type) => [type, rows.filter((row) => row.property_type === type).length])),
-      observation_years: [...new Set(rows.map((row) => String(row.observation_date ?? '').slice(0, 4)).filter(Boolean))]
+      observation_years: [...new Set(rows.map((row) => String(row.observation_date ?? '').slice(0, 4)).filter(Boolean))],
+      transaction_status_composition: Object.fromEntries([...new Set(rows.map(observationStatus))].map((status) => [status, rows.filter((row) => observationStatus(row) === status).length])),
+      vacant_observation_count: rows.filter((row) => String(row.property_type ?? '').startsWith('vacant_')).length,
+      improved_observation_count_excluded: normalized.filter((row) => classifyLandSize(row.total_parcel_area_ha)?.id === band.id && !qualifyingParcelObservation(row) && (row.dwelling_included === true || row.barns_outbuildings_included === true || String(row.property_type ?? '').includes('farm_with'))).length
     };
   });
 }
 
+function productiveLandComparators(observations) {
+  return observations.filter((row) => row.price_cad_per_ha != null && (row.price_basis === 'per_tillable_acre' || row.productive_curve_eligibility === 'productive_land_curve')).map((row) => ({
+    observation_id: row.observation_id,
+    source: row.source,
+    source_url: row.source_url,
+    observation_date: row.observation_date,
+    municipality: row.municipality,
+    price_cad_per_productive_ha: row.price_cad_per_ha,
+    estimated_productive_area_ha: row.estimated_productive_area_ha,
+    evidence_status: row.evidence_status,
+    note: row.price_basis === 'per_tillable_acre' ? 'Tillable-acre survey benchmark; not a whole-parcel transaction.' : 'Productive-area observation requires improvement and land-use verification.'
+  }));
+}
+
 export function buildLandMarketContract(data = loadArcLandMarketData()) {
   const observations = (data.observations ?? []).map(normalizeLandObservation);
+  const parcelSizeBands = summarizeLandObservations(observations);
+  const minimumSampleCount = Number(data.minimum_observations_for_curve ?? ARC_LAND_MARKET_MINIMUM_BAND_SAMPLE);
   return {
     contract_version: ARC_LAND_MARKET_CONTRACT_VERSION,
     geography: 'Grey County and comparable Ontario agricultural evidence',
     observations,
-    parcel_size_bands: summarizeLandObservations(observations),
+    parcel_size_bands: parcelSizeBands.map((band) => ({...band, sufficient_evidence_for_median: band.sample_count >= minimumSampleCount})),
+    productive_land_comparators: productiveLandComparators(observations),
     sources: data.sources ?? ARC_LAND_MARKET_SOURCES,
     planning_curve: data.planning_curve ?? DEFAULT_ARC_LAND_MARKET_DATA.planning_curve,
     planning_curve_status: data.planning_curve_status ?? DEFAULT_ARC_LAND_MARKET_DATA.planning_curve_status,
     planning_curve_basis: data.planning_curve_basis ?? DEFAULT_ARC_LAND_MARKET_DATA.planning_curve_basis,
-    local_parcel_curve_status: summarizeLandObservations(observations).some((row) => row.sample_count > 0) ? 'partial_size_tagged_observations' : 'unresolved_no_size_tagged_observations',
+    minimum_observations_for_curve: minimumSampleCount,
+    local_parcel_curve_status: parcelSizeBands.every((row) => row.sample_count >= minimumSampleCount) ? 'measured_local_whole_property_curve' : parcelSizeBands.some((row) => row.sample_count > 0) ? 'partial_measured_whole_property_curve' : 'unresolved_no_size_tagged_observations',
+    productive_land_curve_status: productiveLandComparators(observations).some((row) => row.estimated_productive_area_ha != null) ? 'requires_improvement_adjustment_and_more_observations' : 'survey_comparator_only_no_parcel_curve',
+    improved_property_observation_count: observations.filter((row) => row.dwelling_included === true || row.barns_outbuildings_included === true || String(row.property_type ?? '').includes('farm_with')).length,
+    usable_whole_property_observation_count: observations.filter(qualifyingParcelObservation).length,
     notes: [
       'Survey benchmarks per tillable acre are not silently treated as whole-parcel sale prices.',
       'Farm properties with dwellings or outbuildings require improvement separation before entering the parcel curve.',
@@ -228,6 +315,6 @@ export function estimateLandPriceForParcel({parcelAreaHa, data = loadArcLandMark
   const band = classifyLandSize(parcelAreaHa);
   if (!band) return {parcel_area_ha: parcelAreaHa, band: null, price_cad_per_ha: null, status: 'unresolved_missing_parcel_area', contract_version: contract.contract_version};
   const observed = contract.parcel_size_bands.find((row) => row.id === band.id);
-  if (observed?.sample_count) return {parcel_area_ha: round(parcelAreaHa, 6), band_id: band.id, band_label: band.label, price_cad_per_ha: observed.median_price_cad_per_ha, price_range_cad_per_ha: [observed.lower_quartile_price_cad_per_ha, observed.upper_quartile_price_cad_per_ha], status: 'measured_local_size_band', sample_count: observed.sample_count, contract_version: contract.contract_version};
-  return {parcel_area_ha: round(parcelAreaHa, 6), band_id: band.id, band_label: band.label, price_cad_per_ha: finite(contract.planning_curve?.[band.id], 35000), price_range_cad_per_ha: null, status: contract.local_parcel_curve_status === 'unresolved_no_size_tagged_observations' ? 'working_planning_sensitivity' : 'working_planning_sensitivity_for_sparse_band', sample_count: 0, contract_version: contract.contract_version};
+  if (observed?.sufficient_evidence_for_median) return {parcel_area_ha: round(parcelAreaHa, 6), band_id: band.id, band_label: band.label, price_cad_per_ha: observed.median_price_cad_per_ha, price_range_cad_per_ha: [observed.lower_quartile_price_cad_per_ha, observed.upper_quartile_price_cad_per_ha], status: 'measured_local_size_band', sample_count: observed.sample_count, contract_version: contract.contract_version};
+  return {parcel_area_ha: round(parcelAreaHa, 6), band_id: band.id, band_label: band.label, price_cad_per_ha: null, price_range_cad_per_ha: null, status: 'unresolved_insufficient_local_size_band_evidence', sample_count: observed?.sample_count ?? 0, required_sample_count: contract.minimum_observations_for_curve, contract_version: contract.contract_version};
 }

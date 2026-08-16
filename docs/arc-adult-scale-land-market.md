@@ -12,11 +12,15 @@ Adult-scale scenarios reuse the geometry-derived common-area prototype from comm
 
 ## Land-market evidence
 
-The repository now contains `packages/carrying-capacity/data/source/arc-land-market-observations.json` and `src/land-market.mjs`. The first loaded observation is the 2024 Grey County average-quality cropland benchmark from the Ontario Farmland Value and Rental Value Survey: CAD 19,000 per tillable acre, 29 survey responses. It is converted for context only and is not treated as a whole-parcel sale or a size-band observation.
+The repository contains `packages/carrying-capacity/data/source/arc-land-market-observations.json` and `src/land-market.mjs`. The 2024 Grey County average-quality cropland benchmark from the Ontario Farmland Value and Rental Value Survey remains separate: CAD 19,000 per tillable acre from 29 responses. It is a productive-land comparator, not a whole-parcel sale or a size-band observation.
 
-The Ontario farmland-value open-data catalogue and FCC farmland-values report are retained as source metadata. Statistics Canada farm-capital data are retained as context but explicitly include land and buildings/improvements. No current Grey County parcel-size-tagged bare-land transaction series is present yet.
+The Ontario farmland-value open-data catalogue and FCC farmland-values report are retained as source metadata. Statistics Canada farm-capital data are retained as context but explicitly include land and buildings/improvements. The local observation file now contains 39 manually transcribed public listing observations, including 30 usable whole-property observations after excluding improved, unverified and strategic-premium records.
 
-Until observations are manually imported, the adult-scale table uses an explicit planning sensitivity curve anchored at the Grey County benchmark for the 5–10 ha band: `<2 ha` CAD 60,000/ha; `2–5 ha` CAD 50,000/ha; `5–10 ha` CAD 46,950/ha; `10–20 ha` CAD 42,000/ha; `20–40 ha` CAD 36,000/ha; `40+ ha` CAD 32,000/ha. These values are marked `working_planning_sensitivity`, not evidence-backed market prices. They are present to test scale effects without silently multiplying every scenario by CAD 35,000/ha.
+The evidence is uneven by parcel-size band. The current usable whole-property counts are: `<2 ha`: 11; `2–5 ha`: 6; `5–10 ha`: 2; `10–20 ha`: 5; `20–40 ha`: 4; `40+ ha`: 2. The package requires three observations before using a band median for adult-scale economics. Consequently the `<2 ha`, `2–5 ha`, `10–20 ha` and `20–40 ha` bands are currently usable, while `5–10 ha` and `40+ ha` remain unresolved. Their descriptive medians remain visible for review, but the old planning curve is not silently substituted into a result.
+
+The usable whole-property descriptive medians are approximately: `<2 ha` CAD 337,743/ha; `2–5 ha` CAD 71,488/ha; `5–10 ha` CAD 52,697/ha (sparse); `10–20 ha` CAD 46,950/ha; `20–40 ha` CAD 21,288/ha; `40+ ha` CAD 18,108/ha (sparse). These are mixed asking-price observations across rural-residential lots, woodland, agricultural land, wetland and access conditions, not a controlled hedonic price curve.
+
+The 5–10 ha and 40+ ha planning values remain available only as explicit fallback sensitivity inputs for experiments. They are not used by the adult-scale contract while those bands are below the minimum sample threshold.
 
 Import lawful, manually verified observations with:
 
@@ -26,9 +30,15 @@ npm run import:arc:land-observations -- --input=/path/to/observations.csv
 
 The importer preserves source IDs, dates, property type, parcel area, improvement status, access/servicing notes and evidence status. Farm-with-residence or outbuilding observations are excluded from the bare-land parcel curve unless improvements have been explicitly separated.
 
-## Crossover limitation
+## Evidence-supported scale signal
 
-The current dataset does not support a defensible minimum practical ARC scale or economic crossover. The published scale table shows the effect of the provisional sensitivity curve and fixed infrastructure sharing, while the evidence column makes the unresolved local market curve visible. A crossover claim should wait for size-tagged Grey County observations or a defensible licensed transaction dataset.
+The first adult-scale demonstration that falls in a measured farm-scale band is 28 adults, requiring approximately 25.51 ha in the current family-capacity planning case. The 28-adult and 40-adult scenarios share the measured 20–40 ha band; moving from 28 to 40 adults reduces the combined land-plus-infrastructure charge by about 4.8%. The model therefore reports 28 adults as a provisional farm-scale entry / diminishing-savings point. The 40+ ha band is still sparse, so the result does not establish the global minimum or what happens at 56 adults. A completed crossover analysis needs more observations, especially large ordinary agricultural parcels and completed sale prices.
+
+The adult-scale rows currently calculate as follows when a band is sufficiently observed: 1 adult uses `<2 ha`; 4 adults uses `2–5 ha`; 12, 16 and 20 adults use `10–20 ha`; 28 and 40 adults use `20–40 ha`; 56 adults is unresolved because its calculated parcel falls in the sparse `40+ ha` band. The shared-infrastructure and dwelling columns remain separate; the evidence-driven land result changes the site lease only.
+
+## Data limitations
+
+Most observations are active or recent asking prices rather than verified sale prices. A few records come from public brokerage indexes and have lower confidence or approximate areas. Vacant lots under 5 ha carry a likely residential/buildability premium and should not be compared directly to productive farmland. Large parcels include woodland, wetlands, conservation constraints and recreational premiums. Productive/tillable hectares are recorded where listing text provides them, but the current sample is not sufficient to derive a second productive-land curve. The Ontario 2024 survey benchmark is therefore retained as the best current productive-land comparator, not applied to whole ARC parcels.
 
 ## Generated outputs
 

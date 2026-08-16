@@ -26,6 +26,10 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(/"(?:wall|roof|floor)_r"\s*:/.test(publicJson), false);
   assert.deepEqual(contract.site_lease_economics.adult_scale.scenarios.map((row) => row.adult_residents), [1, 4, 12, 16, 20, 28, 40, 56]);
   assert.equal(contract.site_lease_economics.adult_scale.family_capacity_standard.household_profile_id, 'two_adults_plus_three_children');
-  assert.equal(contract.site_lease_economics.adult_scale.land_market.local_parcel_curve_status, 'unresolved_no_size_tagged_observations');
+  assert.equal(contract.site_lease_economics.adult_scale.land_market.local_parcel_curve_status, 'partial_measured_whole_property_curve');
+  assert.ok(contract.site_lease_economics.adult_scale.land_market.usable_whole_property_observation_count >= 30);
+  assert.ok(contract.site_lease_economics.adult_scale.land_market.productive_land_comparators.some((row) => row.observation_id === 'grey-2024-tillable-benchmark'));
+  assert.equal(contract.site_lease_economics.adult_scale.economic_crossover.farm_scale_entry_adults, 28);
+  assert.equal(contract.site_lease_economics.adult_scale.economic_crossover.diminishing_savings_point_adults, 28);
   assert.ok(contract.site_lease_economics.adult_scale.land_market.sources.some((source) => source.institution.includes('Ontario Farmland')));
 });
