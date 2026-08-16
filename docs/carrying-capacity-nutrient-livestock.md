@@ -43,13 +43,13 @@ Feed is separated into these classes:
 - invertebrates;
 - purchased concentrate and mineral supplementation.
 
-Each feed row carries dry matter, energy, protein, human-edible fraction, storage loss and source/evidence status. A mixed system consumes the finite property feed pool sequentially, so the same residue or browse stream cannot be allocated twice. Existing understorey, crop residues, culls, leaf fodder and browse are treated as bounded co-products/overlays within the modeled food area; no dedicated feed hectare is created unless a future property inventory explicitly supplies one.
+Each feed row carries dry matter, energy, protein, human-edible fraction, storage loss and source/evidence status. A mixed system consumes the finite property feed pool sequentially, so the same residue or browse stream cannot be allocated twice. Existing understorey, crop residues, culls, leaf fodder and browse are treated as bounded co-products/overlays within the modeled food area. Dedicated feed hectares are added when those finite streams are short.
 
 ## Ration cases
 
-The contract exposes `conventional_reference`, `low_food_competition` and `arc_integrated`. The ARC-integrated case uses the modeled property feed supply first, then reports purchased supplementation. It is not a claim that arbitrary lawn grass, leaves or pasture can replace a balanced ration.
+The livestock contract is version `1.1.0`. It exposes `conventional_reference`, `low_food_competition` and `arc_integrated`. The first two are explicitly non-ARC external-feed sensitivities. The ARC-integrated case prohibits purchased feed: it uses the modeled property feed supply first, then adds locally grown dedicated feed hectares for a deficit or marks the option infeasible. It is not a claim that arbitrary lawn grass, leaves or pasture can replace a balanced ration.
 
-Seasonal accounting reports fresh growing-season feed, winter stored feed, storage loss and purchased feed. Species production start years are carried into establishment rows; for example, the goat case does not receive its modeled output before its second year.
+Seasonal accounting reports fresh growing-season feed, winter stored feed, storage loss, local dedicated feed production and any remaining deficit. Species production start years are carried into establishment rows; for example, the goat case does not receive its modeled output before its second year. Canonical livestock eligibility requires zero feed imports, zero unresolved deficit and complete winter-feed coverage.
 
 ## Current family-capacity result
 

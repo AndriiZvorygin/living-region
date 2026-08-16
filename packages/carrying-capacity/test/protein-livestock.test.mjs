@@ -8,6 +8,7 @@ import {
   calculateFeedLedger,
   calculateLivestockScenario,
   calculateNutrientFoodSystem,
+  compareNutrientFoodSystems,
   derivePropertyFeedSupply,
   calculateFoodSystem,
   siteClasses,
@@ -48,15 +49,24 @@ test('a high-energy crop system can still fail the separate protein constraint',
   assert.equal(result.protein_adequacy, false);
 });
 
-test('feed ledgers distinguish human-edible and human-inedible feed and respect property supply', () => {
+test('canonical on-site feed ledgers distinguish edible feed and convert shortage to local land', () => {
   const propertyFeed = derivePropertyFeedSupply({foodSystem: {required_food_area_ha: 1}});
   const ledger = calculateFeedLedger({speciesId: 'rabbit_meat', rationId: 'arc_integrated', propertyFeedSupply: propertyFeed});
-  assert.equal(ledger.dry_matter_requirement_kg_year, ledger.on_property_dry_matter_kg_year + ledger.purchased_dry_matter_kg_year);
+  assert.equal(ledger.purchased_dry_matter_kg_year, 0);
+  assert.equal(ledger.feed_deficit_dm_kg_year, 0);
+  assert.ok(ledger.additional_dedicated_feed_land_ha > 0);
   assert.equal(ledger.human_edible_feed_dm_kg_year + ledger.human_inedible_feed_dm_kg_year, ledger.dry_matter_requirement_kg_year);
   assert.ok(ledger.on_property_dry_matter_kg_year <= Object.values(propertyFeed).filter((value) => Number.isFinite(Number(value))).reduce((sum, value) => sum + Number(value), 0));
   assert.ok(ledger.human_inedible_feed_dm_kg_year > 0);
-  assert.ok(ledger.purchased_dry_matter_kg_year > 0);
-  assert.equal(propertyFeed.double_counting_rule.includes('No additional hectare'), true);
+  assert.ok(ledger.winter_stored_feed_available_kg_year >= ledger.winter_stored_feed_required_kg_year);
+  assert.equal(propertyFeed.double_counting_rule.includes('not assigned twice'), true);
+});
+
+test('external-feed sensitivities remain separate and are not ARC-feasible', () => {
+  const propertyFeed = derivePropertyFeedSupply({foodSystem: {required_food_area_ha: 1}});
+  const external = calculateFeedLedger({speciesId: 'rabbit_meat', rationId: 'conventional_reference', propertyFeedSupply: propertyFeed});
+  assert.ok(external.purchased_dry_matter_kg_year > 0);
+  assert.equal(external.feed_self_sufficiency, false);
 });
 
 test('animal food output uses edible product and reports winter feed, labour and housing', () => {
@@ -69,13 +79,16 @@ test('animal food output uses edible product and reports winter feed, labour and
   assert.ok(result.manure_kg_year > 0);
 });
 
-test('livestock replaces only its own food-energy output and does not add dedicated feed land by default', () => {
+test('livestock replaces only its own food-energy output and adds on-site feed land', () => {
   const demand = calculateHealthCanadaEER(member()).gj_year;
   const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
   const plants = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, siteCapability: site()});
   const rabbits = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, siteCapability: site(), livestockMode: 'rabbit_meat'});
   assert.ok(rabbits.plant_food.required_food_area_ha < plants.plant_food.required_food_area_ha);
-  assert.equal(rabbits.feed.additional_dedicated_feed_land_ha, 0);
+  assert.ok(rabbits.feed.additional_dedicated_feed_land_ha > 0);
+  assert.equal(rabbits.feed.purchased_feed_dm_kg_year, 0);
+  assert.equal(rabbits.feed.feed_deficit_dm_kg_year, 0);
+  assert.equal(rabbits.feed.feed_self_sufficiency, true);
   assert.equal(rabbits.plant_food.delivered_food_energy_gj + rabbits.animal_food_energy_gj_year, plants.plant_only.food_energy_gj_year);
 });
 
@@ -85,6 +98,28 @@ test('mixed livestock consumes each property feed stream at most once', () => {
   const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, siteCapability: site(), livestockMode: 'mixed_rabbit_eggs'});
   const consumed = Object.fromEntries(result.animals.flatMap((animal) => animal.feed.rows).reduce((map, row) => map.set(row.stream_id, (map.get(row.stream_id) ?? 0) + row.on_property_dm_kg), new Map()));
   for (const [streamId, amount] of Object.entries(consumed)) assert.ok(amount <= Number(result.feed.property_supply[streamId] ?? 0) + 1e-6, `${streamId} consumed ${amount} above property supply`);
+  assert.equal(result.feed.purchased_feed_dm_kg_year, 0);
+  assert.equal(result.feed.feed_deficit_dm_kg_year, 0);
+});
+
+test('a site with no feed production makes on-site livestock infeasible instead of importing feed', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
+  const impossibleSite = {...site(), food_yield_multiplier: 1, feed_yield_multiplier: 0};
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, siteCapability: impossibleSite, livestockMode: 'rabbit_meat'});
+  assert.equal(result.feed.purchased_feed_dm_kg_year, 0);
+  assert.ok(result.feed.feed_deficit_dm_kg_year > 0);
+  assert.equal(result.feed_self_sufficiency, false);
+  assert.equal(result.optimizer_eligible, false);
+});
+
+test('the nutrient optimizer excludes every external-feed sensitivity', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
+  const comparison = compareNutrientFoodSystems({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, siteCapability: site()});
+  assert.equal(comparison.best?.mode, 'plants_only');
+  assert.equal(comparison.best?.ration_id, 'arc_integrated');
+  assert.ok(comparison.rows.filter((row) => row.ration_id !== 'arc_integrated').every((row) => !row.optimizer_eligible));
 });
 
 test('plants-only remains valid and integrated establishment uses species production start years', () => {
@@ -95,5 +130,5 @@ test('plants-only remains valid and integrated establishment uses species produc
   assert.equal(plants.nutrient_food_system.protein_adequacy, true);
   assert.equal(goats.nutrient_food_system.animal_output_by_year['1'].food_energy_gj_year, 0);
   assert.ok(goats.nutrient_food_system.animal_output_by_year['2'].food_energy_gj_year > 0);
-  assert.ok(goats.establishment_land.strategy_comparison.progressive_handoff.establishment_land_requirement_ha < plants.establishment_land.strategy_comparison.progressive_handoff.establishment_land_requirement_ha);
+  assert.ok(goats.establishment_land.strategy_comparison.progressive_handoff.establishment_land_requirement_ha > plants.establishment_land.strategy_comparison.progressive_handoff.establishment_land_requirement_ha);
 });
