@@ -7,7 +7,7 @@ const ACRE_TO_HECTARE = 2.4710538147;
 const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const finite = (value, fallback = null) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 
-export const ARC_LAND_MARKET_CONTRACT_VERSION = '1.1.0';
+export const ARC_LAND_MARKET_CONTRACT_VERSION = '1.2.0';
 export const ARC_LAND_MARKET_MINIMUM_BAND_SAMPLE = 3;
 
 export const ARC_LAND_SIZE_BANDS = [
@@ -178,7 +178,7 @@ export function normalizeLandObservation(raw = {}) {
   const derivedPricePerHa = pricePerHa ?? (pricePerAcre == null
     ? (wholePropertyBasis && curvePrice != null && parcelHa ? curvePrice / parcelHa : (acreBasis && curvePrice != null ? curvePrice * ACRE_TO_HECTARE : curvePrice))
     : pricePerAcre * ACRE_TO_HECTARE);
-  return {
+  const normalized = {
     ...raw,
     observation_id: raw.observation_id ?? raw.id ?? null,
     observation_date: raw.observation_date ?? raw.date ?? null,
@@ -191,10 +191,18 @@ export function normalizeLandObservation(raw = {}) {
     raw_price_cad: price,
     adjusted_price_cad: adjustedPrice,
     price_cad_per_ha: derivedPricePerHa == null ? null : round(derivedPricePerHa, 2),
+    gross_acquisition_price_cad: price,
+    gross_acquisition_price_cad_per_ha: price == null || parcelHa == null || parcelHa <= 0 ? null : round(price / parcelHa, 2),
+    adjusted_land_price_cad_per_ha: adjustedPrice == null || parcelHa == null || parcelHa <= 0 ? null : round(adjustedPrice / parcelHa, 2),
     price_cad: price,
     price_basis: raw.price_basis ?? (pricePerAcre != null ? 'per_tillable_acre' : 'per_ha'),
     evidence_status: raw.evidence_status ?? 'manual_observation_unverified'
   };
+  normalized.property_market_class = isImprovedProperty(normalized) ? 'improved_property' : 'vacant_land';
+  normalized.substantial_improvements = hasSubstantialImprovements(normalized);
+  normalized.arc_usable_acquisition = qualifyingAcquisitionObservation(normalized);
+  normalized.potential_arc_reuse = buildArcReuseAssessment(normalized);
+  return normalized;
 }
 
 export function parseLandObservationCsv(csvText) {
@@ -228,6 +236,56 @@ export function classifyLandSize(parcelHa) {
   return ARC_LAND_SIZE_BANDS.find((band) => value >= band.min_ha && (band.max_ha == null || value < band.max_ha)) ?? ARC_LAND_SIZE_BANDS.at(-1);
 }
 
+function isImprovedProperty(row) {
+  const propertyType = String(row.property_type ?? '').toLowerCase();
+  return row.dwelling_included === true
+    || row.barns_outbuildings_included === true
+    || propertyType.includes('farm_with')
+    || propertyType.includes('with_dwelling')
+    || propertyType.includes('with_outbuilding');
+}
+
+function hasSubstantialImprovements(row) {
+  const propertyType = String(row.property_type ?? '').toLowerCase();
+  if (row.dwelling_included === true || propertyType.includes('farm_with') || propertyType.includes('with_dwelling')) return true;
+  if (propertyType.includes('vacant_land_with_outbuilding')) return true;
+  return row.barns_outbuildings_included === true && row.improvement_adjustment_status === 'improvements_not_removed';
+}
+
+function qualifyingAcquisitionObservation(row) {
+  if (row.total_parcel_area_ha == null || row.gross_acquisition_price_cad == null) return false;
+  if (row.curve_eligibility === 'excluded_unverified' || row.curve_eligibility === 'excluded_strategic_or_development_premium') return false;
+  return ['whole_property_asking_price', 'whole_property_sale_price', 'whole_property_value'].includes(row.price_basis);
+}
+
+function buildArcReuseAssessment(row) {
+  const servicing = String(row.servicing ?? '').toLowerCase();
+  const access = String(row.road_frontage_access ?? '').toLowerCase();
+  const hasDwelling = row.dwelling_included === true;
+  const hasBuildings = row.barns_outbuildings_included === true;
+  const hasWater = /well|water|existing_dwelling_services/.test(servicing);
+  const hasSewage = /septic|sewage|existing_dwelling_services/.test(servicing);
+  const hasElectrical = /hydro|electrical|grid|existing_dwelling_services/.test(servicing);
+  const hasAccess = /driveway|paved_road|rural_road|highway|access/.test(access);
+  const asset = (id, present, status = 'not_present', note = '') => ({id, present, status, reuse_value_cad: null, note});
+  const assets = [
+    asset('resident_dwelling', hasDwelling, hasDwelling ? 'condition_unknown' : 'not_present', hasDwelling ? 'Existing dwelling requires condition, occupancy and code review.' : ''),
+    asset('common_amenity_building', hasDwelling, hasDwelling ? 'potentially_reusable' : 'not_present', hasDwelling ? 'Farmhouse or existing house could serve as common space; permitted use is unresolved.' : ''),
+    asset('workshop_storage', hasBuildings, hasBuildings ? 'potentially_reusable' : 'not_present', hasBuildings ? 'Barn, shed or workshop requires condition and safe-use review.' : ''),
+    asset('agricultural_buildings', hasBuildings, hasBuildings ? 'potentially_reusable' : 'not_present'),
+    asset('road_access', hasAccess, hasAccess ? 'potentially_reusable' : 'not_present', hasAccess ? 'Existing frontage or driveway may reduce new access work; no capital credit is assumed.' : ''),
+    asset('well_water_system', hasWater, hasWater ? 'condition_unknown' : 'not_present', hasWater ? 'Existing water evidence still requires potability, capacity and approval review.' : ''),
+    asset('septic_sanitation', hasSewage, hasSewage ? 'condition_unknown' : 'not_present', hasSewage ? 'Existing sewage evidence still requires capacity and approval review.' : ''),
+    asset('grid_electrical_service', hasElectrical, hasElectrical ? 'potentially_reusable' : 'not_present', hasElectrical ? 'Existing electrical service requires capacity and connection review.' : '')
+  ];
+  return {
+    assessment_status: assets.some((item) => item.present) ? 'candidate_reuse_unpriced' : 'no_known_reuse_assets',
+    capital_offset_status: assets.some((item) => item.present) ? 'reuse_value_unresolved' : 'not_applicable',
+    assets,
+    note: 'Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence.'
+  };
+}
+
 function qualifyingParcelObservation(row) {
   if (row.total_parcel_area_ha == null || row.price_cad_per_ha == null) return false;
   if (row.curve_eligibility === 'excluded_improved_property' || row.curve_eligibility === 'excluded_unverified' || row.curve_eligibility === 'excluded_strategic_or_development_premium') return false;
@@ -247,26 +305,61 @@ function quantile(values, fraction) {
   return round(sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower), 2);
 }
 
-export function summarizeLandObservations(observations = []) {
+function summarizeMarketObservations(observations = [], predicate = qualifyingParcelObservation, marketView = 'vacant_land') {
   const normalized = observations.map(normalizeLandObservation);
   return ARC_LAND_SIZE_BANDS.map((band) => {
     const rows = normalized.filter((row) => qualifyingParcelObservation(row) && classifyLandSize(row.total_parcel_area_ha)?.id === band.id);
-    const prices = rows.map((row) => row.price_cad_per_ha);
+    const selected = normalized.filter((row) => predicate(row) && classifyLandSize(row.total_parcel_area_ha)?.id === band.id);
+    const prices = selected.map((row) => marketView === 'vacant_land' ? row.price_cad_per_ha : row.gross_acquisition_price_cad_per_ha);
+    const grossPrices = selected.map((row) => row.gross_acquisition_price_cad_per_ha);
+    const totalPrices = selected.map((row) => row.gross_acquisition_price_cad);
     return {
       ...band,
-      sample_count: rows.length,
+      market_view: marketView,
+      sample_count: selected.length,
       median_price_cad_per_ha: quantile(prices, .5),
+      median_gross_price_cad_per_ha: quantile(grossPrices, .5),
+      median_total_acquisition_price_cad: quantile(totalPrices, .5),
       lower_quartile_price_cad_per_ha: quantile(prices, .25),
       upper_quartile_price_cad_per_ha: quantile(prices, .75),
       min_price_cad_per_ha: prices.length ? Math.min(...prices) : null,
       max_price_cad_per_ha: prices.length ? Math.max(...prices) : null,
-      property_type_composition: Object.fromEntries([...new Set(rows.map((row) => row.property_type).filter(Boolean))].map((type) => [type, rows.filter((row) => row.property_type === type).length])),
-      observation_years: [...new Set(rows.map((row) => String(row.observation_date ?? '').slice(0, 4)).filter(Boolean))],
-      transaction_status_composition: Object.fromEntries([...new Set(rows.map(observationStatus))].map((status) => [status, rows.filter((row) => observationStatus(row) === status).length])),
-      vacant_observation_count: rows.filter((row) => String(row.property_type ?? '').startsWith('vacant_')).length,
+      min_total_acquisition_price_cad: totalPrices.length ? Math.min(...totalPrices) : null,
+      max_total_acquisition_price_cad: totalPrices.length ? Math.max(...totalPrices) : null,
+      property_type_composition: Object.fromEntries([...new Set(selected.map((row) => row.property_type).filter(Boolean))].map((type) => [type, selected.filter((row) => row.property_type === type).length])),
+      observation_years: [...new Set(selected.map((row) => String(row.observation_date ?? '').slice(0, 4)).filter(Boolean))],
+      transaction_status_composition: Object.fromEntries([...new Set(selected.map(observationStatus))].map((status) => [status, selected.filter((row) => observationStatus(row) === status).length])),
+      vacant_observation_count: selected.filter((row) => String(row.property_type ?? '').startsWith('vacant_')).length,
       improved_observation_count_excluded: normalized.filter((row) => classifyLandSize(row.total_parcel_area_ha)?.id === band.id && !qualifyingParcelObservation(row) && (row.dwelling_included === true || row.barns_outbuildings_included === true || String(row.property_type ?? '').includes('farm_with'))).length
     };
   });
+}
+
+export function summarizeLandObservations(observations = []) {
+  return summarizeMarketObservations(observations, qualifyingParcelObservation, 'vacant_land');
+}
+
+export function getArcAcquisitionObservation({observationId, data = loadArcLandMarketData()} = {}) {
+  const row = (data.observations ?? []).map(normalizeLandObservation).find((candidate) => candidate.observation_id === observationId);
+  return row && qualifyingAcquisitionObservation(row) ? row : null;
+}
+
+function summarizeAcquisitionMarket(observations, predicate, marketView) {
+  const normalized = observations.map(normalizeLandObservation);
+  const selected = normalized.filter(predicate);
+  const prices = selected.map((row) => row.gross_acquisition_price_cad_per_ha);
+  const totalPrices = selected.map((row) => row.gross_acquisition_price_cad);
+  return {
+    market_view: marketView,
+    observation_count: selected.length,
+    median_total_acquisition_price_cad: quantile(totalPrices, .5),
+    lower_quartile_total_acquisition_price_cad: quantile(totalPrices, .25),
+    upper_quartile_total_acquisition_price_cad: quantile(totalPrices, .75),
+    median_gross_price_cad_per_ha: quantile(prices, .5),
+    parcel_size_bands: summarizeMarketObservations(observations, predicate, marketView),
+    property_type_composition: Object.fromEntries([...new Set(selected.map((row) => row.property_type).filter(Boolean))].map((type) => [type, selected.filter((row) => row.property_type === type).length])),
+    observation_ids: selected.map((row) => row.observation_id)
+  };
 }
 
 function productiveLandComparators(observations) {
@@ -286,12 +379,35 @@ function productiveLandComparators(observations) {
 export function buildLandMarketContract(data = loadArcLandMarketData()) {
   const observations = (data.observations ?? []).map(normalizeLandObservation);
   const parcelSizeBands = summarizeLandObservations(observations);
+  const vacantLandMarket = summarizeAcquisitionMarket(observations, qualifyingParcelObservation, 'vacant_land');
+  const improvedPropertyMarket = summarizeAcquisitionMarket(observations, (row) => qualifyingAcquisitionObservation(row) && isImprovedProperty(row), 'improved_property');
+  const arcUsableMarket = summarizeAcquisitionMarket(observations, qualifyingAcquisitionObservation, 'arc_usable_acquisition');
+  const adjustedLandRows = observations.filter((row) => qualifyingAcquisitionObservation(row) && row.adjusted_price_cad != null);
   const minimumSampleCount = Number(data.minimum_observations_for_curve ?? ARC_LAND_MARKET_MINIMUM_BAND_SAMPLE);
   return {
     contract_version: ARC_LAND_MARKET_CONTRACT_VERSION,
     geography: 'Grey County and comparable Ontario agricultural evidence',
     observations,
     parcel_size_bands: parcelSizeBands.map((band) => ({...band, sufficient_evidence_for_median: band.sample_count >= minimumSampleCount})),
+    vacant_land_market: {
+      ...vacantLandMarket,
+      parcel_size_bands: vacantLandMarket.parcel_size_bands.map((band) => ({...band, sufficient_evidence_for_median: band.sample_count >= minimumSampleCount}))
+    },
+    improved_property_acquisition_market: {
+      ...improvedPropertyMarket,
+      parcel_size_bands: improvedPropertyMarket.parcel_size_bands.map((band) => ({...band, sufficient_evidence_for_median: band.sample_count >= minimumSampleCount}))
+    },
+    arc_usable_acquisition_market: {
+      ...arcUsableMarket,
+      parcel_size_bands: arcUsableMarket.parcel_size_bands.map((band) => ({...band, sufficient_evidence_for_median: band.sample_count >= minimumSampleCount}))
+    },
+    adjusted_land_value_evidence: {
+      market_view: 'adjusted_land_value',
+      observation_count: adjustedLandRows.length,
+      status: adjustedLandRows.length ? 'available_for_separate_analysis' : 'unresolved_no_documented_improvement_adjustments',
+      observation_ids: adjustedLandRows.map((row) => row.observation_id),
+      note: 'Adjusted land values are never substituted for gross acquisition prices. A documented improvement value or defensible residual method is required.'
+    },
     productive_land_comparators: productiveLandComparators(observations),
     sources: data.sources ?? ARC_LAND_MARKET_SOURCES,
     planning_curve: data.planning_curve ?? DEFAULT_ARC_LAND_MARKET_DATA.planning_curve,
@@ -300,21 +416,32 @@ export function buildLandMarketContract(data = loadArcLandMarketData()) {
     minimum_observations_for_curve: minimumSampleCount,
     local_parcel_curve_status: parcelSizeBands.every((row) => row.sample_count >= minimumSampleCount) ? 'measured_local_whole_property_curve' : parcelSizeBands.some((row) => row.sample_count > 0) ? 'partial_measured_whole_property_curve' : 'unresolved_no_size_tagged_observations',
     productive_land_curve_status: productiveLandComparators(observations).some((row) => row.estimated_productive_area_ha != null) ? 'requires_improvement_adjustment_and_more_observations' : 'survey_comparator_only_no_parcel_curve',
-    improved_property_observation_count: observations.filter((row) => row.dwelling_included === true || row.barns_outbuildings_included === true || String(row.property_type ?? '').includes('farm_with')).length,
+    improved_property_observation_count: observations.filter(isImprovedProperty).length,
+    improved_property_substantial_observation_count: observations.filter(hasSubstantialImprovements).length,
     usable_whole_property_observation_count: observations.filter(qualifyingParcelObservation).length,
+    usable_vacant_land_observation_count: vacantLandMarket.observation_count,
+    usable_arc_acquisition_observation_count: arcUsableMarket.observation_count,
+    minor_improvement_overlap_observation_count: observations.filter((row) => isImprovedProperty(row) && !hasSubstantialImprovements(row) && qualifyingAcquisitionObservation(row)).length,
     notes: [
       'Survey benchmarks per tillable acre are not silently treated as whole-parcel sale prices.',
-      'Farm properties with dwellings or outbuildings require improvement separation before entering the parcel curve.',
+      'Vacant-land bands exclude substantial buildings while retaining minor improvements as explicitly flagged observations when they are not a separate material asset.',
+      'Improved properties enter gross acquisition statistics at their actual whole-property asking or sale price; no farmhouse or barn value is silently subtracted.',
+      'Existing improvements expose candidate ARC reuse assets, but no monetary capital offset is applied without condition, legal and replacement-cost evidence.',
       'The importer accepts manually verified lawful observations; no REALTOR.ca scraping is used.'
     ]
   };
 }
 
-export function estimateLandPriceForParcel({parcelAreaHa, data = loadArcLandMarketData()} = {}) {
+export function estimateLandPriceForParcel({parcelAreaHa, market = 'vacant_land', data = loadArcLandMarketData()} = {}) {
   const contract = buildLandMarketContract(data);
   const band = classifyLandSize(parcelAreaHa);
-  if (!band) return {parcel_area_ha: parcelAreaHa, band: null, price_cad_per_ha: null, status: 'unresolved_missing_parcel_area', contract_version: contract.contract_version};
-  const observed = contract.parcel_size_bands.find((row) => row.id === band.id);
-  if (observed?.sufficient_evidence_for_median) return {parcel_area_ha: round(parcelAreaHa, 6), band_id: band.id, band_label: band.label, price_cad_per_ha: observed.median_price_cad_per_ha, price_range_cad_per_ha: [observed.lower_quartile_price_cad_per_ha, observed.upper_quartile_price_cad_per_ha], status: 'measured_local_size_band', sample_count: observed.sample_count, contract_version: contract.contract_version};
-  return {parcel_area_ha: round(parcelAreaHa, 6), band_id: band.id, band_label: band.label, price_cad_per_ha: null, price_range_cad_per_ha: null, status: 'unresolved_insufficient_local_size_band_evidence', sample_count: observed?.sample_count ?? 0, required_sample_count: contract.minimum_observations_for_curve, contract_version: contract.contract_version};
+  const marketContract = market === 'improved_property'
+    ? contract.improved_property_acquisition_market
+    : market === 'arc_usable_acquisition' || market === 'all_arc_usable'
+      ? contract.arc_usable_acquisition_market
+      : contract.vacant_land_market;
+  if (!band) return {parcel_area_ha: parcelAreaHa, market_view: marketContract.market_view, band: null, price_cad_per_ha: null, status: 'unresolved_missing_parcel_area', contract_version: contract.contract_version};
+  const observed = marketContract.parcel_size_bands.find((row) => row.id === band.id);
+  if (observed?.sufficient_evidence_for_median) return {parcel_area_ha: round(parcelAreaHa, 6), market_view: marketContract.market_view, band_id: band.id, band_label: band.label, price_cad_per_ha: observed.median_price_cad_per_ha, price_range_cad_per_ha: [observed.lower_quartile_price_cad_per_ha, observed.upper_quartile_price_cad_per_ha], median_total_acquisition_price_cad: observed.median_total_acquisition_price_cad, status: 'measured_local_size_band', sample_count: observed.sample_count, contract_version: contract.contract_version};
+  return {parcel_area_ha: round(parcelAreaHa, 6), market_view: marketContract.market_view, band_id: band.id, band_label: band.label, price_cad_per_ha: null, price_range_cad_per_ha: null, median_total_acquisition_price_cad: null, status: 'unresolved_insufficient_local_size_band_evidence', sample_count: observed?.sample_count ?? 0, required_sample_count: contract.minimum_observations_for_curve, contract_version: contract.contract_version};
 }

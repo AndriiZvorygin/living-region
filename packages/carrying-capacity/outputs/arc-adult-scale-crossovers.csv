@@ -1,6 +1,16 @@
-adult_residents,households,parcel_hectares,previous_land_band,new_land_band,land_price_change_cad_per_ha,household_monthly_change_cad
-4,2,3.729388,<2 ha,2–5 ha,-266255.53,-3177.88
-6,3,5.544112,2–5 ha,5–10 ha,,
-12,6,10.988284,5–10 ha,10–20 ha,,
-22,11,20.061904,10–20 ha,20–40 ha,-25661.89,-268.96
-44,22,40.023868,20–40 ha,40+ ha,,
+market_view,adult_residents,households,parcel_hectares,previous_land_band,new_land_band,land_price_change_cad_per_ha,household_monthly_change_cad
+vacant_land,4,2,3.729388,<2 ha,2–5 ha,-266255.53,-3177.88
+vacant_land,6,3,5.544112,2–5 ha,5–10 ha,,
+vacant_land,12,6,10.988284,5–10 ha,10–20 ha,,
+vacant_land,22,11,20.061904,10–20 ha,20–40 ha,-25661.89,-268.96
+vacant_land,44,22,40.023868,20–40 ha,40+ ha,,
+improved_property,4,2,3.729388,<2 ha,2–5 ha,,
+improved_property,6,3,5.544112,2–5 ha,5–10 ha,,
+improved_property,12,6,10.988284,5–10 ha,10–20 ha,,
+improved_property,22,11,20.061904,10–20 ha,20–40 ha,,
+improved_property,44,22,40.023868,20–40 ha,40+ ha,,
+arc_usable_acquisition,4,2,3.729388,<2 ha,2–5 ha,-246767.33,-2970.97
+arc_usable_acquisition,6,3,5.544112,2–5 ha,5–10 ha,,
+arc_usable_acquisition,12,6,10.988284,5–10 ha,10–20 ha,,
+arc_usable_acquisition,22,11,20.061904,10–20 ha,20–40 ha,-25661.89,-268.96
+arc_usable_acquisition,44,22,40.023868,20–40 ha,40+ ha,3499.4,34.56

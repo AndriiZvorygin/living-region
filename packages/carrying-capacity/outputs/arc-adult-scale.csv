@@ -1,9 +1,11 @@
-adult_residents,households,dependent_children_capacity,productive_hectares,common_hectares,total_parcel_hectares,land_market_band,land_price_cad_per_ha,land_price_status,land_price_sample_count,estimated_parcel_acquisition_cad,site_lease_monthly_cad_per_household,shared_infrastructure_monthly_cad_per_household,dwelling_financing_monthly_cad_per_household,combined_land_infrastructure_monthly_cad_per_household,combined_illustrative_monthly_cad_per_household
-1,1,0,1.117863,0.09994,1.217803,<2 ha,337743.44,measured_local_size_band,11,411304.97,2315.54,575.57,353.72,2891.11,3244.83
-4,2,6,3.629448,0.09994,3.729388,2–5 ha,71487.91,measured_local_size_band,6,266606.15,750.46,287.79,353.72,1038.25,1391.97
-12,6,18,10.888344,0.09994,10.988284,10–20 ha,46950.02,measured_local_size_band,5,515900.15,484.06,95.93,353.72,579.99,933.71
-16,8,24,14.517792,0.09994,14.617732,10–20 ha,46950.02,measured_local_size_band,5,686302.81,482.96,71.95,353.72,554.91,908.63
-20,10,30,18.14724,0.09994,18.24718,10–20 ha,46950.02,measured_local_size_band,5,856705.47,482.3,57.56,353.72,539.86,893.58
-28,14,42,25.406136,0.09994,25.506076,20–40 ha,21288.13,measured_local_size_band,4,542976.66,218.34,41.11,353.72,259.45,613.17
-40,20,60,36.29448,0.09994,36.39442,20–40 ha,21288.13,measured_local_size_band,4,774769.14,218.09,28.78,353.72,246.87,600.59
-56,28,84,50.812272,0.09994,50.912212,40+ ha,,unresolved_insufficient_local_size_band_evidence,2,,,20.56,353.72,,
+adult_residents,households,dependent_children_capacity,productive_hectares,common_hectares,total_parcel_hectares,vacant_land_market_band,vacant_land_price_cad_per_ha,vacant_land_price_status,vacant_land_sample_count,vacant_land_acquisition_cad,vacant_site_lease_monthly_cad_per_household,shared_infrastructure_monthly_cad_per_household,vacant_combined_land_infrastructure_monthly_cad_per_household,arc_usable_market_band,arc_usable_price_cad_per_ha,arc_usable_price_status,arc_usable_sample_count,arc_usable_acquisition_cad,arc_usable_site_lease_monthly_cad_per_household,arc_usable_combined_land_infrastructure_monthly_cad_per_household,dwelling_financing_monthly_cad_per_household,combined_illustrative_monthly_cad_per_household
+1,1,0,1.117863,0.09994,1.217803,<2 ha,337743.44,measured_local_size_band,11,411304.97,2315.54,575.57,2891.11,<2 ha,329490.22,measured_local_size_band,12,401254.18,2258.96,2834.53,353.72,3244.83
+4,2,6,3.629448,0.09994,3.729388,2–5 ha,71487.91,measured_local_size_band,6,266606.15,750.46,287.79,1038.25,2–5 ha,82722.89,measured_local_size_band,8,308505.75,868.4,1156.19,353.72,1391.97
+12,6,18,10.888344,0.09994,10.988284,10–20 ha,46950.02,measured_local_size_band,5,515900.15,484.06,95.93,579.99,10–20 ha,46950.02,measured_local_size_band,5,515900.15,484.06,579.99,353.72,933.71
+16,8,24,14.517792,0.09994,14.617732,10–20 ha,46950.02,measured_local_size_band,5,686302.81,482.96,71.95,554.91,10–20 ha,46950.02,measured_local_size_band,5,686302.81,482.96,554.91,353.72,908.63
+20,10,30,18.14724,0.09994,18.24718,10–20 ha,46950.02,measured_local_size_band,5,856705.47,482.3,57.56,539.86,10–20 ha,46950.02,measured_local_size_band,5,856705.47,482.3,539.86,353.72,893.58
+22,11,33,19.961964,0.09994,20.061904,20–40 ha,21288.13,measured_local_size_band,4,427080.42,218.58,52.32,270.9,20–40 ha,21288.13,measured_local_size_band,4,427080.42,218.58,270.9,353.72,624.62
+24,12,36,21.776688,0.09994,21.876628,20–40 ha,21288.13,measured_local_size_band,4,465712.5,218.49,47.96,266.45,20–40 ha,21288.13,measured_local_size_band,4,465712.5,218.49,266.45,353.72,620.17
+28,14,42,25.406136,0.09994,25.506076,20–40 ha,21288.13,measured_local_size_band,4,542976.66,218.34,41.11,259.45,20–40 ha,21288.13,measured_local_size_band,4,542976.66,218.34,259.45,353.72,613.17
+40,20,60,36.29448,0.09994,36.39442,20–40 ha,21288.13,measured_local_size_band,4,774769.14,218.09,28.78,246.87,20–40 ha,21288.13,measured_local_size_band,4,774769.14,218.09,246.87,353.72,600.59
+56,28,84,50.812272,0.09994,50.912212,40+ ha,,unresolved_insufficient_local_size_band_evidence,2,,,20.56,,40+ ha,24787.53,measured_local_size_band,5,1261987.98,253.74,274.3,353.72,

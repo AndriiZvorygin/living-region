@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-16T01:58:57.516Z",
-  "contract_version": "1.1.0",
+  "generated_at": "2026-08-16T11:39:27.916Z",
+  "contract_version": "1.2.0",
   "geography": "Grey County and comparable Ontario agricultural evidence",
   "observations": [
     {
@@ -27,7 +27,76 @@
       "estimated_productive_area_acres": null,
       "raw_price_cad": 19000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 46950.02
+      "price_cad_per_ha": 46950.02,
+      "gross_acquisition_price_cad": 19000,
+      "gross_acquisition_price_cad_per_ha": null,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": false,
+      "potential_arc_reuse": {
+        "assessment_status": "no_known_reuse_assets",
+        "capital_offset_status": "not_applicable",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12006980-177970-grey-road-18",
@@ -57,7 +126,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 249900,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 617516.35
+      "price_cad_per_ha": 617516.35,
+      "gross_acquisition_price_cad": 249900,
+      "gross_acquisition_price_cad_per_ha": 617516.35,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-40782201-409006-grey-road-4",
@@ -87,7 +225,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 250000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 486427.92
+      "price_cad_per_ha": 486427.92,
+      "gross_acquisition_price_cad": 250000,
+      "gross_acquisition_price_cad_per_ha": 486427.92,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13050500-120-anderson-drive-s",
@@ -117,7 +324,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 225000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 521563.89
+      "price_cad_per_ha": 521563.89,
+      "gross_acquisition_price_cad": 225000,
+      "gross_acquisition_price_cad_per_ha": 521563.89,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13130802-120-forest-creek-trail",
@@ -147,7 +423,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 199999,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 457600.27
+      "price_cad_per_ha": 457600.27,
+      "gross_acquisition_price_cad": 199999,
+      "gross_acquisition_price_cad_per_ha": 457600.27,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x11935568-382309-concession-17",
@@ -177,7 +522,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 219000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 432928.63
+      "price_cad_per_ha": 432928.63,
+      "gross_acquisition_price_cad": 219000,
+      "gross_acquisition_price_cad_per_ha": 432928.63,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13580126-part-lot-17-grey-road-17",
@@ -207,7 +621,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 299000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 321237
+      "price_cad_per_ha": 321237,
+      "gross_acquisition_price_cad": 299000,
+      "gross_acquisition_price_cad_per_ha": 321237,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x10846397-part-lot-25-grey-road-17",
@@ -237,7 +720,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 275000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 337743.44
+      "price_cad_per_ha": 337743.44,
+      "gross_acquisition_price_cad": 275000,
+      "gross_acquisition_price_cad_per_ha": 337743.44,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13430714-part-2-grey-road-12",
@@ -267,7 +819,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 375000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 285121.59
+      "price_cad_per_ha": 285121.59,
+      "gross_acquisition_price_cad": 375000,
+      "gross_acquisition_price_cad_per_ha": 285121.59,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "no_known_reuse_assets",
+        "capital_offset_status": "not_applicable",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12192075-773462-highway-10",
@@ -297,7 +918,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 299000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 211098.6
+      "price_cad_per_ha": 211098.6,
+      "gross_acquisition_price_cad": 299000,
+      "gross_acquisition_price_cad_per_ha": 211098.6,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12743672-401619-grey-road-4",
@@ -327,7 +1017,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 179900,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 148180.86
+      "price_cad_per_ha": 148180.86,
+      "gross_acquisition_price_cad": 179900,
+      "gross_acquisition_price_cad_per_ha": 148180.86,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-40802363-pt-lt-48-concession-3",
@@ -357,7 +1116,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 269500,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 136464.96
+      "price_cad_per_ha": 136464.96,
+      "gross_acquisition_price_cad": 269500,
+      "gross_acquisition_price_cad_per_ha": 136464.96,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13425154-801331-sideroad-2",
@@ -387,7 +1215,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 324900,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 188904.8
+      "price_cad_per_ha": 188904.8,
+      "gross_acquisition_price_cad": 324900,
+      "gross_acquisition_price_cad_per_ha": 188904.8,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": true,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Barn, shed or workshop requires condition and safe-use review."
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12998054-201-con-2-swtsr",
@@ -417,7 +1314,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 245000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 64978.88
+      "price_cad_per_ha": 64978.88,
+      "gross_acquisition_price_cad": 245000,
+      "gross_acquisition_price_cad_per_ha": 64978.88,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-40812575-112314-grey-road-14",
@@ -447,7 +1413,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 350000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 87448.82
+      "price_cad_per_ha": 87448.82,
+      "gross_acquisition_price_cad": 350000,
+      "gross_acquisition_price_cad_per_ha": 87448.82,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13212326-pt-lt-15-baseline",
@@ -477,7 +1512,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 350000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 91909.55
+      "price_cad_per_ha": 91909.55,
+      "gross_acquisition_price_cad": 350000,
+      "gross_acquisition_price_cad_per_ha": 91909.55,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-40619252-pt-lt-20-sideroad-40",
@@ -507,7 +1611,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 125000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 38610.22
+      "price_cad_per_ha": 38610.22,
+      "gross_acquisition_price_cad": 125000,
+      "gross_acquisition_price_cad_per_ha": 38610.22,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-196300-grey-road-7-6-972-acres",
@@ -537,7 +1710,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 599000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 212300.81
+      "price_cad_per_ha": 212300.81,
+      "gross_acquisition_price_cad": 599000,
+      "gross_acquisition_price_cad_per_ha": 212300.81,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": true,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing dwelling requires condition, occupancy and code review."
+          },
+          {
+            "id": "common_amenity_building",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Farmhouse or existing house could serve as common space; permitted use is unresolved."
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-495155-traverston-6-3-acres",
@@ -567,7 +1809,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 749000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 293780.84
+      "price_cad_per_ha": 293780.84,
+      "gross_acquisition_price_cad": 749000,
+      "gross_acquisition_price_cad_per_ha": 293780.84,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": true,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing dwelling requires condition, occupancy and code review."
+          },
+          {
+            "id": "common_amenity_building",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Farmhouse or existing house could serve as common space; permitted use is unresolved."
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13607754-pt-lot-88-hwy-10",
@@ -597,7 +1908,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 249000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 61529.24
+      "price_cad_per_ha": 61529.24,
+      "gross_acquisition_price_cad": 249000,
+      "gross_acquisition_price_cad_per_ha": 61529.24,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Barn, shed or workshop requires condition and safe-use review."
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13212578-part-lot-20-concession-14",
@@ -627,7 +2007,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 339000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 77996.95
+      "price_cad_per_ha": 77996.95,
+      "gross_acquisition_price_cad": 339000,
+      "gross_acquisition_price_cad_per_ha": 77996.95,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "no_known_reuse_assets",
+        "capital_offset_status": "not_applicable",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12789044-lot-22-sideroad-22",
@@ -657,7 +2106,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 199000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 25881.04
+      "price_cad_per_ha": 25881.04,
+      "gross_acquisition_price_cad": 199000,
+      "gross_acquisition_price_cad_per_ha": 25881.04,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "no_known_reuse_assets",
+        "capital_offset_status": "not_applicable",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-public-12-4-acre-williamsford",
@@ -687,7 +2205,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 399000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 79512.13
+      "price_cad_per_ha": 79512.13,
+      "gross_acquisition_price_cad": 399000,
+      "gross_acquisition_price_cad_per_ha": 79512.13,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13521894-part-lot-2-conc-17",
@@ -717,7 +2304,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 58700,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 10744.51
+      "price_cad_per_ha": 10744.51,
+      "gross_acquisition_price_cad": 58700,
+      "gross_acquisition_price_cad_per_ha": 10744.51,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": false,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13410450-part-lot-24-grey-road-12",
@@ -747,7 +2403,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 475000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 46950.02
+      "price_cad_per_ha": 46950.02,
+      "gross_acquisition_price_cad": 475000,
+      "gross_acquisition_price_cad_per_ha": 46950.02,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13548218-ptlt-39-con-25-ne",
@@ -777,7 +2502,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 349000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 33169.15
+      "price_cad_per_ha": 33169.15,
+      "gross_acquisition_price_cad": 349000,
+      "gross_acquisition_price_cad_per_ha": 33169.15,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12911920-395549-concession-2",
@@ -807,7 +2601,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 479000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 43166.84
+      "price_cad_per_ha": 43166.84,
+      "gross_acquisition_price_cad": 479000,
+      "gross_acquisition_price_cad_per_ha": 43166.84,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12342111-448020-10th-concession",
@@ -837,7 +2700,76 @@
       "estimated_productive_area_ha": 6.474970275765723,
       "raw_price_cad": 800000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 65894.77
+      "price_cad_per_ha": 65894.77,
+      "gross_acquisition_price_cad": 800000,
+      "gross_acquisition_price_cad_per_ha": 65894.77,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12736968-23-3rd-line-d-line-e",
@@ -867,7 +2799,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 3200000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 175719.38
+      "price_cad_per_ha": 175719.38,
+      "gross_acquisition_price_cad": 3200000,
+      "gross_acquisition_price_cad_per_ha": 175719.38,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12494384-lt-42-con-2-netsr",
@@ -897,7 +2898,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 499900,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 16921.64
+      "price_cad_per_ha": 16921.64,
+      "gross_acquisition_price_cad": 499900,
+      "gross_acquisition_price_cad_per_ha": 16921.64,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12308978-pl11-12-10-side-road",
@@ -927,7 +2997,76 @@
       "estimated_productive_area_ha": 16.187425689414308,
       "raw_price_cad": 999900,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 25472.23
+      "price_cad_per_ha": 25472.23,
+      "gross_acquisition_price_cad": 999900,
+      "gross_acquisition_price_cad_per_ha": 25472.23,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13159882-lot-24-concession-14",
@@ -957,7 +3096,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 799000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 19743.72
+      "price_cad_per_ha": 19743.72,
+      "gross_acquisition_price_cad": 799000,
+      "gross_acquisition_price_cad_per_ha": 19743.72,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13169206-442318-concession-21",
@@ -988,7 +3196,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 449000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 22190.06
+      "price_cad_per_ha": 22190.06,
+      "gross_acquisition_price_cad": 449000,
+      "gross_acquisition_price_cad_per_ha": 22190.06,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-public-52-acre-priceville",
@@ -1018,7 +3295,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 429000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 20386.19
+      "price_cad_per_ha": 20386.19,
+      "gross_acquisition_price_cad": 429000,
+      "gross_acquisition_price_cad_per_ha": 20386.19,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12937214-south-of-keady-grey-road-3",
@@ -1048,7 +3394,76 @@
       "estimated_productive_area_ha": null,
       "raw_price_cad": 999900,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 16472.04
+      "price_cad_per_ha": 16472.04,
+      "gross_acquisition_price_cad": 999900,
+      "gross_acquisition_price_cad_per_ha": 16472.04,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12829838-409155-grey-road-4",
@@ -1078,7 +3493,76 @@
       "estimated_productive_area_ha": 24.28113853412146,
       "raw_price_cad": 2550000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 63011.87
+      "price_cad_per_ha": 63011.87,
+      "gross_acquisition_price_cad": 2550000,
+      "gross_acquisition_price_cad_per_ha": 63011.87,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": true,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing dwelling requires condition, occupancy and code review."
+          },
+          {
+            "id": "common_amenity_building",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Farmhouse or existing house could serve as common space; permitted use is unresolved."
+          },
+          {
+            "id": "workshop_storage",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Barn, shed or workshop requires condition and safe-use review."
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12235333-135389-concession-8",
@@ -1108,7 +3592,76 @@
       "estimated_productive_area_ha": 16.187425689414308,
       "raw_price_cad": 998000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 24787.53
+      "price_cad_per_ha": 24787.53,
+      "gross_acquisition_price_cad": 998000,
+      "gross_acquisition_price_cad_per_ha": 24787.53,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": true,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing dwelling requires condition, occupancy and code review."
+          },
+          {
+            "id": "common_amenity_building",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Farmhouse or existing house could serve as common space; permitted use is unresolved."
+          },
+          {
+            "id": "workshop_storage",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Barn, shed or workshop requires condition and safe-use review."
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing sewage evidence still requires capacity and approval review."
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x13221646-158567-highway-10",
@@ -1138,7 +3691,76 @@
       "estimated_productive_area_ha": 50.58570527941971,
       "raw_price_cad": 18000000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 300533.57
+      "price_cad_per_ha": 300533.57,
+      "gross_acquisition_price_cad": 18000000,
+      "gross_acquisition_price_cad_per_ha": 300533.57,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "vacant_land",
+      "substantial_improvements": false,
+      "arc_usable_acquisition": false,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing electrical service requires capacity and connection review."
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     },
     {
       "observation_id": "grey-x12772394-304599-south-line",
@@ -1168,7 +3790,76 @@
       "estimated_productive_area_ha": 16.187425689414308,
       "raw_price_cad": 1425000,
       "adjusted_price_cad": null,
-      "price_cad_per_ha": 35435.76
+      "price_cad_per_ha": 35435.76,
+      "gross_acquisition_price_cad": 1425000,
+      "gross_acquisition_price_cad_per_ha": 35435.76,
+      "adjusted_land_price_cad_per_ha": null,
+      "property_market_class": "improved_property",
+      "substantial_improvements": true,
+      "arc_usable_acquisition": true,
+      "potential_arc_reuse": {
+        "assessment_status": "candidate_reuse_unpriced",
+        "capital_offset_status": "reuse_value_unresolved",
+        "assets": [
+          {
+            "id": "resident_dwelling",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "common_amenity_building",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "workshop_storage",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Barn, shed or workshop requires condition and safe-use review."
+          },
+          {
+            "id": "agricultural_buildings",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "road_access",
+            "present": true,
+            "status": "potentially_reusable",
+            "reuse_value_cad": null,
+            "note": "Existing frontage or driveway may reduce new access work; no capital credit is assumed."
+          },
+          {
+            "id": "well_water_system",
+            "present": true,
+            "status": "condition_unknown",
+            "reuse_value_cad": null,
+            "note": "Existing water evidence still requires potability, capacity and approval review."
+          },
+          {
+            "id": "septic_sanitation",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          },
+          {
+            "id": "grid_electrical_service",
+            "present": false,
+            "status": "not_present",
+            "reuse_value_cad": null,
+            "note": ""
+          }
+        ],
+        "note": "Existing assets remain in the gross acquisition price. No monetary capital offset is applied without condition, legal and replacement-cost evidence."
+      }
     }
   ],
   "parcel_size_bands": [
@@ -1177,12 +3868,17 @@
       "label": "<2 ha",
       "min_ha": 0,
       "max_ha": 2,
+      "market_view": "vacant_land",
       "sample_count": 11,
       "median_price_cad_per_ha": 337743.44,
+      "median_gross_price_cad_per_ha": 337743.44,
+      "median_total_acquisition_price_cad": 250000,
       "lower_quartile_price_cad_per_ha": 248110.1,
       "upper_quartile_price_cad_per_ha": 472014.1,
       "min_price_cad_per_ha": 136464.96,
       "max_price_cad_per_ha": 617516.35,
+      "min_total_acquisition_price_cad": 179900,
+      "max_total_acquisition_price_cad": 375000,
       "property_type_composition": {
         "vacant_building_lot": 11
       },
@@ -1203,12 +3899,17 @@
       "label": "2–5 ha",
       "min_ha": 2,
       "max_ha": 5,
+      "market_view": "vacant_land",
       "sample_count": 6,
       "median_price_cad_per_ha": 71487.91,
+      "median_gross_price_cad_per_ha": 71487.91,
+      "median_total_acquisition_price_cad": 294000,
       "lower_quartile_price_cad_per_ha": 62391.65,
       "upper_quartile_price_cad_per_ha": 85085.85,
       "min_price_cad_per_ha": 38610.22,
       "max_price_cad_per_ha": 91909.55,
+      "min_total_acquisition_price_cad": 125000,
+      "max_total_acquisition_price_cad": 350000,
       "property_type_composition": {
         "vacant_agricultural_land": 1,
         "vacant_rural_land": 3,
@@ -1231,12 +3932,17 @@
       "label": "5–10 ha",
       "min_ha": 5,
       "max_ha": 10,
+      "market_view": "vacant_land",
       "sample_count": 2,
       "median_price_cad_per_ha": 52696.59,
+      "median_gross_price_cad_per_ha": 52696.59,
+      "median_total_acquisition_price_cad": 299000,
       "lower_quartile_price_cad_per_ha": 39288.81,
       "upper_quartile_price_cad_per_ha": 66104.36,
       "min_price_cad_per_ha": 25881.04,
       "max_price_cad_per_ha": 79512.13,
+      "min_total_acquisition_price_cad": 199000,
+      "max_total_acquisition_price_cad": 399000,
       "property_type_composition": {
         "vacant_woodland": 2
       },
@@ -1256,12 +3962,17 @@
       "label": "10–20 ha",
       "min_ha": 10,
       "max_ha": 20,
+      "market_view": "vacant_land",
       "sample_count": 5,
       "median_price_cad_per_ha": 46950.02,
+      "median_gross_price_cad_per_ha": 46950.02,
+      "median_total_acquisition_price_cad": 479000,
       "lower_quartile_price_cad_per_ha": 43166.84,
       "upper_quartile_price_cad_per_ha": 65894.77,
       "min_price_cad_per_ha": 33169.15,
       "max_price_cad_per_ha": 175719.38,
+      "min_total_acquisition_price_cad": 349000,
+      "max_total_acquisition_price_cad": 3200000,
       "property_type_composition": {
         "vacant_woodland": 3,
         "vacant_rural_land": 1,
@@ -1283,12 +3994,17 @@
       "label": "20–40 ha",
       "min_ha": 20,
       "max_ha": 40,
+      "market_view": "vacant_land",
       "sample_count": 4,
       "median_price_cad_per_ha": 21288.13,
+      "median_gross_price_cad_per_ha": 21288.13,
+      "median_total_acquisition_price_cad": 474450,
       "lower_quartile_price_cad_per_ha": 19520.05,
       "upper_quartile_price_cad_per_ha": 23010.6,
       "min_price_cad_per_ha": 16921.64,
       "max_price_cad_per_ha": 25472.23,
+      "min_total_acquisition_price_cad": 429000,
+      "max_total_acquisition_price_cad": 999900,
       "property_type_composition": {
         "vacant_rural_land": 1,
         "vacant_agricultural_land": 1,
@@ -1311,12 +4027,17 @@
       "label": "40+ ha",
       "min_ha": 40,
       "max_ha": null,
+      "market_view": "vacant_land",
       "sample_count": 2,
       "median_price_cad_per_ha": 18107.88,
+      "median_gross_price_cad_per_ha": 18107.88,
+      "median_total_acquisition_price_cad": 899450,
       "lower_quartile_price_cad_per_ha": 17289.96,
       "upper_quartile_price_cad_per_ha": 18925.8,
       "min_price_cad_per_ha": 16472.04,
       "max_price_cad_per_ha": 19743.72,
+      "min_total_acquisition_price_cad": 799000,
+      "max_total_acquisition_price_cad": 999900,
       "property_type_composition": {
         "vacant_rural_land": 1,
         "vacant_agricultural_land": 1
@@ -1332,6 +4053,693 @@
       "sufficient_evidence_for_median": false
     }
   ],
+  "vacant_land_market": {
+    "market_view": "vacant_land",
+    "observation_count": 30,
+    "median_total_acquisition_price_cad": 344000,
+    "lower_quartile_total_acquisition_price_cad": 249225,
+    "upper_quartile_total_acquisition_price_cad": 468500,
+    "median_gross_price_cad_per_ha": 78754.54,
+    "parcel_size_bands": [
+      {
+        "id": "under_2_ha",
+        "label": "<2 ha",
+        "min_ha": 0,
+        "max_ha": 2,
+        "market_view": "vacant_land",
+        "sample_count": 11,
+        "median_price_cad_per_ha": 337743.44,
+        "median_gross_price_cad_per_ha": 337743.44,
+        "median_total_acquisition_price_cad": 250000,
+        "lower_quartile_price_cad_per_ha": 248110.1,
+        "upper_quartile_price_cad_per_ha": 472014.1,
+        "min_price_cad_per_ha": 136464.96,
+        "max_price_cad_per_ha": 617516.35,
+        "min_total_acquisition_price_cad": 179900,
+        "max_total_acquisition_price_cad": 375000,
+        "property_type_composition": {
+          "vacant_building_lot": 11
+        },
+        "observation_years": [
+          "2026",
+          "2025"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 10,
+          "expired_listing": 1
+        },
+        "vacant_observation_count": 11,
+        "improved_observation_count_excluded": 1,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "2_to_5_ha",
+        "label": "2–5 ha",
+        "min_ha": 2,
+        "max_ha": 5,
+        "market_view": "vacant_land",
+        "sample_count": 6,
+        "median_price_cad_per_ha": 71487.91,
+        "median_gross_price_cad_per_ha": 71487.91,
+        "median_total_acquisition_price_cad": 294000,
+        "lower_quartile_price_cad_per_ha": 62391.65,
+        "upper_quartile_price_cad_per_ha": 85085.85,
+        "min_price_cad_per_ha": 38610.22,
+        "max_price_cad_per_ha": 91909.55,
+        "min_total_acquisition_price_cad": 125000,
+        "max_total_acquisition_price_cad": 350000,
+        "property_type_composition": {
+          "vacant_agricultural_land": 1,
+          "vacant_rural_land": 3,
+          "vacant_woodland": 2
+        },
+        "observation_years": [
+          "2026",
+          "2024"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 5,
+          "sold_listing": 1
+        },
+        "vacant_observation_count": 6,
+        "improved_observation_count_excluded": 2,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "5_to_10_ha",
+        "label": "5–10 ha",
+        "min_ha": 5,
+        "max_ha": 10,
+        "market_view": "vacant_land",
+        "sample_count": 2,
+        "median_price_cad_per_ha": 52696.59,
+        "median_gross_price_cad_per_ha": 52696.59,
+        "median_total_acquisition_price_cad": 299000,
+        "lower_quartile_price_cad_per_ha": 39288.81,
+        "upper_quartile_price_cad_per_ha": 66104.36,
+        "min_price_cad_per_ha": 25881.04,
+        "max_price_cad_per_ha": 79512.13,
+        "min_total_acquisition_price_cad": 199000,
+        "max_total_acquisition_price_cad": 399000,
+        "property_type_composition": {
+          "vacant_woodland": 2
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 1,
+          "active_listing_observation": 1
+        },
+        "vacant_observation_count": 2,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": false
+      },
+      {
+        "id": "10_to_20_ha",
+        "label": "10–20 ha",
+        "min_ha": 10,
+        "max_ha": 20,
+        "market_view": "vacant_land",
+        "sample_count": 5,
+        "median_price_cad_per_ha": 46950.02,
+        "median_gross_price_cad_per_ha": 46950.02,
+        "median_total_acquisition_price_cad": 479000,
+        "lower_quartile_price_cad_per_ha": 43166.84,
+        "upper_quartile_price_cad_per_ha": 65894.77,
+        "min_price_cad_per_ha": 33169.15,
+        "max_price_cad_per_ha": 175719.38,
+        "min_total_acquisition_price_cad": 349000,
+        "max_total_acquisition_price_cad": 3200000,
+        "property_type_composition": {
+          "vacant_woodland": 3,
+          "vacant_rural_land": 1,
+          "vacant_agricultural_land": 1
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "recent_listing_observation": 1,
+          "active_listing": 4
+        },
+        "vacant_observation_count": 5,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "20_to_40_ha",
+        "label": "20–40 ha",
+        "min_ha": 20,
+        "max_ha": 40,
+        "market_view": "vacant_land",
+        "sample_count": 4,
+        "median_price_cad_per_ha": 21288.13,
+        "median_gross_price_cad_per_ha": 21288.13,
+        "median_total_acquisition_price_cad": 474450,
+        "lower_quartile_price_cad_per_ha": 19520.05,
+        "upper_quartile_price_cad_per_ha": 23010.6,
+        "min_price_cad_per_ha": 16921.64,
+        "max_price_cad_per_ha": 25472.23,
+        "min_total_acquisition_price_cad": 429000,
+        "max_total_acquisition_price_cad": 999900,
+        "property_type_composition": {
+          "vacant_rural_land": 1,
+          "vacant_agricultural_land": 1,
+          "vacant_woodland": 2
+        },
+        "observation_years": [
+          "2025",
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 3,
+          "active_listing_observation": 1
+        },
+        "vacant_observation_count": 4,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "40_plus_ha",
+        "label": "40+ ha",
+        "min_ha": 40,
+        "max_ha": null,
+        "market_view": "vacant_land",
+        "sample_count": 2,
+        "median_price_cad_per_ha": 18107.88,
+        "median_gross_price_cad_per_ha": 18107.88,
+        "median_total_acquisition_price_cad": 899450,
+        "lower_quartile_price_cad_per_ha": 17289.96,
+        "upper_quartile_price_cad_per_ha": 18925.8,
+        "min_price_cad_per_ha": 16472.04,
+        "max_price_cad_per_ha": 19743.72,
+        "min_total_acquisition_price_cad": 799000,
+        "max_total_acquisition_price_cad": 999900,
+        "property_type_composition": {
+          "vacant_rural_land": 1,
+          "vacant_agricultural_land": 1
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 2
+        },
+        "vacant_observation_count": 2,
+        "improved_observation_count_excluded": 3,
+        "sufficient_evidence_for_median": false
+      }
+    ],
+    "property_type_composition": {
+      "vacant_building_lot": 11,
+      "vacant_agricultural_land": 4,
+      "vacant_rural_land": 6,
+      "vacant_woodland": 9
+    },
+    "observation_ids": [
+      "grey-x12006980-177970-grey-road-18",
+      "grey-40782201-409006-grey-road-4",
+      "grey-x13050500-120-anderson-drive-s",
+      "grey-x13130802-120-forest-creek-trail",
+      "grey-x11935568-382309-concession-17",
+      "grey-x13580126-part-lot-17-grey-road-17",
+      "grey-x10846397-part-lot-25-grey-road-17",
+      "grey-x13430714-part-2-grey-road-12",
+      "grey-x12192075-773462-highway-10",
+      "grey-x12743672-401619-grey-road-4",
+      "grey-40802363-pt-lt-48-concession-3",
+      "grey-x12998054-201-con-2-swtsr",
+      "grey-40812575-112314-grey-road-14",
+      "grey-x13212326-pt-lt-15-baseline",
+      "grey-40619252-pt-lt-20-sideroad-40",
+      "grey-x13607754-pt-lot-88-hwy-10",
+      "grey-x13212578-part-lot-20-concession-14",
+      "grey-x12789044-lot-22-sideroad-22",
+      "grey-public-12-4-acre-williamsford",
+      "grey-x13410450-part-lot-24-grey-road-12",
+      "grey-x13548218-ptlt-39-con-25-ne",
+      "grey-x12911920-395549-concession-2",
+      "grey-x12342111-448020-10th-concession",
+      "grey-x12736968-23-3rd-line-d-line-e",
+      "grey-x12494384-lt-42-con-2-netsr",
+      "grey-x12308978-pl11-12-10-side-road",
+      "grey-x13159882-lot-24-concession-14",
+      "grey-x13169206-442318-concession-21",
+      "grey-public-52-acre-priceville",
+      "grey-x12937214-south-of-keady-grey-road-3"
+    ]
+  },
+  "improved_property_acquisition_market": {
+    "market_view": "improved_property",
+    "observation_count": 7,
+    "median_total_acquisition_price_cad": 749000,
+    "lower_quartile_total_acquisition_price_cad": 461950,
+    "upper_quartile_total_acquisition_price_cad": 1211500,
+    "median_gross_price_cad_per_ha": 63011.87,
+    "parcel_size_bands": [
+      {
+        "id": "under_2_ha",
+        "label": "<2 ha",
+        "min_ha": 0,
+        "max_ha": 2,
+        "market_view": "improved_property",
+        "sample_count": 1,
+        "median_price_cad_per_ha": 188904.8,
+        "median_gross_price_cad_per_ha": 188904.8,
+        "median_total_acquisition_price_cad": 324900,
+        "lower_quartile_price_cad_per_ha": 188904.8,
+        "upper_quartile_price_cad_per_ha": 188904.8,
+        "min_price_cad_per_ha": 188904.8,
+        "max_price_cad_per_ha": 188904.8,
+        "min_total_acquisition_price_cad": 324900,
+        "max_total_acquisition_price_cad": 324900,
+        "property_type_composition": {
+          "vacant_land_with_outbuilding": 1
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 1
+        },
+        "vacant_observation_count": 1,
+        "improved_observation_count_excluded": 1,
+        "sufficient_evidence_for_median": false
+      },
+      {
+        "id": "2_to_5_ha",
+        "label": "2–5 ha",
+        "min_ha": 2,
+        "max_ha": 5,
+        "market_view": "improved_property",
+        "sample_count": 3,
+        "median_price_cad_per_ha": 212300.81,
+        "median_gross_price_cad_per_ha": 212300.81,
+        "median_total_acquisition_price_cad": 599000,
+        "lower_quartile_price_cad_per_ha": 136915.03,
+        "upper_quartile_price_cad_per_ha": 253040.83,
+        "min_price_cad_per_ha": 61529.24,
+        "max_price_cad_per_ha": 293780.84,
+        "min_total_acquisition_price_cad": 249000,
+        "max_total_acquisition_price_cad": 749000,
+        "property_type_composition": {
+          "rural_residential_with_dwelling": 1,
+          "farm_with_dwelling": 1,
+          "vacant_woodland": 1
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 3
+        },
+        "vacant_observation_count": 1,
+        "improved_observation_count_excluded": 2,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "5_to_10_ha",
+        "label": "5–10 ha",
+        "min_ha": 5,
+        "max_ha": 10,
+        "market_view": "improved_property",
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "median_gross_price_cad_per_ha": null,
+        "median_total_acquisition_price_cad": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "min_total_acquisition_price_cad": null,
+        "max_total_acquisition_price_cad": null,
+        "property_type_composition": {},
+        "observation_years": [],
+        "transaction_status_composition": {},
+        "vacant_observation_count": 0,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": false
+      },
+      {
+        "id": "10_to_20_ha",
+        "label": "10–20 ha",
+        "min_ha": 10,
+        "max_ha": 20,
+        "market_view": "improved_property",
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "median_gross_price_cad_per_ha": null,
+        "median_total_acquisition_price_cad": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "min_total_acquisition_price_cad": null,
+        "max_total_acquisition_price_cad": null,
+        "property_type_composition": {},
+        "observation_years": [],
+        "transaction_status_composition": {},
+        "vacant_observation_count": 0,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": false
+      },
+      {
+        "id": "20_to_40_ha",
+        "label": "20–40 ha",
+        "min_ha": 20,
+        "max_ha": 40,
+        "market_view": "improved_property",
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "median_gross_price_cad_per_ha": null,
+        "median_total_acquisition_price_cad": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "min_total_acquisition_price_cad": null,
+        "max_total_acquisition_price_cad": null,
+        "property_type_composition": {},
+        "observation_years": [],
+        "transaction_status_composition": {},
+        "vacant_observation_count": 0,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": false
+      },
+      {
+        "id": "40_plus_ha",
+        "label": "40+ ha",
+        "min_ha": 40,
+        "max_ha": null,
+        "market_view": "improved_property",
+        "sample_count": 3,
+        "median_price_cad_per_ha": 35435.76,
+        "median_gross_price_cad_per_ha": 35435.76,
+        "median_total_acquisition_price_cad": 1425000,
+        "lower_quartile_price_cad_per_ha": 30111.65,
+        "upper_quartile_price_cad_per_ha": 49223.82,
+        "min_price_cad_per_ha": 24787.53,
+        "max_price_cad_per_ha": 63011.87,
+        "min_total_acquisition_price_cad": 998000,
+        "max_total_acquisition_price_cad": 2550000,
+        "property_type_composition": {
+          "farm_with_dwelling_and_outbuildings": 2,
+          "farm_with_outbuildings": 1
+        },
+        "observation_years": [
+          "2026",
+          "2025"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 2,
+          "inactive_recent": 1
+        },
+        "vacant_observation_count": 0,
+        "improved_observation_count_excluded": 3,
+        "sufficient_evidence_for_median": true
+      }
+    ],
+    "property_type_composition": {
+      "vacant_land_with_outbuilding": 1,
+      "rural_residential_with_dwelling": 1,
+      "farm_with_dwelling": 1,
+      "vacant_woodland": 1,
+      "farm_with_dwelling_and_outbuildings": 2,
+      "farm_with_outbuildings": 1
+    },
+    "observation_ids": [
+      "grey-x13425154-801331-sideroad-2",
+      "grey-196300-grey-road-7-6-972-acres",
+      "grey-495155-traverston-6-3-acres",
+      "grey-x13607754-pt-lot-88-hwy-10",
+      "grey-x12829838-409155-grey-road-4",
+      "grey-x12235333-135389-concession-8",
+      "grey-x12772394-304599-south-line"
+    ]
+  },
+  "arc_usable_acquisition_market": {
+    "market_view": "arc_usable_acquisition",
+    "observation_count": 36,
+    "median_total_acquisition_price_cad": 350000,
+    "lower_quartile_total_acquisition_price_cad": 249975,
+    "upper_quartile_total_acquisition_price_cad": 636500,
+    "median_gross_price_cad_per_ha": 78754.54,
+    "parcel_size_bands": [
+      {
+        "id": "under_2_ha",
+        "label": "<2 ha",
+        "min_ha": 0,
+        "max_ha": 2,
+        "market_view": "arc_usable_acquisition",
+        "sample_count": 12,
+        "median_price_cad_per_ha": 329490.22,
+        "median_gross_price_cad_per_ha": 329490.22,
+        "median_total_acquisition_price_cad": 259750,
+        "lower_quartile_price_cad_per_ha": 205550.15,
+        "upper_quartile_price_cad_per_ha": 464807.18,
+        "min_price_cad_per_ha": 136464.96,
+        "max_price_cad_per_ha": 617516.35,
+        "min_total_acquisition_price_cad": 179900,
+        "max_total_acquisition_price_cad": 375000,
+        "property_type_composition": {
+          "vacant_building_lot": 11,
+          "vacant_land_with_outbuilding": 1
+        },
+        "observation_years": [
+          "2026",
+          "2025"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 11,
+          "expired_listing": 1
+        },
+        "vacant_observation_count": 12,
+        "improved_observation_count_excluded": 1,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "2_to_5_ha",
+        "label": "2–5 ha",
+        "min_ha": 2,
+        "max_ha": 5,
+        "market_view": "arc_usable_acquisition",
+        "sample_count": 8,
+        "median_price_cad_per_ha": 82722.89,
+        "median_gross_price_cad_per_ha": 82722.89,
+        "median_total_acquisition_price_cad": 344500,
+        "lower_quartile_price_cad_per_ha": 64116.47,
+        "upper_quartile_price_cad_per_ha": 122007.37,
+        "min_price_cad_per_ha": 38610.22,
+        "max_price_cad_per_ha": 293780.84,
+        "min_total_acquisition_price_cad": 125000,
+        "max_total_acquisition_price_cad": 749000,
+        "property_type_composition": {
+          "vacant_agricultural_land": 1,
+          "vacant_rural_land": 3,
+          "vacant_woodland": 2,
+          "rural_residential_with_dwelling": 1,
+          "farm_with_dwelling": 1
+        },
+        "observation_years": [
+          "2026",
+          "2024"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 7,
+          "sold_listing": 1
+        },
+        "vacant_observation_count": 6,
+        "improved_observation_count_excluded": 2,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "5_to_10_ha",
+        "label": "5–10 ha",
+        "min_ha": 5,
+        "max_ha": 10,
+        "market_view": "arc_usable_acquisition",
+        "sample_count": 2,
+        "median_price_cad_per_ha": 52696.59,
+        "median_gross_price_cad_per_ha": 52696.59,
+        "median_total_acquisition_price_cad": 299000,
+        "lower_quartile_price_cad_per_ha": 39288.81,
+        "upper_quartile_price_cad_per_ha": 66104.36,
+        "min_price_cad_per_ha": 25881.04,
+        "max_price_cad_per_ha": 79512.13,
+        "min_total_acquisition_price_cad": 199000,
+        "max_total_acquisition_price_cad": 399000,
+        "property_type_composition": {
+          "vacant_woodland": 2
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 1,
+          "active_listing_observation": 1
+        },
+        "vacant_observation_count": 2,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": false
+      },
+      {
+        "id": "10_to_20_ha",
+        "label": "10–20 ha",
+        "min_ha": 10,
+        "max_ha": 20,
+        "market_view": "arc_usable_acquisition",
+        "sample_count": 5,
+        "median_price_cad_per_ha": 46950.02,
+        "median_gross_price_cad_per_ha": 46950.02,
+        "median_total_acquisition_price_cad": 479000,
+        "lower_quartile_price_cad_per_ha": 43166.84,
+        "upper_quartile_price_cad_per_ha": 65894.77,
+        "min_price_cad_per_ha": 33169.15,
+        "max_price_cad_per_ha": 175719.38,
+        "min_total_acquisition_price_cad": 349000,
+        "max_total_acquisition_price_cad": 3200000,
+        "property_type_composition": {
+          "vacant_woodland": 3,
+          "vacant_rural_land": 1,
+          "vacant_agricultural_land": 1
+        },
+        "observation_years": [
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "recent_listing_observation": 1,
+          "active_listing": 4
+        },
+        "vacant_observation_count": 5,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "20_to_40_ha",
+        "label": "20–40 ha",
+        "min_ha": 20,
+        "max_ha": 40,
+        "market_view": "arc_usable_acquisition",
+        "sample_count": 4,
+        "median_price_cad_per_ha": 21288.13,
+        "median_gross_price_cad_per_ha": 21288.13,
+        "median_total_acquisition_price_cad": 474450,
+        "lower_quartile_price_cad_per_ha": 19520.05,
+        "upper_quartile_price_cad_per_ha": 23010.6,
+        "min_price_cad_per_ha": 16921.64,
+        "max_price_cad_per_ha": 25472.23,
+        "min_total_acquisition_price_cad": 429000,
+        "max_total_acquisition_price_cad": 999900,
+        "property_type_composition": {
+          "vacant_rural_land": 1,
+          "vacant_agricultural_land": 1,
+          "vacant_woodland": 2
+        },
+        "observation_years": [
+          "2025",
+          "2026"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 3,
+          "active_listing_observation": 1
+        },
+        "vacant_observation_count": 4,
+        "improved_observation_count_excluded": 0,
+        "sufficient_evidence_for_median": true
+      },
+      {
+        "id": "40_plus_ha",
+        "label": "40+ ha",
+        "min_ha": 40,
+        "max_ha": null,
+        "market_view": "arc_usable_acquisition",
+        "sample_count": 5,
+        "median_price_cad_per_ha": 24787.53,
+        "median_gross_price_cad_per_ha": 24787.53,
+        "median_total_acquisition_price_cad": 999900,
+        "lower_quartile_price_cad_per_ha": 19743.72,
+        "upper_quartile_price_cad_per_ha": 35435.76,
+        "min_price_cad_per_ha": 16472.04,
+        "max_price_cad_per_ha": 63011.87,
+        "min_total_acquisition_price_cad": 799000,
+        "max_total_acquisition_price_cad": 2550000,
+        "property_type_composition": {
+          "vacant_rural_land": 1,
+          "vacant_agricultural_land": 1,
+          "farm_with_dwelling_and_outbuildings": 2,
+          "farm_with_outbuildings": 1
+        },
+        "observation_years": [
+          "2026",
+          "2025"
+        ],
+        "transaction_status_composition": {
+          "active_listing": 4,
+          "inactive_recent": 1
+        },
+        "vacant_observation_count": 2,
+        "improved_observation_count_excluded": 3,
+        "sufficient_evidence_for_median": true
+      }
+    ],
+    "property_type_composition": {
+      "vacant_building_lot": 11,
+      "vacant_land_with_outbuilding": 1,
+      "vacant_agricultural_land": 4,
+      "vacant_rural_land": 6,
+      "vacant_woodland": 9,
+      "rural_residential_with_dwelling": 1,
+      "farm_with_dwelling": 1,
+      "farm_with_dwelling_and_outbuildings": 2,
+      "farm_with_outbuildings": 1
+    },
+    "observation_ids": [
+      "grey-x12006980-177970-grey-road-18",
+      "grey-40782201-409006-grey-road-4",
+      "grey-x13050500-120-anderson-drive-s",
+      "grey-x13130802-120-forest-creek-trail",
+      "grey-x11935568-382309-concession-17",
+      "grey-x13580126-part-lot-17-grey-road-17",
+      "grey-x10846397-part-lot-25-grey-road-17",
+      "grey-x13430714-part-2-grey-road-12",
+      "grey-x12192075-773462-highway-10",
+      "grey-x12743672-401619-grey-road-4",
+      "grey-40802363-pt-lt-48-concession-3",
+      "grey-x13425154-801331-sideroad-2",
+      "grey-x12998054-201-con-2-swtsr",
+      "grey-40812575-112314-grey-road-14",
+      "grey-x13212326-pt-lt-15-baseline",
+      "grey-40619252-pt-lt-20-sideroad-40",
+      "grey-196300-grey-road-7-6-972-acres",
+      "grey-495155-traverston-6-3-acres",
+      "grey-x13607754-pt-lot-88-hwy-10",
+      "grey-x13212578-part-lot-20-concession-14",
+      "grey-x12789044-lot-22-sideroad-22",
+      "grey-public-12-4-acre-williamsford",
+      "grey-x13410450-part-lot-24-grey-road-12",
+      "grey-x13548218-ptlt-39-con-25-ne",
+      "grey-x12911920-395549-concession-2",
+      "grey-x12342111-448020-10th-concession",
+      "grey-x12736968-23-3rd-line-d-line-e",
+      "grey-x12494384-lt-42-con-2-netsr",
+      "grey-x12308978-pl11-12-10-side-road",
+      "grey-x13159882-lot-24-concession-14",
+      "grey-x13169206-442318-concession-21",
+      "grey-public-52-acre-priceville",
+      "grey-x12937214-south-of-keady-grey-road-3",
+      "grey-x12829838-409155-grey-road-4",
+      "grey-x12235333-135389-concession-8",
+      "grey-x12772394-304599-south-line"
+    ]
+  },
+  "adjusted_land_value_evidence": {
+    "market_view": "adjusted_land_value",
+    "observation_count": 0,
+    "status": "unresolved_no_documented_improvement_adjustments",
+    "observation_ids": [],
+    "note": "Adjusted land values are never substituted for gross acquisition prices. A documented improvement value or defensible residual method is required."
+  },
   "productive_land_comparators": [
     {
       "observation_id": "grey-2024-tillable-benchmark",
@@ -1431,10 +4839,16 @@
   "local_parcel_curve_status": "partial_measured_whole_property_curve",
   "productive_land_curve_status": "survey_comparator_only_no_parcel_curve",
   "improved_property_observation_count": 7,
+  "improved_property_substantial_observation_count": 6,
   "usable_whole_property_observation_count": 30,
+  "usable_vacant_land_observation_count": 30,
+  "usable_arc_acquisition_observation_count": 36,
+  "minor_improvement_overlap_observation_count": 1,
   "notes": [
     "Survey benchmarks per tillable acre are not silently treated as whole-parcel sale prices.",
-    "Farm properties with dwellings or outbuildings require improvement separation before entering the parcel curve.",
+    "Vacant-land bands exclude substantial buildings while retaining minor improvements as explicitly flagged observations when they are not a separate material asset.",
+    "Improved properties enter gross acquisition statistics at their actual whole-property asking or sale price; no farmhouse or barn value is silently subtracted.",
+    "Existing improvements expose candidate ARC reuse assets, but no monetary capital offset is applied without condition, legal and replacement-cost evidence.",
     "The importer accepts manually verified lawful observations; no REALTOR.ca scraping is used."
   ]
 }

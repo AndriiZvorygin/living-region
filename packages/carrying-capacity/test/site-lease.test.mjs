@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ADMINISTRATION_SCENARIOS, ARC_ADULT_SCALE_SCENARIOS, ARC_FAMILY_CAPACITY_STANDARD, DEFAULT_ARC_LAND_MARKET_DATA, buildArcAdultScaleScenarios, buildArcDwellingPresentationContract, buildLandMarketContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcCommonAreaGeometry, calculateArcDwellingCost, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, estimateLandPriceForParcel, INFRASTRUCTURE_SCENARIOS, loadArcLandMarketData, normalizeLandObservation} from '../src/index.mjs';
+import {ADMINISTRATION_SCENARIOS, ARC_ADULT_SCALE_SCENARIOS, ARC_FAMILY_CAPACITY_STANDARD, DEFAULT_ARC_LAND_MARKET_DATA, buildArcAdultScaleScenarios, buildArcDwellingPresentationContract, buildLandMarketContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcCommonAreaGeometry, calculateArcDwellingCost, calculateArcPropertyAcquisitionScenario, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, estimateLandPriceForParcel, INFRASTRUCTURE_SCENARIOS, loadArcLandMarketData, normalizeLandObservation} from '../src/index.mjs';
 
 function scenario(overrides = {}) {
   return {
@@ -452,8 +452,8 @@ test('common property can move from pooled planning hectares to explicit site-pl
 test('adult settlement scale is distinct from resulting household and dwelling count', () => {
   const rows = buildArcAdultScaleScenarios();
   assert.deepEqual(rows.map((row) => row.adult_residents), ARC_ADULT_SCALE_SCENARIOS);
-  assert.deepEqual(rows.map((row) => row.households), [1, 2, 6, 8, 10, 14, 20, 28]);
-  assert.deepEqual(rows.map((row) => row.dependent_children_capacity), [0, 6, 18, 24, 30, 42, 60, 84]);
+  assert.deepEqual(rows.map((row) => row.households), [1, 2, 6, 8, 10, 11, 12, 14, 20, 28]);
+  assert.deepEqual(rows.map((row) => row.dependent_children_capacity), [0, 6, 18, 24, 30, 33, 36, 42, 60, 84]);
   assert.ok(rows.every((row) => row.dwellings === row.households));
 });
 
@@ -523,6 +523,28 @@ test('default local evidence keeps sparse parcel bands unresolved and separates 
   assert.ok(contract.parcel_size_bands.find((band) => band.id === '20_to_40_ha').sufficient_evidence_for_median);
   assert.equal(contract.productive_land_comparators.length, 1);
   assert.ok(contract.improved_property_observation_count > 0);
+});
+
+test('vacant, improved and ARC-usable acquisition markets remain separate', () => {
+  const data = loadArcLandMarketData();
+  const contract = buildLandMarketContract(data);
+  assert.equal(contract.usable_vacant_land_observation_count, 30);
+  assert.equal(contract.improved_property_observation_count, 7);
+  assert.equal(contract.improved_property_substantial_observation_count, 6);
+  assert.equal(contract.usable_arc_acquisition_observation_count, 36);
+  assert.equal(contract.improved_property_acquisition_market.parcel_size_bands.find((band) => band.id === '40_plus_ha').sample_count, 3);
+  assert.equal(contract.arc_usable_acquisition_market.parcel_size_bands.find((band) => band.id === '40_plus_ha').sample_count, 5);
+  assert.equal(estimateLandPriceForParcel({parcelAreaHa: 45, data, market: 'vacant_land'}).price_cad_per_ha, null);
+  assert.equal(estimateLandPriceForParcel({parcelAreaHa: 45, data, market: 'arc_usable_acquisition'}).price_cad_per_ha, 24787.53);
+});
+
+test('actual improved acquisition preserves gross price and flags reuse without invented credits', () => {
+  const property = calculateArcPropertyAcquisitionScenario({adultCount: 24, observationId: 'grey-x12235333-135389-concession-8'});
+  assert.equal(property.property.gross_acquisition_price_cad, 998000);
+  assert.equal(property.acquisition_economics.gross_purchase_price_cad, 998000);
+  assert.equal(property.capital_offset.monetary_offset_cad, null);
+  assert.ok(property.capital_offset.potentially_avoided_components.includes('resident_dwelling'));
+  assert.equal(property.carrying_capacity.capacity_status, 'insufficient_observed_productive_area');
 });
 
 test('sparse local bands do not fall back to planning values in parcel estimates', () => {

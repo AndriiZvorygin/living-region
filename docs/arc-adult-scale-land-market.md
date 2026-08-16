@@ -4,7 +4,7 @@
 
 `packages/carrying-capacity/src/arc-community-scale.mjs` is the canonical demonstration layer for settlement scale. It uses adult residents as the primary input and generates a resulting household/dwelling arrangement. The existing site-lease calculator still accepts `community.household_count` for compatibility; adult-scale scenarios add `adult_residents`, `dependent_children_capacity`, `scale_basis: adult_residents`, and explicit generated household rows rather than redefining household count.
 
-The published demonstration sizes are 1, 4, 12, 16, 20, 28, 40 and 56 adults. One adult is a single-adult case. Larger even scenarios pair adults into family-capacity households using the existing `two_adults_plus_three_children` canonical profile. Three dependent children are a design/capacity stress test, not a demographic forecast.
+The published demonstration sizes are 1, 4, 12, 16, 20, 22, 24, 28, 40 and 56 adults. One adult is a single-adult case. Larger even scenarios pair adults into family-capacity households using the existing `two_adults_plus_three_children` canonical profile. Three dependent children are a design/capacity stress test, not a demographic forecast.
 
 ## Common area
 
@@ -14,7 +14,7 @@ Adult-scale scenarios reuse the geometry-derived common-area prototype from comm
 
 The repository contains `packages/carrying-capacity/data/source/arc-land-market-observations.json` and `src/land-market.mjs`. The 2024 Grey County average-quality cropland benchmark from the Ontario Farmland Value and Rental Value Survey remains separate: CAD 19,000 per tillable acre from 29 responses. It is a productive-land comparator, not a whole-parcel sale or a size-band observation.
 
-The Ontario farmland-value open-data catalogue and FCC farmland-values report are retained as source metadata. Statistics Canada farm-capital data are retained as context but explicitly include land and buildings/improvements. The local observation file now contains 39 manually transcribed public listing observations, including 30 usable whole-property observations after excluding improved, unverified and strategic-premium records.
+The Ontario farmland-value open-data catalogue and FCC farmland-values report are retained as source metadata. Statistics Canada farm-capital data are retained as context but explicitly include land and buildings/improvements. The local observation file now contains 39 manually transcribed public listing observations: 30 usable vacant/land-curve observations, 7 improved-property observations retained for gross acquisition economics, and 36 potentially ARC-usable acquisitions after excluding unverified and strategic-premium records.
 
 The evidence is uneven by parcel-size band. The current usable whole-property counts are: `<2 ha`: 11; `2–5 ha`: 6; `5–10 ha`: 2; `10–20 ha`: 5; `20–40 ha`: 4; `40+ ha`: 2. The package requires three observations before using a band median for adult-scale economics. Consequently the `<2 ha`, `2–5 ha`, `10–20 ha` and `20–40 ha` bands are currently usable, while `5–10 ha` and `40+ ha` remain unresolved. Their descriptive medians remain visible for review, but the old planning curve is not silently substituted into a result.
 
@@ -32,7 +32,7 @@ The importer preserves source IDs, dates, property type, parcel area, improvemen
 
 ## Evidence-supported scale signal
 
-The public adult-scale table remains deliberately limited to 1, 4, 12, 16, 20, 28, 40 and 56 adults. The economic-crossover diagnostic separately evaluates 1 adult plus every even count from 2 through 56, so a boundary is not rounded up to the next published demonstration row.
+The public adult-scale table remains deliberately limited to 1, 4, 12, 16, 20, 22, 24, 28, 40 and 56 adults. The economic-crossover diagnostic separately evaluates 1 adult plus every even count from 2 through 56, so a boundary is not rounded up to the next published demonstration row.
 
 The first internally tested parcel above 20 ha is **22 adults / 11 family-capacity households**, requiring approximately **20.06 ha**. This is the first entry into the measured 20–40 ha band; 28 adults is only the first public demonstration point inside that band. The 20-to-22 transition changes the observed size-band rate from approximately CAD 46,950/ha to CAD 21,288/ha and lowers the modelled combined land-plus-infrastructure charge by approximately CAD 268.96 per household per month. These figures are a provisional market-band signal, not a universal Grey County price curve.
 
@@ -40,7 +40,9 @@ Within the measured 20–40 ha band, the first two-adult increment with no more 
 
 The complete market-band crossing table and internal scan are generated in `packages/carrying-capacity/outputs/arc-adult-scale.md`, `arc-adult-scale-crossovers.csv` and `arc-adult-scale.json` under `economic_crossover.internal_scan`. Crossings into sparse bands remain visible as unresolved rather than being assigned a planning fallback.
 
-The adult-scale rows currently calculate as follows when a band is sufficiently observed: 1 adult uses `<2 ha`; 4 adults uses `2–5 ha`; 12, 16 and 20 adults use `10–20 ha`; 28 and 40 adults use `20–40 ha`; 56 adults is unresolved because its calculated parcel falls in the sparse `40+ ha` band. The shared-infrastructure and dwelling columns remain separate; the evidence-driven land result changes the site lease only.
+The contract also retains the same diagnostic independently under `economic_crossover_by_market`. The all-ARC-usable view includes gross improved-property acquisitions: it confirms the 22-adult entry into the measured 20–40 ha band and the 22→24 provisional sweet spot, while making the 44-adult transition into the currently supported 40+ ha ARC-usable band visible. The improved-property-only view remains unresolved at 20–40 ha because no improved observations currently fall in that band.
+
+The adult-scale rows currently calculate as follows when a band is sufficiently observed: 1 adult uses `<2 ha`; 4 adults uses `2–5 ha`; 12, 16 and 20 adults use `10–20 ha`; 22 and 24 adults use `20–40 ha`; 28 and 40 adults use `20–40 ha`; 56 adults is unresolved on the vacant-land curve because its calculated parcel falls in the sparse `40+ ha` band. The ARC-usable acquisition view has five observations in `40+ ha`, so it can provide a gross whole-property comparison for that row. The shared-infrastructure and dwelling columns remain separate; the evidence-driven land result changes the site lease only.
 
 ## Data limitations
 
