@@ -207,6 +207,66 @@ test('minimum self-replacing rabbit scale is a discrete viable colony', () => {
   assert.ok(colony.output.edible_meat_kg_year > 0);
 });
 
+test('automatic livestock scale follows whole food-adult-equivalent systems', () => {
+  const child = {id: 'child', label: 'Child', age_y: 8, sex: 'female', weight_kg: 28, height_cm: 130, activity: 'low', labour_level: 'dependent'};
+  const adult = member();
+  const foodSystem = (members, mode = 'rabbit_meat', extra = {}) => {
+    const demand = members.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+    const protein = calculateHouseholdProteinDemand(members).household_protein_kg_year;
+    return calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members, siteCapability: site(), livestockMode: mode, ...extra});
+  };
+  const one = foodSystem([adult]);
+  const two = foodSystem([adult, member({id: 'adult-2', sex: 'female', weight_kg: 65, height_cm: 165})]);
+  const family = foodSystem([adult, member({id: 'adult-2', sex: 'female', weight_kg: 65, height_cm: 165}), child, {...child, id: 'child-2', age_y: 14, sex: 'male', weight_kg: 48, height_cm: 160}, {...child, id: 'child-3', sex: 'male'}]);
+  assert.equal(one.livestock_system_count, 1);
+  assert.equal(two.livestock_system_count, 2);
+  assert.equal(family.livestock_system_count, 4);
+  assert.equal(family.livestock_scaling_basis, 'one_minimum_viable_system_per_food_adult_equivalent_rounded_to_nearest_whole_system');
+  assert.equal(family.animals[0].output.edible_protein_kg_year, 35.56);
+  assert.equal(family.animals[0].reproduction.breeding_females, 16);
+  assert.equal(family.animals[0].labour.total_hours_year, 900);
+  assert.equal(family.animals[0].housing.area_m2, 48);
+  assert.equal(family.animals[0].feed.dry_matter_requirement_kg_year, one.animals[0].feed.dry_matter_requirement_kg_year * 4);
+  assert.ok(family.feed.additional_dedicated_feed_land_ha > one.feed.additional_dedicated_feed_land_ha);
+});
+
+test('all canonical livestock modes scale with the same household count', () => {
+  const adults = [member(), member({id: 'adult-2', sex: 'female', weight_kg: 65, height_cm: 165})];
+  const child = {id: 'child', label: 'Child', age_y: 8, sex: 'female', weight_kg: 28, height_cm: 130, activity: 'low', labour_level: 'dependent'};
+  const family = [...adults, child, {...child, id: 'child-2', age_y: 14, sex: 'male', weight_kg: 48, height_cm: 160}, {...child, id: 'child-3', sex: 'male'}];
+  const run = (members, livestockMode) => {
+    const demand = members.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+    return calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(members).household_protein_kg_year, members, siteCapability: site(), livestockMode});
+  };
+  for (const mode of ['chicken_eggs', 'goose_meat', 'goat_meat', 'mixed_rabbit_eggs']) {
+    const result = run(family, mode);
+    assert.equal(result.livestock_system_count, 4, mode);
+    assert.ok(result.animals.every((animal) => animal.scale === 4), mode);
+    assert.ok(result.feed.annual_feed_required_kg > run(adults, mode).feed.annual_feed_required_kg, mode);
+    assert.ok(result.labour.livestock_hours_year > run(adults, mode).labour.livestock_hours_year, mode);
+  }
+});
+
+test('plants-only has no livestock systems and explicit sensitivity scale is respected', () => {
+  const people = [member(), member({id: 'adult-2', sex: 'female', weight_kg: 65, height_cm: 165})];
+  const demand = people.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+  const plants = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(people).household_protein_kg_year, members: people, siteCapability: site(), livestockMode: 'plants_only'});
+  const override = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(people).household_protein_kg_year, members: people, siteCapability: site(), livestockMode: 'rabbit_meat', livestockScale: 1});
+  assert.equal(plants.livestock_system_count, 0);
+  assert.equal(plants.animal_protein_kg_year, 0);
+  assert.equal(override.livestock_system_count, 1);
+  assert.equal(override.livestock_scaling_basis, 'explicit_sensitivity_override');
+});
+
+test('interactive establishment and nutrient results share one automatic livestock count', () => {
+  const members = [member(), member({id: 'adult-2', sex: 'female', weight_kg: 65, height_cm: 165}), {id: 'child', label: 'Child', age_y: 8, sex: 'female', weight_kg: 28, height_cm: 130, activity: 'low', labour_level: 'dependent'}, {id: 'teen', label: 'Teen', age_y: 14, sex: 'male', weight_kg: 48, height_cm: 160, activity: 'low', labour_level: 'dependent'}, {id: 'child-2', label: 'Child 2', age_y: 8, sex: 'male', weight_kg: 28, height_cm: 130, activity: 'low', labour_level: 'dependent'}];
+  const result = calculateInteractiveHousehold({members, buildings: [presentation.heating.default_building], siteId: 'ordinary_mesic', foodEvidence, woodyCases: woodyEvidence.cases, establishmentModel: presentation.establishment.site_models.ordinary_mesic, livestockMode: 'rabbit_meat'});
+  const peak = result.establishment_land.strategy_comparison.progressive_handoff.rows.find((row) => row.year === result.establishment_land.strategy_comparison.progressive_handoff.establishment_peak_year);
+  assert.equal(result.nutrient_food_system.livestock_system_count, 4);
+  assert.equal(result.nutrient_food_system.animals[0].output.edible_protein_kg_year, 35.56);
+  assert.equal(peak.additional_exclusive_land_ha, result.nutrient_food_system.feed.additional_dedicated_feed_land_ha + peak.exclusive_resilience_reserve_ha);
+});
+
 test('nutritional comparison exposes distinct objectives and Pareto options', () => {
   const demand = calculateHealthCanadaEER(member()).gj_year;
   const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;

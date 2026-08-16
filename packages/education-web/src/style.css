@@ -27,14 +27,27 @@
 .parallel-chain strong { font-size: 1rem; }
 .parallel-chain span { color: var(--muted); line-height: 1.45; }
 .labour-panel { background: #fff; border-top: 3px solid var(--purple); padding: 16px; }
-.land-visual { margin: 16px 0; background: #fff; border: 1px solid var(--line); padding: 10px; }
-.land-visual svg { width: 100%; height: auto; display: block; }
-.land-visual text { fill: var(--ink); font-size: 8px; font-weight: 700; }
-.land-annual { fill: var(--amber); }
-.land-perennial { fill: var(--sage); }
-.land-wood { fill: var(--purple); }
-.land-reserve { fill: var(--red); }
-.land-overlay { fill: none; stroke: #fff; stroke-width: 3; stroke-dasharray: 5 4; }
+.land-composition { margin: 16px 0; background: #fff; border: 1px solid var(--line); padding: 18px; }
+.land-composition h3 { margin-bottom: 16px; }
+.land-composition-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(190px, .75fr); gap: 22px; align-items: start; }
+.land-composition-bar { display: flex; height: 30px; overflow: hidden; background: #e9e9e1; border: 1px solid var(--line); }
+.land-composition-segment { display: block; height: 100%; min-width: 0; }
+.land-composition-segment.annual { background: var(--amber); }
+.land-composition-segment.perennial { background: var(--sage); }
+.land-composition-segment.wood { background: var(--purple); }
+.land-composition-segment.reserve { background: var(--red); }
+.land-composition-segment.feed { background: var(--teal); }
+.land-component-list { display: grid; gap: 8px; margin-top: 16px; }
+.land-component-row { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 9px; align-items: center; color: var(--muted); font-size: .84rem; }
+.land-component-row strong { color: var(--ink); white-space: nowrap; }
+.land-component-row.deduction { border-top: 1px solid var(--line); padding-top: 9px; }
+.swatch.overlap { background: repeating-linear-gradient(135deg, #fff 0 2px, var(--muted) 2px 4px); border: 1px solid var(--muted); }
+.swatch.feed { background: var(--teal); }
+.land-equation { display: grid; grid-template-columns: auto auto; gap: 5px 10px; align-items: baseline; padding: 14px; border-left: 3px solid var(--amber); background: #f7f7f2; color: var(--muted); font-size: .82rem; }
+.land-equation span { grid-column: 1; }
+.land-equation strong { grid-column: 2; color: var(--ink); text-align: right; white-space: nowrap; }
+.land-equation b { grid-column: 1 / -1; color: var(--amber); font-size: 1.1rem; line-height: 1; }
+.land-breakdown > div:first-child { display: none; }
 .perennial-section { background: #eaf0eb; }
 .perennial-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .perennial-card { background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--sage); padding: 18px; }
@@ -62,6 +75,7 @@
 .mix-0 { background: var(--sage); }.mix-1 { background: var(--teal); }.mix-2 { background: var(--purple); }.mix-3 { background: var(--amber); }
 @media (max-width: 800px) { .member-card-layout, .parallel-chain, .perennial-grid { grid-template-columns: 1fr; } .member-figure-wrap { justify-items: start; grid-template-columns: 86px 1fr; text-align: left; } .person-figure { width: 82px; height: 130px; } .perennial-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 430px) { .perennial-timeline { grid-template-columns: 1fr; } .mix-bar span { font-size: .62rem; } }
+@media (max-width: 700px) { .land-composition-layout { grid-template-columns: 1fr; } .land-equation { grid-template-columns: 1fr; } .land-equation strong { grid-column: 1; text-align: left; } .land-equation b { grid-column: 1; } }
 
 /* Keep desktop grids from inheriting unbreakable metric content at narrow landscape widths. */
 main, #app, .split > *, .land-layout > *, .hero > *, .sticky-panel, .labour-panel, .building-list, .member-card { min-width: 0; max-width: 100%; }

@@ -1,9 +1,10 @@
 import {calculateHouseholdProteinDemand} from './protein.mjs';
 import {calculateFoodNutrientAdequacy, FOOD_NUTRIENT_PROFILES} from './nutrition.mjs';
+import {FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './food-adult-equivalent.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const LIVESTOCK_CONTRACT_VERSION = '1.4.0';
+export const LIVESTOCK_CONTRACT_VERSION = '1.5.0';
 
 const SOURCE = {
   rabbit: 'https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf',
@@ -76,6 +77,13 @@ export const MINIMUM_SELF_REPLACING_SYSTEMS = {
   goose_meat: {minimum_scale: 1, label: 'Minimum self-replacing goose flock', breeding_females: 3, breeding_males: 1},
   goat_meat: {minimum_scale: 1, label: 'Minimum self-replacing goat herd', breeding_does: 2, breeding_bucks: .25}
 };
+
+export function deriveLivestockSystemCount({foodDemandGJYear, livestockMode = 'plants_only', livestockScale} = {}) {
+  if (livestockMode === 'plants_only') return 0;
+  if (livestockScale !== undefined && livestockScale !== null) return Math.max(0, Number(livestockScale));
+  const foodAdultEquivalents = Number(foodDemandGJYear ?? 0) / FOOD_ADULT_EQUIVALENT_GJ_YEAR;
+  return Math.max(1, Math.round(foodAdultEquivalents));
+}
 
 export function calculateLivestockReproductiveLedger({speciesId, scale = 1} = {}) {
   const animal = LIVESTOCK_SPECIES[speciesId];
@@ -259,14 +267,20 @@ export function calculateMinimumSelfReplacingLivestockSystem({speciesId = 'rabbi
   return calculateLivestockScenario({speciesId, rationId, scale: definition.minimum_scale, propertyFeedSupply, siteCapability, requireSelfSufficient: true});
 }
 
-export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale = 1, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
+export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
   if (!foodEvidence) throw new Error('nutrient food system requires canonical food evidence');
   const {calculateFoodSystem} = siteCapability?.calculateFoodSystem ? siteCapability : {};
   if (typeof calculateFoodSystem !== 'function') throw new Error('nutrient food system requires calculateFoodSystem in siteCapability');
   const plantOnly = calculateFoodSystem(foodEvidence, demandGJ, siteCapability);
   const proteinTarget = Number(proteinDemandKgYear ?? 0);
   const modes = livestockMode === 'plants_only' ? [] : livestockMode === 'mixed_rabbit_eggs' ? ['rabbit_meat', 'chicken_eggs'] : [livestockMode];
-  const animalOutputs = modes.map((speciesId) => calculateLivestockScenario({speciesId, rationId, scale: livestockScale, propertyFeedSupply: {}, siteCapability}));
+  const effectiveLivestockScale = deriveLivestockSystemCount({foodDemandGJYear: demandGJ, livestockMode, livestockScale});
+  const livestockScalingBasis = livestockMode === 'plants_only'
+    ? 'plants_only_zero_systems'
+    : livestockScale !== undefined && livestockScale !== null
+      ? 'explicit_sensitivity_override'
+      : 'one_minimum_viable_system_per_food_adult_equivalent_rounded_to_nearest_whole_system';
+  const animalOutputs = modes.map((speciesId) => calculateLivestockScenario({speciesId, rationId, scale: effectiveLivestockScale, propertyFeedSupply: {}, siteCapability}));
   const animalEnergy = animalOutputs.reduce((sum, row) => sum + Number(row.output.food_energy_gj_year ?? 0), 0);
   const animalProtein = animalOutputs.reduce((sum, row) => sum + Number(row.output.edible_protein_kg_year ?? 0), 0);
   const plantDemandGJ = Math.max(0, Number(demandGJ) - animalEnergy);
@@ -306,6 +320,8 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
     contract_version: LIVESTOCK_CONTRACT_VERSION,
     mode: livestockMode,
     ration_id: rationId,
+    livestock_system_count: effectiveLivestockScale,
+    livestock_scaling_basis: livestockScalingBasis,
     protein_demand_kg_year: round(proteinTarget),
     plant_only: {food_energy_gj_year: round(demandGJ), protein_kg_year: round(plantOnly.macro_delivered_to_household?.protein_kg ?? 0), food_area_ha: plantOnly.required_food_area_ha},
     plant_food: plantFood,
