@@ -2,7 +2,7 @@ import {calculateHealthCanadaProtein, HEALTH_CANADA_PROTEIN_SOURCE} from './prot
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const NUTRITION_CONTRACT_VERSION = '1.2.0';
+export const NUTRITION_CONTRACT_VERSION = '1.3.0';
 export const DAYS_PER_YEAR = 365.25;
 export const HEALTH_CANADA_NUTRIENT_DRI_SOURCE = 'https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html';
 export const HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE = 'https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf';
@@ -100,11 +100,11 @@ export const NUTRIENT_DEFINITIONS = {
 };
 
 export const FOOD_PORTFOLIO = [
-  {id: 'carrot_raw', label: 'Carrot and orange-root crops', category: 'carotenoid-rich vegetable', energy_share: .02, preparation_loss_fraction: .10, evidence_status: 'CNF food form plus local crop planning overlay', source: CANADIAN_NUTRIENT_FILE_SOURCE},
-  {id: 'leafy_green_raw', label: 'Leafy green vegetables', category: 'leafy vegetable', energy_share: .02, preparation_loss_fraction: .15, evidence_status: 'representative CNF planning form; species/form unresolved', source: CANADIAN_NUTRIENT_FILE_SOURCE},
-  {id: 'apple_raw_skin', label: 'Apples and storage fruit', category: 'fruit', energy_share: .01, preparation_loss_fraction: .10, evidence_status: 'CNF food form plus perennial food-forest diversity layer', source: CANADIAN_NUTRIENT_FILE_SOURCE},
-  {id: 'raspberry_raw', label: 'Berries', category: 'fruit', energy_share: .01, preparation_loss_fraction: .10, evidence_status: 'CNF food form plus perennial berry layer', source: CANADIAN_NUTRIENT_FILE_SOURCE},
-  {id: 'hazelnut_dried', label: 'Hazelnut and comparable fat-bearing perennial foods', category: 'fat source', energy_share: .04, preparation_loss_fraction: .05, evidence_status: 'CNF food form plus canonical perennial fat/protein layer', source: CANADIAN_NUTRIENT_FILE_SOURCE}
+  {id: 'carrot_raw', label: 'Carrot and orange-root crops', category: 'carotenoid-rich vegetable', energy_share: .02, preparation_loss_fraction: .10, production_type: 'annual', representative_crop: 'Carrot', food_gj_ha_year: 12, edible_yield_t_ha_year: 7, first_meaningful_crop_year: 1, substantial_crop_year: 1, mature_year: 1, site_yield_multipliers: {wetter_productive: 1, ordinary_mesic: 1, dry: .75, shallow_rocky_marginal: .55}, evidence_status: 'CNF food form plus conservative annual crop planning synthesis; local field calibration unresolved', source: CANADIAN_NUTRIENT_FILE_SOURCE},
+  {id: 'leafy_green_raw', label: 'Leafy green vegetables', category: 'leafy vegetable', energy_share: .02, preparation_loss_fraction: .15, production_type: 'annual', representative_crop: 'Leafy green vegetable mix', food_gj_ha_year: 8, edible_yield_t_ha_year: 8, first_meaningful_crop_year: 1, substantial_crop_year: 1, mature_year: 1, site_yield_multipliers: {wetter_productive: 1, ordinary_mesic: 1, dry: .65, shallow_rocky_marginal: .25}, evidence_status: 'CNF representative food form plus conservative annual crop planning synthesis; exact species and local field calibration unresolved', source: CANADIAN_NUTRIENT_FILE_SOURCE},
+  {id: 'apple_raw_skin', label: 'Apples and storage fruit', category: 'fruit', energy_share: .01, preparation_loss_fraction: .10, production_type: 'perennial', representative_crop: 'Apple and pear layer', food_gj_ha_year: 8.72, edible_yield_t_ha_year: 4, first_meaningful_crop_year: 4, substantial_crop_year: 8, mature_year: 12, bearing_curve: {1: 0, 2: 0, 3: .08, 5: .35, 8: .65, 10: .85, 15: 1, 20: 1}, canonical_layer_share: .25, site_yield_multipliers: {wetter_productive: 1, ordinary_mesic: 1, dry: .6, shallow_rocky_marginal: .2}, evidence_status: 'CNF food form plus canonical perennial diversity-layer synthesis', source: CANADIAN_NUTRIENT_FILE_SOURCE},
+  {id: 'raspberry_raw', label: 'Berries', category: 'fruit', energy_share: .01, preparation_loss_fraction: .10, production_type: 'perennial', representative_crop: 'Raspberry and berry shrub layer', food_gj_ha_year: 6.66, edible_yield_t_ha_year: 3, first_meaningful_crop_year: 2, substantial_crop_year: 3, mature_year: 3, bearing_curve: {1: 0, 2: .25, 3: .6, 5: .9, 8: 1, 10: 1, 15: 1, 20: 1}, canonical_layer_share: .25, site_yield_multipliers: {wetter_productive: 1, ordinary_mesic: 1, dry: .8, shallow_rocky_marginal: .45}, evidence_status: 'CNF food form plus Ontario-guided canonical perennial berry synthesis', source: CANADIAN_NUTRIENT_FILE_SOURCE},
+  {id: 'hazelnut_dried', label: 'Hazelnut and comparable fat-bearing perennial foods', category: 'fat source', energy_share: .04, preparation_loss_fraction: .05, production_type: 'perennial', representative_crop: 'Hazelnut', food_gj_ha_year: 19.725, edible_yield_t_ha_year: .75, first_meaningful_crop_year: 5, substantial_crop_year: 8, mature_year: 11, bearing_curve: {1: 0, 2: 0, 3: .08, 5: .35, 8: .65, 10: .85, 15: 1, 20: 1}, canonical_layer_share: .25, site_yield_multipliers: {wetter_productive: 1, ordinary_mesic: 1, dry: .5, shallow_rocky_marginal: false}, evidence_status: 'CNF food form plus canonical perennial fat/protein synthesis; Ontario yield history remains limited', source: CANADIAN_NUTRIENT_FILE_SOURCE}
 ];
 
 export const NUTRITION_GOAL_DEFINITIONS = {
@@ -157,7 +157,7 @@ function nutrientStatus(ratio, known, supplied = null) {
 function memberAMDR(member) {
   const age = Number(member.age_y);
   return {
-    protein_percent_energy: age < 4 ? {min: 5, max: 20} : {min: 10, max: 35},
+    protein_percent_energy: age <= 3 ? {min: 5, max: 20} : age <= 18 ? {min: 10, max: 30} : {min: 10, max: 35},
     fat_percent_energy: age < 4 ? {min: 30, max: 40} : age < 19 ? {min: 25, max: 35} : {min: 20, max: 35},
     carbohydrate_percent_energy: {min: 45, max: 65},
     source: 'Health Canada Dietary Reference Intakes macronutrient AMDR planning bands'
@@ -199,9 +199,73 @@ function portfolioFoodRows(plantFood) {
     const profile = FOOD_NUTRIENT_PROFILES[row.id];
     const energyKjPerKg = Number(profile?.macro_per_100g?.energy_kj_per_100g ?? 0) * 10;
     const grossKg = energyKjPerKg > 0 ? availableEnergyGJ * 1e6 * Number(row.energy_share) / energyKjPerKg : 0;
-    return {...row, composition_id: row.id, consumed_energy_gj_year: round(availableEnergyGJ * Number(row.energy_share)), consumed_food_kg_year: round(grossKg * (1 - Number(row.preparation_loss_fraction ?? 0))), preparation_loss_kg_year: round(grossKg * Number(row.preparation_loss_fraction ?? 0))};
+    const retention = 1 - Number(row.preparation_loss_fraction ?? 0);
+    return {...row, composition_id: row.id, consumed_energy_gj_year: round(availableEnergyGJ * Number(row.energy_share)), gross_food_energy_gj_year: round(availableEnergyGJ * Number(row.energy_share) / Math.max(.01, retention)), gross_food_kg_year: round(grossKg), consumed_food_kg_year: round(grossKg * retention), preparation_loss_kg_year: round(grossKg * Number(row.preparation_loss_fraction ?? 0)), retention_factor: round(retention)};
   });
   return {base_fraction: baseFraction, total_energy_share: totalShare, rows};
+}
+
+function portfolioBearingFraction(row, year) {
+  if (row.production_type === 'annual') return Number(year) >= Number(row.first_meaningful_crop_year ?? 1) || year === 'mature' ? 1 : 0;
+  if (year === 'mature') return 1;
+  const points = Object.entries(row.bearing_curve ?? {}).map(([key, value]) => [Number(key), Number(value)]).sort((a, b) => a[0] - b[0]);
+  if (!points.length) return 0;
+  const x = Number(year);
+  if (x <= points[0][0]) return points[0][1];
+  if (x >= points.at(-1)[0]) return points.at(-1)[1];
+  for (let index = 1; index < points.length; index += 1) {
+    const [x2, y2] = points[index];
+    const [x1, y1] = points[index - 1];
+    if (x <= x2) return y1 + (y2 - y1) * ((x - x1) / (x2 - x1));
+  }
+  return 0;
+}
+
+function portfolioSiteRule(row, siteCapability = {}) {
+  const siteId = siteCapability.site_id ?? siteCapability.id ?? 'ordinary_mesic';
+  const multiplier = row.site_yield_multipliers?.[siteId];
+  return multiplier === false ? {viable: false, yield_multiplier: 0} : {viable: true, yield_multiplier: Number(multiplier ?? 1)};
+}
+
+/**
+ * Map the nutrient portfolio onto physical food-system land. The canonical
+ * annual/perennial food zones are capacity, not an extra crop list: rows fit
+ * inside those zones where possible and only overflow becomes new land.
+ */
+export function calculateFoodPortfolioLand({plantFood = {}, siteCapability = {}, years = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
+  const portfolio = portfolioFoodRows(plantFood);
+  const existingFoodArea = Number(plantFood.required_food_area_ha ?? 0);
+  const annualCapacity = existingFoodArea * .25;
+  const perennialCapacity = existingFoodArea * .75;
+  const rows = portfolio.rows.map((row) => {
+    const siteRule = portfolioSiteRule(row, siteCapability);
+    const effectiveYield = Number(row.food_gj_ha_year ?? 0) * Number(siteRule.yield_multiplier ?? 0);
+    const grossEnergy = Number(row.gross_food_energy_gj_year ?? 0);
+    const requiredArea = siteRule.viable && effectiveYield > 0 ? grossEnergy / effectiveYield : null;
+    const capacity = row.production_type === 'perennial' ? perennialCapacity * Number(row.canonical_layer_share ?? 0) : annualCapacity / Math.max(1, portfolio.rows.filter((item) => item.production_type === 'annual').length);
+    const additional = requiredArea == null ? null : Math.max(0, requiredArea - capacity);
+    const allocated = requiredArea == null ? 0 : Math.min(requiredArea, capacity);
+    const yearRows = Object.fromEntries(years.map((year) => {
+      const fraction = portfolioBearingFraction(row, year);
+      const output = grossEnergy * fraction * Number(row.retention_factor ?? 1);
+      return [String(year), {bearing_fraction: round(fraction), net_food_energy_gj_year: round(output), annual_bridge_food_energy_gj_year: round(Math.max(0, Number(row.consumed_energy_gj_year ?? 0) - output))}];
+    }));
+    return {...row, site_viability: siteRule, effective_food_gj_ha_year: round(effectiveYield), required_area_ha: requiredArea == null ? null : round(requiredArea), existing_zone_capacity_ha: round(capacity), allocated_within_existing_food_zone_ha: round(allocated), additional_area_ha: additional == null ? null : round(additional), land_role: row.production_type === 'perennial' ? 'allocated_inside_canonical_perennial_food_zone_where_capacity_allows' : 'allocated_inside_canonical_annual_food_zone_where_capacity_allows', production_by_year: yearRows};
+  });
+  const additionalRows = rows.filter((row) => row.additional_area_ha != null);
+  const additionalArea = additionalRows.reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0);
+  return {
+    base_food_area_ha: round(existingFoodArea),
+    existing_annual_food_zone_ha: round(annualCapacity),
+    existing_perennial_food_zone_ha: round(perennialCapacity),
+    rows,
+    additional_annual_area_ha: round(rows.filter((row) => row.production_type === 'annual').reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0)),
+    additional_perennial_area_ha: round(rows.filter((row) => row.production_type === 'perennial').reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0)),
+    additional_area_ha: round(additionalArea),
+    total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea),
+    area_reconciliation: {existing_food_zone_ha: round(existingFoodArea), additional_portfolio_area_ha: round(additionalArea), total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea), counted_once: true, rule: 'Portfolio crops are assigned within existing annual/perennial food zones before additional area is added.'},
+    timing_rule: 'Perennial portfolio energy is credited only at its bearing fraction; planted area exists from the beginning and the general annual bridge remains responsible for non-bearing years.'
+  };
 }
 
 export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, animals = [], energyGJ = 0, foodPortfolio = true} = {}) {
@@ -253,7 +317,7 @@ export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, ani
   const nutrients = Object.fromEntries(Object.entries(microMap).map(([id, demandId]) => {
     const supplied = total.nutrients[id] ?? 0;
     const target = annual[demandId] ?? 0;
-    const compositionIds = [...(plantFood.rows ?? []).map((row) => row.composition_id), ...animals.flatMap((animal) => Object.values(animal.food_profile_id_by_output ?? {}).concat(animal.food_profile_id ?? []))].filter(Boolean);
+    const compositionIds = [...(plantFood.rows ?? []).map((row) => row.composition_id), ...portfolio.rows.map((row) => row.composition_id), ...animals.flatMap((animal) => Object.values(animal.food_profile_id_by_output ?? {}).concat(animal.food_profile_id ?? []))].filter(Boolean);
     const known = compositionIds.some((compositionId) => FOOD_NUTRIENT_PROFILES[compositionId]?.nutrients_per_100g?.[id] != null);
     const definition = NUTRIENT_DEFINITIONS[demandId];
     return [demandId, {target_daily: round(daily[demandId]), target_annual: round(target), supplied_annual: round(supplied), adequacy_ratio: target > 0 ? round(supplied / target) : null, status: nutrientStatus(target > 0 ? supplied / target : 0, known, supplied), unit: `${definition.unit}/year`, daily_unit: `${definition.unit}/day`}];

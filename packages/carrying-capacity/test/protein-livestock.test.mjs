@@ -16,6 +16,7 @@ import {
   LIVESTOCK_SPECIES,
   calculateFoodNutrientAdequacy,
   calculateHealthCanadaNutrientDemand,
+  calculateFoodPortfolioLand,
   DAYS_PER_YEAR,
   derivePropertyFeedSupply,
   calculateFoodSystem,
@@ -213,6 +214,14 @@ test('daily micronutrient targets are explicit and annual adequacy uses 365.25 d
   assert.equal(total.d * DAYS_PER_YEAR, 27393.75);
   assert.equal(total.a * DAYS_PER_YEAR, 1205325);
   assert.equal(total.iron * DAYS_PER_YEAR, 20819.25);
+  const adequacy = calculateFoodNutrientAdequacy({members: family, plantFood: {rows: []}, energyGJ: 100});
+  assert.equal(adequacy.nutrients.b12.target_daily, 9.6);
+  assert.equal(adequacy.nutrients.b12.target_annual, 3506.4);
+  assert.equal(adequacy.nutrients.d.target_annual, 27393.75);
+  assert.equal(adequacy.nutrients.a.target_annual, 1205325);
+  assert.equal(adequacy.nutrients.iron.target_annual, 20819.25);
+  assert.equal(adequacy.dimensional_analysis.daily_reference_values_annualized, true);
+  assert.equal(adequacy.dimensional_analysis.comparison_rule.toLowerCase().includes('annual food supply'), true);
 });
 
 test('chicken adds food-form B12 but annualized demand remains explicit', () => {
@@ -424,4 +433,67 @@ test('plants-only remains valid and integrated establishment uses species produc
   assert.equal(goats.nutrient_food_system.animal_output_by_year['1'].food_energy_gj_year, 0);
   assert.ok(goats.nutrient_food_system.animal_output_by_year['2'].food_energy_gj_year > 0);
   assert.ok(goats.establishment_land.strategy_comparison.progressive_handoff.establishment_land_requirement_ha > plants.establishment_land.strategy_comparison.progressive_handoff.establishment_land_requirement_ha);
+});
+
+test('minimum property B12 searches discrete rabbit doe populations rather than integer system scales', () => {
+  const family = [member({id: 'adult-woman', sex: 'female'}), member({id: 'adult-man'}), member({id: 'child-girl', age_y: 8, sex: 'female', weight_kg: 28, height_cm: 130}), member({id: 'teen-boy', age_y: 14, sex: 'male', weight_kg: 48, height_cm: 160}), member({id: 'child-boy', age_y: 8, sex: 'male', weight_kg: 28, height_cm: 130})];
+  const demand = family.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(family).household_protein_kg_year, members: family, siteCapability: site(), nutritionGoal: 'minimum_property_b12'});
+  const minimum = result.minimum_property_b12;
+  assert.equal(minimum.selected_does, 5);
+  assert.equal(minimum.selected_bucks, 1);
+  assert.equal(minimum.population.breeding_females, 5);
+  assert.equal(minimum.population.breeding_males, 1);
+  assert.equal(minimum.population.kits_surviving_year, 105);
+  assert.ok(minimum.scenario.output.edible_meat_kg_year > 40.8);
+  assert.ok(minimum.scenario.output.edible_protein_kg_year > 8.89);
+  assert.ok(minimum.scenario.labour.total_hours_year > 225);
+  assert.ok(minimum.adequacy.nutrients.b12.adequacy_ratio >= 1);
+  assert.equal(minimum.candidate_rows.find((row) => row.breeding_females === 4).b12_covered, false);
+  assert.equal(minimum.candidate_rows.find((row) => row.breeding_females === 5).b12_covered, true);
+  assert.ok(minimum.system_comparison.rabbit_meat.lowest_land);
+  assert.ok(minimum.system_comparison.mixed_rabbit_eggs);
+});
+
+test('pregnancy iron sensitivity compares plants and property-fed livestock without assuming member zero', () => {
+  const people = [member({id: 'adult-man'}), member({id: 'adult-woman', sex: 'female', pregnancy_sensitivity_selected: true})];
+  const demand = people.reduce((sum, person) => sum + calculateHealthCanadaEER(person).gj_year, 0);
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(people).household_protein_kg_year, members: people, siteCapability: site(), nutritionGoal: 'pregnancy_iron_sensitivity'});
+  assert.equal(result.pregnancy_sensitivity_subject.id, 'adult-woman');
+  assert.equal(result.pregnancy_sensitivity_comparison.length, 5);
+  assert.deepEqual(result.pregnancy_sensitivity_comparison.map((row) => row.mode), ['plants_only', 'rabbit_meat', 'chicken_eggs', 'goose_meat', 'mixed_rabbit_eggs']);
+  assert.ok(result.pregnancy_sensitivity_comparison.every((row) => row.total_iron_mg_year > 0 && row.iron_target_mg_year > 0));
+  assert.ok(result.pregnancy_sensitivity_comparison.every((row) => Object.hasOwn(row, 'heme_iron_mg_year') && Object.hasOwn(row, 'estimated_absorbable_iron_mg_year')));
+  const hypothetical = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand(people).household_protein_kg_year, members: [member({id: 'adult-man'})], siteCapability: site(), nutritionGoal: 'pregnancy_iron_sensitivity'});
+  assert.equal(hypothetical.pregnancy_sensitivity_subject.basis, 'no eligible household member explicitly selected');
+});
+
+test('member AMDR uses Health Canada boundaries at ages 3, 4, 18 and 19', () => {
+  const expected = {3: [5, 20, 30], 4: [10, 30, 25], 18: [10, 30, 25], 19: [10, 35, 20]};
+  for (const [age, [proteinMin, proteinMax, fatMin]] of Object.entries(expected)) {
+    const person = member({id: `age-${age}`, age_y: Number(age)});
+    const demand = calculateHealthCanadaEER(person).gj_year;
+    const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand([person]).household_protein_kg_year, members: [person], siteCapability: site()});
+    const range = result.nutrient_completeness.whole_diet.macros.amdr.member_ranges[0];
+    assert.deepEqual([range.protein_percent_energy.min, range.protein_percent_energy.max, range.fat_percent_energy.min], [proteinMin, proteinMax, fatMin]);
+  }
+});
+
+test('whole-diet portfolio rows have yield, site and establishment land accounting', () => {
+  const person = member();
+  const demand = calculateHealthCanadaEER(person).gj_year;
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand([person]).household_protein_kg_year, members: [person], siteCapability: site(), livestockMode: 'plants_only'});
+  const portfolio = result.portfolio_land;
+  assert.equal(portfolio.area_reconciliation.counted_once, true);
+  assert.equal(portfolio.total_food_area_with_portfolio_ha, portfolio.base_food_area_ha + portfolio.additional_area_ha);
+  assert.equal(portfolio.rows.length, 5);
+  for (const row of portfolio.rows) {
+    assert.ok(row.representative_crop);
+    assert.ok(row.effective_food_gj_ha_year > 0);
+    assert.ok(row.required_area_ha > 0);
+    assert.ok(row.production_by_year['1']);
+    assert.ok(row.production_by_year.mature);
+  }
+  const explicit = calculateFoodPortfolioLand({plantFood: result.plant_food, siteCapability: site()});
+  assert.equal(explicit.total_food_area_with_portfolio_ha, portfolio.total_food_area_with_portfolio_ha);
 });

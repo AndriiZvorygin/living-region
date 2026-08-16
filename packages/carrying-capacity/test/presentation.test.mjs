@@ -11,11 +11,12 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.reference_profile.height_cm, 178);
   assert.equal(contract.environment.climate.growing_degree_days.value_degree_days, 2073.5);
   assert.equal(contract.environment.solar.status, 'unresolved');
-  assert.equal(contract.nutrition.contract_version, '1.2.0');
-  assert.equal(contract.livestock.contract_version, '1.9.0');
+  assert.equal(contract.nutrition.contract_version, '1.3.0');
+  assert.equal(contract.livestock.contract_version, '1.10.0');
   assert.equal(contract.nutrition.days_per_year, 365.25);
   assert.ok(contract.nutrition.goals.minimum_property_b12);
   assert.ok(contract.nutrition.food_portfolio.some((row) => row.id === 'carrot_raw'));
+  assert.ok(contract.nutrition.food_portfolio.every((row) => row.food_gj_ha_year > 0 && row.production_type));
   assert.equal(contract.livestock.labour_scaling.method, 'task_based_species_specific_planning_model');
   assert.match(contract.livestock.labour_scaling.formula, /processing setup/);
   assert.match(contract.livestock.labour_scaling.note, /unsupported fixed\/variable percentage/i);

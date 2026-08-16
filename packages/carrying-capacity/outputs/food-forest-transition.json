@@ -1727,6 +1727,7 @@
   },
   "site_classes": {
     "wetter_productive": {
+      "site_id": "wetter_productive",
       "label": "Favourable / deep / well-drained productive soil",
       "cli_capability_class_band": "1-3 scenario band",
       "soil_depth": "deep",
@@ -1781,6 +1782,7 @@
       "notes": "Favourable / deep / well-drained productive soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     "ordinary_mesic": {
+      "site_id": "ordinary_mesic",
       "label": "Ordinary / mesic Grey County soil",
       "cli_capability_class_band": "3-4 scenario band",
       "soil_depth": "moderate",
@@ -1835,6 +1837,7 @@
       "notes": "Ordinary / mesic Grey County soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     "dry": {
+      "site_id": "dry",
       "label": "Dry / moisture-limited soil",
       "cli_capability_class_band": "4-5 scenario band",
       "soil_depth": "variable to shallow",
@@ -1889,6 +1892,7 @@
       "notes": "Dry / moisture-limited soil. This is a scenario capability band, not a parcel-level soil classification."
     },
     "shallow_rocky_marginal": {
+      "site_id": "shallow_rocky_marginal",
       "label": "Marginal / shallow / rocky soil",
       "cli_capability_class_band": "5-6 scenario band",
       "soil_depth": "shallow",
@@ -2130,6 +2134,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "wetter_productive",
         "label": "Favourable / deep / well-drained productive soil",
         "cli_capability_class_band": "1-3 scenario band",
         "soil_depth": "deep",
@@ -7219,6 +7224,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "wetter_productive",
         "label": "Favourable / deep / well-drained productive soil",
         "cli_capability_class_band": "1-3 scenario band",
         "soil_depth": "deep",
@@ -12368,6 +12374,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "wetter_productive",
         "label": "Favourable / deep / well-drained productive soil",
         "cli_capability_class_band": "1-3 scenario band",
         "soil_depth": "deep",
@@ -17464,6 +17471,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "wetter_productive",
         "label": "Favourable / deep / well-drained productive soil",
         "cli_capability_class_band": "1-3 scenario band",
         "soil_depth": "deep",
@@ -22642,6 +22650,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "wetter_productive",
         "label": "Favourable / deep / well-drained productive soil",
         "cli_capability_class_band": "1-3 scenario band",
         "soil_depth": "deep",
@@ -27851,6 +27860,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "wetter_productive",
         "label": "Favourable / deep / well-drained productive soil",
         "cli_capability_class_band": "1-3 scenario band",
         "soil_depth": "deep",
@@ -33047,6 +33057,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "ordinary_mesic",
         "label": "Ordinary / mesic Grey County soil",
         "cli_capability_class_band": "3-4 scenario band",
         "soil_depth": "moderate",
@@ -38136,6 +38147,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "ordinary_mesic",
         "label": "Ordinary / mesic Grey County soil",
         "cli_capability_class_band": "3-4 scenario band",
         "soil_depth": "moderate",
@@ -43285,6 +43297,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "ordinary_mesic",
         "label": "Ordinary / mesic Grey County soil",
         "cli_capability_class_band": "3-4 scenario band",
         "soil_depth": "moderate",
@@ -48381,6 +48394,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "ordinary_mesic",
         "label": "Ordinary / mesic Grey County soil",
         "cli_capability_class_band": "3-4 scenario band",
         "soil_depth": "moderate",
@@ -53559,6 +53573,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "ordinary_mesic",
         "label": "Ordinary / mesic Grey County soil",
         "cli_capability_class_band": "3-4 scenario band",
         "soil_depth": "moderate",
@@ -58768,6 +58783,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "ordinary_mesic",
         "label": "Ordinary / mesic Grey County soil",
         "cli_capability_class_band": "3-4 scenario band",
         "soil_depth": "moderate",
@@ -63964,6 +63980,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "dry",
         "label": "Dry / moisture-limited soil",
         "cli_capability_class_band": "4-5 scenario band",
         "soil_depth": "variable to shallow",
@@ -68621,6 +68638,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "dry",
         "label": "Dry / moisture-limited soil",
         "cli_capability_class_band": "4-5 scenario band",
         "soil_depth": "variable to shallow",
@@ -73338,6 +73356,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "dry",
         "label": "Dry / moisture-limited soil",
         "cli_capability_class_band": "4-5 scenario band",
         "soil_depth": "variable to shallow",
@@ -78002,6 +78021,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "dry",
         "label": "Dry / moisture-limited soil",
         "cli_capability_class_band": "4-5 scenario band",
         "soil_depth": "variable to shallow",
@@ -82748,6 +82768,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "dry",
         "label": "Dry / moisture-limited soil",
         "cli_capability_class_band": "4-5 scenario band",
         "soil_depth": "variable to shallow",
@@ -87525,6 +87546,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "dry",
         "label": "Dry / moisture-limited soil",
         "cli_capability_class_band": "4-5 scenario band",
         "soil_depth": "variable to shallow",
@@ -92289,6 +92311,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "shallow_rocky_marginal",
         "label": "Marginal / shallow / rocky soil",
         "cli_capability_class_band": "5-6 scenario band",
         "soil_depth": "shallow",
@@ -96561,6 +96584,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "shallow_rocky_marginal",
         "label": "Marginal / shallow / rocky soil",
         "cli_capability_class_band": "5-6 scenario band",
         "soil_depth": "shallow",
@@ -100893,6 +100917,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "shallow_rocky_marginal",
         "label": "Marginal / shallow / rocky soil",
         "cli_capability_class_band": "5-6 scenario band",
         "soil_depth": "shallow",
@@ -105172,6 +105197,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "shallow_rocky_marginal",
         "label": "Marginal / shallow / rocky soil",
         "cli_capability_class_band": "5-6 scenario band",
         "soil_depth": "shallow",
@@ -109533,6 +109559,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "shallow_rocky_marginal",
         "label": "Marginal / shallow / rocky soil",
         "cli_capability_class_band": "5-6 scenario band",
         "soil_depth": "shallow",
@@ -113925,6 +113952,7 @@
         "note": "ARC allocation is evaluated after the biological establishment calculation and does not constrain it."
       },
       "local_environment": {
+        "site_id": "shallow_rocky_marginal",
         "label": "Marginal / shallow / rocky soil",
         "cli_capability_class_band": "5-6 scenario band",
         "soil_depth": "shallow",

@@ -1,6 +1,6 @@
 # Nutrient-aware livestock comparison
 
-Generated 2026-08-16T22:38:32.754Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
+Generated 2026-08-16T23:59:58.465Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
 
 ## Results
 
@@ -98,3 +98,16 @@ Labour is calculated from explicit task quantities and unit-time assumptions. Ce
 | Self-replacing rabbits + chicken flock | 389.9 | 84.5 | 474.5 | 3.90 | 23.65 | rabbit_meat: {"recurring":{"fixed_system":90,"breeding_females":16,"breeding_males":4,"growout_inventory":8.054795,"seasonal_batches":61.945205},"processing":{"batch_setup":10,"harvested_animals":35}}<br>chicken_eggs: {"recurring":{"fixed_system":90,"breeding_females":40,"breeding_males":5,"growout_inventory":2.146192,"seasonal_batches":72.8},"processing":{"batch_setup":8,"harvested_animals":31.511551}} |
 
 Each row also contains low, central and high sensitivity totals plus the task frequencies and unit-time assumptions used to derive it.
+
+## Discrete property-produced B12 search
+
+The search begins at each species' minimum self-replacing population and adds one breeding female at a time. It runs the complete reproductive, feed, land, labour and nutrient calculation; it does not treat an integer system scale as a population.
+
+| System | First feasible population | Lowest-land feasible population / food-feed area | Lowest labour | Lowest human-edible feed |
+| --- | --- | --- | ---: | ---: |
+| rabbit_meat | 5 does + 1 bucks | 5 does + 1 bucks; 1.001 ha | 258 h/year | 2.3 kg protein/year |
+| chicken_eggs | 28 hens + 4 roosters | 28 hens + 4 roosters; 1.725 ha | 465 h/year | 421.5 kg protein/year |
+| goose_meat | No feasible population in search range | — | — | — |
+| mixed_rabbit_eggs | 4 does + 8 hens | 4 does + 8 hens; 1.177 ha | 474 h/year | 112.5 kg protein/year |
+
+The selected rabbit result is the first rabbit population that reaches 100% B12 coverage. Other rows are comparison objectives, not a universal livestock recommendation.
