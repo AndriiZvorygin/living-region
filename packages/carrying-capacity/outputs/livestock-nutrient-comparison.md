@@ -1,6 +1,6 @@
 # Nutrient-aware livestock comparison
 
-Generated 2026-08-16T14:34:00.644Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
+Generated 2026-08-16T14:38:27.995Z. This report uses the canonical Health Canada protein layer, CNF food-form profiles and the **zero-import ARC on-site feed** ration for the **two-adult + three-dependent-child** family-capacity case on the **ordinary / mesic** site.
 
 ## Results
 
@@ -8,11 +8,11 @@ Generated 2026-08-16T14:34:00.644Z. This report uses the canonical Health Canada
 | --- | :---: | ---: | ---: | :---: | :---: | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | Plants only | yes | 77.3 | 157.8 | yes | n/a | 97% lysine | b12, d, a, iodine, alpha_linolenic_g | 0.0 | 0.000 | 0 | 1.815 | 1.522 |
 | Self-replacing rabbits | yes | 77.3 | 164.5 | yes | yes | 101% lysine | d, a, iodine, alpha_linolenic_g | 0.8 | 0.048 | 225 | 1.828 | 1.538 |
-| Self-replacing dual-purpose chicken flock | yes | 77.3 | 159.3 | yes | yes | 100% lysine | iodine, alpha_linolenic_g | 102.7 | 0.236 | 245 | 1.895 | 1.616 |
+| Self-replacing dual-purpose chicken flock | yes | 77.3 | 159.2 | yes | yes | 101% lysine | iodine, alpha_linolenic_g | 102.7 | 0.236 | 245 | 1.895 | 1.616 |
 | Fast-growing chicken sensitivity (non-canonical) | yes | 77.3 | 160.8 | yes | no | 100% lysine | b12, d, a, iodine, alpha_linolenic_g | 11.8 | 0.025 | 210 | 1.777 | 1.490 |
 | Self-replacing grazing-biased geese | yes | 77.3 | 159.6 | yes | yes | 100% lysine | d, a, iodine, alpha_linolenic_g | 9.4 | 0.326 | 196 | 2.089 | 1.801 |
 | Self-replacing browse-biased goats | yes | 77.3 | 159.8 | yes | yes | 97% lysine | b12, d, a, iodine, alpha_linolenic_g | 0.0 | 0.846 | 310 | 2.596 | 2.309 |
-| Self-replacing rabbits + chicken flock | yes | 77.3 | 166.0 | yes | yes | 103% lysine | iodine, alpha_linolenic_g | 112.5 | 0.312 | 470 | 1.936 | 1.661 |
+| Self-replacing rabbits + chicken flock | yes | 77.3 | 165.8 | yes | yes | 104% lysine | iodine, alpha_linolenic_g | 112.5 | 0.312 | 470 | 1.936 | 1.661 |
 
 The plant-only result remains a valid low-complexity baseline, but it is not automatically the minimum for every objective. The former optimizer compared plant food area plus dedicated feed land; the table below keeps food/feed area, peak land, mature land, labour and human-edible-feed competition separate.
 
@@ -35,11 +35,11 @@ This is not conventional feed-conversion ratio. It asks whether animal protein c
 | Option | Human-inedible feed DM kg/year | Animal protein kg/year | Edible protein per inedible feed kg | Human-edible feed protein consumed kg/year | Edible protein per edible feed protein kg |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Self-replacing rabbits | 342.1 | 8.9 | 0.026 | 0.8 | 11.289 |
-| Self-replacing dual-purpose chicken flock | 120.9 | 11.3 | 0.093 | 102.7 | 0.110 |
+| Self-replacing dual-purpose chicken flock | 120.9 | 11.2 | 0.092 | 102.7 | 0.109 |
 | Fast-growing chicken sensitivity (non-canonical) | 56.6 | 7.0 | 0.124 | 11.8 | 0.592 |
 | Self-replacing grazing-biased geese | 993.8 | 5.0 | 0.005 | 9.4 | 0.530 |
 | Self-replacing browse-biased goats | 1200.0 | 6.0 | 0.005 | 0.0 | — |
-| Self-replacing rabbits + chicken flock | 416.6 | 20.2 | 0.048 | 112.5 | 0.180 |
+| Self-replacing rabbits + chicken flock | 416.6 | 20.1 | 0.048 | 112.5 | 0.178 |
 
 ## Self-replacing chicken boundary
 

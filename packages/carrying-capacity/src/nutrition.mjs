@@ -88,9 +88,9 @@ export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, ani
   const total = {protein_g: 0, amino_mg: {}, nutrients: {}, sources: new Set()};
   for (const row of plantFood.rows ?? []) addProfile(total, FOOD_NUTRIENT_PROFILES[row.composition_id], Number(row.edible_food_kg_delivered ?? 0));
   for (const animal of animals) {
-    const profile = FOOD_NUTRIENT_PROFILES[animal.food_profile_id];
-    addProfile(total, profile, Number(animal.output?.eggs_kg_year ?? 0));
-    addProfile(total, profile, Number(animal.output?.edible_meat_kg_year ?? 0));
+    const profiles = animal.food_profile_id_by_output ?? {};
+    addProfile(total, FOOD_NUTRIENT_PROFILES[profiles.eggs ?? animal.food_profile_id], Number(animal.output?.eggs_kg_year ?? 0));
+    addProfile(total, FOOD_NUTRIENT_PROFILES[profiles.meat ?? animal.food_profile_id], Number(animal.output?.edible_meat_kg_year ?? 0));
   }
   const amino = Object.fromEntries(Object.entries(HEALTH_CANADA_AMINO_ACID_PATTERN).map(([id, mgPerG]) => {
     const target = total.protein_g * mgPerG;
