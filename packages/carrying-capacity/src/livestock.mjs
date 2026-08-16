@@ -1,15 +1,17 @@
 import {calculateHouseholdProteinDemand} from './protein.mjs';
+import {calculateFoodNutrientAdequacy} from './nutrition.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const LIVESTOCK_CONTRACT_VERSION = '1.1.0';
+export const LIVESTOCK_CONTRACT_VERSION = '1.3.0';
 
 const SOURCE = {
   rabbit: 'https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf',
   poultry: 'https://www.ontario.ca/page/introduction-poultry-nutrition; https://extension.umn.edu/small-scale-poultry/raising-chickens-eggs',
   goose: 'https://extension.psu.edu/poultry-nutrition-and-feeding; https://extension.psu.edu/geese-ducks-and-swans',
   goat: 'https://files.ontario.ca/omafra-pasture-production-en-2022-12-08.pdf; https://www.gov.mb.ca/agriculture/livestock/goat/pubs/goats-and-their-nutrition.pdf',
-  composition: 'https://open.canada.ca/data/en/dataset/1b6139bd-ed7e-4043-bc28-ff00e10f3109'
+  composition: 'https://open.canada.ca/data/en/dataset/1b6139bd-ed7e-4043-bc28-ff00e10f3109',
+  chickenBreeds: 'https://afs.mgcafe.uky.edu/research/poultry/use-heritage-breeds-alternative-poultry-production; https://extension.umd.edu/sites/extension.umd.edu/files/publications/FS-987%20Choosing%20the%20Best%20Poultry%20Breeds%20for%20your%20Small%20Farm_0.pdf; https://pmc.ncbi.nlm.nih.gov/articles/PMC8858978/'
 };
 
 /**
@@ -33,25 +35,58 @@ export const LIVESTOCK_FEED_STREAMS = {
   mineral_supplement: {label: 'Mineral supplement', class: 'mineral_supplement', dry_matter_energy_mj_kg: 0, protein_fraction: 0, human_edible_fraction: 1, winter_storage: true, storage_loss_fraction: 0, land_required: false, evidence_status: 'health_requirement_not_food_energy', source: SOURCE.poultry}
 };
 
+export const CHICKEN_BREED_CANDIDATES = {
+  chantecler: {label: 'Chantecler', true_breeding: true, cold_hardiness: 'high', natural_reproduction: 'possible; flock-specific broodiness', range_foraging: 'moderate; local validation required', forage_behaviour: 'outdoor forage contribution is plausible but not quantified here', locomotion: 'mobile enough for outdoor ranging; flock-specific validation required', heat_tolerance: 'not quantified; Grey County cold hardiness is the relevant reference condition', growth_rate: 'slow-growing dual-purpose reference; not a broiler performance claim', feed_requirement: 'bounded flock synthesis; lower-concentration assumption than industrial broiler', longevity: 'multi-season breeding flock assumed', dual_purpose: true, canonical_reference: true, evidence_status: 'qualitative breed/reference evidence; quantitative flock values are planning synthesis', source: SOURCE.chickenBreeds},
+  plymouth_rock: {label: 'Plymouth Rock', true_breeding: true, cold_hardiness: 'moderate-high', natural_reproduction: 'possible; flock-specific broodiness', range_foraging: 'moderate', forage_behaviour: 'outdoor-range candidate; no local intake estimate', locomotion: 'outdoor-range candidate', heat_tolerance: 'not separately modelled', growth_rate: 'slow/dual-purpose relative to industrial broilers', feed_requirement: 'planning comparison only', longevity: 'not separately modelled', dual_purpose: true, canonical_reference: false, evidence_status: 'comparison candidate', source: SOURCE.chickenBreeds},
+  rhode_island_red: {label: 'Rhode Island Red', true_breeding: true, cold_hardiness: 'moderate-high', natural_reproduction: 'possible; flock-specific broodiness', range_foraging: 'moderate', forage_behaviour: 'outdoor-range candidate; no local intake estimate', locomotion: 'outdoor-range candidate', heat_tolerance: 'not separately modelled', growth_rate: 'slow/dual-purpose relative to industrial broilers', feed_requirement: 'planning comparison only', longevity: 'not separately modelled', dual_purpose: true, canonical_reference: false, evidence_status: 'comparison candidate', source: SOURCE.chickenBreeds},
+  sussex: {label: 'Sussex', true_breeding: true, cold_hardiness: 'moderate', natural_reproduction: 'possible; flock-specific broodiness', range_foraging: 'good', forage_behaviour: 'good outdoor-range candidate; no local intake estimate', locomotion: 'good outdoor-range candidate', heat_tolerance: 'not separately modelled', growth_rate: 'slow/dual-purpose relative to industrial broilers', feed_requirement: 'planning comparison only', longevity: 'not separately modelled', dual_purpose: true, canonical_reference: false, evidence_status: 'comparison candidate', source: SOURCE.chickenBreeds}
+};
+
+export const CHICKEN_SYSTEM_COMPARISON = {
+  canonical: {label: 'Self-replacing true-breeding dual-purpose flock', breeding: 'natural mating with retained replacement birds; no recurring chicks or pullets', locomotion_and_range: 'outdoor mobility, range use and forage behaviour are relevant; intake contribution remains bounded and site-specific', heat_tolerance: 'not a Grey County selection driver and not quantitatively modelled', growth_and_feed: 'slow-growing/dual-purpose planning boundary; no commercial broiler feed-conversion or carcass assumptions are inherited', climate: 'cold-hardy reference range for Grey County, with Chantecler selected as the conservative reference', sources: SOURCE.chickenBreeds, evidence_status: 'breed comparison and flock outputs are planning synthesis; local flock validation required'},
+  industrial_sensitivity: {label: 'Fast-growing commercial broiler sensitivity', breeding: 'recurring production-bird replacement; excluded from canonical ARC carrying capacity', locomotion_and_range: 'selection for rapid growth can reduce mobility/range suitability relative to slower-growing birds', heat_tolerance: 'comparative heat/locomotion evidence is context-specific and not transferred into the canonical flock', growth_and_feed: 'commercial performance is a separate sensitivity and must not be used for the canonical flock', climate: 'not selected as the Grey County self-replacing reference', sources: SOURCE.chickenBreeds, evidence_status: 'non-canonical comparison boundary'}
+};
+
 const species = {
   rabbit_meat: {
-    id: 'rabbit_meat', label: 'Rabbit meat', animal: 'Rabbit', unit_label: '48-fryer household rabbitry plus breeding stock', output: {edible_meat_kg_year: 40.8, food_energy_gj_year: .232, edible_protein_kg_year: 8.89, edible_fat_kg_year: 1.43}, feed_dm_kg_year: 350, winter_fraction: .60, housing_area_m2: 12, fencing_m: 25, water_l_day: 35, labour_hours_year: 180, physical_labour: 'moderate-high', slaughter_processing_hours_year: 45, manure_kg_year: 300, production_start_year: 1, sources: [SOURCE.rabbit], notes: 'Balanced rabbit feed remains required; forage and leaves are bounded supplements rather than an assumption of grass-only production.'
+    id: 'rabbit_meat', label: 'Self-replacing rabbits', animal: 'Rabbit', unit_label: 'Breeding does/buck plus household fryer output', output: {edible_meat_kg_year: 40.8, food_energy_gj_year: .232, edible_protein_kg_year: 8.89, edible_fat_kg_year: 1.43}, feed_dm_kg_year: 350, winter_fraction: .60, housing_area_m2: 12, fencing_m: 25, water_l_day: 35, labour_hours_year: 180, physical_labour: 'moderate-high', slaughter_processing_hours_year: 45, manure_kg_year: 300, production_start_year: 1, food_profile_id: 'rabbit_meat_raw', reproduction: {breeding_does: 4, breeding_bucks: 1, litters_year: 4, kits_per_litter: 7, kit_survival: .75, replacement_does_year: 1, replacement_bucks_year: .25, external_replacement_animals_year: 0, feed_all_generations_included: true, self_replacing: true, evidence_status: 'bounded smallholder planning synthesis'}, sources: [SOURCE.rabbit], canonical_arc: true, notes: 'Breeding stock, replacements and fryer output are included in the self-replacing household rabbitry. Forage and leaves are bounded supplements rather than an assumption of grass-only production.'
   },
   chicken_eggs: {
-    id: 'chicken_eggs', label: 'Laying hens / eggs', animal: 'Chicken', unit_label: '6 laying hens', output: {eggs_kg_year: 72.6, eggs_year: 1320, food_energy_gj_year: .448, edible_protein_kg_year: 9.15, edible_fat_kg_year: 7.70}, feed_dm_kg_year: 425.2, winter_fraction: .45, housing_area_m2: 6, fencing_m: 20, water_l_day: 3, labour_hours_year: 120, physical_labour: 'moderate', slaughter_processing_hours_year: 0, manure_kg_year: 300, production_start_year: 1, sources: [SOURCE.poultry], notes: 'A complete ration, calcium, grit and clean water remain required; scraps and pasture cannot replace balanced layer nutrition.'
+    id: 'chicken_eggs', label: 'Self-replacing dual-purpose chicken flock', animal: 'Chicken', unit_label: '8 breeding hens plus 1 breeding rooster; integrated eggs and surplus-bird meat', output: {eggs_kg_year: 68.65, eggs_year: 1373, edible_meat_kg_year: 11.66, food_energy_gj_year: 1.04, edible_protein_kg_year: 11.3, edible_fat_kg_year: 8.6}, feed_dm_kg_year: 700, winter_fraction: .55, housing_area_m2: 10, fencing_m: 35, water_l_day: 5, labour_hours_year: 210, physical_labour: 'moderate', slaughter_processing_hours_year: 35, manure_kg_year: 420, production_start_year: 1, food_profile_id: 'chicken_egg_raw', reproduction: {breeding_hens: 8, breeding_roosters: 1, eggs_per_hen_year: 180, incubation_eggs_year: 24, hatch_rate: .80, juvenile_survival: .85, female_chick_fraction: .5, replacement_hens_year: 4, replacement_roosters_year: 1, egg_loss_fraction: .03, egg_mass_kg: .05, surplus_cockerel_edible_meat_kg: 1, cull_hen_edible_meat_kg: 1, cull_rooster_edible_meat_kg: .8, external_replacement_chicks_year: 0, external_replacement_pullets_year: 0, feed_all_generations_included: true, reference_breed: 'Chantecler / conservative true-breeding dual-purpose range', reproduction_modes: ['broody_hen', 'local_incubator'], reproduction_mode_note: 'Broody hens avoid incubator electricity but reduce edible eggs; a locally powered incubator trades electricity and labour for more controlled hatch timing.', genetic_resilience_note: 'Occasional unrelated breeding-stock introduction may be prudent, but it is not an annual production input.', evidence_status: 'planning synthesis; breed and reproduction figures require local flock validation'}, sources: [SOURCE.poultry, SOURCE.chickenBreeds], canonical_arc: true, notes: 'Canonical chicken is an integrated, naturally mating, true-breeding dual-purpose flock. Gross eggs are reduced for incubation and losses; meat comes from surplus cockerels and cull birds. Feed includes breeding adults and growing replacements.'
   },
   chicken_meat: {
-    id: 'chicken_meat', label: 'Meat chickens', animal: 'Chicken', unit_label: '25 meat birds per year', output: {edible_meat_kg_year: 35, food_energy_gj_year: .42, edible_protein_kg_year: 7.0, edible_fat_kg_year: 5.6}, feed_dm_kg_year: 125, winter_fraction: .25, housing_area_m2: 8, fencing_m: 25, water_l_day: 12, labour_hours_year: 150, physical_labour: 'moderate', slaughter_processing_hours_year: 60, manure_kg_year: 180, production_start_year: 1, sources: [SOURCE.poultry], notes: 'Reference smallholder output; feed and processing are planning assumptions and not a claim of pasture-only growth.'
+    id: 'chicken_meat', label: 'Fast-growing meat chicken sensitivity', animal: 'Chicken', unit_label: '25 recurring meat birds per year', output: {edible_meat_kg_year: 35, food_energy_gj_year: .42, edible_protein_kg_year: 7.0, edible_fat_kg_year: 5.6}, feed_dm_kg_year: 125, winter_fraction: .25, housing_area_m2: 8, fencing_m: 25, water_l_day: 12, labour_hours_year: 150, physical_labour: 'moderate', slaughter_processing_hours_year: 60, manure_kg_year: 180, production_start_year: 1, food_profile_id: 'chicken_meat_raw', reproduction: {external_replacement_chicks_year: 25, external_replacement_pullets_year: 0, feed_all_generations_included: false, self_replacing: false, evidence_status: 'non-canonical industrial/specialist sensitivity'}, sources: [SOURCE.poultry], canonical_arc: false, notes: 'Non-canonical sensitivity only. It assumes recurring production birds and cannot qualify as ARC self-replacing carrying capacity.'
   },
   goose_meat: {
-    id: 'goose_meat', label: 'Grazing-biased geese', animal: 'Goose', unit_label: '8 geese annual meat flock', output: {edible_meat_kg_year: 24, food_energy_gj_year: .34, edible_protein_kg_year: 5.0, edible_fat_kg_year: 3.8}, feed_dm_kg_year: 1050, winter_fraction: .35, housing_area_m2: 10, fencing_m: 45, water_l_day: 16, labour_hours_year: 160, physical_labour: 'moderate', slaughter_processing_hours_year: 36, manure_kg_year: 850, production_start_year: 1, sources: [SOURCE.goose], notes: 'Pasture contribution is substantial but seasonal; winter feed, shelter, water and supplemental ration remain necessary.'
+    id: 'goose_meat', label: 'Self-replacing grazing-biased geese', animal: 'Goose', unit_label: 'Breeding geese plus surplus gosling meat', output: {edible_meat_kg_year: 24, food_energy_gj_year: .34, edible_protein_kg_year: 5.0, edible_fat_kg_year: 3.8}, feed_dm_kg_year: 1050, winter_fraction: .35, housing_area_m2: 10, fencing_m: 45, water_l_day: 16, labour_hours_year: 160, physical_labour: 'moderate', slaughter_processing_hours_year: 36, manure_kg_year: 850, production_start_year: 1, food_profile_id: 'goose_meat_raw', reproduction: {breeding_females: 3, breeding_males: 1, fertile_eggs_year: 24, hatch_rate: .75, gosling_survival: .80, replacement_females_year: 1, replacement_males_year: .25, external_replacement_animals_year: 0, feed_all_generations_included: true, self_replacing: true, evidence_status: 'bounded smallholder planning synthesis'}, sources: [SOURCE.goose], canonical_arc: true, notes: 'Pasture contribution is substantial but seasonal; breeding adults, replacement birds, winter feed, shelter and water are included.'
   },
   goat_meat: {
-    id: 'goat_meat', label: 'Browse-biased goats', animal: 'Goat', unit_label: '2 mature does plus annual meat-kid output', output: {edible_meat_kg_year: 30, food_energy_gj_year: .43, edible_protein_kg_year: 6.0, edible_fat_kg_year: 4.5}, feed_dm_kg_year: 1200, winter_fraction: .55, housing_area_m2: 14, fencing_m: 120, water_l_day: 12, labour_hours_year: 260, physical_labour: 'high', slaughter_processing_hours_year: 50, manure_kg_year: 950, production_start_year: 2, sources: [SOURCE.goat], notes: 'Goats can browse a large share of their diet, but browse inventory, fencing, hay and winter supplementation are site-specific.'
+    id: 'goat_meat', label: 'Self-replacing browse-biased goats', animal: 'Goat', unit_label: 'Breeding does/buck plus annual meat-kid output', output: {edible_meat_kg_year: 30, food_energy_gj_year: .43, edible_protein_kg_year: 6.0, edible_fat_kg_year: 4.5}, feed_dm_kg_year: 1200, winter_fraction: .55, housing_area_m2: 14, fencing_m: 120, water_l_day: 12, labour_hours_year: 260, physical_labour: 'high', slaughter_processing_hours_year: 50, manure_kg_year: 950, production_start_year: 2, food_profile_id: null, reproduction: {breeding_does: 2, breeding_bucks: .25, kids_year: 3, kid_survival: .85, replacement_does_year: .5, replacement_bucks_year: .1, external_replacement_animals_year: 0, feed_all_generations_included: true, self_replacing: true, evidence_status: 'bounded smallholder planning synthesis; goat food composition profile unresolved'}, sources: [SOURCE.goat], canonical_arc: true, notes: 'Goats can browse a large share of their diet, but browse inventory, fencing, hay and winter supplementation are site-specific. A matching CNF goat-meat food form remains unresolved for micronutrient accounting.'
   }
 };
 
 export const LIVESTOCK_SPECIES = species;
+
+export function calculateLivestockReproductiveLedger({speciesId, scale = 1} = {}) {
+  const animal = LIVESTOCK_SPECIES[speciesId];
+  const reproduction = animal?.reproduction;
+  if (!animal || !reproduction) return {self_replacing: false, external_replacement_animals_year: null, feed_all_generations_included: false, status: 'reproduction ledger unavailable'};
+  const factor = Number(scale);
+  if (speciesId === 'chicken_eggs') {
+    const grossEggs = reproduction.breeding_hens * reproduction.eggs_per_hen_year * factor;
+    const incubationEggs = reproduction.incubation_eggs_year * factor;
+    const edibleEggs = Math.max(0, (grossEggs - incubationEggs) * (1 - reproduction.egg_loss_fraction));
+    const chicks = incubationEggs * reproduction.hatch_rate * reproduction.juvenile_survival;
+    const females = chicks * reproduction.female_chick_fraction;
+    const males = chicks * (1 - reproduction.female_chick_fraction);
+    const surplusCockerels = Math.max(0, males - reproduction.replacement_roosters_year * factor);
+    const surplusFemales = Math.max(0, females - reproduction.replacement_hens_year * factor);
+    const edibleMeat = surplusCockerels * reproduction.surplus_cockerel_edible_meat_kg + surplusFemales * reproduction.cull_hen_edible_meat_kg + reproduction.replacement_roosters_year * reproduction.cull_rooster_edible_meat_kg * factor;
+    return {self_replacing: true, external_replacement_chicks_year: 0, external_replacement_pullets_year: 0, feed_all_generations_included: true, breeding_females: reproduction.breeding_hens * factor, breeding_males: reproduction.breeding_roosters * factor, fertile_eggs_year: incubationEggs, eggs_incubated_year: incubationEggs, chicks_hatched_and_surviving_year: chicks, replacement_females_year: reproduction.replacement_hens_year * factor, replacement_males_year: reproduction.replacement_roosters_year * factor, surplus_males_year: surplusCockerels, surplus_females_year: surplusFemales, gross_eggs_year: grossEggs, edible_eggs_year: edibleEggs, edible_eggs_kg_year: edibleEggs * reproduction.egg_mass_kg, edible_meat_kg_year: edibleMeat, output: {eggs_year: edibleEggs, eggs_kg_year: edibleEggs * reproduction.egg_mass_kg, edible_meat_kg_year: edibleMeat}, reference_breed: reproduction.reference_breed, evidence_status: reproduction.evidence_status};
+  }
+  const external = Number(reproduction.external_replacement_animals_year ?? reproduction.external_replacement_chicks_year ?? 0) * factor;
+  return {self_replacing: reproduction.self_replacing !== false && external === 0 && Number(reproduction.external_replacement_animals_year ?? 0) === 0, external_replacement_animals_year: external, feed_all_generations_included: reproduction.feed_all_generations_included === true, breeding_females: Number(reproduction.breeding_does ?? reproduction.breeding_females ?? 0) * factor, breeding_males: Number(reproduction.breeding_bucks ?? reproduction.breeding_males ?? 0) * factor, replacement_females_year: Number(reproduction.replacement_does ?? reproduction.replacement_females_year ?? 0) * factor, replacement_males_year: Number(reproduction.replacement_bucks ?? reproduction.replacement_males_year ?? 0) * factor, evidence_status: reproduction.evidence_status};
+}
 
 export const LIVESTOCK_RATION_SCENARIOS = {
   conventional_reference: {
@@ -176,6 +211,8 @@ export function calculateLivestockScenario({speciesId, rationId = 'arc_integrate
   const animal = LIVESTOCK_SPECIES[speciesId];
   const feed = calculateFeedLedger({speciesId, rationId, scale, propertyFeedSupply, siteCapability, requireSelfSufficient});
   const outputScale = Number(scale);
+  const reproduction = calculateLivestockReproductiveLedger({speciesId, scale: outputScale});
+  const output = {...Object.fromEntries(Object.entries(animal.output).map(([key, value]) => [key, round(Number(value) * outputScale)])), ...(reproduction.output ?? {})};
   const edibleProtein = Number(animal.output.edible_protein_kg_year) * outputScale;
   return {
     species_id: speciesId,
@@ -183,7 +220,9 @@ export function calculateLivestockScenario({speciesId, rationId = 'arc_integrate
     animal: animal.animal,
     unit_label: animal.unit_label,
     scale: outputScale,
-    output: Object.fromEntries(Object.entries(animal.output).map(([key, value]) => [key, round(Number(value) * outputScale)])),
+    output,
+    food_profile_id: animal.food_profile_id ?? null,
+    reproduction,
     feed,
     net_human_edible_protein_kg_year: round(edibleProtein - feed.human_edible_feed_protein_kg_year),
     human_edible_protein_conversion_efficiency: feed.human_edible_feed_protein_kg_year > 0 ? round(edibleProtein / feed.human_edible_feed_protein_kg_year, 4) : null,
@@ -198,7 +237,7 @@ export function calculateLivestockScenario({speciesId, rationId = 'arc_integrate
   };
 }
 
-export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale = 1, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
+export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale = 1, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
   if (!foodEvidence) throw new Error('nutrient food system requires canonical food evidence');
   const {calculateFoodSystem} = siteCapability?.calculateFoodSystem ? siteCapability : {};
   if (typeof calculateFoodSystem !== 'function') throw new Error('nutrient food system requires calculateFoodSystem in siteCapability');
@@ -226,7 +265,9 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   const dedicatedFeedLand = animals.reduce((sum, row) => sum + row.feed.additional_dedicated_feed_land_ha, 0);
   const feedDeficit = animals.reduce((sum, row) => sum + row.feed.feed_deficit_dm_kg_year, 0);
   const feedSelfSufficiency = animals.every((row) => row.feed.feed_self_sufficiency) && purchasedFeed === 0 && feedDeficit === 0;
+  const reproductiveSelfSufficiency = animals.every((row) => row.reproduction?.self_replacing === true && row.reproduction?.feed_all_generations_included === true);
   const proteinCoverage = proteinTarget > 0 ? totalProtein / proteinTarget : 1;
+  const nutrientCompleteness = calculateFoodNutrientAdequacy({members, plantFood, animals, energyGJ: demandGJ});
   const animalOutputByYear = Object.fromEntries(establishmentYears.map((year) => {
     const activeAnimals = animals.filter((animal) => year === 'mature' || Number(year) >= Number(animal.production_start_year ?? 1));
     return [String(year), {
@@ -256,17 +297,23 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
     labour: {livestock_hours_year: round(animals.reduce((sum, row) => sum + row.labour.total_hours_year, 0))},
     feed_self_sufficiency: feedSelfSufficiency,
     energy_adequacy: Number(plantFood.delivered_food_energy_gj ?? 0) + animalEnergy >= Number(demandGJ) - 1e-9,
-    optimizer_eligible: livestockMode === 'plants_only' || (proteinCoverage >= 1 && feedSelfSufficiency && purchasedFeed === 0 && feedDeficit === 0),
-    optimizer_note: livestockMode === 'plants_only' ? 'Plants-only is a valid baseline. Livestock is not required unless it improves the selected nutrient/land objective.' : (!feedSelfSufficiency ? 'This livestock option is not ARC-feasible because the property cannot supply all dietary feed without imports.' : (deficit > 0 ? 'This on-site animal option supplies part of the remaining total-protein deficit; quality and micronutrients remain unresolved.' : 'This explicit on-site animal option meets the modeled total-protein target, but it is not automatically land-optimal.')),
+    nutrient_completeness: nutrientCompleteness,
+    reproductive_self_sufficiency: reproductiveSelfSufficiency,
+    optimizer_eligible: livestockMode === 'plants_only' || (proteinCoverage >= 1 && feedSelfSufficiency && reproductiveSelfSufficiency && purchasedFeed === 0 && feedDeficit === 0),
+    optimizer_note: livestockMode === 'plants_only' ? 'Plants-only is a valid baseline. Livestock is not required unless it improves a selected nutrient, land or labour objective.' : (!reproductiveSelfSufficiency ? 'This livestock option is non-canonical because the production population is not self-replacing or all generations are not fed.' : (!feedSelfSufficiency ? 'This livestock option is not ARC-feasible because the property cannot supply all dietary feed without imports.' : (deficit > 0 ? 'This on-site animal option supplies part of the remaining total-protein deficit; quality and micronutrients remain unresolved.' : 'This explicit on-site animal option meets the modeled total-protein target, but it is not automatically land-optimal.'))),
     evidence_boundary: 'Feed quantities, edible outputs and property co-product yields are bounded planning syntheses from government/extension sources, not Grey-Bruce household trials. Human-edible feed competition is tracked separately from total feed conversion.'
   };
 }
 
-export function compareNutrientFoodSystems({foodEvidence, demandGJ, proteinDemandKgYear, siteCapability} = {}) {
+export function compareNutrientFoodSystems({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability} = {}) {
   const modes = ['plants_only', 'rabbit_meat', 'chicken_eggs', 'chicken_meat', 'goose_meat', 'goat_meat', 'mixed_rabbit_eggs'];
   const rationIds = ['conventional_reference', 'low_food_competition', 'arc_integrated'];
-  const rows = modes.flatMap((mode) => rationIds.map((rationId) => calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, siteCapability, livestockMode: mode, rationId}))).filter((row) => row.mode === 'plants_only' ? row.ration_id === 'arc_integrated' : true);
+  const rows = modes.flatMap((mode) => rationIds.map((rationId) => calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members, siteCapability, livestockMode: mode, rationId}))).filter((row) => row.mode === 'plants_only' ? row.ration_id === 'arc_integrated' : true);
   const eligible = rows.filter((row) => row.protein_adequacy && row.energy_adequacy && row.optimizer_eligible && row.feed_self_sufficiency);
-  const best = eligible.reduce((bestRow, row) => !bestRow || (row.plant_food.required_food_area_ha + row.feed.additional_dedicated_feed_land_ha) < (bestRow.plant_food.required_food_area_ha + bestRow.feed.additional_dedicated_feed_land_ha) ? row : bestRow, null);
-  return {rows, best: best ? {mode: best.mode, ration_id: best.ration_id, reason: best.mode === 'plants_only' ? 'Plants-only meets the modeled total-protein target without imported feed or dedicated animal-feed land.' : 'Lowest modeled total food plus on-site feed land among protein-adequate, feed-self-sufficient options.'} : null};
+  const foodFeedArea = (row) => Number(row.plant_food.required_food_area_ha ?? 0) + Number(row.feed.additional_dedicated_feed_land_ha ?? 0);
+  const labour = (row) => Number(row.labour?.livestock_hours_year ?? 0);
+  const edibleCompetition = (row) => Number(row.feed.human_edible_feed_protein_consumed_kg ?? 0);
+  const bestBy = (metric) => eligible.reduce((bestRow, row) => !bestRow || metric(row) < metric(bestRow) ? row : bestRow, null);
+  const best = bestBy(foodFeedArea);
+  return {rows, objectives: {lowest_food_feed_area: best ? {mode: best.mode, ration_id: best.ration_id, value_ha: foodFeedArea(best)} : null, lowest_peak_productive_land: null, lowest_mature_productive_land: null, lowest_labour: bestBy(labour) ? {mode: bestBy(labour).mode, ration_id: bestBy(labour).ration_id, value_hours_year: labour(bestBy(labour))} : null, lowest_human_edible_feed_competition: bestBy(edibleCompetition) ? {mode: bestBy(edibleCompetition).mode, ration_id: bestBy(edibleCompetition).ration_id, value_kg_protein_year: edibleCompetition(bestBy(edibleCompetition))} : null, note: 'Food/feed area and final peak/mature transition land are separate objectives. Peak and mature winners are filled by the full household transition report, not this nutrient-only screening function.'}, best: best ? {mode: best.mode, ration_id: best.ration_id, reason: best.mode === 'plants_only' ? 'Plants-only has the lowest modeled plant-food plus dedicated-feed screening area among eligible rows.' : 'Lowest modeled plant-food plus on-site dedicated-feed screening area among eligible rows.', objective: 'food_feed_area_screening'} : null};
 }

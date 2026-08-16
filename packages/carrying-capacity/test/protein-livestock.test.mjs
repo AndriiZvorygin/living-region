@@ -9,6 +9,10 @@ import {
   calculateLivestockScenario,
   calculateNutrientFoodSystem,
   compareNutrientFoodSystems,
+  calculateLivestockReproductiveLedger,
+  CHICKEN_SYSTEM_COMPARISON,
+  LIVESTOCK_SPECIES,
+  calculateFoodNutrientAdequacy,
   derivePropertyFeedSupply,
   calculateFoodSystem,
   siteClasses,
@@ -60,6 +64,14 @@ test('canonical on-site feed ledgers distinguish edible feed and convert shortag
   assert.ok(ledger.human_inedible_feed_dm_kg_year > 0);
   assert.ok(ledger.winter_stored_feed_available_kg_year >= ledger.winter_stored_feed_required_kg_year);
   assert.equal(propertyFeed.double_counting_rule.includes('not assigned twice'), true);
+});
+
+test('livestock conversion reports human-edible and human-inedible feed separately', () => {
+  const propertyFeed = derivePropertyFeedSupply({foodSystem: {required_food_area_ha: 1}});
+  const rabbit = calculateLivestockScenario({speciesId: 'rabbit_meat', rationId: 'arc_integrated', propertyFeedSupply: propertyFeed});
+  assert.equal(rabbit.feed.human_edible_feed_dm_kg_year + rabbit.feed.human_inedible_feed_dm_kg_year, rabbit.feed.dry_matter_requirement_kg_year);
+  assert.ok(rabbit.feed.human_inedible_feed_dm_kg_year > 0);
+  assert.ok(rabbit.human_edible_protein_conversion_efficiency == null || rabbit.human_edible_protein_conversion_efficiency >= 0);
 });
 
 test('external-feed sensitivities remain separate and are not ARC-feasible', () => {
@@ -120,6 +132,57 @@ test('the nutrient optimizer excludes every external-feed sensitivity', () => {
   assert.equal(comparison.best?.mode, 'plants_only');
   assert.equal(comparison.best?.ration_id, 'arc_integrated');
   assert.ok(comparison.rows.filter((row) => row.ration_id !== 'arc_integrated').every((row) => !row.optimizer_eligible));
+});
+
+test('canonical chicken is a self-replacing dual-purpose flock with no recurring bird imports', () => {
+  const ledger = calculateLivestockReproductiveLedger({speciesId: 'chicken_eggs'});
+  assert.equal(ledger.self_replacing, true);
+  assert.equal(ledger.external_replacement_chicks_year, 0);
+  assert.equal(ledger.external_replacement_pullets_year, 0);
+  assert.ok(ledger.gross_eggs_year > ledger.edible_eggs_year);
+  assert.ok(ledger.surplus_males_year > 0);
+  const result = calculateLivestockScenario({speciesId: 'chicken_eggs', rationId: 'arc_integrated', propertyFeedSupply: derivePropertyFeedSupply({foodSystem: {required_food_area_ha: 1}})});
+  assert.equal(result.reproduction.feed_all_generations_included, true);
+  assert.ok(result.output.edible_meat_kg_year > 0);
+  assert.equal(result.feed.purchased_dry_matter_kg_year, 0);
+  assert.deepEqual(LIVESTOCK_SPECIES.chicken_eggs.reproduction.reproduction_modes, ['broody_hen', 'local_incubator']);
+  assert.equal(CHICKEN_SYSTEM_COMPARISON.canonical.breeding.includes('no recurring'), true);
+  assert.equal(CHICKEN_SYSTEM_COMPARISON.industrial_sensitivity.evidence_status, 'non-canonical comparison boundary');
+});
+
+test('canonical livestock reproduction ledgers reject recurring animal imports', () => {
+  for (const speciesId of ['rabbit_meat', 'chicken_eggs', 'goose_meat', 'goat_meat']) {
+    const ledger = calculateLivestockReproductiveLedger({speciesId});
+    assert.equal(ledger.self_replacing, true, speciesId);
+    assert.equal(ledger.feed_all_generations_included, true, speciesId);
+    assert.equal(ledger.external_replacement_animals_year ?? ledger.external_replacement_chicks_year ?? 0, 0, speciesId);
+  }
+});
+
+test('fast-growing chicken sensitivity is not canonical without self-replacement', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site(), livestockMode: 'chicken_meat'});
+  assert.equal(result.reproductive_self_sufficiency, false);
+  assert.equal(result.optimizer_eligible, false);
+});
+
+test('nutrient completeness reports amino-acid pattern and external nutrient boundary', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand([member()]).household_protein_kg_year, members: [member()], siteCapability: site()});
+  assert.ok(result.nutrient_completeness.amino_acid_pattern.limiting_amino_acid);
+  assert.ok(result.nutrient_completeness.amino_acid_pattern.rows.lysine.adequacy_ratio > 0);
+  assert.ok(result.nutrient_completeness.external_inputs.some((row) => row.nutrient === 'iodine'));
+  assert.equal(result.feed.purchased_feed_dm_kg_year, 0);
+});
+
+test('chicken adds food-form B12 while plants-only leaves it unresolved', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
+  const plants = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site()});
+  const chickens = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site(), livestockMode: 'chicken_eggs'});
+  assert.notEqual(plants.nutrient_completeness.nutrients.b12.status, 'adequate from property food');
+  assert.equal(chickens.nutrient_completeness.nutrients.b12.status, 'adequate from property food');
 });
 
 test('plants-only remains valid and integrated establishment uses species production start years', () => {
