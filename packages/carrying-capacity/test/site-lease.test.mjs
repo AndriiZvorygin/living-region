@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ADMINISTRATION_SCENARIOS, buildArcDwellingPresentationContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcCommonAreaGeometry, calculateArcDwellingCost, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
+import {ADMINISTRATION_SCENARIOS, ARC_ADULT_SCALE_SCENARIOS, ARC_FAMILY_CAPACITY_STANDARD, DEFAULT_ARC_LAND_MARKET_DATA, buildArcAdultScaleScenarios, buildArcDwellingPresentationContract, buildLandMarketContract, buildSiteLeasePresentationContract, calculateAdministrationBudget, calculateArcCommonAreaGeometry, calculateArcDwellingCost, calculateArcSiteLeaseEconomics, calculateCommonPropertyAreaAccounting, calculateCommonPropertyOperations, DEFAULT_SITE_LEASE_SCENARIO, estimateLandPriceForParcel, INFRASTRUCTURE_SCENARIOS} from '../src/index.mjs';
 
 function scenario(overrides = {}) {
   return {
@@ -447,4 +447,58 @@ test('common property can move from pooled planning hectares to explicit site-pl
   const result = calculateArcSiteLeaseEconomics(scenario({community: {common_area_ha: 0, common_area_accounting: {components}}}));
   assert.equal(result.scenario.common_area_ha, 1.5);
   assert.equal(result.physical_inputs.common_area_accounting.mode, 'spatial_or_layout_derived');
+});
+
+test('adult settlement scale is distinct from resulting household and dwelling count', () => {
+  const rows = buildArcAdultScaleScenarios();
+  assert.deepEqual(rows.map((row) => row.adult_residents), ARC_ADULT_SCALE_SCENARIOS);
+  assert.deepEqual(rows.map((row) => row.households), [1, 2, 6, 8, 10, 14, 20, 28]);
+  assert.deepEqual(rows.map((row) => row.dependent_children_capacity), [0, 6, 18, 24, 30, 42, 60, 84]);
+  assert.ok(rows.every((row) => row.dwellings === row.households));
+});
+
+test('family-capacity planning standard is two adults plus three dependent children', () => {
+  assert.equal(ARC_FAMILY_CAPACITY_STANDARD.household_profile_id, 'two_adults_plus_three_children');
+  const result = calculateArcSiteLeaseEconomics(scenario({household: {members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']}}));
+  assert.equal(result.households[0].members.length, 5);
+  assert.equal(result.households[0].members.filter((member) => member.age_y >= 19).length, 2);
+  assert.equal(result.households[0].members.filter((member) => member.age_y < 19).length, 3);
+});
+
+test('adult scale preserves the geometry-derived common area and excludes productive edge vegetation', () => {
+  const rows = buildArcAdultScaleScenarios();
+  assert.ok(rows.every((row) => row.common_area_geometry_mode === 'geometry_derived'));
+  assert.ok(rows.every((row) => row.common_hectares === .09994));
+  assert.equal(DEFAULT_ARC_LAND_MARKET_DATA.planning_curve_status, 'working_planning_sensitivity_not_market_evidence');
+});
+
+test('parcel-size land pricing selects a measured band and excludes improved farm observations', () => {
+  const data = {
+    ...structuredClone(DEFAULT_ARC_LAND_MARKET_DATA),
+    observations: [
+      {observation_id: 'small-bare', observation_date: '2025-01-01', municipality: 'Grey County', total_parcel_area_ha: 1, price_cad_per_ha: 100000, value_basis: 'bare_land', improvement_adjustment_status: 'bare_land', property_type: 'vacant_land'},
+      {observation_id: 'large-bare', observation_date: '2025-01-01', municipality: 'Grey County', total_parcel_area_ha: 12, price_cad_per_ha: 30000, value_basis: 'bare_land', improvement_adjustment_status: 'bare_land', property_type: 'vacant_land'},
+      {observation_id: 'improved-farm', observation_date: '2025-01-01', municipality: 'Grey County', total_parcel_area_ha: 12, price_cad_per_ha: 90000, value_basis: 'farm_with_improvements', improvement_adjustment_status: 'improvements_not_removed', property_type: 'farm_with_residence'}
+    ]
+  };
+  const contract = buildLandMarketContract(data);
+  assert.equal(contract.parcel_size_bands.find((band) => band.id === 'under_2_ha').sample_count, 1);
+  assert.equal(contract.parcel_size_bands.find((band) => band.id === '10_to_20_ha').sample_count, 1);
+  assert.equal(estimateLandPriceForParcel({parcelAreaHa: 1, data}).price_cad_per_ha, 100000);
+  assert.equal(estimateLandPriceForParcel({parcelAreaHa: 12, data}).price_cad_per_ha, 30000);
+});
+
+test('tillable-acre survey benchmark is converted to a hectare equivalent without entering parcel bands', () => {
+  const contract = buildLandMarketContract(DEFAULT_ARC_LAND_MARKET_DATA);
+  const benchmark = contract.observations.find((row) => row.observation_id === 'grey-2024-tillable-benchmark');
+  assert.equal(Math.round(benchmark.price_cad_per_ha), 46950);
+  assert.equal(contract.parcel_size_bands.every((band) => band.sample_count === 0), true);
+});
+
+test('adult-scale hectares and economics reconcile from household rows', () => {
+  const row = buildArcAdultScaleScenarios({adultCounts: [12]})[0];
+  assert.equal(row.households, 6);
+  assert.equal(row.total_parcel_hectares, Number((row.productive_hectares + row.common_hectares).toFixed(6)));
+  assert.equal(row.combined_land_infrastructure_monthly_cad_per_household, Number((row.site_lease_monthly_cad_per_household + row.shared_infrastructure_monthly_cad_per_household).toFixed(2)));
+  assert.ok(row.land_price_status.startsWith('working_planning'));
 });

@@ -29,14 +29,14 @@ This household-first report starts with canonical carrying-capacity hectares and
 
 The common-property land holding share is broadly unchanged as household hectares vary because the conceptual lane/loop/amenity common area is shared equally. The productive land portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.
 
-## Community-size sensitivity · 2 adults + 2 children
+## Community-size sensitivity · 2 adults + 3 dependent children family-capacity case
 
 | Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo | Dwelling capital | Illustrative dwelling finance | Dwelling finance + land/shared |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 2 adults + 2 children · ordinary land | 12 | 1.75 ha | $1.64 | $197.04 | $344.51 | $346.15 | $47.96 | $394.11 | $61000.00 | $353.72 / mo | $747.83 / mo |
-| 2 adults + 2 children · ordinary land | 16 | 1.75 ha | $1.23 | $197.04 | $344.51 | $345.74 | $35.97 | $381.71 | $61000.00 | $353.72 / mo | $735.43 / mo |
-| 2 adults + 2 children · ordinary land | 25 | 1.75 ha | $0.79 | $197.04 | $344.51 | $345.29 | $23.02 | $368.31 | $61000.00 | $353.72 / mo | $722.03 / mo |
-| 2 adults + 2 children · ordinary land | 50 | 1.75 ha | $0.39 | $197.04 | $344.51 | $344.90 | $11.51 | $356.41 | $61000.00 | $353.72 / mo | $710.13 / mo |
+| 2 adults + 3 children · ordinary land | 12 | 1.81 ha | $1.64 | $197.04 | $357.57 | $359.22 | $47.96 | $407.18 | $61000.00 | $353.72 / mo | $760.90 / mo |
+| 2 adults + 3 children · ordinary land | 16 | 1.81 ha | $1.23 | $197.04 | $357.57 | $358.81 | $35.97 | $394.78 | $61000.00 | $353.72 / mo | $748.50 / mo |
+| 2 adults + 3 children · ordinary land | 25 | 1.81 ha | $0.79 | $197.04 | $357.57 | $358.36 | $23.02 | $381.38 | $61000.00 | $353.72 / mo | $735.10 / mo |
+| 2 adults + 3 children · ordinary land | 50 | 1.81 ha | $0.39 | $197.04 | $357.57 | $357.97 | $11.51 | $369.48 | $61000.00 | $353.72 / mo | $723.20 / mo |
 
 Community size lowers fixed/common charges and shared infrastructure per household. It does not change the selected household's carrying-capacity hectares or the productive-land rate itself.
 

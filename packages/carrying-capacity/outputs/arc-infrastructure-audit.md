@@ -32,9 +32,9 @@ The monthly allocation includes that component’s debt service, operating cost,
 
 | Component | Capital basis | Financing term | Annual operating/recovery | Annual maintenance | Replacement reserve | Monthly household allocation | Layer | Source / status |
 |---|---:|---|---:|---:|---:|---:|---|---|
-| Common land acquisition/debt recovery | $0 | 6.0% / 5 y term / 30 y amortization | $0 | $0 | $0 | $0.00 | common-property land holding share | common property is recovered equally |
-| Productive land acquisition/debt recovery | $734328 | 6.0% / 5 y term / 30 y amortization | $42266 | $0 | $0 | $293.51 | productive land charge | productive land follows calculated hectares |
-| Common and productive property tax | $734328 | none | $7343 | $0 | $0 | $51.00 | common share + productive land charge | planning assumption; parcel assessment required |
+| Common land acquisition/debt recovery | $3498 | 6.0% / 5 y term / 30 y amortization | $201 | $0 | $0 | $1.40 | common-property land holding share | common property is recovered equally |
+| Productive land acquisition/debt recovery | $762184 | 6.0% / 5 y term / 30 y amortization | $43869 | $0 | $0 | $304.65 | productive land charge | productive land follows calculated hectares |
+| Common and productive property tax | $765682 | none | $7657 | $0 | $0 | $53.17 | common share + productive land charge | planning assumption; parcel assessment required |
 | Land insurance | $0 | none | $0 | $0 | $0 | $0.00 | common-property land holding share | site-lease layer; separate from infrastructure service |
 | Common land costs | $0 | none | $0 | $0 | $0 | $0.00 | common-property land holding share | common-property operating cost |
 | Land-holding administration | $0 | none | $0 | $0 | $0 | $0.00 | common-property land holding share | charged once in land layer |
@@ -61,11 +61,11 @@ The legacy administration configuration is the material identified overlap risk.
 
 | Scenario | Capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
 |---|---:|---:|---:|---:|---:|---:|
-| Legal minimum / resident-maintained | $120000 | $0 | $0 | $47.96 | $344.51 | $392.47 |
-| Legacy current shared-services baseline | $1055000 | $75000 | $10550 | $1162.31 | $344.51 | $1506.82 |
-| Minimal compliant ARC | $140000 | $22000 | $700 | $228.18 | $344.51 | $572.69 |
-| Shared-services ARC | $1005000 | $65000 | $5025 | $1027.57 | $344.51 | $1372.08 |
-| Amenity-rich ARC | $1275000 | $72000 | $12750 | $1275.24 | $344.51 | $1619.75 |
+| Legal minimum / resident-maintained | $120000 | $0 | $0 | $47.96 | $359.22 | $407.18 |
+| Legacy current shared-services baseline | $1055000 | $75000 | $10550 | $1162.31 | $359.22 | $1521.53 |
+| Minimal compliant ARC | $140000 | $22000 | $700 | $228.18 | $359.22 | $587.40 |
+| Shared-services ARC | $1005000 | $65000 | $5025 | $1027.57 | $359.22 | $1386.79 |
+| Amenity-rich ARC | $1275000 | $72000 | $12750 | $1275.24 | $359.22 | $1634.46 |
 
 - **Legal minimum ARC** is the recommended affordability default. It includes only the basic access capital debt placeholder in recurring shared cash; road/snow/waste labour and future replacement are shown separately. Water, wastewater and electricity remain distributed/site-specific alternatives unless legal and engineering review supports a shared system.
 - **Minimal compliant ARC** is an optional resilience/compliance comparison that adds paid maintenance, early reserves and insurance assumptions.
@@ -76,46 +76,46 @@ The legacy administration configuration is the material identified overlap risk.
 
 | Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
 |---:|---:|---:|---:|---:|---:|---:|
-| 12 | $1055000 | $75000 | $10550 | $1162.31 | $344.51 | $1506.82 |
-| 16 | $1055000 | $75000 | $10550 | $871.73 | $344.51 | $1216.24 |
-| 25 | $1055000 | $75000 | $10550 | $557.91 | $344.51 | $902.42 |
-| 50 | $1055000 | $75000 | $10550 | $278.95 | $344.51 | $623.46 |
+| 12 | $1055000 | $75000 | $10550 | $1162.31 | $359.22 | $1521.53 |
+| 16 | $1055000 | $75000 | $10550 | $871.73 | $358.81 | $1230.54 |
+| 25 | $1055000 | $75000 | $10550 | $557.91 | $358.36 | $916.27 |
+| 50 | $1055000 | $75000 | $10550 | $278.95 | $357.97 | $636.92 |
 
 ### Legal minimum / resident-maintained
 
 | Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
 |---:|---:|---:|---:|---:|---:|---:|
-| 12 | $120000 | $0 | $0 | $47.96 | $344.51 | $392.47 |
-| 16 | $120000 | $0 | $0 | $35.97 | $344.51 | $380.48 |
-| 25 | $120000 | $0 | $0 | $23.02 | $344.51 | $367.53 |
-| 50 | $120000 | $0 | $0 | $11.51 | $344.51 | $356.02 |
+| 12 | $120000 | $0 | $0 | $47.96 | $359.22 | $407.18 |
+| 16 | $120000 | $0 | $0 | $35.97 | $358.81 | $394.78 |
+| 25 | $120000 | $0 | $0 | $23.02 | $358.36 | $381.38 |
+| 50 | $120000 | $0 | $0 | $11.51 | $357.97 | $369.48 |
 
 ### Minimal compliant ARC
 
 | Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
 |---:|---:|---:|---:|---:|---:|---:|
-| 12 | $140000 | $22000 | $700 | $228.18 | $344.51 | $572.69 |
-| 16 | $140000 | $22000 | $700 | $171.14 | $344.51 | $515.65 |
-| 25 | $140000 | $22000 | $700 | $109.53 | $344.51 | $454.04 |
-| 50 | $140000 | $22000 | $700 | $54.76 | $344.51 | $399.27 |
+| 12 | $140000 | $22000 | $700 | $228.18 | $359.22 | $587.40 |
+| 16 | $140000 | $22000 | $700 | $171.14 | $358.81 | $529.95 |
+| 25 | $140000 | $22000 | $700 | $109.53 | $358.36 | $467.89 |
+| 50 | $140000 | $22000 | $700 | $54.76 | $357.97 | $412.73 |
 
 ### Shared-services ARC
 
 | Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
 |---:|---:|---:|---:|---:|---:|---:|
-| 12 | $1005000 | $65000 | $5025 | $1027.57 | $344.51 | $1372.08 |
-| 16 | $1005000 | $65000 | $5025 | $770.67 | $344.51 | $1115.18 |
-| 25 | $1005000 | $65000 | $5025 | $493.23 | $344.51 | $837.74 |
-| 50 | $1005000 | $65000 | $5025 | $246.62 | $344.51 | $591.13 |
+| 12 | $1005000 | $65000 | $5025 | $1027.57 | $359.22 | $1386.79 |
+| 16 | $1005000 | $65000 | $5025 | $770.67 | $358.81 | $1129.48 |
+| 25 | $1005000 | $65000 | $5025 | $493.23 | $358.36 | $851.59 |
+| 50 | $1005000 | $65000 | $5025 | $246.62 | $357.97 | $604.59 |
 
 ### Amenity-rich ARC
 
 | Households | Infrastructure capital | Annual operating | Annual reserve | Shared services / household / month | Site lease / month | Land + infrastructure / household / month |
 |---:|---:|---:|---:|---:|---:|---:|
-| 12 | $1275000 | $72000 | $12750 | $1275.24 | $344.51 | $1619.75 |
-| 16 | $1275000 | $72000 | $12750 | $956.43 | $344.51 | $1300.94 |
-| 25 | $1275000 | $72000 | $12750 | $612.12 | $344.51 | $956.63 |
-| 50 | $1275000 | $72000 | $12750 | $306.06 | $344.51 | $650.57 |
+| 12 | $1275000 | $72000 | $12750 | $1275.24 | $359.22 | $1634.46 |
+| 16 | $1275000 | $72000 | $12750 | $956.43 | $358.81 | $1315.24 |
+| 25 | $1275000 | $72000 | $12750 | $612.12 | $358.36 | $970.48 |
+| 50 | $1275000 | $72000 | $12750 | $306.06 | $357.97 | $664.03 |
 
 ## Replacement reserve sensitivity
 

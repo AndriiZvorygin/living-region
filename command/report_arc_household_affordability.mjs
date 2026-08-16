@@ -79,13 +79,13 @@ for (const householdCase of householdCases) {
   rows.push(rowFor(householdCase, result));
 }
 for (const householdCount of sizes) {
-  const householdCase = householdCases.find((row) => row.id === 'family_two_children');
+  const householdCase = householdCases.find((row) => row.id === 'family_three_children');
   const result = calculateArcSiteLeaseEconomics({scenario: makeScenario({household: householdCase, householdCount})});
   rows.push(rowFor({...householdCase, id: `${householdCase.id}_${householdCount}`}, result));
 }
 const sensitivity = [];
 for (const householdCount of sizes) for (const price of prices) for (const mode of ownerships) {
-  const householdCase = householdCases.find((row) => row.id === 'family_two_children');
+  const householdCase = householdCases.find((row) => row.id === 'family_three_children');
   const result = calculateArcSiteLeaseEconomics({scenario: makeScenario({household: householdCase, householdCount, price, ownership: mode.ownership, recoveryMode: mode.recovery_mode})});
   sensitivity.push(rowFor({...householdCase, id: `${householdCase.id}_${householdCount}_${price}_${mode.id}`}, result, {price, ownership: mode.id}));
 }
@@ -114,12 +114,12 @@ fs.writeFileSync(path.join(outputDir, 'arc-household-affordability.json'), JSON.
   biology_source: 'calculateArcSiteLeaseEconomics carrying-capacity outputs',
   household_comparison: rows,
   decomposition_example: decomposition,
-  community_size_sensitivity: rows.filter((row) => row.id.startsWith('family_two_children_') && sizes.some((size) => row.id.endsWith(`_${size}`))),
+  community_size_sensitivity: rows.filter((row) => row.id.startsWith('family_three_children_') && sizes.some((size) => row.id.endsWith(`_${size}`))),
   land_price_ownership_sensitivity: sensitivity
 }, null, 2) + '\n');
 
 const baseRows = rows.filter((row) => householdCases.some((item) => item.id === row.id));
-const sizeRows = rows.filter((row) => row.id.startsWith('family_two_children_'));
+const sizeRows = rows.filter((row) => row.id.startsWith('family_three_children_'));
 const table = (items) => items.map((row) => `| ${row.scenario} | ${row.households_in_project} | ${row.establishment_allocation_ha.toFixed(2)} ha | $${money(row.common_property_land_holding_share_monthly_cad)} | $${money(row.productive_land_charge_per_hectare_monthly_cad)} | $${money(row.productive_land_portion_monthly_cad)} | $${money(row.site_lease_monthly_cad)} | $${money(row.shared_infrastructure_monthly_cad)} | $${money(row.combined_land_infrastructure_monthly_cad)} | $${money(row.completed_dwelling_capital_cad)} | $${money(row.illustrative_dwelling_financing_monthly_cad)} / mo | $${money(row.illustrative_dwelling_plus_land_shared_monthly_cad)} / mo |`).join('\n');
 const markdown = [
   '# ARC household affordability and land lease',
@@ -148,7 +148,7 @@ const markdown = [
   '',
   'The common-property land holding share is broadly unchanged as household hectares vary because the conceptual lane/loop/amenity common area is shared equally. The productive land portion rises with the calculated establishment allocation. Children contribute to pooled dependent food demand while growing up, but do not automatically create a permanent child-specific perennial allocation.',
   '',
-  '## Community-size sensitivity · 2 adults + 2 children',
+  '## Community-size sensitivity · 2 adults + 3 dependent children family-capacity case',
   '',
   '| Household | Community | Reserved hectares | Common-property share | Productive land/ha/mo | Productive portion | Site lease | Shared infrastructure | Land + infrastructure/mo | Dwelling capital | Illustrative dwelling finance | Dwelling finance + land/shared |',
   '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',

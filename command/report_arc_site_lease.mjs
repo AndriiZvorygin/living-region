@@ -25,8 +25,8 @@ const scenario = ({id, label, siteId = 'ordinary_mesic', members, householdCount
 const definitions = [
   scenario({id: 'one_adult_ordinary_12', label: '1 adult · ordinary land · 12 households', members: ['reference_adult_man']}),
   scenario({id: 'one_adult_marginal_12', label: '1 adult · marginal land · 12 households', siteId: 'shallow_rocky_marginal', members: ['reference_adult_man']}),
-  scenario({id: 'family_ordinary_12', label: '2 adults + 2 children · ordinary land · 12 households', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}),
-  ...[16, 25].map((householdCount) => scenario({id: `family_ordinary_${householdCount}`, label: `2 adults + 2 children · ordinary land · ${householdCount} households`, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], householdCount}))
+  scenario({id: 'family_ordinary_12', label: '2 adults + 3 dependent children · ordinary land · 12 households', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']}),
+  ...[16, 25].map((householdCount) => scenario({id: `family_ordinary_${householdCount}`, label: `2 adults + 3 dependent children · ordinary land · ${householdCount} households`, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8'], householdCount}))
 ];
 
 const results = definitions.map(({id, label, scenario: input}) => ({id, label, result: calculateArcSiteLeaseEconomics({scenario: input})}));
@@ -104,9 +104,9 @@ const markdown = [
   '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
 ...[ordinaryAdult, marginalAdult, family].map(({label, result}) => { const row = compactRows.find((candidate) => candidate.scenario === label); return `| ${label} | ${ha(row.productive_land_ha)} | ${ha(row.mature_land_ha)} | ${ha(row.property_area_ha)} | ${money(row.land_value_cad)} | ${money(row.site_lease_month_cad)} | ${money(row.shared_service_month_cad)} | ${money(row.land_infrastructure_month_cad)} | ${money(row.completed_dwelling_capital_cad)} | ${money(row.illustrative_dwelling_financing_month_cad)} | ${money(row.illustrative_dwelling_plus_land_shared_month_cad)} |`; }),
   '',
-  `For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').land_infrastructure_month_cad)}/month** and the 2-adult + 2-child case is **${money(compactRows.find((row) => row.id === 'family_ordinary_12').land_infrastructure_month_cad)}/month**. The componentized resident-owned dwelling central case is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').completed_dwelling_capital_cad)}** with an illustrative financing payment of **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').illustrative_dwelling_financing_month_cad)}/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.`,
+  `For the central 12-household ordinary-land case, the one-adult land + infrastructure charge is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').land_infrastructure_month_cad)}/month** and the 2-adult + 3-dependent-child family-capacity case is **${money(compactRows.find((row) => row.id === 'family_ordinary_12').land_infrastructure_month_cad)}/month**. The componentized resident-owned dwelling central case is **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').completed_dwelling_capital_cad)}** with an illustrative financing payment of **${money(compactRows.find((row) => row.id === 'one_adult_ordinary_12').illustrative_dwelling_financing_month_cad)}/month**; children change the canonical reserved land requirement without creating a separate child-specific perennial allocation.`,
   '',
-  '## Community scale: 2 adults + 2 children per household',
+  '## Community scale: 2 adults + 3 dependent children per household',
   '',
   '| Households | Productive site area | Total property | Land value | Site lease/mo | Shared services/mo | Land + infrastructure/mo |',
   '|---:|---:|---:|---:|---:|---:|---:|',

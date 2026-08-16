@@ -60,13 +60,13 @@ Future replacement liability is shown separately as $120000 for the modeled acce
 | Household | Reserved establishment land | Mature land | Site lease/month | Shared infrastructure/month | Land + infrastructure/month | Dwelling capital | Dwelling finance/month | Dwelling finance + land/shared | Labour | Future replacement liability |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | One adult | 1.12 ha | 1.05 ha | $221.91 | $47.96 | $269.87 | $61000.00 | $353.72 | $623.59 | 388 h/year | $120000 |
-| 2 adults + 2 dependent children | 1.75 ha | 1.52 ha | $346.15 | $47.96 | $394.11 | $61000.00 | $353.72 | $747.83 | 388 h/year | $120000 |
+| 2 adults + 3 dependent children family-capacity case | 1.81 ha | 1.52 ha | $359.22 | $47.96 | $407.18 | $61000.00 | $353.72 | $760.90 | 388 h/year | $120000 |
 
 These are legal-minimum land/infrastructure cash figures under the current illustrative land-financing case and the conceptual 0.100 ha common-area prototype (300 m² laneway corridor + 449 m² terminal circulation + 250 m² central common envelope). The ARC dwelling package places household water, sanitation/greywater, hot water and electrical systems in resident dwelling capital once. A real site may require a different approved system or a centralized project service; that alternative must replace, not stack on top of, the corresponding package component.
 
 ## Owen Sound affordability comparison
 
-The repository does not currently contain a Grey County/Owen Sound household income, rent distribution or approved affordability-band contract. The only loaded affordability-adjacent input is the Ontario general minimum wage of CAD 17.60/hour for 2025-10-01 to 2026-09-30. At 40 hours/week and 52 weeks/year, that is a gross proxy of $3050.67/month. The one-adult legal-minimum land-plus-infrastructure charge is $269.87 (8.8% of that gross proxy); the family case is $394.11 (12.9%). This comparison is a provincial wage proxy, not a local affordability band, and excludes the private dwelling and all household expenses.
+The repository does not currently contain a Grey County/Owen Sound household income, rent distribution or approved affordability-band contract. The only loaded affordability-adjacent input is the Ontario general minimum wage of CAD 17.60/hour for 2025-10-01 to 2026-09-30. At 40 hours/week and 52 weeks/year, that is a gross proxy of $3050.67/month. The one-adult legal-minimum land-plus-infrastructure charge is $269.87 (8.8% of that gross proxy); the family case is $407.18 (13.3%). This comparison is a provincial wage proxy, not a local affordability band, and excludes the private dwelling and all household expenses.
 
 A defensible local affordability comparison still requires Owen Sound/Grey household income distribution, household composition, rent/shelter-cost bands, tax treatment and the actual dwelling arrangement. The legal-minimum result should not be called affordable or unaffordable until those inputs are loaded.
 
@@ -74,9 +74,9 @@ A defensible local affordability comparison still requires Owen Sound/Grey house
 
 | Land ownership | Adult site lease | Adult infrastructure | Adult combined | Family site lease | Family infrastructure | Family combined |
 |---|---:|---:|---:|---:|---:|---:|
-| financed | $221.91 | $47.96 | $269.87 | $346.15 | $47.96 | $394.11 |
-| owned_out_right | $32.85 | $47.96 | $80.81 | $51.24 | $47.96 | $99.20 |
-| land_trust | $32.85 | $47.96 | $80.81 | $51.24 | $47.96 | $99.20 |
+| financed | $221.91 | $47.96 | $269.87 | $359.22 | $47.96 | $407.18 |
+| owned_out_right | $32.85 | $47.96 | $80.81 | $53.17 | $47.96 | $101.13 |
+| land_trust | $32.85 | $47.96 | $80.81 | $53.17 | $47.96 | $101.13 |
 
 Owned-outright and land-trust cases remove land acquisition debt service but retain the modeled property-tax obligation. The model does not charge a return on donated land equity.
 
@@ -88,10 +88,10 @@ Owned-outright and land-trust cases remove land acquisition debt service but ret
 | one_adult | 16 | 17.89 ha | $221.50 | $35.97 | $257.47 | 388 h/year | $120000 |
 | one_adult | 25 | 27.95 ha | $221.05 | $23.02 | $244.07 | 388 h/year | $120000 |
 | one_adult | 50 | 55.89 ha | $220.66 | $11.51 | $232.17 | 388 h/year | $120000 |
-| family | 12 | 20.98 ha | $346.15 | $47.96 | $394.11 | 388 h/year | $120000 |
-| family | 16 | 27.97 ha | $345.74 | $35.97 | $381.71 | 388 h/year | $120000 |
-| family | 25 | 43.71 ha | $345.29 | $23.02 | $368.31 | 388 h/year | $120000 |
-| family | 50 | 87.42 ha | $344.90 | $11.51 | $356.41 | 388 h/year | $120000 |
+| family | 12 | 21.78 ha | $359.22 | $47.96 | $407.18 | 388 h/year | $120000 |
+| family | 16 | 29.04 ha | $358.81 | $35.97 | $394.78 | 388 h/year | $120000 |
+| family | 25 | 45.37 ha | $358.36 | $23.02 | $381.38 | 388 h/year | $120000 |
+| family | 50 | 90.74 ha | $357.97 | $11.51 | $369.48 | 388 h/year | $120000 |
 
 The access capital is fixed in this scenario, so its cash allocation declines with household count. Productive hectares and productive land charges remain household-dependent. The common-area prototype also varies with entrance-laneway length; productive edge vegetation remains in adjoining household leases rather than being added to common property.
 

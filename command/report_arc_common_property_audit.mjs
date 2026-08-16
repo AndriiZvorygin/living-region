@@ -67,7 +67,7 @@ const scaleRows = sizes.map((householdCount) => {
 });
 
 const ordinary = calculateArcSiteLeaseEconomics({scenario: makeScenario(12)}).households[0];
-const family = calculateArcSiteLeaseEconomics({scenario: {...makeScenario(12, ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']), household: {...makeScenario(12).household, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}}}).households[0];
+const family = calculateArcSiteLeaseEconomics({scenario: {...makeScenario(12, ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']), household: {...makeScenario(12).household, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']}}}).households[0];
 const lineItems = operationBudget.components;
 const json = {
   contract_version: ARC_SITE_LEASE_CONTRACT_VERSION,

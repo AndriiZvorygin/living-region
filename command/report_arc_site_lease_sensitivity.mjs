@@ -18,7 +18,7 @@ for (const householdCount of sizes) {
       const base = clone(DEFAULT_SITE_LEASE_SCENARIO);
       const result = calculateArcSiteLeaseEconomics({scenario: {
         ...base,
-        household: {id: 'family', label: '2 adults + 2 children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], buildings: base.household.buildings},
+        household: {id: 'family', label: '2 adults + 3 dependent children family-capacity case', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8'], buildings: base.household.buildings},
         community: {...base.community, household_count: householdCount, project_id: `family-${householdCount}`},
         land: {...base.land, price_cad_per_ha: price, ownership: mode.ownership, recovery_mode: mode.recovery_mode}
       }});
@@ -31,7 +31,7 @@ const financingRows = Object.values(LAND_FINANCING_SCENARIOS).map((financingScen
   const base = clone(DEFAULT_SITE_LEASE_SCENARIO);
   const result = calculateArcSiteLeaseEconomics({scenario: {
     ...base,
-    household: {...base.household, household_id: `financing-${financingScenario.id}`, label: '2 adults + 2 children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']},
+    household: {...base.household, household_id: `financing-${financingScenario.id}`, label: '2 adults + 3 dependent children family-capacity case', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']},
     community: {...base.community, household_count: 12},
     land: {...base.land, ...financingScenario, financing_scenario_id: financingScenario.id, ownership: 'financed', recovery_mode: 'debt_service'}
   }});
@@ -63,7 +63,7 @@ const money = (value) => `$${Number(value).toFixed(0)}`;
 const markdown = [
   '# ARC site-lease sensitivity',
   '',
-  'Family case: 2 adults + 2 children on an ordinary site. Prices and infrastructure are scenario inputs; the carrying-capacity hectares are held canonical. The public comparison covers land lease plus shared infrastructure only.',
+  'Family-capacity case: 2 adults + 3 dependent children on an ordinary site. Prices and infrastructure are scenario inputs; the carrying-capacity hectares are held canonical. The public comparison covers land lease plus shared infrastructure only.',
   '',
   '## Land price and ownership',
   '',

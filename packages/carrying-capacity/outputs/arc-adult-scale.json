@@ -1,0 +1,509 @@
+{
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-16T01:14:14.660Z",
+  "scale_basis": "adult_residents",
+  "family_capacity_standard": {
+    "id": "family_capacity_2_adults_3_children",
+    "household_profile_id": "two_adults_plus_three_children",
+    "label": "Family-capacity planning case",
+    "adult_residents": 2,
+    "dependent_children": 3,
+    "description": "A two-adult household designed and land-reserved to support up to three dependent children. This is a capacity stress test, not a demographic forecast."
+  },
+  "rows": [
+    {
+      "adult_residents": 1,
+      "households": 1,
+      "dwellings": 1,
+      "dependent_children_capacity": 0,
+      "household_standard": "single_adult_planning_case",
+      "family_capacity_case": false,
+      "productive_hectares": 1.117863,
+      "mature_productive_hectares": 1.048378,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 1.217803,
+      "establishment_peak_year": 5,
+      "land_market_band_id": "under_2_ha",
+      "land_market_band": "<2 ha",
+      "land_price_cad_per_ha": 60000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        48000,
+        72000
+      ],
+      "estimated_parcel_acquisition_cad": 73068.18,
+      "estimated_parcel_acquisition_range_cad": [
+        58454.54,
+        87681.82
+      ],
+      "land_financing_monthly_cad_per_household": 350.46,
+      "site_lease_monthly_cad_per_household": 411.35,
+      "shared_infrastructure_monthly_cad_per_household": 575.57,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 986.92,
+      "combined_illustrative_monthly_cad_per_household": 1340.64,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "not_applicable"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 4,
+      "households": 2,
+      "dwellings": 2,
+      "dependent_children_capacity": 6,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 3.629448,
+      "mature_productive_hectares": 3.04322,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 3.729388,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "2_to_5_ha",
+      "land_market_band": "2–5 ha",
+      "land_price_cad_per_ha": 50000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        40000,
+        60000
+      ],
+      "estimated_parcel_acquisition_cad": 186469.4,
+      "estimated_parcel_acquisition_range_cad": [
+        149175.52,
+        223763.28
+      ],
+      "land_financing_monthly_cad_per_household": 447.19,
+      "site_lease_monthly_cad_per_household": 524.89,
+      "shared_infrastructure_monthly_cad_per_household": 287.79,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 812.68,
+      "combined_illustrative_monthly_cad_per_household": 1166.4,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 12,
+      "households": 6,
+      "dwellings": 6,
+      "dependent_children_capacity": 18,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 10.888344,
+      "mature_productive_hectares": 9.12966,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 10.988284,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "10_to_20_ha",
+      "land_market_band": "10–20 ha",
+      "land_price_cad_per_ha": 42000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        33600,
+        50400
+      ],
+      "estimated_parcel_acquisition_cad": 461507.93,
+      "estimated_parcel_acquisition_range_cad": [
+        369206.34,
+        553809.51
+      ],
+      "land_financing_monthly_cad_per_household": 368.93,
+      "site_lease_monthly_cad_per_household": 433.03,
+      "shared_infrastructure_monthly_cad_per_household": 95.93,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 528.96,
+      "combined_illustrative_monthly_cad_per_household": 882.68,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 16,
+      "households": 8,
+      "dwellings": 8,
+      "dependent_children_capacity": 24,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 14.517792,
+      "mature_productive_hectares": 12.17288,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 14.617732,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "10_to_20_ha",
+      "land_market_band": "10–20 ha",
+      "land_price_cad_per_ha": 42000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        33600,
+        50400
+      ],
+      "estimated_parcel_acquisition_cad": 613944.74,
+      "estimated_parcel_acquisition_range_cad": [
+        491155.8,
+        736733.69
+      ],
+      "land_financing_monthly_cad_per_household": 368.09,
+      "site_lease_monthly_cad_per_household": 432.04,
+      "shared_infrastructure_monthly_cad_per_household": 71.95,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 503.99,
+      "combined_illustrative_monthly_cad_per_household": 857.71,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 20,
+      "households": 10,
+      "dwellings": 10,
+      "dependent_children_capacity": 30,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 18.14724,
+      "mature_productive_hectares": 15.2161,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 18.24718,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "10_to_20_ha",
+      "land_market_band": "10–20 ha",
+      "land_price_cad_per_ha": 42000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        33600,
+        50400
+      ],
+      "estimated_parcel_acquisition_cad": 766381.56,
+      "estimated_parcel_acquisition_range_cad": [
+        613105.25,
+        919657.87
+      ],
+      "land_financing_monthly_cad_per_household": 367.59,
+      "site_lease_monthly_cad_per_household": 431.45,
+      "shared_infrastructure_monthly_cad_per_household": 57.56,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 489.01,
+      "combined_illustrative_monthly_cad_per_household": 842.73,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 28,
+      "households": 14,
+      "dwellings": 14,
+      "dependent_children_capacity": 42,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 25.406136,
+      "mature_productive_hectares": 21.30254,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 25.506076,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "20_to_40_ha",
+      "land_market_band": "20–40 ha",
+      "land_price_cad_per_ha": 36000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        28800,
+        43200
+      ],
+      "estimated_parcel_acquisition_cad": 918218.74,
+      "estimated_parcel_acquisition_range_cad": [
+        734574.99,
+        1101862.48
+      ],
+      "land_financing_monthly_cad_per_household": 314.58,
+      "site_lease_monthly_cad_per_household": 369.24,
+      "shared_infrastructure_monthly_cad_per_household": 41.11,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 410.35,
+      "combined_illustrative_monthly_cad_per_household": 764.07,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 40,
+      "households": 20,
+      "dwellings": 20,
+      "dependent_children_capacity": 60,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 36.29448,
+      "mature_productive_hectares": 30.4322,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 36.39442,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "20_to_40_ha",
+      "land_market_band": "20–40 ha",
+      "land_price_cad_per_ha": 36000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        28800,
+        43200
+      ],
+      "estimated_parcel_acquisition_cad": 1310199.12,
+      "estimated_parcel_acquisition_range_cad": [
+        1048159.3,
+        1572238.94
+      ],
+      "land_financing_monthly_cad_per_household": 314.21,
+      "site_lease_monthly_cad_per_household": 368.8,
+      "shared_infrastructure_monthly_cad_per_household": 28.78,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 397.58,
+      "combined_illustrative_monthly_cad_per_household": 751.3,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    },
+    {
+      "adult_residents": 56,
+      "households": 28,
+      "dwellings": 28,
+      "dependent_children_capacity": 84,
+      "household_standard": "family_capacity_2_adults_3_children",
+      "family_capacity_case": true,
+      "productive_hectares": 50.812272,
+      "mature_productive_hectares": 42.60508,
+      "common_hectares": 0.09994,
+      "total_parcel_hectares": 50.912212,
+      "establishment_peak_year": 8,
+      "land_market_band_id": "40_plus_ha",
+      "land_market_band": "40+ ha",
+      "land_price_cad_per_ha": 32000,
+      "land_price_status": "working_planning_sensitivity",
+      "land_price_sample_count": 0,
+      "land_price_range_cad_per_ha": [
+        25600,
+        38400
+      ],
+      "estimated_parcel_acquisition_cad": 1629190.78,
+      "estimated_parcel_acquisition_range_cad": [
+        1303352.63,
+        1955028.94
+      ],
+      "land_financing_monthly_cad_per_household": 279.08,
+      "site_lease_monthly_cad_per_household": 327.57,
+      "shared_infrastructure_monthly_cad_per_household": 20.56,
+      "dwelling_financing_monthly_cad_per_household": 353.72,
+      "combined_land_infrastructure_monthly_cad_per_household": 348.13,
+      "combined_illustrative_monthly_cad_per_household": 701.85,
+      "common_area_geometry_mode": "geometry_derived",
+      "evidence": {
+        "land_price": "working_planning_sensitivity",
+        "hectares": "derived_from_canonical_carrying_capacity_and_existing_geometry",
+        "family_capacity": "planning_design_case"
+      },
+      "land_market_contract_version": "1.0.0"
+    }
+  ],
+  "land_market": {
+    "contract_version": "1.0.0",
+    "geography": "Grey County and comparable Ontario agricultural evidence",
+    "observations": [
+      {
+        "observation_id": "grey-2024-tillable-benchmark",
+        "observation_date": "2024-12-31",
+        "source": "ontario_farmland_value_rental_survey_2024",
+        "municipality": "Grey County",
+        "property_identifier": null,
+        "source_url": "https://www.onfarmlandsurvey.com/_files/ugd/25f478_d4037c4c1a514db29440ad1d0cfb5c73.pdf",
+        "price_cad": 19000,
+        "price_basis": "per_tillable_acre",
+        "total_parcel_area_ha": null,
+        "estimated_productive_area_ha": 0,
+        "property_type": "average_quality_cropland_benchmark",
+        "dwelling_included": null,
+        "barns_outbuildings_included": null,
+        "road_frontage_access": null,
+        "servicing": null,
+        "agricultural_designation": null,
+        "site_quality_notes": "Median Grey County average-quality cropland response; 29 responses.",
+        "response_count": 29,
+        "value_basis": "tillable_land_survey",
+        "improvement_adjustment_status": "not_applicable_benchmark_not_parcel_sale",
+        "evidence_status": "survey_benchmark",
+        "price_cad_per_ha": 46950.02
+      }
+    ],
+    "parcel_size_bands": [
+      {
+        "id": "under_2_ha",
+        "label": "<2 ha",
+        "min_ha": 0,
+        "max_ha": 2,
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "property_type_composition": {},
+        "observation_years": []
+      },
+      {
+        "id": "2_to_5_ha",
+        "label": "2–5 ha",
+        "min_ha": 2,
+        "max_ha": 5,
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "property_type_composition": {},
+        "observation_years": []
+      },
+      {
+        "id": "5_to_10_ha",
+        "label": "5–10 ha",
+        "min_ha": 5,
+        "max_ha": 10,
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "property_type_composition": {},
+        "observation_years": []
+      },
+      {
+        "id": "10_to_20_ha",
+        "label": "10–20 ha",
+        "min_ha": 10,
+        "max_ha": 20,
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "property_type_composition": {},
+        "observation_years": []
+      },
+      {
+        "id": "20_to_40_ha",
+        "label": "20–40 ha",
+        "min_ha": 20,
+        "max_ha": 40,
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "property_type_composition": {},
+        "observation_years": []
+      },
+      {
+        "id": "40_plus_ha",
+        "label": "40+ ha",
+        "min_ha": 40,
+        "max_ha": null,
+        "sample_count": 0,
+        "median_price_cad_per_ha": null,
+        "lower_quartile_price_cad_per_ha": null,
+        "upper_quartile_price_cad_per_ha": null,
+        "min_price_cad_per_ha": null,
+        "max_price_cad_per_ha": null,
+        "property_type_composition": {},
+        "observation_years": []
+      }
+    ],
+    "sources": [
+      {
+        "id": "ontario_farmland_value_rental_survey_2024",
+        "institution": "Ontario Farmland Value and Rental Value Survey",
+        "title": "2024 Farmland Value Rental Value Survey",
+        "date": "2024 observations, published 2025",
+        "url": "https://www.onfarmlandsurvey.com/_files/ugd/25f478_d4037c4c1a514db29440ad1d0cfb5c73.pdf",
+        "geography": "Grey County and Ontario counties",
+        "evidence_status": "survey_benchmark",
+        "limitation": "Reports tillable-acre values and response counts, not whole-parcel size-tagged transactions or bare-land sale records."
+      },
+      {
+        "id": "ontario_farmland_value_open_data",
+        "institution": "Ontario Ministry of Agriculture, Food and Agribusiness",
+        "title": "Estimated value and rental rate of farmland by county and township",
+        "date": "1991–2021 dataset; validated 2022, catalog record updated 2025",
+        "url": "https://data.ontario.ca/en/dataset/estimated-value-and-rental-rate-of-farmland-by-county-and-township",
+        "geography": "Ontario counties and townships",
+        "evidence_status": "official_context_dataset",
+        "limitation": "Farm land/building value context is not a parcel-size curve and does not isolate ARC-suitable bare land."
+      },
+      {
+        "id": "fcc_farmland_values_2025",
+        "institution": "Farm Credit Canada",
+        "title": "FCC Farmland Values Report",
+        "date": "2025 values; accessed 2026-08-15",
+        "url": "https://www.fcc-fac.ca/en/knowledge/economics/farmland-values-report",
+        "geography": "Canadian provinces and FCC regions",
+        "evidence_status": "authoritative_comparator",
+        "limitation": "Regional cultivated-land value trends are not Grey County parcel-size observations and detailed historical data require FCC Online Services access."
+      },
+      {
+        "id": "statistics_canada_farm_capital_2021",
+        "institution": "Statistics Canada",
+        "title": "Farm capital, Census of Agriculture, 2021, Table 32-10-0237-01",
+        "date": "2021",
+        "url": "https://www150.statcan.gc.ca/n1/en/catalogue/3210023701",
+        "geography": "Canada, provinces, census divisions and other agricultural geographies",
+        "evidence_status": "official_context_dataset",
+        "limitation": "Value of land and buildings includes improvements and is not a bare-land parcel-price series."
+      }
+    ],
+    "planning_curve": {
+      "under_2_ha": 60000,
+      "2_to_5_ha": 50000,
+      "5_to_10_ha": 46950,
+      "10_to_20_ha": 42000,
+      "20_to_40_ha": 36000,
+      "40_plus_ha": 32000
+    },
+    "planning_curve_status": "working_planning_sensitivity_not_market_evidence",
+    "planning_curve_basis": "The 5–10 ha anchor is the 2024 Grey County survey benchmark converted from CAD 19,000 per tillable acre. Other bands are explicit sensitivity assumptions for testing parcel-size effects until whole-parcel observations are imported.",
+    "local_parcel_curve_status": "unresolved_no_size_tagged_observations",
+    "notes": [
+      "Survey benchmarks per tillable acre are not silently treated as whole-parcel sale prices.",
+      "Farm properties with dwellings or outbuildings require improvement separation before entering the parcel curve.",
+      "The importer accepts manually verified lawful observations; no REALTOR.ca scraping is used."
+    ]
+  }
+}

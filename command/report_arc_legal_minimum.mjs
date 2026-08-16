@@ -67,17 +67,17 @@ function householdRow(result) {
 }
 
 const ordinary = calculate();
-const family = calculate({members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']});
+const family = calculate({members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']});
 const minimumWageHourlyCad = 17.60;
 const fullTimeGrossMonthlyCad = minimumWageHourlyCad * 40 * 52 / 12;
 const ownershipRows = ['financed', 'owned_out_right', 'land_trust'].map((ownership) => ({
   ownership,
   one_adult: householdRow(calculate({ownership})),
-  family: householdRow(calculate({ownership, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']}))
+  family: householdRow(calculate({ownership, members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']}))
 }));
 
 const scaleRows = ['one_adult', 'family'].flatMap((householdType) => sizes.map((householdCount) => {
-  const members = householdType === 'family' ? ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'] : ['reference_adult_man'];
+  const members = householdType === 'family' ? ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8'] : ['reference_adult_man'];
   const result = calculate({members, householdCount});
   const h = result.households[0];
   return {
@@ -117,7 +117,7 @@ const classification = [
 
 const resultSummary = [ordinary, family].map((result) => {
   const row = householdRow(result);
-  return {...row, household_type: result.households[0].household_id === 'household-1-1' && result.households[0].physical_carrying_capacity.household_food_demand_gj_year < 10 ? 'one adult' : '2 adults + 2 dependent children'};
+  return {...row, household_type: result.households[0].household_id === 'household-1-1' && result.households[0].physical_carrying_capacity.household_food_demand_gj_year < 10 ? 'one adult' : '2 adults + 3 dependent children family-capacity case'};
 });
 const ordinaryRow = resultSummary[0];
 const familyRow = resultSummary[1];
@@ -212,7 +212,7 @@ const markdown = [
   '| Household | Reserved establishment land | Mature land | Site lease/month | Shared infrastructure/month | Land + infrastructure/month | Dwelling capital | Dwelling finance/month | Dwelling finance + land/shared | Labour | Future replacement liability |',
   '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
   `| One adult | ${ha(ordinaryRow.establishment_ha)} | ${ha(ordinaryRow.mature_ha)} | ${money(ordinaryRow.site_lease_monthly_cad)} | ${money(ordinaryRow.shared_infrastructure_monthly_cad)} | ${money(ordinaryRow.combined_monthly_cad)} | ${money(ordinaryRow.completed_dwelling_capital_cad)} | ${money(ordinaryRow.dwelling_financing_monthly_cad)} | ${money(ordinaryRow.dwelling_plus_land_shared_monthly_cad)} | ${hours(ordinaryRow.resident_labour_hours_year)} | ${wholeMoney(ordinaryRow.infrastructure_future_replacement_liability_cad)} |`,
-  `| 2 adults + 2 dependent children | ${ha(familyRow.establishment_ha)} | ${ha(familyRow.mature_ha)} | ${money(familyRow.site_lease_monthly_cad)} | ${money(familyRow.shared_infrastructure_monthly_cad)} | ${money(familyRow.combined_monthly_cad)} | ${money(familyRow.completed_dwelling_capital_cad)} | ${money(familyRow.dwelling_financing_monthly_cad)} | ${money(familyRow.dwelling_plus_land_shared_monthly_cad)} | ${hours(familyRow.resident_labour_hours_year)} | ${wholeMoney(familyRow.infrastructure_future_replacement_liability_cad)} |`,
+  `| 2 adults + 3 dependent children family-capacity case | ${ha(familyRow.establishment_ha)} | ${ha(familyRow.mature_ha)} | ${money(familyRow.site_lease_monthly_cad)} | ${money(familyRow.shared_infrastructure_monthly_cad)} | ${money(familyRow.combined_monthly_cad)} | ${money(familyRow.completed_dwelling_capital_cad)} | ${money(familyRow.dwelling_financing_monthly_cad)} | ${money(familyRow.dwelling_plus_land_shared_monthly_cad)} | ${hours(familyRow.resident_labour_hours_year)} | ${wholeMoney(familyRow.infrastructure_future_replacement_liability_cad)} |`,
   '',
   `These are legal-minimum land/infrastructure cash figures under the current illustrative land-financing case and the conceptual ${commonAreaPrototype.common_property_area_ha.toFixed(3)} ha common-area prototype (${commonAreaPrototype.laneway.corridor_area_m2.toFixed(0)} m² laneway corridor + ${commonAreaPrototype.terminal_loop.circulation_lane_area_m2.toFixed(0)} m² terminal circulation + ${commonAreaPrototype.terminal_loop.amenity_envelope_area_m2.toFixed(0)} m² central common envelope). The ARC dwelling package places household water, sanitation/greywater, hot water and electrical systems in resident dwelling capital once. A real site may require a different approved system or a centralized project service; that alternative must replace, not stack on top of, the corresponding package component.`,
   '',

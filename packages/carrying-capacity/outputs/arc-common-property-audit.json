@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.7.0",
-  "generated_at": "2026-08-16T00:34:52.995Z",
+  "contract_version": "1.8.0",
+  "generated_at": "2026-08-16T01:09:23.513Z",
   "scope": "Common-property administration, common-property operations and land-layer evidence audit; private dwelling excluded.",
   "administration_scale": [
     {
@@ -653,9 +653,9 @@
       "combined_land_infrastructure_monthly_cad": 269.87
     },
     "family_ordinary": {
-      "site_lease_monthly_cad": 346.15,
+      "site_lease_monthly_cad": 359.22,
       "shared_infrastructure_monthly_cad": 47.96,
-      "combined_land_infrastructure_monthly_cad": 394.11
+      "combined_land_infrastructure_monthly_cad": 407.18
     }
   }
 }

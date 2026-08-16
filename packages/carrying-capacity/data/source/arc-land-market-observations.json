@@ -1,0 +1,38 @@
+{
+  "contract_version": "1.0.0",
+  "observations": [
+    {
+      "observation_id": "grey-2024-tillable-benchmark",
+      "observation_date": "2024-12-31",
+      "source": "ontario_farmland_value_rental_survey_2024",
+      "municipality": "Grey County",
+      "property_identifier": null,
+      "source_url": "https://www.onfarmlandsurvey.com/_files/ugd/25f478_d4037c4c1a514db29440ad1d0cfb5c73.pdf",
+      "price_cad": 19000,
+      "price_basis": "per_tillable_acre",
+      "total_parcel_area_ha": null,
+      "estimated_productive_area_ha": null,
+      "property_type": "average_quality_cropland_benchmark",
+      "dwelling_included": null,
+      "barns_outbuildings_included": null,
+      "road_frontage_access": null,
+      "servicing": null,
+      "agricultural_designation": null,
+      "site_quality_notes": "Median Grey County average-quality cropland response; 29 responses.",
+      "response_count": 29,
+      "value_basis": "tillable_land_survey",
+      "improvement_adjustment_status": "not_applicable_benchmark_not_parcel_sale",
+      "evidence_status": "survey_benchmark"
+    }
+  ],
+  "planning_curve": {
+    "under_2_ha": 60000,
+    "2_to_5_ha": 50000,
+    "5_to_10_ha": 46950,
+    "10_to_20_ha": 42000,
+    "20_to_40_ha": 36000,
+    "40_plus_ha": 32000
+  },
+  "planning_curve_status": "working_planning_sensitivity_not_market_evidence",
+  "planning_curve_basis": "The 5–10 ha anchor is the 2024 Grey County survey benchmark converted from CAD 19,000 per tillable acre. Other bands are explicit sensitivity assumptions for testing parcel-size effects until whole-parcel observations are imported."
+}

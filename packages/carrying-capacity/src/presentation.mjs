@@ -8,8 +8,9 @@ import {calculatePerennialMixTimeline} from './perennial.mjs';
 import {GROWING_ENVIRONMENT_CONTRACT_VERSION, owenSoundGrowingEnvironment, siteCapabilityDefinitions, selectPerennialMixForSite} from './environment.mjs';
 import {HOUSEHOLD_LAND_ADULT_AGE, HOUSEHOLD_TRANSITION_YEAR_CONVENTION} from './household-demand.mjs';
 import {buildSiteLeasePresentationContract} from './site-lease.mjs';
+import {buildArcAdultScalePresentationContract} from './arc-community-scale.mjs';
 
-export const PRESENTATION_CONTRACT_VERSION = '1.3.0';
+export const PRESENTATION_CONTRACT_VERSION = '1.4.0';
 
 function readJson(filePath, fallback = {}) { return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : fallback; }
 function finite(value, fallback = 0) { return Number.isFinite(Number(value)) ? Number(value) : fallback; }
@@ -62,7 +63,7 @@ export function buildCarryingCapacityPresentationContract({produceDir = 'know/pr
     site_classes: publicSites,
     environment: publicize({contract_version: GROWING_ENVIRONMENT_CONTRACT_VERSION, ...owenSoundGrowingEnvironment, solar: owenSoundGrowingEnvironment.climate.solar}),
     establishment: publicize({starting_condition: 'bare_land_new_planting', years: [1, 2, 3, 5, 8, 10, 15, 'mature'], annual_intercrop_overlap_by_year: {1: .75, 2: .75, 3: .60, 5: .40, 8: .15, 10: .05, 15: 0, mature: 0}, loss_or_reserve_fraction: .30, annual_reserve_fraction: .25, adult_transition_age: HOUSEHOLD_LAND_ADULT_AGE, year_convention: HOUSEHOLD_TRANSITION_YEAR_CONVENTION, pooled_food_rule: 'Annual and perennial food are pooled outputs available to every current household member. Dependent children increase current demand and annual bridge requirements only while they remain under the adult-transition age; they do not receive a child-specific perennial footprint.', arc_policy_comparison: 'ARC allocation is tested after the biological calculation and never constrains the planted perennial footprint or annual bridge.', site_models: Object.fromEntries(Object.keys(publicSiteLabels).map((id) => [id, {site_id: id, curve_anchors: perennialEvidence.curve_anchors.central, perennial_mix: selectPerennialMixForSite(perennialEvidence.mix, id), years: [1, 2, 3, 5, 8, 10, 15, 'mature'], annual_intercrop_overlap_by_year: {1: .75, 2: .75, 3: .60, 5: .40, 8: .15, 10: .05, 15: 0, mature: 0}, loss_or_reserve_fraction: .30, annual_reserve_fraction: .25}]))}),
-    site_lease_economics: buildSiteLeasePresentationContract(),
+    site_lease_economics: {...buildSiteLeasePresentationContract(), adult_scale: buildArcAdultScalePresentationContract()},
     household_profiles: householdProfiles,
     household_presets: presets,
     mature_rows: matureRows,

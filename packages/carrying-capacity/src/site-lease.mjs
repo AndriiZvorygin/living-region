@@ -18,7 +18,7 @@ const round = (value, digits = 2) => Math.round(Number(value) * 10 ** digits) / 
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.7.0';
+export const ARC_SITE_LEASE_CONTRACT_VERSION = '1.8.0';
 export const SITE_LEASE_ALLOCATION_METHODS = {
   proportional_hectares: 'All allocable site-lease pools are proportional to calculated productive hectares.',
   base_plus_hectare: 'Recommended: productive-land value and area-dependent tax follow productive hectares; common-property value and fixed land-holding costs are divided equally.',
@@ -1101,6 +1101,10 @@ export function calculateArcSiteLeaseEconomics(options = {}) {
       site_id: scenario.site_id,
       site_label: siteClasses[scenario.site_id].label,
       household_count: count,
+      adult_residents: scenario.community.adult_residents == null ? null : finite(scenario.community.adult_residents),
+      dependent_children_capacity: scenario.community.dependent_children_capacity == null ? null : finite(scenario.community.dependent_children_capacity),
+      scale_basis: scenario.community.scale_basis ?? null,
+      family_capacity_stress_test: scenario.community.family_capacity_stress_test === true,
       common_area_ha: round(commonArea, 6),
       common_area_accounting: commonAreaAccounting,
       allocation_method: scenario.community.allocation_method,
@@ -1235,7 +1239,7 @@ export function buildSiteLeasePresentationContract() {
     scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 12}, household: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.household), label: 'Reference adult man'}}
   });
   const family = calculateArcSiteLeaseEconomics({
-    scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), household: {household_id: 'family-1', label: '2 adults + 2 children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14'], buildings: [defaultBuilding()]}, community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 12}}
+    scenario: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO), household: {household_id: 'family-1', label: '2 adults + 3 dependent children', members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8'], buildings: [defaultBuilding()]}, community: {...deepClone(DEFAULT_SITE_LEASE_SCENARIO.community), household_count: 12}}
   });
   const infrastructureScenarioMetadata = Object.values(INFRASTRUCTURE_SCENARIOS).map((scenario) => ({
     id: scenario.id,

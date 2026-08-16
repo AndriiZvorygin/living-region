@@ -24,4 +24,8 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(/\bkcal\b/i.test(publicJson), false);
   assert.equal(/\bcalories?\b/i.test(publicJson), false);
   assert.equal(/"(?:wall|roof|floor)_r"\s*:/.test(publicJson), false);
+  assert.deepEqual(contract.site_lease_economics.adult_scale.scenarios.map((row) => row.adult_residents), [1, 4, 12, 16, 20, 28, 40, 56]);
+  assert.equal(contract.site_lease_economics.adult_scale.family_capacity_standard.household_profile_id, 'two_adults_plus_three_children');
+  assert.equal(contract.site_lease_economics.adult_scale.land_market.local_parcel_curve_status, 'unresolved_no_size_tagged_observations');
+  assert.ok(contract.site_lease_economics.adult_scale.land_market.sources.some((source) => source.institution.includes('Ontario Farmland')));
 });

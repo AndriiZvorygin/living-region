@@ -18,8 +18,8 @@ const scenarioFor = (infrastructureScenarioId, householdCount) => ({
   household: {
     ...clone(DEFAULT_SITE_LEASE_SCENARIO.household),
     household_id: `${infrastructureScenarioId}-${householdCount}-family`,
-    label: '2 adults + 2 dependent children',
-    members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14']
+    label: '2 adults + 3 dependent children family-capacity case',
+    members: ['adult_woman', 'adult_man', 'child_girl_8', 'adolescent_boy_14', 'child_boy_8']
   },
   community: {
     ...clone(DEFAULT_SITE_LEASE_SCENARIO.community),

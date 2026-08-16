@@ -1,0 +1,175 @@
+{
+  "generated_at": "2026-08-16T01:14:14.953Z",
+  "contract_version": "1.0.0",
+  "geography": "Grey County and comparable Ontario agricultural evidence",
+  "observations": [
+    {
+      "observation_id": "grey-2024-tillable-benchmark",
+      "observation_date": "2024-12-31",
+      "source": "ontario_farmland_value_rental_survey_2024",
+      "municipality": "Grey County",
+      "property_identifier": null,
+      "source_url": "https://www.onfarmlandsurvey.com/_files/ugd/25f478_d4037c4c1a514db29440ad1d0cfb5c73.pdf",
+      "price_cad": 19000,
+      "price_basis": "per_tillable_acre",
+      "total_parcel_area_ha": null,
+      "estimated_productive_area_ha": 0,
+      "property_type": "average_quality_cropland_benchmark",
+      "dwelling_included": null,
+      "barns_outbuildings_included": null,
+      "road_frontage_access": null,
+      "servicing": null,
+      "agricultural_designation": null,
+      "site_quality_notes": "Median Grey County average-quality cropland response; 29 responses.",
+      "response_count": 29,
+      "value_basis": "tillable_land_survey",
+      "improvement_adjustment_status": "not_applicable_benchmark_not_parcel_sale",
+      "evidence_status": "survey_benchmark",
+      "price_cad_per_ha": 46950.02
+    }
+  ],
+  "parcel_size_bands": [
+    {
+      "id": "under_2_ha",
+      "label": "<2 ha",
+      "min_ha": 0,
+      "max_ha": 2,
+      "sample_count": 0,
+      "median_price_cad_per_ha": null,
+      "lower_quartile_price_cad_per_ha": null,
+      "upper_quartile_price_cad_per_ha": null,
+      "min_price_cad_per_ha": null,
+      "max_price_cad_per_ha": null,
+      "property_type_composition": {},
+      "observation_years": []
+    },
+    {
+      "id": "2_to_5_ha",
+      "label": "2–5 ha",
+      "min_ha": 2,
+      "max_ha": 5,
+      "sample_count": 0,
+      "median_price_cad_per_ha": null,
+      "lower_quartile_price_cad_per_ha": null,
+      "upper_quartile_price_cad_per_ha": null,
+      "min_price_cad_per_ha": null,
+      "max_price_cad_per_ha": null,
+      "property_type_composition": {},
+      "observation_years": []
+    },
+    {
+      "id": "5_to_10_ha",
+      "label": "5–10 ha",
+      "min_ha": 5,
+      "max_ha": 10,
+      "sample_count": 0,
+      "median_price_cad_per_ha": null,
+      "lower_quartile_price_cad_per_ha": null,
+      "upper_quartile_price_cad_per_ha": null,
+      "min_price_cad_per_ha": null,
+      "max_price_cad_per_ha": null,
+      "property_type_composition": {},
+      "observation_years": []
+    },
+    {
+      "id": "10_to_20_ha",
+      "label": "10–20 ha",
+      "min_ha": 10,
+      "max_ha": 20,
+      "sample_count": 0,
+      "median_price_cad_per_ha": null,
+      "lower_quartile_price_cad_per_ha": null,
+      "upper_quartile_price_cad_per_ha": null,
+      "min_price_cad_per_ha": null,
+      "max_price_cad_per_ha": null,
+      "property_type_composition": {},
+      "observation_years": []
+    },
+    {
+      "id": "20_to_40_ha",
+      "label": "20–40 ha",
+      "min_ha": 20,
+      "max_ha": 40,
+      "sample_count": 0,
+      "median_price_cad_per_ha": null,
+      "lower_quartile_price_cad_per_ha": null,
+      "upper_quartile_price_cad_per_ha": null,
+      "min_price_cad_per_ha": null,
+      "max_price_cad_per_ha": null,
+      "property_type_composition": {},
+      "observation_years": []
+    },
+    {
+      "id": "40_plus_ha",
+      "label": "40+ ha",
+      "min_ha": 40,
+      "max_ha": null,
+      "sample_count": 0,
+      "median_price_cad_per_ha": null,
+      "lower_quartile_price_cad_per_ha": null,
+      "upper_quartile_price_cad_per_ha": null,
+      "min_price_cad_per_ha": null,
+      "max_price_cad_per_ha": null,
+      "property_type_composition": {},
+      "observation_years": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "ontario_farmland_value_rental_survey_2024",
+      "institution": "Ontario Farmland Value and Rental Value Survey",
+      "title": "2024 Farmland Value Rental Value Survey",
+      "date": "2024 observations, published 2025",
+      "url": "https://www.onfarmlandsurvey.com/_files/ugd/25f478_d4037c4c1a514db29440ad1d0cfb5c73.pdf",
+      "geography": "Grey County and Ontario counties",
+      "evidence_status": "survey_benchmark",
+      "limitation": "Reports tillable-acre values and response counts, not whole-parcel size-tagged transactions or bare-land sale records."
+    },
+    {
+      "id": "ontario_farmland_value_open_data",
+      "institution": "Ontario Ministry of Agriculture, Food and Agribusiness",
+      "title": "Estimated value and rental rate of farmland by county and township",
+      "date": "1991–2021 dataset; validated 2022, catalog record updated 2025",
+      "url": "https://data.ontario.ca/en/dataset/estimated-value-and-rental-rate-of-farmland-by-county-and-township",
+      "geography": "Ontario counties and townships",
+      "evidence_status": "official_context_dataset",
+      "limitation": "Farm land/building value context is not a parcel-size curve and does not isolate ARC-suitable bare land."
+    },
+    {
+      "id": "fcc_farmland_values_2025",
+      "institution": "Farm Credit Canada",
+      "title": "FCC Farmland Values Report",
+      "date": "2025 values; accessed 2026-08-15",
+      "url": "https://www.fcc-fac.ca/en/knowledge/economics/farmland-values-report",
+      "geography": "Canadian provinces and FCC regions",
+      "evidence_status": "authoritative_comparator",
+      "limitation": "Regional cultivated-land value trends are not Grey County parcel-size observations and detailed historical data require FCC Online Services access."
+    },
+    {
+      "id": "statistics_canada_farm_capital_2021",
+      "institution": "Statistics Canada",
+      "title": "Farm capital, Census of Agriculture, 2021, Table 32-10-0237-01",
+      "date": "2021",
+      "url": "https://www150.statcan.gc.ca/n1/en/catalogue/3210023701",
+      "geography": "Canada, provinces, census divisions and other agricultural geographies",
+      "evidence_status": "official_context_dataset",
+      "limitation": "Value of land and buildings includes improvements and is not a bare-land parcel-price series."
+    }
+  ],
+  "planning_curve": {
+    "under_2_ha": 60000,
+    "2_to_5_ha": 50000,
+    "5_to_10_ha": 46950,
+    "10_to_20_ha": 42000,
+    "20_to_40_ha": 36000,
+    "40_plus_ha": 32000
+  },
+  "planning_curve_status": "working_planning_sensitivity_not_market_evidence",
+  "planning_curve_basis": "The 5–10 ha anchor is the 2024 Grey County survey benchmark converted from CAD 19,000 per tillable acre. Other bands are explicit sensitivity assumptions for testing parcel-size effects until whole-parcel observations are imported.",
+  "local_parcel_curve_status": "unresolved_no_size_tagged_observations",
+  "notes": [
+    "Survey benchmarks per tillable acre are not silently treated as whole-parcel sale prices.",
+    "Farm properties with dwellings or outbuildings require improvement separation before entering the parcel curve.",
+    "The importer accepts manually verified lawful observations; no REALTOR.ca scraping is used."
+  ]
+}
