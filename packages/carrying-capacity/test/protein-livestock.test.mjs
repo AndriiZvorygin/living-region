@@ -7,6 +7,7 @@ import {
   calculateHouseholdProteinDemand,
   calculateFeedLedger,
   calculateLivestockScenario,
+  calculateMinimumSelfReplacingLivestockSystem,
   calculateNutrientFoodSystem,
   compareNutrientFoodSystems,
   calculateLivestockReproductiveLedger,
@@ -181,8 +182,40 @@ test('chicken adds food-form B12 while plants-only leaves it unresolved', () => 
   const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
   const plants = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site()});
   const chickens = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site(), livestockMode: 'chicken_eggs'});
-  assert.notEqual(plants.nutrient_completeness.nutrients.b12.status, 'adequate from property food');
-  assert.equal(chickens.nutrient_completeness.nutrients.b12.status, 'adequate from property food');
+  assert.notEqual(plants.nutrient_completeness.nutrients.b12.status, 'adequate from property-produced food');
+  assert.equal(chickens.nutrient_completeness.nutrients.b12.status, 'adequate from property-produced food');
+});
+
+test('amino-acid quality pattern is separate from absolute household adequacy', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const result = calculateNutrientFoodSystem({foodEvidence, demandGJ: demand, proteinDemandKgYear: calculateHouseholdProteinDemand([member()]).household_protein_kg_year, members: [member()], siteCapability: site()});
+  const lysine = result.nutrient_completeness.amino_acid_pattern.rows.lysine;
+  assert.ok(lysine.quality_pattern_ratio < 1);
+  assert.ok(lysine.absolute_adequacy_ratio > 1);
+  assert.ok(lysine.actual_intake_g_year > lysine.requirement_g_year);
+  assert.equal(lysine.digestibility_status, 'unresolved evidence');
+  assert.equal(lysine.digestibility_adjusted_ratio, null);
+  assert.equal(result.nutrient_completeness.amino_acid_pattern.absolute_adequacy, true);
+});
+
+test('minimum self-replacing rabbit scale is a discrete viable colony', () => {
+  const colony = calculateMinimumSelfReplacingLivestockSystem({speciesId: 'rabbit_meat', propertyFeedSupply: derivePropertyFeedSupply({foodSystem: {required_food_area_ha: 1}})});
+  assert.equal(colony.scale, 1);
+  assert.equal(colony.reproduction.self_replacing, true);
+  assert.equal(colony.reproduction.feed_all_generations_included, true);
+  assert.equal(colony.reproduction.external_replacement_animals_year, 0);
+  assert.ok(colony.output.edible_meat_kg_year > 0);
+});
+
+test('nutritional comparison exposes distinct objectives and Pareto options', () => {
+  const demand = calculateHealthCanadaEER(member()).gj_year;
+  const protein = calculateHouseholdProteinDemand([member()]).household_protein_kg_year;
+  const comparison = compareNutrientFoodSystems({foodEvidence, demandGJ: demand, proteinDemandKgYear: protein, members: [member()], siteCapability: site()});
+  assert.ok(comparison.objectives.lowest_food_feed_area);
+  assert.ok(comparison.objectives.lowest_external_nutrient_dependence);
+  assert.ok(comparison.objectives.maximum_nutritional_completeness);
+  assert.ok(comparison.pareto_efficient_options.some((row) => row.mode === 'plants_only'));
+  assert.ok(comparison.pareto_efficient_options.length >= 2);
 });
 
 test('plants-only remains valid and integrated establishment uses species production start years', () => {

@@ -3,7 +3,7 @@ import {calculateFoodNutrientAdequacy, FOOD_NUTRIENT_PROFILES} from './nutrition
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const LIVESTOCK_CONTRACT_VERSION = '1.3.0';
+export const LIVESTOCK_CONTRACT_VERSION = '1.4.0';
 
 const SOURCE = {
   rabbit: 'https://files.ontario.ca/omafra-starting-farm-in-ontario-pub-61-en-2023-04-21.pdf; https://extension.usu.edu/washington/files/Understanding_the_Basics_of_Rabbit_Care.pdf',
@@ -66,6 +66,16 @@ const species = {
 };
 
 export const LIVESTOCK_SPECIES = species;
+
+// These are discrete minimum viable production units, not fractional nutrient
+// knobs. A smaller scale may be useful for a sensitivity calculation, but it
+// cannot represent a self-replacing ARC population.
+export const MINIMUM_SELF_REPLACING_SYSTEMS = {
+  rabbit_meat: {minimum_scale: 1, label: 'Minimum self-replacing rabbit colony', breeding_does: 4, breeding_bucks: 1},
+  chicken_eggs: {minimum_scale: 1, label: 'Minimum self-replacing dual-purpose chicken flock', breeding_hens: 8, breeding_roosters: 1},
+  goose_meat: {minimum_scale: 1, label: 'Minimum self-replacing goose flock', breeding_females: 3, breeding_males: 1},
+  goat_meat: {minimum_scale: 1, label: 'Minimum self-replacing goat herd', breeding_does: 2, breeding_bucks: .25}
+};
 
 export function calculateLivestockReproductiveLedger({speciesId, scale = 1} = {}) {
   const animal = LIVESTOCK_SPECIES[speciesId];
@@ -243,6 +253,12 @@ export function calculateLivestockScenario({speciesId, rationId = 'arc_integrate
   };
 }
 
+export function calculateMinimumSelfReplacingLivestockSystem({speciesId = 'rabbit_meat', rationId = 'arc_integrated', propertyFeedSupply = {}, siteCapability = {}} = {}) {
+  const definition = MINIMUM_SELF_REPLACING_SYSTEMS[speciesId];
+  if (!definition) throw new Error(`No minimum self-replacing system is defined for ${speciesId}`);
+  return calculateLivestockScenario({speciesId, rationId, scale: definition.minimum_scale, propertyFeedSupply, siteCapability, requireSelfSufficient: true});
+}
+
 export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale = 1, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
   if (!foodEvidence) throw new Error('nutrient food system requires canonical food evidence');
   const {calculateFoodSystem} = siteCapability?.calculateFoodSystem ? siteCapability : {};
@@ -282,6 +298,10 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
       active_species: activeAnimals.map((row) => row.species_id)
     }];
   }));
+  // Low-level nutrient screening may be called without household members. In
+  // that case there is no absolute household requirement to test; the full
+  // household API always supplies members and performs the requirement check.
+  const absoluteAminoAdequacy = members.length === 0 || nutrientCompleteness.amino_acid_pattern?.absolute_adequacy === true;
   return {
     contract_version: LIVESTOCK_CONTRACT_VERSION,
     mode: livestockMode,
@@ -305,7 +325,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
     energy_adequacy: Number(plantFood.delivered_food_energy_gj ?? 0) + animalEnergy >= Number(demandGJ) - 1e-9,
     nutrient_completeness: nutrientCompleteness,
     reproductive_self_sufficiency: reproductiveSelfSufficiency,
-    optimizer_eligible: livestockMode === 'plants_only' || (proteinCoverage >= 1 && feedSelfSufficiency && reproductiveSelfSufficiency && purchasedFeed === 0 && feedDeficit === 0),
+    optimizer_eligible: proteinCoverage >= 1 && absoluteAminoAdequacy && Number(demandGJ) > 0 && feedSelfSufficiency && (livestockMode === 'plants_only' || reproductiveSelfSufficiency) && purchasedFeed === 0 && feedDeficit === 0,
     optimizer_note: livestockMode === 'plants_only' ? 'Plants-only is a valid baseline. Livestock is not required unless it improves a selected nutrient, land or labour objective.' : (!reproductiveSelfSufficiency ? 'This livestock option is non-canonical because the production population is not self-replacing or all generations are not fed.' : (!feedSelfSufficiency ? 'This livestock option is not ARC-feasible because the property cannot supply all dietary feed without imports.' : (deficit > 0 ? 'This on-site animal option supplies part of the remaining total-protein deficit; quality and micronutrients remain unresolved.' : 'This explicit on-site animal option meets the modeled total-protein target, but it is not automatically land-optimal.'))),
     evidence_boundary: 'Feed quantities, edible outputs and property co-product yields are bounded planning syntheses from government/extension sources, not Grey-Bruce household trials. Human-edible feed competition is tracked separately from total feed conversion.'
   };
@@ -319,7 +339,39 @@ export function compareNutrientFoodSystems({foodEvidence, demandGJ, proteinDeman
   const foodFeedArea = (row) => Number(row.plant_food.required_food_area_ha ?? 0) + Number(row.feed.additional_dedicated_feed_land_ha ?? 0);
   const labour = (row) => Number(row.labour?.livestock_hours_year ?? 0);
   const edibleCompetition = (row) => Number(row.feed.human_edible_feed_protein_consumed_kg ?? 0);
+  const externalInputs = (row) => Number((row.nutrient_completeness?.external_inputs ?? []).length);
+  const nutritionalCompleteness = (row) => Object.values(row.nutrient_completeness?.nutrients ?? {}).filter((item) => item.status === 'adequate from property-produced food').length + (row.nutrient_completeness?.amino_acid_pattern?.absolute_adequacy ? Object.keys(row.nutrient_completeness.amino_acid_pattern.rows).length : 0);
+  const complexity = (row) => row.mode === 'plants_only' ? 0 : row.mode === 'mixed_rabbit_eggs' ? 2 : 1;
   const bestBy = (metric) => eligible.reduce((bestRow, row) => !bestRow || metric(row) < metric(bestRow) ? row : bestRow, null);
+  const bestByDescending = (metric) => eligible.reduce((bestRow, row) => !bestRow || metric(row) > metric(bestRow) ? row : bestRow, null);
   const best = bestBy(foodFeedArea);
-  return {rows, objectives: {lowest_food_feed_area: best ? {mode: best.mode, ration_id: best.ration_id, value_ha: foodFeedArea(best)} : null, lowest_peak_productive_land: null, lowest_mature_productive_land: null, lowest_labour: bestBy(labour) ? {mode: bestBy(labour).mode, ration_id: bestBy(labour).ration_id, value_hours_year: labour(bestBy(labour))} : null, lowest_human_edible_feed_competition: bestBy(edibleCompetition) ? {mode: bestBy(edibleCompetition).mode, ration_id: bestBy(edibleCompetition).ration_id, value_kg_protein_year: edibleCompetition(bestBy(edibleCompetition))} : null, note: 'Food/feed area and final peak/mature transition land are separate objectives. Peak and mature winners are filled by the full household transition report, not this nutrient-only screening function.'}, best: best ? {mode: best.mode, ration_id: best.ration_id, reason: best.mode === 'plants_only' ? 'Plants-only has the lowest modeled plant-food plus dedicated-feed screening area among eligible rows.' : 'Lowest modeled plant-food plus on-site dedicated-feed screening area among eligible rows.', objective: 'food_feed_area_screening'} : null};
+  const objectiveRow = (row, value, unit) => row ? {mode: row.mode, ration_id: row.ration_id, value, unit} : null;
+  const metrics = (row) => ({food_feed_area_ha: foodFeedArea(row), labour_hours_year: labour(row), external_nutrient_inputs: externalInputs(row), human_edible_feed_protein_kg_year: edibleCompetition(row), nutritional_completeness_score: nutritionalCompleteness(row), complexity_units: complexity(row)});
+  const pareto = eligible.filter((candidate) => {
+    const a = metrics(candidate);
+    return !eligible.some((other) => {
+      if (other === candidate) return false;
+      const b = metrics(other);
+      const noWorse = b.food_feed_area_ha <= a.food_feed_area_ha && b.labour_hours_year <= a.labour_hours_year && b.external_nutrient_inputs <= a.external_nutrient_inputs && b.human_edible_feed_protein_kg_year <= a.human_edible_feed_protein_kg_year && b.complexity_units <= a.complexity_units && b.nutritional_completeness_score >= a.nutritional_completeness_score;
+      const strictlyBetter = b.food_feed_area_ha < a.food_feed_area_ha || b.labour_hours_year < a.labour_hours_year || b.external_nutrient_inputs < a.external_nutrient_inputs || b.human_edible_feed_protein_kg_year < a.human_edible_feed_protein_kg_year || b.complexity_units < a.complexity_units || b.nutritional_completeness_score > a.nutritional_completeness_score;
+      return noWorse && strictlyBetter;
+    });
+  }).map((row) => ({mode: row.mode, ration_id: row.ration_id, metrics: metrics(row)}));
+  return {
+    rows,
+    eligible_rows: eligible.map((row) => ({mode: row.mode, ration_id: row.ration_id, metrics: metrics(row)})),
+    objectives: {
+      lowest_food_feed_area: objectiveRow(best, best ? foodFeedArea(best) : null, 'ha'),
+      lowest_peak_productive_land: {status: 'requires full household transition context'},
+      lowest_mature_productive_land: {status: 'requires full household transition context'},
+      lowest_labour: objectiveRow(bestBy(labour), bestBy(labour) ? labour(bestBy(labour)) : null, 'hours/year'),
+      lowest_external_nutrient_dependence: objectiveRow(bestBy(externalInputs), bestBy(externalInputs) ? externalInputs(bestBy(externalInputs)) : null, 'tracked nutrients'),
+      lowest_human_edible_feed_competition: objectiveRow(bestBy(edibleCompetition), bestBy(edibleCompetition) ? edibleCompetition(bestBy(edibleCompetition)) : null, 'kg protein/year'),
+      maximum_nutritional_completeness: objectiveRow(bestByDescending(nutritionalCompleteness), bestByDescending(nutritionalCompleteness) ? nutritionalCompleteness(bestByDescending(nutritionalCompleteness)) : null, 'tracked adequacy rows'),
+      lowest_complexity: objectiveRow(bestBy(complexity), bestBy(complexity) ? complexity(bestBy(complexity)) : null, 'system units'),
+      note: 'No single best food system is implied. Peak and mature productive-land winners require the full establishment transition; Pareto rows retain distinct land, labour, external-input, feed-competition, completeness and complexity objectives.'
+    },
+    pareto_efficient_options: pareto,
+    best: best ? {mode: best.mode, ration_id: best.ration_id, reason: 'Lowest modeled plant-food plus on-site dedicated-feed screening area among eligible rows; not a universal optimum.', objective: 'food_feed_area_screening'} : null
+  };
 }

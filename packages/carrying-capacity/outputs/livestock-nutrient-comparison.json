@@ -1,13 +1,14 @@
 {
-  "report_version": "2.1.0",
-  "generated_at": "2026-08-16T14:45:05.901Z",
+  "report_version": "2.2.0",
+  "generated_at": "2026-08-16T17:15:15.008Z",
   "household": "two_adults_plus_three_children",
   "site": "ordinary_mesic",
   "ration": "arc_integrated",
-  "baseline_note": "Plants-only remains the policy baseline. Livestock rows are eligible only when feed is property-grown, winter supply is closed and the production population is self-replacing.",
+  "baseline_note": "Plants-only remains the policy baseline. Livestock rows are eligible only when feed is property-grown, winter supply is closed and the production population is self-replacing. No single row is universally optimal.",
   "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
   "nutrient_sources": {
     "health_canada_dri": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
+    "amino_acid_pattern": "https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf",
     "canadian_nutrient_file": "https://open.canada.ca/data/en/dataset/1b6139bd-ed7e-4043-bc28-ff00e10f3109"
   },
   "livestock_sources": {
@@ -84,7 +85,16 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 0.936894,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 0.972357,
+      "protein_quality_pattern_ratio": 0.972357,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 7826.532412,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 1.984669,
+      "b12_supplied_ug_year": 0,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 0,
+      "reproductive_ledgers": [],
       "nutrients_requiring_external_input": [
         "b12",
         "d",
@@ -93,7 +103,7 @@
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -115,6 +125,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -137,6 +150,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -159,6 +175,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -181,6 +200,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -203,6 +225,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -221,6 +246,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -249,60 +275,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2840835.900568,
+              "pattern_target_mg": 2840835.900568,
               "supplied_mg": 3986342.18687,
+              "actual_intake_g_year": 3986.342187,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.864119,
+              "quality_pattern_ratio": 1.403229,
               "adequacy_ratio": 1.403229,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 3945605.417455,
+              "pattern_target_mg": 3945605.417455,
               "supplied_mg": 6759608.12739,
+              "actual_intake_g_year": 6759.608127,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.496797,
+              "quality_pattern_ratio": 1.713199,
               "adequacy_ratio": 1.713199,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 8680331.918401,
+              "pattern_target_mg": 8680331.918401,
               "supplied_mg": 11379264.184,
+              "actual_intake_g_year": 11379.264184,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.675718,
+              "quality_pattern_ratio": 1.310925,
               "adequacy_ratio": 1.310925,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 8049035.051608,
+              "pattern_target_mg": 8049035.051608,
               "supplied_mg": 7826532.41246,
+              "actual_intake_g_year": 7826.532412,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 1.984669,
+              "quality_pattern_ratio": 0.972357,
               "adequacy_ratio": 0.972357,
-              "status": "marginal"
+              "quality_status": "limiting reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 3945605.417455,
+              "pattern_target_mg": 3945605.417455,
               "supplied_mg": 5587137.85751,
+              "actual_intake_g_year": 5587.137858,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 2.890269,
+              "quality_pattern_ratio": 1.416041,
               "adequacy_ratio": 1.416041,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7417738.184815,
+              "pattern_target_mg": 7417738.184815,
               "supplied_mg": 12652268.87248,
+              "actual_intake_g_year": 12652.268872,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.481444,
+              "quality_pattern_ratio": 1.705677,
               "adequacy_ratio": 1.705677,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4261253.850851,
+              "pattern_target_mg": 4261253.850851,
               "supplied_mg": 5962049.64488,
+              "actual_intake_g_year": 5962.049645,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 2.855754,
+              "quality_pattern_ratio": 1.39913,
               "adequacy_ratio": 1.39913,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1104769.516887,
+              "pattern_target_mg": 1104769.516887,
               "supplied_mg": 2062535.63177,
+              "actual_intake_g_year": 2062.535632,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 3.810591,
+              "quality_pattern_ratio": 1.866937,
               "adequacy_ratio": 1.866937,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 5050374.934342,
+              "pattern_target_mg": 5050374.934342,
               "supplied_mg": 8391487.76343,
+              "actual_intake_g_year": 8391.487763,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.391391,
+              "quality_pattern_ratio": 1.661557,
               "adequacy_ratio": 1.661557,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -311,56 +414,56 @@
             "target": 9.6,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1842819.64521,
             "adequacy_ratio": 1151.762278,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 134126.528585,
             "adequacy_ratio": 462.505271,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 765948.93652,
             "adequacy_ratio": 144.518667,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 49572.403227,
             "adequacy_ratio": 869.691285,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 28431.199979,
             "adequacy_ratio": 710.779999,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -374,59 +477,59 @@
             "target": 225,
             "supplied": 274634.556804,
             "adequacy_ratio": 1220.59803,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1723374.39532,
             "adequacy_ratio": 1222.251344,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11847328.12563,
             "adequacy_ratio": 713.694465,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 329276.204831,
             "adequacy_ratio": 162.605533,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 44211.943894,
             "adequacy_ratio": 1.961757,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 840.908246,
             "adequacy_ratio": 0.310937,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
         "external_inputs": [
           {
             "nutrient": "b12",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "A small external non-food input may be required; no supplement is silently included."
           },
           {
             "nutrient": "d",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
             "nutrient": "a",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
@@ -436,7 +539,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -478,7 +581,37 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 0.9714830000000001,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 1.007174,
+      "protein_quality_pattern_ratio": 1.007174,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 8434.104612,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 2.138739,
+      "b12_supplied_ug_year": 2921.28,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 304.3,
+      "reproductive_ledgers": [
+        {
+          "species_id": "rabbit_meat",
+          "scale": 1,
+          "output": {
+            "edible_meat_kg_year": 40.8,
+            "food_energy_gj_year": 0.232,
+            "edible_protein_kg_year": 8.89,
+            "edible_fat_kg_year": 1.43
+          },
+          "reproduction": {
+            "self_replacing": true,
+            "external_replacement_animals_year": 0,
+            "feed_all_generations_included": true,
+            "breeding_females": 4,
+            "breeding_males": 1,
+            "replacement_females_year": 0,
+            "replacement_males_year": 0,
+            "evidence_status": "bounded smallholder planning synthesis"
+          }
+        }
+      ],
       "nutrients_requiring_external_input": [
         "d",
         "a",
@@ -486,7 +619,7 @@
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -508,6 +641,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -530,6 +666,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -552,6 +691,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -574,6 +716,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -596,6 +741,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -614,6 +762,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -643,60 +792,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2955540.702899,
+              "pattern_target_mg": 2955540.702899,
               "supplied_mg": 4160183.71729,
+              "actual_intake_g_year": 4160.183717,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.989021,
+              "quality_pattern_ratio": 1.407588,
               "adequacy_ratio": 1.407588,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 4104917.642915,
+              "pattern_target_mg": 4104917.642915,
               "supplied_mg": 7053582.43262,
+              "actual_intake_g_year": 7053.582433,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.648872,
+              "quality_pattern_ratio": 1.718325,
               "adequacy_ratio": 1.718325,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 9030818.814413,
+              "pattern_target_mg": 9030818.814413,
               "supplied_mg": 11858261.91875,
+              "actual_intake_g_year": 11858.261919,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.78835,
+              "quality_pattern_ratio": 1.313088,
               "adequacy_ratio": 1.313088,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 8374031.991547,
+              "pattern_target_mg": 8374031.991547,
               "supplied_mg": 8434104.61178,
+              "actual_intake_g_year": 8434.104612,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 2.138739,
+              "quality_pattern_ratio": 1.007174,
               "adequacy_ratio": 1.007174,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 4104917.642915,
+              "pattern_target_mg": 4104917.642915,
               "supplied_mg": 5817046.53409,
+              "actual_intake_g_year": 5817.046534,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.009203,
+              "quality_pattern_ratio": 1.417092,
               "adequacy_ratio": 1.417092,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7717245.16868,
+              "pattern_target_mg": 7717245.16868,
               "supplied_mg": 13103357.69185,
+              "actual_intake_g_year": 13103.357692,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.605568,
+              "quality_pattern_ratio": 1.697932,
               "adequacy_ratio": 1.697932,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4433311.054348,
+              "pattern_target_mg": 4433311.054348,
               "supplied_mg": 6245086.87925,
+              "actual_intake_g_year": 6245.086879,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 2.991325,
+              "quality_pattern_ratio": 1.408673,
               "adequacy_ratio": 1.408673,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1149376.940016,
+              "pattern_target_mg": 1149376.940016,
               "supplied_mg": 2141963.4589,
+              "actual_intake_g_year": 2141.963459,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 3.957336,
+              "quality_pattern_ratio": 1.863587,
               "adequacy_ratio": 1.863587,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 5254294.582931,
+              "pattern_target_mg": 5254294.582931,
               "supplied_mg": 8690504.80259,
+              "actual_intake_g_year": 8690.504803,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.512238,
+              "quality_pattern_ratio": 1.653981,
               "adequacy_ratio": 1.653981,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -705,56 +931,56 @@
             "target": 9.6,
             "supplied": 2921.28,
             "adequacy_ratio": 304.3,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1820447.9665,
             "adequacy_ratio": 1137.779979,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 132260.67904,
             "adequacy_ratio": 456.071307,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 760597.73198,
             "adequacy_ratio": 143.509006,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 49523.35578,
             "adequacy_ratio": 868.830803,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 28676.250257,
             "adequacy_ratio": 716.906256,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -768,54 +994,54 @@
             "target": 225,
             "supplied": 280483.683408,
             "adequacy_ratio": 1246.594148,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1707152.33363,
             "adequacy_ratio": 1210.746336,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11817158.57547,
             "adequacy_ratio": 711.877023,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 324695.605246,
             "adequacy_ratio": 160.343509,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 43947.786283,
             "adequacy_ratio": 1.950036,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 918.970274,
             "adequacy_ratio": 0.339802,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
         "external_inputs": [
           {
             "nutrient": "d",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
             "nutrient": "a",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
@@ -825,7 +1051,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -867,13 +1093,61 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 1.114082,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 1.005018,
+      "protein_quality_pattern_ratio": 1.005018,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 8157.543528,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 2.068608,
+      "b12_supplied_ug_year": 1031.51352,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 107.449325,
+      "reproductive_ledgers": [
+        {
+          "species_id": "chicken_eggs",
+          "scale": 1,
+          "output": {
+            "eggs_kg_year": 68.676,
+            "eggs_year": 1373.52,
+            "edible_meat_kg_year": 12.120000000000001,
+            "food_energy_gj_year": 1.04,
+            "edible_protein_kg_year": 11.170906,
+            "edible_fat_kg_year": 8.6
+          },
+          "reproduction": {
+            "self_replacing": true,
+            "external_replacement_chicks_year": 0,
+            "external_replacement_pullets_year": 0,
+            "feed_all_generations_included": true,
+            "breeding_females": 8,
+            "breeding_males": 1,
+            "fertile_eggs_year": 24,
+            "eggs_incubated_year": 24,
+            "chicks_hatched_and_surviving_year": 16.32,
+            "replacement_females_year": 4,
+            "replacement_males_year": 1,
+            "surplus_males_year": 7.16,
+            "surplus_females_year": 4.16,
+            "gross_eggs_year": 1440,
+            "edible_eggs_year": 1373.52,
+            "edible_eggs_kg_year": 68.676,
+            "edible_meat_kg_year": 12.120000000000001,
+            "output": {
+              "eggs_year": 1373.52,
+              "eggs_kg_year": 68.676,
+              "edible_meat_kg_year": 12.120000000000001
+            },
+            "reference_breed": "Chantecler / conservative true-breeding dual-purpose range",
+            "evidence_status": "planning synthesis; breed and reproduction figures require local flock validation"
+          }
+        }
+      ],
       "nutrients_requiring_external_input": [
         "iodine",
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -895,6 +1169,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -917,6 +1194,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -939,6 +1219,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -961,6 +1244,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -983,6 +1269,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -1001,6 +1290,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -1031,60 +1321,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2864757.193294,
+              "pattern_target_mg": 2864757.193294,
               "supplied_mg": 3987091.37274,
+              "actual_intake_g_year": 3987.091373,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.864657,
+              "quality_pattern_ratio": 1.391773,
               "adequacy_ratio": 1.391773,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 3978829.43513,
+              "pattern_target_mg": 3978829.43513,
               "supplied_mg": 6905105.8994,
+              "actual_intake_g_year": 6905.105899,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.572064,
+              "quality_pattern_ratio": 1.735462,
               "adequacy_ratio": 1.735462,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 8753424.757286,
+              "pattern_target_mg": 8753424.757286,
               "supplied_mg": 11596223.42194,
+              "actual_intake_g_year": 11596.223422,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.726734,
+              "quality_pattern_ratio": 1.324764,
               "adequacy_ratio": 1.324764,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 8116812.047665,
+              "pattern_target_mg": 8116812.047665,
               "supplied_mg": 8157543.52796,
+              "actual_intake_g_year": 8157.543528,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 2.068608,
+              "quality_pattern_ratio": 1.005018,
               "adequacy_ratio": 1.005018,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 3978829.43513,
+              "pattern_target_mg": 3978829.43513,
               "supplied_mg": 5830271.03308,
+              "actual_intake_g_year": 5830.271033,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.016044,
+              "quality_pattern_ratio": 1.465323,
               "adequacy_ratio": 1.465323,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7480199.338044,
+              "pattern_target_mg": 7480199.338044,
               "supplied_mg": 12858761.00216,
+              "actual_intake_g_year": 12858.761002,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.538264,
+              "quality_pattern_ratio": 1.71904,
               "adequacy_ratio": 1.71904,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4297135.78994,
+              "pattern_target_mg": 4297135.78994,
               "supplied_mg": 6105210.37946,
+              "actual_intake_g_year": 6105.210379,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 2.924326,
+              "quality_pattern_ratio": 1.420763,
               "adequacy_ratio": 1.420763,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1114072.241836,
+              "pattern_target_mg": 1114072.241836,
               "supplied_mg": 2085772.0802,
+              "actual_intake_g_year": 2085.77208,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 3.853521,
+              "quality_pattern_ratio": 1.872205,
               "adequacy_ratio": 1.872205,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 5092901.676966,
+              "pattern_target_mg": 5092901.676966,
               "supplied_mg": 8564090.44536,
+              "actual_intake_g_year": 8564.090445,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.461148,
+              "quality_pattern_ratio": 1.681574,
               "adequacy_ratio": 1.681574,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -1093,56 +1460,56 @@
             "target": 9.6,
             "supplied": 1031.51352,
             "adequacy_ratio": 107.449325,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 1056.23688,
             "adequacy_ratio": 14.083158,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 139507.73964,
             "adequacy_ratio": 42.275073,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1774856.9422,
             "adequacy_ratio": 1109.285589,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 125762.37562,
             "adequacy_ratio": 433.663364,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 752667.13774,
             "adequacy_ratio": 142.012667,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 47688.383853,
             "adequacy_ratio": 836.638313,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 27535.218046,
             "adequacy_ratio": 688.380451,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -1156,42 +1523,42 @@
             "target": 225,
             "supplied": 277825.406582,
             "adequacy_ratio": 1234.779585,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1622982.91116,
             "adequacy_ratio": 1151.05171,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11194260.48646,
             "adequacy_ratio": 674.353041,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 577835.655516,
             "adequacy_ratio": 285.350941,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 42216.427722,
             "adequacy_ratio": 1.873213,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 838.327842,
             "adequacy_ratio": 0.309983,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
@@ -1203,7 +1570,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -1245,7 +1612,37 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 0.9383,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 1.004653,
+      "protein_quality_pattern_ratio": 1.004653,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 8259.429688,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 2.094444,
+      "b12_supplied_ug_year": 0,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 0,
+      "reproductive_ledgers": [
+        {
+          "species_id": "chicken_meat",
+          "scale": 1,
+          "output": {
+            "edible_meat_kg_year": 35,
+            "food_energy_gj_year": 0.42,
+            "edible_protein_kg_year": 7,
+            "edible_fat_kg_year": 5.6
+          },
+          "reproduction": {
+            "self_replacing": false,
+            "external_replacement_animals_year": 25,
+            "feed_all_generations_included": false,
+            "breeding_females": 0,
+            "breeding_males": 0,
+            "replacement_females_year": 0,
+            "replacement_males_year": 0,
+            "evidence_status": "non-canonical industrial/specialist sensitivity"
+          }
+        }
+      ],
       "nutrients_requiring_external_input": [
         "b12",
         "d",
@@ -1254,7 +1651,7 @@
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -1276,6 +1673,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1298,6 +1698,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1320,6 +1723,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1342,6 +1748,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1364,6 +1773,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -1382,6 +1794,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -1411,60 +1824,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2901592.531642,
+              "pattern_target_mg": 2901592.531642,
               "supplied_mg": 4078450.48476,
+              "actual_intake_g_year": 4078.450485,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.930297,
+              "quality_pattern_ratio": 1.40559,
               "adequacy_ratio": 1.40559,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 4029989.62728,
+              "pattern_target_mg": 4029989.62728,
               "supplied_mg": 6921874.73184,
+              "actual_intake_g_year": 6921.874732,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.580739,
+              "quality_pattern_ratio": 1.717591,
               "adequacy_ratio": 1.717591,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 8865977.180016,
+              "pattern_target_mg": 8865977.180016,
               "supplied_mg": 11670189.76528,
+              "actual_intake_g_year": 11670.189765,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.744127,
+              "quality_pattern_ratio": 1.316289,
               "adequacy_ratio": 1.316289,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 8221178.839651,
+              "pattern_target_mg": 8221178.839651,
               "supplied_mg": 8259429.68812,
+              "actual_intake_g_year": 8259.429688,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 2.094444,
+              "quality_pattern_ratio": 1.004653,
               "adequacy_ratio": 1.004653,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 4029989.62728,
+              "pattern_target_mg": 4029989.62728,
               "supplied_mg": 5708931.85398,
+              "actual_intake_g_year": 5708.931854,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 2.953274,
+              "quality_pattern_ratio": 1.416612,
               "adequacy_ratio": 1.416612,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7576380.499286,
+              "pattern_target_mg": 7576380.499286,
               "supplied_mg": 12876135.21254,
+              "actual_intake_g_year": 12876.135213,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.543044,
+              "quality_pattern_ratio": 1.69951,
               "adequacy_ratio": 1.69951,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4352388.797462,
+              "pattern_target_mg": 4352388.797462,
               "supplied_mg": 6126901.89448,
+              "actual_intake_g_year": 6126.901894,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 2.934716,
+              "quality_pattern_ratio": 1.40771,
               "adequacy_ratio": 1.40771,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1128397.095638,
+              "pattern_target_mg": 1128397.095638,
               "supplied_mg": 2098092.91012,
+              "actual_intake_g_year": 2098.09291,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 3.876284,
+              "quality_pattern_ratio": 1.859357,
               "adequacy_ratio": 1.859357,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 5158386.722918,
+              "pattern_target_mg": 5158386.722918,
               "supplied_mg": 8547657.25102,
+              "actual_intake_g_year": 8547.657251,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.454507,
+              "quality_pattern_ratio": 1.657041,
               "adequacy_ratio": 1.657041,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -1473,56 +1963,56 @@
             "target": 9.6,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1796410.23196,
             "adequacy_ratio": 1122.756395,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 130748.697576,
             "adequacy_ratio": 450.857578,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 746659.34386,
             "adequacy_ratio": 140.879121,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 48323.976058,
             "adequacy_ratio": 847.789054,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 27715.191064,
             "adequacy_ratio": 692.879777,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -1536,59 +2026,59 @@
             "target": 225,
             "supplied": 267718.183234,
             "adequacy_ratio": 1189.858592,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1679973.08114,
             "adequacy_ratio": 1191.47027,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11548966.02656,
             "adequacy_ratio": 695.720845,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 320983.74076,
             "adequacy_ratio": 158.510489,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 43098.513984,
             "adequacy_ratio": 1.912353,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 819.730885,
             "adequacy_ratio": 0.303107,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
         "external_inputs": [
           {
             "nutrient": "b12",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "A small external non-food input may be required; no supplement is silently included."
           },
           {
             "nutrient": "d",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
             "nutrient": "a",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
@@ -1598,7 +2088,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -1640,7 +2130,37 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 1.243367,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 0.99643,
+      "protein_quality_pattern_ratio": 0.99643,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 8134.253058,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 2.062702,
+      "b12_supplied_ug_year": 117.6,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 12.25,
+      "reproductive_ledgers": [
+        {
+          "species_id": "goose_meat",
+          "scale": 1,
+          "output": {
+            "edible_meat_kg_year": 24,
+            "food_energy_gj_year": 0.34,
+            "edible_protein_kg_year": 5,
+            "edible_fat_kg_year": 3.8
+          },
+          "reproduction": {
+            "self_replacing": true,
+            "external_replacement_animals_year": 0,
+            "feed_all_generations_included": true,
+            "breeding_females": 3,
+            "breeding_males": 1,
+            "replacement_females_year": 1,
+            "replacement_males_year": 0.25,
+            "evidence_status": "bounded smallholder planning synthesis"
+          }
+        }
+      ],
       "nutrients_requiring_external_input": [
         "d",
         "a",
@@ -1648,7 +2168,7 @@
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -1670,6 +2190,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1692,6 +2215,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1714,6 +2240,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1736,6 +2265,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -1758,6 +2290,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -1776,6 +2311,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -1805,60 +2341,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2881199.836858,
+              "pattern_target_mg": 2881199.836858,
               "supplied_mg": 4049312.70962,
+              "actual_intake_g_year": 4049.31271,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.909362,
+              "quality_pattern_ratio": 1.405426,
               "adequacy_ratio": 1.405426,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 4001666.44008,
+              "pattern_target_mg": 4001666.44008,
               "supplied_mg": 6902120.13372,
+              "actual_intake_g_year": 6902.120134,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.57052,
+              "quality_pattern_ratio": 1.724811,
               "adequacy_ratio": 1.724811,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 8803666.168176,
+              "pattern_target_mg": 8803666.168176,
               "supplied_mg": 11608555.35634,
+              "actual_intake_g_year": 11608.555356,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.729634,
+              "quality_pattern_ratio": 1.318605,
               "adequacy_ratio": 1.318605,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 8163399.537763,
+              "pattern_target_mg": 8163399.537763,
               "supplied_mg": 8134253.05756,
+              "actual_intake_g_year": 8134.253058,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 2.062702,
+              "quality_pattern_ratio": 0.99643,
               "adequacy_ratio": 0.99643,
-              "status": "marginal"
+              "quality_status": "limiting reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 4001666.44008,
+              "pattern_target_mg": 4001666.44008,
               "supplied_mg": 5704592.99058,
+              "actual_intake_g_year": 5704.592991,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 2.95103,
+              "quality_pattern_ratio": 1.425554,
               "adequacy_ratio": 1.425554,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7523132.90735,
+              "pattern_target_mg": 7523132.90735,
               "supplied_mg": 12831127.32406,
+              "actual_intake_g_year": 12831.127324,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.53066,
+              "quality_pattern_ratio": 1.705556,
               "adequacy_ratio": 1.705556,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4321799.755286,
+              "pattern_target_mg": 4321799.755286,
               "supplied_mg": 6073781.4603,
+              "actual_intake_g_year": 6073.78146,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 2.909272,
+              "quality_pattern_ratio": 1.405382,
               "adequacy_ratio": 1.405382,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1120466.603222,
+              "pattern_target_mg": 1120466.603222,
               "supplied_mg": 2096566.7596,
+              "actual_intake_g_year": 2096.56676,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 3.873464,
+              "quality_pattern_ratio": 1.871155,
               "adequacy_ratio": 1.871155,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 5122133.043302,
+              "pattern_target_mg": 5122133.043302,
               "supplied_mg": 8506010.6733,
+              "actual_intake_g_year": 8506.010673,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.437675,
+              "quality_pattern_ratio": 1.660638,
               "adequacy_ratio": 1.660638,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -1867,56 +2480,56 @@
             "target": 9.6,
             "supplied": 117.6,
             "adequacy_ratio": 12.25,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 2880,
             "adequacy_ratio": 0.872727,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1812690.11924,
             "adequacy_ratio": 1132.931325,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 133120.093924,
             "adequacy_ratio": 459.034807,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 753453.5514,
             "adequacy_ratio": 142.161047,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 49178.57166,
             "adequacy_ratio": 862.781959,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 28413.173678,
             "adequacy_ratio": 710.329342,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -1930,54 +2543,54 @@
             "target": 225,
             "supplied": 273067.587248,
             "adequacy_ratio": 1213.633721,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1693999.99638,
             "adequacy_ratio": 1201.418437,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11706596.89554,
             "adequacy_ratio": 705.21668,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 322563.257476,
             "adequacy_ratio": 159.290498,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 43502.595858,
             "adequacy_ratio": 1.930282,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 847.764667,
             "adequacy_ratio": 0.313473,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
         "external_inputs": [
           {
             "nutrient": "d",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
             "nutrient": "a",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
@@ -1987,7 +2600,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -2029,7 +2642,37 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 1.758771,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 0.972357,
+      "protein_quality_pattern_ratio": 0.972357,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 7624.736767,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 1.933497,
+      "b12_supplied_ug_year": 0,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 0,
+      "reproductive_ledgers": [
+        {
+          "species_id": "goat_meat",
+          "scale": 1,
+          "output": {
+            "edible_meat_kg_year": 30,
+            "food_energy_gj_year": 0.43,
+            "edible_protein_kg_year": 6,
+            "edible_fat_kg_year": 4.5
+          },
+          "reproduction": {
+            "self_replacing": true,
+            "external_replacement_animals_year": 0,
+            "feed_all_generations_included": true,
+            "breeding_females": 2,
+            "breeding_males": 0.25,
+            "replacement_females_year": 0,
+            "replacement_males_year": 0,
+            "evidence_status": "bounded smallholder planning synthesis; goat food composition profile unresolved"
+          }
+        }
+      ],
       "nutrients_requiring_external_input": [
         "b12",
         "d",
@@ -2038,7 +2681,7 @@
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -2060,6 +2703,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2082,6 +2728,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2104,6 +2753,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2126,6 +2778,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2148,6 +2803,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -2166,6 +2824,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -2194,60 +2853,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2767589.117557,
+              "pattern_target_mg": 2767589.117557,
               "supplied_mg": 3883560.20639,
+              "actual_intake_g_year": 3883.560206,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.790271,
+              "quality_pattern_ratio": 1.403229,
               "adequacy_ratio": 1.403229,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 3843873.774385,
+              "pattern_target_mg": 3843873.774385,
               "supplied_mg": 6585321.55629,
+              "actual_intake_g_year": 6585.321556,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.406637,
+              "quality_pattern_ratio": 1.713199,
               "adequacy_ratio": 1.713199,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 8456522.303647,
+              "pattern_target_mg": 8456522.303647,
               "supplied_mg": 11085866.56356,
+              "actual_intake_g_year": 11085.866564,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.606729,
+              "quality_pattern_ratio": 1.310925,
               "adequacy_ratio": 1.310925,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 7841502.499745,
+              "pattern_target_mg": 7841502.499745,
               "supplied_mg": 7624736.76699,
+              "actual_intake_g_year": 7624.736767,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 1.933497,
+              "quality_pattern_ratio": 0.972357,
               "adequacy_ratio": 0.972357,
-              "status": "marginal"
+              "quality_status": "limiting reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 3843873.774385,
+              "pattern_target_mg": 3843873.774385,
               "supplied_mg": 5443081.70927,
+              "actual_intake_g_year": 5443.081709,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 2.815748,
+              "quality_pattern_ratio": 1.416041,
               "adequacy_ratio": 1.416041,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7226482.695844,
+              "pattern_target_mg": 7226482.695844,
               "supplied_mg": 12326048.69449,
+              "actual_intake_g_year": 12326.048694,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.391681,
+              "quality_pattern_ratio": 1.705677,
               "adequacy_ratio": 1.705677,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4151383.676336,
+              "pattern_target_mg": 4151383.676336,
               "supplied_mg": 5808326.94869,
+              "actual_intake_g_year": 5808.326949,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 2.782122,
+              "quality_pattern_ratio": 1.39913,
               "adequacy_ratio": 1.39913,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1076284.656828,
+              "pattern_target_mg": 1076284.656828,
               "supplied_mg": 2009356.17848,
+              "actual_intake_g_year": 2009.356178,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 3.712341,
+              "quality_pattern_ratio": 1.866937,
               "adequacy_ratio": 1.866937,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 4920158.431213,
+              "pattern_target_mg": 4920158.431213,
               "supplied_mg": 8175125.57141,
+              "actual_intake_g_year": 8175.125571,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.303949,
+              "quality_pattern_ratio": 1.661557,
               "adequacy_ratio": 1.661557,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -2256,56 +2992,56 @@
             "target": 9.6,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 0,
             "adequacy_ratio": 0,
-            "status": "external input required",
+            "status": "small external input required",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1795305.24755,
             "adequacy_ratio": 1122.06578,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 130668.272994,
             "adequacy_ratio": 450.580252,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 746200.06805,
             "adequacy_ratio": 140.792466,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 48294.251598,
             "adequacy_ratio": 847.267572,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 27698.143219,
             "adequacy_ratio": 692.45358,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -2319,59 +3055,59 @@
             "target": 225,
             "supplied": 267553.507827,
             "adequacy_ratio": 1189.126701,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1678939.71657,
             "adequacy_ratio": 1190.737388,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11541862.16768,
             "adequacy_ratio": 695.292902,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 320786.301313,
             "adequacy_ratio": 158.412988,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 43072.003839,
             "adequacy_ratio": 1.911176,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 819.226662,
             "adequacy_ratio": 0.30292,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
         "external_inputs": [
           {
             "nutrient": "b12",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "A small external non-food input may be required; no supplement is silently included."
           },
           {
             "nutrient": "d",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
             "nutrient": "a",
-            "status": "external input required",
+            "status": "small external input required",
             "note": "Current food-form evidence does not establish adequacy."
           },
           {
@@ -2381,7 +3117,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -2423,13 +3159,81 @@
       "establishment_peak_year": 8,
       "total_food_feed_area_ha": 1.177321,
       "limiting_amino_acid": "lysine",
-      "limiting_amino_acid_ratio": 1.038298,
+      "protein_quality_pattern_ratio": 1.038298,
+      "absolute_limiting_amino_acid": "lysine",
+      "absolute_amino_acid_adequacy": true,
+      "lysine_intake_g_year": 8765.115733,
+      "lysine_requirement_g_year": 3943.494675,
+      "lysine_absolute_adequacy_ratio": 2.222677,
+      "b12_supplied_ug_year": 3952.79352,
+      "b12_requirement_ug_year": 9.6,
+      "b12_adequacy_ratio": 411.749325,
+      "reproductive_ledgers": [
+        {
+          "species_id": "rabbit_meat",
+          "scale": 1,
+          "output": {
+            "edible_meat_kg_year": 40.8,
+            "food_energy_gj_year": 0.232,
+            "edible_protein_kg_year": 8.89,
+            "edible_fat_kg_year": 1.43
+          },
+          "reproduction": {
+            "self_replacing": true,
+            "external_replacement_animals_year": 0,
+            "feed_all_generations_included": true,
+            "breeding_females": 4,
+            "breeding_males": 1,
+            "replacement_females_year": 0,
+            "replacement_males_year": 0,
+            "evidence_status": "bounded smallholder planning synthesis"
+          }
+        },
+        {
+          "species_id": "chicken_eggs",
+          "scale": 1,
+          "output": {
+            "eggs_kg_year": 68.676,
+            "eggs_year": 1373.52,
+            "edible_meat_kg_year": 12.120000000000001,
+            "food_energy_gj_year": 1.04,
+            "edible_protein_kg_year": 11.170906,
+            "edible_fat_kg_year": 8.6
+          },
+          "reproduction": {
+            "self_replacing": true,
+            "external_replacement_chicks_year": 0,
+            "external_replacement_pullets_year": 0,
+            "feed_all_generations_included": true,
+            "breeding_females": 8,
+            "breeding_males": 1,
+            "fertile_eggs_year": 24,
+            "eggs_incubated_year": 24,
+            "chicks_hatched_and_surviving_year": 16.32,
+            "replacement_females_year": 4,
+            "replacement_males_year": 1,
+            "surplus_males_year": 7.16,
+            "surplus_females_year": 4.16,
+            "gross_eggs_year": 1440,
+            "edible_eggs_year": 1373.52,
+            "edible_eggs_kg_year": 68.676,
+            "edible_meat_kg_year": 12.120000000000001,
+            "output": {
+              "eggs_year": 1373.52,
+              "eggs_kg_year": 68.676,
+              "edible_meat_kg_year": 12.120000000000001
+            },
+            "reference_breed": "Chantecler / conservative true-breeding dual-purpose range",
+            "evidence_status": "planning synthesis; breed and reproduction figures require local flock validation"
+          }
+        }
+      ],
       "nutrients_requiring_external_input": [
         "iodine",
         "alpha_linolenic_g"
       ],
       "nutrient_completeness": {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "demand": {
           "members": [
             {
@@ -2451,6 +3255,9 @@
               "magnesium": 320,
               "potassium": 2600,
               "choline": 425,
+              "protein_rda_g_day": 52,
+              "protein_rda_g_year": 18993,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2473,6 +3280,9 @@
               "magnesium": 420,
               "potassium": 3400,
               "choline": 550,
+              "protein_rda_g_day": 64,
+              "protein_rda_g_year": 23376,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2495,6 +3305,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2517,6 +3330,9 @@
               "magnesium": 410,
               "potassium": 3000,
               "choline": 550,
+              "protein_rda_g_day": 42.5,
+              "protein_rda_g_year": 15523.125,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             },
@@ -2539,6 +3355,9 @@
               "magnesium": 130,
               "potassium": 3800,
               "choline": 250,
+              "protein_rda_g_day": 26.6,
+              "protein_rda_g_year": 9715.65,
+              "protein_source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-macronutrients.html",
               "source": "https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html",
               "status": "Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied"
             }
@@ -2557,6 +3376,7 @@
             "magnesium": 1410,
             "potassium": 16600,
             "choline": 2025,
+            "protein_rda_g_year": 77323.425,
             "linoleic_g": 22536.908108,
             "alpha_linolenic_g": 2704.428973
           }
@@ -2588,60 +3408,137 @@
             "valine": 32
           },
           "limiting_amino_acid": "lysine",
+          "limiting_pattern_amino_acid": "lysine",
+          "absolute_limiting_amino_acid": "lysine",
+          "absolute_adequacy": true,
+          "requirement_method": "Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.",
+          "digestibility_method": "No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.",
           "rows": {
             "histidine": {
-              "target_mg": 2979461.998595,
+              "pattern_target_mg": 2979461.998595,
               "supplied_mg": 4160932.90828,
+              "actual_intake_g_year": 4160.932908,
+              "requirement_g_year": 1391.82165,
+              "absolute_adequacy_ratio": 2.989559,
+              "quality_pattern_ratio": 1.396538,
               "adequacy_ratio": 1.396538,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "isoleucine": {
-              "target_mg": 4138141.664715,
+              "pattern_target_mg": 4138141.664715,
               "supplied_mg": 7199080.21366,
+              "actual_intake_g_year": 7199.080214,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.724139,
+              "quality_pattern_ratio": 1.739689,
               "adequacy_ratio": 1.739689,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "leucine": {
-              "target_mg": 9103911.662373,
+              "pattern_target_mg": 9103911.662373,
               "supplied_mg": 12075221.16898,
+              "actual_intake_g_year": 12075.221169,
+              "requirement_g_year": 4252.788375,
+              "absolute_adequacy_ratio": 2.839366,
+              "quality_pattern_ratio": 1.326377,
               "adequacy_ratio": 1.326377,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "lysine": {
-              "target_mg": 8441808.996019,
+              "pattern_target_mg": 8441808.996019,
               "supplied_mg": 8765115.73299,
+              "actual_intake_g_year": 8765.115733,
+              "requirement_g_year": 3943.494675,
+              "absolute_adequacy_ratio": 2.222677,
+              "quality_pattern_ratio": 1.038298,
               "adequacy_ratio": 1.038298,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "methionine_cysteine": {
-              "target_mg": 4138141.664715,
+              "pattern_target_mg": 4138141.664715,
               "supplied_mg": 6060179.71714,
+              "actual_intake_g_year": 6060.179717,
+              "requirement_g_year": 1933.085625,
+              "absolute_adequacy_ratio": 3.134977,
+              "quality_pattern_ratio": 1.464469,
               "adequacy_ratio": 1.464469,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "phenylalanine_tyrosine": {
-              "target_mg": 7779706.329664,
+              "pattern_target_mg": 7779706.329664,
               "supplied_mg": 13309849.83499,
+              "actual_intake_g_year": 13309.849835,
+              "requirement_g_year": 3634.200975,
+              "absolute_adequacy_ratio": 3.662387,
+              "quality_pattern_ratio": 1.710842,
               "adequacy_ratio": 1.710842,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "threonine": {
-              "target_mg": 4469192.997892,
+              "pattern_target_mg": 4469192.997892,
               "supplied_mg": 6388247.62101,
+              "actual_intake_g_year": 6388.247621,
+              "requirement_g_year": 2087.732475,
+              "absolute_adequacy_ratio": 3.059898,
+              "quality_pattern_ratio": 1.429396,
               "adequacy_ratio": 1.429396,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "tryptophan": {
-              "target_mg": 1158679.66612,
+              "pattern_target_mg": 1158679.66612,
               "supplied_mg": 2165199.91007,
+              "actual_intake_g_year": 2165.19991,
+              "requirement_g_year": 541.263975,
+              "absolute_adequacy_ratio": 4.000266,
+              "quality_pattern_ratio": 1.868679,
               "adequacy_ratio": 1.868679,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             },
             "valine": {
-              "target_mg": 5296821.330835,
+              "pattern_target_mg": 5296821.330835,
               "supplied_mg": 8863107.49386,
+              "actual_intake_g_year": 8863.107494,
+              "requirement_g_year": 2474.3496,
+              "absolute_adequacy_ratio": 3.581995,
+              "quality_pattern_ratio": 1.673288,
               "adequacy_ratio": 1.673288,
-              "status": "adequate from property food"
+              "quality_status": "meets reference pattern",
+              "absolute_status": "absolute adequacy met",
+              "digestibility_status": "unresolved evidence",
+              "digestibility_adjusted_ratio": null,
+              "status": "absolute adequacy met"
             }
           }
         },
@@ -2650,56 +3547,56 @@
             "target": 9.6,
             "supplied": 3952.79352,
             "adequacy_ratio": 411.749325,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "d": {
             "target": 75,
             "supplied": 1056.23688,
             "adequacy_ratio": 14.083158,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "a": {
             "target": 3300,
             "supplied": 139507.73964,
             "adequacy_ratio": 42.275073,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "folate": {
             "target": 1600,
             "supplied": 1752485.26558,
             "adequacy_ratio": 1095.303291,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "c": {
             "target": 290,
             "supplied": 123896.526089,
             "adequacy_ratio": 427.2294,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "calcium": {
             "target": 5300,
             "supplied": 747315.93373,
             "adequacy_ratio": 141.003006,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iron": {
             "target": 57,
             "supplied": 47639.336443,
             "adequacy_ratio": 835.777832,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "zinc": {
             "target": 40,
             "supplied": 27780.268361,
             "adequacy_ratio": 694.506709,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "iodine": {
@@ -2713,42 +3610,42 @@
             "target": 225,
             "supplied": 283674.534423,
             "adequacy_ratio": 1260.775709,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "µg/year"
           },
           "magnesium": {
             "target": 1410,
             "supplied": 1606760.85221,
             "adequacy_ratio": 1139.546704,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "potassium": {
             "target": 16600,
             "supplied": 11164090.94209,
             "adequacy_ratio": 672.535599,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "choline": {
             "target": 2025,
             "supplied": 573255.056794,
             "adequacy_ratio": 283.088917,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "mg/year"
           },
           "linoleic_g": {
             "target": 22536.908108,
             "supplied": 41952.270323,
             "adequacy_ratio": 1.861492,
-            "status": "adequate from property food",
+            "status": "adequate from property-produced food",
             "unit": "g/year"
           },
           "alpha_linolenic_g": {
             "target": 2704.428973,
             "supplied": 916.38987,
             "adequacy_ratio": 0.338848,
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "unit": "g/year"
           }
         },
@@ -2760,7 +3657,7 @@
           },
           {
             "nutrient": "alpha_linolenic_g",
-            "status": "marginal",
+            "status": "actual food-system deficit",
             "note": "Current food-form evidence does not establish adequacy."
           }
         ],
@@ -2774,34 +3671,130 @@
     "lowest_food_feed_area": {
       "mode": "plants_only",
       "label": "Plants only",
-      "value": 0.936894
+      "value": 0.936894,
+      "direction": "min"
     },
     "lowest_peak_productive_land": {
       "mode": "plants_only",
       "label": "Plants only",
-      "value": 1.814724
+      "value": 1.814724,
+      "direction": "min"
     },
     "lowest_mature_productive_land": {
       "mode": "plants_only",
       "label": "Plants only",
-      "value": 1.52161
+      "value": 1.52161,
+      "direction": "min"
     },
     "lowest_labour": {
       "mode": "plants_only",
       "label": "Plants only",
-      "value": 0
+      "value": 0,
+      "direction": "min"
     },
     "lowest_human_edible_feed_competition": {
       "mode": "plants_only",
       "label": "Plants only",
-      "value": 0
+      "value": 0,
+      "direction": "min"
+    },
+    "lowest_external_nutrient_dependence": {
+      "mode": "chicken_eggs",
+      "label": "Self-replacing dual-purpose chicken flock",
+      "value": 2,
+      "direction": "min"
+    },
+    "maximum_nutritional_completeness": {
+      "mode": "chicken_eggs",
+      "label": "Self-replacing dual-purpose chicken flock",
+      "value": 22,
+      "direction": "max"
+    },
+    "lowest_complexity": {
+      "mode": "plants_only",
+      "label": "Plants only",
+      "value": 0,
+      "direction": "min"
     }
   },
+  "pareto_efficient_options": [
+    {
+      "mode": "plants_only",
+      "label": "Plants only",
+      "metrics": {
+        "peak_land_ha": 1.814724,
+        "mature_land_ha": 1.52161,
+        "labour_hours_year": 0,
+        "external_nutrient_inputs": 5,
+        "human_edible_feed_protein_kg_year": 0,
+        "nutritional_completeness": 19,
+        "complexity": 0
+      }
+    },
+    {
+      "mode": "rabbit_meat",
+      "label": "Self-replacing rabbits",
+      "metrics": {
+        "peak_land_ha": 1.827634,
+        "mature_land_ha": 1.537767,
+        "labour_hours_year": 225,
+        "external_nutrient_inputs": 4,
+        "human_edible_feed_protein_kg_year": 0.7875,
+        "nutritional_completeness": 20,
+        "complexity": 1
+      }
+    },
+    {
+      "mode": "chicken_eggs",
+      "label": "Self-replacing dual-purpose chicken flock",
+      "metrics": {
+        "peak_land_ha": 1.894728,
+        "mature_land_ha": 1.616171,
+        "labour_hours_year": 245,
+        "external_nutrient_inputs": 2,
+        "human_edible_feed_protein_kg_year": 102.670033,
+        "nutritional_completeness": 22,
+        "complexity": 1
+      }
+    },
+    {
+      "mode": "goose_meat",
+      "label": "Self-replacing grazing-biased geese",
+      "metrics": {
+        "peak_land_ha": 2.089425,
+        "mature_land_ha": 1.80107,
+        "labour_hours_year": 196,
+        "external_nutrient_inputs": 4,
+        "human_edible_feed_protein_kg_year": 9.435249,
+        "nutritional_completeness": 20,
+        "complexity": 1
+      }
+    }
+  ],
   "best_protein_adequate_option": {
     "mode": "plants_only",
     "label": "Plants only",
     "rule": "lowest plant-food plus dedicated on-site feed screening area among protein-adequate, feed-self-sufficient and reproductively self-sufficient rows",
-    "objective": "food_feed_area_screening"
+    "objective": "food_feed_area_screening",
+    "warning": "This is one screening objective, not a universal optimum."
+  },
+  "plants_only_vs_minimum_rabbit_tradeoff": {
+    "plants_only_peak_ha": 1.814724,
+    "plants_only_mature_ha": 1.52161,
+    "rabbit_peak_ha": 1.827634,
+    "rabbit_mature_ha": 1.537767,
+    "rabbit_minimum_scale": 1,
+    "peak_land_delta_ha": 0.012909999999999977,
+    "mature_land_delta_ha": 0.0161570000000002,
+    "rabbit_labour_delta_hours_year": 225
+  },
+  "minimum_rabbit_colony": {
+    "scale": 1,
+    "reproductive_self_sufficiency": true,
+    "b12_supplied_ug_year": 2921.28,
+    "b12_requirement_ug_year": 9.6,
+    "b12_adequacy_ratio": 304.3,
+    "conclusion": "Minimum viable colony supplies more B12 than the modeled household minimum; it is not fractionally scaled just to close B12."
   },
   "prior_report_purchased_feed_dm_kg_year": {
     "plants_only": 0,

@@ -11,9 +11,10 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.reference_profile.height_cm, 178);
   assert.equal(contract.environment.climate.growing_degree_days.value_degree_days, 2073.5);
   assert.equal(contract.environment.solar.status, 'unresolved');
-  assert.equal(contract.nutrition.contract_version, '1.0.0');
+  assert.equal(contract.nutrition.contract_version, '1.1.0');
   assert.equal(contract.nutrition.food_composition_source.includes('open.canada.ca'), true);
-  assert.equal(contract.public_arc_contract.publication_ready, false);
+  assert.equal(contract.public_arc_contract.publication_ready, true);
+  assert.equal(contract.public_arc_contract.contract_version, '1.1.0');
   assert.equal(contract.public_arc_contract.canonical_household, 'two_adults_plus_three_children');
   assert.equal(contract.livestock.species.chicken_eggs.canonical_arc, true);
   assert.equal(contract.livestock.species.chicken_meat.canonical_arc, false);

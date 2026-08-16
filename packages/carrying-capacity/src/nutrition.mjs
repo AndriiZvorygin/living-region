@@ -1,6 +1,8 @@
+import {calculateHealthCanadaProtein, HEALTH_CANADA_PROTEIN_SOURCE} from './protein.mjs';
+
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const NUTRITION_CONTRACT_VERSION = '1.0.0';
+export const NUTRITION_CONTRACT_VERSION = '1.1.0';
 export const HEALTH_CANADA_NUTRIENT_DRI_SOURCE = 'https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html';
 export const HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE = 'https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf';
 export const CANADIAN_NUTRIENT_FILE_SOURCE = 'https://open.canada.ca/data/en/dataset/1b6139bd-ed7e-4043-bc28-ff00e10f3109';
@@ -62,9 +64,10 @@ const band = (age, sex) => {
 
 export function calculateHealthCanadaNutrientDemand(member = {}) {
   const d = band(member.age_y, member.sex);
+  const protein = calculateHealthCanadaProtein(member);
   if (member.pregnancy && member.pregnancy !== 'none') Object.assign(d, {b12: 2.6, a: 770, folate: 600, c: 85, iron: 27, iodine: 220, choline: 450});
   if (member.lactation && member.lactation !== 'none') Object.assign(d, {b12: 2.8, a: 1300, folate: 500, c: 120, iodine: 290, choline: 550});
-  return {id: member.id, age_y: Number(member.age_y), sex: member.sex, pregnancy: member.pregnancy ?? 'none', lactation: member.lactation ?? 'none', ...d, source: HEALTH_CANADA_NUTRIENT_DRI_SOURCE, status: 'Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied'};
+  return {id: member.id, age_y: Number(member.age_y), sex: member.sex, pregnancy: member.pregnancy ?? 'none', lactation: member.lactation ?? 'none', ...d, protein_rda_g_day: protein.rda_g_day, protein_rda_g_year: protein.rda_kg_year * 1000, protein_source: HEALTH_CANADA_PROTEIN_SOURCE, source: HEALTH_CANADA_NUTRIENT_DRI_SOURCE, status: 'Health Canada DRI planning reference; pregnancy/lactation adjustments applied where supplied'};
 }
 
 function addProfile(total, profile, kg) {
@@ -76,11 +79,16 @@ function addProfile(total, profile, kg) {
   total.sources.add(profile.source_food_code ?? profile.id);
 }
 
-function nutrientStatus(ratio, known, supplied = null) { if (!known) return 'unresolved evidence'; if (Number(supplied) === 0) return 'external input required'; if (ratio >= 1) return 'adequate from property food'; return 'marginal'; }
+function nutrientStatus(ratio, known, supplied = null) {
+  if (!known) return 'unresolved evidence';
+  if (ratio >= 1) return 'adequate from property-produced food';
+  if (Number(supplied) === 0) return 'small external input required';
+  return 'actual food-system deficit';
+}
 
 export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, animals = [], energyGJ = 0} = {}) {
   const demandRows = members.map(calculateHealthCanadaNutrientDemand);
-  const demand = {b12: 0, d: 0, a: 0, folate: 0, c: 0, calcium: 0, iron: 0, zinc: 0, iodine: 0, selenium: 0, magnesium: 0, potassium: 0, choline: 0};
+  const demand = {b12: 0, d: 0, a: 0, folate: 0, c: 0, calcium: 0, iron: 0, zinc: 0, iodine: 0, selenium: 0, magnesium: 0, potassium: 0, choline: 0, protein_rda_g_year: 0};
   for (const row of demandRows) for (const id of Object.keys(demand)) demand[id] += row[id];
   const energyKj = Number(energyGJ) * 1e6;
   demand.linoleic_g = energyKj * .05 / 37;
@@ -93,18 +101,58 @@ export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, ani
     addProfile(total, FOOD_NUTRIENT_PROFILES[profiles.meat ?? animal.food_profile_id], Number(animal.output?.edible_meat_kg_year ?? 0));
   }
   const amino = Object.fromEntries(Object.entries(HEALTH_CANADA_AMINO_ACID_PATTERN).map(([id, mgPerG]) => {
-    const target = total.protein_g * mgPerG;
+    const patternTarget = total.protein_g * mgPerG;
     const supplied = total.amino_mg[id] ?? 0;
-    return [id, {target_mg: round(target), supplied_mg: round(supplied), adequacy_ratio: target > 0 ? round(supplied / target) : null, status: nutrientStatus(target > 0 ? supplied / target : 0, total.sources.size > 0, supplied)}];
+    const requirement = demand.protein_rda_g_year * mgPerG / 1000;
+    const actual = supplied / 1000;
+    const qualityRatio = patternTarget > 0 ? supplied / patternTarget : null;
+    const absoluteRatio = requirement > 0 ? actual / requirement : null;
+    return [id, {
+      pattern_target_mg: round(patternTarget),
+      supplied_mg: round(supplied),
+      actual_intake_g_year: round(actual),
+      requirement_g_year: round(requirement),
+      absolute_adequacy_ratio: absoluteRatio == null ? null : round(absoluteRatio),
+      quality_pattern_ratio: qualityRatio == null ? null : round(qualityRatio),
+      // Compatibility alias. It is a pattern score, not an absolute requirement ratio.
+      adequacy_ratio: qualityRatio == null ? null : round(qualityRatio),
+      quality_status: qualityRatio == null ? 'unresolved evidence' : qualityRatio >= 1 ? 'meets reference pattern' : 'limiting reference pattern',
+      absolute_status: absoluteRatio == null ? 'unresolved evidence' : absoluteRatio >= 1 ? 'absolute adequacy met' : 'actual amino-acid deficit',
+      digestibility_status: 'unresolved evidence',
+      digestibility_adjusted_ratio: null,
+      status: absoluteRatio == null ? 'unresolved evidence' : absoluteRatio >= 1 ? 'absolute adequacy met' : 'actual amino-acid deficit'
+    }];
   }));
-  const limiting = Object.entries(amino).filter(([, row]) => row.adequacy_ratio != null).sort(([, a], [, b]) => a.adequacy_ratio - b.adequacy_ratio)[0];
+  const limiting = Object.entries(amino).filter(([, row]) => row.quality_pattern_ratio != null).sort(([, a], [, b]) => a.quality_pattern_ratio - b.quality_pattern_ratio)[0];
+  const absoluteLimiting = Object.entries(amino).filter(([, row]) => row.absolute_adequacy_ratio != null).sort(([, a], [, b]) => a.absolute_adequacy_ratio - b.absolute_adequacy_ratio)[0];
   const microMap = {vitamin_b12_ug: 'b12', vitamin_d_ug: 'd', vitamin_a_rae_ug: 'a', folate_dfe_ug: 'folate', vitamin_c_mg: 'c', calcium_mg: 'calcium', iron_mg: 'iron', zinc_mg: 'zinc', iodine_ug: 'iodine', selenium_ug: 'selenium', magnesium_mg: 'magnesium', potassium_mg: 'potassium', choline_mg: 'choline', linoleic_g: 'linoleic_g', alpha_linolenic_g: 'alpha_linolenic_g'};
   const nutrients = Object.fromEntries(Object.entries(microMap).map(([id, demandId]) => {
     const supplied = total.nutrients[id] ?? 0;
     const target = demand[demandId] ?? 0;
-    const known = total.sources.size > 0 && [...total.sources].some((source) => source && [...(plantFood.rows ?? []), ...animals.flatMap((animal) => [{composition_id: animal.food_profile_id}])].some((row) => row.composition_id && FOOD_NUTRIENT_PROFILES[row.composition_id]?.nutrients_per_100g?.[id] != null));
+    const compositionIds = [...(plantFood.rows ?? []).map((row) => row.composition_id), ...animals.flatMap((animal) => Object.values(animal.food_profile_id_by_output ?? {}).concat(animal.food_profile_id ?? []))].filter(Boolean);
+    const known = compositionIds.some((compositionId) => FOOD_NUTRIENT_PROFILES[compositionId]?.nutrients_per_100g?.[id] != null);
     return [demandId, {target: round(target), supplied: round(supplied), adequacy_ratio: target > 0 ? round(supplied / target) : null, status: nutrientStatus(target > 0 ? supplied / target : 0, known, supplied), unit: id.endsWith('_ug') ? 'µg/year' : id.endsWith('_mg') ? 'mg/year' : 'g/year'}];
   }));
-  const externalInputs = Object.entries(nutrients).filter(([, row]) => row.status !== 'adequate from property food').map(([id, row]) => ({nutrient: id, status: row.status, note: id === 'b12' || id === 'iodine' ? 'A small external non-food input may be required; no supplement is silently included.' : 'Current food-form evidence does not establish adequacy.'}));
-  return {contract_version: NUTRITION_CONTRACT_VERSION, demand: {members: demandRows, aggregate: Object.fromEntries(Object.entries(demand).map(([id, value]) => [id, round(value)]))}, supply: {protein_g: round(total.protein_g), sources: [...total.sources]}, amino_acid_pattern: {source: HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE, reference_mg_per_g_protein: HEALTH_CANADA_AMINO_ACID_PATTERN, limiting_amino_acid: limiting ? limiting[0] : null, rows: amino}, nutrients, external_inputs: externalInputs, food_source_boundary: 'Only modeled property-produced food is counted. Iodized salt, supplements, fortification and veterinary minerals are external non-food inputs and are not included.', status: externalInputs.length ? 'external input or unresolved evidence remains' : 'adequate from modeled property food'};
+  const externalInputs = Object.entries(nutrients).filter(([, row]) => row.status !== 'adequate from property-produced food').map(([id, row]) => ({nutrient: id, status: row.status, note: id === 'b12' || id === 'iodine' ? 'A small external non-food input may be required; no supplement is silently included.' : 'Current food-form evidence does not establish adequacy.'}));
+  const absoluteAdequacy = Object.values(amino).every((row) => row.absolute_adequacy_ratio != null && row.absolute_adequacy_ratio >= 1);
+  return {
+    contract_version: NUTRITION_CONTRACT_VERSION,
+    demand: {members: demandRows, aggregate: Object.fromEntries(Object.entries(demand).map(([id, value]) => [id, round(value)]))},
+    supply: {protein_g: round(total.protein_g), sources: [...total.sources]},
+    amino_acid_pattern: {
+      source: HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE,
+      reference_mg_per_g_protein: HEALTH_CANADA_AMINO_ACID_PATTERN,
+      limiting_amino_acid: limiting ? limiting[0] : null,
+      limiting_pattern_amino_acid: limiting ? limiting[0] : null,
+      absolute_limiting_amino_acid: absoluteLimiting ? absoluteLimiting[0] : null,
+      absolute_adequacy: absoluteAdequacy,
+      requirement_method: 'Household absolute amino-acid planning requirements are derived by applying the Health Canada age-1+ reference pattern (mg/g protein) to each member total-protein RDA. This is an explicit planning comparison, not a separate clinical amino-acid DRI table.',
+      digestibility_method: 'No food-specific digestibility adjustment is applied where the current CNF food-form evidence does not provide a defensible value. Raw intake and reference-pattern results remain separate from digestibility-adjusted quality.',
+      rows: amino
+    },
+    nutrients,
+    external_inputs: externalInputs,
+    food_source_boundary: 'Only modeled property-produced food is counted. Iodized salt, supplements, fortification and veterinary minerals are external non-food inputs and are not included.',
+    status: externalInputs.length ? 'external input or unresolved evidence remains' : 'adequate from modeled property food'
+  };
 }
