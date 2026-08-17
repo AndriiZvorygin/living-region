@@ -498,6 +498,14 @@ export function calculateInterveningHouseholdCosts(
 
 export const NESTED_COVERAGE_TARGETS = [150, 300, 600] as const;
 const LOCAL_COVERAGE_TARGET = NESTED_COVERAGE_TARGETS[0];
+/**
+ * Keep a recommendation out of the immediate edge of already-covered work
+ * when the graph has another complete practical area to offer. This is an
+ * operational buffer measured in eligible household transitions, not metres
+ * or screen distance. The nested undercoverage score still ranks candidates
+ * inside the buffer-qualified set.
+ */
+export const NEXT_AREA_MIN_COVERED_SEPARATION_HOPS = 20;
 
 type StopCoverageStats = {
   eligible: Array<{ household_id: string; covered: boolean }>;
@@ -765,26 +773,45 @@ export function calculateNestedCoverageArea(
   );
 }
 
-const chooseNextUnderflyeredArea = (
-  scored: LocalCoverageArea[],
-): NextUnderflyeredArea | null => {
+const rankScoredUnderflyeredAreas = (scored: LocalCoverageArea[]) => {
   // A tiny disconnected component can otherwise report 100% undercoverage
   // from one available household and outrank a city-sized neighbourhood.
   // Keep those areas scored and visible in diagnostics, but only let them
   // compete when no candidate has a complete practical 150-household window.
   const completeInner = scored.filter((area) => area.inner.complete);
   const candidates = completeInner.length ? completeInner : scored;
-  const chosen = [...candidates].sort(
+  const separatedCandidates = candidates.filter((area) => {
+    const hops = area.nearestCoveredHouseholdHops;
+    // A fully sampled component with no covered household is a genuinely
+    // untouched candidate, not an infinite-distance bonus. Incomplete
+    // disconnected fragments stay in the ordinary fallback pool.
+    return hops == null
+      ? area.inner.complete && area.broad.complete
+      : hops >= NEXT_AREA_MIN_COVERED_SEPARATION_HOPS;
+  });
+  // Prefer a fresh graph neighbourhood when one exists. If the current
+  // coverage pattern leaves no such candidate, retain the nested score's
+  // original citywide behaviour instead of returning no recommendation.
+  const preferredCandidates = separatedCandidates.length
+    ? separatedCandidates
+    : candidates;
+  return [...preferredCandidates].sort(
     (left, right) =>
       right.nestedUndercoverageScore - left.nestedUndercoverageScore ||
       (right.nearestCoveredHouseholdHops == null ? -1 : right.nearestCoveredHouseholdHops) -
         (left.nearestCoveredHouseholdHops == null ? -1 : left.nearestCoveredHouseholdHops) ||
       left.inner.averageHouseholdHops - right.inner.averageHouseholdHops ||
       left.center_household_id.localeCompare(right.center_household_id),
-  )[0];
+  );
+};
+
+const chooseNextUnderflyeredArea = (
+  scored: LocalCoverageArea[],
+): NextUnderflyeredArea | null => {
+  const chosen = rankScoredUnderflyeredAreas(scored)[0];
   if (!chosen) return null;
   const tieBreakResult =
-    `score ${(chosen.nestedUndercoverageScore * 100).toFixed(1)}%; nearest covered hops ${chosen.nearestCoveredHouseholdHops == null ? "unconnected" : chosen.nearestCoveredHouseholdHops}; inner average hops ${chosen.inner.averageHouseholdHops.toFixed(1)}`;
+    `score ${(chosen.nestedUndercoverageScore * 100).toFixed(1)}%; fresh-area preference ${NEXT_AREA_MIN_COVERED_SEPARATION_HOPS}+ household hops; nearest covered hops ${chosen.nearestCoveredHouseholdHops == null ? "unconnected" : chosen.nearestCoveredHouseholdHops}; inner average hops ${chosen.inner.averageHouseholdHops.toFixed(1)}`;
   return {
     ...chosen,
     remaining: chosen.localRemaining,
@@ -796,6 +823,36 @@ const chooseNextUnderflyeredArea = (
     reason: "local_coverage",
   };
 };
+
+/**
+ * Return the same deterministic ranking used by the selector. This is kept
+ * as a small diagnostic API so the server and regression tools can explain
+ * why a practical centre won instead of inspecting only the winner.
+ */
+export function rankNextUnderflyeredAreas(
+  locations: CoverageLocation[],
+  graph: HouseholdAdjacencyGraph,
+  _targetSize: number = LOCAL_COVERAGE_TARGET,
+): LocalCoverageArea[] {
+  const context = buildLocalCoverageContext(locations, graph);
+  const eligible = [...context.locations.values()].filter((location) => location.eligible);
+  if (!eligible.length || eligible.every((location) => location.covered)) return [];
+  const targetSizes =
+    _targetSize === LOCAL_COVERAGE_TARGET
+      ? NESTED_COVERAGE_TARGETS
+      : [_targetSize, _targetSize * 2, _targetSize * 4];
+  const scored = eligible
+    .map((location) =>
+      calculateCoverageAreaWithTargets(
+        location.household_id,
+        graph,
+        context,
+        targetSizes,
+      ),
+    )
+    .filter((area): area is LocalCoverageArea => Boolean(area));
+  return rankScoredUnderflyeredAreas(scored);
+}
 
 /**
  * Choose a stable centre from the full household graph. This deliberately
