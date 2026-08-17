@@ -147,3 +147,16 @@ export function getCanonicalHouseholdRows({site = 'ordinary_mesic'} = {}) {
   const rows = summary.canonical?.mature_food_system?.canonical_rows ?? [];
   return rows.filter((row) => row.site === site);
 }
+
+export {
+  PLANT_DATABASE_CONTRACT_VERSION,
+  PLANT_DATABASE_VERSION,
+  PLANT_EVIDENCE_CLASSES,
+  PLANT_LIFE_CYCLES,
+  PLANT_LAYERS,
+  NUTRITION_FIELDS,
+  normalizePlantRecord,
+  validatePlantDatabase,
+  assertValidPlantDatabase,
+  buildPlantDatabase
+} from './plant-database.mjs';

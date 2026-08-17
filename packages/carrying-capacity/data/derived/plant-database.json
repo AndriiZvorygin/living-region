@@ -1,0 +1,2858 @@
+{
+  "contract_version": "1.0.0",
+  "database_version": "1.0.0",
+  "source_date": "2026-08-16",
+  "source_manifest": [
+    "Existing Living Region food-yield and perennial-yield evidence files",
+    "Health Canada / Canadian Nutrient File food-form profiles",
+    "Ontario Ministry of Agriculture, Food and Rural Affairs extension material",
+    "University of Virginia Honeylocust Agroforestry summary",
+    "Bryan, Berlyn and Gordon (1996) nitrogen-fixation study"
+  ],
+  "records": [
+    {
+      "id": "annual_potato",
+      "identity": {
+        "common_name": "White potato",
+        "scientific_name": "Solanum tuberosum",
+        "cultivar": "low-input planning composite",
+        "family": "Solanaceae",
+        "evidence_status": "canonical_bridge_crop"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "annual_plot",
+        "mature_height_m": 0.6,
+        "canopy_width_m": null,
+        "root_depth_m": 0.5,
+        "growth_form": "herbaceous",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 110,
+          "end_doy": 145
+        },
+        "harvest_window": {
+          "start_doy": 235,
+          "end_doy": 285
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 3,
+        "min_winter_temp_c": -35,
+        "growing_degree_days_base5": 1200,
+        "frost_sensitive": true,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5.2,
+          "max": 6.8
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "tuber",
+          "part": "tuber",
+          "edible": true,
+          "composition_id": "potato_white_raw",
+          "destination": "human_food",
+          "yield": {
+            "low": 7000,
+            "central": 10000,
+            "high": 14000
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "potato_white_raw",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "livestock_feed",
+            "compost"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 500,
+          "central": 1000,
+          "high": 1500
+        },
+        "pollinator_support": "low",
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 35,
+          "central": 55,
+          "high": 85
+        },
+        "propagation_method": "seed tuber",
+        "pruning": null,
+        "harvest": "dig and cure",
+        "processing": "storage and cooking",
+        "storage": "cool dark storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed tubers",
+          "fertility replacement"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "solanaceae",
+        "disease_conflicts": [
+          "annual_solanaceae"
+        ],
+        "compatible_layers": [
+          "young_orchard_rows"
+        ],
+        "competition": "full-season annual occupation",
+        "livestock_compatibility": [
+          "crop_residue"
+        ],
+        "guilds": [
+          "annual_staple_plot"
+        ]
+      },
+      "evidence": {
+        "source_class": "documented_synthesis",
+        "sources": [
+          "packages/carrying-capacity/data/derived/evidence-food-yields.json#potato_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "derived low-input synthesis",
+        "confidence": "moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Central yield is a planning synthesis, not a Grey-Bruce trial."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "annual_winter_wheat",
+      "identity": {
+        "common_name": "Winter wheat",
+        "scientific_name": "Triticum aestivum",
+        "cultivar": "low-input planning composite",
+        "family": "Poaceae",
+        "evidence_status": "canonical_bridge_crop"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "annual_plot",
+        "mature_height_m": 1,
+        "canopy_width_m": null,
+        "root_depth_m": 1.2,
+        "growth_form": "grass",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 250,
+          "end_doy": 295
+        },
+        "harvest_window": {
+          "start_doy": 190,
+          "end_doy": 230
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 3,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1500,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "clay_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5.5,
+          "max": 7.5
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "grain",
+          "part": "seed",
+          "edible": true,
+          "composition_id": "winter_wheat_dry",
+          "destination": "human_food",
+          "yield": {
+            "low": 1200,
+            "central": 2000,
+            "high": 3000
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "winter_wheat_dry",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "straw"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 400,
+          "central": 800,
+          "high": 1200
+        },
+        "pollinator_support": null,
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 30,
+          "central": 50,
+          "high": 75
+        },
+        "propagation_method": "saved seed",
+        "pruning": null,
+        "harvest": "cut, dry and thresh",
+        "processing": "threshing and milling",
+        "storage": "dry grain storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed",
+          "fertility replacement"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "cereal",
+        "disease_conflicts": [
+          "cereal_repeat"
+        ],
+        "compatible_layers": [
+          "young_tree_rows"
+        ],
+        "competition": "full-season annual occupation",
+        "livestock_compatibility": [
+          "grain",
+          "straw"
+        ],
+        "guilds": [
+          "annual_staple_plot"
+        ]
+      },
+      "evidence": {
+        "source_class": "documented_synthesis",
+        "sources": [
+          "packages/carrying-capacity/data/derived/evidence-food-yields.json#wheat_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "derived low-input synthesis",
+        "confidence": "moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Commercial Ontario evidence is discounted for low-input use."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "annual_dry_bean",
+      "identity": {
+        "common_name": "Dry bean",
+        "scientific_name": "Phaseolus vulgaris",
+        "cultivar": "short-season planning composite",
+        "family": "Fabaceae",
+        "evidence_status": "canonical_bridge_crop"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "annual_plot",
+        "mature_height_m": 0.5,
+        "canopy_width_m": null,
+        "root_depth_m": 0.7,
+        "growth_form": "herbaceous legume",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 125,
+          "end_doy": 155
+        },
+        "harvest_window": {
+          "start_doy": 245,
+          "end_doy": 285
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -5,
+        "growing_degree_days_base5": 1400,
+        "frost_sensitive": true,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5.5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "low_to_medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "dry_seed",
+          "part": "seed",
+          "edible": true,
+          "composition_id": "black_beans_dry",
+          "destination": "human_food",
+          "yield": {
+            "low": 500,
+            "central": 800,
+            "high": 1300
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "black_beans_dry",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "crop_residue"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 20,
+          "central": 50,
+          "high": 100
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 400,
+          "central": 800,
+          "high": 1200
+        },
+        "pollinator_support": "medium",
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 45,
+          "central": 70,
+          "high": 110
+        },
+        "propagation_method": "saved seed",
+        "pruning": null,
+        "harvest": "dry and thresh",
+        "processing": "drying and cleaning",
+        "storage": "dry seed storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "inoculant optional",
+          "phosphorus replacement"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "legume",
+        "disease_conflicts": [
+          "bean_repeat"
+        ],
+        "compatible_layers": [
+          "young_orchard_rows",
+          "corn_or_squash"
+        ],
+        "competition": "annual plot occupation",
+        "livestock_compatibility": [
+          "crop_residue"
+        ],
+        "guilds": [
+          "annual_staple_plot",
+          "nitrogen_rotation"
+        ]
+      },
+      "evidence": {
+        "source_class": "documented_synthesis",
+        "sources": [
+          "packages/carrying-capacity/data/derived/evidence-food-yields.json#dry_beans_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "derived low-input synthesis",
+        "confidence": "moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Harvested seed exports nutrients; fixation is not automatically crop-available."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "annual_sunflower",
+      "identity": {
+        "common_name": "Sunflower",
+        "scientific_name": "Helianthus annuus",
+        "cultivar": "short-season oilseed composite",
+        "family": "Asteraceae",
+        "evidence_status": "canonical_bridge_crop"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "annual_plot",
+        "mature_height_m": 2,
+        "canopy_width_m": null,
+        "root_depth_m": 1.5,
+        "growth_form": "herbaceous",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 120,
+          "end_doy": 150
+        },
+        "harvest_window": {
+          "start_doy": 245,
+          "end_doy": 285
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -5,
+        "growing_degree_days_base5": 1500,
+        "frost_sensitive": true,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "deep",
+        "ph": {
+          "min": 5.5,
+          "max": 7.5
+        },
+        "drainage": [
+          "well_drained"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "seed",
+          "part": "seed",
+          "edible": true,
+          "composition_id": "sunflower_seed_dry",
+          "destination": "human_food",
+          "yield": {
+            "low": 500,
+            "central": 900,
+            "high": 1400
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "sunflower_seed_dry",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "crop_residue"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 500,
+          "central": 1000,
+          "high": 1600
+        },
+        "pollinator_support": "high",
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 35,
+          "central": 55,
+          "high": 90
+        },
+        "propagation_method": "saved seed",
+        "pruning": null,
+        "harvest": "dry head and thresh",
+        "processing": "drying and pressing or cracking",
+        "storage": "dry seed storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed",
+          "phosphorus and potassium replacement"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "oilseed",
+        "disease_conflicts": [
+          "oilseed_repeat"
+        ],
+        "compatible_layers": [
+          "young_orchard_rows"
+        ],
+        "competition": "early fat bridge occupies annual land",
+        "livestock_compatibility": [
+          "seed cake",
+          "crop residue"
+        ],
+        "guilds": [
+          "annual_staple_plot"
+        ]
+      },
+      "evidence": {
+        "source_class": "documented_synthesis",
+        "sources": [
+          "packages/carrying-capacity/data/derived/evidence-food-yields.json#sunflower_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "derived low-input synthesis",
+        "confidence": "moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Adjustable early fat bridge; should decline as perennial nuts mature."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "annual_oat",
+      "identity": {
+        "common_name": "Oat",
+        "scientific_name": "Avena sativa",
+        "cultivar": "short-season planning composite",
+        "family": "Poaceae",
+        "evidence_status": "canonical_bridge_crop"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "annual_plot",
+        "mature_height_m": 1,
+        "canopy_width_m": null,
+        "root_depth_m": 0.9,
+        "growth_form": "grass",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 140
+        },
+        "harvest_window": {
+          "start_doy": 225,
+          "end_doy": 270
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 3,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1300,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "clay_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "grain",
+          "part": "seed",
+          "edible": true,
+          "composition_id": "oats_dry",
+          "destination": "human_food",
+          "yield": {
+            "low": 900,
+            "central": 1500,
+            "high": 2300
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "oats_dry",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "straw"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 400,
+          "central": 800,
+          "high": 1200
+        },
+        "pollinator_support": null,
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 30,
+          "central": 50,
+          "high": 80
+        },
+        "propagation_method": "saved seed",
+        "pruning": null,
+        "harvest": "cut, dry and thresh",
+        "processing": "threshing and rolling",
+        "storage": "dry grain storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed",
+          "fertility replacement"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "cereal",
+        "disease_conflicts": [
+          "cereal_repeat"
+        ],
+        "compatible_layers": [
+          "young_tree_rows"
+        ],
+        "competition": "annual plot occupation",
+        "livestock_compatibility": [
+          "grain",
+          "straw"
+        ],
+        "guilds": [
+          "annual_staple_plot"
+        ]
+      },
+      "evidence": {
+        "source_class": "documented_synthesis",
+        "sources": [
+          "packages/carrying-capacity/data/derived/evidence-food-yields.json#oats_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "derived low-input synthesis",
+        "confidence": "moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Commercial Ontario evidence is discounted for low-input use."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "annual_buckwheat",
+      "identity": {
+        "common_name": "Buckwheat",
+        "scientific_name": "Fagopyrum esculentum",
+        "cultivar": "short-season planning composite",
+        "family": "Polygonaceae",
+        "evidence_status": "documented_synthesis"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "annual_plot",
+        "mature_height_m": 0.8,
+        "canopy_width_m": null,
+        "root_depth_m": 0.6,
+        "growth_form": "herbaceous",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 135,
+          "end_doy": 190
+        },
+        "harvest_window": {
+          "start_doy": 210,
+          "end_doy": 250
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -3,
+        "growing_degree_days_base5": 1000,
+        "frost_sensitive": true,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "shallow_to_moderate",
+        "ph": {
+          "min": 5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "low_to_medium",
+        "light": "full_sun",
+        "water_requirement": "low_to_medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "grain",
+          "part": "seed",
+          "edible": true,
+          "composition_id": "buckwheat_dry",
+          "destination": "human_food",
+          "yield": {
+            "low": 500,
+            "central": 900,
+            "high": 1400
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "buckwheat_dry",
+            "values": null,
+            "source": "composition profile pending full CNF linkage"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "green_manure"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 600,
+          "central": 1200,
+          "high": 1800
+        },
+        "pollinator_support": "high",
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 30,
+          "central": 50,
+          "high": 80
+        },
+        "propagation_method": "saved seed",
+        "pruning": null,
+        "harvest": "grain or mow before seed set",
+        "processing": "drying and dehulling",
+        "storage": "dry grain storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed"
+        ],
+        "green_manure_rule": "Harvested grain and full green-manure credit are mutually exclusive."
+      },
+      "relationships": {
+        "rotation_family": "pseudocereal",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "young_tree_rows"
+        ],
+        "competition": "short-season succession crop",
+        "livestock_compatibility": [
+          "grain",
+          "green_manure"
+        ],
+        "guilds": [
+          "succession_cover"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "Ontario buckwheat extension guidance"
+        ],
+        "geography": "Ontario and comparable northern climates",
+        "sample_type": "extension crop guidance",
+        "confidence": "low",
+        "values": {},
+        "proxy": "low-input planning synthesis",
+        "caveat": "Nutrition composition and Grey-Bruce yield require local validation."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "annual_carrot",
+      "identity": {
+        "common_name": "Carrot",
+        "scientific_name": "Daucus carota",
+        "cultivar": "storage-root composite",
+        "family": "Apiaceae",
+        "evidence_status": "portfolio_crop"
+      },
+      "architecture": {
+        "life_cycle": "annual",
+        "layer": "root",
+        "mature_height_m": 0.5,
+        "canopy_width_m": null,
+        "root_depth_m": 0.5,
+        "growth_form": "root crop",
+        "lifespan_years": null
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 220,
+          "end_doy": 320
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 1,
+        "mature_year": 1,
+        "replacement_cycle_years": 1
+      },
+      "site_needs": {
+        "hardiness_zone_min": 3,
+        "min_winter_temp_c": -20,
+        "growing_degree_days_base5": 1000,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "sandy_loam",
+          "loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5.5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "root",
+          "part": "root",
+          "edible": true,
+          "composition_id": "carrot_raw",
+          "destination": "human_food",
+          "yield": {
+            "low": 3000,
+            "central": 5000,
+            "high": 8000
+          },
+          "bearing_curve": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0,
+            "15": 0,
+            "mature": 0
+          },
+          "retention_factor": 0.65,
+          "nutrition": {
+            "composition_id": "carrot_raw",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "livestock_feed",
+            "compost"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "pollinator_support": "medium",
+        "wind_protection": null,
+        "habitat_value": null,
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 100,
+          "central": 150,
+          "high": 240
+        },
+        "propagation_method": "seed",
+        "pruning": null,
+        "harvest": "lift and store",
+        "processing": "washing and storage",
+        "storage": "root cellar",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed",
+          "fertility replacement"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "root",
+        "disease_conflicts": [
+          "root_repeat"
+        ],
+        "compatible_layers": [
+          "young_tree_rows"
+        ],
+        "competition": "annual plot occupation",
+        "livestock_compatibility": [
+          "tops",
+          "culls"
+        ],
+        "guilds": [
+          "nutrition_portfolio"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "Canadian Nutrient File food-form profile",
+          "Ontario vegetable production guidance"
+        ],
+        "geography": "Ontario",
+        "sample_type": "food composition plus planning yield",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "Nutrition-diversity input, not the energy anchor."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "perennial_raspberry",
+      "identity": {
+        "common_name": "Raspberry and berry shrub layer",
+        "scientific_name": "Rubus idaeus",
+        "cultivar": "low-input synthesis",
+        "family": "Rosaceae",
+        "evidence_status": "central_synthesis"
+      },
+      "architecture": {
+        "life_cycle": "perennial",
+        "layer": "shrub",
+        "mature_height_m": 1.8,
+        "canopy_width_m": 1.2,
+        "root_depth_m": 0.5,
+        "growth_form": "thorny shrub",
+        "lifespan_years": 10
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 190,
+          "end_doy": 250
+        },
+        "years_to_first_yield": 2,
+        "years_to_substantial_yield": 3,
+        "mature_year": 3,
+        "replacement_cycle_years": 8
+      },
+      "site_needs": {
+        "hardiness_zone_min": 3,
+        "min_winter_temp_c": -35,
+        "growing_degree_days_base5": 900,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5.5,
+          "max": 6.8
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "berry",
+          "part": "fruit",
+          "edible": true,
+          "composition_id": "raspberry_raw",
+          "destination": "human_food",
+          "yield": {
+            "low": 1500,
+            "central": 3000,
+            "high": 5000
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0.25,
+            "3": 1,
+            "5": 1,
+            "8": 1,
+            "10": 0.9,
+            "15": 0.7,
+            "mature": 1
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "raspberry_raw",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "livestock_feed",
+            "compost"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "pollinator_support": "high",
+        "wind_protection": null,
+        "habitat_value": "medium",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 90,
+          "central": 140,
+          "high": 220
+        },
+        "propagation_method": "cane and root division",
+        "pruning": "annual cane renewal",
+        "harvest": "hand harvest",
+        "processing": "fresh, dried or frozen",
+        "storage": "cold/frozen storage",
+        "machinery": "hand harvest",
+        "external_inputs": [
+          "mulch",
+          "wildlife protection"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "perennial_berry",
+        "disease_conflicts": [
+          "raspberry_repeat"
+        ],
+        "compatible_layers": [
+          "hazelnut_shrub",
+          "fruit_tree"
+        ],
+        "competition": "moderate root and light competition",
+        "livestock_compatibility": [
+          "leaf fodder",
+          "fruit waste"
+        ],
+        "guilds": [
+          "early_food_forest"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "https://www.ontario.ca/page/growing-raspberries-and-blackberries-home-gardens",
+          "packages/carrying-capacity/data/derived/perennial-yield-evidence.json#early_berry_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "extension benchmark adjusted downward",
+        "confidence": "moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Conservative synthesis, not a replicated Grey-Bruce trial."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "perennial_hazelnut",
+      "identity": {
+        "common_name": "Hazelnut",
+        "scientific_name": "Corylus avellana",
+        "cultivar": "Ontario planning composite",
+        "family": "Betulaceae",
+        "evidence_status": "central_synthesis"
+      },
+      "architecture": {
+        "life_cycle": "perennial",
+        "layer": "shrub",
+        "mature_height_m": 4,
+        "canopy_width_m": 3.5,
+        "root_depth_m": 1.2,
+        "growth_form": "multi-stem shrub",
+        "lifespan_years": 25
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 240,
+          "end_doy": 285
+        },
+        "years_to_first_yield": 5,
+        "years_to_substantial_yield": 8,
+        "mature_year": 11,
+        "replacement_cycle_years": 25
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1500,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate_to_deep",
+        "ph": {
+          "min": 5.5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun_to_partial_shade",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "nut",
+          "part": "nut",
+          "edible": true,
+          "composition_id": "hazelnut_dried",
+          "destination": "human_food",
+          "yield": {
+            "low": 400,
+            "central": 750,
+            "high": 1200
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0.08,
+            "5": 0.35,
+            "8": 0.65,
+            "10": 0.85,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "hazelnut_dried",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "oil",
+            "shell_biomass"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "pollinator_support": "medium",
+        "wind_protection": "medium",
+        "habitat_value": "high",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 80,
+          "central": 130,
+          "high": 220
+        },
+        "propagation_method": "layering, grafting or nursery stock",
+        "pruning": "coppice and canopy management",
+        "harvest": "nut harvest and drying",
+        "processing": "shelling and storage",
+        "storage": "dry nut storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "wildlife protection",
+          "pollination management"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "perennial_nut",
+        "disease_conflicts": [
+          "hazelnut_repeat"
+        ],
+        "compatible_layers": [
+          "berry",
+          "herbaceous",
+          "ground_cover"
+        ],
+        "competition": "light and root competition rises with canopy age",
+        "livestock_compatibility": [
+          "leaf fodder",
+          "nut culls",
+          "shell biomass"
+        ],
+        "guilds": [
+          "central_food_forest",
+          "nut_fat_layer"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "https://www.ontario.ca/page/2018-economic-report-establishment-and-production-costs-hazelnuts-ontario",
+          "packages/carrying-capacity/data/derived/perennial-yield-evidence.json#intermediate_hazelnut_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "government economic model discounted for low-input planning",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "Ontario has no established broad yield history; 0.75 t/ha remains an explicit conservative synthesis."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "perennial_chinese_chestnut",
+      "identity": {
+        "common_name": "Chinese chestnut",
+        "scientific_name": "Castanea mollissima",
+        "cultivar": "low-input planning composite",
+        "family": "Fagaceae",
+        "evidence_status": "central_synthesis"
+      },
+      "architecture": {
+        "life_cycle": "perennial",
+        "layer": "canopy",
+        "mature_height_m": 12,
+        "canopy_width_m": 8,
+        "root_depth_m": 2,
+        "growth_form": "nut tree",
+        "lifespan_years": 60
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 250,
+          "end_doy": 300
+        },
+        "years_to_first_yield": 8,
+        "years_to_substantial_yield": 12,
+        "mature_year": 15,
+        "replacement_cycle_years": 60
+      },
+      "site_needs": {
+        "hardiness_zone_min": 5,
+        "min_winter_temp_c": -25,
+        "growing_degree_days_base5": 1800,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "deep",
+        "ph": {
+          "min": 5,
+          "max": 6.5
+        },
+        "drainage": [
+          "well_drained"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "nut",
+          "part": "nut",
+          "edible": true,
+          "composition_id": "chestnut_chinese_raw",
+          "destination": "human_food",
+          "yield": {
+            "low": 400,
+            "central": 750,
+            "high": 1200
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0.15,
+            "10": 0.35,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "chestnut_chinese_raw",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "livestock_feed",
+            "shell_biomass"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "pollinator_support": "medium",
+        "wind_protection": "high",
+        "habitat_value": "high",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 60,
+          "central": 100,
+          "high": 180
+        },
+        "propagation_method": "seedling or grafted tree",
+        "pruning": "form and canopy management",
+        "harvest": "nut collection",
+        "processing": "curing and storage",
+        "storage": "cool dry storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "wildlife protection",
+          "tree protection"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "perennial_nut",
+        "disease_conflicts": [
+          "chestnut_blight_risk"
+        ],
+        "compatible_layers": [
+          "berry",
+          "shrub",
+          "ground_cover"
+        ],
+        "competition": "high canopy and root competition at maturity",
+        "livestock_compatibility": [
+          "nut culls",
+          "leaf litter"
+        ],
+        "guilds": [
+          "central_food_forest",
+          "starch_layer"
+        ]
+      },
+      "evidence": {
+        "source_class": "documented_synthesis",
+        "sources": [
+          "https://www.ontario.ca/page/american-chestnut-recovery-strategy",
+          "https://ucanr.edu/site/fruit-nut-research-information-center/chestnut-fact-sheet",
+          "packages/carrying-capacity/data/derived/perennial-yield-evidence.json#long_staple_chestnut_low_input_synthesis"
+        ],
+        "geography": "Ontario and comparable northern/warm-temperate extension",
+        "sample_type": "conservation and extension synthesis",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "No Grey-Bruce low-input yield trial; central yield is deliberately conservative."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "perennial_apple_pear",
+      "identity": {
+        "common_name": "Apple and pear layer",
+        "scientific_name": "Malus domestica / Pyrus communis",
+        "cultivar": "hardy mixed orchard composite",
+        "family": "Rosaceae",
+        "evidence_status": "diversity_synthesis"
+      },
+      "architecture": {
+        "life_cycle": "perennial",
+        "layer": "low_tree",
+        "mature_height_m": 5,
+        "canopy_width_m": 4,
+        "root_depth_m": 1.5,
+        "growth_form": "fruit tree",
+        "lifespan_years": 30
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 220,
+          "end_doy": 300
+        },
+        "years_to_first_yield": 4,
+        "years_to_substantial_yield": 8,
+        "mature_year": 12,
+        "replacement_cycle_years": 30
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1400,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate_to_deep",
+        "ph": {
+          "min": 5.5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun_to_partial_shade",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "fruit",
+          "part": "fruit",
+          "edible": true,
+          "composition_id": "apple_raw_skin",
+          "destination": "human_food",
+          "yield": {
+            "low": 2000,
+            "central": 4000,
+            "high": 7000
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0.1,
+            "5": 0.35,
+            "8": 0.7,
+            "10": 0.9,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "apple_raw_skin",
+            "values": null,
+            "source": "Canadian Nutrient File profile"
+          },
+          "destinations": [
+            "human_food",
+            "storage",
+            "livestock_feed",
+            "cull_compost"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "pollinator_support": "high",
+        "wind_protection": "medium",
+        "habitat_value": "medium",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 80,
+          "central": 140,
+          "high": 260
+        },
+        "propagation_method": "grafted nursery tree",
+        "pruning": "annual training and renewal",
+        "harvest": "hand harvest",
+        "processing": "fresh, dried or stored",
+        "storage": "cool storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "wildlife protection",
+          "disease monitoring"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "perennial_fruit",
+        "disease_conflicts": [
+          "apple_repeat",
+          "pear_fire_blight"
+        ],
+        "compatible_layers": [
+          "berry",
+          "herbaceous",
+          "ground_cover"
+        ],
+        "competition": "moderate canopy competition",
+        "livestock_compatibility": [
+          "fruit culls",
+          "prunings"
+        ],
+        "guilds": [
+          "central_food_forest",
+          "fruit_storage_layer"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "https://www.ontario.ca/page/apple-rootstocks",
+          "packages/carrying-capacity/data/derived/perennial-yield-evidence.json#intermediate_apple_low_input_synthesis"
+        ],
+        "geography": "Ontario",
+        "sample_type": "guidance plus planning synthesis",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "Central value is not an intensive orchard yield promise."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "perennial_black_walnut",
+      "identity": {
+        "common_name": "Black walnut",
+        "scientific_name": "Juglans nigra",
+        "cultivar": "research candidate",
+        "family": "Juglandaceae",
+        "evidence_status": "reference_only"
+      },
+      "architecture": {
+        "life_cycle": "perennial",
+        "layer": "canopy",
+        "mature_height_m": 20,
+        "canopy_width_m": 12,
+        "root_depth_m": 2.5,
+        "growth_form": "nut tree",
+        "lifespan_years": 80
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 270,
+          "end_doy": 320
+        },
+        "years_to_first_yield": 10,
+        "years_to_substantial_yield": 15,
+        "mature_year": 20,
+        "replacement_cycle_years": 80
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1900,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam"
+        ],
+        "soil_depth": "deep",
+        "ph": {
+          "min": 5.5,
+          "max": 7.5
+        },
+        "drainage": [
+          "well_drained"
+        ],
+        "moisture": "mesic",
+        "fertility": "medium",
+        "light": "full_sun",
+        "water_requirement": "medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "nut",
+          "part": "nut",
+          "edible": true,
+          "composition_id": "black_walnut_dried",
+          "destination": "human_food",
+          "yield": {
+            "low": null,
+            "central": null,
+            "high": null
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "10": 0.1,
+            "15": 0.4,
+            "mature": 1
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "black_walnut_dried",
+            "values": null,
+            "source": "Canadian Nutrient File profile; yield unresolved"
+          },
+          "destinations": [
+            "human_food",
+            "seed_reserve",
+            "wildlife"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 0,
+          "central": 0,
+          "high": 0
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "pollinator_support": null,
+        "wind_protection": "high",
+        "habitat_value": "high",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": null,
+          "central": null,
+          "high": null
+        },
+        "propagation_method": "seed or grafted tree",
+        "pruning": "canopy management",
+        "harvest": "nut collection",
+        "processing": "shelling",
+        "storage": "dry nut storage",
+        "machinery": "unresolved",
+        "external_inputs": [
+          "wildlife protection"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "perennial_nut",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "shade_tolerant_herbaceous"
+        ],
+        "competition": "high canopy and root competition",
+        "livestock_compatibility": [
+          "nut culls",
+          "leaf litter"
+        ],
+        "guilds": [
+          "late_nut_sensitivity"
+        ]
+      },
+      "evidence": {
+        "source_class": "reference_only",
+        "sources": [
+          "Canadian Nutrient File food-form profile"
+        ],
+        "geography": "comparable temperate climates",
+        "sample_type": "food composition only",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "Yield and Grey-Bruce low-input bearing remain unresolved; never use as canonical calorie yield."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "support_black_locust",
+      "identity": {
+        "common_name": "Black locust",
+        "scientific_name": "Robinia pseudoacacia",
+        "cultivar": "support and coppice composite",
+        "family": "Fabaceae",
+        "evidence_status": "proxy_synthesis"
+      },
+      "architecture": {
+        "life_cycle": "support",
+        "layer": "support",
+        "mature_height_m": 15,
+        "canopy_width_m": 8,
+        "root_depth_m": 2,
+        "growth_form": "coppice tree",
+        "lifespan_years": 40
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 250,
+          "end_doy": 320
+        },
+        "years_to_first_yield": 3,
+        "years_to_substantial_yield": 6,
+        "mature_year": 10,
+        "replacement_cycle_years": 20
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1400,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5,
+          "max": 8
+        },
+        "drainage": [
+          "well_drained"
+        ],
+        "moisture": "mesic_to_dry",
+        "fertility": "low_to_medium",
+        "light": "full_sun",
+        "water_requirement": "low_to_medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "coppice_biomass",
+          "part": "stem_and_branch",
+          "edible": false,
+          "composition_id": null,
+          "destination": "wood_fuel",
+          "yield": {
+            "low": 3000,
+            "central": 6000,
+            "high": 9000
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0.25,
+            "5": 0.6,
+            "8": 1,
+            "10": 1,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.8,
+          "nutrition": {
+            "composition_id": null,
+            "values": null,
+            "source": null
+          },
+          "destinations": [
+            "wood_fuel",
+            "mulch",
+            "fibre"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 30,
+          "central": 43,
+          "high": 56
+        },
+        "phosphorus_scavenging": "medium",
+        "mulch_kg_dm_ha_year": {
+          "low": 1000,
+          "central": 2500,
+          "high": 4000
+        },
+        "pollinator_support": "medium",
+        "wind_protection": "high",
+        "habitat_value": "high",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 20,
+          "central": 45,
+          "high": 90
+        },
+        "propagation_method": "seed, root cutting or coppice",
+        "pruning": "coppice rotation",
+        "harvest": "cut and stack",
+        "processing": "drying",
+        "storage": "air-dry",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "containment and stand management"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "nitrogen_support",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "nut",
+          "berry",
+          "coppice_edge"
+        ],
+        "competition": "canopy and root competition if unmanaged",
+        "livestock_compatibility": [
+          "leaf fodder",
+          "browse caution"
+        ],
+        "guilds": [
+          "fertility_support"
+        ]
+      },
+      "evidence": {
+        "source_class": "published_research",
+        "sources": [
+          "Bryan, Berlyn and Gordon (1996)",
+          "https://extension.virginia.edu/publications/2905"
+        ],
+        "geography": "temperate North America",
+        "sample_type": "nitrogen fixation and agroforestry synthesis",
+        "confidence": "low_to_moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Fixation is not equivalent to crop-available nitrogen; transfer is modelled separately."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "support_honey_locust",
+      "identity": {
+        "common_name": "Honey locust",
+        "scientific_name": "Gleditsia triacanthos",
+        "cultivar": "black-locust proxy",
+        "family": "Fabaceae",
+        "evidence_status": "explicit_proxy"
+      },
+      "architecture": {
+        "life_cycle": "support",
+        "layer": "support",
+        "mature_height_m": 18,
+        "canopy_width_m": 12,
+        "root_depth_m": 2,
+        "growth_form": "support tree",
+        "lifespan_years": 70
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 250,
+          "end_doy": 320
+        },
+        "years_to_first_yield": 5,
+        "years_to_substantial_yield": 10,
+        "mature_year": 15,
+        "replacement_cycle_years": 50
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 1500,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "clay_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5,
+          "max": 8
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic_to_dry",
+        "fertility": "low_to_medium",
+        "light": "full_sun",
+        "water_requirement": "low_to_medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "pod_and_biomass",
+          "part": "pod_and_stem",
+          "edible": false,
+          "composition_id": null,
+          "destination": "fodder_and_biomass",
+          "yield": {
+            "low": 2000,
+            "central": 4000,
+            "high": 7000
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0.2,
+            "8": 0.5,
+            "10": 0.8,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.8,
+          "nutrition": {
+            "composition_id": null,
+            "values": null,
+            "source": null
+          },
+          "destinations": [
+            "fodder",
+            "wood_fuel",
+            "mulch"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 7.5,
+          "central": 21.5,
+          "high": 42
+        },
+        "phosphorus_scavenging": "medium",
+        "mulch_kg_dm_ha_year": {
+          "low": 800,
+          "central": 1800,
+          "high": 3000
+        },
+        "pollinator_support": "medium",
+        "wind_protection": "high",
+        "habitat_value": "high",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 20,
+          "central": 45,
+          "high": 90
+        },
+        "propagation_method": "seedling",
+        "pruning": "form and biomass management",
+        "harvest": "pod or coppice harvest",
+        "processing": "drying and chipping",
+        "storage": "dry biomass storage",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "proxy uncertainty",
+          "stand management"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "nitrogen_support",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "nut",
+          "berry",
+          "coppice_edge"
+        ],
+        "competition": "high if canopy unmanaged",
+        "livestock_compatibility": [
+          "pod fodder",
+          "browse caution"
+        ],
+        "guilds": [
+          "fertility_support"
+        ]
+      },
+      "evidence": {
+        "source_class": "explicit_proxy",
+        "sources": [
+          "https://extension.virginia.edu/publications/2905",
+          "Bryan, Berlyn and Gordon (1996)"
+        ],
+        "geography": "North American temperate proxy",
+        "sample_type": "black-locust reference proxy",
+        "confidence": "low",
+        "values": {},
+        "proxy": {
+          "source_id": "support_black_locust",
+          "factor": {
+            "low": 0.25,
+            "central": 0.5,
+            "high": 0.75
+          }
+        },
+        "caveat": "Honey locust nitrogen fixation is not directly measured here; proxy factor is a model assumption."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "support_siberian_peashrub",
+      "identity": {
+        "common_name": "Siberian peashrub",
+        "scientific_name": "Caragana arborescens",
+        "cultivar": "cold-hardy support shrub",
+        "family": "Fabaceae",
+        "evidence_status": "government_extension"
+      },
+      "architecture": {
+        "life_cycle": "support",
+        "layer": "shrub",
+        "mature_height_m": 5,
+        "canopy_width_m": 3,
+        "root_depth_m": 1.2,
+        "growth_form": "nitrogen-fixing shrub",
+        "lifespan_years": 25
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 230,
+          "end_doy": 300
+        },
+        "years_to_first_yield": 3,
+        "years_to_substantial_yield": 6,
+        "mature_year": 8,
+        "replacement_cycle_years": 20
+      },
+      "site_needs": {
+        "hardiness_zone_min": 2,
+        "min_winter_temp_c": -40,
+        "growing_degree_days_base5": 900,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "shallow_to_moderate",
+        "ph": {
+          "min": 5,
+          "max": 8
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic_to_dry",
+        "fertility": "low",
+        "light": "full_sun",
+        "water_requirement": "low",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "leaf_and_biomass",
+          "part": "leaf_and_branch",
+          "edible": false,
+          "composition_id": null,
+          "destination": "fodder_and_mulch",
+          "yield": {
+            "low": 1000,
+            "central": 2500,
+            "high": 4500
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0.25,
+            "5": 0.6,
+            "8": 1,
+            "10": 1,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.8,
+          "nutrition": {
+            "composition_id": null,
+            "values": null,
+            "source": null
+          },
+          "destinations": [
+            "leaf_fodder",
+            "mulch",
+            "habitat"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 20,
+          "central": 35,
+          "high": 60
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 500,
+          "central": 1200,
+          "high": 2200
+        },
+        "pollinator_support": "medium",
+        "wind_protection": "medium",
+        "habitat_value": "medium",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 20,
+          "central": 40,
+          "high": 75
+        },
+        "propagation_method": "seed",
+        "pruning": "renewal pruning",
+        "harvest": "leaf and branch cut",
+        "processing": "chop or dry",
+        "storage": "dry mulch/fodder",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "containment and renewal"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "nitrogen_support",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "berry",
+          "nut",
+          "windbreak"
+        ],
+        "competition": "moderate shrub competition",
+        "livestock_compatibility": [
+          "leaf fodder",
+          "browse"
+        ],
+        "guilds": [
+          "fertility_support",
+          "marginal_site_support"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "Ontario peashrub extension guidance"
+        ],
+        "geography": "Canada and northern temperate climates",
+        "sample_type": "extension and practitioner range",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "Fixation and fodder transfer are planning ranges, not local measurements."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "support_autumn_olive",
+      "identity": {
+        "common_name": "Autumn olive",
+        "scientific_name": "Elaeagnus umbellata",
+        "cultivar": "edible nitrogen-fixing shrub",
+        "family": "Elaeagnaceae",
+        "evidence_status": "practitioner_observation"
+      },
+      "architecture": {
+        "life_cycle": "support",
+        "layer": "shrub",
+        "mature_height_m": 5,
+        "canopy_width_m": 4,
+        "root_depth_m": 1.2,
+        "growth_form": "thorny shrub",
+        "lifespan_years": 25
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 230,
+          "end_doy": 290
+        },
+        "years_to_first_yield": 4,
+        "years_to_substantial_yield": 7,
+        "mature_year": 10,
+        "replacement_cycle_years": 20
+      },
+      "site_needs": {
+        "hardiness_zone_min": 4,
+        "min_winter_temp_c": -25,
+        "growing_degree_days_base5": 1300,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "moderate",
+        "ph": {
+          "min": 5,
+          "max": 7.5
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic_to_dry",
+        "fertility": "low",
+        "light": "full_sun_to_partial_shade",
+        "water_requirement": "low_to_medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "berry",
+          "part": "fruit",
+          "edible": true,
+          "composition_id": "autumn_olive_fruit_reference",
+          "destination": "human_food",
+          "yield": {
+            "low": null,
+            "central": null,
+            "high": null
+          },
+          "bearing_curve": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0.1,
+            "5": 0,
+            "7": 0.5,
+            "8": 0,
+            "10": 1,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.7,
+          "nutrition": {
+            "composition_id": "autumn_olive_fruit_reference",
+            "values": null,
+            "source": "composition and yield unresolved"
+          },
+          "destinations": [
+            "human_food",
+            "wildlife",
+            "livestock_feed"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 10,
+          "central": 25,
+          "high": 60
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 600,
+          "central": 1400,
+          "high": 2500
+        },
+        "pollinator_support": "medium",
+        "wind_protection": "high",
+        "habitat_value": "high",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 50,
+          "central": 100,
+          "high": 200
+        },
+        "propagation_method": "seed or rooted cutting",
+        "pruning": "containment and renewal pruning",
+        "harvest": "hand berry harvest",
+        "processing": "fresh or preserved",
+        "storage": "fresh/frozen storage",
+        "machinery": "hand harvest",
+        "external_inputs": [
+          "spread monitoring",
+          "containment labour"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "nitrogen_support",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "berry",
+          "nut",
+          "windbreak"
+        ],
+        "competition": "can spread and shade neighbours",
+        "livestock_compatibility": [
+          "leaf fodder",
+          "fruit culls",
+          "browse caution"
+        ],
+        "guilds": [
+          "fertility_support",
+          "edible_support_shrub"
+        ]
+      },
+      "evidence": {
+        "source_class": "practitioner_observation",
+        "sources": [
+          "Ontario invasive-species and agroforestry references",
+          "documented practitioner observations"
+        ],
+        "geography": "eastern North America",
+        "sample_type": "practitioner and comparative evidence",
+        "confidence": "low",
+        "values": {},
+        "proxy": null,
+        "caveat": "Selectable but not central-calorie canonical; spread-management labour and approval must be assessed."
+      },
+      "database_contract_version": "1.0.0"
+    },
+    {
+      "id": "support_clover",
+      "identity": {
+        "common_name": "Clover understory",
+        "scientific_name": "Trifolium pratense / T. repens",
+        "cultivar": "mixed low-input understory",
+        "family": "Fabaceae",
+        "evidence_status": "government_extension"
+      },
+      "architecture": {
+        "life_cycle": "support",
+        "layer": "ground_cover",
+        "mature_height_m": 0.4,
+        "canopy_width_m": null,
+        "root_depth_m": 0.5,
+        "growth_form": "herbaceous ground cover",
+        "lifespan_years": 4
+      },
+      "establishment": {
+        "sowing_window": {
+          "start_doy": 100,
+          "end_doy": 160
+        },
+        "harvest_window": {
+          "start_doy": 140,
+          "end_doy": 260
+        },
+        "years_to_first_yield": 1,
+        "years_to_substantial_yield": 2,
+        "mature_year": 2,
+        "replacement_cycle_years": 4
+      },
+      "site_needs": {
+        "hardiness_zone_min": 3,
+        "min_winter_temp_c": -30,
+        "growing_degree_days_base5": 800,
+        "frost_sensitive": false,
+        "soil_texture": [
+          "loam",
+          "sandy_loam"
+        ],
+        "soil_depth": "shallow_to_moderate",
+        "ph": {
+          "min": 5.5,
+          "max": 7
+        },
+        "drainage": [
+          "well_drained",
+          "moderate"
+        ],
+        "moisture": "mesic",
+        "fertility": "low_to_medium",
+        "light": "full_sun_to_partial_shade",
+        "water_requirement": "low_to_medium",
+        "slope_tolerance_percent": null,
+        "wind_exposure": null
+      },
+      "outputs": [
+        {
+          "id": "forage",
+          "part": "leaf_and_stem",
+          "edible": false,
+          "composition_id": null,
+          "destination": "forage_and_soil_return",
+          "yield": {
+            "low": 1000,
+            "central": 2500,
+            "high": 5000
+          },
+          "bearing_curve": {
+            "1": 0.5,
+            "2": 1,
+            "3": 1,
+            "5": 1,
+            "8": 1,
+            "10": 1,
+            "15": 1,
+            "mature": 1
+          },
+          "retention_factor": 0.8,
+          "nutrition": {
+            "composition_id": null,
+            "values": null,
+            "source": null
+          },
+          "destinations": [
+            "livestock_feed",
+            "mulch",
+            "soil_return"
+          ],
+          "evidence": {
+            "status": "unknown",
+            "source_class": "reference_only",
+            "sources": [],
+            "confidence": "low",
+            "proxy": null,
+            "caveat": "Evidence not yet established."
+          }
+        }
+      ],
+      "ecological_function": {
+        "nitrogen_fixation_kg_n_ha_year": {
+          "low": 30,
+          "central": 80,
+          "high": 150
+        },
+        "phosphorus_scavenging": null,
+        "mulch_kg_dm_ha_year": {
+          "low": 500,
+          "central": 1200,
+          "high": 2200
+        },
+        "pollinator_support": "high",
+        "wind_protection": null,
+        "habitat_value": "medium",
+        "carbon_or_soil_organic_matter": null
+      },
+      "management": {
+        "labour_hours_ha_year": {
+          "low": 10,
+          "central": 25,
+          "high": 60
+        },
+        "propagation_method": "seed",
+        "pruning": "mow or graze",
+        "harvest": "cut or graze",
+        "processing": "dry forage if stored",
+        "storage": "hay or fresh grazing",
+        "machinery": "hand or small-scale",
+        "external_inputs": [
+          "seed",
+          "lime if required"
+        ]
+      },
+      "relationships": {
+        "rotation_family": "legume_cover",
+        "disease_conflicts": [],
+        "compatible_layers": [
+          "all_food_forest_layers",
+          "annual_plot"
+        ],
+        "competition": "light and water competition under dense canopy",
+        "livestock_compatibility": [
+          "forage",
+          "hay"
+        ],
+        "guilds": [
+          "fertility_support",
+          "food_forest_understory"
+        ]
+      },
+      "evidence": {
+        "source_class": "government_extension",
+        "sources": [
+          "Ontario pasture production guidance"
+        ],
+        "geography": "Ontario",
+        "sample_type": "extension forage range",
+        "confidence": "low_to_moderate",
+        "values": {},
+        "proxy": null,
+        "caveat": "Nitrogen fixation is not automatically available to neighbouring crops; transfer pathways are ledgerled separately."
+      },
+      "database_contract_version": "1.0.0"
+    }
+  ],
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [
+      "perennial_black_walnut has unresolved or reference-only evidence"
+    ],
+    "plant_count": 17,
+    "output_count": 17
+  },
+  "generated_from": "data/source/agroecosystem-plants.json",
+  "generated_at": "2026-08-17T01:27:08.565Z"
+}
