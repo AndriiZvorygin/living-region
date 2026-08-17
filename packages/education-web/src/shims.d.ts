@@ -10,6 +10,7 @@ declare module '@living-region/carrying-capacity/browser' {
   export function financeCapital(options?: Record<string, unknown>): any;
   export function calculateExclusiveLandAllocation(options?: Record<string, unknown>): any;
   export function calculateArcCommonAreaGeometry(options?: Record<string, unknown>): any;
+  export function calculateAgroecosystemPlan(options?: Record<string, unknown>): any;
   export function defaultBuilding(): any;
   export const labourCapacityLevels: Record<string, any>;
   export const heatingCases: Record<string, any>;

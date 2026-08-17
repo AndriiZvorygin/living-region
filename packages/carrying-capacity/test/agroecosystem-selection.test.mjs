@@ -47,5 +47,6 @@ test('ordinary agroecosystem plan contains selected species, succession and expl
     const reconciliation = row.reconciliation;
     const lhs = reconciliation.consumed_annual_kg + reconciliation.seed_kg + reconciliation.stored_kg + reconciliation.feed_kg + reconciliation.export_kg + reconciliation.loss_kg;
     assert.ok(Math.abs(lhs - reconciliation.produced_annual_kg) < .01);
+    assert.ok(Math.abs(row.energy_reconciliation.consumed_gj_year - row.energy_reconciliation.demand_gj_year) < .000001);
   }
 });

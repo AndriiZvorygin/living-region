@@ -14,15 +14,15 @@ Generated for the two-adult plus three-dependent-child capacity household. House
 
 | Year | Annual bridge ha | Perennial harvest kg | Food energy GJ | Carbohydrate | Protein | Fat | Main sources |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 1 | 1.289 | 0.00 | 16.68 | 77.6% | 14.4% | 7.9% | annual_potato, annual_winter_wheat, annual_oat |
-| 2 | 1.267 | 0.29 | 16.68 | 77.7% | 14.3% | 8.0% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 3 | 1.166 | 1.59 | 16.68 | 77.2% | 13.9% | 8.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 5 | 1.065 | 2.91 | 16.68 | 74.6% | 13.5% | 11.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 8 | 0.943 | 4.48 | 16.68 | 71.7% | 12.8% | 15.4% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 10 | 0.875 | 5.36 | 16.68 | 69.6% | 12.5% | 17.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 15 | 0.842 | 5.79 | 16.68 | 68.0% | 12.3% | 19.7% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 30 | 0.842 | 5.79 | 16.68 | 68.0% | 12.3% | 19.7% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| mature | 0.814 | 6.14 | 16.68 | 68.0% | 12.2% | 19.8% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 1 | 0.993 | 0.00 | 16.68 | 77.6% | 14.4% | 7.9% | annual_potato, annual_winter_wheat, annual_oat |
+| 2 | 0.977 | 0.29 | 16.68 | 77.7% | 14.3% | 8.0% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 3 | 0.907 | 1.59 | 16.68 | 77.0% | 13.8% | 9.3% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 5 | 0.836 | 2.91 | 16.68 | 73.5% | 13.1% | 13.3% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 8 | 0.751 | 4.48 | 16.68 | 69.9% | 12.4% | 17.8% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 10 | 0.703 | 5.36 | 16.68 | 67.3% | 11.9% | 20.7% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 15 | 0.679 | 5.79 | 16.68 | 65.3% | 11.7% | 22.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 30 | 0.679 | 5.79 | 16.68 | 65.3% | 11.7% | 22.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| mature | 0.660 | 6.14 | 16.68 | 65.4% | 11.6% | 23.0% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
 
 ## Nutrient and material boundary
 
