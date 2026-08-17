@@ -1,5 +1,5 @@
 import {calculateHouseholdProteinDemand} from './protein.mjs';
-import {calculateFoodNutrientAdequacy, calculateFoodPortfolioLand, calculateFoodSuccessionLedger, FOOD_NUTRIENT_PROFILES, NUTRITION_GOAL_DEFINITIONS} from './nutrition.mjs';
+import {calculateFoodNutrientAdequacy, calculateFoodPortfolioLand, calculateFoodSuccessionLedger, FOOD_NUTRIENT_PROFILES, FOOD_PORTFOLIO, NUTRITION_GOAL_DEFINITIONS} from './nutrition.mjs';
 import {FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './food-adult-equivalent.mjs';
 import {calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
 
@@ -616,7 +616,7 @@ function goalSummary({members, demandGJ, selectedMode, selectedScale, selectedGo
   return {goals, pregnancy_sensitivity_members: pregnancySensitivity?.members ?? members, pregnancy_sensitivity_subject: pregnancySensitivity?.subject ?? null};
 }
 
-export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYear = {}, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, nutritionGoal = 'user_selected_animal_share', establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature'], perennialMix = [], curveAnchors = {}, permanentAdultDemandGJ = null, perennialRetentionFactor = .70, nutritionYear = 1, _skipComparisons = false, _skipMinimumB12 = false} = {}) {
+export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYear = {}, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, nutritionGoal = 'user_selected_animal_share', establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature'], perennialMix = [], curveAnchors = {}, permanentAdultDemandGJ = null, perennialRetentionFactor = .70, annualIntercropOverlapByYear, nutritionYear = 1, _skipComparisons = false, _skipMinimumB12 = false} = {}) {
   if (!foodEvidence) throw new Error('nutrient food system requires canonical food evidence');
   const {calculateFoodSystem} = siteCapability?.calculateFoodSystem ? siteCapability : {};
   if (typeof calculateFoodSystem !== 'function') throw new Error('nutrient food system requires calculateFoodSystem in siteCapability');
@@ -633,6 +633,10 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYea
   livestockMode = goalMode;
   livestockScale = goalScale;
   const plantOnly = calculateFoodSystem(foodEvidence, demandGJ, siteCapability);
+  // The expanded portfolio is part of the canonical evidence contract, but
+  // must not be injected into caller-supplied/custom crop rows. This keeps
+  // nutrient and land tests honest: custom evidence is the complete input.
+  const canonicalFoodPortfolio = (foodEvidence.rows ?? []).some((row) => row.composition_id && FOOD_NUTRIENT_PROFILES[row.composition_id]) ? FOOD_PORTFOLIO : [];
   const proteinTarget = Number(proteinDemandKgYear ?? 0);
   const modes = livestockMode === 'plants_only' ? [] : livestockMode === 'mixed_rabbit_eggs' ? ['rabbit_meat', 'chicken_eggs'] : [livestockMode];
   const effectiveLivestockScale = deriveLivestockScale({foodDemandGJYear: demandGJ, livestockMode, livestockScale});
@@ -681,7 +685,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYea
   const plantedPerennialFootprint = perennialMix.length && maturePerennialYield > 0
     ? permanentDemandAfterAnimals / (maturePerennialYield * perennialRetentionFactor)
     : Number(plantFood.required_food_area_ha ?? 0) * .75;
-  let foodSuccessionLedger = calculateFoodSuccessionLedger({plantFood, demandGJ: Number(demandGJ), demandByYear: resolvedDemandByYear, perennialMix, curveAnchors, perennialFootprintHa: plantedPerennialFootprint, animalOutputByYear, years: establishmentYears, retentionFactor: perennialRetentionFactor, siteCapability, householdFatMax: 35});
+  let foodSuccessionLedger = calculateFoodSuccessionLedger({plantFood, demandGJ: Number(demandGJ), demandByYear: resolvedDemandByYear, perennialMix, curveAnchors, perennialFootprintHa: plantedPerennialFootprint, animalOutputByYear, years: establishmentYears, retentionFactor: perennialRetentionFactor, siteCapability, foodPortfolio: canonicalFoodPortfolio, householdFatMax: 35, annualIntercropOverlapByYear});
   // The physical ledger supplies the finite plant/perennial harvest. Attach
   // the same year's animal output to each row so the UI, nutrient report and
   // establishment calculation all read one year-specific whole-diet result.
@@ -706,7 +710,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYea
   plantProtein = Math.max(0, totalProtein - animalProtein);
   deficit = Math.max(0, proteinTarget - totalProtein);
   nutrientCompleteness.whole_diet.portfolio_land = portfolioLand;
-  const plantsOnlyLedger = calculateFoodSuccessionLedger({plantFood: plantOnly, demandGJ: Number(demandGJ), demandByYear: resolvedDemandByYear, perennialMix, curveAnchors, perennialFootprintHa: maturePerennialYield <= 0 ? Number(plantOnly.required_food_area_ha ?? 0) * .75 : Number(resolvedPermanentAdultDemandGJ) / (maturePerennialYield * perennialRetentionFactor), animalOutputByYear: {}, years: establishmentYears, retentionFactor: perennialRetentionFactor, siteCapability});
+  const plantsOnlyLedger = calculateFoodSuccessionLedger({plantFood: plantOnly, demandGJ: Number(demandGJ), demandByYear: resolvedDemandByYear, perennialMix, curveAnchors, perennialFootprintHa: maturePerennialYield <= 0 ? Number(plantOnly.required_food_area_ha ?? 0) * .75 : Number(resolvedPermanentAdultDemandGJ) / (maturePerennialYield * perennialRetentionFactor), animalOutputByYear: {}, years: establishmentYears, retentionFactor: perennialRetentionFactor, siteCapability, foodPortfolio: canonicalFoodPortfolio, annualIntercropOverlapByYear});
   const plantsOnlyNutritionRow = plantsOnlyLedger.rows.find((row) => String(row.year) === String(nutritionYear)) ?? plantsOnlyLedger.mature;
   const plantsOnlyAdequacy = calculateFoodNutrientAdequacy({members, plantFood: plantOnly, animals: [], energyGJ: demandGJ, foodPortfolio: false, foodProductionLedger: plantsOnlyNutritionRow});
   const pregnancySensitivity = resolvePregnancySensitivity(members);

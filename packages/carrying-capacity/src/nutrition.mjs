@@ -1,9 +1,10 @@
 import {calculateHealthCanadaProtein, HEALTH_CANADA_PROTEIN_SOURCE} from './protein.mjs';
 import {calculatePerennialFoodProductionLedger} from './perennial.mjs';
+import {DEFAULT_ANNUAL_INTERCROP_OVERLAP} from './establishment.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const NUTRITION_CONTRACT_VERSION = '1.4.0';
+export const NUTRITION_CONTRACT_VERSION = '1.5.0';
 export const DAYS_PER_YEAR = 365.25;
 export const HEALTH_CANADA_NUTRIENT_DRI_SOURCE = 'https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html';
 export const HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE = 'https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf';
@@ -242,39 +243,51 @@ function portfolioSiteRule(row, siteCapability = {}) {
 export function calculateFoodPortfolioLand({plantFood = {}, siteCapability = {}, years = [1, 2, 3, 5, 8, 10, 15, 'mature'], foodSuccessionLedger = null} = {}) {
   const portfolio = portfolioFoodRows(plantFood);
   const existingFoodArea = Number(plantFood.required_food_area_ha ?? 0);
-  const annualCapacity = existingFoodArea * .25;
-  const perennialCapacity = existingFoodArea * .75;
+  // The succession ledger is the authoritative physical allocation. The
+  // portfolio is a nutrition view over those zones, not another hectare
+  // layer. Fall back to the legacy 25/75 capacities only for callers that do
+  // not yet provide a year-by-year ledger.
+  const annualCapacityByYear = Object.fromEntries((foodSuccessionLedger?.rows ?? []).map((row) => [String(row.year), Number(row.annual_cultivation_area_ha ?? 0)]));
+  const perennialCapacity = Number(foodSuccessionLedger?.planted_perennial_footprint_ha ?? existingFoodArea * .75);
+  const annualCapacity = Math.max(...Object.values(annualCapacityByYear), existingFoodArea * .25, 0);
   const rows = portfolio.rows.map((row) => {
     const siteRule = portfolioSiteRule(row, siteCapability);
     const effectiveYield = Number(row.food_gj_ha_year ?? 0) * Number(siteRule.yield_multiplier ?? 0);
     const grossEnergy = Number(row.gross_food_energy_gj_year ?? 0);
     const requiredArea = siteRule.viable && effectiveYield > 0 ? grossEnergy / effectiveYield : null;
-    const capacity = row.production_type === 'perennial' ? perennialCapacity * Number(row.canonical_layer_share ?? 0) : annualCapacity / Math.max(1, portfolio.rows.filter((item) => item.production_type === 'annual').length);
-    const additional = requiredArea == null ? null : Math.max(0, requiredArea - capacity);
-    const allocated = requiredArea == null ? 0 : Math.min(requiredArea, capacity);
+    const capacity = row.production_type === 'perennial' ? perennialCapacity : annualCapacity;
     const yearRows = Object.fromEntries(years.map((year) => {
       const fraction = portfolioBearingFraction(row, year);
       const output = grossEnergy * fraction * Number(row.retention_factor ?? 1);
       return [String(year), {bearing_fraction: round(fraction), net_food_energy_gj_year: round(output), annual_bridge_food_energy_gj_year: round(Math.max(0, Number(row.consumed_energy_gj_year ?? 0) - output))}];
     }));
-    return {...row, site_viability: siteRule, effective_food_gj_ha_year: round(effectiveYield), required_area_ha: requiredArea == null ? null : round(requiredArea), existing_zone_capacity_ha: round(capacity), allocated_within_existing_food_zone_ha: round(allocated), additional_area_ha: additional == null ? null : round(additional), land_role: row.production_type === 'perennial' ? 'allocated_inside_canonical_perennial_food_zone_where_capacity_allows' : 'allocated_inside_canonical_annual_food_zone_where_capacity_allows', production_by_year: yearRows};
+    return {...row, site_viability: siteRule, effective_food_gj_ha_year: round(effectiveYield), required_area_ha: requiredArea == null ? null : round(requiredArea), existing_zone_capacity_ha: round(capacity), allocated_within_existing_food_zone_ha: null, additional_area_ha: null, true_overflow_area_ha: null, zone_assignment: row.production_type === 'perennial' ? 'perennial_food_zone' : 'annual_cultivation_zone', land_role: row.production_type === 'perennial' ? 'allocated_inside_canonical_perennial_food_zone_where_capacity_allows' : 'allocated_inside_canonical_annual_food_zone_where_capacity_allows', production_by_year: yearRows};
   });
-  const additionalRows = rows.filter((row) => row.additional_area_ha != null);
-  const staticAdditionalArea = additionalRows.reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0);
-  const successionAdditionalArea = foodSuccessionLedger ? Math.max(0, Number(foodSuccessionLedger.peak_food_production_area_ha ?? 0) - existingFoodArea) : 0;
-  const additionalArea = Math.max(staticAdditionalArea, successionAdditionalArea);
+  const groups = Object.groupBy ? Object.groupBy(rows, (row) => row.production_type) : rows.reduce((out, row) => ((out[row.production_type] ??= []).push(row), out), {});
+  const overflowByType = Object.fromEntries(Object.entries(groups).map(([type, group]) => {
+    const required = group.reduce((sum, row) => sum + Number(row.required_area_ha ?? 0), 0);
+    const capacity = type === 'perennial' ? perennialCapacity : annualCapacity;
+    return [type, {required, capacity, overflow: Math.max(0, required - capacity)}];
+  }));
+  const additionalArea = Object.values(overflowByType).reduce((sum, row) => sum + row.overflow, 0);
+  const rowsWithAllocation = rows.map((row) => {
+    const group = overflowByType[row.production_type];
+    const required = Number(row.required_area_ha ?? 0);
+    const overflow = group?.required > 0 ? group.overflow * required / group.required : 0;
+    return {...row, allocated_within_existing_food_zone_ha: round(Math.max(0, required - overflow)), additional_area_ha: round(overflow), true_overflow_area_ha: round(overflow)};
+  });
   return {
     base_food_area_ha: round(existingFoodArea),
     existing_annual_food_zone_ha: round(annualCapacity),
     existing_perennial_food_zone_ha: round(perennialCapacity),
-    rows,
-    additional_annual_area_ha: round(rows.filter((row) => row.production_type === 'annual').reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0)),
-    additional_perennial_area_ha: round(rows.filter((row) => row.production_type === 'perennial').reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0)),
+    rows: rowsWithAllocation,
+    additional_annual_area_ha: round(overflowByType.annual?.overflow ?? 0),
+    additional_perennial_area_ha: round(overflowByType.perennial?.overflow ?? 0),
     additional_area_ha: round(additionalArea),
     total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea),
     succession_ledger: foodSuccessionLedger ?? null,
     succession_area_basis: foodSuccessionLedger ? 'Peak annual cultivation plus planted perennial footprint from the canonical year-by-year food ledger.' : null,
-    area_reconciliation: {existing_food_zone_ha: round(existingFoodArea), additional_portfolio_area_ha: round(additionalArea), total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea), counted_once: true, rule: 'Portfolio crops are assigned within existing annual/perennial food zones before additional area is added.'},
+    area_reconciliation: {existing_food_zone_ha: round(existingFoodArea), annual_zone_capacity_ha: round(annualCapacity), perennial_zone_capacity_ha: round(perennialCapacity), required_annual_portfolio_area_ha: round(overflowByType.annual?.required ?? 0), required_perennial_portfolio_area_ha: round(overflowByType.perennial?.required ?? 0), true_annual_overflow_ha: round(overflowByType.annual?.overflow ?? 0), true_perennial_overflow_ha: round(overflowByType.perennial?.overflow ?? 0), additional_portfolio_area_ha: round(additionalArea), total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea), counted_once: true, rule: 'Every annual row is assigned within the canonical annual cultivation zone and every perennial row within the planted perennial footprint. Only group-level excess becomes true portfolio overflow; support and ecological plants are overlays.'},
     timing_rule: 'Perennial portfolio energy is credited only at its bearing fraction; planted area exists from the beginning and the general annual bridge remains responsible for non-bearing years.'
   };
 }
@@ -305,11 +318,19 @@ function consumedMacroEnergy(rows = []) {
   return {grams, energy, fat_percent: total > 0 ? energy.fat / total * 100 : 0};
 }
 
-function successionAnnualRows({plantFood, annualRetention, perennialFatEnergyGJ, demandGJ, residualEnergyGJ, portfolioAnnualRows = []} = {}) {
+function successionAnnualRows({plantFood, annualRetention, perennialFatEnergyGJ, demandGJ, residualEnergyGJ, portfolioAnnualRows = [], siteCapability = {}} = {}) {
   const baseShare = Math.max(0, 1 - portfolioAnnualRows.reduce((sum, row) => sum + Number(row.energy_share ?? 0), 0));
   const rows = [
     ...(plantFood.rows ?? []).map((row) => ({...row, succession_source: 'canonical_annual_staple', desired_energy_share: baseShare * Number(row.energy_share ?? 0)})),
-    ...portfolioAnnualRows.map((row) => ({...row, succession_source: 'whole_diet_portfolio', desired_energy_share: Number(row.energy_share ?? 0)}))
+    ...portfolioAnnualRows.map((row) => ({
+      ...row,
+      composition_id: row.composition_id ?? row.id,
+      food_gj_ha: row.food_gj_ha ?? row.food_gj_ha_year,
+      edible_yield_t_ha: row.edible_yield_t_ha ?? row.edible_yield_t_ha_year,
+      site_yield_multiplier: row.site_yield_multiplier ?? row.site_yield_multipliers?.[siteCapability.site_id ?? siteCapability.id ?? 'ordinary_mesic'] ?? 1,
+      succession_source: 'whole_diet_portfolio',
+      desired_energy_share: Number(row.energy_share ?? 0)
+    }))
   ];
   const sunflower = rows.find((row) => row.id === 'sunflower_low_input_synthesis');
   const reduction = sunflower ? Math.min(Number(sunflower.desired_energy_share ?? 0) * .85, perennialFatEnergyGJ / Math.max(Number(demandGJ), 1e-9)) : 0;
@@ -381,8 +402,12 @@ export function calculateFoodSuccessionLedger({
   years = [1, 2, 3, 5, 8, 10, 15, 'mature'],
   retentionFactor = .70,
   siteCapability = {},
-  foodPortfolio = FOOD_PORTFOLIO,
-  householdFatMax = 35
+  // A portfolio is an explicit input to the canonical ledger. Keeping the
+  // default empty prevents custom nutrient tests or callers from silently
+  // receiving the default crop basket as extra food.
+  foodPortfolio = null,
+  householdFatMax = 35,
+  annualIntercropOverlapByYear = DEFAULT_ANNUAL_INTERCROP_OVERLAP
 } = {}) {
   const footprint = perennialFootprintHa == null ? Number(plantFood.required_food_area_ha ?? 0) * .75 : Number(perennialFootprintHa);
   const perennialRows = calculatePerennialFoodProductionLedger({mix: perennialMix, curveAnchors, footprintHa: footprint, years, retentionFactor, compositionProfiles: FOOD_NUTRIENT_PROFILES});
@@ -399,7 +424,7 @@ export function calculateFoodSuccessionLedger({
       const perennialConsumedEnergy = availablePerennialEnergy * scale;
       const perennialFatEnergy = Number(perennial.fat_kg_year ?? 0) * scale * .037656;
       const annualEnergy = Math.max(0, remainingEnergy - perennialConsumedEnergy);
-      const annual = successionAnnualRows({plantFood, annualRetention, perennialFatEnergyGJ: perennialFatEnergy, demandGJ: householdDemand, residualEnergyGJ: annualEnergy, portfolioAnnualRows: annualPortfolioRows});
+    const annual = successionAnnualRows({plantFood, annualRetention, perennialFatEnergyGJ: perennialFatEnergy, demandGJ: householdDemand, residualEnergyGJ: annualEnergy, portfolioAnnualRows: annualPortfolioRows, siteCapability});
       const perennialFood = perennial.layers.map((layer) => {
         const consumedKg = Number(layer.retained_edible_harvest_kg ?? 0) * scale;
         const consumedEnergy = Number(layer.retained_food_energy_gj_year ?? 0) * scale;
@@ -447,7 +472,9 @@ export function calculateFoodSuccessionLedger({
     const {annual, perennialFood, foodRows, perennialConsumedEnergy, annualEnergy} = candidate;
     const consumedEnergyTotal = foodRows.reduce((sum, row) => sum + Number(row.consumed_food_energy_gj_year ?? 0), 0);
     const producedEnergyTotal = foodRows.reduce((sum, row) => sum + Number(row.produced_food_energy_gj_year ?? 0), 0);
-    const area = annual.reduce((sum, row) => sum + Number(row.area_ha ?? 0), 0) + footprint;
+    const annualArea = annual.reduce((sum, row) => sum + Number(row.area_ha ?? 0), 0);
+    const overlap = Math.min(annualArea, footprint) * Number(annualIntercropOverlapByYear[perennial.year] ?? 0);
+    const area = annualArea + footprint - overlap;
     const surplusEnergy = foodRows.reduce((sum, row) => sum + Number(row.exportable_surplus_food_energy_gj_year ?? 0), 0) + Math.max(0, animalEnergy - householdDemand);
     const producedFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.produced_food_kg_year ?? 0), 0));
     const consumedFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.consumed_food_kg_year ?? 0), 0));
@@ -467,6 +494,7 @@ export function calculateFoodSuccessionLedger({
       exportable_surplus_food_energy_gj_year: round(surplusEnergy),
       annual_cultivation_area_ha: round(annual.reduce((sum, row) => sum + Number(row.area_ha ?? 0), 0)),
       planted_perennial_footprint_ha: round(footprint),
+      valid_annual_perennial_intercrop_overlap_ha: round(overlap),
       occupied_food_production_area_ha: round(area),
       macro_energy_percent_note: 'Calculated from consumed food only; retained surplus is not forced into the household ration.',
       foods: foodRows,
@@ -483,7 +511,15 @@ export function calculateFoodSuccessionLedger({
         reconciliation_rule: 'Produced = consumed + reserved + livestock feed + exportable surplus + losses; animal feed co-products remain in the separate finite feed ledger.'
       },
       site_capability: siteCapability.site_id ?? siteCapability.id ?? null,
-      household_fat_max_percent: householdFatMax
+      household_fat_max_percent: householdFatMax,
+      land_reconciliation: {
+        annual_cultivation_area_ha: round(annualArea),
+        planted_perennial_footprint_ha: round(footprint),
+        valid_annual_perennial_intercrop_overlap_ha: round(overlap),
+        occupied_food_footprint_ha: round(area),
+        counted_once: true,
+        equation: 'annual cultivation + planted perennial footprint - valid overlap = occupied food footprint'
+      }
     };
   });
   return {
@@ -492,7 +528,8 @@ export function calculateFoodSuccessionLedger({
     rows: yearRows,
     mature: yearRows.find((row) => row.year === 'mature') ?? yearRows.at(-1),
     peak_food_production_area_ha: round(Math.max(...yearRows.map((row) => Number(row.occupied_food_production_area_ha ?? 0)), 0)),
-    canonical_rule: 'Perennial harvest, annual residual production and whole-diet nutrient supply are calculated from this same year-by-year ledger.'
+    canonical_rule: 'Perennial harvest, annual residual production, valid intercropping overlap and whole-diet nutrient supply are calculated from this same year-by-year ledger.',
+    land_accounting_rule: 'Annual rows occupy the annual cultivation zone, perennial rows occupy the planted perennial zone, support plants are overlays, and only true overflow is added as exclusive land.'
   };
 }
 

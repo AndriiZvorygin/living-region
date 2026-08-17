@@ -54,6 +54,8 @@ export function calculateEstablishmentLandRequirement({
   strategy = 'progressive_handoff',
   heatingAreaHa = 0,
   additionalExclusiveLandHa = 0,
+  portfolioOverflowAreaHa = 0,
+  feedOverflowAreaHa = 0,
   exclusiveReserveHa = .12,
   yieldMultiplier = 1,
   arcPolicyAllocationHa = null,
@@ -78,6 +80,10 @@ export function calculateEstablishmentLandRequirement({
   const plantedFootprint = plantedPerennialFootprintHa == null
     ? permanentDemand / (maturePerennialYield * (1 - Number(loss)))
     : Number(plantedPerennialFootprintHa);
+  const legacyAdditionalArea = Number(additionalExclusiveLandHa);
+  const portfolioOverflow = Number(portfolioOverflowAreaHa);
+  const feedOverflow = Number(feedOverflowAreaHa);
+  const totalAdditionalArea = legacyAdditionalArea + portfolioOverflow + feedOverflow;
   const rows = years.map((year) => {
     const householdDemand = demandAt(year);
     const demandScope = scopeAt(year);
@@ -93,7 +99,7 @@ export function calculateEstablishmentLandRequirement({
     const overlapFraction = Number(annualIntercropOverlap[year] ?? 0);
     const overlap = Math.min(requestedAnnualArea, plantedFootprint) * overlapFraction;
     const occupiedFood = requestedAnnualArea + plantedFootprint - overlap;
-    const totalExclusive = occupiedFood + Number(heatingAreaHa) + Number(exclusiveReserveHa) + Number(additionalExclusiveLandHa);
+    const totalExclusive = occupiedFood + Number(heatingAreaHa) + Number(exclusiveReserveHa) + totalAdditionalArea;
     const annualGross = ledgerRow ? Number(ledgerRow.annual_food_energy_gj_year ?? 0) / Math.max(1 - Number(loss), .01) : requestedAnnualArea * annualYield;
     const annualUsable = ledgerRow ? Number(ledgerRow.annual_food_energy_gj_year ?? 0) : annualGross * (1 - Number(loss));
     const adultResidual = Math.max(0, permanentDemand - perennialUsable);
@@ -126,9 +132,26 @@ export function calculateEstablishmentLandRequirement({
       land_double_counted_as_if_separate_ha: round(overlap),
       occupied_food_production_area_ha: round(occupiedFood),
       heating_area_ha: round(heatingAreaHa),
-      additional_exclusive_land_ha: round(additionalExclusiveLandHa),
+      portfolio_overflow_area_ha: round(portfolioOverflow),
+      feed_overflow_area_ha: round(feedOverflow),
+      legacy_additional_exclusive_land_ha: round(legacyAdditionalArea),
+      additional_exclusive_land_ha: round(totalAdditionalArea),
       exclusive_resilience_reserve_ha: round(exclusiveReserveHa),
       total_exclusive_land_requirement_ha: round(totalExclusive),
+      land_reconciliation: {
+        annual_cultivation_area_ha: round(requestedAnnualArea),
+        planted_perennial_footprint_ha: round(plantedFootprint),
+        valid_annual_perennial_intercrop_overlap_ha: round(overlap),
+        occupied_food_footprint_ha: round(occupiedFood),
+        heating_area_ha: round(heatingAreaHa),
+        exclusive_resilience_reserve_ha: round(exclusiveReserveHa),
+        true_portfolio_overflow_ha: round(portfolioOverflow),
+        true_feed_overflow_ha: round(feedOverflow),
+        legacy_additional_exclusive_land_ha: round(legacyAdditionalArea),
+        total_exclusive_footprint_ha: round(totalExclusive),
+        equation: 'annual cultivation + planted perennial footprint - valid overlap + heating + exclusive reserve + true portfolio overflow + true feed overflow + legacy additional land = total exclusive footprint',
+        counted_once: true
+      },
       annual_land_limited: false,
       establishment_deficit_gj: round(Math.max(0, householdDemand - annualUsable - perennialUsable))
     };
@@ -155,11 +178,20 @@ export function calculateEstablishmentLandRequirement({
     mature_land_requirement_ha: mature.total_exclusive_land_requirement_ha,
     mature_food_production_footprint_ha: mature.occupied_food_production_area_ha,
     heating_area_ha: round(heatingAreaHa),
-    additional_exclusive_land_ha: round(additionalExclusiveLandHa),
+    additional_exclusive_land_ha: round(totalAdditionalArea),
+    portfolio_overflow_area_ha: round(portfolioOverflow),
+    feed_overflow_area_ha: round(feedOverflow),
+    legacy_additional_exclusive_land_ha: round(legacyAdditionalArea),
     exclusive_resilience_reserve_ha: round(exclusiveReserveHa),
     arc_policy_allocation_ha: arcPolicyAllocationHa == null ? null : round(arcPolicyAllocationHa),
     arc_policy_surplus_or_deficit_ha: arcPolicyAllocationHa == null ? null : round(Number(arcPolicyAllocationHa) - peak.total_exclusive_land_requirement_ha),
-    biological_requirement_independent_of_arc_policy: true
+    biological_requirement_independent_of_arc_policy: true,
+    land_reconciliation: {
+      equation: 'occupied food footprint = annual cultivation + planted perennial footprint - valid overlap; total exclusive footprint = occupied food footprint + heating + exclusive reserve + true portfolio overflow + true feed overflow + legacy additional land',
+      peak: peak.land_reconciliation,
+      mature: mature.land_reconciliation,
+      counted_once: true
+    }
   };
   return result;
 }

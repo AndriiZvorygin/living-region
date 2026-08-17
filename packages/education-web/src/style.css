@@ -37,6 +37,9 @@
 .land-composition-segment.wood { background: var(--purple); }
 .land-composition-segment.reserve { background: var(--red); }
 .land-composition-segment.feed { background: var(--teal); }
+.land-composition-segment.portfolio, .swatch.portfolio { background: var(--teal); }
+.land-composition-segment.feed, .swatch.feed { background: var(--teal); }
+.land-composition-segment.legacy, .swatch.legacy { background: var(--muted); }
 .land-component-list { display: grid; gap: 8px; margin-top: 16px; }
 .land-component-row { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 9px; align-items: center; color: var(--muted); font-size: .84rem; }
 .land-component-row strong { color: var(--ink); white-space: nowrap; }

@@ -1,6 +1,6 @@
 import {owenSoundGrowingEnvironment, siteCapability} from './environment.mjs';
 
-export const AGROECOSYSTEM_CONTRACT_VERSION = '1.0.0';
+export const AGROECOSYSTEM_CONTRACT_VERSION = '1.1.0';
 export const SUPPORT_PLANT_SENSITIVITIES = Object.freeze([0.15, 0.25, 0.33]);
 export const AGROECOSYSTEM_OBJECTIVES = Object.freeze({
   low_external_input: {label: 'Lowest external inputs'},
@@ -62,7 +62,8 @@ export function calculatePlantSuitability(record, site = buildSiteSelectionConte
   const override = options.overrides?.[record.id] ?? site.user_overrides?.[record.id] ?? null;
   const hard = [];
   const climateMinimum = Number(needs.min_winter_temp_c);
-  if (Number.isFinite(climateMinimum) && Number(site.climate.minimum_winter_temp_c) < climateMinimum) {
+  const seasonalCrop = record.architecture?.life_cycle === 'annual';
+  if (!seasonalCrop && Number.isFinite(climateMinimum) && Number(site.climate.minimum_winter_temp_c) < climateMinimum) {
     hard.push(`winter survival is below the ${site.climate.minimum_winter_temp_c} °C scenario minimum`);
   }
   if (Number.isFinite(Number(needs.growing_degree_days_base5)) && Number(needs.growing_degree_days_base5) > Number(site.climate.growing_degree_days_base5)) {

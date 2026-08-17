@@ -498,6 +498,26 @@ test('whole-diet portfolio rows have yield, site and establishment land accounti
   assert.ok(portfolio.total_food_area_with_portfolio_ha >= explicit.total_food_area_with_portfolio_ha);
 });
 
+test('reference adult land reconciliation uses one authoritative succession ledger', () => {
+  const members = [member({id: 'reference-adult-man'})];
+  const result = calculateInteractiveHousehold({members, buildings: [presentation.heating.default_building], siteId: 'ordinary_mesic', foodEvidence, woodyCases: woodyEvidence.cases, establishmentModel: presentation.establishment.site_models.ordinary_mesic, livestockMode: 'plants_only'});
+  const transition = result.establishment_land.strategy_comparison.progressive_handoff;
+  const peak = transition.rows.find((row) => row.year === transition.establishment_peak_year);
+  assert.equal(transition.establishment_peak_year, 5);
+  assert.equal(transition.establishment_land_requirement_ha, 1.144383);
+  assert.equal(transition.mature_land_requirement_ha, 1.094794);
+  const land = peak.land_reconciliation;
+  assert.equal(land.true_portfolio_overflow_ha, 0);
+  assert.equal(land.true_feed_overflow_ha, 0);
+  assert.equal(land.legacy_additional_exclusive_land_ha, 0);
+  assert.equal(land.total_exclusive_footprint_ha, 1.144383);
+  assert.equal(land.occupied_food_footprint_ha, 0.676414);
+  assert.ok(Math.abs(land.annual_cultivation_area_ha + land.planted_perennial_footprint_ha - land.valid_annual_perennial_intercrop_overlap_ha - land.occupied_food_footprint_ha) < 1e-9);
+  assert.ok(Math.abs(land.occupied_food_footprint_ha + land.heating_area_ha + land.exclusive_resilience_reserve_ha - land.total_exclusive_footprint_ha) < 1e-9);
+  assert.equal(result.nutrient_food_system.portfolio_land.area_reconciliation.counted_once, true);
+  assert.equal(result.nutrient_food_system.portfolio_land.area_reconciliation.additional_portfolio_area_ha, 0);
+});
+
 test('food-forest succession uses one year-by-year whole-diet ledger', () => {
   const members = presentation.household_presets.find((row) => row.id === 'two_adults_plus_three_children').members;
   const result = calculateInteractiveHousehold({members, buildings: [presentation.heating.default_building], siteId: 'ordinary_mesic', foodEvidence, woodyCases: woodyEvidence.cases, establishmentModel: presentation.establishment.site_models.ordinary_mesic, livestockMode: 'plants_only'});

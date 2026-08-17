@@ -8,21 +8,21 @@ Generated for the two-adult plus three-dependent-child capacity household. House
 - Site: Owen Sound / Grey County ordinary/mesic scenario.
 - Objective set: low external input, nutritional completeness, resilience/diversity.
 - Support-plant sensitivity: 25% shared nominal area; 15% and 33% remain available.
-- Selected records: Oat, White potato, Winter wheat, Raspberry and berry shrub layer, Black locust, Apple and pear layer, Hazelnut.
+- Selected records: Dry bean, Oat, White potato, Winter wheat, Raspberry and berry shrub layer, Buckwheat, Carrot, Sunflower, Apple and pear layer, Hazelnut.
 
 ## Ordinary/mesic succession
 
-| Year | Annual bridge ha | Perennial harvest kg | Food energy GJ | Carbohydrate | Protein | Fat | Main sources |
+| Year | Annual bridge ha | Perennial food energy GJ/year | Food energy GJ | Carbohydrate | Protein | Fat | Main sources |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 1 | 0.993 | 0.00 | 16.68 | 77.6% | 14.4% | 7.9% | annual_potato, annual_winter_wheat, annual_oat |
-| 2 | 0.977 | 0.29 | 16.68 | 77.7% | 14.3% | 8.0% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 3 | 0.907 | 1.59 | 16.68 | 77.0% | 13.8% | 9.3% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 5 | 0.836 | 2.91 | 16.68 | 73.5% | 13.1% | 13.3% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 8 | 0.751 | 4.48 | 16.68 | 69.9% | 12.4% | 17.8% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 10 | 0.703 | 5.36 | 16.68 | 67.3% | 11.9% | 20.7% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 15 | 0.679 | 5.79 | 16.68 | 65.3% | 11.7% | 22.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| 30 | 0.679 | 5.79 | 16.68 | 65.3% | 11.7% | 22.9% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
-| mature | 0.660 | 6.14 | 16.68 | 65.4% | 11.6% | 23.0% | annual_potato, annual_winter_wheat, annual_oat, perennial_raspberry |
+| 1 | 1.402 | 0.00 | 16.68 | 54.2% | 16.9% | 28.9% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 2 | 1.380 | 0.29 | 16.68 | 54.9% | 16.7% | 28.4% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 3 | 1.287 | 1.59 | 16.68 | 57.2% | 16.0% | 26.8% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 5 | 1.199 | 2.91 | 16.68 | 58.1% | 15.4% | 26.5% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 8 | 1.090 | 4.48 | 16.68 | 58.8% | 14.6% | 26.6% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 10 | 1.028 | 5.36 | 16.68 | 58.6% | 14.1% | 27.3% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 15 | 0.999 | 5.79 | 16.68 | 58.0% | 13.9% | 28.2% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| 30 | 0.999 | 5.79 | 16.68 | 58.0% | 13.9% | 28.2% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
+| mature | 0.972 | 6.14 | 16.68 | 58.4% | 13.7% | 27.9% | annual_potato, annual_winter_wheat, annual_dry_bean, annual_sunflower |
 
 ## Nutrient and material boundary
 

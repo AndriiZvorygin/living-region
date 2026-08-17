@@ -27,7 +27,7 @@ const lines = [
   '- Support-plant sensitivity: 25% shared nominal area; 15% and 33% remain available.',
   `- Selected records: ${reference.selection.selected.map((row) => row.common_name).join(', ')}.`, '',
   '## Ordinary/mesic succession', '',
-  '| Year | Annual bridge ha | Perennial harvest kg | Food energy GJ | Carbohydrate | Protein | Fat | Main sources |',
+  '| Year | Annual bridge ha | Perennial food energy GJ/year | Food energy GJ | Carbohydrate | Protein | Fat | Main sources |',
   '| ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
   ...reference.whole_diet.years.filter((row) => [1, 2, 3, 5, 8, 10, 15, 30, 'mature'].includes(row.year)).map((row) => `| ${row.year} | ${row.annual_cultivation_area_ha.toFixed(3)} | ${row.perennial_food_energy_gj_year.toFixed(2)} | ${row.consumed_food_energy_gj_year.toFixed(2)} | ${row.macro.energy_percent.carbohydrate.toFixed(1)}% | ${row.macro.energy_percent.protein.toFixed(1)}% | ${row.macro.energy_percent.fat.toFixed(1)}% | ${row.principal_food_sources.slice(0, 4).map((source) => source.plant_id).join(', ')} |`), '',
   '## Nutrient and material boundary', '',

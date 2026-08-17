@@ -54,12 +54,15 @@ function publicSuccessionLedger(ledger) {
       exportable_surplus_food_energy_gj_year: row.exportable_surplus_food_energy_gj_year,
       annual_cultivation_area_ha: row.annual_cultivation_area_ha,
       planted_perennial_footprint_ha: row.planted_perennial_footprint_ha,
+      valid_annual_perennial_intercrop_overlap_ha: row.valid_annual_perennial_intercrop_overlap_ha,
       occupied_food_production_area_ha: row.occupied_food_production_area_ha,
+      land_reconciliation: publicize(row.land_reconciliation),
       macro_summary: publicize({energy_percent: row.macro_summary?.energy_percent, grams_per_day: row.macro_summary?.grams_per_day, mass_kg_year: row.macro_summary?.mass_kg_year, flags: row.macro_summary?.flags}),
       nutrients: publicize(Object.fromEntries(Object.entries(row.nutrients ?? {}).map(([id, nutrient]) => [id, {status: nutrient.status, adequacy_ratio: nutrient.adequacy_ratio}]))),
       amino_acid_pattern: publicize({limiting_amino_acid: row.amino_acid_pattern?.limiting_amino_acid, absolute_limiting_amino_acid: row.amino_acid_pattern?.absolute_limiting_amino_acid, absolute_adequacy: row.amino_acid_pattern?.absolute_adequacy}),
       external_inputs: publicize((row.external_inputs ?? []).map((item) => item.nutrient ?? item)),
       accounting: publicize(row.accounting),
+      food_rows: (row.foods ?? []).map((food) => ({id: food.id, label: food.label, composition_id: food.composition_id, production_type: food.production_type, zone_assignment: food.zone_assignment ?? (food.production_type === 'perennial' ? 'perennial_food_zone' : 'annual_cultivation_zone'), area_ha: food.area_ha, consumed_food_kg_year: food.consumed_food_kg_year, produced_food_kg_year: food.produced_food_kg_year, reserved_food_kg_year: food.reserved_food_kg_year, livestock_feed_food_kg_year: food.livestock_feed_food_kg_year, exportable_surplus_food_kg_year: food.exportable_surplus_food_kg_year, lost_food_kg_year: food.lost_food_kg_year, required_area_ha: food.area_ha})),
       major_fat_sources: (row.foods ?? []).filter((food) => ['hazelnut_dried', 'black_walnut_dried', 'sunflower_seed_dry'].includes(food.composition_id) && Number(food.consumed_food_kg_year ?? 0) > 0).map((food) => ({composition_id: food.composition_id, label: food.label, consumed_food_kg_year: food.consumed_food_kg_year})),
       perennial_layers: (row.perennial_rows ?? []).map((layer) => ({id: layer.id, species: layer.species, composition_id: layer.composition_id, area_ha: layer.area_ha, bearing_factor: layer.bearing_factor, gross_edible_harvest_kg: layer.gross_edible_harvest_kg, retained_edible_harvest_kg: layer.retained_edible_harvest_kg, consumed_food_kg_year: layer.consumed_food_kg_year, produced_food_energy_gj_year: layer.produced_food_energy_gj_year, consumed_food_energy_gj_year: layer.consumed_food_energy_gj_year, protein_kg_year: layer.protein_kg_year, fat_kg_year: layer.fat_kg_year, carbohydrate_kg_year: layer.carbohydrate_kg_year, fibre_kg_year: layer.fibre_kg_year, micronutrients: layer.micronutrients, source: layer.source, evidence_status: layer.evidence_status}))
     }))
@@ -206,7 +209,7 @@ function publicNutrientRows(rows, {detailed = true} = {}) {
     // needlessly large; animal rows still expose their complete current-year
     // nutrient result and feed/reproduction ledger.
     plants_only_food_succession_ledger: null,
-    portfolio_land: publicize({base_food_area_ha: row.portfolio_land?.base_food_area_ha, additional_area_ha: row.portfolio_land?.additional_area_ha, total_food_area_with_portfolio_ha: row.portfolio_land?.total_food_area_with_portfolio_ha, area_reconciliation: row.portfolio_land?.area_reconciliation, rows: (row.portfolio_land?.rows ?? []).map((item) => ({id: item.id, label: item.label, composition_id: item.composition_id, required_area_ha: item.required_area_ha, effective_food_gj_ha_year: item.effective_food_gj_ha_year, site_viability: item.site_viability, production_by_year: item.production_by_year}))}),
+    portfolio_land: publicize({base_food_area_ha: row.portfolio_land?.base_food_area_ha, additional_area_ha: row.portfolio_land?.additional_area_ha, total_food_area_with_portfolio_ha: row.portfolio_land?.total_food_area_with_portfolio_ha, area_reconciliation: row.portfolio_land?.area_reconciliation, rows: (row.portfolio_land?.rows ?? []).map((item) => ({id: item.id, label: item.label, composition_id: item.composition_id, required_area_ha: item.required_area_ha, effective_food_gj_ha_year: item.effective_food_gj_ha_year, allocated_within_existing_food_zone_ha: item.allocated_within_existing_food_zone_ha, true_overflow_area_ha: item.true_overflow_area_ha, additional_area_ha: item.additional_area_ha, zone_assignment: item.zone_assignment, site_viability: item.site_viability, production_by_year: item.production_by_year}))}),
     food_feed_area_ha: row.food_feed_area_ha,
     plant_energy_demand_gj_year: row.plant_energy_demand_gj_year,
     animal_food_energy_gj_year: row.animal_food_energy_gj_year,
@@ -237,7 +240,7 @@ function publicNutrientRows(rows, {detailed = true} = {}) {
   });
 }
 function publicLivestockFeed(id) { return [id, publicize({id, ...LIVESTOCK_FEED_STREAMS[id]})]; }
-function pickTransition(row) { return {year: row.year, annual_food_area_ha: row.annual_area_ha, perennial_food_area_ha: row.perennial_area_ha, planted_perennial_footprint_ha: row.planted_perennial_footprint_ha, annual_perennial_intercrop_overlap_ha: row.young_forest_annual_intercrop_overlap_ha, occupied_food_production_area_ha: row.occupied_food_production_area_ha, total_exclusive_land_requirement_ha: row.total_exclusive_land_requirement_ha, annual_food_supplied_gj_year: row.annual_usable_food_gj, perennial_food_supplied_gj_year: row.perennial_usable_food_gj, household_food_demand_gj_year: row.household_food_demand_gj_year, permanent_adult_food_demand_gj_year: row.permanent_adult_food_demand_gj_year, dependent_child_food_demand_gj_year: row.dependent_child_food_demand_gj_year, dependent_food_supplement_annual_area_ha: row.dependent_food_supplement_annual_area_ha, food_coverage_ratio: row.household_food_coverage_ratio, exportable_food_energy_surplus_gj_year: row.exportable_food_energy_surplus_gj, labour: publicize(row.labour)}; }
+function pickTransition(row) { return {year: row.year, annual_food_area_ha: row.annual_area_ha, perennial_food_area_ha: row.perennial_area_ha, planted_perennial_footprint_ha: row.planted_perennial_footprint_ha, annual_perennial_intercrop_overlap_ha: row.young_forest_annual_intercrop_overlap_ha, occupied_food_production_area_ha: row.occupied_food_production_area_ha, total_exclusive_land_requirement_ha: row.total_exclusive_land_requirement_ha, portfolio_overflow_area_ha: row.portfolio_overflow_area_ha, feed_overflow_area_ha: row.feed_overflow_area_ha, land_reconciliation: publicize(row.land_reconciliation), annual_food_supplied_gj_year: row.annual_usable_food_gj, perennial_food_supplied_gj_year: row.perennial_usable_food_gj, household_food_demand_gj_year: row.household_food_demand_gj_year, permanent_adult_food_demand_gj_year: row.permanent_adult_food_demand_gj_year, dependent_child_food_demand_gj_year: row.dependent_child_food_demand_gj_year, dependent_food_supplement_annual_area_ha: row.dependent_food_supplement_annual_area_ha, food_coverage_ratio: row.household_food_coverage_ratio, exportable_food_energy_surplus_gj_year: row.exportable_food_energy_surplus_gj, labour: publicize(row.labour)}; }
 function publicRegional(regional) { return {...regional, scenarios: regional.scenarios.map((scenario) => ({...scenario, transition_years: scenario.transition_years.map(({profile_rows, ...year}) => year)}))}; }
 function publicAgroecosystem(plan) {
   return {
@@ -248,11 +251,12 @@ function publicAgroecosystem(plan) {
     selection: {
       selected: plan.selection.selected,
       named_solutions: plan.selection.named_solutions,
-      candidates: plan.selection.candidates.map((row) => ({plant_id: row.plant_id, common_name: row.common_name, life_cycle: row.life_cycle, layer: row.layer, selected: row.selected, status: row.suitability.status, score: row.suitability.suitability_score, evidence_status: row.suitability.evidence_status, inclusion_reasons: row.suitability.inclusion_reasons, exclusion_reasons: row.suitability.exclusion_reasons, missing_data: row.suitability.missing_data}))
+      candidates: plan.selection.candidates.map((row) => ({plant_id: row.plant_id, common_name: row.common_name, life_cycle: row.life_cycle, layer: row.layer, selected: row.selected, selection_reason: row.selection_reason, nutritional_role: row.nutritional_role, status: row.suitability.status, score: row.suitability.suitability_score, evidence_status: row.suitability.evidence_status, inclusion_reasons: row.suitability.inclusion_reasons, exclusion_reasons: row.suitability.exclusion_reasons, missing_data: row.suitability.missing_data}))
     },
     annual_schedule: plan.annual_schedule,
     perennial_succession: plan.perennial_succession,
     whole_diet: plan.whole_diet,
+    nutrition_constraint: plan.nutrition_constraint,
     nutrient_ledger: plan.nutrient_ledger,
     reconciliation: plan.reconciliation
   };

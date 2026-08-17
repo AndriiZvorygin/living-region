@@ -50,3 +50,16 @@ test('ordinary agroecosystem plan contains selected species, succession and expl
     assert.ok(Math.abs(row.energy_reconciliation.consumed_gj_year - row.energy_reconciliation.demand_gj_year) < .000001);
   }
 });
+
+test('nutritional-completeness planning selects fat and protein roles and reports a real macro constraint', () => {
+  const plan = calculateAgroecosystemPlan({database, siteId: 'ordinary_mesic', objectives: ['nutritional_completeness'], annualAreaHa: 1, perennialAreaHa: 1, householdFoodDemandGJYear: 100, annualResilienceFloorGJYear: 10, nutritionProfiles: FOOD_NUTRIENT_PROFILES});
+  const selected = new Set(plan.selection.selected.map((row) => row.plant_id));
+  assert.equal(selected.has('annual_dry_bean'), true);
+  assert.equal(selected.has('annual_sunflower'), true);
+  assert.equal(plan.nutrition_constraint.status, 'feasible_macro_screen');
+  assert.ok(plan.whole_diet.years.every((row) => row.nutrition_constraint.status === 'feasible_macro_screen'));
+  const yearOne = plan.whole_diet.years.find((row) => row.year === 1);
+  const mature = plan.whole_diet.years.find((row) => row.year === 'mature');
+  const sunflower = (row) => row.produced.annual.find((item) => item.plant_id === 'annual_sunflower');
+  assert.ok(sunflower(yearOne).energy_share >= sunflower(mature).energy_share);
+});
