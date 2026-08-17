@@ -80,6 +80,8 @@ function economicsAtMarketEstimate({adultCount, estimate, data, fallbackResult})
   const householdCount = result?.scenario.household_count ?? adultScaleHouseholds(adultCount).length;
   const infrastructureMonthly = result?.infrastructure.service_charge_per_household_month_cad ?? null;
   const siteLeaseMonthly = priced ? result.project.annual_revenue_cad.site_leases / householdCount / 12 : null;
+  const siteLeaseRounded = round(siteLeaseMonthly, 2);
+  const infrastructureRounded = round(infrastructureMonthly, 2);
   const dwellingFinanceMonthly = result ? result.households.reduce((sum, household) => sum + finite(household.affordability?.illustrative_dwelling_financing_monthly_cad), 0) / householdCount : null;
   return {
     market_view: estimate.market_view,
@@ -93,11 +95,11 @@ function economicsAtMarketEstimate({adultCount, estimate, data, fallbackResult})
     estimated_parcel_acquisition_cad: priced ? round(result.project_land.total_land_value_cad, 2) : null,
     estimated_parcel_acquisition_range_cad: priced ? estimate.price_range_cad_per_ha?.map((pricePerHa) => round(pricePerHa * result.project_land.total_property_area_ha, 2)) ?? null : null,
     land_financing_monthly_cad_per_household: priced ? round(result.project_land.financing.monthly_debt_service_cad / householdCount, 2) : null,
-    site_lease_monthly_cad_per_household: round(siteLeaseMonthly, 2),
-    shared_infrastructure_monthly_cad_per_household: round(infrastructureMonthly, 2),
+    site_lease_monthly_cad_per_household: siteLeaseRounded,
+    shared_infrastructure_monthly_cad_per_household: infrastructureRounded,
     dwelling_financing_monthly_cad_per_household: round(dwellingFinanceMonthly, 2),
-    combined_land_infrastructure_monthly_cad_per_household: priced ? round(siteLeaseMonthly + infrastructureMonthly, 2) : null,
-    combined_illustrative_monthly_cad_per_household: priced ? round(siteLeaseMonthly + infrastructureMonthly + dwellingFinanceMonthly, 2) : null
+    combined_land_infrastructure_monthly_cad_per_household: priced ? round(siteLeaseRounded + infrastructureRounded, 2) : null,
+    combined_illustrative_monthly_cad_per_household: priced ? round(siteLeaseRounded + infrastructureRounded + round(dwellingFinanceMonthly, 2), 2) : null
   };
 }
 

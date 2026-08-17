@@ -1,8 +1,9 @@
 import {calculateHealthCanadaProtein, HEALTH_CANADA_PROTEIN_SOURCE} from './protein.mjs';
+import {calculatePerennialFoodProductionLedger} from './perennial.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const NUTRITION_CONTRACT_VERSION = '1.3.0';
+export const NUTRITION_CONTRACT_VERSION = '1.4.0';
 export const DAYS_PER_YEAR = 365.25;
 export const HEALTH_CANADA_NUTRIENT_DRI_SOURCE = 'https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html';
 export const HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE = 'https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf';
@@ -24,7 +25,9 @@ const MACRO_PROFILES = {
   leafy_green_raw: {energy_kj_per_100g: 97, fat_g_per_100g: .39, carbohydrate_g_per_100g: 3.6, fibre_g_per_100g: 2.2, saturated_fat_g_per_100g: .06, linoleic_g_per_100g: .15, alpha_linolenic_g_per_100g: .02},
   apple_raw_skin: {energy_kj_per_100g: 218, fat_g_per_100g: .17, carbohydrate_g_per_100g: 13.81, fibre_g_per_100g: 2.4, saturated_fat_g_per_100g: .028, linoleic_g_per_100g: .043, alpha_linolenic_g_per_100g: .012},
   raspberry_raw: {energy_kj_per_100g: 222, fat_g_per_100g: .65, carbohydrate_g_per_100g: 11.94, fibre_g_per_100g: 6.5, saturated_fat_g_per_100g: .019, linoleic_g_per_100g: .375, alpha_linolenic_g_per_100g: .249},
-  hazelnut_dried: {energy_kj_per_100g: 2630, fat_g_per_100g: 60.75, carbohydrate_g_per_100g: 16.70, fibre_g_per_100g: 9.7, saturated_fat_g_per_100g: 4.464, linoleic_g_per_100g: 7.92, alpha_linolenic_g_per_100g: .087}
+  hazelnut_dried: {energy_kj_per_100g: 2630, fat_g_per_100g: 60.75, carbohydrate_g_per_100g: 16.70, fibre_g_per_100g: 9.7, saturated_fat_g_per_100g: 4.464, linoleic_g_per_100g: 7.92, alpha_linolenic_g_per_100g: .087},
+  chestnut_chinese_raw: {energy_kj_per_100g: 937, fat_g_per_100g: 1.11, carbohydrate_g_per_100g: 49.07, fibre_g_per_100g: 0, saturated_fat_g_per_100g: 0, linoleic_g_per_100g: 0, alpha_linolenic_g_per_100g: 0},
+  black_walnut_dried: {energy_kj_per_100g: 2592, fat_g_per_100g: 59.33, carbohydrate_g_per_100g: 9.58, fibre_g_per_100g: 0, saturated_fat_g_per_100g: 0, linoleic_g_per_100g: 0, alpha_linolenic_g_per_100g: 0}
 };
 const PROFILE = (id, label, protein, amino, nutrients, sourceCode, notes = '') => ({
   id, label, protein_g_per_100g: protein, amino_acid_g_per_100g: amino,
@@ -72,7 +75,11 @@ export const FOOD_NUTRIENT_PROFILES = {
   raspberry_raw: PROFILE('raspberry_raw', 'Raspberry, raw', 1.20, {},
     {vitamin_a_rae_ug: 2, vitamin_b12_ug: 0, vitamin_d_ug: 0, folate_dfe_ug: 21, vitamin_c_mg: 26.2, calcium_mg: 25, iron_mg: .69, zinc_mg: .42, iodine_ug: null, selenium_ug: .4, magnesium_mg: 22, potassium_mg: 151, choline_mg: 12.3, linoleic_g: .375, alpha_linolenic_g: .249}, '1747'),
   hazelnut_dried: PROFILE('hazelnut_dried', 'Hazelnut, dried', 14.95, {},
-    {vitamin_a_rae_ug: 1, vitamin_b12_ug: 0, vitamin_d_ug: 0, folate_dfe_ug: 113, vitamin_c_mg: 6.3, calcium_mg: 114, iron_mg: 4.7, zinc_mg: 2.45, iodine_ug: null, selenium_ug: 2.4, magnesium_mg: 163, potassium_mg: 680, choline_mg: 45.6, linoleic_g: 7.92, alpha_linolenic_g: .087}, '2567')
+    {vitamin_a_rae_ug: 1, vitamin_b12_ug: 0, vitamin_d_ug: 0, folate_dfe_ug: 113, vitamin_c_mg: 6.3, calcium_mg: 114, iron_mg: 4.7, zinc_mg: 2.45, iodine_ug: null, selenium_ug: 2.4, magnesium_mg: 163, potassium_mg: 680, choline_mg: 45.6, linoleic_g: 7.92, alpha_linolenic_g: .087}, '2567'),
+  chestnut_chinese_raw: PROFILE('chestnut_chinese_raw', 'Chinese chestnut, raw', 4.2, {},
+    {vitamin_a_rae_ug: null, vitamin_b12_ug: 0, vitamin_d_ug: 0, folate_dfe_ug: null, vitamin_c_mg: null, calcium_mg: null, iron_mg: null, zinc_mg: null, iodine_ug: null, selenium_ug: null, magnesium_mg: null, potassium_mg: null, choline_mg: null, linoleic_g: null, alpha_linolenic_g: null}, '2549', 'CNF composition is available; detailed micronutrient fields are not loaded in the current local extract.'),
+  black_walnut_dried: PROFILE('black_walnut_dried', 'Black walnut, dried', 24.06, {},
+    {vitamin_a_rae_ug: null, vitamin_b12_ug: 0, vitamin_d_ug: 0, folate_dfe_ug: null, vitamin_c_mg: null, calcium_mg: null, iron_mg: null, zinc_mg: null, iodine_ug: null, selenium_ug: null, magnesium_mg: null, potassium_mg: null, choline_mg: null, linoleic_g: null, alpha_linolenic_g: null}, '2589', 'CNF composition is available; Grey-Bruce yield remains reference-only.')
 };
 
 export const HEALTH_CANADA_AMINO_ACID_PATTERN = {
@@ -232,7 +239,7 @@ function portfolioSiteRule(row, siteCapability = {}) {
  * annual/perennial food zones are capacity, not an extra crop list: rows fit
  * inside those zones where possible and only overflow becomes new land.
  */
-export function calculateFoodPortfolioLand({plantFood = {}, siteCapability = {}, years = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
+export function calculateFoodPortfolioLand({plantFood = {}, siteCapability = {}, years = [1, 2, 3, 5, 8, 10, 15, 'mature'], foodSuccessionLedger = null} = {}) {
   const portfolio = portfolioFoodRows(plantFood);
   const existingFoodArea = Number(plantFood.required_food_area_ha ?? 0);
   const annualCapacity = existingFoodArea * .25;
@@ -253,7 +260,9 @@ export function calculateFoodPortfolioLand({plantFood = {}, siteCapability = {},
     return {...row, site_viability: siteRule, effective_food_gj_ha_year: round(effectiveYield), required_area_ha: requiredArea == null ? null : round(requiredArea), existing_zone_capacity_ha: round(capacity), allocated_within_existing_food_zone_ha: round(allocated), additional_area_ha: additional == null ? null : round(additional), land_role: row.production_type === 'perennial' ? 'allocated_inside_canonical_perennial_food_zone_where_capacity_allows' : 'allocated_inside_canonical_annual_food_zone_where_capacity_allows', production_by_year: yearRows};
   });
   const additionalRows = rows.filter((row) => row.additional_area_ha != null);
-  const additionalArea = additionalRows.reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0);
+  const staticAdditionalArea = additionalRows.reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0);
+  const successionAdditionalArea = foodSuccessionLedger ? Math.max(0, Number(foodSuccessionLedger.peak_food_production_area_ha ?? 0) - existingFoodArea) : 0;
+  const additionalArea = Math.max(staticAdditionalArea, successionAdditionalArea);
   return {
     base_food_area_ha: round(existingFoodArea),
     existing_annual_food_zone_ha: round(annualCapacity),
@@ -263,12 +272,231 @@ export function calculateFoodPortfolioLand({plantFood = {}, siteCapability = {},
     additional_perennial_area_ha: round(rows.filter((row) => row.production_type === 'perennial').reduce((sum, row) => sum + Number(row.additional_area_ha ?? 0), 0)),
     additional_area_ha: round(additionalArea),
     total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea),
+    succession_ledger: foodSuccessionLedger ?? null,
+    succession_area_basis: foodSuccessionLedger ? 'Peak annual cultivation plus planted perennial footprint from the canonical year-by-year food ledger.' : null,
     area_reconciliation: {existing_food_zone_ha: round(existingFoodArea), additional_portfolio_area_ha: round(additionalArea), total_food_area_with_portfolio_ha: round(existingFoodArea + additionalArea), counted_once: true, rule: 'Portfolio crops are assigned within existing annual/perennial food zones before additional area is added.'},
     timing_rule: 'Perennial portfolio energy is credited only at its bearing fraction; planted area exists from the beginning and the general annual bridge remains responsible for non-bearing years.'
   };
 }
 
-export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, animals = [], energyGJ = 0, foodPortfolio = true} = {}) {
+function profileEnergyGJPerKg(profile, fallback = 0) {
+  const value = Number(profile?.macro_per_100g?.energy_kj_per_100g ?? 0);
+  // CNF energy is kJ per 100 g. Convert to GJ per kg explicitly:
+  // kJ/100 g × 10 = kJ/kg, then ÷ 1,000,000 = GJ/kg.
+  return value > 0 ? value / 100000 : fallback;
+}
+
+function energyForMacro(profile, field, fallback = 0) {
+  const value = Number(profile?.macro_per_100g?.[`${field}_g_per_100g`]);
+  return Number.isFinite(value) ? value * 10 : fallback;
+}
+
+function consumedMacroEnergy(rows = []) {
+  const grams = {protein: 0, fat: 0, carbohydrate: 0};
+  for (const row of rows) {
+    const kg = Number(row.consumed_food_kg_year ?? 0);
+    const profile = FOOD_NUTRIENT_PROFILES[row.composition_id] ?? {};
+    grams.protein += kg * Number(profile.protein_g_per_100g ?? 0) * 10;
+    grams.fat += kg * Number(profile.macro_per_100g?.fat_g_per_100g ?? 0) * 10;
+    grams.carbohydrate += kg * Number(profile.macro_per_100g?.carbohydrate_g_per_100g ?? 0) * 10;
+  }
+  const energy = {protein: grams.protein * .016736, fat: grams.fat * .037656, carbohydrate: grams.carbohydrate * .016736};
+  const total = Object.values(energy).reduce((sum, value) => sum + value, 0);
+  return {grams, energy, fat_percent: total > 0 ? energy.fat / total * 100 : 0};
+}
+
+function successionAnnualRows({plantFood, annualRetention, perennialFatEnergyGJ, demandGJ, residualEnergyGJ, portfolioAnnualRows = []} = {}) {
+  const baseShare = Math.max(0, 1 - portfolioAnnualRows.reduce((sum, row) => sum + Number(row.energy_share ?? 0), 0));
+  const rows = [
+    ...(plantFood.rows ?? []).map((row) => ({...row, succession_source: 'canonical_annual_staple', desired_energy_share: baseShare * Number(row.energy_share ?? 0)})),
+    ...portfolioAnnualRows.map((row) => ({...row, succession_source: 'whole_diet_portfolio', desired_energy_share: Number(row.energy_share ?? 0)}))
+  ];
+  const sunflower = rows.find((row) => row.id === 'sunflower_low_input_synthesis');
+  const reduction = sunflower ? Math.min(Number(sunflower.desired_energy_share ?? 0) * .85, perennialFatEnergyGJ / Math.max(Number(demandGJ), 1e-9)) : 0;
+  if (sunflower && reduction > 0) {
+    sunflower.desired_energy_share = Math.max(0, sunflower.desired_energy_share - reduction);
+    const others = rows.filter((row) => row !== sunflower);
+    const otherShare = others.reduce((sum, row) => sum + Number(row.desired_energy_share ?? 0), 0);
+    for (const row of others) row.desired_energy_share += otherShare > 0 ? reduction * Number(row.desired_energy_share ?? 0) / otherShare : reduction / Math.max(1, others.length);
+  }
+  const totalShare = rows.reduce((sum, row) => sum + Number(row.desired_energy_share ?? 0), 0) || 1;
+  return rows.map((row) => {
+    const share = Number(row.desired_energy_share ?? 0) / totalShare;
+    const consumedEnergy = residualEnergyGJ * share;
+    const profile = FOOD_NUTRIENT_PROFILES[row.composition_id] ?? {};
+    const energyDensity = profileEnergyGJPerKg(profile, Number(row.food_gj_ha ?? 0) / Math.max(Number(row.edible_yield_t_ha ?? 0) * 1000, 1));
+    const grossEnergy = consumedEnergy / Math.max(.01, Number(annualRetention));
+    const grossKg = energyDensity > 0 ? grossEnergy / energyDensity : 0;
+    const consumedKg = energyDensity > 0 ? consumedEnergy / energyDensity : 0;
+    const effectiveYield = Number(row.food_gj_ha ?? 0) * Number(row.site_yield_multiplier ?? 1);
+    return {
+      id: row.id,
+      label: row.crop ?? row.label,
+      category: row.category,
+      composition_id: row.composition_id,
+      production_type: 'annual',
+      area_ha: effectiveYield > 0 ? grossEnergy / effectiveYield : 0,
+      produced_food_kg_year: grossKg,
+      consumed_food_kg_year: consumedKg,
+      retained_food_kg_year: consumedKg,
+      reserved_food_kg_year: 0,
+      livestock_feed_food_kg_year: 0,
+      exportable_surplus_food_kg_year: 0,
+      lost_food_kg_year: Math.max(0, grossKg - consumedKg),
+      produced_food_energy_gj_year: grossEnergy,
+      consumed_food_energy_gj_year: consumedEnergy,
+      retained_food_energy_gj_year: consumedEnergy,
+      exportable_surplus_food_energy_gj_year: 0,
+      lost_food_energy_gj_year: Math.max(0, grossEnergy - consumedEnergy),
+      annual_energy_share: round(share),
+      retention_factor: round(annualRetention),
+      bearing_factor: 1,
+      first_meaningful_crop_year: row.first_meaningful_crop_year ?? 1,
+      production_status: 'annual production available in the selected year',
+      source: row.source ?? null,
+      evidence_status: row.evidence_status ?? row.canonical_status ?? null,
+      macro_per_kg: {
+        protein: energyForMacro(profile, 'protein', Number(row.protein_kg_ha ?? 0) * 1000 / Math.max(Number(row.edible_yield_t_ha ?? 0) * 1000, 1)),
+        fat: energyForMacro(profile, 'fat', Number(row.fat_kg_ha ?? 0) * 1000 / Math.max(Number(row.edible_yield_t_ha ?? 0) * 1000, 1)),
+        carbohydrate: energyForMacro(profile, 'carbohydrate', Number(row.carbohydrate_kg_ha ?? 0) * 1000 / Math.max(Number(row.edible_yield_t_ha ?? 0) * 1000, 1))
+      }
+    };
+  });
+}
+
+/**
+ * Canonical annual-to-perennial food ledger.  It is the single bridge between
+ * perennial bearing, annual crop substitution, whole-diet nutrition and
+ * production accounting.  No perennial food is credited before its curve
+ * allows it, and excess harvest is reported rather than forced into a diet.
+ */
+export function calculateFoodSuccessionLedger({
+  plantFood = {},
+  demandGJ = 0,
+  demandByYear = {},
+  perennialMix = [],
+  curveAnchors = {},
+  perennialFootprintHa = null,
+  animalOutputByYear = {},
+  years = [1, 2, 3, 5, 8, 10, 15, 'mature'],
+  retentionFactor = .70,
+  siteCapability = {},
+  foodPortfolio = FOOD_PORTFOLIO,
+  householdFatMax = 35
+} = {}) {
+  const footprint = perennialFootprintHa == null ? Number(plantFood.required_food_area_ha ?? 0) * .75 : Number(perennialFootprintHa);
+  const perennialRows = calculatePerennialFoodProductionLedger({mix: perennialMix, curveAnchors, footprintHa: footprint, years, retentionFactor, compositionProfiles: FOOD_NUTRIENT_PROFILES});
+  const annualRetention = Math.max(.01, Number(plantFood.delivery_factor_after_losses_and_reserves ?? retentionFactor));
+  const annualPortfolioRows = (foodPortfolio ?? []).filter((row) => row.production_type === 'annual');
+  const yearRows = perennialRows.map((perennial) => {
+    const householdDemand = Number(demandByYear[String(perennial.year)] ?? demandGJ);
+    const animal = animalOutputByYear[String(perennial.year)] ?? {};
+    const animalEnergy = Number(animal.food_energy_gj_year ?? 0);
+    const remainingEnergy = Math.max(0, householdDemand - animalEnergy);
+    const availablePerennialEnergy = Number(perennial.retained_food_energy_gj_year ?? 0);
+    const maxPerennialScale = availablePerennialEnergy > 0 ? Math.min(1, remainingEnergy / availablePerennialEnergy) : 0;
+    const buildFoodRows = (scale) => {
+      const perennialConsumedEnergy = availablePerennialEnergy * scale;
+      const perennialFatEnergy = Number(perennial.fat_kg_year ?? 0) * scale * .037656;
+      const annualEnergy = Math.max(0, remainingEnergy - perennialConsumedEnergy);
+      const annual = successionAnnualRows({plantFood, annualRetention, perennialFatEnergyGJ: perennialFatEnergy, demandGJ: householdDemand, residualEnergyGJ: annualEnergy, portfolioAnnualRows: annualPortfolioRows});
+      const perennialFood = perennial.layers.map((layer) => {
+        const consumedKg = Number(layer.retained_edible_harvest_kg ?? 0) * scale;
+        const consumedEnergy = Number(layer.retained_food_energy_gj_year ?? 0) * scale;
+        return {
+          ...layer,
+          succession_source: 'canonical_perennial_layer',
+          production_type: 'perennial',
+          label: layer.species,
+          produced_food_kg_year: layer.gross_edible_harvest_kg,
+          retained_food_kg_year: layer.retained_edible_harvest_kg,
+          consumed_food_kg_year: round(consumedKg),
+          reserved_food_kg_year: 0,
+          livestock_feed_food_kg_year: 0,
+          exportable_surplus_food_kg_year: round(Math.max(0, Number(layer.retained_edible_harvest_kg ?? 0) - consumedKg)),
+          lost_food_kg_year: layer.loss_kg_year,
+          produced_food_energy_gj_year: layer.gross_food_energy_gj_year,
+          consumed_food_energy_gj_year: round(consumedEnergy),
+          retained_food_energy_gj_year: round(Number(layer.retained_food_energy_gj_year ?? 0)),
+          exportable_surplus_food_energy_gj_year: round(Math.max(0, Number(layer.retained_food_energy_gj_year ?? 0) - consumedEnergy)),
+          lost_food_energy_gj_year: round(Math.max(0, Number(layer.gross_food_energy_gj_year ?? 0) - Number(layer.retained_food_energy_gj_year ?? 0))),
+          production_status: Number(layer.bearing_factor) > 0 ? 'bearing harvest available' : 'planted; no harvest credited',
+          food_energy_gj_ha_year: Number(layer.gross_food_energy_gj_year ?? 0) / Math.max(footprint, 1e-9)
+        };
+      });
+      const foodRows = [...annual, ...perennialFood];
+      return {annual, perennialFood, foodRows, perennialConsumedEnergy, annualEnergy};
+    };
+    let selectedScale = maxPerennialScale;
+    let candidate = buildFoodRows(selectedScale);
+    // Preserve the household fat ceiling by treating excess nuts as surplus.
+    // The binary search finds the greatest perennial share that remains inside
+    // the selected household AMDR planning ceiling.
+    if (consumedMacroEnergy(candidate.foodRows).fat_percent > householdFatMax && selectedScale > 0) {
+      let low = 0;
+      let high = selectedScale;
+      for (let iteration = 0; iteration < 28; iteration += 1) {
+        const middle = (low + high) / 2;
+        const middleCandidate = buildFoodRows(middle);
+        if (consumedMacroEnergy(middleCandidate.foodRows).fat_percent <= householdFatMax) low = middle;
+        else high = middle;
+      }
+      selectedScale = low;
+      candidate = buildFoodRows(selectedScale);
+    }
+    const {annual, perennialFood, foodRows, perennialConsumedEnergy, annualEnergy} = candidate;
+    const consumedEnergyTotal = foodRows.reduce((sum, row) => sum + Number(row.consumed_food_energy_gj_year ?? 0), 0);
+    const producedEnergyTotal = foodRows.reduce((sum, row) => sum + Number(row.produced_food_energy_gj_year ?? 0), 0);
+    const area = annual.reduce((sum, row) => sum + Number(row.area_ha ?? 0), 0) + footprint;
+    const surplusEnergy = foodRows.reduce((sum, row) => sum + Number(row.exportable_surplus_food_energy_gj_year ?? 0), 0) + Math.max(0, animalEnergy - householdDemand);
+    const producedFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.produced_food_kg_year ?? 0), 0));
+    const consumedFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.consumed_food_kg_year ?? 0), 0));
+    const reservedFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.reserved_food_kg_year ?? 0), 0));
+    const livestockFeedFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.livestock_feed_food_kg_year ?? 0), 0));
+    const exportableSurplusFoodKg = round(foodRows.reduce((sum, row) => sum + Number(row.exportable_surplus_food_kg_year ?? 0), 0));
+    const lostFoodKg = round(Math.max(0, producedFoodKg - consumedFoodKg - reservedFoodKg - livestockFeedFoodKg - exportableSurplusFoodKg));
+    return {
+      year: perennial.year,
+      household_food_demand_gj_year: round(householdDemand),
+      animal_food_energy_gj_year: round(animalEnergy),
+      annual_food_energy_gj_year: round(annualEnergy),
+      perennial_food_energy_available_gj_year: round(availablePerennialEnergy),
+      perennial_food_energy_consumed_gj_year: round(perennialConsumedEnergy),
+      consumed_food_energy_gj_year: round(consumedEnergyTotal),
+      produced_food_energy_gj_year: round(producedEnergyTotal),
+      exportable_surplus_food_energy_gj_year: round(surplusEnergy),
+      annual_cultivation_area_ha: round(annual.reduce((sum, row) => sum + Number(row.area_ha ?? 0), 0)),
+      planted_perennial_footprint_ha: round(footprint),
+      occupied_food_production_area_ha: round(area),
+      macro_energy_percent_note: 'Calculated from consumed food only; retained surplus is not forced into the household ration.',
+      foods: foodRows,
+      annual_rows: annual,
+      perennial_rows: perennialFood,
+      accounting: {
+        produced_food_kg_year: producedFoodKg,
+        consumed_food_kg_year: consumedFoodKg,
+        reserved_food_kg_year: reservedFoodKg,
+        livestock_feed_food_kg_year: livestockFeedFoodKg,
+        exportable_surplus_food_kg_year: exportableSurplusFoodKg,
+        lost_food_kg_year: lostFoodKg,
+        counted_once: true,
+        reconciliation_rule: 'Produced = consumed + reserved + livestock feed + exportable surplus + losses; animal feed co-products remain in the separate finite feed ledger.'
+      },
+      site_capability: siteCapability.site_id ?? siteCapability.id ?? null,
+      household_fat_max_percent: householdFatMax
+    };
+  });
+  return {
+    years,
+    planted_perennial_footprint_ha: round(footprint),
+    rows: yearRows,
+    mature: yearRows.find((row) => row.year === 'mature') ?? yearRows.at(-1),
+    peak_food_production_area_ha: round(Math.max(...yearRows.map((row) => Number(row.occupied_food_production_area_ha ?? 0)), 0)),
+    canonical_rule: 'Perennial harvest, annual residual production and whole-diet nutrient supply are calculated from this same year-by-year ledger.'
+  };
+}
+
+export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, animals = [], energyGJ = 0, foodPortfolio = true, foodProductionLedger = null} = {}) {
   const demandRows = members.map(calculateHealthCanadaNutrientDemand);
   const daily = Object.fromEntries(Object.keys(NUTRIENT_DEFINITIONS).map((id) => [id, 0]));
   const annual = Object.fromEntries(Object.keys(NUTRIENT_DEFINITIONS).map((id) => [id, 0]));
@@ -281,8 +509,12 @@ export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, ani
   annual.protein_rda_g = demandRows.reduce((sum, row) => sum + Number(row.protein_rda_g_year ?? 0), 0);
   const total = {protein_g: 0, amino_mg: {}, nutrients: {}, macro: {protein_g: 0, fat_g: 0, carbohydrate_g: 0, fibre_g: 0, saturated_fat_g: 0, linoleic_g: 0, alpha_linolenic_g: 0}, sources: new Set()};
   const portfolio = foodPortfolio ? portfolioFoodRows(plantFood) : {base_fraction: 1, total_energy_share: 0, rows: []};
-  for (const row of plantFood.rows ?? []) addProfile(total, FOOD_NUTRIENT_PROFILES[row.composition_id], Number(row.edible_food_kg_delivered ?? 0) * portfolio.base_fraction);
-  for (const row of portfolio.rows) addProfile(total, FOOD_NUTRIENT_PROFILES[row.composition_id], Number(row.consumed_food_kg_year ?? 0));
+  if (foodProductionLedger) {
+    for (const row of foodProductionLedger.foods ?? []) addProfile(total, FOOD_NUTRIENT_PROFILES[row.composition_id], Number(row.consumed_food_kg_year ?? 0));
+  } else {
+    for (const row of plantFood.rows ?? []) addProfile(total, FOOD_NUTRIENT_PROFILES[row.composition_id], Number(row.edible_food_kg_delivered ?? 0) * portfolio.base_fraction);
+    for (const row of portfolio.rows) addProfile(total, FOOD_NUTRIENT_PROFILES[row.composition_id], Number(row.consumed_food_kg_year ?? 0));
+  }
   for (const animal of animals) {
     const profiles = animal.food_profile_id_by_output ?? {};
     addProfile(total, FOOD_NUTRIENT_PROFILES[profiles.eggs ?? animal.food_profile_id], Number(animal.output?.eggs_kg_year ?? 0));
@@ -325,11 +557,15 @@ export function calculateFoodNutrientAdequacy({members = [], plantFood = {}, ani
   const externalInputs = Object.entries(nutrients).filter(([, row]) => row.status !== 'adequate from property-produced food').map(([id, row]) => ({nutrient: id, status: row.status, note: id === 'b12' || id === 'iodine' ? 'A small external non-food input may be required; no supplement is silently included.' : 'Current food-form evidence does not establish adequacy.'}));
   const absoluteAdequacy = Object.values(amino).every((row) => row.absolute_adequacy_ratio != null && row.absolute_adequacy_ratio >= 1);
   const iron = nutrients.iron ?? {};
+  const ledgerFoods = foodProductionLedger?.foods ?? null;
+  const ledgerConsumedEnergy = ledgerFoods ? ledgerFoods.reduce((sum, row) => sum + Number(row.consumed_food_energy_gj_year ?? 0), 0) : 0;
+  const ledgerPortfolioEnergy = ledgerFoods ? ledgerFoods.filter((row) => row.succession_source !== 'canonical_annual_staple').reduce((sum, row) => sum + Number(row.consumed_food_energy_gj_year ?? 0), 0) : 0;
+  const ledgerBaseStapleEnergy = ledgerFoods ? ledgerFoods.filter((row) => row.succession_source === 'canonical_annual_staple').reduce((sum, row) => sum + Number(row.consumed_food_energy_gj_year ?? 0), 0) : 0;
   return {
     contract_version: NUTRITION_CONTRACT_VERSION,
     demand: {days_per_year: DAYS_PER_YEAR, members: demandRows, aggregate: {daily: Object.fromEntries(Object.entries(daily).map(([id, value]) => [id, round(value)])), annual: Object.fromEntries(Object.entries(annual).map(([id, value]) => [id, round(value)])), protein_rda_g_day: round(demandRows.reduce((sum, row) => sum + Number(row.protein_rda_g_day ?? 0), 0)), protein_rda_g_year: round(annual.protein_rda_g)}},
     supply: {protein_g: round(total.protein_g), sources: [...total.sources]},
-    whole_diet: {portfolio: portfolio.rows, portfolio_energy_share: round(portfolio.total_energy_share), base_staple_energy_share: round(portfolio.base_fraction), macros: calculateDietaryMacroSummary(total, members)},
+    whole_diet: {portfolio: foodProductionLedger ? foodProductionLedger.foods : portfolio.rows, portfolio_energy_share: foodProductionLedger ? round(ledgerConsumedEnergy > 0 ? ledgerPortfolioEnergy / ledgerConsumedEnergy : 0) : round(portfolio.total_energy_share), base_staple_energy_share: foodProductionLedger ? round(ledgerConsumedEnergy > 0 ? ledgerBaseStapleEnergy / ledgerConsumedEnergy : 0) : round(portfolio.base_fraction), macros: calculateDietaryMacroSummary(total, members), succession_year: foodProductionLedger?.year ?? null},
     amino_acid_pattern: {
       source: HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE,
       reference_mg_per_g_protein: HEALTH_CANADA_AMINO_ACID_PATTERN,

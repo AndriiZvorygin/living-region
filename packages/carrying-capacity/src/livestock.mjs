@@ -1,6 +1,7 @@
 import {calculateHouseholdProteinDemand} from './protein.mjs';
-import {calculateFoodNutrientAdequacy, calculateFoodPortfolioLand, FOOD_NUTRIENT_PROFILES, NUTRITION_GOAL_DEFINITIONS} from './nutrition.mjs';
+import {calculateFoodNutrientAdequacy, calculateFoodPortfolioLand, calculateFoodSuccessionLedger, FOOD_NUTRIENT_PROFILES, NUTRITION_GOAL_DEFINITIONS} from './nutrition.mjs';
 import {FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './food-adult-equivalent.mjs';
+import {calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const B12_SEARCH_CACHE = new Map();
@@ -615,10 +616,16 @@ function goalSummary({members, demandGJ, selectedMode, selectedScale, selectedGo
   return {goals, pregnancy_sensitivity_members: pregnancySensitivity?.members ?? members, pregnancy_sensitivity_subject: pregnancySensitivity?.subject ?? null};
 }
 
-export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, nutritionGoal = 'user_selected_animal_share', establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature'], _skipComparisons = false, _skipMinimumB12 = false} = {}) {
+export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYear = {}, proteinDemandKgYear, members = [], siteCapability, livestockMode = 'plants_only', rationId = 'arc_integrated', livestockScale, nutritionGoal = 'user_selected_animal_share', establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature'], perennialMix = [], curveAnchors = {}, permanentAdultDemandGJ = null, perennialRetentionFactor = .70, nutritionYear = 1, _skipComparisons = false, _skipMinimumB12 = false} = {}) {
   if (!foodEvidence) throw new Error('nutrient food system requires canonical food evidence');
   const {calculateFoodSystem} = siteCapability?.calculateFoodSystem ? siteCapability : {};
   if (typeof calculateFoodSystem !== 'function') throw new Error('nutrient food system requires calculateFoodSystem in siteCapability');
+  const resolvedDemandProfile = members.length ? calculateHouseholdFoodDemandProfile(members, establishmentYears) : null;
+  const resolvedDemandByYear = Object.keys(demandByYear).length || !resolvedDemandProfile ? demandByYear : resolvedDemandProfile.demand_by_year;
+  // Direct nutrient comparisons and the full interactive household API must
+  // size the permanent perennial system from adults, even when the caller
+  // does not separately pass the demand profile.
+  const resolvedPermanentAdultDemandGJ = permanentAdultDemandGJ ?? resolvedDemandProfile?.permanent_adult_food_demand_gj_year ?? demandGJ;
   const minimumB12 = _skipMinimumB12 ? {scale: null, scenario: null, adequacy: null, system_comparison: {}} : findMinimumPropertyB12Scale({foodEvidence, demandGJ, members, siteCapability, rationId});
   const explicitLivestockScale = livestockScale !== undefined && livestockScale !== null;
   const goalMode = nutritionGoal === 'plants_plus_external' ? 'plants_only' : nutritionGoal === 'minimum_property_b12' ? 'rabbit_meat' : nutritionGoal === 'nutrient_dense_mixed' ? 'mixed_rabbit_eggs' : livestockMode;
@@ -642,9 +649,9 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   const animalProtein = animalOutputs.reduce((sum, row) => sum + Number(row.output.edible_protein_kg_year ?? 0), 0);
   const plantDemandGJ = Math.max(0, Number(demandGJ) - animalEnergy);
   const plantFood = plantDemandGJ === Number(demandGJ) ? plantOnly : calculateFoodSystem(foodEvidence, plantDemandGJ, siteCapability);
-  const plantProtein = Number(plantFood.macro_delivered_to_household?.protein_kg ?? 0);
-  const totalProtein = plantProtein + animalProtein;
-  const deficit = Math.max(0, proteinTarget - totalProtein);
+  let plantProtein = Number(plantFood.macro_delivered_to_household?.protein_kg ?? 0);
+  let totalProtein = plantProtein + animalProtein;
+  let deficit = Math.max(0, proteinTarget - totalProtein);
   const propertyFeed = derivePropertyFeedSupply({foodSystem: plantFood});
   const remainingPropertyFeed = {...propertyFeed};
   const animals = animalOutputs.map((row) => {
@@ -660,26 +667,6 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   const feedSelfSufficiency = animals.every((row) => row.feed.feed_self_sufficiency) && purchasedFeed === 0 && feedDeficit === 0;
   const reproductiveSelfSufficiency = animals.every((row) => row.reproduction?.self_replacing === true && row.reproduction?.feed_all_generations_included === true);
   const proteinCoverage = proteinTarget > 0 ? totalProtein / proteinTarget : 1;
-  const portfolioLand = calculateFoodPortfolioLand({plantFood, siteCapability, years: establishmentYears});
-  const nutrientCompleteness = calculateFoodNutrientAdequacy({members, plantFood, animals, energyGJ: demandGJ});
-  nutrientCompleteness.whole_diet.portfolio_land = portfolioLand;
-  const plantsOnlyAdequacy = calculateFoodNutrientAdequacy({members, plantFood: plantOnly, animals: [], energyGJ: demandGJ});
-  const pregnancySensitivity = resolvePregnancySensitivity(members);
-  const pregnancyAdequacy = calculateFoodNutrientAdequacy({members: pregnancySensitivity.members, plantFood, animals, energyGJ: demandGJ});
-  const pregnancyComparison = !_skipComparisons && nutritionGoal === 'pregnancy_iron_sensitivity'
-    ? [
-      ['plants_only', 'Plants plus disclosed external nutrients'],
-      ['rabbit_meat', 'Self-replacing rabbits'],
-      ['chicken_eggs', 'Self-replacing heritage chickens'],
-      ['goose_meat', 'Self-replacing geese'],
-      ['mixed_rabbit_eggs', 'Mixed rabbits and chickens']
-    ].map(([mode, label]) => {
-      const result = calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members: pregnancySensitivity.members, siteCapability, livestockMode: mode, rationId, nutritionGoal: 'user_selected_animal_share', establishmentYears, _skipComparisons: true, _skipMinimumB12: true});
-      const iron = result.nutrient_completeness.nutrients.iron ?? {};
-      return {mode, label, subject: pregnancySensitivity.subject, total_iron_mg_year: iron.supplied_annual ?? null, heme_iron_mg_year: result.nutrient_completeness.iron_assessment?.heme_iron_mg_year ?? null, estimated_absorbable_iron_mg_year: result.nutrient_completeness.iron_assessment?.estimated_bioavailable_iron_mg_year ?? null, iron_target_mg_year: iron.target_annual ?? null, iron_coverage_ratio: iron.adequacy_ratio ?? null, food_feed_area_ha: result.food_feed_area_ha, labour_hours_year: result.labour.livestock_hours_year, feed_self_sufficiency: result.feed_self_sufficiency, unresolved_note: result.nutrient_completeness.iron_assessment?.status ?? null};
-    }) : null;
-  const marginalNutrientValue = buildMarginalNutrientValue({before: plantsOnlyAdequacy, after: nutrientCompleteness, animals, demandGJ, feed: {additional_dedicated_feed_land_ha: dedicatedFeedLand, human_edible_feed_protein_consumed_kg: animals.reduce((sum, row) => sum + row.feed.human_edible_feed_protein_kg_year, 0)}, labour: {livestock_hours_year: animals.reduce((sum, row) => sum + row.labour.total_hours_year, 0)}});
-  const goalResults = goalSummary({members, demandGJ, selectedMode: livestockMode, selectedScale: effectiveLivestockScale, selectedGoal: nutritionGoal, minimumB12, finalAdequacy: nutrientCompleteness, pregnancyAdequacy, pregnancyComparison, pregnancySensitivity});
   const animalOutputByYear = Object.fromEntries(establishmentYears.map((year) => {
     const activeAnimals = animals.filter((animal) => year === 'mature' || Number(year) >= Number(animal.production_start_year ?? 1));
     return [String(year), {
@@ -688,6 +675,56 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
       active_species: activeAnimals.map((row) => row.species_id)
     }];
   }));
+  const matureAnimalEnergy = Number(animalOutputByYear.mature?.food_energy_gj_year ?? animalEnergy);
+  const maturePerennialYield = perennialMix.reduce((sum, row) => sum + Number(row.area_share ?? 0) * Number(row.mature_food_gj_ha_year ?? 0) * Number(row.site_yield_multiplier ?? 1), 0);
+  const permanentDemandAfterAnimals = Math.max(0, Number(resolvedPermanentAdultDemandGJ) - matureAnimalEnergy);
+  const plantedPerennialFootprint = perennialMix.length && maturePerennialYield > 0
+    ? permanentDemandAfterAnimals / (maturePerennialYield * perennialRetentionFactor)
+    : Number(plantFood.required_food_area_ha ?? 0) * .75;
+  let foodSuccessionLedger = calculateFoodSuccessionLedger({plantFood, demandGJ: Number(demandGJ), demandByYear: resolvedDemandByYear, perennialMix, curveAnchors, perennialFootprintHa: plantedPerennialFootprint, animalOutputByYear, years: establishmentYears, retentionFactor: perennialRetentionFactor, siteCapability, householdFatMax: 35});
+  // The physical ledger supplies the finite plant/perennial harvest. Attach
+  // the same year's animal output to each row so the UI, nutrient report and
+  // establishment calculation all read one year-specific whole-diet result.
+  const successionRowsWithNutrition = foodSuccessionLedger.rows.map((row) => {
+    const elapsed = row.year === 'mature' ? null : Math.max(0, Number(row.year) - 1);
+    const activeMembers = members.filter((member) => member.land_role === 'permanent_adult' || (Number(member.age_y) >= 18) || (elapsed != null && Number(member.age_y) + elapsed < 18));
+    const activeAnimals = animals.filter((animal) => row.year === 'mature' || Number(row.year) >= Number(animal.production_start_year ?? 1));
+    const yearAdequacy = calculateFoodNutrientAdequacy({members: activeMembers, plantFood, animals: activeAnimals, energyGJ: Number(row.household_food_demand_gj_year ?? demandGJ), foodPortfolio: false, foodProductionLedger: row});
+    return {
+      ...row,
+      macro_summary: yearAdequacy.whole_diet.macros,
+      nutrients: yearAdequacy.nutrients,
+      amino_acid_pattern: yearAdequacy.amino_acid_pattern,
+      external_inputs: yearAdequacy.external_inputs
+    };
+  });
+  foodSuccessionLedger = {...foodSuccessionLedger, rows: successionRowsWithNutrition, mature: successionRowsWithNutrition.find((row) => row.year === 'mature') ?? successionRowsWithNutrition.at(-1)};
+  const nutritionLedgerRow = foodSuccessionLedger.rows.find((row) => String(row.year) === String(nutritionYear)) ?? foodSuccessionLedger.mature;
+  const portfolioLand = calculateFoodPortfolioLand({plantFood, siteCapability, years: establishmentYears, foodSuccessionLedger: foodSuccessionLedger});
+  const nutrientCompleteness = calculateFoodNutrientAdequacy({members, plantFood, animals, energyGJ: demandGJ, foodPortfolio: false, foodProductionLedger: nutritionLedgerRow});
+  totalProtein = Number(nutrientCompleteness.supply?.protein_g ?? 0) / 1000;
+  plantProtein = Math.max(0, totalProtein - animalProtein);
+  deficit = Math.max(0, proteinTarget - totalProtein);
+  nutrientCompleteness.whole_diet.portfolio_land = portfolioLand;
+  const plantsOnlyLedger = calculateFoodSuccessionLedger({plantFood: plantOnly, demandGJ: Number(demandGJ), demandByYear: resolvedDemandByYear, perennialMix, curveAnchors, perennialFootprintHa: maturePerennialYield <= 0 ? Number(plantOnly.required_food_area_ha ?? 0) * .75 : Number(resolvedPermanentAdultDemandGJ) / (maturePerennialYield * perennialRetentionFactor), animalOutputByYear: {}, years: establishmentYears, retentionFactor: perennialRetentionFactor, siteCapability});
+  const plantsOnlyNutritionRow = plantsOnlyLedger.rows.find((row) => String(row.year) === String(nutritionYear)) ?? plantsOnlyLedger.mature;
+  const plantsOnlyAdequacy = calculateFoodNutrientAdequacy({members, plantFood: plantOnly, animals: [], energyGJ: demandGJ, foodPortfolio: false, foodProductionLedger: plantsOnlyNutritionRow});
+  const pregnancySensitivity = resolvePregnancySensitivity(members);
+  const pregnancyAdequacy = calculateFoodNutrientAdequacy({members: pregnancySensitivity.members, plantFood, animals, energyGJ: demandGJ, foodPortfolio: false, foodProductionLedger: nutritionLedgerRow});
+  const pregnancyComparison = !_skipComparisons && nutritionGoal === 'pregnancy_iron_sensitivity'
+    ? [
+      ['plants_only', 'Plants plus disclosed external nutrients'],
+      ['rabbit_meat', 'Self-replacing rabbits'],
+      ['chicken_eggs', 'Self-replacing heritage chickens'],
+      ['goose_meat', 'Self-replacing geese'],
+      ['mixed_rabbit_eggs', 'Mixed rabbits and chickens']
+    ].map(([mode, label]) => {
+      const result = calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members: pregnancySensitivity.members, siteCapability, livestockMode: mode, rationId, nutritionGoal: 'user_selected_animal_share', establishmentYears, perennialMix, curveAnchors, permanentAdultDemandGJ, perennialRetentionFactor, nutritionYear, _skipComparisons: true, _skipMinimumB12: true});
+      const iron = result.nutrient_completeness.nutrients.iron ?? {};
+      return {mode, label, subject: pregnancySensitivity.subject, total_iron_mg_year: iron.supplied_annual ?? null, heme_iron_mg_year: result.nutrient_completeness.iron_assessment?.heme_iron_mg_year ?? null, estimated_absorbable_iron_mg_year: result.nutrient_completeness.iron_assessment?.estimated_bioavailable_iron_mg_year ?? null, iron_target_mg_year: iron.target_annual ?? null, iron_coverage_ratio: iron.adequacy_ratio ?? null, food_feed_area_ha: result.food_feed_area_ha, labour_hours_year: result.labour.livestock_hours_year, feed_self_sufficiency: result.feed_self_sufficiency, unresolved_note: result.nutrient_completeness.iron_assessment?.status ?? null};
+    }) : null;
+  const marginalNutrientValue = buildMarginalNutrientValue({before: plantsOnlyAdequacy, after: nutrientCompleteness, animals, demandGJ, feed: {additional_dedicated_feed_land_ha: dedicatedFeedLand, human_edible_feed_protein_consumed_kg: animals.reduce((sum, row) => sum + row.feed.human_edible_feed_protein_kg_year, 0)}, labour: {livestock_hours_year: animals.reduce((sum, row) => sum + row.labour.total_hours_year, 0)}});
+  const goalResults = goalSummary({members, demandGJ, selectedMode: livestockMode, selectedScale: effectiveLivestockScale, selectedGoal: nutritionGoal, minimumB12, finalAdequacy: nutrientCompleteness, pregnancyAdequacy, pregnancyComparison, pregnancySensitivity});
   // Low-level nutrient screening may be called without household members. In
   // that case there is no absolute household requirement to test; the full
   // household API always supplies members and performs the requirement check.
@@ -705,6 +742,8 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
     protein_demand_kg_year: round(proteinTarget),
     plant_only: {food_energy_gj_year: round(demandGJ), protein_kg_year: round(plantOnly.macro_delivered_to_household?.protein_kg ?? 0), food_area_ha: plantOnly.required_food_area_ha},
     plant_food: plantFood,
+    food_succession_ledger: foodSuccessionLedger,
+    plants_only_food_succession_ledger: plantsOnlyLedger,
     portfolio_land: portfolioLand,
     food_feed_area_ha: round(Number(plantFood.required_food_area_ha ?? 0) + Number(portfolioLand.additional_area_ha ?? 0) + dedicatedFeedLand),
     plant_energy_demand_gj_year: round(plantDemandGJ),
@@ -727,7 +766,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
       return {recurring_hours_year: round(recurring), slaughter_processing_hours_year: round(processing), livestock_hours_year: round(total), edible_product_kg_year: round(edibleProduct), animal_protein_kg_year: round(protein), hours_per_kg_edible_product: edibleProduct > 0 ? round(total / edibleProduct, 4) : null, hours_per_kg_animal_protein: protein > 0 ? round(total / protein, 4) : null, scaling_method: LIVESTOCK_LABOUR_SCALING_METHOD, scaling_formula: LIVESTOCK_LABOUR_SCALING_FORMULA, scaling_note: LIVESTOCK_LABOUR_SCALING_NOTE};
     })(),
     feed_self_sufficiency: feedSelfSufficiency,
-    energy_adequacy: Number(plantFood.delivered_food_energy_gj ?? 0) + animalEnergy >= Number(demandGJ) - 1e-9,
+    energy_adequacy: Number(nutritionLedgerRow?.consumed_food_energy_gj_year ?? 0) + Number(nutritionLedgerRow?.animal_food_energy_gj_year ?? animalEnergy) >= Number(demandGJ) - 1e-9,
     nutrient_completeness: nutrientCompleteness,
     plants_only_nutrient_completeness: plantsOnlyAdequacy,
     pregnancy_sensitivity_nutrient_completeness: pregnancyAdequacy,
@@ -742,10 +781,10 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDema
   };
 }
 
-export function compareNutrientFoodSystems({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability} = {}) {
+export function compareNutrientFoodSystems({foodEvidence, demandGJ, proteinDemandKgYear, members = [], siteCapability, perennialMix = [], curveAnchors = {}, permanentAdultDemandGJ = null, establishmentYears = [1, 2, 3, 5, 8, 10, 15, 'mature']} = {}) {
   const modes = ['plants_only', 'rabbit_meat', 'chicken_eggs', 'chicken_meat', 'goose_meat', 'goat_meat', 'mixed_rabbit_eggs'];
   const rationIds = ['conventional_reference', 'low_food_competition', 'arc_integrated'];
-  const rows = modes.flatMap((mode) => rationIds.map((rationId) => calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members, siteCapability, livestockMode: mode, rationId}))).filter((row) => row.mode === 'plants_only' ? row.ration_id === 'arc_integrated' : true);
+  const rows = modes.flatMap((mode) => rationIds.map((rationId) => calculateNutrientFoodSystem({foodEvidence, demandGJ, proteinDemandKgYear, members, siteCapability, livestockMode: mode, rationId, perennialMix, curveAnchors, permanentAdultDemandGJ, establishmentYears}))).filter((row) => row.mode === 'plants_only' ? row.ration_id === 'arc_integrated' : true);
   const eligible = rows.filter((row) => row.protein_adequacy && row.energy_adequacy && row.optimizer_eligible && row.feed_self_sufficiency);
   const foodFeedArea = (row) => Number(row.plant_food.required_food_area_ha ?? 0) + Number(row.feed.additional_dedicated_feed_land_ha ?? 0);
   const labour = (row) => Number(row.labour?.livestock_hours_year ?? 0);

@@ -56,7 +56,9 @@ export function calculateEstablishmentLandRequirement({
   additionalExclusiveLandHa = 0,
   exclusiveReserveHa = .12,
   yieldMultiplier = 1,
-  arcPolicyAllocationHa = null
+  arcPolicyAllocationHa = null,
+  plantedPerennialFootprintHa = null,
+  perennialFoodProductionLedger = null
 } = {}) {
   if (!(Number(demandGJ) > 0)) throw new Error('establishment land requires positive household food demand');
   if (!(Number(annualYieldGJHaYear) > 0)) throw new Error('establishment land requires a positive viable annual yield');
@@ -73,23 +75,27 @@ export function calculateEstablishmentLandRequirement({
     dependent_child_food_demand_gj_year: Math.max(0, demandAt(year) - permanentDemand),
     household_food_demand_gj_year: demandAt(year)
   };
-  const plantedPerennialFootprintHa = permanentDemand / (maturePerennialYield * (1 - Number(loss)));
+  const plantedFootprint = plantedPerennialFootprintHa == null
+    ? permanentDemand / (maturePerennialYield * (1 - Number(loss)))
+    : Number(plantedPerennialFootprintHa);
   const rows = years.map((year) => {
     const householdDemand = demandAt(year);
     const demandScope = scopeAt(year);
-    const productionRows = classProduction({perennialMix, curveAnchors, year, footprintHa: plantedPerennialFootprintHa, yieldMultiplier});
-    const perennialGross = productionRows.reduce((sum, row) => sum + row.gross_food_gj, 0);
-    const perennialUsable = perennialGross * (1 - Number(loss));
+    const ledgerRow = perennialFoodProductionLedger?.rows?.find((candidate) => String(candidate.year) === String(year));
+    const productionRows = ledgerRow?.perennial_rows?.map((row) => ({id: row.id, functional_class: row.functional_class, area_share: Number(row.area_ha ?? 0) / Math.max(plantedFootprint, 1e-12), yield_fraction: row.bearing_factor, gross_food_gj: row.gross_food_energy_gj_year, usable_food_gj: row.retained_food_energy_gj_year})) ?? classProduction({perennialMix, curveAnchors, year, footprintHa: plantedFootprint, yieldMultiplier});
+    const perennialGross = ledgerRow ? Number(ledgerRow.perennial_food_energy_available_gj_year ?? 0) / Math.max(1 - Number(loss), .01) : productionRows.reduce((sum, row) => sum + row.gross_food_gj, 0);
+    const perennialUsable = ledgerRow ? Number(ledgerRow.perennial_food_energy_consumed_gj_year ?? 0) : perennialGross * (1 - Number(loss));
     const residual = Math.max(0, householdDemand - perennialUsable);
-    const requestedAnnualArea = strategy === 'constant_annual_reserve'
+    const ledgerAnnualArea = ledgerRow ? Number(ledgerRow.annual_cultivation_area_ha ?? 0) : null;
+    const requestedAnnualArea = ledgerAnnualArea != null && strategy === 'progressive_handoff' ? ledgerAnnualArea : strategy === 'constant_annual_reserve'
       ? Math.max(householdDemand * Number(annualReserveFraction) / netAnnualYield, residual / netAnnualYield)
       : residual / netAnnualYield;
     const overlapFraction = Number(annualIntercropOverlap[year] ?? 0);
-    const overlap = Math.min(requestedAnnualArea, plantedPerennialFootprintHa) * overlapFraction;
-    const occupiedFood = requestedAnnualArea + plantedPerennialFootprintHa - overlap;
+    const overlap = Math.min(requestedAnnualArea, plantedFootprint) * overlapFraction;
+    const occupiedFood = requestedAnnualArea + plantedFootprint - overlap;
     const totalExclusive = occupiedFood + Number(heatingAreaHa) + Number(exclusiveReserveHa) + Number(additionalExclusiveLandHa);
-    const annualGross = requestedAnnualArea * annualYield;
-    const annualUsable = annualGross * (1 - Number(loss));
+    const annualGross = ledgerRow ? Number(ledgerRow.annual_food_energy_gj_year ?? 0) / Math.max(1 - Number(loss), .01) : requestedAnnualArea * annualYield;
+    const annualUsable = ledgerRow ? Number(ledgerRow.annual_food_energy_gj_year ?? 0) : annualGross * (1 - Number(loss));
     const adultResidual = Math.max(0, permanentDemand - perennialUsable);
     const adultAnnualArea = adultResidual / netAnnualYield;
     return {
@@ -98,8 +104,8 @@ export function calculateEstablishmentLandRequirement({
       annual_area_ha: round(requestedAnnualArea),
       annual_gross_food_gj: round(annualGross),
       annual_usable_food_gj: round(annualUsable),
-      perennial_area_ha: round(plantedPerennialFootprintHa),
-      planted_perennial_footprint_ha: round(plantedPerennialFootprintHa),
+      perennial_area_ha: round(plantedFootprint),
+      planted_perennial_footprint_ha: round(plantedFootprint),
       perennial_gross_food_gj: round(perennialGross),
       perennial_usable_food_gj: round(perennialUsable),
       perennial_by_function_usable_gj: Object.fromEntries(productionRows.map((row) => [row.functional_class, row.usable_food_gj])),
@@ -137,7 +143,7 @@ export function calculateEstablishmentLandRequirement({
     annual_reserve_fraction: Number(annualReserveFraction),
     annual_yield_gj_ha_year: round(annualYield),
     mature_perennial_yield_gj_ha_year: round(maturePerennialYield),
-    planted_perennial_footprint_ha: round(plantedPerennialFootprintHa),
+    planted_perennial_footprint_ha: round(plantedFootprint),
     current_household_food_demand_gj_year: round(Number(demandGJ)),
     permanent_adult_food_demand_gj_year: round(permanentDemand),
     dependent_child_food_demand_gj_year: round(Math.max(0, Number(demandGJ) - permanentDemand)),
