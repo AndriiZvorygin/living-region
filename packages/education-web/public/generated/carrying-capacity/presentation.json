@@ -2,7 +2,7 @@
   "contract_version": "3.0.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-17T01:50:44.177Z",
+  "generated_at": "2026-08-17T01:58:51.552Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",

@@ -79,7 +79,11 @@ export function ensureDir(relative) { fs.mkdirSync(path.join(ROOT, relative), {r
 export function writeJson(relative, value) {
   const file = path.join(ROOT, relative);
   fs.mkdirSync(path.dirname(file), {recursive: true});
-  fs.writeFileSync(file, JSON.stringify(value, null, 2) + '\n');
+  // Keep readers from observing a truncated generated contract while another
+  // report/test process is rebuilding the same output.
+  const temporary = `${file}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`;
+  fs.writeFileSync(temporary, JSON.stringify(value, null, 2) + '\n');
+  fs.renameSync(temporary, file);
 }
 export function writeText(relative, text) {
   const file = path.join(ROOT, relative);
