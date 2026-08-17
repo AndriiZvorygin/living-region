@@ -160,3 +160,5 @@ export {
   assertValidPlantDatabase,
   buildPlantDatabase
 } from './plant-database.mjs';
+export {AGROECOSYSTEM_CONTRACT_VERSION, SUPPORT_PLANT_SENSITIVITIES, AGROECOSYSTEM_OBJECTIVES, buildSiteSelectionContext, calculatePlantSuitability, rankPlantCandidates} from './suitability.mjs';
+export {AGROECOSYSTEM_YEARS, selectAgroecosystemCandidates, scheduleAnnualPlots, calculateLayeredPerennialSuccession, calculateAgroecosystemPlan} from './agroecosystem.mjs';
