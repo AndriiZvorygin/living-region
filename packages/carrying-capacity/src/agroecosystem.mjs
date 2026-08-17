@@ -1,4 +1,5 @@
 import {buildSiteSelectionContext, rankPlantCandidates, SUPPORT_PLANT_SENSITIVITIES, AGROECOSYSTEM_OBJECTIVES, AGROECOSYSTEM_CONTRACT_VERSION} from './suitability.mjs';
+import {calculateHumanureContribution, calculateNutrientLedger} from './nutrient-ledger.mjs';
 
 export const AGROECOSYSTEM_YEARS = Object.freeze([...Array.from({length: 30}, (_, index) => index + 1), 'mature']);
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
@@ -73,11 +74,14 @@ export function calculateLayeredPerennialSuccession({records = [], totalAreaHa =
   return {years: rows, planted_perennial_footprint_ha: totalAreaHa, support_plant_ratio: supportPlantRatio, support_species: support.map((record) => record.id), accounting_note: 'Support plants occupy shared nominal space; they are ecological overlays and are not added as extra hectares. Canopy/root competition bounds additive layer output.'};
 }
 
-export function calculateAgroecosystemPlan({database, siteId = 'ordinary_mesic', siteOverrides = {}, objectives = ['low_external_input'], supportPlantRatio = .25, annualAreaHa = 1, perennialAreaHa = 1, nutritionProfiles = {}, years = AGROECOSYSTEM_YEARS} = {}) {
+export function calculateAgroecosystemPlan({database, siteId = 'ordinary_mesic', siteOverrides = {}, objectives = ['low_external_input'], supportPlantRatio = .25, annualAreaHa = 1, perennialAreaHa = 1, nutritionProfiles = {}, years = AGROECOSYSTEM_YEARS, householdPeople = 0, humanure = {enabled: false}} = {}) {
   const site = buildSiteSelectionContext(siteId, siteOverrides);
   const selection = selectAgroecosystemCandidates({database, site, objectives, supportPlantRatio});
   const records = (database.records ?? []).filter((record) => selection.selected.some((row) => row.plant_id === record.id));
   const annual = scheduleAnnualPlots({records, totalAreaHa: annualAreaHa, years: years.filter((year) => year !== 'mature')});
   const perennial = calculateLayeredPerennialSuccession({records, totalAreaHa: perennialAreaHa, supportPlantRatio, nutritionProfiles, years});
-  return {contract_version: AGROECOSYSTEM_CONTRACT_VERSION, site, objectives, support_plant_ratio: supportPlantRatio, selection, annual_schedule: annual, perennial_succession: perennial, reconciliation: {annual_years: annual.years.length, perennial_years: perennial.years.length, annual_schedule_feasible: annual.feasible, unknown_values_are_not_zero: true}};
+  const people = Number(householdPeople);
+  const humanureScenario = calculateHumanureContribution({people, ...humanure});
+  const ledger = calculateNutrientLedger({years, humanure: humanureScenario, annual: (year) => ({production: perennial.years.find((row) => row.year === year)?.layers ?? [], supportPlants: records.filter((record) => record.architecture.life_cycle === 'support').map((record) => ({plant_id: record.id, area_ha: perennialAreaHa * supportPlantRatio / Math.max(1, records.filter((candidate) => candidate.architecture.life_cycle === 'support').length), nitrogen_fixed_kg_ha_year: record.ecological_function?.nitrogen_fixation_kg_n_ha_year?.central ?? 0}))})});
+  return {contract_version: AGROECOSYSTEM_CONTRACT_VERSION, site, objectives, support_plant_ratio: supportPlantRatio, selection, annual_schedule: annual, perennial_succession: perennial, nutrient_ledger: ledger, reconciliation: {annual_years: annual.years.length, perennial_years: perennial.years.length, nutrient_years: ledger.years.length, annual_schedule_feasible: annual.feasible, nutrient_ledger_balanced: ledger.all_years_balanced, unknown_values_are_not_zero: true}};
 }
