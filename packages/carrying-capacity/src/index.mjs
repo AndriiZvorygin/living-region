@@ -161,5 +161,5 @@ export {
   buildPlantDatabase
 } from './plant-database.mjs';
 export {AGROECOSYSTEM_CONTRACT_VERSION, SUPPORT_PLANT_SENSITIVITIES, AGROECOSYSTEM_OBJECTIVES, buildSiteSelectionContext, calculatePlantSuitability, rankPlantCandidates} from './suitability.mjs';
-export {AGROECOSYSTEM_YEARS, selectAgroecosystemCandidates, scheduleAnnualPlots, calculateLayeredPerennialSuccession, calculateAgroecosystemPlan} from './agroecosystem.mjs';
+export {AGROECOSYSTEM_YEARS, selectAgroecosystemCandidates, scheduleAnnualPlots, calculateLayeredPerennialSuccession, calculateWholeDietProductionLedger, calculateAgroecosystemPlan} from './agroecosystem.mjs';
 export {NUTRIENT_LEDGER_CONTRACT_VERSION, LEDGER_NUTRIENTS, DEFAULT_NUTRIENT_DENSITIES, calculateHumanureContribution, calculatePlantNutrientFlows, calculateNutrientBalance, calculateNutrientLedger} from './nutrient-ledger.mjs';

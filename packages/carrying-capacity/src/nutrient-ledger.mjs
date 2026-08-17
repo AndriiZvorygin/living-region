@@ -43,11 +43,13 @@ export function calculateNutrientBalance({openingStock = {}, externalInputs = {}
   const exported = nutrientObject(exports);
   const lost = nutrientObject(losses);
   const closing = nutrientObject(add(opening, external, biological, transfersIn));
-  const closingAfter = nutrientObject(subtract(closing, add(transfersOut, exported, lost)));
+  const requestedOut = add(transfersOut, exported, lost);
+  const closingAfter = nutrientObject(Object.fromEntries(LEDGER_NUTRIENTS.map((id) => [id, Math.max(0, Number(closing[id]) - Number(requestedOut[id]))])));
+  const unmet = nutrientObject(Object.fromEntries(LEDGER_NUTRIENTS.map((id) => [id, Math.max(0, Number(requestedOut[id]) - Number(closing[id]))])));
   const lhs = add(opening, external, biological, transfersIn);
-  const rhs = add(closingAfter, transfersOut, exported, lost);
+  const rhs = subtract(add(closingAfter, transfersOut, exported, lost), unmet);
   const residual = subtract(lhs, rhs);
-  return {opening_stock: opening, external_inputs: external, biological_additions: biological, internal_transfers_in: transfersIn, internal_transfers_out: transfersOut, exports: exported, losses: lost, closing_stock: closingAfter, reconciliation_residual: residual, balanced: LEDGER_NUTRIENTS.every((id) => Math.abs(residual[id]) < .000001)};
+  return {opening_stock: opening, external_inputs: external, biological_additions: biological, internal_transfers_in: transfersIn, internal_transfers_out: transfersOut, exports: exported, losses: lost, closing_stock: closingAfter, nutrient_deficit: unmet, reconciliation_residual: residual, balanced: LEDGER_NUTRIENTS.every((id) => Math.abs(residual[id]) < .000001)};
 }
 
 export function calculateNutrientLedger({years = [1], initialStocks = {N: 100, P: 25, K: 50}, annual = {}, humanure = {}, livestock = {}, externalInputs = {}, losses = {}, exports = {}} = {}) {

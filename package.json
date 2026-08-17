@@ -52,6 +52,8 @@
     "report:grey:carrying-capacity": "node command/report_grey_carrying_capacity.mjs",
     "report:grey:household-transition": "node command/report_grey_household_transition.mjs",
     "report:carrying-capacity:livestock": "node command/report_carrying_capacity_livestock.mjs",
+    "report:carrying-capacity:agroecosystem": "node command/report_agroecosystem.mjs",
+    "report:agroecosystem": "node command/report_agroecosystem.mjs",
     "report:arc:site-lease": "node command/report_arc_site_lease.mjs",
     "report:arc:adult-scale": "node command/report_arc_adult_scale.mjs",
     "report:arc:land-market": "node command/report_arc_land_market.mjs",

@@ -11,3 +11,6 @@ export {LIVESTOCK_CONTRACT_VERSION, CANONICAL_HOUSEHOLD_FAE, LIVESTOCK_SCALING_B
 export {ADMINISTRATION_SCENARIOS, COMMON_PROPERTY_OPERATIONS_SCENARIOS, calculateAdministrationBudget, calculateCommonPropertyOperations, calculateLandLeaseAccounting, financeCapital, monthlyDebtService} from './site-lease-browser.mjs';
 export {ARC_DWELLING_COST_EVIDENCE, ARC_DWELLING_COST_CONTRACT_VERSION, ARC_DWELLING_SERVICING_MODES, calculateArcDwellingCost, buildArcDwellingPresentationContract} from './dwelling.mjs';
 export {ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION, DEFAULT_ARC_COMMON_AREA_GEOMETRY, calculateArcCommonAreaGeometry} from './common-area.mjs';
+export {AGROECOSYSTEM_CONTRACT_VERSION, SUPPORT_PLANT_SENSITIVITIES, AGROECOSYSTEM_OBJECTIVES, buildSiteSelectionContext, calculatePlantSuitability, rankPlantCandidates} from './suitability.mjs';
+export {AGROECOSYSTEM_YEARS, selectAgroecosystemCandidates, scheduleAnnualPlots, calculateLayeredPerennialSuccession, calculateWholeDietProductionLedger, calculateAgroecosystemPlan} from './agroecosystem.mjs';
+export {NUTRIENT_LEDGER_CONTRACT_VERSION, LEDGER_NUTRIENTS, DEFAULT_NUTRIENT_DENSITIES, calculateHumanureContribution, calculatePlantNutrientFlows, calculateNutrientBalance, calculateNutrientLedger} from './nutrient-ledger.mjs';

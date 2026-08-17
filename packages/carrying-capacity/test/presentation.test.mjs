@@ -5,6 +5,10 @@ import {buildCarryingCapacityPresentationContract} from '../src/presentation.mjs
 test('public presentation contains perennial evidence, reference-only candidates and metric display units', () => {
   const contract = buildCarryingCapacityPresentationContract({generatedAt: 'test'});
   assert.equal(contract.metric_only_presentation, true);
+  assert.equal(contract.contract_version, '3.0.0');
+  assert.equal(contract.agroecosystem.plant_database_version, '1.0.0');
+  assert.ok(contract.agroecosystem.reference_plan.whole_diet.years.length >= 30);
+  assert.equal(contract.agroecosystem.reference_plan.reconciliation.unknown_values_are_not_zero, true);
   assert.deepEqual(contract.units, {energy: 'MJ/day and GJ/year', land: 'ha', labour: 'hours/year', population: 'people'});
   assert.equal(contract.reference_profile.sex, 'male');
   assert.equal(contract.reference_profile.weight_kg, 75);

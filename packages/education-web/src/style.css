@@ -184,3 +184,12 @@ main { max-width: 1180px; }
   .evidence-table { min-width: 650px; }
   .evidence-table thead th { position: static; }
 }
+
+.agro-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 22px 0; }
+.agro-summary > div { background: #fff; border: 1px solid var(--line); padding: 18px; }
+.plant-choice { display: flex; align-items: center; gap: 9px; font-weight: 700; }
+.plant-choice input, .checkbox-control input { min-height: 22px; width: 22px; accent-color: var(--teal); }
+.checkbox-control { display: flex; align-items: center; gap: 8px; min-width: 220px; }
+.checkbox-control span { display: block; }
+.checkbox-control em { font-style: normal; color: var(--muted); font-size: .72rem; }
+@media (max-width: 700px) { .agro-summary { grid-template-columns: 1fr; } }

@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {buildPlantDatabase} from '../src/plant-database.mjs';
 import {buildSiteSelectionContext, calculatePlantSuitability} from '../src/suitability.mjs';
 import {calculateAgroecosystemPlan, calculateLayeredPerennialSuccession, scheduleAnnualPlots} from '../src/agroecosystem.mjs';
+import {FOOD_NUTRIENT_PROFILES} from '../src/nutrition.mjs';
 
 const database = buildPlantDatabase(JSON.parse(await readFile(new URL('../data/source/agroecosystem-plants.json', import.meta.url))));
 
@@ -36,9 +37,15 @@ test('layered perennial output changes with bearing curves and does not sum unli
 });
 
 test('ordinary agroecosystem plan contains selected species, succession and explicit uncertainty', () => {
-  const plan = calculateAgroecosystemPlan({database, siteId: 'ordinary_mesic', annualAreaHa: 1, perennialAreaHa: 1});
+  const plan = calculateAgroecosystemPlan({database, siteId: 'ordinary_mesic', annualAreaHa: 1, perennialAreaHa: 1, householdFoodDemandGJYear: 100, nutritionProfiles: FOOD_NUTRIENT_PROFILES});
   assert.equal(plan.site.id, 'ordinary_mesic');
   assert.ok(plan.selection.selected.length > 0);
   assert.equal(plan.perennial_succession.years.length, 31);
   assert.equal(plan.reconciliation.unknown_values_are_not_zero, true);
+  assert.ok(plan.whole_diet.years.some((row) => row.macro.energy_percent.fat > 0));
+  for (const row of plan.whole_diet.years) {
+    const reconciliation = row.reconciliation;
+    const lhs = reconciliation.consumed_annual_kg + reconciliation.seed_kg + reconciliation.stored_kg + reconciliation.feed_kg + reconciliation.export_kg + reconciliation.loss_kg;
+    assert.ok(Math.abs(lhs - reconciliation.produced_annual_kg) < .01);
+  }
 });
