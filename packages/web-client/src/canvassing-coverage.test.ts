@@ -9,7 +9,6 @@ import {
   type CoverageLocation,
   type HouseholdAdjacencyGraph,
   infernoCoverageColor,
-  NEXT_AREA_MIN_COVERED_SEPARATION_HOPS,
   selectNextUnderflyeredArea,
 } from "./canvassing-coverage";
 
@@ -291,9 +290,6 @@ describe("flyer coverage", () => {
     const result = selectNextUnderflyeredArea(locations, graphFor(locations, edges));
     expect(result?.center_household_id.startsWith("long-")).toBe(true);
     expect(result?.householdHopRadius).toBeGreaterThan(10);
-    expect(result?.nearestCoveredHouseholdHops).toBeGreaterThanOrEqual(
-      NEXT_AREA_MIN_COVERED_SEPARATION_HOPS,
-    );
   });
 
   it("counts multi-unit stops as multiple local households", () => {
