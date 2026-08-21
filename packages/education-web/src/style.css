@@ -83,6 +83,12 @@
 /* Keep desktop grids from inheriting unbreakable metric content at narrow landscape widths. */
 main, #app, .split > *, .land-layout > *, .hero > *, .sticky-panel, .labour-panel, .building-list, .member-card { min-width: 0; max-width: 100%; }
 .metric, .metric span, .metric small, .metric strong { min-width: 0; overflow-wrap: anywhere; }
+.metric-rich { grid-column: 1 / -1; }
+.macro-constraint-panel { width: 100%; text-align: left; border-top: 1px solid var(--line); padding-top: 12px; }
+.macro-constraint-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.macro-constraint-heading h3 { margin: 0; font-size: 1rem; }
+.macro-table .status-good { color: var(--teal); font-weight: 700; }
+.macro-table .status-warn { color: #a14d20; font-weight: 700; }
 body { overflow-x: clip; }
 h1, h2, h3 { overflow-wrap: anywhere; }
 main { max-width: 1180px; }

@@ -7,6 +7,7 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.metric_only_presentation, true);
   assert.equal(contract.contract_version, '3.0.0');
   assert.equal(contract.agroecosystem.plant_database_version, '1.0.0');
+  assert.equal(contract.agroecosystem.contract_version, '1.2.0');
   assert.ok(contract.agroecosystem.reference_plan.whole_diet.years.length >= 30);
   assert.equal(contract.agroecosystem.reference_plan.reconciliation.unknown_values_are_not_zero, true);
   assert.deepEqual(contract.units, {energy: 'MJ/day and GJ/year', land: 'ha', labour: 'hours/year', population: 'people'});
@@ -15,7 +16,7 @@ test('public presentation contains perennial evidence, reference-only candidates
   assert.equal(contract.reference_profile.height_cm, 178);
   assert.equal(contract.environment.climate.growing_degree_days.value_degree_days, 2073.5);
   assert.equal(contract.environment.solar.status, 'unresolved');
-  assert.equal(contract.nutrition.contract_version, '1.5.0');
+  assert.equal(contract.nutrition.contract_version, '1.6.0');
   assert.equal(contract.livestock.contract_version, '1.10.0');
   assert.equal(contract.nutrition.days_per_year, 365.25);
   assert.ok(contract.nutrition.goals.minimum_property_b12);

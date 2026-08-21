@@ -56,10 +56,72 @@ test('nutritional-completeness planning selects fat and protein roles and report
   const selected = new Set(plan.selection.selected.map((row) => row.plant_id));
   assert.equal(selected.has('annual_dry_bean'), true);
   assert.equal(selected.has('annual_sunflower'), true);
-  assert.equal(plan.nutrition_constraint.status, 'feasible_macro_screen');
-  assert.ok(plan.whole_diet.years.every((row) => row.nutrition_constraint.status === 'feasible_macro_screen'));
+  assert.equal(plan.nutrition_constraint.status, 'current_ration_feasible');
+  assert.ok(plan.whole_diet.years.every((row) => row.nutrition_constraint.status === 'current_ration_feasible'));
   const yearOne = plan.whole_diet.years.find((row) => row.year === 1);
   const mature = plan.whole_diet.years.find((row) => row.year === 'mature');
   const sunflower = (row) => row.produced.annual.find((item) => item.plant_id === 'annual_sunflower');
   assert.ok(sunflower(yearOne).energy_share >= sunflower(mature).energy_share);
+});
+
+test('macro contract distinguishes a protein miss from optimizer infeasibility', () => {
+  const plan = calculateAgroecosystemPlan({database, siteId: 'ordinary_mesic', objectives: ['low_external_input'], annualAreaHa: 1, perennialAreaHa: 1, householdFoodDemandGJYear: 4.279466, annualResilienceFloorGJYear: .4279466, nutritionProfiles: FOOD_NUTRIENT_PROFILES, humanure: {enabled: false}});
+  const yearFive = plan.whole_diet.years.find((row) => row.year === 5);
+  assert.equal(yearFive.nutrition_constraint.current_ration.status, 'outside_targets');
+  assert.equal(yearFive.nutrition_constraint.checks.carbohydrate.met, true);
+  assert.equal(yearFive.nutrition_constraint.checks.fat.met, true);
+  assert.equal(yearFive.nutrition_constraint.checks.protein.status, 'below_target');
+  assert.equal(yearFive.nutrition_constraint.optimizer.status, 'not_requested');
+  assert.equal(yearFive.nutrition_constraint.status, 'current_ration_outside_targets');
+  assert.ok(yearFive.nutrition_constraint.adjustment.share_transfer > 0);
+  assert.ok(yearFive.nutrition_constraint.adjustment.resulting_energy_percent.protein >= 10);
+  assert.equal(plan.nutrition_constraint.status, 'current_ration_outside_targets');
+});
+
+test('macro-feasible candidate set is reported separately from the displayed ration', () => {
+  const plan = calculateAgroecosystemPlan({database, siteId: 'ordinary_mesic', objectives: ['nutritional_completeness'], annualAreaHa: 1, perennialAreaHa: 1, householdFoodDemandGJYear: 4.279466, annualResilienceFloorGJYear: .4279466, nutritionProfiles: FOOD_NUTRIENT_PROFILES});
+  const yearOne = plan.whole_diet.years.find((row) => row.year === 1);
+  assert.equal(yearOne.nutrition_constraint.optimizer.status, 'feasible_candidate_exists');
+  assert.equal(yearOne.nutrition_constraint.optimizer.proved_infeasible, false);
+});
+
+test('truly infeasible macro food set is proven only under an explicit nutrition objective', () => {
+  const records = database.records.filter((record) => ['annual_potato', 'annual_winter_wheat'].includes(record.id));
+  const plan = calculateAgroecosystemPlan({database: {records}, siteId: 'ordinary_mesic', objectives: ['nutritional_completeness'], annualAreaHa: 1, perennialAreaHa: 0, householdFoodDemandGJYear: 20, nutritionProfiles: FOOD_NUTRIENT_PROFILES});
+  assert.equal(plan.nutrition_constraint.status, 'optimizer_proved_infeasible');
+  assert.equal(plan.nutrition_constraint.optimizer.status, 'proved_infeasible_under_active_food_set');
+  assert.ok(plan.whole_diet.years.every((row) => row.nutrition_constraint.optimizer.proved_infeasible));
+});
+
+test('macro target checks use raw energy shares and retain dimensional energy factors', () => {
+  const plan = calculateAgroecosystemPlan({database, siteId: 'ordinary_mesic', objectives: ['low_external_input'], annualAreaHa: 1, perennialAreaHa: 1, householdFoodDemandGJYear: 4.279466, annualResilienceFloorGJYear: .4279466, nutritionProfiles: FOOD_NUTRIENT_PROFILES});
+  const row = plan.whole_diet.years.find((candidate) => candidate.year === 5);
+  assert.deepEqual(row.nutrition_constraint.target_ranges, {carbohydrate: {min: 45, max: 65, unit: '% of food energy'}, protein: {min: 10, max: 35, unit: '% of food energy'}, fat: {min: 20, max: 35, unit: '% of food energy'}});
+  assert.equal(row.macro.energy_factor_basis.includes('0.016736'), true);
+  assert.equal(row.energy_reconciliation.status, 'balanced');
+  assert.ok(Math.abs(Object.values(row.macro.energy_percent).reduce((sum, value) => sum + value, 0) - 100) < .02);
+});
+
+test('macro matrix recalculates status across site, objective and succession changes', () => {
+  const cases = [];
+  for (const siteId of ['ordinary_mesic', 'dry', 'shallow_rocky_marginal']) for (const objective of ['low_external_input', 'nutritional_completeness']) {
+    const plan = calculateAgroecosystemPlan({database, siteId, objectives: [objective], annualAreaHa: 1, perennialAreaHa: 1, householdFoodDemandGJYear: 4.279466, annualResilienceFloorGJYear: .4279466, nutritionProfiles: FOOD_NUTRIENT_PROFILES, humanure: {enabled: false}});
+    const row = plan.whole_diet.years.find((candidate) => candidate.year === 5);
+    cases.push({siteId, objective, status: row.nutrition_constraint.status, optimizer: row.nutrition_constraint.optimizer.status});
+    assert.ok(['current_ration_feasible', 'current_ration_outside_targets', 'optimizer_proved_infeasible'].includes(row.nutrition_constraint.status));
+    assert.deepEqual(Object.keys(row.nutrition_constraint.checks).sort(), ['carbohydrate', 'fat', 'protein']);
+  }
+  assert.ok(cases.some((row) => row.objective === 'low_external_input' && row.status === 'current_ration_outside_targets'));
+  assert.ok(cases.some((row) => row.objective === 'nutritional_completeness' && row.optimizer === 'feasible_candidate_exists'));
+});
+
+test('the URL scenario parameters resolve to a year-five protein-only current-ration miss', () => {
+  const url = new URL('https://andriizvorygin.github.io/living-region/carrying-capacity?preset=reference_adult_man&site=ordinary_mesic&livestock=plants_only&ration=arc_integrated&goal=plants_plus_external&agroGoal=low_external_input&supportRatio=0.25&agroYear=5&humanure=0');
+  const plan = calculateAgroecosystemPlan({database, siteId: url.searchParams.get('site'), objectives: [url.searchParams.get('agroGoal')], supportPlantRatio: Number(url.searchParams.get('supportRatio')), annualAreaHa: 1, perennialAreaHa: 1, nutritionProfiles: FOOD_NUTRIENT_PROFILES, householdPeople: 1, householdFoodDemandGJYear: 4.279466, annualResilienceFloorGJYear: .4279466, humanure: {enabled: url.searchParams.get('humanure') === '1'}});
+  const row = plan.whole_diet.years.find((candidate) => candidate.year === Number(url.searchParams.get('agroYear')));
+  assert.equal(row.nutrition_constraint.status, 'current_ration_outside_targets');
+  assert.equal(row.nutrition_constraint.optimizer.status, 'not_requested');
+  assert.equal(row.nutrition_constraint.checks.carbohydrate.met, true);
+  assert.equal(row.nutrition_constraint.checks.fat.met, true);
+  assert.equal(row.nutrition_constraint.checks.protein.status, 'below_target');
 });

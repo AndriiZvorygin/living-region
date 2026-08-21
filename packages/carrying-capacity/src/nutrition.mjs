@@ -4,7 +4,7 @@ import {DEFAULT_ANNUAL_INTERCROP_OVERLAP} from './establishment.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 
-export const NUTRITION_CONTRACT_VERSION = '1.5.0';
+export const NUTRITION_CONTRACT_VERSION = '1.6.0';
 export const DAYS_PER_YEAR = 365.25;
 export const HEALTH_CANADA_NUTRIENT_DRI_SOURCE = 'https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables/reference-values-elements.html';
 export const HEALTH_CANADA_AMINO_ACID_PATTERN_SOURCE = 'https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/fn-an/alt_formats/hpfb-dgpsa/pdf/nutrition/dri_tables-eng.pdf';
@@ -18,6 +18,7 @@ const MACRO_PROFILES = {
   black_beans_dry: {energy_kj_per_100g: 1417, fat_g_per_100g: .90, carbohydrate_g_per_100g: 63.25, fibre_g_per_100g: 15.5, saturated_fat_g_per_100g: .23, linoleic_g_per_100g: .211, alpha_linolenic_g_per_100g: .176},
   sunflower_seed_dry: {energy_kj_per_100g: 2445, fat_g_per_100g: 51.46, carbohydrate_g_per_100g: 20, fibre_g_per_100g: 8.6, saturated_fat_g_per_100g: 4.455, linoleic_g_per_100g: 23.05, alpha_linolenic_g_per_100g: .060},
   oats_dry: {energy_kj_per_100g: 1628, fat_g_per_100g: 6.90, carbohydrate_g_per_100g: 66.27, fibre_g_per_100g: 10.1, saturated_fat_g_per_100g: 1.217, linoleic_g_per_100g: 2.424, alpha_linolenic_g_per_100g: .111},
+  buckwheat_dry: {energy_kj_per_100g: 1435, fat_g_per_100g: 3.40, carbohydrate_g_per_100g: 71.50, fibre_g_per_100g: null, saturated_fat_g_per_100g: null, linoleic_g_per_100g: null, alpha_linolenic_g_per_100g: null},
   chicken_egg_raw: {energy_kj_per_100g: 523, fat_g_per_100g: 10.0, carbohydrate_g_per_100g: .72, fibre_g_per_100g: 0, saturated_fat_g_per_100g: 3.126, linoleic_g_per_100g: 1.109, alpha_linolenic_g_per_100g: .073},
   rabbit_meat_raw: {energy_kj_per_100g: 694, fat_g_per_100g: 8.0, carbohydrate_g_per_100g: 0, fibre_g_per_100g: 0, saturated_fat_g_per_100g: 2.35, linoleic_g_per_100g: .860, alpha_linolenic_g_per_100g: .220},
   chicken_meat_raw: {energy_kj_per_100g: 700, fat_g_per_100g: 8.0, carbohydrate_g_per_100g: 0, fibre_g_per_100g: 0, saturated_fat_g_per_100g: 2.2, linoleic_g_per_100g: 1.6, alpha_linolenic_g_per_100g: .08},
@@ -54,6 +55,8 @@ export const FOOD_NUTRIENT_PROFILES = {
   oats_dry: PROFILE('oats_dry', 'Oats, dry', 16.89,
     {histidine: .405, isoleucine: .694, leucine: 1.284, lysine: .701, methionine_cysteine: .720, phenylalanine_tyrosine: 1.468, threonine: .575, tryptophan: .234, valine: .937},
     {vitamin_a_rae_ug: 0, vitamin_b12_ug: 0, vitamin_d_ug: 0, folate_dfe_ug: 56, vitamin_c_mg: 0, calcium_mg: 54, iron_mg: 4.72, zinc_mg: 3.97, iodine_ug: null, selenium_ug: null, magnesium_mg: 177, potassium_mg: 429, choline_mg: null, linoleic_g: 2.424, alpha_linolenic_g: .111}, '4421'),
+  buckwheat_dry: PROFILE('buckwheat_dry', 'Buckwheat grain, dry', 13.25, {},
+    {vitamin_a_rae_ug: null, vitamin_b12_ug: 0, vitamin_d_ug: null, folate_dfe_ug: null, vitamin_c_mg: 0, calcium_mg: null, iron_mg: null, zinc_mg: null, iodine_ug: null, selenium_ug: null, magnesium_mg: null, potassium_mg: null, choline_mg: null, linoleic_g: null, alpha_linolenic_g: null}, '4487', 'CNF macro food-form record; fibre, fatty-acid and micronutrient fields remain unresolved in the local extract.'),
   chicken_egg_raw: PROFILE('chicken_egg_raw', 'Chicken egg, whole, raw', 12.56,
     {histidine: .266, isoleucine: .658, leucine: 1.058, lysine: .875, methionine_cysteine: .729, phenylalanine_tyrosine: 1.176, threonine: .591, tryptophan: .177, valine: .828},
     {vitamin_a_rae_ug: 203.139, vitamin_b12_ug: 1.502, vitamin_d_ug: 1.538, folate_dfe_ug: 68.373, vitamin_c_mg: 0, calcium_mg: 50.211, iron_mg: 1.758, zinc_mg: 1.277, iodine_ug: null, selenium_ug: 29.584, magnesium_mg: 10.307, potassium_mg: 124.838, choline_mg: 391.83, linoleic_g: 1.1089, alpha_linolenic_g: .0726}, '125'),

@@ -2,6 +2,11 @@ import {buildSiteSelectionContext, rankPlantCandidates, SUPPORT_PLANT_SENSITIVIT
 import {calculateHumanureContribution, calculateNutrientLedger} from './nutrient-ledger.mjs';
 
 export const AGROECOSYSTEM_YEARS = Object.freeze([...Array.from({length: 30}, (_, index) => index + 1), 'mature']);
+export const AGRO_MACRO_TARGET_RANGES = Object.freeze({
+  carbohydrate: Object.freeze({min: 45, max: 65, unit: '% of food energy'}),
+  protein: Object.freeze({min: 10, max: 35, unit: '% of food energy'}),
+  fat: Object.freeze({min: 20, max: 35, unit: '% of food energy'})
+});
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const curveFactor = (curve = {}, year) => {
   if (year === 'mature') return Number(curve.mature ?? 1);
@@ -15,6 +20,149 @@ const curveFactor = (curve = {}, year) => {
   return prior[1] + (next[1] - prior[1]) * (numeric - prior[0]) / (next[0] - prior[0]);
 };
 const dateWindow = (record) => ({start: Number(record.establishment?.sowing_window?.start_doy ?? 1), end: Number(record.establishment?.harvest_window?.end_doy ?? 365)});
+
+const MACRO_ENERGY_GJ_PER_KG = Object.freeze({protein: .016736, carbohydrate: .016736, fat: .037656});
+
+function macroEnergyPoint(profile = {}) {
+  const macro = profile.macro_per_100g ?? {};
+  const energyKjPerKg = Number(macro.energy_kj_per_100g ?? 0) * 10;
+  if (!(energyKjPerKg > 0)) return null;
+  const energy = {
+    carbohydrate: Number(macro.carbohydrate_g_per_100g ?? 0) * 10 / 1000 * MACRO_ENERGY_GJ_PER_KG.carbohydrate,
+    protein: Number(profile.protein_g_per_100g ?? 0) * 10 / 1000 * MACRO_ENERGY_GJ_PER_KG.protein,
+    fat: Number(macro.fat_g_per_100g ?? 0) * 10 / 1000 * MACRO_ENERGY_GJ_PER_KG.fat
+  };
+  const total = Object.values(energy).reduce((sum, value) => sum + value, 0);
+  return total > 0 ? Object.fromEntries(Object.entries(energy).map(([id, value]) => [id, value / total * 100])) : null;
+}
+
+function macroCheck(id, value) {
+  const target = AGRO_MACRO_TARGET_RANGES[id];
+  const status = value < target.min ? 'below_target' : value > target.max ? 'above_target' : 'within_target';
+  return {
+    min_percent: target.min,
+    max_percent: target.max,
+    achieved_percent: round(value, 2),
+    status,
+    met: status === 'within_target',
+    delta_percentage_points: round(status === 'below_target' ? value - target.min : status === 'above_target' ? value - target.max : 0, 2)
+  };
+}
+
+function macroAssessment(percentages, {optimizerRequested = false, feasibleCandidate = null, candidateFoodIds = [], adjustment = null} = {}) {
+  const checks = Object.fromEntries(Object.keys(AGRO_MACRO_TARGET_RANGES).map((id) => [id, macroCheck(id, Number(percentages[id] ?? 0))]));
+  const currentRationFeasible = Object.values(checks).every((row) => row.met);
+  const failed = Object.entries(checks).filter(([, row]) => !row.met).map(([id, row]) => `${id} ${row.status === 'below_target' ? `below by ${Math.abs(row.delta_percentage_points).toFixed(2)} percentage points` : `above by ${Math.abs(row.delta_percentage_points).toFixed(2)} percentage points`}`);
+  const optimizer = !optimizerRequested
+    ? {status: 'not_requested', proved_infeasible: false, method: 'No macro optimizer was requested for this planning objective.'}
+    : feasibleCandidate
+      ? {status: 'feasible_candidate_exists', proved_infeasible: false, method: 'Convex-hull feasibility check over the active year-specific food set.', candidate_food_ids: candidateFoodIds}
+      : {status: 'proved_infeasible_under_active_food_set', proved_infeasible: true, method: 'Convex-hull feasibility check found no combination of the active foods that intersects all three AMDR ranges.', candidate_food_ids: candidateFoodIds};
+  return {
+    target_ranges: AGRO_MACRO_TARGET_RANGES,
+    checks,
+    constraints: checks,
+    current_ration: {status: currentRationFeasible ? 'feasible' : 'outside_targets', feasible: currentRationFeasible, failed_targets: failed},
+    optimizer,
+    solver: {status: optimizerRequested ? 'completed' : 'not_requested', failed: false},
+    displayed_solution: {kind: 'current_ration', fallback: false, note: 'The displayed food mix is the selected current ration; the optimizer never silently substitutes a different mix.'},
+    adjustment,
+    status: currentRationFeasible ? 'current_ration_feasible' : optimizer.proved_infeasible ? 'optimizer_proved_infeasible' : 'current_ration_outside_targets',
+    reason: currentRationFeasible ? 'The displayed ration is within every active macro target range.' : optimizer.proved_infeasible ? 'The active food set cannot satisfy all macro target ranges under the stated year-specific constraints.' : `The displayed ration is outside the active macro target range: ${failed.join('; ')}. This is not an optimizer infeasibility result.`
+  };
+}
+
+function convexHull(points) {
+  const unique = [...new Map(points.map((point) => [`${point.x.toFixed(8)}:${point.y.toFixed(8)}`, point])).values()].sort((a, b) => a.x - b.x || a.y - b.y);
+  if (unique.length <= 1) return unique;
+  const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lower = [];
+  for (const point of unique) { while (lower.length >= 2 && cross(lower.at(-2), lower.at(-1), point) <= 1e-10) lower.pop(); lower.push(point); }
+  const upper = [];
+  for (const point of [...unique].reverse()) { while (upper.length >= 2 && cross(upper.at(-2), upper.at(-1), point) <= 1e-10) upper.pop(); upper.push(point); }
+  return lower.slice(0, -1).concat(upper.slice(0, -1));
+}
+
+function clipHalfPlane(polygon, a, b, c) {
+  if (!polygon.length) return [];
+  const inside = (point) => a * point.x + b * point.y + c >= -1e-9;
+  const intersection = (from, to) => {
+    const first = a * from.x + b * from.y + c;
+    const second = a * to.x + b * to.y + c;
+    const fraction = first / (first - second);
+    return {x: from.x + (to.x - from.x) * fraction, y: from.y + (to.y - from.y) * fraction};
+  };
+  const result = [];
+  let previous = polygon.at(-1);
+  for (const current of polygon) {
+    const currentInside = inside(current);
+    const previousInside = inside(previous);
+    if (currentInside !== previousInside) result.push(intersection(previous, current));
+    if (currentInside) result.push(current);
+    previous = current;
+  }
+  return result;
+}
+
+function macroFeasibleFromFoodSet(points) {
+  const hull = convexHull(points.map(({carbohydrate, protein}) => ({x: carbohydrate, y: protein})));
+  let clipped = hull;
+  // x=carbohydrate, y=protein, and fat = 100 - x - y.
+  for (const [a, b, c] of [[1, 0, -45], [-1, 0, 65], [0, 1, -10], [0, -1, 35], [1, 1, -65], [-1, -1, 80]]) clipped = clipHalfPlane(clipped, a, b, c);
+  return {feasible: clipped.length > 0, hull, intersection: clipped};
+}
+
+function macroPointForComposition(profile, fixedEnergy = {carbohydrate: 0, protein: 0, fat: 0}, annualEnergyGJ = 0) {
+  const point = macroEnergyPoint(profile);
+  if (!point) return null;
+  const energy = {
+    carbohydrate: Number(fixedEnergy.carbohydrate ?? 0) + annualEnergyGJ * point.carbohydrate / 100,
+    protein: Number(fixedEnergy.protein ?? 0) + annualEnergyGJ * point.protein / 100,
+    fat: Number(fixedEnergy.fat ?? 0) + annualEnergyGJ * point.fat / 100
+  };
+  const total = Object.values(energy).reduce((sum, value) => sum + value, 0);
+  return total > 0 ? {carbohydrate: energy.carbohydrate / total * 100, protein: energy.protein / total * 100, fat: energy.fat / total * 100} : null;
+}
+
+function nearestSingleTransfer({annualRows, currentShares, perennialEnergy, fixedPerennialEnergy, nutritionProfiles}) {
+  const current = macroPointForShares(annualRows, currentShares, perennialEnergy, fixedPerennialEnergy, nutritionProfiles);
+  if (!current || Object.values(macroAssessment(current).checks).every((row) => row.met)) return null;
+  let best = null;
+  for (let donorIndex = 0; donorIndex < annualRows.length; donorIndex += 1) for (let recipientIndex = 0; recipientIndex < annualRows.length; recipientIndex += 1) {
+    if (donorIndex === recipientIndex || !(currentShares[donorIndex] > 0)) continue;
+    const donor = annualRows[donorIndex];
+    const recipient = annualRows[recipientIndex];
+    const donorProfile = nutritionProfiles[donor.composition_id];
+    const recipientProfile = nutritionProfiles[recipient.composition_id];
+    if (!macroEnergyPoint(donorProfile) || !macroEnergyPoint(recipientProfile)) continue;
+    const maxTransfer = Number(currentShares[donorIndex]);
+    let low = 0;
+    let high = maxTransfer;
+    const evaluate = (transfer) => {
+      const shares = currentShares.map((value, index) => index === donorIndex ? value - transfer : index === recipientIndex ? value + transfer : value);
+      return macroPointForShares(annualRows, shares, perennialEnergy, fixedPerennialEnergy, nutritionProfiles);
+    };
+    const satisfies = (point) => point && Object.values(macroAssessment(point).checks).every((row) => row.met);
+    if (!satisfies(evaluate(high))) continue;
+    for (let iteration = 0; iteration < 45; iteration += 1) { const middle = (low + high) / 2; if (satisfies(evaluate(middle))) high = middle; else low = middle; }
+    const result = evaluate(high);
+    if (!best || high < best.share_transfer) best = {from: donor.plant_id, to: recipient.plant_id, share_transfer: round(high, 6), resulting_energy_percent: Object.fromEntries(Object.entries(result).map(([id, value]) => [id, round(value, 2)]))};
+  }
+  return best;
+}
+
+function macroPointForShares(annualRows, shares, annualEnergyGJ, fixedPerennialEnergy, nutritionProfiles) {
+  const annualEnergy = Number(annualEnergyGJ ?? 0);
+  const fixed = fixedPerennialEnergy ?? {carbohydrate: 0, protein: 0, fat: 0};
+  const energy = {...fixed};
+  annualRows.forEach((row, index) => {
+    const point = macroEnergyPoint(nutritionProfiles[row.composition_id]);
+    if (!point) return;
+    for (const id of ['carbohydrate', 'protein', 'fat']) energy[id] += annualEnergy * Number(shares[index] ?? 0) * point[id] / 100;
+  });
+  const total = Object.values(energy).reduce((sum, value) => sum + value, 0);
+  return total > 0 ? Object.fromEntries(Object.entries(energy).map(([id, value]) => [id, value / total * 100])) : null;
+}
 
 function outputNutrition(output, nutritionProfiles = {}) {
   return nutritionProfiles[output.composition_id] ?? nutritionProfiles[output.nutrition?.composition_id] ?? null;
@@ -157,12 +305,22 @@ export function calculateWholeDietProductionLedger({records = [], perennialSucce
     const perennialConsumptionFactor = perennialEnergyGJ > 0 ? perennialConsumedGJ / perennialEnergyGJ : 0;
     const perennialMacro = {protein_kg: Number(perennialYear.nutrition?.protein_kg ?? 0) * perennialConsumptionFactor, fat_kg: Number(perennialYear.nutrition?.fat_kg ?? 0) * perennialConsumptionFactor, carbohydrate_kg: Number(perennialYear.nutrition?.carbohydrate_kg ?? 0) * perennialConsumptionFactor};
     const combinedMacro = {protein_kg: macro.protein_kg + perennialMacro.protein_kg, fat_kg: macro.fat_kg + perennialMacro.fat_kg, carbohydrate_kg: macro.carbohydrate_kg + perennialMacro.carbohydrate_kg};
-    const macroEnergyGJ = {protein: combinedMacro.protein_kg * .016736, fat: combinedMacro.fat_kg * .037656, carbohydrate: combinedMacro.carbohydrate_kg * .016736};
+    const macroEnergyGJ = {protein: combinedMacro.protein_kg * MACRO_ENERGY_GJ_PER_KG.protein, fat: combinedMacro.fat_kg * MACRO_ENERGY_GJ_PER_KG.fat, carbohydrate: combinedMacro.carbohydrate_kg * MACRO_ENERGY_GJ_PER_KG.carbohydrate};
     const macroTotal = Object.values(macroEnergyGJ).reduce((sum, value) => sum + value, 0) || 1;
-    const macroPercent = {carbohydrate: round(macroEnergyGJ.carbohydrate / macroTotal * 100, 2), protein: round(macroEnergyGJ.protein / macroTotal * 100, 2), fat: round(macroEnergyGJ.fat / macroTotal * 100, 2)};
-    const macroConstraints = {carbohydrate: {min: 45, max: 65, met: macroPercent.carbohydrate >= 45 && macroPercent.carbohydrate <= 65}, protein: {min: 10, max: 35, met: macroPercent.protein >= 10 && macroPercent.protein <= 35}, fat: {min: 20, max: 35, met: macroPercent.fat >= 20 && macroPercent.fat <= 35}};
+    const rawMacroPercent = Object.fromEntries(Object.entries(macroEnergyGJ).map(([id, value]) => [id, value / macroTotal * 100]));
+    const macroPercent = Object.fromEntries(Object.entries(rawMacroPercent).map(([id, value]) => [id, round(value, 2)]));
+    const currentShares = annualRowsForYear.map((row) => Number(row.share ?? 0) / Math.max(shareTotal, 1e-9));
+    const fixedPerennialEnergy = {carbohydrate: perennialMacro.carbohydrate_kg * MACRO_ENERGY_GJ_PER_KG.carbohydrate, protein: perennialMacro.protein_kg * MACRO_ENERGY_GJ_PER_KG.protein, fat: perennialMacro.fat_kg * MACRO_ENERGY_GJ_PER_KG.fat};
+    const candidatePoints = annualRowsForYear.map(({record}) => {
+      const output = record.outputs.find((candidate) => candidate.edible && candidate.yield.central != null);
+      return {plant_id: record.id, composition_id: output?.composition_id ?? null, point: macroPointForComposition(nutritionProfiles[output?.composition_id ?? output?.nutrition?.composition_id], fixedPerennialEnergy, annualEnergy)};
+    }).filter((row) => row.point);
+    const macroFeasibility = macroFeasibleFromFoodSet(candidatePoints.map((row) => row.point));
+    const adjustment = nearestSingleTransfer({annualRows: annualFood, currentShares, perennialEnergy: annualEnergy, fixedPerennialEnergy, nutritionProfiles});
+    const macroConstraint = macroAssessment(rawMacroPercent, {optimizerRequested: objectives.includes('nutritional_completeness'), feasibleCandidate: macroFeasibility.feasible, candidateFoodIds: candidatePoints.map((row) => row.plant_id), adjustment});
     const consumedEnergy = demand;
-    return {year: perennialYear.year, household_food_demand_gj_year: demand, perennial_food_energy_gj_year: round(perennialEnergyGJ, 9), perennial_food_consumed_gj_year: round(perennialConsumedGJ, 9), annual_food_required_gj_year: round(annualEnergy, 9), annual_bridge_resilience_floor_gj_year: round(annualResilienceFloorGJYear, 9), consumed_food_energy_gj_year: round(consumedEnergy, 9), energy_reconciliation: {demand_gj_year: round(demand, 9), consumed_gj_year: round(consumedEnergy, 9), residual_gj_year: round(demand - consumedEnergy, 9), status: Math.abs(demand - consumedEnergy) < .000001 ? 'balanced' : 'deficit'}, annual_cultivation_area_ha: round(annualFood.reduce((sum, row) => sum + row.required_area_ha, 0)), perennial_planted_area_ha: perennialYear.planted_area_ha, occupied_food_footprint_ha: round(annualFood.reduce((sum, row) => sum + row.required_area_ha, 0) + perennialYear.planted_area_ha), produced: {annual: annualFood, perennial: perennialYear.layers}, consumed: {annual: annualFood, perennial: perennialYear.layers.map((row) => ({...row, consumed_fraction: perennialConsumptionFactor}))}, stored_reserved: annualFood.reduce((sum, row) => sum + row.stored_or_reserved_kg, 0), livestock_feed_kg: 0, exportable_surplus_food_energy_gj_year: round(Math.max(0, perennialEnergyGJ - perennialConsumedGJ)), loss_kg: round(annualFood.reduce((sum, row) => sum + row.loss_kg, 0)), macro: {kg_year: combinedMacro, energy_percent: macroPercent, annual_energy_gj_year: round(macroEnergyGJ.carbohydrate + macroEnergyGJ.protein + macroEnergyGJ.fat)}, nutrition_constraint: {goal: objectives.includes('nutritional_completeness') ? 'nutritional_completeness' : 'screening_only', status: Object.values(macroConstraints).every((row) => row.met) ? 'feasible_macro_screen' : 'infeasible_macro_screen', constraints: macroConstraints, note: 'Macro screening is necessary but does not prove micronutrient or digestibility adequacy.'}, principal_food_sources: [...annualFood.filter((row) => row.consumed_kg > 0).map((row) => ({plant_id: row.plant_id, consumed_kg: row.consumed_kg, role: 'annual bridge'})), ...perennialYear.layers.filter((row) => row.retained_edible_harvest_kg > 0).map((row) => ({plant_id: row.plant_id, consumed_kg: row.retained_edible_harvest_kg * perennialConsumptionFactor, role: 'perennial available harvest'}))], reconciliation: {produced_annual_kg: round(annualFood.reduce((sum, row) => sum + row.gross_production_kg, 0)), consumed_annual_kg: round(annualFood.reduce((sum, row) => sum + row.consumed_kg, 0)), seed_kg: round(annualFood.reduce((sum, row) => sum + row.seed_propagation_kg, 0)), stored_kg: round(annualFood.reduce((sum, row) => sum + row.stored_or_reserved_kg, 0)), feed_kg: 0, export_kg: 0, loss_kg: round(annualFood.reduce((sum, row) => sum + row.loss_kg, 0)), note: 'Gross production is allocated to consumed food, seed, storage, feed, export and losses. Perennial harvest is included only at its bearing factor; excess mature harvest is exportable or reserved.'}};
+    macroConstraint.energy_reconciliation = {consumed_food_energy_gj_year: round(consumedEnergy, 9), macro_energy_gj_year: round(macroTotal, 9), difference_gj_year: round(macroTotal - consumedEnergy, 9), status: Math.abs(macroTotal - consumedEnergy) < .000001 ? 'matched' : 'macro-factor-total differs from source food energy; percentages use macro-factor energy only'};
+    return {year: perennialYear.year, household_food_demand_gj_year: demand, perennial_food_energy_gj_year: round(perennialEnergyGJ, 9), perennial_food_consumed_gj_year: round(perennialConsumedGJ, 9), annual_food_required_gj_year: round(annualEnergy, 9), annual_bridge_resilience_floor_gj_year: round(annualResilienceFloorGJYear, 9), consumed_food_energy_gj_year: round(consumedEnergy, 9), energy_reconciliation: {demand_gj_year: round(demand, 9), consumed_gj_year: round(consumedEnergy, 9), residual_gj_year: round(demand - consumedEnergy, 9), status: Math.abs(demand - consumedEnergy) < .000001 ? 'balanced' : 'deficit'}, annual_cultivation_area_ha: round(annualFood.reduce((sum, row) => sum + row.required_area_ha, 0)), perennial_planted_area_ha: perennialYear.planted_area_ha, occupied_food_footprint_ha: round(annualFood.reduce((sum, row) => sum + row.required_area_ha, 0) + perennialYear.planted_area_ha), produced: {annual: annualFood, perennial: perennialYear.layers}, consumed: {annual: annualFood, perennial: perennialYear.layers.map((row) => ({...row, consumed_fraction: perennialConsumptionFactor}))}, stored_reserved: annualFood.reduce((sum, row) => sum + row.stored_or_reserved_kg, 0), livestock_feed_kg: 0, exportable_surplus_food_energy_gj_year: round(Math.max(0, perennialEnergyGJ - perennialConsumedGJ)), loss_kg: round(annualFood.reduce((sum, row) => sum + row.loss_kg, 0)), macro: {kg_year: combinedMacro, energy_percent: macroPercent, energy_percent_raw: rawMacroPercent, annual_energy_gj_year: round(macroEnergyGJ.carbohydrate + macroEnergyGJ.protein + macroEnergyGJ.fat), energy_factor_basis: 'Protein and carbohydrate 0.016736 GJ/kg; fat 0.037656 GJ/kg; fibre is reported separately and is not added as an independent energy source.'}, nutrition_constraint: macroConstraint, principal_food_sources: [...annualFood.filter((row) => row.consumed_kg > 0).map((row) => ({plant_id: row.plant_id, consumed_kg: row.consumed_kg, role: 'annual bridge'})), ...perennialYear.layers.filter((row) => row.retained_edible_harvest_kg > 0).map((row) => ({plant_id: row.plant_id, consumed_kg: row.retained_edible_harvest_kg * perennialConsumptionFactor, role: 'perennial available harvest'}))], reconciliation: {produced_annual_kg: round(annualFood.reduce((sum, row) => sum + row.gross_production_kg, 0)), consumed_annual_kg: round(annualFood.reduce((sum, row) => sum + row.consumed_kg, 0)), seed_kg: round(annualFood.reduce((sum, row) => sum + row.seed_propagation_kg, 0)), stored_kg: round(annualFood.reduce((sum, row) => sum + row.stored_or_reserved_kg, 0)), feed_kg: 0, export_kg: 0, loss_kg: round(annualFood.reduce((sum, row) => sum + row.loss_kg, 0)), note: 'Gross production is allocated to consumed food, seed, storage, feed, export and losses. Perennial harvest is included only at its bearing factor; excess mature harvest is exportable or reserved.'}};
   });
   return {years, accounting_rule: 'produced = consumed + seed/propagation + stored/reserved + livestock feed + exports + losses; annual crops fill residual household energy after retained perennial harvest.', annual_energy_share_basis: objectives.includes('nutritional_completeness') && Object.keys(suppliedShares).length === 0 ? 'Nutrition objective uses explicit annual role weights: sunflower/fat .30, Fabaceae/protein .25, root .01, Poaceae/starch .15, buckwheat .03 and other selected crops .05; perennial fat progressively displaces sunflower. These are planning weights, not measured dietary prescriptions.' : 'Shares are derived from crop family/layer roles unless the caller supplies explicit shares.'};
 }
@@ -178,5 +336,8 @@ export function calculateAgroecosystemPlan({database, siteId = 'ordinary_mesic',
   const humanureScenario = calculateHumanureContribution({people, ...humanure});
   const ledger = calculateNutrientLedger({years, humanure: humanureScenario, annual: (year) => ({production: perennial.years.find((row) => row.year === year)?.layers ?? [], supportPlants: records.filter((record) => record.architecture.life_cycle === 'support').map((record) => ({plant_id: record.id, area_ha: perennialAreaHa * supportPlantRatio / Math.max(1, records.filter((candidate) => candidate.architecture.life_cycle === 'support').length), nitrogen_fixed_kg_ha_year: record.ecological_function?.nitrogen_fixation_kg_n_ha_year?.central ?? 0}))})});
   const nutritionRows = wholeDiet.years.map((row) => row.nutrition_constraint);
-  return {contract_version: AGROECOSYSTEM_CONTRACT_VERSION, site, objectives, support_plant_ratio: supportPlantRatio, selection, annual_schedule: annual, perennial_succession: perennial, whole_diet: wholeDiet, nutrition_constraint: {goal: objectives.includes('nutritional_completeness') ? 'nutritional_completeness' : 'screening_only', status: nutritionRows.every((row) => row?.status === 'feasible_macro_screen') ? 'feasible_macro_screen' : 'infeasible_macro_screen', years: nutritionRows, note: 'A selected nutritional-completeness plan must pass the macro screen for every reported year; unresolved micronutrients and digestibility remain disclosed separately.'}, nutrient_ledger: ledger, reconciliation: {annual_years: annual.years.length, perennial_years: perennial.years.length, whole_diet_years: wholeDiet.years.length, nutrient_years: ledger.years.length, annual_schedule_feasible: annual.feasible, nutrient_ledger_balanced: ledger.all_years_balanced, nutrition_constraint_satisfied: nutritionRows.every((row) => row?.status === 'feasible_macro_screen'), unknown_values_are_not_zero: true}};
+  const currentRationFeasible = nutritionRows.every((row) => row?.current_ration?.feasible === true);
+  const optimizerProvedInfeasible = nutritionRows.some((row) => row?.optimizer?.proved_infeasible === true);
+  const optimizerRequested = objectives.includes('nutritional_completeness');
+  return {contract_version: AGROECOSYSTEM_CONTRACT_VERSION, site, objectives, support_plant_ratio: supportPlantRatio, selection, annual_schedule: annual, perennial_succession: perennial, whole_diet: wholeDiet, nutrition_constraint: {goal: optimizerRequested ? 'nutritional_completeness' : 'screening_only', status: currentRationFeasible ? 'current_ration_feasible' : optimizerProvedInfeasible ? 'optimizer_proved_infeasible' : 'current_ration_outside_targets', optimizer: {requested: optimizerRequested, status: optimizerProvedInfeasible ? 'proved_infeasible_under_active_food_set' : nutritionRows.some((row) => row?.optimizer?.status === 'feasible_candidate_exists') ? 'feasible_candidate_exists' : 'not_requested_or_not_proven'}, years: nutritionRows, note: 'The current ration checks are separate from optimizer feasibility. A current-ration miss does not prove that no other active-food combination can meet the targets; unresolved micronutrients and digestibility remain disclosed separately.'}, nutrient_ledger: ledger, reconciliation: {annual_years: annual.years.length, perennial_years: perennial.years.length, whole_diet_years: wholeDiet.years.length, nutrient_years: ledger.years.length, annual_schedule_feasible: annual.feasible, nutrient_ledger_balanced: ledger.all_years_balanced, nutrition_constraint_satisfied: currentRationFeasible, unknown_values_are_not_zero: true}};
 }
