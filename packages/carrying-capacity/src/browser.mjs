@@ -14,3 +14,4 @@ export {ARC_COMMON_AREA_GEOMETRY_CONTRACT_VERSION, DEFAULT_ARC_COMMON_AREA_GEOME
 export {AGROECOSYSTEM_CONTRACT_VERSION, SUPPORT_PLANT_SENSITIVITIES, AGROECOSYSTEM_OBJECTIVES, buildSiteSelectionContext, calculatePlantSuitability, rankPlantCandidates} from './suitability.mjs';
 export {AGROECOSYSTEM_YEARS, AGRO_MACRO_TARGET_RANGES, selectAgroecosystemCandidates, scheduleAnnualPlots, calculateLayeredPerennialSuccession, calculateWholeDietProductionLedger, calculateAgroecosystemPlan} from './agroecosystem.mjs';
 export {NUTRIENT_LEDGER_CONTRACT_VERSION, LEDGER_NUTRIENTS, DEFAULT_NUTRIENT_DENSITIES, calculateHumanureContribution, calculatePlantNutrientFlows, calculateNutrientBalance, calculateNutrientLedger} from './nutrient-ledger.mjs';
+export {FOOD_PRODUCTION_LABOUR_CONTRACT_VERSION, LABOUR_WEEKS_PER_YEAR, LABOUR_CAPACITY_THRESHOLDS, LABOUR_PROFILE_BY_PRODUCTION_ID, calculateFoodProductionLabour, compareFoodLabourCapacity} from './production-labour.mjs';

@@ -1,6 +1,6 @@
 import {owenSoundGrowingEnvironment, siteCapability} from './environment.mjs';
 
-export const AGROECOSYSTEM_CONTRACT_VERSION = '1.2.0';
+export const AGROECOSYSTEM_CONTRACT_VERSION = '1.3.0';
 export const SUPPORT_PLANT_SENSITIVITIES = Object.freeze([0.15, 0.25, 0.33]);
 export const AGROECOSYSTEM_OBJECTIVES = Object.freeze({
   low_external_input: {label: 'Lowest external inputs'},

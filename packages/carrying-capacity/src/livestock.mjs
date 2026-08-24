@@ -2,11 +2,12 @@ import {calculateHouseholdProteinDemand} from './protein.mjs';
 import {calculateFoodNutrientAdequacy, calculateFoodPortfolioLand, calculateFoodSuccessionLedger, FOOD_NUTRIENT_PROFILES, FOOD_PORTFOLIO, NUTRITION_GOAL_DEFINITIONS} from './nutrition.mjs';
 import {FOOD_ADULT_EQUIVALENT_GJ_YEAR} from './food-adult-equivalent.mjs';
 import {calculateHouseholdFoodDemandProfile} from './household-demand.mjs';
+import {calculateFoodProductionLabour} from './production-labour.mjs';
 
 const round = (value, digits = 6) => Math.round(Number(value) * 10 ** digits) / 10 ** digits;
 const B12_SEARCH_CACHE = new Map();
 
-export const LIVESTOCK_CONTRACT_VERSION = '1.10.0';
+export const LIVESTOCK_CONTRACT_VERSION = '1.11.0';
 
 // The reference livestock system is sized for the canonical two-adult plus
 // three-dependent-child planning household. Other households resize the
@@ -703,6 +704,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYea
     };
   });
   foodSuccessionLedger = {...foodSuccessionLedger, rows: successionRowsWithNutrition, mature: successionRowsWithNutrition.find((row) => row.year === 'mature') ?? successionRowsWithNutrition.at(-1)};
+  const foodProductionLabour = calculateFoodProductionLabour({foodSuccessionLedger, animals, supportPlantRatio: 0, proteinDemandKgYear: proteinTarget, availableLabourHoursYear: null});
   const nutritionLedgerRow = foodSuccessionLedger.rows.find((row) => String(row.year) === String(nutritionYear)) ?? foodSuccessionLedger.mature;
   const portfolioLand = calculateFoodPortfolioLand({plantFood, siteCapability, years: establishmentYears, foodSuccessionLedger: foodSuccessionLedger});
   const nutrientCompleteness = calculateFoodNutrientAdequacy({members, plantFood, animals, energyGJ: demandGJ, foodPortfolio: false, foodProductionLedger: nutritionLedgerRow});
@@ -747,6 +749,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYea
     plant_only: {food_energy_gj_year: round(demandGJ), protein_kg_year: round(plantOnly.macro_delivered_to_household?.protein_kg ?? 0), food_area_ha: plantOnly.required_food_area_ha},
     plant_food: plantFood,
     food_succession_ledger: foodSuccessionLedger,
+    food_production_labour: foodProductionLabour,
     plants_only_food_succession_ledger: plantsOnlyLedger,
     portfolio_land: portfolioLand,
     food_feed_area_ha: round(Number(plantFood.required_food_area_ha ?? 0) + Number(portfolioLand.additional_area_ha ?? 0) + dedicatedFeedLand),
