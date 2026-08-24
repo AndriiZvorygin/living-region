@@ -704,7 +704,7 @@ export function calculateNutrientFoodSystem({foodEvidence, demandGJ, demandByYea
     };
   });
   foodSuccessionLedger = {...foodSuccessionLedger, rows: successionRowsWithNutrition, mature: successionRowsWithNutrition.find((row) => row.year === 'mature') ?? successionRowsWithNutrition.at(-1)};
-  const foodProductionLabour = calculateFoodProductionLabour({foodSuccessionLedger, animals, supportPlantRatio: 0, proteinDemandKgYear: proteinTarget, availableLabourHoursYear: null});
+  const foodProductionLabour = calculateFoodProductionLabour({foodSuccessionLedger, animals, supportPlantRatio: .25, proteinDemandKgYear: proteinTarget, availableLabourHoursYear: null});
   const nutritionLedgerRow = foodSuccessionLedger.rows.find((row) => String(row.year) === String(nutritionYear)) ?? foodSuccessionLedger.mature;
   const portfolioLand = calculateFoodPortfolioLand({plantFood, siteCapability, years: establishmentYears, foodSuccessionLedger: foodSuccessionLedger});
   const nutrientCompleteness = calculateFoodNutrientAdequacy({members, plantFood, animals, energyGJ: demandGJ, foodPortfolio: false, foodProductionLedger: nutritionLedgerRow});

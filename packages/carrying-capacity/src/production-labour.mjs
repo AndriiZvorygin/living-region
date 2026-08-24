@@ -147,6 +147,7 @@ export function calculateFoodProductionLabour({foodSuccessionLedger = null, whol
   const supportRecords = records.filter((record) => record.architecture?.life_cycle === 'support' || record.architecture?.layer === 'support');
   const supportArea = inferredFootprint * Number(supportPlantRatio) / Math.max(1, supportRecords.length);
   const missing = [];
+  if (Number(supportPlantRatio) > 0 && supportRecords.length === 0) missing.push({id: 'support_plants', reason: 'Support-plant records were not supplied to this household food ledger; support maintenance labour remains unresolved.'});
   const stages = [];
   const establishmentCategories = emptyCategories();
   for (const row of [...(foodSuccessionLedger?.rows ?? []), ...(wholeDiet?.years ?? [])].slice(0, 1)) {

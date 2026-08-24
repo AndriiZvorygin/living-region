@@ -2,7 +2,7 @@
   "contract_version": "3.0.0",
   "model_contract_version": "1.0.0",
   "model_version": "phase-2-evidence-based",
-  "generated_at": "2026-08-24T23:08:24.222Z",
+  "generated_at": "2026-08-24T23:13:48.840Z",
   "units": {
     "energy": "MJ/day and GJ/year",
     "land": "ha",
@@ -29334,8 +29334,8 @@
               "note": "Year 0 is site establishment before the first production season."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29409,8 +29409,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29484,8 +29484,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29559,8 +29559,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29634,8 +29634,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29709,8 +29709,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29784,8 +29784,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29859,8 +29859,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -29934,8 +29934,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30009,8 +30009,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30084,8 +30084,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30159,8 +30159,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30234,8 +30234,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30309,8 +30309,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30384,8 +30384,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30459,8 +30459,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30534,8 +30534,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30609,8 +30609,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30684,8 +30684,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30759,8 +30759,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30834,8 +30834,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30909,8 +30909,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -30984,8 +30984,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31059,8 +31059,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31134,8 +31134,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31209,8 +31209,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31284,8 +31284,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31359,8 +31359,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31434,8 +31434,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31509,8 +31509,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31584,8 +31584,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31659,8 +31659,8 @@
               "note": "Nutrition status is read from the same year-specific food ledger. An immature perennial system is never treated as sufficient merely because its labour is low."
             },
             "data_quality": {
-              "status": "complete",
-              "missing_labour_data_count": 0
+              "status": "partial",
+              "missing_labour_data_count": 1
             },
             "capacity": {
               "status": "unresolved",
@@ -31671,7 +31671,12 @@
         ],
         "peak_stage": 3,
         "peak_hours_year": 336.837,
-        "missing_data": [],
+        "missing_data": [
+          {
+            "id": "support_plants",
+            "reason": "Support-plant records were not supplied to this household food ledger; support maintenance labour remains unresolved."
+          }
+        ],
         "source_profiles": [
           {
             "id": "annual_staple_low_input",
