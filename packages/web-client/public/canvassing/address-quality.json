@@ -1,29 +1,23 @@
 {
-  "generated_at": "2026-08-06T01:35:07.867Z",
+  "generated_at": "2026-08-26T19:06:12.318Z",
+  "source": "statistics_canada_national_address_register",
+  "source_release": "June 2026",
   "config": {
-    "high_confidence_max_m": 12,
-    "probable_max_m": 30,
-    "far_from_road_m": 50
+    "boundary": "CSD 3542059 plus repository Owen Sound municipal boundary",
+    "coordinates": "NAR BF representative point, falling back to building representative point"
   },
   "totals": {
-    "civic_addresses": 7467,
-    "duplicate_normalized_addresses": 335,
+    "civic_addresses": 10909,
+    "duplicate_normalized_addresses": 0,
     "outside_municipal_boundary": 12,
-    "far_from_any_road": 75,
-    "no_street_match": 80,
-    "several_points_same_civic_address": 335,
-    "apparent_multi_unit": 339,
-    "more_than_one_candidate_building": 2981,
-    "nearest_footprint_beyond_high_confidence_threshold": 1872,
-    "nearest_footprint_beyond_probable_threshold": 359
+    "records_missing_usable_coordinates": 14,
+    "unique_physical_locations": 7156,
+    "multi_unit_physical_locations": 656,
+    "unique_streets": 125
   },
   "automatic_join_counts": {
-    "exact": 352,
-    "high_confidence": 1026,
-    "probable_sourced": 1205,
-    "inferred_range": 4040,
-    "estimated": 840,
-    "unresolved": 4
+    "authoritative_residential": 8875,
+    "authoritative_partly_residential": 2034
   },
-  "methodology": "Point-in-polygon is preferred. Plausible sourced roofs within 12 m are high confidence; sourced roofs up to 30 m are marked probable and queued for review. Unlinked plausible sourced roofs receive stable inferred addresses from official left/right segment ranges and parity. Remaining imported civic-address groups receive a collision-checked, street-oriented estimated roof or remain a reviewable point. Display roofs without their own address retain a provisional reference to the nearest addressed structure so every roof is selectable without creating duplicate households; these references can be separated through an audited manual civic-number correction."
+  "methodology": "The June 2026 Statistics Canada National Address Register is the authoritative civic-address source. Residential and partly residential address units are published as separate address stops; LOC_GUID groups units at one physical location. Twelve records outside the repository municipal boundary and fourteen records without usable coordinates are excluded from the primary bundle. Building-footprint association remains a separate, reviewable layer; an unmatched NAR point is an explicit review point rather than an invented roof. No resident, owner, telephone, or roll-number fields are retained."
 }

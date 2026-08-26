@@ -1,41 +1,49 @@
 {
-  "generated_at": "2026-08-06T01:35:07.872Z",
+  "generated_at": "2026-08-26T19:06:12.318Z",
   "crs": "OGC:CRS84 / WGS84 longitude-latitude",
   "extent": [
-    -80.9642092446995,
-    44.5408736503963,
-    -80.8918497733922,
-    44.6095384376204
+    -80.961715,
+    44.547725,
+    -80.894634,
+    44.605075
   ],
   "sources": {
-    "osm": "data/osm/owen-sound.osm.pbf",
-    "canada_structures": "data/canvassing/canada-structures-owen-sound.geojson",
-    "owen_sound_city_map": "data/canvassing/owen-sound-city-map-buildings.geojson",
+    "addresses": "Statistics Canada National Address Register, June 2026",
+    "address_catalogue": "https://www150.statcan.gc.ca/n1/en/catalogue/46260002",
+    "structures": "data/canvassing/owen-sound-city-map-buildings.geojson and deduplicated supplemental building sources",
     "roads": "know/input/gis/road-centrelines-grey.geojson",
     "boundary": "data/boundaries/owen-sound.geojson"
   },
   "counts": {
     "structures": 8027,
-    "addresses": 7467,
-    "matched_addresses": 7463,
+    "addresses": 10909,
+    "matched_addresses": 991,
     "sourced_structures": 7201,
     "estimated_structures": 826,
-    "unresolved_addresses": 4,
-    "match_confidence": {
-      "exact": 352,
-      "high_confidence": 1026,
-      "probable_sourced": 1205,
-      "inferred_range": 4040,
-      "estimated": 840,
-      "unresolved": 4
-    },
+    "unresolved_addresses": 9918,
     "roads": 883,
-    "address_review_records": 1589
+    "address_review_records": 1589,
+    "match_confidence": {
+      "authoritative_residential": 8875,
+      "authoritative_partly_residential": 2034
+    }
+  },
+  "address_foundation": {
+    "source": "statistics_canada_national_address_register",
+    "retrieval_date": "2026-08-26",
+    "all_in_bound_units": 11244,
+    "residential_units": 8875,
+    "partly_residential_units": 2034,
+    "non_residential_units": 324,
+    "unknown_use_units": 11,
+    "physical_locations": 7156,
+    "multi_unit_locations": 656,
+    "matched_legacy_rows": 991,
+    "unmatched_legacy_rows_retained": 6462
   },
   "source_currency": {
-    "osm_latest_object_timestamp": "2026-05-18",
-    "canada_structures": "2025-09-17T16:07:45.430467",
-    "owen_sound_city_map": "2022-04-07",
+    "national_address_register": "June 2026 release retrieved 2026-08-26",
+    "structures": "see building source audit",
     "official_roads": "see source manifest; feature-level currency not supplied"
   }
 }

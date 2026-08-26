@@ -1,0 +1,147 @@
+{
+  "generated_at": "2026-08-26T19:21:32.508Z",
+  "source_counts": {
+    "residential": 8875,
+    "partly_residential": 2034,
+    "non_residential": 324,
+    "unknown": 11
+  },
+  "validation": {
+    "addresses_seen_in_ontario_files": 6246543,
+    "addresses_with_owen_sound_name": 11270,
+    "addresses_joined_to_owen_sound_locations": 11244,
+    "addresses_missing_location": 0,
+    "locations_in_csd": 7170,
+    "locations_with_coordinates": 7156,
+    "records_outside_boundary": 12,
+    "records_missing_coordinates": 14,
+    "duplicate_addr_guid": 0,
+    "duplicate_normalized_addresses": 0,
+    "conflicting_normalized_addresses": 0,
+    "outside_boundary_sample": [
+      {
+        "address_id": "600d7c46-2a86-4c29-88a5-5edf0bc456cd",
+        "location_id": "584a8cb7-c8b1-42e9-8d58-0db55d8c05bb",
+        "civic_number": "1065",
+        "street": "9TH AVE W",
+        "building_use_code": "2",
+        "longitude": -80.962149,
+        "latitude": 44.566169
+      },
+      {
+        "address_id": "b399e360-e5de-4657-9da0-dd547cb32a95",
+        "location_id": "6c98d880-94ea-4aa9-9241-314aff8f4d17",
+        "civic_number": "243040",
+        "street": "21 SIDERD",
+        "building_use_code": "1",
+        "longitude": -80.894433,
+        "latitude": 44.593581
+      },
+      {
+        "address_id": "e281942f-00ed-4a7f-9003-2e1d511bb757",
+        "location_id": "e997bc29-1f39-4c2e-abd0-74942644cd55",
+        "civic_number": "243018",
+        "street": "21 SIDERD",
+        "building_use_code": "1",
+        "longitude": -80.894433,
+        "latitude": 44.593581
+      },
+      {
+        "address_id": "3ebefe46-6b03-4fc9-8442-c8fe706385c0",
+        "location_id": "d6cb49c9-998c-4c3e-9535-02935b0a16d0",
+        "civic_number": "243030",
+        "street": "21 SIDERD",
+        "building_use_code": "1",
+        "longitude": -80.894433,
+        "latitude": 44.593581
+      },
+      {
+        "address_id": "924acc67-f595-4d2f-bb32-c5d8f6d17013",
+        "location_id": "1391f1f6-f1ee-47c7-9e39-3b36160a381d",
+        "civic_number": "243014",
+        "street": "21 SIDERD",
+        "building_use_code": "1",
+        "longitude": -80.894433,
+        "latitude": 44.593581
+      },
+      {
+        "address_id": "770edf2c-676c-458c-8cb2-593e97bdd70b",
+        "location_id": "7c9a5f5a-169b-4823-ac30-b2070c8cd4e9",
+        "civic_number": "902",
+        "street": "10TH ST W",
+        "building_use_code": "3",
+        "longitude": -80.962097,
+        "latitude": 44.565922
+      },
+      {
+        "address_id": "04b6c0f8-029f-4a86-8772-22b27576da27",
+        "location_id": "b1897a39-aeaf-4073-a1bc-ab4eb2f60908",
+        "civic_number": "1053",
+        "street": "9TH AVE W",
+        "building_use_code": "1",
+        "longitude": -80.962517,
+        "latitude": 44.566917
+      },
+      {
+        "address_id": "89a831a5-b6fc-41fa-9f37-a6b036d97244",
+        "location_id": "3422ebb0-88cb-4a2e-9ef5-ecf2874ea38a",
+        "civic_number": "930",
+        "street": "10TH ST W",
+        "building_use_code": "1",
+        "longitude": -80.963228,
+        "latitude": 44.564721
+      },
+      {
+        "address_id": "66fe0b76-5a06-4f61-bd2b-ab188d0aceee",
+        "location_id": "4e324bcf-d2dd-4e4f-8696-b9c1e2d32b5d",
+        "civic_number": "920",
+        "street": "10TH ST W",
+        "building_use_code": "1",
+        "longitude": -80.963852,
+        "latitude": 44.564343
+      },
+      {
+        "address_id": "467084ed-12e3-4eb6-8381-5918606cd859",
+        "location_id": "61d30249-03c7-41b5-b4eb-0f901b9cda32",
+        "civic_number": "950",
+        "street": "10TH ST W",
+        "building_use_code": "1",
+        "longitude": -80.964088,
+        "latitude": 44.564117
+      },
+      {
+        "address_id": "4db659dd-c06d-41b5-8ccc-f68bd8223fdc",
+        "location_id": "913f3c54-9275-4cbb-9730-8ed87008b582",
+        "civic_number": "243022",
+        "street": "21 SIDERD",
+        "building_use_code": "1",
+        "longitude": -80.894433,
+        "latitude": 44.593581
+      },
+      {
+        "address_id": "728e3747-f9d3-4cba-8beb-7d7e4d98a4c5",
+        "location_id": "c6489a2c-3994-46dd-a454-5a9fa72502af",
+        "civic_number": "910",
+        "street": "10TH ST W",
+        "building_use_code": "1",
+        "longitude": -80.962342,
+        "latitude": 44.565887
+      }
+    ]
+  },
+  "reconciliation": {
+    "matched_exact": 916,
+    "matched_base_distance": 75,
+    "new": 9918,
+    "existing_feature_count": 7467,
+    "existing_osm_stop_features": 3426,
+    "existing_address_rows": 7453,
+    "existing_3426_osm_stops": 3426,
+    "unmatched_existing_rows": 6462
+  },
+  "unique_physical_locations": 7156,
+  "multi_unit_locations": 656,
+  "unique_streets": 125,
+  "records_lacking_usable_coordinates": 14,
+  "records_outside_municipal_boundary": 12
+}

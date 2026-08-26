@@ -9,20 +9,41 @@ describe("Owen Sound canvassing prepared data", () => {
     const addresses = await readJson(
       "packages/web-client/public/canvassing/addresses.geojson",
     );
+    const usesNationalAddressRegister = addresses.features.some(
+      (feature: any) =>
+        feature.properties.external_source ===
+        "statistics_canada_national_address_register",
+    );
     const counts: Record<string, number> = {};
     for (const feature of addresses.features) {
       const status = feature.properties.association_status;
       counts[status] = (counts[status] ?? 0) + 1;
-      expect(Boolean(feature.properties.structure_id)).toBe(
-        status !== "unresolved",
-      );
+      if (usesNationalAddressRegister)
+        expect(
+          Boolean(feature.properties.structure_id) || status === "unresolved",
+        ).toBe(true);
+      else
+        expect(Boolean(feature.properties.structure_id)).toBe(
+          status !== "unresolved",
+        );
     }
-    expect(counts.exact).toBeGreaterThan(0);
-    expect(counts.high_confidence).toBeGreaterThan(0);
-    expect(counts.probable_sourced).toBeGreaterThan(0);
-    expect(counts.inferred_range).toBeGreaterThan(0);
-    expect(counts.estimated).toBeGreaterThan(0);
-    expect(counts.unresolved).toBeGreaterThan(0);
+    if (usesNationalAddressRegister) {
+      expect(addresses.features.length).toBe(10_909);
+      expect(counts.unresolved).toBeGreaterThan(0);
+      expect(
+        addresses.features.every(
+          (feature: any) =>
+            feature.properties.address_source_status === "authoritative",
+        ),
+      ).toBe(true);
+    } else {
+      expect(counts.exact).toBeGreaterThan(0);
+      expect(counts.high_confidence).toBeGreaterThan(0);
+      expect(counts.probable_sourced).toBeGreaterThan(0);
+      expect(counts.inferred_range).toBeGreaterThan(0);
+      expect(counts.estimated).toBeGreaterThan(0);
+      expect(counts.unresolved).toBeGreaterThan(0);
+    }
   });
 
   it("keeps address-quality totals internally consistent", async () => {
@@ -34,7 +55,9 @@ describe("Owen Sound canvassing prepared data", () => {
       0,
     );
     expect(confidenceTotal).toBe(quality.totals.civic_addresses);
-    expect(quality.automatic_join_counts.inferred_range).toBeGreaterThan(0);
+    if (quality.source === "statistics_canada_national_address_register")
+      expect(quality.totals.civic_addresses).toBe(10_909);
+    else expect(quality.automatic_join_counts.inferred_range).toBeGreaterThan(0);
   });
 
   it("publishes no generated roof collisions", async () => {
