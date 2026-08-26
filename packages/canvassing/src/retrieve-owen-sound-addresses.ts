@@ -92,11 +92,15 @@ async function main() {
     },
     supplemental_source: {
       name: "Grey County Building Footprints - Open Data",
+      public_gis_application_item_id: "645d414b2614427e91efc9c197c79657",
+      public_open_data_group_id: "0810446c724f4ebf81fbe7be185da5c8",
       item_url: GREY_BUILDING_FOOTPRINTS_ITEM_URL,
       service_url: GREY_BUILDING_FOOTPRINTS_URL,
+      layer_id: 0,
       open_data_url: GREY_OPEN_DATA_URL,
       licence: "Grey County Open Data Licence",
       required_attribution: "Contains information licensed under the Grey County Open Data Licence.",
+      service_capabilities: "public query service; maxRecordCount 2000; WGS84 export available through ArcGIS service",
       role: "licensed physical-building geometry reference; not used as the address-unit authority",
     },
     rejected_address_source: {
@@ -104,6 +108,10 @@ async function main() {
       item_url: GREY_ADDRESS_LIKE_ITEM_URL,
       reason: "The public table exposes MPAC/Teranet assessment address data and roll-number fields, but its item metadata does not state the Grey County Open Data Licence. It was not used for the derived campaign address dataset, and roll numbers were not collected.",
       grey_terms_url: GREY_TERMS_URL,
+    },
+    comparison_source: {
+      name: "Open Database of Addresses, 2021",
+      role: "not used; retained only as a possible historical comparison because the newer June 2026 NAR was sufficiently complete",
     },
     privacy: {
       excluded_fields: ["roll_number", "resident_name", "telephone", "property_owner_information"],

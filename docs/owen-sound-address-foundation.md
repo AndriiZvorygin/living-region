@@ -26,6 +26,9 @@ service is explicitly licensed under the Grey County Open Data Licence and is
 retained as a licensed physical-building reference:
 
 - <https://maps.grey.ca/pages/open-data>
+- Public GIS application item: `645d414b2614427e91efc9c197c79657`
+- Public Open Data group: `0810446c724f4ebf81fbe7be185da5c8`
+- Building Footprints item: `1c937b952166443f91914e1123f7b924`, layer `0`
 - <https://services1.arcgis.com/wE2uWQWlTTnVDgyt/arcgis/rest/services/Building_Footprints/FeatureServer>
 
 Required attribution for that source is:
@@ -37,6 +40,13 @@ derived address dataset: its item identifies MPAC/Teranet data, exposes
 roll-number fields, and does not state the Grey County Open Data Licence. The
 interactive locator was not scraped or treated as a bulk source. See the
 generated `source-provenance.json` for the exact item references and decision.
+
+The 2021 Open Database of Addresses was also not used for the primary output:
+the newer NAR supplied a sufficiently complete Owen Sound subset, so the older
+source was not allowed to override it. A rendered Grey address-search spot
+check was not used as a derivation input because the Grey address-like layer
+did not have clear bulk reuse licensing; the report instead records the NAR
+boundary and normalization checks and preserves the Grey licence limitation.
 
 ## Reproducible extraction
 
