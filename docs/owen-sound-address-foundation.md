@@ -74,16 +74,18 @@ The command writes `data/derived/owen-sound-address-foundation/`:
   and address GUIDs;
 - `legacy-unmatched-stops.geojson`: existing rows not matched to the new
   source, retained for review and not deleted from SQLite;
+- `legacy-unmatched-address-ids.json`: the stable internal IDs that the server
+  keeps historical-only during its transactional seed;
 - `reconciliation.json`, `validation-report.json`, and
   `source-provenance.json`.
 
 Use `--publish` only after reviewing the generated report. It replaces the
 static primary address bundle with the residential/partly-residential NAR
-units. The existing server importer already performs an upsert by address ID,
-keeps unmatched old rows in SQLite with `source_active=0`, and never deletes
-households, visits, outcomes, conversations, corrections, or journal entries.
-Existing IDs are reused for safe normalized matches; new rows receive a
-SHA-256-derived ID from `ADDR_GUID`.
+units. The existing server importer performs an upsert by address ID, keeps
+the generated unmatched-ID list in SQLite with `source_active=0`, and never
+deletes households, visits, outcomes, conversations, corrections, or journal
+entries. Existing IDs are reused for safe normalized matches; new rows receive
+a SHA-256-derived ID from `ADDR_GUID`.
 
 ```sh
 npm run canvassing:addresses -- \
@@ -92,7 +94,12 @@ npm run canvassing:addresses -- \
 ```
 
 Restarting the canvassing server runs its existing transactional prepared-data
-seed. Make a backup before production restart as usual.
+seed. Make a backup before production restart as usual. The seed applies the
+generated unmatched-ID list as a historical-only deny list, so an old row that
+had previously been labelled manually cannot remain active merely because of
+its old source name. Manually inferred roof-split addresses remain separate
+operational exceptions until explicitly reconciled; they are not counted as
+NAR units.
 
 ## Current generated validation snapshot
 
@@ -117,9 +124,19 @@ not match are preserved in the database and review export rather than being
 rewritten or deleted.
 
 The NAR's point is a representative building/location coordinate and may be
-shared by all units at an apartment or mixed-use location. This is why the
-location file is supplied separately from the unit file. The generated primary
-unit bundle is now published at
-`packages/web-client/public/canvassing/addresses.geojson`; the separate location
-file remains available for future map-marker aggregation without duplicating
-apartment markers.
+shared by all units at an apartment or mixed-use location. The generated
+`canvassing-locations.geojson` has one feature per `LOC_GUID` and the primary
+NAR units represent 6,857 physical locations (7,156 across all retained use
+categories). The generated primary unit bundle is published at
+`packages/web-client/public/canvassing/addresses.geojson`.
+
+The final activation audit is recorded in
+`data/derived/owen-sound-address-foundation/validation-report.json`. The
+11,244 retained all-use units and 10,909 primary units both exclude the 12
+outside-boundary and 14 no-coordinate records. The live database currently
+contains 10,912 selectable household rows: the 10,909 NAR primary rows plus
+three pre-existing manual roof-split exceptions. The current runtime does not
+yet consume `LOC_GUID` as its map/selection identity; it still groups linked
+records by legacy `structure_id` and otherwise exposes address-unit points.
+That is an explicit remaining address-foundation limitation, not a count that
+should be hidden by the published source totals.

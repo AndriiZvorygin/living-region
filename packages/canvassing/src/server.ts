@@ -517,12 +517,24 @@ async function seed() {
   const addressReview = JSON.parse(
     await readFile(join(base, "address-review.geojson"), "utf8"),
   );
+  const legacyUnmatchedIds = JSON.parse(
+    await readFile(join(base, "legacy-unmatched-address-ids.json"), "utf8").catch(() => '{"address_ids":[]}'),
+  ).address_ids as unknown;
+  const historicalOnlyAddressIds = Array.isArray(legacyUnmatchedIds)
+    ? legacyUnmatchedIds.filter((id): id is string => typeof id === "string")
+    : [];
   const timestamp = now();
   db.exec("BEGIN");
   try {
     db.exec(
       "UPDATE structures SET source_active=0 WHERE external_source!='manual_canvassing_split'; UPDATE addresses SET source_active=0 WHERE external_source NOT IN ('manual_canvassing','manual_split_inferred'); UPDATE address_review_records SET source_active=0;",
     );
+    if (historicalOnlyAddressIds.length) {
+      const placeholders = historicalOnlyAddressIds.map(() => "?").join(",");
+      db.prepare(
+        `UPDATE addresses SET source_active=0 WHERE id IN (${placeholders})`,
+      ).run(...historicalOnlyAddressIds);
+    }
     const insertStructure = db.prepare(
       "INSERT INTO structures (id,geometry_json,building_type,external_source,external_id,source_confidence,imported_at,source_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1) ON CONFLICT(id) DO UPDATE SET geometry_json=excluded.geometry_json,building_type=excluded.building_type,external_source=excluded.external_source,external_id=excluded.external_id,source_confidence=excluded.source_confidence,imported_at=excluded.imported_at,source_active=1",
     );

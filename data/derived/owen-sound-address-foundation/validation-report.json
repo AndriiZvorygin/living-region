@@ -1,5 +1,16 @@
 {
-  "generated_at": "2026-08-26T19:21:32.508Z",
+  "generated_at": "2026-08-26T20:16:36.030Z",
+  "published_counts": {
+    "raw_nar_records_in_ontario_files": 6246543,
+    "raw_owen_sound_named_records": 11270,
+    "rejected_outside_municipal_boundary": 12,
+    "rejected_missing_usable_coordinates": 14,
+    "retained_all_address_units": 11244,
+    "retained_primary_canvassing_units": 10909,
+    "mappable_physical_locations_all_uses": 7156,
+    "mappable_primary_canvassing_locations": 6857,
+    "exclusions_are_applied_before_retained_counts": true
+  },
   "source_counts": {
     "residential": 8875,
     "partly_residential": 2034,
@@ -143,5 +154,21 @@
   "multi_unit_locations": 656,
   "unique_streets": 125,
   "records_lacking_usable_coordinates": 14,
-  "records_outside_municipal_boundary": 12
+  "records_outside_municipal_boundary": 12,
+  "activation_audit": {
+    "observed_at": "2026-08-26T20:19:45.919Z",
+    "database_integrity_check": "ok",
+    "foreign_key_check_rows": 0,
+    "active_database_households": 10912,
+    "active_database_households_from_nar_primary_bundle": 10909,
+    "active_manual_split_inferred_exceptions": 3,
+    "legacy_unmatched_manifest_rows": 6462,
+    "legacy_unmatched_active_rows": 0,
+    "legacy_unmatched_visible_in_fresh_state": 0,
+    "legacy_unmatched_historical_visits_preserved": 1799,
+    "historical_visits_total": 2177,
+    "historical_corrections_total": 1,
+    "historical_flyer_events_total": 1,
+    "runtime_physical_location_grouping": "not yet implemented; canonical LOC_GUID grouping is present in canvassing-locations.geojson but current state/map selection remains address-unit/structure based"
+  }
 }

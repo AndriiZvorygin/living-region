@@ -714,6 +714,9 @@ export async function writeFoundationOutputs(options: {
     properties: { ...row, review_status: "legacy_existing_stop_not_matched_to_june_2026_nar" },
     geometry: { type: "Point", coordinates: [row.longitude, row.latitude] },
   }));
+  const legacyUnmatchedIds = reconciliation.unmatchedExisting.map(
+    (row) => row.internal_address_id,
+  );
   await mkdir(options.outDir, { recursive: true });
   const writeGeoJson = (name: string, features: Feature[]) =>
     writeFile(join(options.outDir, name), JSON.stringify({ type: "FeatureCollection", features }) + "\n");
@@ -749,7 +752,17 @@ export async function writeFoundationOutputs(options: {
     }, null, 2) + "\n"),
   ]);
   if (options.publishAddressesPath)
-    await writeFile(options.publishAddressesPath, JSON.stringify({ type: "FeatureCollection", features: residentialFeatures }) + "\n");
+    await Promise.all([
+      writeFile(options.publishAddressesPath, JSON.stringify({ type: "FeatureCollection", features: residentialFeatures }) + "\n"),
+      writeFile(
+        join(dirname(options.publishAddressesPath), "legacy-unmatched-address-ids.json"),
+        JSON.stringify({
+          schema_version: 1,
+          purpose: "Address IDs from the authoritative-source reconciliation that must remain historical-only",
+          address_ids: legacyUnmatchedIds,
+        }, null, 2) + "\n",
+      ),
+    ]);
   return { residentialFeatures, allFeatures, locations, legacyUnmatched };
 }
 

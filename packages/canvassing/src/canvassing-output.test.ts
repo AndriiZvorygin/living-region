@@ -60,6 +60,15 @@ describe("Owen Sound canvassing prepared data", () => {
     else expect(quality.automatic_join_counts.inferred_range).toBeGreaterThan(0);
   });
 
+  it("publishes the stable legacy-only address list used by the server seed", async () => {
+    const legacy = await readJson(
+      "packages/web-client/public/canvassing/legacy-unmatched-address-ids.json",
+    );
+    expect(legacy.schema_version).toBe(1);
+    expect(legacy.address_ids).toHaveLength(6_462);
+    expect(new Set(legacy.address_ids).size).toBe(legacy.address_ids.length);
+  });
+
   it("publishes no generated roof collisions", async () => {
     const audit = await readJson(
       "packages/web-client/public/canvassing/building-coverage-audit.json",
