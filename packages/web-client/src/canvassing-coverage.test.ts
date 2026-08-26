@@ -6,6 +6,8 @@ import {
   calculateNestedCoverageArea,
   calculateInterveningHouseholdCosts,
   calculateCoverage,
+  rankNextUnderflyeredAreas,
+  rankNextUnderflyeredAreasWithoutCompactness,
   type CoverageLocation,
   type HouseholdAdjacencyGraph,
   infernoCoverageColor,
@@ -56,6 +58,39 @@ const location = (
   covered,
   ...extra,
 });
+
+const linearCandidates = (
+  candidates: Array<{
+    prefix: string;
+    spread: boolean;
+    covered?: number;
+  }>,
+  size = 170,
+) => {
+  const locations: CoverageLocation[] = [];
+  const edges: Array<[string, string]> = [];
+  for (const candidate of candidates) {
+    for (let index = 0; index < size; index++) {
+      const id = `${candidate.prefix}-${String(index).padStart(3, "0")}`;
+      locations.push(
+        location(
+          id,
+          index < (candidate.covered ?? 0),
+          candidate.spread
+            ? -80.95 + index * 0.0004
+            : -80.94 + index * 0.00001,
+          44.56,
+        ),
+      );
+      if (index)
+        edges.push([
+          `${candidate.prefix}-${String(index - 1).padStart(3, "0")}`,
+          id,
+        ]);
+    }
+  }
+  return { locations, graph: graphFor(locations, edges) };
+};
 
 describe("flyer coverage", () => {
   it("reports untouched, partial, and fully covered clusters", () => {
@@ -387,5 +422,100 @@ describe("flyer coverage", () => {
       graph,
     )!;
     expect(area.nestedUndercoverageScore).toBe(first.nestedUndercoverageScore);
+  });
+
+  it("prefers a geographically coherent candidate when coverage is equivalent", () => {
+    const { locations, graph } = linearCandidates([
+      { prefix: "a-dispersed", spread: true },
+      { prefix: "z-compact", spread: false },
+    ]);
+    const before = rankNextUnderflyeredAreasWithoutCompactness(locations, graph)[0];
+    const after = rankNextUnderflyeredAreas(locations, graph)[0];
+    expect(before.center_household_id.startsWith("a-dispersed")).toBe(true);
+    expect(after.center_household_id.startsWith("z-compact")).toBe(true);
+    expect(after.compactnessDistanceMeters).toBeLessThan(
+      before.compactnessDistanceMeters,
+    );
+  });
+
+  it("keeps coverage ahead of a compactness advantage", () => {
+    const { locations, graph } = linearCandidates([
+      { prefix: "a-dispersed", spread: true },
+      { prefix: "z-compact", spread: false, covered: 10 },
+    ]);
+    const result = rankNextUnderflyeredAreas(locations, graph)[0];
+    expect(result.center_household_id.startsWith("a-dispersed")).toBe(true);
+    expect(result.nestedUndercoverageScore).toBe(1);
+    expect(result.compactnessPenalty).toBeGreaterThan(0);
+  });
+
+  it("limits the effect of one distant household while penalizing broad dispersion", () => {
+    const makeArea = (prefix: string, distantHouseholds: number) => {
+      const locations: CoverageLocation[] = [];
+      const edges: Array<[string, string]> = [];
+      for (let index = 0; index < 150; index++) {
+        const id = `${prefix}-${index}`;
+        const distant = index >= 150 - distantHouseholds;
+        locations.push(
+          location(
+            id,
+            false,
+            distant ? -80.84 + (index % 3) * 0.0001 : -80.94 + index * 0.00001,
+            distant ? 44.62 : 44.56,
+          ),
+        );
+        if (index) edges.push([`${prefix}-${index - 1}`, id]);
+      }
+      return {
+        locations,
+        graph: graphFor(locations, edges),
+      };
+    };
+    const one = makeArea("one-outlier", 1);
+    const many = makeArea("many-outliers", 20);
+    const oneArea = calculateNestedCoverageArea(
+      "one-outlier-0",
+      one.locations,
+      one.graph,
+    )!;
+    const manyArea = calculateNestedCoverageArea(
+      "many-outliers-0",
+      many.locations,
+      many.graph,
+    )!;
+    expect(oneArea.compactnessPenalty).toBeLessThan(manyArea.compactnessPenalty);
+    expect(oneArea.compactnessPenalty).toBeLessThan(0.005);
+  });
+
+  it("keeps an isolated unfinished household reachable after dense areas finish", () => {
+    const locations = Array.from({ length: 220 }, (_, index) =>
+      location(`city-${index}`, true),
+    );
+    locations.push(location("isolated-unfinished"));
+    const edges = locations.slice(1, 220).map((item, index) => [
+      `city-${index}`,
+      item.household_id,
+    ] as [string, string]);
+    const result = selectNextUnderflyeredArea(
+      locations,
+      graphFor(locations, edges),
+    );
+    expect(result?.center_household_id).toBe("isolated-unfinished");
+    expect(result?.inner.complete).toBe(false);
+  });
+
+  it("does not jump to a dispersed candidate for an unrelated small update", () => {
+    const { locations, graph } = linearCandidates([
+      { prefix: "a-dispersed", spread: true },
+      { prefix: "z-compact", spread: false },
+    ]);
+    const first = rankNextUnderflyeredAreas(locations, graph)[0];
+    const unrelated = locations.find(
+      (item) => item.household_id === "a-dispersed-000",
+    )!;
+    unrelated.covered = true;
+    const second = rankNextUnderflyeredAreas(locations, graph)[0];
+    expect(first.center_household_id.startsWith("z-compact")).toBe(true);
+    expect(second.center_household_id.startsWith("z-compact")).toBe(true);
   });
 });

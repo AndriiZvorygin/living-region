@@ -13,7 +13,7 @@ The schema 12 migration creates two editable catalogue records:
 | Stable ID | Initial name | Introduction date |
 | --- | --- | --- |
 | `flyer-1-original` | Flyer 1: Original flyer | 2026-07-26 |
-| `flyer-2-current` | Flyer 2: Current flyer | 2026-08-12 |
+| `flyer-2-current` | A City That Works for Residents | 2026-08-12 |
 
 Names, descriptions, active state, introduction date and printable filename/link
 can be edited from **Flyer catalogue**. Stable IDs are retained in delivery

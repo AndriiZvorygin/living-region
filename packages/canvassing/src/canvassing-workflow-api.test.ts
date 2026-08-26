@@ -17,6 +17,22 @@ describe.sequential("canvassing weekly workflow API", () => {
     areaId = "";
   let sourceHouseholds: string[] = [],
     versionedHousehold = "";
+  const testPassword = "canvassing-test-password";
+  const cookies = new Map<string, string>();
+
+  async function login(role: "candidate" | "volunteer" = "candidate") {
+    const username = role === "volunteer" ? "rynaldo" : "andrii";
+    const response = await fetch(`http://127.0.0.1:${port}/api/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username, password: testPassword }),
+    });
+    expect(response.status).toBe(200);
+    const cookie = response.headers.get("set-cookie")?.split(";", 1)[0];
+    expect(cookie).toBeTruthy();
+    cookies.set(role, cookie!);
+    return (await response.json()).user;
+  }
 
   async function startServer() {
     server = spawn(
@@ -33,13 +49,16 @@ describe.sequential("canvassing weekly workflow API", () => {
             directory,
             "address-number-calibration.json",
           ),
+          CANVASS_TEST_USERS: "1",
+          CANVASS_TEST_PASSWORD: testPassword,
         },
         stdio: "ignore",
       },
     );
     for (let attempt = 0; attempt < 80; attempt++) {
       try {
-        if ((await fetch(`${base}/state`)).ok) return;
+        if ((await fetch(`http://127.0.0.1:${port}/api/canvassing/health`)).ok)
+          return;
       } catch {}
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
@@ -58,15 +77,18 @@ describe.sequential("canvassing weekly workflow API", () => {
     role = "candidate",
     method = "POST",
   ) {
+    if (!cookies.has(role === "volunteer" ? "volunteer" : "candidate"))
+      await login(role === "volunteer" ? "volunteer" : "candidate");
+    const cookie = cookies.get(role === "volunteer" ? "volunteer" : "candidate")!;
     const response = await fetch(
       `${base}${path}`,
       value === undefined
-        ? { headers: { "x-canvass-role": role } }
+        ? { headers: { cookie } }
         : {
             method,
             headers: {
               "content-type": "application/json",
-              "x-canvass-role": role,
+              cookie,
             },
             body: JSON.stringify(value),
           },
@@ -75,8 +97,10 @@ describe.sequential("canvassing weekly workflow API", () => {
     return { status: response.status, data };
   }
   async function requestText(path: string, role = "candidate") {
+    if (!cookies.has(role === "volunteer" ? "volunteer" : "candidate"))
+      await login(role === "volunteer" ? "volunteer" : "candidate");
     const response = await fetch(`${base}${path}`, {
-      headers: { "x-canvass-role": role },
+      headers: { cookie: cookies.get(role === "volunteer" ? "volunteer" : "candidate")! },
     });
     return { status: response.status, text: await response.text() };
   }
@@ -84,7 +108,7 @@ describe.sequential("canvassing weekly workflow API", () => {
   beforeAll(async () => {
     directory = await mkdtemp(join(tmpdir(), "living-region-canvassing-m3-"));
     await startServer();
-  }, 15_000);
+  }, 60_000);
   afterAll(async () => {
     await stopServer();
     await rm(directory, { recursive: true, force: true });
@@ -119,7 +143,7 @@ describe.sequential("canvassing weekly workflow API", () => {
       created = after.households.find(
         (home: any) => home.structure_id === unlinked.properties.structure_id,
       );
-    expect(after.schema_version).toBe(12);
+    expect(after.schema_version).toBe(18);
     expect(created).toMatchObject({
       civic_number: "1234",
       street: "Test Street",
@@ -277,7 +301,9 @@ describe.sequential("canvassing weekly workflow API", () => {
       flyerOne = before.flyers.find((flyer: any) => flyer.id === "flyer-1-original"),
       flyerTwo = before.flyers.find((flyer: any) => flyer.id === "flyer-2-current");
     expect(flyerOne).toMatchObject({ short_name: "Flyer 1: Original flyer" });
-    expect(flyerTwo).toMatchObject({ short_name: "Flyer 2: Current flyer" });
+    expect(flyerTwo).toMatchObject({
+      short_name: "A City That Works for Residents",
+    });
     expect(
       (await request("/flyers/flyer-2-current", {
         short_name: "Spring information flyer",

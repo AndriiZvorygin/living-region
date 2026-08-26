@@ -4,6 +4,19 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { stableId, type Feature, geometryContains, metresBetween } from "./building-coverage";
+import {
+  formatOfficialAddress,
+  formatOfficialBaseAddress,
+  formatOfficialStreet,
+} from "./official-address";
+import {
+  placementReviewFeatures,
+  placementSummary,
+  type FootprintPlacement,
+} from "./owen-sound-footprint-placement";
+import {
+  reconcileLegacyHistory,
+} from "./legacy-history-reconciliation";
 
 export const STATCAN_NAR_URL =
   "https://www150.statcan.gc.ca/n1/pub/46-26-0002/2022001/202606.zip";
@@ -379,17 +392,14 @@ function unitLabel(row: CsvRow) {
 }
 
 function officialLabel(row: CsvRow) {
-  const civic = [asString(row.CIVIC_NO), asString(row.CIVIC_NO_SUFFIX)].filter(Boolean).join("");
-  const street = normalizeStreetParts(row.OFFICIAL_STREET_NAME, row.OFFICIAL_STREET_TYPE, row.OFFICIAL_STREET_DIR)
-    .replace(/\bAVE\b/g, "Avenue")
-    .replace(/\bST\b/g, "Street")
-    .replace(/\bRD\b/g, "Road")
-    .replace(/\bE\b/g, "East")
-    .replace(/\bW\b/g, "West")
-    .replace(/\bN\b/g, "North")
-    .replace(/\bS\b/g, "South");
-  const unit = unitLabel(row);
-  return `${civic} ${street}${unit ? ` Unit ${unit}` : ""}`.trim();
+  return formatOfficialAddress({
+    civicNumber: row.CIVIC_NO,
+    civicNumberSuffix: row.CIVIC_NO_SUFFIX,
+    streetName: row.OFFICIAL_STREET_NAME,
+    streetType: row.OFFICIAL_STREET_TYPE,
+    streetDirection: row.OFFICIAL_STREET_DIR,
+    unit: unitLabel(row),
+  });
 }
 
 export async function downloadNar(zipPath: string, url = STATCAN_NAR_URL) {
@@ -612,10 +622,29 @@ function unitFeature(unit: AddressUnit, match: ReconciliationMatch, category: st
       external_id: unit.address_id,
       source_retrieval_date: unit.source_retrieval_date,
       civic_number: [unit.civic_number, unit.civic_number_suffix].filter(Boolean).join(""),
+      civic_number_base: unit.civic_number,
       civic_number_suffix: unit.civic_number_suffix,
-      street: normalizeStreetParts(unit.official_street_name, unit.official_street_type, unit.official_street_direction),
+      street: formatOfficialStreet(
+        unit.official_street_name,
+        unit.official_street_type,
+        unit.official_street_direction,
+      ),
       unit: unit.apartment_or_suite,
-      label: unit.label,
+      label: formatOfficialAddress({
+        civicNumber: unit.civic_number,
+        civicNumberSuffix: unit.civic_number_suffix,
+        streetName: unit.official_street_name,
+        streetType: unit.official_street_type,
+        streetDirection: unit.official_street_direction,
+        unit: unit.apartment_or_suite,
+      }),
+      base_label: formatOfficialBaseAddress({
+        civicNumber: unit.civic_number,
+        civicNumberSuffix: unit.civic_number_suffix,
+        streetName: unit.official_street_name,
+        streetType: unit.official_street_type,
+        streetDirection: unit.official_street_direction,
+      }),
       official_street_name: unit.official_street_name,
       official_street_type: unit.official_street_type,
       official_street_direction: unit.official_street_direction,
@@ -656,8 +685,23 @@ export function groupAddressUnitsByLocation(units: AddressUnit[]) {
   return grouped;
 }
 
-function locationFeature(location: NarLocation, units: AddressUnit[]): Feature {
-  const atLocation = groupAddressUnitsByLocation(units).get(location.loc_guid) ?? [];
+function locationFeature(
+  location: NarLocation,
+  units: AddressUnit[],
+  grouped = groupAddressUnitsByLocation(units),
+  placement?: FootprintPlacement,
+): Feature {
+  const atLocation = grouped.get(location.loc_guid) ?? [];
+  const primary = atLocation.filter((unit) =>
+    ["residential", "partly_residential"].includes(unit.building_use),
+  );
+  const baseLabels = [...new Set(primary.map((unit) => formatOfficialBaseAddress({
+    civicNumber: unit.civic_number,
+    civicNumberSuffix: unit.civic_number_suffix,
+    streetName: unit.official_street_name,
+    streetType: unit.official_street_type,
+    streetDirection: unit.official_street_direction,
+  })))];
   const counts = { residential: 0, partly_residential: 0, non_residential: 0, unknown: 0 };
   for (const unit of atLocation) counts[unit.building_use]++;
   return {
@@ -676,6 +720,15 @@ function locationFeature(location: NarLocation, units: AddressUnit[]): Feature {
       unknown_use_unit_count: counts.unknown,
       address_ids: atLocation.map((unit) => unit.address_id),
       labels: atLocation.map((unit) => unit.label),
+      canonical_labels: baseLabels,
+      canonical_label: baseLabels.join(" / "),
+      structure_id: placement?.structure_id ?? null,
+      footprint_source: placement?.footprint_source ?? null,
+      footprint_match_status: placement?.status ?? "unmatched",
+      footprint_match_distance_m: placement?.distance_m ?? null,
+      footprint_review_required: placement
+        ? ["ambiguous", "unmatched"].includes(placement.status)
+        : true,
     },
     geometry: { type: "Point", coordinates: [location.longitude, location.latitude] },
   };
@@ -688,27 +741,42 @@ export async function writeFoundationOutputs(options: {
   outDir: string;
   publishAddressesPath?: string;
   sourceManifest: Record<string, unknown>;
+  structures?: Feature[];
+  placements?: FootprintPlacement[];
+  numberingReport?: Record<string, unknown>;
+  audit?: Record<string, unknown>;
 }) {
   const { result, reconciliation } = options;
   const matches = new Map(reconciliation.matches.map((match) => [match.address_id, match]));
+  const placements = new Map((options.placements ?? []).map((placement) => [placement.location_id, placement]));
+  const grouped = groupAddressUnitsByLocation(result.units);
   const primary = result.units.filter((unit) => ["residential", "partly_residential"].includes(unit.building_use));
-  const featureFor = (unit: AddressUnit) =>
-    unitFeature(
-      unit,
-      matches.get(unit.address_id) ?? {
+  const featureFor = (unit: AddressUnit) => {
+    const baseMatch = matches.get(unit.address_id) ?? {
         internal_address_id: unit.internal_address_id,
         address_id: unit.address_id,
         status: "new",
         distance_m: null,
         structure_id: null,
-      },
+      };
+    const placement = placements.get(unit.location_id);
+    return unitFeature(
+      unit,
+      { ...baseMatch, structure_id: placement?.structure_id ?? null },
       unit.building_use,
     );
+  };
   const allFeatures = result.units.map(featureFor);
   const residentialFeatures = primary.map(featureFor);
   const unknownFeatures = result.units.filter((unit) => unit.building_use === "unknown").map(featureFor);
   const nonResidentialFeatures = result.units.filter((unit) => unit.building_use === "non_residential").map(featureFor);
-  const locations = result.locations.map((location) => locationFeature(location, result.units));
+  const locations = result.locations.map((location) =>
+    locationFeature(location, result.units, grouped, placements.get(location.loc_guid)),
+  );
+  const primaryLocationIds = new Set(primary.map((unit) => unit.location_id));
+  const primaryPlacements = (options.placements ?? []).filter((placement) =>
+    primaryLocationIds.has(placement.location_id),
+  );
   const legacyUnmatched = reconciliation.unmatchedExisting.map((row) => ({
     type: "Feature" as const,
     properties: { ...row, review_status: "legacy_existing_stop_not_matched_to_june_2026_nar" },
@@ -716,6 +784,11 @@ export async function writeFoundationOutputs(options: {
   }));
   const legacyUnmatchedIds = reconciliation.unmatchedExisting.map(
     (row) => row.internal_address_id,
+  );
+  const legacyHistory = reconcileLegacyHistory(
+    options.existingFeatures,
+    residentialFeatures,
+    new Set(legacyUnmatchedIds),
   );
   await mkdir(options.outDir, { recursive: true });
   const writeGeoJson = (name: string, features: Feature[]) =>
@@ -727,6 +800,19 @@ export async function writeFoundationOutputs(options: {
     writeGeoJson("address-units-non-residential.geojson", nonResidentialFeatures),
     writeGeoJson("canvassing-locations.geojson", locations),
     writeGeoJson("legacy-unmatched-stops.geojson", legacyUnmatched),
+    ...(options.structures
+      ? [writeGeoJson("structures-authoritative.geojson", options.structures)]
+      : []),
+    ...(options.placements
+      ? [
+          writeGeoJson("address-footprint-review.geojson", placementReviewFeatures(options.placements)),
+          writeFile(join(options.outDir, "address-footprint-placement.json"), JSON.stringify(placementSummary(options.placements), null, 2) + "\n"),
+        ]
+      : []),
+    ...(options.numberingReport
+      ? [writeFile(join(options.outDir, "address-numbering-validation.json"), JSON.stringify(options.numberingReport, null, 2) + "\n")]
+      : []),
+    writeFile(join(options.outDir, "legacy-history-reconciliation.json"), JSON.stringify(legacyHistory, null, 2) + "\n"),
     writeFile(join(options.outDir, "source-provenance.json"), JSON.stringify(options.sourceManifest, null, 2) + "\n"),
     writeFile(join(options.outDir, "validation-report.json"), JSON.stringify({
       generated_at: new Date().toISOString(),
@@ -745,6 +831,22 @@ export async function writeFoundationOutputs(options: {
       unique_streets: new Set(primary.map((unit) => normalizeStreetParts(unit.official_street_name, unit.official_street_type, unit.official_street_direction))).size,
       records_lacking_usable_coordinates: result.validation.records_missing_coordinates,
       records_outside_municipal_boundary: result.validation.records_outside_boundary,
+      published_counts: {
+        raw_nar_records_in_ontario_files: result.validation.addresses_seen_in_ontario_files,
+        raw_owen_sound_named_records: result.validation.addresses_with_owen_sound_name,
+        rejected_outside_municipal_boundary: result.validation.records_outside_boundary,
+        rejected_missing_usable_coordinates: result.validation.records_missing_coordinates,
+        retained_all_address_units: result.units.length,
+        retained_primary_canvassing_units: primary.length,
+        mappable_physical_locations_all_uses: locations.length,
+        mappable_primary_canvassing_locations: primaryLocationIds.size,
+        exclusions_are_applied_before_retained_counts: true,
+      },
+      primary_footprint_placement: options.placements ? placementSummary(primaryPlacements) : null,
+      ...(options.audit ?? {}),
+      footprint_placement: options.placements ? placementSummary(options.placements) : null,
+      numbering: options.numberingReport?.summary ?? null,
+      legacy_history: legacyHistory.summary,
     }, null, 2) + "\n"),
     writeFile(join(options.outDir, "reconciliation.json"), JSON.stringify({
       matches: reconciliation.matches,
@@ -754,6 +856,9 @@ export async function writeFoundationOutputs(options: {
   if (options.publishAddressesPath)
     await Promise.all([
       writeFile(options.publishAddressesPath, JSON.stringify({ type: "FeatureCollection", features: residentialFeatures }) + "\n"),
+      ...(options.structures
+        ? [writeFile(join(dirname(options.publishAddressesPath), "structures.geojson"), JSON.stringify({ type: "FeatureCollection", features: options.structures }) + "\n")]
+        : []),
       writeFile(
         join(dirname(options.publishAddressesPath), "legacy-unmatched-address-ids.json"),
         JSON.stringify({
@@ -762,8 +867,31 @@ export async function writeFoundationOutputs(options: {
           address_ids: legacyUnmatchedIds,
         }, null, 2) + "\n",
       ),
+      ...(options.placements
+        ? [
+            writeGeoJsonAt(
+              join(dirname(options.publishAddressesPath), "address-footprint-review.geojson"),
+              placementReviewFeatures(options.placements),
+            ),
+            writeFile(
+              join(dirname(options.publishAddressesPath), "address-footprint-placement.json"),
+              JSON.stringify(placementSummary(options.placements), null, 2) + "\n",
+            ),
+          ]
+        : []),
+      ...(options.numberingReport
+        ? [writeFile(join(dirname(options.publishAddressesPath), "address-numbering-validation.json"), JSON.stringify(options.numberingReport, null, 2) + "\n")]
+        : []),
+      writeFile(
+        join(dirname(options.publishAddressesPath), "legacy-history-reconciliation.json"),
+        JSON.stringify(legacyHistory, null, 2) + "\n",
+      ),
     ]);
-  return { residentialFeatures, allFeatures, locations, legacyUnmatched };
+  return { residentialFeatures, allFeatures, locations, legacyUnmatched, legacyHistory };
+}
+
+function writeGeoJsonAt(path: string, features: Feature[]) {
+  return writeFile(path, JSON.stringify({ type: "FeatureCollection", features }) + "\n");
 }
 
 function existingFeaturesForReport(existingFeatures: Feature[], source?: string) {

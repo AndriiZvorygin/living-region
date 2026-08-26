@@ -38,6 +38,28 @@ import {
   type HouseholdAdjacencyGraph,
   type NextUnderflyeredArea,
 } from "../../web-client/src/canvassing-coverage";
+import {
+  createSession,
+  createUser,
+  deleteSession,
+  ensureAuthSchema,
+  ensureUserProfileSchema,
+  findSessionUser,
+  generateTemporaryPassword,
+  hashSessionToken,
+  normalizeUsername,
+  parseCookies,
+  setUserPasswordById,
+  validateChosenPassword,
+  validateUserEmail,
+  verifyPassword,
+} from "./auth";
+import {
+  configuredAdminEmail,
+  sendCredentialsEmail,
+  type CredentialDelivery,
+} from "./mail";
+import { formatOfficialAddress } from "./official-address";
 
 const root = resolve(process.cwd());
 const host = process.env.CANVASS_HOST ?? "127.0.0.1";
@@ -65,7 +87,7 @@ const LEGACY_FLYER_ID = "flyer-1-original";
 const CURRENT_FLYER_ID = "flyer-2-current";
 await mkdir(dirname(storePath), { recursive: true });
 const db = new DatabaseSync(storePath);
-db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;
+db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON;
 CREATE TABLE IF NOT EXISTS structures (id TEXT PRIMARY KEY, geometry_json TEXT NOT NULL, building_type TEXT NOT NULL, external_source TEXT, external_id TEXT, source_confidence TEXT, imported_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS addresses (id TEXT PRIMARY KEY, structure_id TEXT REFERENCES structures(id), civic_number TEXT, street TEXT, unit TEXT, label TEXT, lon REAL NOT NULL, lat REAL NOT NULL, external_source TEXT, external_id TEXT, association_status TEXT, imported_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS households (id TEXT PRIMARY KEY, address_id TEXT NOT NULL REFERENCES addresses(id), unit_label TEXT, created_at TEXT NOT NULL, UNIQUE(address_id, unit_label));
@@ -263,7 +285,7 @@ if (!migrated.has(12)) {
     (id,short_name,description,introduction_date,active,printable_url,created_at,updated_at)
   VALUES
     ('flyer-1-original','Flyer 1: Original flyer',NULL,'2026-07-26',1,NULL,datetime('now'),datetime('now')),
-    ('flyer-2-current','Flyer 2: Current flyer',NULL,'2026-08-12',1,NULL,datetime('now'),datetime('now'));
+    ('flyer-2-current','A City That Works for Residents',NULL,'2026-08-12',1,NULL,datetime('now'),datetime('now'));
   ALTER TABLE visits ADD COLUMN flyer_id TEXT REFERENCES flyer_catalogue(id);
   ALTER TABLE household_flyer_events ADD COLUMN flyer_id TEXT REFERENCES flyer_catalogue(id);
   UPDATE visits SET flyer_id='flyer-1-original' WHERE flyer_delivered=1;
@@ -277,9 +299,171 @@ if (!migrated.has(12)) {
     (12,'campaign_flyer_catalogue_and_delivery_versions',datetime('now'));
   COMMIT;`);
 }
-db.exec(
-  `CREATE VIEW IF NOT EXISTS active_visits AS SELECT v.* FROM visits v WHERE COALESCE((SELECT correction_type FROM visit_corrections c WHERE c.visit_id=v.id ORDER BY c.occurred_at DESC,c.rowid DESC LIMIT 1),'restore')!='undo';`,
+ensureAuthSchema(db);
+const postAuthMigrations = new Set(
+  (
+    db.prepare("SELECT version FROM schema_migrations").all() as Array<{
+      version: number;
+    }>
+  ).map((row) => row.version),
 );
+if (!postAuthMigrations.has(14)) {
+  db.exec(`BEGIN;
+    UPDATE flyer_catalogue
+      SET short_name='A City That Works for Residents',updated_at=datetime('now')
+      WHERE id='flyer-2-current';
+    INSERT INTO schema_migrations VALUES
+      (14,'canonical_current_flagship_flyer_name',datetime('now'));
+    COMMIT;`);
+}
+if (!postAuthMigrations.has(15)) {
+  db.exec(`BEGIN;
+    CREATE TABLE recommendation_holds (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id),
+      center_household_id TEXT NOT NULL REFERENCES households(id),
+      household_ids_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    );
+    CREATE INDEX recommendation_holds_user
+      ON recommendation_holds(user_id,expires_at);
+    CREATE INDEX recommendation_holds_expiry
+      ON recommendation_holds(expires_at);
+    INSERT INTO schema_migrations VALUES
+      (15,'short_lived_multi_user_recommendation_holds',datetime('now'));
+    COMMIT;`);
+}
+ensureUserProfileSchema(db);
+const postAddressMigrations = new Set(
+  (
+    db.prepare("SELECT version FROM schema_migrations").all() as Array<{
+      version: number;
+    }>
+  ).map((row) => row.version),
+);
+if (!postAddressMigrations.has(17)) {
+  db.exec(`BEGIN;
+    ALTER TABLE addresses ADD COLUMN civic_number_base TEXT;
+    ALTER TABLE addresses ADD COLUMN civic_number_suffix TEXT NOT NULL DEFAULT '';
+    ALTER TABLE addresses ADD COLUMN source_address_guid TEXT;
+    ALTER TABLE addresses ADD COLUMN source_location_guid TEXT;
+    ALTER TABLE addresses ADD COLUMN official_street_name TEXT;
+    ALTER TABLE addresses ADD COLUMN official_street_type TEXT;
+    ALTER TABLE addresses ADD COLUMN official_street_direction TEXT;
+    ALTER TABLE addresses ADD COLUMN source_retrieval_date TEXT;
+    INSERT INTO schema_migrations VALUES
+      (17,'authoritative_nar_address_parts_and_footprint_provenance',datetime('now'));
+    COMMIT;`);
+}
+if (!postAddressMigrations.has(18)) {
+  db.exec(`BEGIN;
+    CREATE TABLE legacy_history_links (
+      legacy_address_id TEXT PRIMARY KEY REFERENCES addresses(id),
+      legacy_household_id TEXT REFERENCES households(id),
+      canonical_address_id TEXT REFERENCES addresses(id),
+      canonical_household_id TEXT REFERENCES households(id),
+      canonical_location_id TEXT,
+      match_status TEXT NOT NULL CHECK(match_status IN ('confident','ambiguous','unmatched')),
+      distance_m REAL,
+      candidate_count INTEGER NOT NULL DEFAULT 0,
+      candidate_location_count INTEGER NOT NULL DEFAULT 0,
+      reason TEXT NOT NULL,
+      linked_at TEXT NOT NULL
+    );
+    CREATE INDEX legacy_history_links_canonical_household
+      ON legacy_history_links(canonical_household_id,match_status);
+    CREATE TABLE legacy_history_reviews (
+      legacy_address_id TEXT PRIMARY KEY REFERENCES addresses(id),
+      review_status TEXT NOT NULL,
+      reason TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    INSERT INTO schema_migrations VALUES
+      (18,'legacy_activity_preservation_across_authoritative_address_reconciliation',datetime('now'));
+    COMMIT;`);
+}
+db.exec(`DROP VIEW IF EXISTS household_flyer_state;
+DROP VIEW IF EXISTS effective_people;
+DROP VIEW IF EXISTS activity_people;
+DROP VIEW IF EXISTS activity_neighbourhood_conversations;
+DROP VIEW IF EXISTS activity_flyer_events;
+DROP VIEW IF EXISTS active_visits;`);
+db.exec(`CREATE VIEW active_visits AS
+SELECT v.*
+FROM visits v
+WHERE COALESCE((SELECT correction_type FROM visit_corrections c
+  WHERE c.visit_id=v.id ORDER BY c.occurred_at DESC,c.rowid DESC LIMIT 1),'restore')!='undo'
+  AND NOT EXISTS (
+    SELECT 1 FROM legacy_history_links l
+    WHERE l.legacy_household_id=v.household_id
+      AND l.match_status='confident'
+      AND l.canonical_household_id IS NOT NULL
+  )
+UNION ALL
+SELECT v.id,v.occurred_at,v.user_id,l.canonical_household_id household_id,
+  v.route_id,v.flyer_delivered,v.door_knocked,v.outcome,
+  v.conversation_occurred,v.issue_categories_json,v.notes,v.follow_up_action,
+  v.follow_up_date,v.support_category,v.source,v.imported_at,v.session_id,
+  v.revisit_requested,v.no_answer,v.flyer_id
+FROM visits v
+JOIN legacy_history_links l ON l.legacy_household_id=v.household_id
+  AND l.match_status='confident'
+  AND l.canonical_household_id IS NOT NULL
+WHERE COALESCE((SELECT correction_type FROM visit_corrections c
+  WHERE c.visit_id=v.id ORDER BY c.occurred_at DESC,c.rowid DESC LIMIT 1),'restore')!='undo';`);
+db.exec(`CREATE VIEW activity_flyer_events AS
+SELECT f.*
+FROM household_flyer_events f
+WHERE NOT EXISTS (
+  SELECT 1 FROM legacy_history_links l
+  WHERE l.legacy_household_id=f.household_id
+    AND l.match_status='confident'
+    AND l.canonical_household_id IS NOT NULL
+)
+UNION ALL
+SELECT f.id,l.canonical_household_id household_id,f.occurred_at,f.user_id,
+  f.flyer_delivered,f.reason,f.source,f.previous_event_id,f.flyer_id
+FROM household_flyer_events f
+JOIN legacy_history_links l ON l.legacy_household_id=f.household_id
+  AND l.match_status='confident'
+  AND l.canonical_household_id IS NOT NULL;`);
+db.exec(`CREATE VIEW activity_people AS
+SELECT p.*
+FROM people p
+WHERE NOT EXISTS (
+  SELECT 1 FROM legacy_history_links l
+  WHERE l.legacy_household_id=p.household_id
+    AND l.match_status='confident'
+    AND l.canonical_household_id IS NOT NULL
+)
+UNION ALL
+SELECT p.id,l.canonical_household_id household_id,p.name,p.phone,p.email,
+  p.voluntarily_supplied,p.created_at,p.mailing_list_consent
+FROM people p
+JOIN legacy_history_links l ON l.legacy_household_id=p.household_id
+  AND l.match_status='confident'
+  AND l.canonical_household_id IS NOT NULL;`);
+db.exec(`CREATE VIEW activity_neighbourhood_conversations AS
+SELECT n.*
+FROM neighbourhood_conversations n
+WHERE n.household_id IS NULL OR NOT EXISTS (
+  SELECT 1 FROM legacy_history_links l
+  WHERE l.legacy_household_id=n.household_id
+    AND l.match_status='confident'
+    AND l.canonical_household_id IS NOT NULL
+)
+UNION ALL
+SELECT n.id,n.occurred_at,n.user_id,n.lon,n.lat,n.location_accuracy_m,
+  n.issue_discussed,n.political_outcome,n.possible_volunteer,
+  n.possible_local_representative,n.possible_councillor_candidate,
+  n.follow_up_requested,l.canonical_household_id household_id,n.route_id,
+  n.source,n.created_at
+FROM neighbourhood_conversations n
+JOIN legacy_history_links l ON l.legacy_household_id=n.household_id
+  AND l.match_status='confident'
+  AND l.canonical_household_id IS NOT NULL;`);
 db.exec(`CREATE VIEW IF NOT EXISTS effective_addresses AS
 SELECT a.*,
   COALESCE((SELECT e.civic_number FROM address_number_events e WHERE e.address_id=a.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),a.civic_number) civic_number_effective,
@@ -297,7 +481,7 @@ SELECT h.id household_id,
       WHERE v.household_id=h.id AND v.flyer_delivered=1
       UNION ALL
       SELECT f.occurred_at,f.id,1 sort_priority,f.flyer_delivered state
-      FROM household_flyer_events f
+      FROM activity_flyer_events f
       WHERE f.household_id=h.id
     )
     ORDER BY occurred_at DESC,sort_priority DESC,id DESC LIMIT 1
@@ -313,9 +497,22 @@ SELECT p.id,p.household_id,
   COALESCE((SELECT e.voluntarily_supplied FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.voluntarily_supplied,1) voluntarily_supplied,
   (SELECT e.id FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1) latest_event_id,
   COALESCE((SELECT e.occurred_at FROM person_contact_events e WHERE e.person_id=p.id ORDER BY e.occurred_at DESC,e.rowid DESC LIMIT 1),p.created_at) last_updated_at
-FROM people p;`);
+FROM activity_people p;`);
 
 const now = () => new Date().toISOString();
+const SCHEMA_VERSION = 18;
+const configuredHoldMinutes = Number(
+  process.env.CANVASS_RECOMMENDATION_HOLD_MINUTES ?? "30",
+);
+const recommendationHoldDurationMs =
+  Number.isFinite(configuredHoldMinutes) && configuredHoldMinutes > 0
+    ? configuredHoldMinutes * 60_000
+    : 30 * 60_000;
+const sessionCookieName = "canvassing_session";
+const secureCookies =
+  process.env.CANVASS_SECURE_COOKIES === "true" ||
+  (process.env.CANVASS_SECURE_COOKIES !== "false" &&
+    !["127.0.0.1", "localhost", "::1"].includes(host));
 const json = (
   res: ServerResponse,
   status: number,
@@ -356,6 +553,22 @@ const jsonForRequest = (
     .includes("gzip")
     ? compressedJson(res, status, value)
     : json(res, status, value);
+const cookieOptions = (maxAge: number) =>
+  `Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Lax${
+    secureCookies ? "; Secure" : ""
+  }`;
+const setSessionCookie = (res: ServerResponse, sessionToken: string) =>
+  res.setHeader(
+    "set-cookie",
+    `${sessionCookieName}=${encodeURIComponent(sessionToken)}; ${cookieOptions(
+      30 * 24 * 60 * 60,
+    )}`,
+  );
+const clearSessionCookie = (res: ServerResponse) =>
+  res.setHeader(
+    "set-cookie",
+    `${sessionCookieName}=; ${cookieOptions(0)}`,
+  );
 const body = async (req: IncomingMessage) => {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(Buffer.from(chunk));
@@ -520,6 +733,15 @@ async function seed() {
   const legacyUnmatchedIds = JSON.parse(
     await readFile(join(base, "legacy-unmatched-address-ids.json"), "utf8").catch(() => '{"address_ids":[]}'),
   ).address_ids as unknown;
+  const legacyHistory = JSON.parse(
+    await readFile(join(base, "legacy-history-reconciliation.json"), "utf8").catch(() => '{"links":[]}'),
+  );
+  const legacyHistoryLinks = Array.isArray(legacyHistory.links)
+    ? legacyHistory.links.filter((link: any) =>
+        link && typeof link.legacy_address_id === "string" &&
+        ["confident", "ambiguous", "unmatched"].includes(link.match_status),
+      )
+    : [];
   const historicalOnlyAddressIds = Array.isArray(legacyUnmatchedIds)
     ? legacyUnmatchedIds.filter((id): id is string => typeof id === "string")
     : [];
@@ -547,9 +769,9 @@ async function seed() {
         feature.properties.external_id,
         feature.properties.confidence,
         timestamp,
-      );
+    );
     const insertAddress = db.prepare(
-      "INSERT INTO addresses (id,structure_id,civic_number,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,civic_number=excluded.civic_number,street=excluded.street,unit=excluded.unit,label=excluded.label,lon=excluded.lon,lat=excluded.lat,association_status=excluded.association_status,imported_at=excluded.imported_at,source_active=1",
+      "INSERT INTO addresses (id,structure_id,civic_number,civic_number_base,civic_number_suffix,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active,source_address_guid,source_location_guid,official_street_name,official_street_type,official_street_direction,source_retrieval_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,civic_number=excluded.civic_number,civic_number_base=excluded.civic_number_base,civic_number_suffix=excluded.civic_number_suffix,street=excluded.street,unit=excluded.unit,label=excluded.label,lon=excluded.lon,lat=excluded.lat,association_status=excluded.association_status,imported_at=excluded.imported_at,source_active=1,source_address_guid=excluded.source_address_guid,source_location_guid=excluded.source_location_guid,official_street_name=excluded.official_street_name,official_street_type=excluded.official_street_type,official_street_direction=excluded.official_street_direction,source_retrieval_date=excluded.source_retrieval_date",
     );
     const insertHousehold = db.prepare(
       "INSERT OR IGNORE INTO households VALUES (?, ?, ?, ?)",
@@ -561,6 +783,8 @@ async function seed() {
         p.address_id,
         p.structure_id,
         p.civic_number,
+        p.civic_number_base ?? null,
+        p.civic_number_suffix ?? "",
         p.street,
         p.unit,
         p.label,
@@ -570,6 +794,12 @@ async function seed() {
         p.external_id,
         p.association_status,
         timestamp,
+        p.source_address_guid ?? null,
+        p.source_location_guid ?? null,
+        p.official_street_name ?? null,
+        p.official_street_type ?? null,
+        p.official_street_direction ?? null,
+        p.source_retrieval_date ?? null,
       );
       insertHousehold.run(
         `household_${p.address_id.slice(8)}`,
@@ -598,11 +828,84 @@ async function seed() {
         timestamp,
       );
     }
+    const findHouseholdByAddress = db.prepare(
+      "SELECT id FROM households WHERE address_id=? LIMIT 1",
+    );
+    const upsertHistoryLink = db.prepare(
+      `INSERT INTO legacy_history_links
+       (legacy_address_id,legacy_household_id,canonical_address_id,
+        canonical_household_id,canonical_location_id,match_status,distance_m,
+        candidate_count,candidate_location_count,reason,linked_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?)
+       ON CONFLICT(legacy_address_id) DO UPDATE SET
+        legacy_household_id=excluded.legacy_household_id,
+        canonical_address_id=excluded.canonical_address_id,
+        canonical_household_id=excluded.canonical_household_id,
+        canonical_location_id=excluded.canonical_location_id,
+        match_status=excluded.match_status,
+        distance_m=excluded.distance_m,
+        candidate_count=excluded.candidate_count,
+        candidate_location_count=excluded.candidate_location_count,
+        reason=excluded.reason,
+        linked_at=excluded.linked_at`,
+    );
+    for (const link of legacyHistoryLinks) {
+      const legacyHousehold = findHouseholdByAddress.get(
+        link.legacy_address_id,
+      ) as { id: string } | undefined;
+      if (!legacyHousehold) continue;
+      const canonicalHousehold = link.canonical_address_id
+        ? (findHouseholdByAddress.get(link.canonical_address_id) as
+            | { id: string }
+            | undefined)
+        : undefined;
+      upsertHistoryLink.run(
+        link.legacy_address_id,
+        legacyHousehold?.id ?? null,
+        canonicalHousehold ? link.canonical_address_id : null,
+        canonicalHousehold?.id ?? null,
+        link.canonical_location_id ?? null,
+        link.match_status,
+        link.distance_m == null ? null : Number(link.distance_m),
+        Number(link.candidate_count ?? 0),
+        Number(link.candidate_location_count ?? 0),
+        String(link.reason ?? "authoritative address reconciliation"),
+        timestamp,
+      );
+    }
+    // Historical rows carrying real campaign activity remain inspectable as
+    // map points when no safe one-to-one canonical household link exists. The
+    // review rows are deliberately derived from the event tables, so a seed
+    // or restart cannot silently hide a flyered/visited roof.
+    db.prepare(
+      `INSERT INTO legacy_history_reviews
+       (legacy_address_id,review_status,reason,created_at,updated_at)
+       SELECT a.id,
+         CASE WHEN l.match_status IS NULL THEN 'unmatched_activity' ELSE l.match_status||'_activity' END,
+         COALESCE(l.reason,'inactive historical address with campaign activity'),
+         ?,?
+       FROM addresses a
+       JOIN households h ON h.address_id=a.id
+       LEFT JOIN legacy_history_links l ON l.legacy_address_id=a.id
+       WHERE a.source_active=0
+         AND NOT (l.match_status='confident' AND l.canonical_household_id IS NOT NULL)
+         AND (
+           EXISTS (SELECT 1 FROM visits v WHERE v.household_id=h.id)
+           OR EXISTS (SELECT 1 FROM household_flyer_events f WHERE f.household_id=h.id)
+           OR EXISTS (SELECT 1 FROM neighbourhood_conversations n WHERE n.household_id=h.id)
+           OR EXISTS (SELECT 1 FROM person_contact_events p WHERE p.household_id=h.id)
+         )
+       ON CONFLICT(legacy_address_id) DO UPDATE SET
+         review_status=excluded.review_status,
+         reason=excluded.reason,
+         updated_at=excluded.updated_at`,
+    ).run(timestamp, timestamp);
     db.exec("COMMIT");
     audit("system", "seed", "import", null, {
       structures: structures.features.length,
       addresses: addresses.features.length,
       address_review_records: addressReview.features.length,
+      legacy_history_links: legacyHistoryLinks.length,
     });
   } catch (error) {
     try {
@@ -776,14 +1079,18 @@ function state(role = "candidate") {
     .prepare(
       `SELECT h.id household_id,h.unit_label,a.id address_id,
     CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae WHERE ae.address_id=a.id) THEN (SELECT CASE WHEN ae.event_type='clear' THEN NULL ELSE ae.structure_id END FROM address_association_events ae WHERE ae.address_id=a.id ORDER BY ae.occurred_at DESC,ae.rowid DESC LIMIT 1) ELSE a.structure_id END structure_id,
-    a.structure_id imported_structure_id,a.civic_number_effective civic_number,a.street_effective street,a.unit_effective unit,
+    a.structure_id imported_structure_id,a.civic_number_effective civic_number,a.civic_number_base,a.civic_number_suffix,a.street_effective street,a.unit_effective unit,
+    a.source_address_guid,a.source_location_guid,a.official_street_name,a.official_street_type,a.official_street_direction,a.source_retrieval_date,
     CASE WHEN a.number_event_id IS NOT NULL THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END) ELSE a.label END label,
     a.lon,a.lat,a.number_event_id,CASE WHEN a.number_event_id IS NOT NULL THEN 1 ELSE 0 END number_corrected,
     CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae WHERE ae.address_id=a.id) THEN 'manual_verified' ELSE a.association_status END association_status,
-    COALESCE((SELECT CASE WHEN v.revisit_requested=1 THEN 'revisit' ELSE v.outcome END FROM active_visits v WHERE v.household_id=h.id AND (fs.flyer_delivered=1 OR v.outcome!='flyer_delivered') ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),'untouched') status,
+    CASE WHEN a.source_active=1 THEN 0 ELSE 1 END historical_only,
+    CASE WHEN a.source_active=1 THEN 0 ELSE 1 END address_review_required,
+    (SELECT review_status FROM legacy_history_reviews r WHERE r.legacy_address_id=a.id) legacy_review_status,
+    COALESCE((SELECT CASE WHEN v.revisit_requested=1 THEN 'revisit' ELSE v.outcome END FROM active_visits v WHERE v.household_id=h.id AND (fs.flyer_delivered=1 OR v.outcome!='flyer_delivered') ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),CASE WHEN EXISTS(SELECT 1 FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id) THEN 'conversation' ELSE 'untouched' END) status,
     fs.flyer_delivered,
     COALESCE((SELECT max(v.door_knocked) FROM active_visits v WHERE v.household_id=h.id),0) door_knocked,
-    COALESCE((SELECT max(v.conversation_occurred) FROM active_visits v WHERE v.household_id=h.id),0) conversation_occurred,
+    CASE WHEN EXISTS(SELECT 1 FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id) THEN 1 ELSE COALESCE((SELECT max(v.conversation_occurred) FROM active_visits v WHERE v.household_id=h.id),0) END conversation_occurred,
     COALESCE((SELECT max(v.revisit_requested) FROM active_visits v WHERE v.household_id=h.id),0) revisit_requested,
     COALESCE((SELECT max(v.no_answer) FROM active_visits v WHERE v.household_id=h.id),0) no_answer,
     (SELECT v.outcome FROM active_visits v
@@ -793,16 +1100,35 @@ function state(role = "candidate") {
     (SELECT occurred_at FROM (
       SELECT v.occurred_at,v.id FROM active_visits v WHERE v.household_id=h.id
       UNION ALL
-      SELECT f.occurred_at,f.id FROM household_flyer_events f WHERE f.household_id=h.id
+      SELECT f.occurred_at,f.id FROM activity_flyer_events f WHERE f.household_id=h.id
+      UNION ALL
+      SELECT n.occurred_at,n.id FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id
       UNION ALL
       SELECT p.last_updated_at,p.id FROM effective_people p WHERE p.household_id=h.id
     ) ORDER BY occurred_at DESC,id DESC LIMIT 1) last_updated_at,
     (SELECT count(*) FROM active_visits v WHERE v.household_id=h.id) visit_count
     FROM households h JOIN effective_addresses a ON a.id=h.address_id
     JOIN household_flyer_state fs ON fs.household_id=h.id
-    WHERE a.source_active=1`,
+    WHERE a.source_active=1 OR EXISTS(
+      SELECT 1 FROM legacy_history_reviews r WHERE r.legacy_address_id=a.id
+    )`,
     )
     .all() as any[];
+  for (const household of households) {
+    if (
+      !household.number_event_id &&
+      household.source_address_guid &&
+      household.official_street_name
+    )
+      household.label = formatOfficialAddress({
+        civicNumber: household.civic_number_base ?? household.civic_number,
+        civicNumberSuffix: household.civic_number_suffix,
+        streetName: household.official_street_name,
+        streetType: household.official_street_type,
+        streetDirection: household.official_street_direction,
+        unit: household.unit,
+      });
+  }
   const flyers = db
     .prepare("SELECT * FROM flyer_catalogue ORDER BY introduction_date,id")
     .all() as any[];
@@ -818,7 +1144,7 @@ function state(role = "candidate") {
        SELECT f.household_id,f.id event_id,f.occurred_at,f.flyer_id,
               COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
               f.user_id,f.source
-         FROM household_flyer_events f
+         FROM activity_flyer_events f
          LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
         WHERE f.flyer_delivered=1
         ORDER BY occurred_at DESC,event_id DESC`,
@@ -844,6 +1170,35 @@ function state(role = "candidate") {
       ...new Set(history.map((event) => event.flyer_id).filter(Boolean)),
     ];
   }
+  if (role === "volunteer") {
+    for (const household of households) {
+      household.political_outcome = null;
+      if (
+        [
+          "supportive",
+          "undecided",
+          "opposed",
+          "volunteer_interest",
+          "lawn_sign_interest",
+        ].includes(household.status)
+      )
+        household.status = household.conversation_occurred
+          ? "conversation"
+          : household.door_knocked
+            ? "knocked_no_answer"
+            : household.flyer_delivered
+              ? "flyer_delivered"
+              : "untouched";
+      household.flyer_history = household.flyer_history.map(
+        ({ event_id, occurred_at, flyer_id, flyer_name }: any) => ({
+          event_id,
+          occurred_at,
+          flyer_id,
+          flyer_name,
+        }),
+      );
+    }
+  }
   const routes = db
     .prepare(
       "SELECT r.*,count(s.id) stop_count,sum(CASE WHEN s.completed_at IS NOT NULL THEN 1 ELSE 0 END) completed_count FROM routes r LEFT JOIN route_stops s ON s.route_id=r.id GROUP BY r.id ORDER BY r.created_at DESC",
@@ -853,12 +1208,25 @@ function state(role = "candidate") {
     .prepare(
       `SELECT s.*,
        CASE WHEN a.number_event_id IS NOT NULL THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END) ELSE a.label END label,
-       a.civic_number_effective civic_number,a.street_effective street,a.lon,a.lat
+       a.civic_number_effective civic_number,a.civic_number_base,a.civic_number_suffix,
+       a.official_street_name,a.official_street_type,a.official_street_direction,a.source_address_guid,
+       a.number_event_id,a.unit_effective unit,a.street_effective street,a.lon,a.lat
        FROM route_stops s JOIN households h ON h.id=s.household_id
        JOIN effective_addresses a ON a.id=h.address_id
        ORDER BY s.route_id,s.sequence`,
     )
-    .all();
+    .all() as any[];
+  for (const stop of route_stops) {
+    if (!stop.number_event_id && stop.source_address_guid && stop.official_street_name)
+      stop.label = formatOfficialAddress({
+        civicNumber: stop.civic_number_base ?? stop.civic_number,
+        civicNumberSuffix: stop.civic_number_suffix,
+        streetName: stop.official_street_name,
+        streetType: stop.official_street_type,
+        streetDirection: stop.official_street_direction,
+        unit: stop.unit,
+      });
+  }
   const followup_samples = (
     db
       .prepare(
@@ -909,7 +1277,7 @@ function state(role = "candidate") {
             `SELECT nc.*,CASE WHEN a.number_event_id IS NOT NULL
              THEN trim(a.civic_number_effective||' '||a.street_effective||CASE WHEN a.unit_effective!='' THEN ' Unit '||a.unit_effective ELSE '' END)
              ELSE a.label END household_label
-             FROM neighbourhood_conversations nc
+             FROM activity_neighbourhood_conversations nc
              LEFT JOIN households h ON h.id=nc.household_id
              LEFT JOIN effective_addresses a ON a.id=h.address_id
              ORDER BY nc.occurred_at DESC LIMIT 100`,
@@ -1007,18 +1375,23 @@ function state(role = "candidate") {
   summary.unknown_flyer_deliveries = flyerHistoryRows.filter(
     (row) => !row.flyer_id,
   ).length;
+  if (role === "volunteer") {
+    summary.supporters = 0;
+    summary.volunteers = 0;
+    summary.lawn_signs = 0;
+  }
   return {
     households,
     flyers,
     routes,
     route_stops,
     route_sessions: sessions,
-    followup_samples,
+    followup_samples: role === "volunteer" ? [] : followup_samples,
     neighbourhood_conversations,
     recruitment_areas,
     recruitment_prospects,
-    address_review_counts,
-    schema_version: 12,
+    address_review_counts: role === "volunteer" ? {} : address_review_counts,
+    schema_version: SCHEMA_VERSION,
     summary,
   };
 }
@@ -1059,7 +1432,9 @@ let nextAreaInFlight:
     }
   | undefined;
 
-function serverCoverageSnapshot(): ServerCoverageSnapshot {
+function serverCoverageSnapshot(
+  excludedHouseholdIds: ReadonlySet<string> = new Set(),
+): ServerCoverageSnapshot {
   const current = state("candidate").households as Array<any>;
   const buildingTypes = new Map(
     (
@@ -1071,10 +1446,12 @@ function serverCoverageSnapshot(): ServerCoverageSnapshot {
     ).map((row) => [row.id, String(row.building_type ?? "").toLowerCase()]),
   );
   const locations = current.map((home) => {
+    const historicalOnly = Boolean(home.historical_only);
     const nonResidential = knownNonResidentialBuildingTypes.has(
       buildingTypes.get(String(home.structure_id ?? "")) ?? "",
     );
     const eligible =
+      !historicalOnly &&
       !nonResidential &&
       isCoverageEligible({
         household_id: home.household_id,
@@ -1098,7 +1475,12 @@ function serverCoverageSnapshot(): ServerCoverageSnapshot {
       stop_id: home.structure_id ?? home.address_id,
     } satisfies CoverageLocation;
   });
-  const structuralKey = locations
+  const filteredLocations = excludedHouseholdIds.size
+    ? locations.filter(
+        (location) => !excludedHouseholdIds.has(location.household_id),
+      )
+    : locations;
+  const structuralKey = filteredLocations
     .map((location) =>
       [
         location.household_id,
@@ -1114,24 +1496,102 @@ function serverCoverageSnapshot(): ServerCoverageSnapshot {
   if (!coverageGraphCache || coverageGraphCache.structuralKey !== structuralKey)
     coverageGraphCache = {
       structuralKey,
-      graph: buildHouseholdAdjacencyGraph(locations, coverageRoads),
+      graph: buildHouseholdAdjacencyGraph(filteredLocations, coverageRoads),
     };
   const coverageKey = createHash("sha1")
     .update(
-      locations
+      filteredLocations
         .filter((location) => location.eligible)
         .map((location) => `${location.household_id}:${location.covered ? 1 : 0}`)
         .join("\u001e"),
     )
     .digest("hex");
   return {
-    locations,
+    locations: filteredLocations,
     graph: coverageGraphCache.graph,
     coverageKey,
   };
 }
 
-async function serverNextArea(centerHouseholdId?: string) {
+type RecommendationHoldRow = {
+  id: string;
+  user_id: string;
+  center_household_id: string;
+  household_ids_json: string;
+  created_at: string;
+  expires_at: string;
+};
+
+function recommendationHoldHouseholdIds(row: RecommendationHoldRow) {
+  try {
+    const value = JSON.parse(row.household_ids_json);
+    return Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function removeExpiredRecommendationHolds(at = now()) {
+  db.prepare("DELETE FROM recommendation_holds WHERE expires_at<=?").run(at);
+}
+
+function removeUserRecommendationHolds(userId: string) {
+  db.prepare("DELETE FROM recommendation_holds WHERE user_id=?").run(userId);
+}
+
+function activeOtherRecommendationHoldHouseholds(
+  userId: string,
+  at = now(),
+) {
+  const rows = db
+    .prepare(
+      `SELECT id,user_id,center_household_id,household_ids_json,created_at,expires_at
+       FROM recommendation_holds
+       WHERE user_id!=? AND expires_at>?`,
+    )
+    .all(userId, at) as RecommendationHoldRow[];
+  const householdIds = new Set<string>();
+  for (const row of rows)
+    for (const householdId of recommendationHoldHouseholdIds(row))
+      householdIds.add(householdId);
+  return householdIds;
+}
+
+function refreshRecommendationHoldForActivity(
+  userId: string,
+  householdId: string | null | undefined,
+) {
+  if (!householdId) return;
+  const at = now();
+  const rows = db
+    .prepare(
+      `SELECT id,user_id,center_household_id,household_ids_json,created_at,expires_at
+       FROM recommendation_holds WHERE user_id=? AND expires_at>?`,
+    )
+    .all(userId, at) as RecommendationHoldRow[];
+  const expiresAt = new Date(
+    Date.parse(at) + recommendationHoldDurationMs,
+  ).toISOString();
+  for (const row of rows) {
+    if (recommendationHoldHouseholdIds(row).includes(householdId))
+      db.prepare("UPDATE recommendation_holds SET expires_at=? WHERE id=?").run(
+        expiresAt,
+        row.id,
+      );
+  }
+}
+
+function recommendationForClient(
+  recommendation: { household_ids: string[] } | null,
+) {
+  if (!recommendation) return null;
+  const { household_ids: _householdIds, ...visibleRecommendation } = recommendation;
+  return visibleRecommendation;
+}
+
+async function serverNextAreaWithoutHold(centerHouseholdId?: string) {
   const started = Date.now();
   const snapshot = serverCoverageSnapshot();
   const eligible = snapshot.locations.filter((location) => location.eligible);
@@ -1145,10 +1605,12 @@ async function serverNextArea(centerHouseholdId?: string) {
     };
   if (centerHouseholdId) {
     return {
-      recommendation: calculateNestedCoverageArea(
-        centerHouseholdId,
-        snapshot.locations,
-        snapshot.graph,
+      recommendation: recommendationForClient(
+        calculateNestedCoverageArea(
+          centerHouseholdId,
+          snapshot.locations,
+          snapshot.graph,
+        ),
       ),
       complete: false,
       cached: false,
@@ -1157,7 +1619,7 @@ async function serverNextArea(centerHouseholdId?: string) {
   }
   if (nextAreaCache?.coverageKey === snapshot.coverageKey)
     return {
-      recommendation: nextAreaCache.recommendation,
+      recommendation: recommendationForClient(nextAreaCache.recommendation),
       complete: false,
       cached: true,
       calculation_ms: Date.now() - started,
@@ -1174,11 +1636,120 @@ async function serverNextArea(centerHouseholdId?: string) {
   if (nextAreaInFlight === calculation) nextAreaInFlight = undefined;
   nextAreaCache = { coverageKey: snapshot.coverageKey, recommendation };
   return {
-    recommendation,
+    recommendation: recommendationForClient(recommendation),
     complete: false,
     cached: false,
     calculation_ms: Date.now() - started,
   };
+}
+
+function serverNextAreaWithHold(userId: string) {
+  const started = Date.now();
+  // This write transaction serializes recommendation selection and hold
+  // creation across concurrent SQLite clients/processes.
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const at = now();
+    removeExpiredRecommendationHolds(at);
+    removeUserRecommendationHolds(userId);
+
+    const baseSnapshot = serverCoverageSnapshot();
+    const baseEligible = baseSnapshot.locations.filter(
+      (location) => location.eligible,
+    );
+    const baseComplete =
+      baseEligible.length > 0 && baseEligible.every((location) => location.covered);
+    if (baseComplete) {
+      db.exec("COMMIT");
+      return {
+        recommendation: null,
+        complete: true,
+        cached: false,
+        calculation_ms: Date.now() - started,
+      };
+    }
+
+    const heldByOthers = activeOtherRecommendationHoldHouseholds(userId, at);
+    const availableSnapshot = heldByOthers.size
+      ? serverCoverageSnapshot(heldByOthers)
+      : baseSnapshot;
+    const availableEligible = availableSnapshot.locations.filter(
+      (location) => location.eligible,
+    );
+    let recommendation: NextUnderflyeredArea | null = null;
+    let cached = false;
+    if (
+      !heldByOthers.size &&
+      nextAreaCache?.coverageKey === baseSnapshot.coverageKey
+    ) {
+      recommendation = nextAreaCache.recommendation;
+      cached = true;
+    } else if (
+      availableEligible.length > 0 &&
+      availableEligible.some((location) => !location.covered)
+    ) {
+      recommendation = selectNextUnderflyeredArea(
+        availableSnapshot.locations,
+        availableSnapshot.graph,
+      );
+    }
+
+    // If all otherwise eligible households are temporarily held, keep the
+    // normal selector result as a last resort. Duplicate delivery safeguards
+    // remain authoritative in that rare case.
+    if (!recommendation)
+      recommendation =
+        nextAreaCache?.coverageKey === baseSnapshot.coverageKey
+          ? nextAreaCache.recommendation
+          : selectNextUnderflyeredArea(
+              baseSnapshot.locations,
+              baseSnapshot.graph,
+            );
+
+    if (recommendation && recommendation.household_ids.length) {
+      const expiresAt = new Date(
+        Date.parse(at) + recommendationHoldDurationMs,
+      ).toISOString();
+      db.prepare(
+        `INSERT INTO recommendation_holds
+         (id,user_id,center_household_id,household_ids_json,created_at,expires_at)
+         VALUES (?,?,?,?,?,?)`,
+      ).run(
+        randomUUID(),
+        userId,
+        recommendation.center_household_id,
+        JSON.stringify(recommendation.household_ids),
+        at,
+        expiresAt,
+      );
+    }
+    if (!heldByOthers.size)
+      nextAreaCache = {
+        coverageKey: baseSnapshot.coverageKey,
+        recommendation,
+      };
+    db.exec("COMMIT");
+    return {
+      recommendation: recommendationForClient(recommendation),
+      complete: false,
+      cached,
+      calculation_ms: Date.now() - started,
+    };
+  } catch (error) {
+    try {
+      db.exec("ROLLBACK");
+    } catch {}
+    throw error;
+  }
+}
+
+async function serverNextArea(
+  centerHouseholdId?: string,
+  authenticatedUserId?: string,
+) {
+  if (!authenticatedUserId || centerHouseholdId)
+    return serverNextAreaWithoutHold(centerHouseholdId);
+  return serverNextAreaWithHold(authenticatedUserId);
 }
 
 function parseCsv(text: string) {
@@ -1257,6 +1828,184 @@ const recruitmentStatuses = new Set([
   "registered",
 ]);
 
+async function ensureTestUsers() {
+  if (process.env.CANVASS_TEST_USERS !== "1") return;
+  const count = Number(
+    (db.prepare("SELECT count(*) count FROM users").get() as { count: number })
+      .count,
+  );
+  if (count) return;
+  const password = process.env.CANVASS_TEST_PASSWORD ?? "canvassing-test-password";
+  await createUser(db, {
+    username: "andrii",
+    display_name: "Andrii",
+    role: "candidate",
+    password,
+  });
+  await createUser(db, {
+    username: "rynaldo",
+    display_name: "Rynaldo",
+    role: "volunteer",
+    password,
+  });
+}
+await ensureTestUsers();
+
+function publicAdminUser(row: any) {
+  return {
+    id: String(row.id),
+    username: String(row.username),
+    display_name: String(row.display_name),
+    email: row.email == null ? null : String(row.email),
+    role: row.role,
+    active: Boolean(row.active),
+    created_at: row.created_at,
+    updated_at: row.updated_at ?? row.created_at,
+    last_login_at: row.last_login_at,
+    current_flagship_flyers: Number(row.current_flagship_flyers ?? 0),
+    total_flyer_deliveries: Number(row.total_flyer_deliveries ?? 0),
+    visits: Number(row.visits ?? 0),
+    first_field_activity: row.first_field_activity ?? null,
+    last_field_activity: row.last_field_activity ?? null,
+    last_active: row.last_active ?? null,
+  };
+}
+
+function adminUsers() {
+  return db
+    .prepare(
+      `WITH flyer_state_events AS (
+         SELECT v.household_id,v.id,v.occurred_at,v.user_id,v.flyer_id,
+                1 flyer_delivered,0 sort_priority
+         FROM active_visits v
+         WHERE v.flyer_delivered=1
+         UNION ALL
+         SELECT f.household_id,f.id,f.occurred_at,f.user_id,f.flyer_id,
+                f.flyer_delivered,1 sort_priority
+         FROM activity_flyer_events f
+       ), ranked_flyer_state AS (
+         SELECT *,ROW_NUMBER() OVER (
+           PARTITION BY household_id
+           ORDER BY occurred_at DESC,sort_priority DESC,id DESC
+         ) row_number
+         FROM flyer_state_events
+       ), field_activity AS (
+         SELECT user_id,occurred_at FROM active_visits
+         UNION ALL
+         SELECT user_id,occurred_at FROM activity_neighbourhood_conversations
+       ), activity_stats AS (
+         SELECT user_id,min(occurred_at) first_field_activity,
+                max(occurred_at) last_field_activity
+         FROM field_activity GROUP BY user_id
+       ), visit_stats AS (
+         SELECT user_id,count(*) visits FROM active_visits GROUP BY user_id
+       )
+       SELECT u.id,u.username,u.display_name,u.email,u.role,u.active,
+         u.created_at,u.updated_at,u.last_login_at,
+         COALESCE(SUM(CASE WHEN fs.user_id=u.id AND fs.flyer_delivered=1
+                            AND fs.flyer_id=? THEN 1 ELSE 0 END),0)
+           current_flagship_flyers,
+         COALESCE(SUM(CASE WHEN fs.user_id=u.id AND fs.flyer_delivered=1
+                            THEN 1 ELSE 0 END),0)
+           total_flyer_deliveries,
+         COALESCE(vs.visits,0) visits,
+         a.first_field_activity,a.last_field_activity,
+         CASE
+           WHEN a.last_field_activity IS NULL THEN u.last_login_at
+           WHEN u.last_login_at IS NULL OR a.last_field_activity>=u.last_login_at
+             THEN a.last_field_activity
+           ELSE u.last_login_at
+         END last_active
+       FROM users u
+       LEFT JOIN ranked_flyer_state fs
+         ON fs.row_number=1 AND fs.flyer_delivered=1
+       LEFT JOIN visit_stats vs ON vs.user_id=u.id
+       LEFT JOIN activity_stats a ON a.user_id=u.id
+       GROUP BY u.id,u.username,u.display_name,u.email,u.role,
+         u.active,u.created_at,u.updated_at,u.last_login_at,vs.visits,
+         a.first_field_activity,a.last_field_activity` ,
+    )
+    .all(CURRENT_FLYER_ID)
+    .map(publicAdminUser);
+}
+
+function findAdminUser(userId: string) {
+  return adminUsers().find((row) => row.id === userId) ?? null;
+}
+
+function credentialDelivery(value: unknown): CredentialDelivery {
+  if (value === "volunteer") return "volunteer";
+  if (value === "admin" || value == null || value === "") return "admin";
+  throw new Error("delivery must be admin or volunteer");
+}
+
+async function deliverCredentials(
+  actorId: string,
+  target: { id: string; display_name: string; username: string; email: string | null },
+  password: string,
+  delivery: CredentialDelivery,
+) {
+  const recipient =
+    delivery === "volunteer" ? target.email : configuredAdminEmail();
+  if (!recipient) {
+    const message =
+      delivery === "volunteer"
+        ? "The user has no email address; the account was created and the password is shown once below."
+        : "CANVASSING_ADMIN_EMAIL is not configured; the account was created and the password is shown once below.";
+    audit(actorId, "send_failed", "credentials_email", target.id, {
+      delivery,
+      reason: "recipient_not_configured",
+    });
+    await recordEvent({
+      type: "canvassing.admin.credentials_email.failed",
+      user_id: actorId,
+      target_user_id: target.id,
+      delivery,
+      reason: "recipient_not_configured",
+    });
+    return {
+      status: "failed" as const,
+      message,
+    };
+  }
+  try {
+    const sent = await sendCredentialsEmail(recipient, {
+      displayName: target.display_name,
+      username: target.username,
+      password,
+      volunteerEmail: target.email,
+      delivery,
+    });
+    audit(actorId, "send", "credentials_email", target.id, {
+      delivery,
+      recipient,
+    });
+    await recordEvent({
+      type: "canvassing.admin.credentials_email.sent",
+      user_id: actorId,
+      target_user_id: target.id,
+      delivery,
+      recipient,
+    });
+    return { status: "sent" as const, recipient, subject: sent.subject };
+  } catch {
+    audit(actorId, "send_failed", "credentials_email", target.id, {
+      delivery,
+    });
+    await recordEvent({
+      type: "canvassing.admin.credentials_email.failed",
+      user_id: actorId,
+      target_user_id: target.id,
+      delivery,
+    });
+    return {
+      status: "failed" as const,
+      message:
+        "The account was created, but credential delivery failed. The password is shown once below.",
+    };
+  }
+}
+
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(
@@ -1265,11 +2014,296 @@ const server = createServer(async (req, res) => {
     );
     if (token && req.headers.authorization !== `Bearer ${token}`)
       return json(res, 401, { error: "authentication required" });
-    const user = String(req.headers["x-canvass-user"] ?? "local-user");
-    const role = String(req.headers["x-canvass-role"] ?? "candidate");
     if (req.method === "GET" && url.pathname === "/api/canvassing/health") {
       db.prepare("SELECT 1").get();
       return json(res, 200, { status: "ok" });
+    }
+    if (req.method === "POST" && url.pathname === "/api/login") {
+      let input: any;
+      try {
+        input = JSON.parse(await body(req));
+      } catch {
+        return json(res, 400, { error: "invalid JSON body" });
+      }
+      const username = normalizeUsername(input.username);
+      const password = String(input.password ?? "");
+      const row = db
+        .prepare("SELECT * FROM users WHERE username=?")
+        .get(username) as any;
+      if (
+        !row ||
+        !row.active ||
+        !(await verifyPassword(password, String(row.password_hash)))
+      )
+        return json(res, 401, { error: "Invalid username or password" });
+      const sessionToken = createSession(db, String(row.id));
+      db.prepare("UPDATE users SET last_login_at=? WHERE id=?").run(
+        now(),
+        row.id,
+      );
+      setSessionCookie(res, sessionToken);
+      return json(res, 200, {
+        user: {
+          id: row.id,
+          username: row.username,
+          display_name: row.display_name,
+          email: row.email ?? null,
+          role: row.role,
+        },
+      });
+    }
+    if (req.method === "POST" && url.pathname === "/api/logout") {
+      const sessionToken = parseCookies(req.headers.cookie).get(sessionCookieName);
+      if (sessionToken) deleteSession(db, sessionToken);
+      clearSessionCookie(res);
+      return json(res, 200, { logged_out: true });
+    }
+    const sessionToken = parseCookies(req.headers.cookie).get(sessionCookieName);
+    const authenticated = sessionToken
+      ? findSessionUser(db, sessionToken)
+      : null;
+    if (!authenticated)
+      return json(res, 401, { error: "login required" });
+    const user = authenticated.id;
+    const role = authenticated.role;
+    if (req.method === "GET" && url.pathname === "/api/me")
+      return json(res, 200, { user: authenticated });
+    if (url.pathname === "/api/me/password" && req.method === "POST") {
+      let input: any;
+      try {
+        input = JSON.parse(await body(req));
+      } catch {
+        return json(res, 400, { error: "invalid JSON body" });
+      }
+      const currentPassword = String(input.current_password ?? "");
+      const newPassword = String(input.new_password ?? "");
+      if (newPassword !== String(input.confirm_password ?? ""))
+        return json(res, 400, { error: "new passwords do not match" });
+      try {
+        validateChosenPassword(newPassword);
+      } catch (error) {
+        return json(res, 400, {
+          error: error instanceof Error ? error.message : "invalid password",
+        });
+      }
+      const row = db
+        .prepare("SELECT password_hash FROM users WHERE id=?")
+        .get(user) as { password_hash: string } | undefined;
+      if (!row || !(await verifyPassword(currentPassword, row.password_hash)))
+        return json(res, 401, { error: "current password is incorrect" });
+      await setUserPasswordById(db, user, newPassword, hashSessionToken(sessionToken!));
+      audit(user, "change", "user_password", user, {});
+      await recordEvent({
+        type: "canvassing.user.password_changed",
+        user_id: user,
+      });
+      return json(res, 200, { changed: true });
+    }
+    if (url.pathname.startsWith("/api/admin/")) {
+      if (role !== "candidate")
+        return json(res, 403, { error: "candidate role required" });
+      if (req.method === "GET" && url.pathname === "/api/admin/users")
+        return json(res, 200, { users: adminUsers() });
+      if (req.method === "POST" && url.pathname === "/api/admin/users") {
+        let input: any;
+        try {
+          input = JSON.parse(await body(req));
+        } catch {
+          return json(res, 400, { error: "invalid JSON body" });
+        }
+        const displayName = String(input.display_name ?? "").trim();
+        const username = normalizeUsername(input.username);
+        if (!displayName)
+          return json(res, 400, { error: "display_name is required" });
+        if (!/^[a-z][a-z0-9._-]{1,63}$/.test(username))
+          return json(res, 400, {
+            error:
+              "Username must start with a letter and contain only letters, numbers, dot, underscore, or hyphen",
+          });
+        let email: string | null;
+        try {
+          email = validateUserEmail(input.email);
+        } catch (error) {
+          return json(res, 400, {
+            error: error instanceof Error ? error.message : "invalid email",
+          });
+        }
+        let delivery: CredentialDelivery;
+        try {
+          delivery = credentialDelivery(input.delivery);
+        } catch (error) {
+          return json(res, 400, {
+            error: error instanceof Error ? error.message : "invalid delivery",
+          });
+        }
+        if (delivery === "volunteer" && !email)
+          return json(res, 400, {
+            error: "direct volunteer delivery requires an email address",
+          });
+        if (
+          input.role != null &&
+          input.role !== "candidate" &&
+          input.role !== "volunteer"
+        )
+          return json(res, 400, {
+            error: "role must be candidate or volunteer",
+          });
+        const password = generateTemporaryPassword();
+        try {
+          await createUser(db, {
+            username,
+            display_name: displayName,
+            email,
+            role: input.role === "candidate" ? "candidate" : "volunteer",
+            password,
+          });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "user creation failed";
+          return json(
+            res,
+            message.includes("UNIQUE constraint") ? 409 : 400,
+            { error: message.includes("UNIQUE constraint") ? "username already exists" : message },
+          );
+        }
+        const target = findAdminUser(username)!;
+        audit(user, "create", "user", target.id, {
+          username: target.username,
+          role: target.role,
+          delivery,
+        });
+        await recordEvent({
+          type: "canvassing.admin.user.created",
+          user_id: user,
+          target_user_id: target.id,
+          role: target.role,
+          delivery,
+        });
+        const deliveryResult = await deliverCredentials(
+          user,
+          target,
+          password,
+          delivery,
+        );
+        return json(res, 201, {
+          user: target,
+          temporary_password: password,
+          password_notice: "This password will not be shown again.",
+          delivery: deliveryResult,
+        });
+      }
+      const userPath = url.pathname.match(/^\/api\/admin\/users\/([^/]+)$/);
+      const passwordPath = url.pathname.match(
+        /^\/api\/admin\/users\/([^/]+)\/password$/,
+      );
+      if (passwordPath && req.method === "POST") {
+        const targetRow = db
+          .prepare("SELECT id,username,display_name,email FROM users WHERE id=?")
+          .get(passwordPath[1]) as any;
+        if (!targetRow) return json(res, 404, { error: "user not found" });
+        let input: any;
+        try {
+          input = JSON.parse(await body(req));
+        } catch {
+          return json(res, 400, { error: "invalid JSON body" });
+        }
+        let delivery: CredentialDelivery;
+        try {
+          delivery = credentialDelivery(input.delivery);
+        } catch (error) {
+          return json(res, 400, {
+            error: error instanceof Error ? error.message : "invalid delivery",
+          });
+        }
+        if (delivery === "volunteer" && !targetRow.email)
+          return json(res, 400, {
+            error: "direct volunteer delivery requires an email address",
+          });
+        const password = generateTemporaryPassword();
+        await setUserPasswordById(db, targetRow.id, password);
+        audit(user, "reset", "user_password", targetRow.id, { delivery });
+        await recordEvent({
+          type: "canvassing.admin.user.password_reset",
+          user_id: user,
+          target_user_id: targetRow.id,
+          delivery,
+        });
+        const deliveryResult = await deliverCredentials(
+          user,
+          targetRow,
+          password,
+          delivery,
+        );
+        return json(res, 200, {
+          user: findAdminUser(targetRow.id),
+          temporary_password: password,
+          password_notice: "This password will not be shown again.",
+          delivery: deliveryResult,
+        });
+      }
+      if (userPath && req.method === "PATCH") {
+        const targetRow = db
+          .prepare("SELECT * FROM users WHERE id=?")
+          .get(userPath[1]) as any;
+        if (!targetRow) return json(res, 404, { error: "user not found" });
+        let input: any;
+        try {
+          input = JSON.parse(await body(req));
+        } catch {
+          return json(res, 400, { error: "invalid JSON body" });
+        }
+        const displayName =
+          input.display_name == null
+            ? targetRow.display_name
+            : String(input.display_name).trim();
+        if (!displayName)
+          return json(res, 400, { error: "display_name is required" });
+        let email: string | null;
+        try {
+          email =
+            input.email == null && !Object.hasOwn(input, "email")
+              ? targetRow.email ?? null
+              : validateUserEmail(input.email);
+        } catch (error) {
+          return json(res, 400, {
+            error: error instanceof Error ? error.message : "invalid email",
+          });
+        }
+        const nextRole = input.role == null ? targetRow.role : input.role;
+        if (nextRole !== "candidate" && nextRole !== "volunteer")
+          return json(res, 400, { error: "role must be candidate or volunteer" });
+        const nextActive = input.active == null ? Boolean(targetRow.active) : input.active;
+        if (typeof nextActive !== "boolean")
+          return json(res, 400, { error: "active must be boolean" });
+        if (
+          targetRow.role === "candidate" &&
+          targetRow.active &&
+          (nextRole !== "candidate" || !nextActive) &&
+          Number(
+            (db
+              .prepare("SELECT count(*) count FROM users WHERE role='candidate' AND active=1")
+              .get() as { count: number }).count,
+          ) <= 1
+        )
+          return json(res, 400, { error: "cannot disable or demote the last active candidate" });
+        db.prepare(
+          "UPDATE users SET display_name=?,email=?,role=?,active=?,updated_at=? WHERE id=?",
+        ).run(displayName, email, nextRole, +nextActive, now(), targetRow.id);
+        audit(user, "update", "user", targetRow.id, {
+          display_name: displayName,
+          email,
+          role: nextRole,
+          active: nextActive,
+        });
+        await recordEvent({
+          type: "canvassing.admin.user.updated",
+          user_id: user,
+          target_user_id: targetRow.id,
+          role: nextRole,
+          active: nextActive,
+        });
+        return json(res, 200, { user: findAdminUser(targetRow.id) });
+      }
+      return json(res, 404, { error: "admin endpoint not found" });
     }
     if (req.method === "GET" && url.pathname === "/api/canvassing/next-area") {
       const centerHouseholdId =
@@ -1278,7 +2312,7 @@ const server = createServer(async (req, res) => {
         req,
         res,
         200,
-        await serverNextArea(centerHouseholdId),
+        await serverNextArea(centerHouseholdId, user),
       );
     }
     if (req.method === "GET" && url.pathname === "/api/canvassing/state")
@@ -1436,6 +2470,19 @@ const server = createServer(async (req, res) => {
       const submissionKey = String(input.submission_key ?? "");
       if (!submissionKey)
         return json(res, 400, { error: "submission_key is required" });
+      if (
+        role === "volunteer" &&
+        [
+          "supportive",
+          "undecided",
+          "opposed",
+          "volunteer_interest",
+          "lawn_sign_interest",
+        ].includes(input.outcome)
+      )
+        return json(res, 403, {
+          error: "political outcome recording requires candidate role",
+        });
       try {
         db.prepare("INSERT INTO submission_keys VALUES (?,?,'visit',NULL)").run(
           submissionKey,
@@ -1485,7 +2532,7 @@ const server = createServer(async (req, res) => {
         follow_up_action: input.follow_up_action ?? null,
         follow_up_date: input.follow_up_date ?? null,
         support_category: input.support_category ?? null,
-        source: input.source ?? "candidate",
+        source: role === "volunteer" ? "volunteer" : "candidate",
         imported_at: now(),
         session_id: input.session_id ?? null,
       };
@@ -1507,7 +2554,7 @@ const server = createServer(async (req, res) => {
             `SELECT occurred_at FROM active_visits
               WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
              UNION ALL
-             SELECT occurred_at FROM household_flyer_events
+             SELECT occurred_at FROM activity_flyer_events
               WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
              ORDER BY occurred_at DESC LIMIT 1`,
           )
@@ -1566,6 +2613,15 @@ const server = createServer(async (req, res) => {
           event.follow_up_action,
           event.follow_up_date,
         );
+      if (
+        event.flyer_delivered ||
+        event.outcome !== "untouched" ||
+        event.door_knocked ||
+        event.conversation_occurred ||
+        event.revisit_requested ||
+        event.no_answer
+      )
+        refreshRecommendationHoldForActivity(user, event.household_id);
       audit(user, "append", "visit", event.id, {
         household_id: event.household_id,
         outcome: event.outcome,
@@ -1602,7 +2658,7 @@ const server = createServer(async (req, res) => {
         });
       const previous = db
           .prepare(
-            "SELECT id FROM household_flyer_events WHERE household_id=? ORDER BY occurred_at DESC,rowid DESC LIMIT 1",
+            "SELECT id FROM activity_flyer_events WHERE household_id=? ORDER BY occurred_at DESC,id DESC LIMIT 1",
           )
           .get(householdId) as { id: string } | undefined,
         event = {
@@ -1629,7 +2685,7 @@ const server = createServer(async (req, res) => {
             `SELECT occurred_at FROM active_visits
               WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
              UNION ALL
-             SELECT occurred_at FROM household_flyer_events
+             SELECT occurred_at FROM activity_flyer_events
               WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
              ORDER BY occurred_at DESC LIMIT 1`,
           )
@@ -2296,6 +3352,7 @@ const server = createServer(async (req, res) => {
           );
         }
       }
+      refreshRecommendationHoldForActivity(user, conversation.household_id);
       audit(user, "append", "neighbourhood_conversation", conversation.id, {
         household_id: conversation.household_id,
         route_id: conversation.route_id,
@@ -3335,6 +4392,8 @@ const server = createServer(async (req, res) => {
       req.method === "POST" &&
       url.pathname === "/api/canvassing/import.csv"
     ) {
+      if (role === "volunteer")
+        return json(res, 403, { error: "CSV import requires candidate role" });
       const records = parseCsv(await body(req));
       let imported = 0;
       for (const row of records) {
@@ -3425,7 +4484,7 @@ const server = createServer(async (req, res) => {
                  WHERE v.household_id=h.id AND v.flyer_delivered=1
                 UNION ALL
                 SELECT f.flyer_id
-                  FROM household_flyer_events f
+                  FROM activity_flyer_events f
                  WHERE f.household_id=h.id AND f.flyer_delivered=1
               ) delivery) flyer_versions
            FROM route_stops s JOIN routes r ON r.id=s.route_id
@@ -3493,9 +4552,11 @@ const server = createServer(async (req, res) => {
       return json(res, 200, {
         backup: await backupStatus(),
         journal: await verifyJournal(),
-        schema_version: 12,
+        schema_version: SCHEMA_VERSION,
       });
     if (req.method === "POST" && url.pathname === "/api/canvassing/backup") {
+      if (role === "volunteer")
+        return json(res, 403, { error: "database backup requires candidate role" });
       const path = await performBackup("manual");
       audit(user, "backup", "database", null, { path });
       return json(res, 201, { path, restore_test: "passed" });
@@ -3504,6 +4565,8 @@ const server = createServer(async (req, res) => {
       req.method === "POST" &&
       url.pathname === "/api/canvassing/maintenance/preflight"
     ) {
+      if (role === "volunteer")
+        return json(res, 403, { error: "maintenance requires candidate role" });
       const exportPath = join(
         backupDir,
         `route-export-before-maintenance-${Date.now()}.csv`,

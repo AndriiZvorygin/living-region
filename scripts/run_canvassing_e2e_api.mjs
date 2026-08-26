@@ -18,6 +18,8 @@ const child = spawn(
       CANVASS_EVENT_LOG: join(directory, "events.jsonl"),
       CANVASS_CALIBRATION_EXPORT: join(directory, "address-number-calibration.json"),
       CANVASS_SPLIT_CALIBRATION_EXPORT: join(directory, "structure-split-calibration.json"),
+      CANVASS_TEST_USERS: "1",
+      CANVASS_TEST_PASSWORD: "canvassing-test-password",
     },
     stdio: "inherit",
   },

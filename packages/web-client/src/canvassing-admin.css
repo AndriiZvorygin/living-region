@@ -1,0 +1,296 @@
+.admin-shell {
+  min-height: 100dvh;
+  overflow: auto;
+  background: #eef0eb;
+  color: #17211d;
+}
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+  padding: 9px 18px;
+  background: #173e35;
+  color: #fff;
+}
+.admin-header div {
+  display: grid;
+}
+.admin-header strong {
+  font-size: 16px;
+}
+.admin-header span {
+  color: #bcd0c8;
+  font-size: 11px;
+}
+.admin-header nav {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.admin-account-menu {
+  position: relative;
+}
+.admin-account-menu > summary {
+  border: 1px solid #52776c;
+  border-radius: 5px;
+  background: #28584b;
+  color: #fff;
+  padding: 8px 11px;
+  cursor: pointer;
+  list-style: none;
+}
+.admin-account-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.admin-account-menu > summary::after {
+  content: " ▾";
+  color: #bcd0c8;
+}
+.admin-account-menu[open] > summary {
+  border-color: #fff;
+  background: #fff;
+  color: #173e35;
+}
+.admin-account-menu[open] > summary::after {
+  color: #52776c;
+}
+.admin-account-menu > div {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  min-width: 130px;
+  padding: 8px;
+  border: 1px solid #52776c;
+  border-radius: 5px;
+  background: #173e35;
+  box-shadow: 0 5px 16px #17211d40;
+}
+.admin-account-menu button {
+  width: 100%;
+}
+.admin-header a,
+.admin-header button {
+  border: 1px solid #52776c;
+  border-radius: 5px;
+  background: #28584b;
+  color: #fff;
+  padding: 8px 11px;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+}
+.admin-content {
+  display: grid;
+  gap: 16px;
+  width: min(100% - 28px, 1420px);
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+.admin-page-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.admin-page-heading h1,
+.admin-page-heading p {
+  margin: 0;
+}
+.admin-page-heading p,
+.admin-help,
+.admin-message {
+  color: #5d6964;
+  font-size: 13px;
+}
+.admin-page-heading button,
+.admin-card button {
+  min-height: 38px;
+  border: 1px solid #aeb8b2;
+  border-radius: 5px;
+  background: #fff;
+  color: #17211d;
+  padding: 8px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+.admin-page-heading button {
+  background: #28584b;
+  color: #fff;
+  border-color: #28584b;
+}
+.admin-message {
+  min-height: 18px;
+  margin: 0;
+}
+.admin-message[data-tone="error"] {
+  color: #9b2d2d;
+}
+.admin-message[data-tone="success"] {
+  color: #216a47;
+}
+.admin-card,
+.credential-result {
+  border: 1px solid #c5cec8;
+  border-radius: 7px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 3px 12px #17211d0b;
+}
+.admin-card h2 {
+  margin: 0 0 14px;
+  font-size: 17px;
+}
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+.admin-form-grid label {
+  display: grid;
+  gap: 5px;
+  color: #56625d;
+  font-size: 13px;
+  font-weight: 700;
+}
+.admin-form-grid small {
+  font-weight: 400;
+}
+.admin-form-grid input,
+.admin-form-grid select,
+.admin-table-wrap input,
+.admin-table-wrap select {
+  min-height: 36px;
+  min-width: 0;
+  border: 1px solid #aeb8b2;
+  border-radius: 5px;
+  background: #fff;
+  color: #17211d;
+  padding: 7px 8px;
+  font: inherit;
+}
+.admin-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.admin-form-actions button:first-child,
+.admin-form-grid > button {
+  background: #28584b;
+  color: #fff;
+  border-color: #28584b;
+}
+.credential-result {
+  display: grid;
+  gap: 10px;
+}
+.credential-result > div {
+  display: grid;
+  gap: 3px;
+}
+.credential-result span {
+  color: #9b2d2d;
+  font-size: 13px;
+}
+.credential-result dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 5px 12px;
+  margin: 0;
+}
+.credential-result dd {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.admin-table-wrap {
+  overflow-x: auto;
+}
+.admin-table-wrap table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.admin-table-wrap th,
+.admin-table-wrap td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e0e5e1;
+  text-align: left;
+  vertical-align: middle;
+}
+.admin-table-wrap th {
+  color: #56625d;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.admin-table-wrap td:first-child {
+  min-width: 180px;
+}
+.admin-table-wrap td:first-child small {
+  display: block;
+  margin-top: 4px;
+  color: #68736e;
+}
+.admin-table-wrap td:first-child input[type="email"] {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  font-size: 12px;
+}
+.admin-user-details {
+  display: grid;
+  gap: 2px;
+  margin-top: 5px;
+  color: #68736e;
+  font-size: 11px;
+}
+.admin-user-details summary {
+  width: max-content;
+  color: #56625d;
+  cursor: pointer;
+}
+.admin-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.admin-row-actions {
+  display: flex;
+  gap: 5px;
+  min-width: 270px;
+}
+.admin-row-actions button,
+.admin-row-actions select {
+  min-height: 32px;
+  padding: 5px 7px;
+  font-size: 12px;
+}
+.admin-row-actions button:last-child {
+  background: #f5eee4;
+}
+.admin-card summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.admin-card details {
+  margin: -4px;
+}
+@media (max-width: 700px) {
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .admin-header nav {
+    flex-wrap: wrap;
+  }
+  .admin-page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

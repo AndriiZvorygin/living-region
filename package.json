@@ -126,9 +126,12 @@
     "canvassing:extract-city-roofs": "python3 scripts/extract_owen_sound_city_map_buildings.py",
     "canvassing:prepare": "tsx packages/canvassing/src/prepare-data.ts",
     "canvassing:addresses": "tsx packages/canvassing/src/retrieve-owen-sound-addresses.ts",
+    "canvassing:grey-footprints": "tsx packages/canvassing/src/retrieve-grey-building-footprints.ts",
     "canvassing:prepare-osm-import": "tsx packages/canvassing/src/prepare-osm-import.ts",
     "canvassing:verify-operations": "tsx packages/canvassing/src/verify-operations.ts",
     "canvassing:repair-journal": "tsx packages/canvassing/src/repair-journal.ts",
+    "canvassing:user:create": "tsx packages/canvassing/src/user-admin.ts create",
+    "canvassing:user:password": "tsx packages/canvassing/src/user-admin.ts password",
     "test:e2e:canvassing": "playwright test --config=playwright.canvassing.config.ts",
     "canvassing:server": "tsx packages/canvassing/src/server.ts",
     "canvassing:dev": "npm run canvassing:prepare && concurrently -k -n api,web \"npm run canvassing:server\" \"npm run dev:web\""
@@ -149,6 +152,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "@types/nodemailer": "^8.0.1",
     "@types/pdf-parse": "^1.1.5",
     "@types/three": "^0.185.0",
     "concurrently": "^9.2.4",
@@ -170,7 +174,9 @@
     "packages/*"
   ],
   "dependencies": {
+    "argon2": "^0.45.1",
     "maplibre-gl": "^5.24.0",
+    "nodemailer": "^9.0.5",
     "pdf-parse": "^1.1.1",
     "polygon-clipping": "^0.15.7",
     "three": "^0.171.0"

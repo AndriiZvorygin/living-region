@@ -1,0 +1,17 @@
+{
+  "total_locations": 7156,
+  "exact_matches": 807,
+  "nearest_matches": 6211,
+  "ambiguous_matches": 91,
+  "unmatched_matches": 47,
+  "distance_m": {
+    "p50": 7.968686029312722,
+    "p90": 17.331619674533904,
+    "p95": 21.8657465772309,
+    "p99": 38.638464659679954,
+    "max": 618.3287699807915
+  },
+  "grey_exact_matches": 180,
+  "grey_nearest_matches": 164,
+  "review_required": 138
+}

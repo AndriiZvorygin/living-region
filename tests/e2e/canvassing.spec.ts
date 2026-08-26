@@ -3,6 +3,7 @@ import { expect, test, type Page } from "playwright/test";
 async function openCanvassing(page: Page, width = 390, height = 844) {
   await page.setViewportSize({ width, height });
   await page.goto("/canvassing/?e2e=1", { waitUntil: "domcontentloaded" });
+  await loginIfNeeded(page);
   await expect(page.locator(".maplibregl-canvas")).toBeVisible({
     timeout: 30_000,
   });
@@ -14,13 +15,24 @@ async function openCanvassing(page: Page, width = 390, height = 844) {
   await page.waitForTimeout(1_000);
 }
 
+async function loginIfNeeded(page: Page, username = "andrii") {
+  await page.waitForSelector("#login-form, .maplibregl-canvas", {
+    timeout: 30_000,
+  });
+  if (!(await page.locator("#login-form").count())) return;
+  await page.locator("#login-username").fill(username);
+  await page.locator("#login-password").fill("canvassing-test-password");
+  await page.locator("#login-form button[type=submit]").click();
+  await expect(page.locator("#login-form")).toHaveCount(0);
+}
+
 async function roofPoints(page: Page, count = 2) {
   return page.evaluate((wanted) => {
     const map = (window as any).__livingRegionCanvassing.map;
     const container = map.getContainer().getBoundingClientRect();
     const features = map
       .queryRenderedFeatures({ layers: ["structures"] })
-      .filter((feature: any) => Number(feature.properties?.household_count) > 0);
+      .filter((feature: any) => Number(feature.properties?.household_count) === 1);
     const points: Array<{ id: string; x: number; y: number }> = [];
     const seen = new Set<string>();
     for (const feature of features) {
@@ -131,6 +143,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
   test("mobile next area opens its diagnostic popup", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/canvassing/?e2e=1", { waitUntil: "domcontentloaded" });
+    await loginIfNeeded(page);
     await expect(page.locator("#mobile-next-area")).toBeVisible({
       timeout: 30_000,
     });

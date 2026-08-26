@@ -97,9 +97,20 @@ export type NextUnderflyeredArea = {
   middle: LocalCoverageScale;
   broad: LocalCoverageScale;
   nestedUndercoverageScore: number;
+  /** Coverage score after the bounded geographic compactness penalty. */
+  adjustedUndercoverageScore: number;
+  /** Robust physical spread of the inner household window, in metres. */
+  compactnessDistanceMeters: number;
+  compactnessP90DistanceMeters: number;
+  compactnessP95DistanceMeters: number;
+  compactnessUpperDecileMeanMeters: number;
+  compactnessNormalized: number;
+  compactnessPenalty: number;
   nearestCoveredHouseholdHops: number | null;
   graphComponent: string;
   incompleteSamples: number[];
+  /** The actual household footprint sampled by the nested recommendation. */
+  household_ids: string[];
   tieBreakResult: string;
   reason: "local_coverage";
 };
@@ -131,8 +142,17 @@ export type LocalCoverageArea = {
   middle: LocalCoverageScale;
   broad: LocalCoverageScale;
   nestedUndercoverageScore: number;
+  adjustedUndercoverageScore: number;
+  compactnessDistanceMeters: number;
+  compactnessP90DistanceMeters: number;
+  compactnessP95DistanceMeters: number;
+  compactnessUpperDecileMeanMeters: number;
+  compactnessNormalized: number;
+  compactnessPenalty: number;
   nearestCoveredHouseholdHops: number | null;
   incompleteSamples: number[];
+  /** The actual household footprint sampled by the nested recommendation. */
+  household_ids: string[];
 };
 
 type RoadSegment = {
@@ -499,6 +519,27 @@ export function calculateInterveningHouseholdCosts(
 export const NESTED_COVERAGE_TARGETS = [150, 300, 600] as const;
 const LOCAL_COVERAGE_TARGET = NESTED_COVERAGE_TARGETS[0];
 
+/**
+ * Geographic compactness is deliberately bounded so coverage remains the
+ * primary objective. A maximum penalty of 0.005 is half a percentage point
+ * of the undercoverage score; larger coverage differences cannot be erased by
+ * geography alone.
+ */
+export const COMPACTNESS_PENALTY_WEIGHT = 0.005;
+
+/**
+ * Smooth normalization scale for the physical spread metric. The current
+ * Owen Sound candidate distribution has a typical inner-window p90 near this
+ * walking scale; this is a scale, not a hard radius cutoff.
+ */
+export const COMPACTNESS_DISTANCE_SCALE_METERS = 500;
+
+/** Ignore insignificant floating-point differences before tie-breaking. */
+export const SELECTOR_SCORE_EPSILON = 1e-9;
+
+const COMPACTNESS_TAIL_WEIGHT = 0.25;
+const COMPACTNESS_TAIL_FRACTION = 0.1;
+
 type StopCoverageStats = {
   eligible: Array<{ household_id: string; covered: boolean }>;
   covered: number;
@@ -509,6 +550,15 @@ type LocalCoverageContext = {
   statsByStop: Map<string, StopCoverageStats>;
   componentByStop: Map<string, string>;
   interveningHouseholdHops: Map<string, number>;
+};
+
+type CompactnessMetrics = {
+  distanceMeters: number;
+  p90DistanceMeters: number;
+  p95DistanceMeters: number;
+  upperDecileMeanMeters: number;
+  normalized: number;
+  penalty: number;
 };
 
 const uniqueCoverageLocations = (locations: CoverageLocation[]) => {
@@ -640,6 +690,73 @@ const coverageScale = (
   };
 };
 
+const percentile = (sorted: number[], fraction: number) => {
+  if (!sorted.length) return 0;
+  return sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * fraction))];
+};
+
+/**
+ * Measure physical coherence without turning one bad coordinate into a hard
+ * exclusion. The base is the p90 centre distance. The upper-decile mean adds
+ * a small, winsorized tail signal so several distant households matter while
+ * one anomalous outlier cannot dominate the result.
+ */
+const calculateCompactnessMetrics = (
+  sampled: Array<{ household_id: string }>,
+  targetSize: number,
+  center: CoverageLocation,
+  locations: Map<string, CoverageLocation>,
+): CompactnessMetrics => {
+  const selected = sampled
+    .slice(0, targetSize)
+    .map((household) => locations.get(household.household_id))
+    .filter((location): location is CoverageLocation => Boolean(location));
+  const distances = selected
+    .map((location) => {
+      const latitude = ((center.lat + location.lat) / 2) * (Math.PI / 180);
+      return Math.hypot(
+        (center.lon - location.lon) * 111320 * Math.cos(latitude),
+        (center.lat - location.lat) * 111320,
+      );
+    })
+    .sort((left, right) => left - right);
+  if (!distances.length)
+    return {
+      distanceMeters: 0,
+      p90DistanceMeters: 0,
+      p95DistanceMeters: 0,
+      upperDecileMeanMeters: 0,
+      normalized: 0,
+      penalty: 0,
+    };
+  const p90DistanceMeters = percentile(distances, 0.9);
+  const p95DistanceMeters = percentile(distances, 0.95);
+  const tailStart = Math.max(
+    0,
+    distances.length - Math.max(1, Math.ceil(distances.length * COMPACTNESS_TAIL_FRACTION)),
+  );
+  const winsorizedTail = distances
+    .slice(tailStart)
+    .map((distance) => Math.min(distance, p95DistanceMeters * 2));
+  const upperDecileMeanMeters =
+    winsorizedTail.reduce((sum, distance) => sum + distance, 0) /
+    winsorizedTail.length;
+  const distanceMeters =
+    (1 - COMPACTNESS_TAIL_WEIGHT) * p90DistanceMeters +
+    COMPACTNESS_TAIL_WEIGHT * upperDecileMeanMeters;
+  const normalized =
+    distanceMeters /
+    (distanceMeters + COMPACTNESS_DISTANCE_SCALE_METERS);
+  return {
+    distanceMeters,
+    p90DistanceMeters,
+    p95DistanceMeters,
+    upperDecileMeanMeters,
+    normalized,
+    penalty: COMPACTNESS_PENALTY_WEIGHT * normalized,
+  };
+};
+
 const nestedCoverageScore = (
   inner: LocalCoverageScale,
   middle: LocalCoverageScale,
@@ -664,7 +781,11 @@ const calculateCoverageAreaWithTargets = (
   queuePush(queue, { stopId: centerStopId, distance: 0 });
   const visited = new Set<string>();
   const maxTarget = Math.max(...targetSizes);
-  const sampled: Array<{ covered: boolean; distance: number }> = [];
+  const sampled: Array<{
+    household_id: string;
+    covered: boolean;
+    distance: number;
+  }> = [];
   while (queue.length && sampled.length < maxTarget) {
     const current = queuePop(queue)!;
     if (visited.has(current.stopId)) continue;
@@ -675,6 +796,7 @@ const calculateCoverageAreaWithTargets = (
       const selected = stats.eligible.slice(0, take);
       sampled.push(
         ...selected.map((household) => ({
+          household_id: household.household_id,
           covered: household.covered,
           distance: current.distance,
         })),
@@ -707,6 +829,12 @@ const calculateCoverageAreaWithTargets = (
     ? nearestCoveredHouseholdHops!
     : null;
   const nestedUndercoverageScore = nestedCoverageScore(inner, middle, broad);
+  const compactness = calculateCompactnessMetrics(
+    sampled,
+    innerTarget,
+    center,
+    context.locations,
+  );
   const incompleteSamples = [inner, middle, broad]
     .filter((scale) => !scale.complete)
     .map((scale) => scale.targetSize);
@@ -725,8 +853,17 @@ const calculateCoverageAreaWithTargets = (
     middle,
     broad,
     nestedUndercoverageScore,
+    adjustedUndercoverageScore:
+      nestedUndercoverageScore - compactness.penalty,
+    compactnessDistanceMeters: compactness.distanceMeters,
+    compactnessP90DistanceMeters: compactness.p90DistanceMeters,
+    compactnessP95DistanceMeters: compactness.p95DistanceMeters,
+    compactnessUpperDecileMeanMeters: compactness.upperDecileMeanMeters,
+    compactnessNormalized: compactness.normalized,
+    compactnessPenalty: compactness.penalty,
     nearestCoveredHouseholdHops: finiteNearestCoveredHouseholdHops,
     incompleteSamples,
+    household_ids: sampled.map((household) => household.household_id),
   };
 };
 
@@ -765,20 +902,46 @@ export function calculateNestedCoverageArea(
   );
 }
 
-const rankScoredUnderflyeredAreas = (scored: LocalCoverageArea[]) => {
+const rankScoredUnderflyeredAreas = (
+  scored: LocalCoverageArea[],
+  useCompactness = true,
+  useScoreEpsilon = true,
+) => {
   // A tiny disconnected component can otherwise report 100% undercoverage
   // from one available household and outrank a city-sized neighbourhood.
   // Keep those areas scored and visible in diagnostics, but only let them
-  // compete when no candidate has a complete practical 150-household window.
-  const completeInner = scored.filter((area) => area.inner.complete);
-  const candidates = completeInner.length ? completeInner : scored;
+  // compete when no undercovered candidate has a complete practical
+  // 150-household window. Once a dense area is fully covered, an incomplete
+  // isolated remainder must still be reachable.
+  const undercovered = scored.filter((area) => area.inner.localRemaining > 0);
+  const completeInner = undercovered.filter((area) => area.inner.complete);
+  const candidates = completeInner.length
+    ? completeInner
+    : undercovered.length
+      ? undercovered
+      : scored;
   return [...candidates].sort(
-    (left, right) =>
-      right.nestedUndercoverageScore - left.nestedUndercoverageScore ||
-      (right.nearestCoveredHouseholdHops == null ? -1 : right.nearestCoveredHouseholdHops) -
-        (left.nearestCoveredHouseholdHops == null ? -1 : left.nearestCoveredHouseholdHops) ||
-      left.inner.averageHouseholdHops - right.inner.averageHouseholdHops ||
-      left.center_household_id.localeCompare(right.center_household_id),
+    (left, right) => {
+      const leftScore = useCompactness
+        ? left.adjustedUndercoverageScore
+        : left.nestedUndercoverageScore;
+      const rightScore = useCompactness
+        ? right.adjustedUndercoverageScore
+        : right.nestedUndercoverageScore;
+      const scoreDifference = rightScore - leftScore;
+      if (
+        useScoreEpsilon
+          ? Math.abs(scoreDifference) > SELECTOR_SCORE_EPSILON
+          : scoreDifference !== 0
+      )
+        return scoreDifference;
+      return (
+        (right.nearestCoveredHouseholdHops == null ? -1 : right.nearestCoveredHouseholdHops) -
+          (left.nearestCoveredHouseholdHops == null ? -1 : left.nearestCoveredHouseholdHops) ||
+        left.inner.averageHouseholdHops - right.inner.averageHouseholdHops ||
+        left.center_household_id.localeCompare(right.center_household_id)
+      );
+    },
   );
 };
 
@@ -813,6 +976,31 @@ export function rankNextUnderflyeredAreas(
 ): LocalCoverageArea[] {
   return rankScoredUnderflyeredAreas(
     scoreNextUnderflyeredAreas(locations, graph, _targetSize),
+  );
+}
+
+/** Developer-only baseline ranking used to explain compactness changes. */
+export function rankNextUnderflyeredAreasWithoutCompactness(
+  locations: CoverageLocation[],
+  graph: HouseholdAdjacencyGraph,
+  _targetSize: number = LOCAL_COVERAGE_TARGET,
+): LocalCoverageArea[] {
+  return rankScoredUnderflyeredAreas(
+    scoreNextUnderflyeredAreas(locations, graph, _targetSize),
+    false,
+  );
+}
+
+/** Developer-only pre-change ranking, including its floating-point ordering. */
+export function rankNextUnderflyeredAreasOriginal(
+  locations: CoverageLocation[],
+  graph: HouseholdAdjacencyGraph,
+  _targetSize: number = LOCAL_COVERAGE_TARGET,
+): LocalCoverageArea[] {
+  return rankScoredUnderflyeredAreas(
+    scoreNextUnderflyeredAreas(locations, graph, _targetSize),
+    false,
+    false,
   );
 }
 

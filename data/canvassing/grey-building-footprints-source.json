@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "source": "Grey County Building Footprints - Open Data",
+  "item_url": "https://www.arcgis.com/sharing/rest/content/items/1c937b952166443f91914e1123f7b924?f=json",
+  "service_url": "https://services1.arcgis.com/wE2uWQWlTTnVDgyt/arcgis/rest/services/Building_Footprints/FeatureServer",
+  "layer_id": 0,
+  "query_geometry": "-80.9642092446995,44.5408736503963,-80.8918497733922,44.6095384376204",
+  "query_count": 1940,
+  "feature_count": 1940,
+  "retrieval_date": "2026-08-26",
+  "open_data_url": "https://maps.grey.ca/pages/open-data",
+  "terms_url": "https://maps.grey.ca/pages/terms",
+  "licence": "Grey County Open Data Licence",
+  "required_attribution": "Contains information licensed under the Grey County Open Data Licence.",
+  "note": "Building footprints are supplemental physical geometry. Statistics Canada's National Address Register remains the civic-address authority."
+}

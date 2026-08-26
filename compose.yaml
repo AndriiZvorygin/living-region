@@ -24,6 +24,16 @@ services:
     restart: unless-stopped
     volumes:
       - ./private/canvassing:/app/private/canvassing
+    environment:
+      CANVASS_SECURE_COOKIES: "false"
+      CANVASSING_SMTP_HOST: ${CANVASSING_SMTP_HOST:-}
+      CANVASSING_SMTP_PORT: ${CANVASSING_SMTP_PORT:-587}
+      CANVASSING_SMTP_SECURE: ${CANVASSING_SMTP_SECURE:-false}
+      CANVASSING_SMTP_USER: ${CANVASSING_SMTP_USER:-}
+      CANVASSING_SMTP_PASSWORD: ${CANVASSING_SMTP_PASSWORD:-}
+      CANVASSING_FROM_EMAIL: ${CANVASSING_FROM_EMAIL:-}
+      CANVASSING_ADMIN_EMAIL: ${CANVASSING_ADMIN_EMAIL:-}
+      CANVASSING_BASE_URL: ${CANVASSING_BASE_URL:-http://localhost:5174}
     healthcheck:
       interval: 30s
       timeout: 5s

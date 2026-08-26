@@ -1,4 +1,4 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import {
   GREY_ADDRESS_LIKE_ITEM_URL,
@@ -21,6 +21,11 @@ import {
   reconcileExistingAddresses,
   writeFoundationOutputs,
 } from "./owen-sound-address-foundation";
+import {
+  applyAuthoritativePlacements,
+  placeNarLocations,
+} from "./owen-sound-footprint-placement";
+import { validateOwenSoundAddressNumbering } from "./owen-sound-address-numbering";
 
 const root = resolve(process.cwd());
 const defaultZip = resolve(
@@ -33,6 +38,12 @@ const defaultOut = resolve(
 );
 const defaultBoundary = resolve("data/boundaries/owen-sound.geojson");
 const defaultExisting = resolve("packages/web-client/public/canvassing/addresses.geojson");
+const defaultLegacyExisting = resolve(
+  "data/derived/owen-sound-address-foundation/legacy-unmatched-stops.geojson",
+);
+const defaultStructures = resolve("packages/web-client/public/canvassing/structures.geojson");
+const defaultGreyFootprints = resolve("data/canvassing/grey-building-footprints-owen-sound.geojson");
+const defaultRoads = resolve("packages/web-client/public/canvassing/roads.geojson");
 
 function argument(name: string) {
   const index = process.argv.indexOf(name);
@@ -48,6 +59,9 @@ async function main() {
   const outDir = resolve(argument("--out") ?? defaultOut);
   const boundaryPath = resolve(argument("--boundary") ?? defaultBoundary);
   const existingPath = resolve(argument("--existing") ?? defaultExisting);
+  const structuresPath = resolve(argument("--structures") ?? defaultStructures);
+  const greyFootprintsPath = resolve(argument("--grey-footprints") ?? defaultGreyFootprints);
+  const roadsPath = resolve(argument("--roads") ?? defaultRoads);
   const retrievalDate = argument("--retrieved-at") ?? new Date().toISOString().slice(0, 10);
   if (hasArgument("--download") || !(await discoverCachedNar(dirname(zipPath))).includes(zipPath)) {
     if (!hasArgument("--download") && process.argv.includes("--zip"))
@@ -55,9 +69,13 @@ async function main() {
     console.log(`Downloading the official June 2026 NAR release to ${zipPath}`);
     await downloadNar(zipPath, argument("--url") ?? STATCAN_NAR_URL);
   }
-  const [boundary, existing] = await Promise.all([
+  const [boundary, existing, legacyExisting, structuresFile, greyFile, roadsFile] = await Promise.all([
     loadBoundary(boundaryPath),
     loadExistingFeatures(existingPath),
+    loadExistingFeatures(defaultLegacyExisting).catch(() => []),
+    loadExistingFeatures(structuresPath),
+    loadExistingFeatures(greyFootprintsPath).catch(() => []),
+    loadExistingFeatures(roadsPath).catch(() => []),
   ]);
   const result = await extractOwenSoundNar({
     zipPath,
@@ -67,8 +85,62 @@ async function main() {
   const primary = result.units.filter((unit) =>
     ["residential", "partly_residential"].includes(unit.building_use),
   );
-  const reconciliation = reconcileExistingAddresses(primary, existing);
-  const comparison = migrationComparison(result, existing);
+  const existingById = new Map<string, (typeof existing)[number]>();
+  for (const feature of [...existing, ...legacyExisting]) {
+    const id = String(feature.properties.address_id ?? feature.id ?? "");
+    if (id && !existingById.has(id)) existingById.set(id, feature);
+  }
+  const reconciliationSourceFeatures = [...existingById.values()];
+  const reconciliation = reconcileExistingAddresses(primary, reconciliationSourceFeatures);
+  const previousAuthoritativeStructureIds = reconciliationSourceFeatures
+    .map((feature) => feature.properties)
+    .filter((properties) => properties.external_source === "statistics_canada_national_address_register")
+    .map((properties) => String(properties.structure_id ?? ""))
+    .filter(Boolean);
+  const preferredStructureByLocation = new Map<string, string>();
+  const reconciliationByAddress = new Map(reconciliation.matches.map((match) => [match.address_id, match]));
+  for (const unit of primary) {
+    const match = reconciliationByAddress.get(unit.address_id);
+    if (match?.structure_id && !preferredStructureByLocation.has(unit.location_id))
+      preferredStructureByLocation.set(unit.location_id, match.structure_id);
+  }
+  const placement = placeNarLocations({
+    locations: result.locations,
+    structures: structuresFile,
+    greyFootprints: greyFile,
+    units: result.units,
+    preferredStructureByLocation,
+  });
+  const placedStructures = applyAuthoritativePlacements({
+    structures: structuresFile,
+    units: result.units,
+    placements: placement.placements,
+    previousAuthoritativeStructureIds,
+    greyFootprints: placement.greyFootprints,
+  });
+  const placementStructureIds = new Set(
+    placement.placements
+      .map((item) => item.structure_id)
+      .filter((value): value is string => Boolean(value)),
+  );
+  const selectedGreyFootprintIds = new Set(
+    placement.placements
+      .filter((item) => item.footprint_source === "grey_county_building_footprints")
+      .map((item) => item.footprint_id)
+      .filter((value): value is string => Boolean(value)),
+  );
+  const oldStructureById = new Map(
+    structuresFile.map((feature) => [String(feature.properties.structure_id ?? feature.id), feature]),
+  );
+  const estimatedLabelsReplaced = [...placementStructureIds].filter((id) =>
+    String(oldStructureById.get(id)?.properties.civic_label ?? "").startsWith("~"),
+  ).length;
+  const usableOldFootprints = structuresFile.filter((feature) =>
+    feature.properties.external_source !== "living_region_estimate" &&
+    String(feature.properties.building_type ?? "").toLowerCase() !== "accessory",
+  );
+  const numberingReport = validateOwenSoundAddressNumbering(primary, roadsFile);
+  const comparison = migrationComparison(result, reconciliationSourceFeatures);
   const sourceManifest = {
     schema_version: 1,
     generated_at: new Date().toISOString(),
@@ -123,15 +195,44 @@ async function main() {
       existing_id_policy: "reuse the existing internal address_id when matched so household and visit foreign keys remain stable; otherwise use a SHA-256-derived ID from the NAR ADDR_GUID",
       unmatched_existing_policy: "retain in SQLite through the existing source_active lifecycle and export for review; do not delete historical households or events",
     },
-    counts: comparison,
+      counts: comparison,
+      physical_footprint_matching: {
+        threshold_m: 50,
+        grey_snapshot_path: "data/canvassing/grey-building-footprints-owen-sound.geojson",
+        fallback_structure_path: "packages/web-client/public/canvassing/structures.geojson",
+        placement_statuses: "exact, nearest, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved",
+      },
+      numbering_validation: {
+        rules: "Owen Sound numbered-grid parity, direction, hundred-block, cross-road, and monotonic progression checks; authoritative NAR values are preserved and anomalies are review flags",
+        report: "address-numbering-validation.json",
+      },
   };
   await writeFoundationOutputs({
     result,
     reconciliation,
-    existingFeatures: existing,
+    existingFeatures: reconciliationSourceFeatures,
     outDir,
     publishAddressesPath: hasArgument("--publish") ? defaultExisting : undefined,
     sourceManifest,
+    structures: placedStructures.structures,
+    placements: placement.placements,
+    numberingReport,
+    audit: {
+      address_display: {
+        authoritative_labels_applied_to_locations: placementStructureIds.size,
+        estimated_structure_labels_replaced: estimatedLabelsReplaced,
+        active_address_labels_are_nar_formatted: true,
+        former_estimated_labels_are_not_used_for_nar_address_units: true,
+      },
+      physical_footprint_audit: {
+        usable_existing_footprints: usableOldFootprints.length,
+        grey_footprints_retrieved: greyFile.length,
+        unaddressed_usable_footprints_excluded_from_canvassing_locations:
+          usableOldFootprints.filter((feature) => !placementStructureIds.has(String(feature.properties.structure_id ?? feature.id))).length +
+          greyFile.filter((feature) => !selectedGreyFootprintIds.has(String(feature.properties.OBJECTID ?? feature.properties.objectid ?? feature.id))).length,
+        multi_address_structures: placedStructures.structures.filter((feature) => Number(feature.properties.address_count ?? 0) > 1).length,
+      },
+    },
   });
   console.log(JSON.stringify({
     source: sourceManifest.selected_source.name,
@@ -139,6 +240,14 @@ async function main() {
     source_counts: result.source_counts,
     validation: result.validation,
     reconciliation: comparison,
+    footprint_placement: {
+      ...placement.placements.reduce((counts, item) => {
+        counts[item.status] = (counts[item.status] ?? 0) + 1;
+        return counts;
+      }, {} as Record<string, number>),
+      grey_snapshot_features: greyFile.length,
+    },
+    numbering: numberingReport.summary,
     published_to_existing_bundle: hasArgument("--publish"),
   }, null, 2));
 }

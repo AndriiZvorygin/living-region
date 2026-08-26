@@ -6,7 +6,7 @@
 	@canvassing_data path /canvassing/*.json /canvassing/*.geojson
 	header @canvassing_data Cache-Control "public, max-age=31536000, immutable"
 
-	handle /api/canvassing/* {
+	handle /api/* {
 		reverse_proxy canvassing-api:4174 {
 			header_up Authorization "Bearer docker-private-canvassing"
 		}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-26T19:06:12.318Z",
+  "generated_at": "2026-08-26T21:12:21.848Z",
   "crs": "OGC:CRS84 / WGS84 longitude-latitude",
   "extent": [
     -80.961715,
@@ -10,17 +10,17 @@
   "sources": {
     "addresses": "Statistics Canada National Address Register, June 2026",
     "address_catalogue": "https://www150.statcan.gc.ca/n1/en/catalogue/46260002",
-    "structures": "data/canvassing/owen-sound-city-map-buildings.geojson and deduplicated supplemental building sources",
+    "structures": "Grey County Building Footprints Open Data, with existing sourced fallback footprints; see source-provenance.json",
     "roads": "know/input/gis/road-centrelines-grey.geojson",
     "boundary": "data/boundaries/owen-sound.geojson"
   },
   "counts": {
-    "structures": 8027,
+    "structures": 8095,
     "addresses": 10909,
-    "matched_addresses": 991,
-    "sourced_structures": 7201,
+    "matched_addresses": 10759,
+    "sourced_structures": 7269,
     "estimated_structures": 826,
-    "unresolved_addresses": 9918,
+    "unresolved_addresses": 150,
     "roads": 883,
     "address_review_records": 1589,
     "match_confidence": {

@@ -69,6 +69,35 @@ describe("Owen Sound canvassing prepared data", () => {
     expect(new Set(legacy.address_ids).size).toBe(legacy.address_ids.length);
   });
 
+  it("publishes the legacy activity reconciliation without embedding event data", async () => {
+    const reconciliation = await readJson(
+      "packages/web-client/public/canvassing/legacy-history-reconciliation.json",
+    );
+    expect(reconciliation.links).toHaveLength(6_462);
+    expect(reconciliation.summary).toMatchObject({
+      legacy_rows: 6_462,
+      confident: 232,
+      ambiguous: 4_631,
+      unmatched: 1_599,
+    });
+    expect(
+      reconciliation.links.every((link: any) =>
+        Object.keys(link).every((key) =>
+          [
+            "legacy_address_id",
+            "canonical_address_id",
+            "canonical_location_id",
+            "match_status",
+            "distance_m",
+            "candidate_count",
+            "candidate_location_count",
+            "reason",
+          ].includes(key),
+        ),
+      ),
+    ).toBe(true);
+  });
+
   it("publishes no generated roof collisions", async () => {
     const audit = await readJson(
       "packages/web-client/public/canvassing/building-coverage-audit.json",

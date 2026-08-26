@@ -140,3 +140,70 @@ yet consume `LOC_GUID` as its map/selection identity; it still groups linked
 records by legacy `structure_id` and otherwise exposes address-unit points.
 That is an explicit remaining address-foundation limitation, not a count that
 should be hidden by the published source totals.
+
+## Authoritative number and footprint activation
+
+The active NAR address bundle now uses `CIVIC_NO` plus `CIVIC_NO_SUFFIX`, the
+official street name/type/direction, and `APT_NO_LABEL` directly. The shared
+formatter in `packages/canvassing/src/official-address.ts` produces labels such
+as `808 2nd Avenue East`, `254 8th Street East`, `155A 10th Street West`, and
+`305 14th Street West Unit 101`. Estimated or interpolated numbers are not
+used for an active NAR unit. Legacy estimates remain only on legacy or
+unaddressed review geometry.
+
+`npm run canvassing:grey-footprints` retrieves the Owen Sound envelope from the
+public Grey County Building Footprints ArcGIS layer using IPv4, paginates the
+service response, and writes a reproducible snapshot plus source metadata. The
+address generator combines those polygons with the existing sourced footprint
+bundle. It first tests containing polygons, then a nearest plausible polygon
+within 50 metres; ambiguous and unmatched points are retained as NAR address
+points and written to `address-footprint-review.geojson`. The 50-metre value is
+a conservative review threshold, not a hard address exclusion.
+
+`address-footprint-placement.json` and
+`address-numbering-validation.json` are developer-facing diagnostics. The
+numbering validator checks parity, numbered-grid hundred blocks, directions,
+suffix syntax, and monotonic progression. It never overwrites an authoritative
+NAR value. The Grey footprint snapshot and the generated review files contain
+no resident or roll-number data.
+
+The latest generated snapshot reports 7,156 retained physical `LOC_GUID`
+locations, of which 6,857 contain residential or partly residential units;
+10,909 primary address units remain published. Footprint placement reports
+807 containing matches, 6,211 nearest matches, 91 ambiguous matches, and 47
+unmatched points. Its distance distribution is p50 7.97m, p90 17.33m, p95
+21.87m, p99 38.64m, and maximum 618.33m. The 138 review points are not removed
+from the address bundle. Numbering diagnostics record anomalies for review,
+including 335 parity, 314 hundred-block, and 3,035 monotonic-progression
+flags; these are data/geometry flags rather than corrections to NAR.
+
+The live database seed stores the NAR GUIDs, suffix, official street parts,
+retrieval date, and footprint provenance in the address row. Existing matched
+internal address IDs and their histories remain unchanged. Route and household
+responses use the generated canonical label, while manual correction events
+continue to take precedence for historically corrected rows.
+
+## Preserving activity when a legacy roof is reconciled
+
+The authoritative reseed also publishes
+`legacy-history-reconciliation.json`. It contains only internal address IDs,
+NAR address/location IDs, match status, and matching diagnostics; it contains
+no event payloads or resident information. The current snapshot links 232
+legacy rows confidently, leaves 4,631 ambiguous, and leaves 1,599 unmatched.
+
+On startup, schema migration 18 creates `legacy_history_links` and
+`legacy_history_reviews`. A confident link causes the existing append-only
+`visits`, `household_flyer_events`, `people`, and neighbourhood-conversation
+rows to be projected onto the canonical household through read views. The
+original row, event ID, timestamp, actor, flyer ID, notes, corrections, and
+foreign keys are not copied or rewritten. This also prevents an event from
+being counted twice in coverage, history, or user statistics.
+
+Inactive legacy addresses that have activity but no safe one-to-one link are
+recorded in `legacy_history_reviews` and remain visible in the map/state with
+their historical label, current derived status, and an address-review flag.
+They are explicitly excluded from fresh coverage totals, recommendation
+selection, and route targeting. The review set is derived from the event
+tables during every seed, so reseeding and restarting cannot reset a roof's
+colour or hide an activity-bearing historical roof. A later safe reconciliation
+can update the link table without modifying the original events.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-26T19:21:12.785Z",
+  "generated_at": "2026-08-26T21:36:13.255Z",
   "geography": {
     "province_code": "35",
     "csd_code": "3542059",
@@ -66,5 +66,15 @@
     "matched_base_distance": 75,
     "new": 9918,
     "unmatched_existing": 6462
+  },
+  "physical_footprint_matching": {
+    "threshold_m": 50,
+    "grey_snapshot_path": "data/canvassing/grey-building-footprints-owen-sound.geojson",
+    "fallback_structure_path": "packages/web-client/public/canvassing/structures.geojson",
+    "placement_statuses": "exact, nearest, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved"
+  },
+  "numbering_validation": {
+    "rules": "Owen Sound numbered-grid parity, direction, hundred-block, cross-road, and monotonic progression checks; authoritative NAR values are preserved and anomalies are review flags",
+    "report": "address-numbering-validation.json"
   }
 }

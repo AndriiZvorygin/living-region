@@ -35,6 +35,16 @@ type Household = {
   flyer_ids: string[];
   number_corrected: number;
   last_updated_at: string | null;
+  historical_only?: number;
+  address_review_required?: number;
+  legacy_review_status?: string | null;
+};
+type AuthUser = {
+  id: string;
+  username: string;
+  display_name: string;
+  email: string | null;
+  role: "candidate" | "volunteer";
 };
 type Flyer = {
   id: string;
@@ -56,8 +66,8 @@ type FlyerDelivery = {
   occurred_at: string;
   flyer_id: string | null;
   flyer_name: string;
-  user_id: string;
-  source: string;
+  user_id?: string;
+  source?: string;
 };
 type Contact = {
   person_id: string;
@@ -280,18 +290,16 @@ const coverageClusterRadius = [
   34,
 ];
 const canvassingDataVersion = "all-roofs-addressable-20260726";
+let authenticatedUser: AuthUser | null = null;
+const isVolunteer = () => authenticatedUser?.role === "volunteer";
 const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
-  const role = document.querySelector<HTMLInputElement>("#volunteer-mode")
-    ?.checked
-    ? "volunteer"
-    : "candidate";
   const response = await fetch(url, {
     ...init,
     headers: {
       "content-type": "application/json",
-      "x-canvass-role": role,
       ...(init?.headers ?? {}),
     },
+    credentials: "same-origin",
   });
   if (!response.ok) throw new Error(await response.text());
   return response.json();
@@ -325,16 +333,68 @@ const escapeHtml = (value: unknown) =>
       })[character]!,
   );
 
+async function readCurrentUser() {
+  const response = await fetch("/api/me", {
+    credentials: "same-origin",
+    headers: { "content-type": "application/json" },
+  });
+  if (response.status === 401) return null;
+  if (!response.ok) throw new Error(await response.text());
+  const result = (await response.json()) as { user: AuthUser };
+  return result.user;
+}
+
+async function showLogin(): Promise<AuthUser> {
+  document.title = "Log in · Owen Sound Canvassing";
+  document.body.innerHTML = `<main class="auth-shell"><form class="auth-card" id="login-form"><h1>Owen Sound Canvassing</h1><p>Log in to continue to the campaign map.</p><label>Username<input id="login-username" name="username" autocomplete="username" required autofocus></label><label>Password<input id="login-password" name="password" type="password" autocomplete="current-password" required></label><p class="auth-error" id="login-error" role="alert"></p><button type="submit">Log in</button></form></main>`;
+  const form = document.querySelector<HTMLFormElement>("#login-form")!;
+  const error = document.querySelector<HTMLElement>("#login-error")!;
+  return new Promise((resolve) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = form.querySelector<HTMLButtonElement>("button")!;
+      button.disabled = true;
+      error.textContent = "";
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            username: form.querySelector<HTMLInputElement>("#login-username")!.value,
+            password: form.querySelector<HTMLInputElement>("#login-password")!.value,
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error ?? "Login failed");
+        resolve(result.user as AuthUser);
+      } catch (loginError) {
+        error.textContent =
+          loginError instanceof Error ? loginError.message : "Login failed";
+        button.disabled = false;
+      }
+    });
+  });
+}
+
 export async function canvassingMain() {
+  authenticatedUser = await readCurrentUser();
+  if (!authenticatedUser) authenticatedUser = await showLogin();
+  const legacyPrefsKey = "living-region.canvassing.field-state";
+  const prefsKey = `${legacyPrefsKey}:${authenticatedUser.id}`;
   const saved = JSON.parse(
-    localStorage.getItem("living-region.canvassing.field-state") ?? "{}",
+    localStorage.getItem(prefsKey) ??
+      (authenticatedUser.role === "candidate"
+        ? localStorage.getItem(legacyPrefsKey)
+        : null) ??
+      "{}",
   ) as Partial<FieldPrefs>;
   const persist = (patch: Partial<FieldPrefs> = {}) => {
     const current = JSON.parse(
-      localStorage.getItem("living-region.canvassing.field-state") ?? "{}",
+      localStorage.getItem(prefsKey) ?? "{}",
     ) as Partial<FieldPrefs>;
     localStorage.setItem(
-      "living-region.canvassing.field-state",
+      prefsKey,
       JSON.stringify({ ...current, ...patch }),
     );
   };
@@ -344,7 +404,7 @@ export async function canvassingMain() {
     <aside class="summary" id="summary"></aside><main id="canvass-map"></main>
     <aside class="cluster-key" id="cluster-key" hidden><strong id="cluster-key-title">Grouped civic addresses</strong><span id="cluster-key-description">Number = household stops; colour = most common status. Tap to zoom in.</span><div class="coverage-legend" id="coverage-legend" hidden><div class="coverage-swatches"><i style="background:#000004"></i><i style="background:#420A68"></i><i style="background:#FCA50A"></i><i style="background:#FCFFA4"></i></div><div class="coverage-legend-labels"><span>Untouched</span><span>Partly covered</span><span>Fully covered</span></div><small>Bubble number = eligible households remaining</small><small class="next-area-status" id="next-area-status"></small></div></aside>
     <div class="mobile-scrim" id="mobile-scrim" hidden></div>
-    <section class="mobile-sheet mobile-menu-sheet" id="mobile-menu-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Map menu</strong><button id="mobile-menu-close" class="mobile-close" aria-label="Close map menu">Close</button></div><section class="mobile-flyer-controls"><label>Active flyer<select id="mobile-active-flyer"><option value="">Choose flyer</option></select></label><label>Inspect distribution<select id="mobile-flyer-filter"><option value="">All flyers</option></select></label><button id="mobile-flyer-catalogue-open">Edit flyer names</button></section><details open><summary>Campaign tools</summary><div class="mobile-menu-actions"><button id="mobile-bulk-open">Bulk select homes</button><button id="mobile-tools-open">Route and filters</button><button id="mobile-summary-open">Campaign totals</button><button id="mobile-find-next-area">Find next area</button></div></details><details><summary>Workflows</summary><div class="mobile-menu-actions"><button id="mobile-followup-open">Follow-ups</button><button id="mobile-conversation-open">Neighbourhood conversation</button><button id="mobile-recruitment-open">Recruitment</button><button id="mobile-quality-open">Address quality</button></div></details><details><summary>Data and print</summary><div class="mobile-menu-actions"><button id="mobile-import-open">Import records</button><button id="mobile-print-open">Print route</button><a class="button" href="/api/canvassing/export/routes.csv">Export route CSV</a></div></details></section>
+    <section class="mobile-sheet mobile-menu-sheet" id="mobile-menu-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Map menu</strong><button id="mobile-menu-close" class="mobile-close" aria-label="Close map menu">Close</button></div><section class="mobile-flyer-controls"><label>Active flyer<select id="mobile-active-flyer"><option value="">Choose flyer</option></select></label><label>Inspect distribution<select id="mobile-flyer-filter"><option value="">All flyers</option></select></label><button id="mobile-flyer-catalogue-open">Edit flyer names</button></section><details open><summary>Campaign tools</summary><div class="mobile-menu-actions"><button id="mobile-bulk-open">Bulk select homes</button><button id="mobile-tools-open">Route and filters</button><button id="mobile-summary-open">Campaign totals</button><button id="mobile-find-next-area">Find next area</button></div></details><details><summary>Workflows</summary><div class="mobile-menu-actions"><button id="mobile-followup-open">Follow-ups</button><button id="mobile-conversation-open">Neighbourhood conversation</button><button id="mobile-recruitment-open">Recruitment</button><button id="mobile-quality-open">Address quality</button></div></details><details><summary>Data and print</summary><div class="mobile-menu-actions"><button id="mobile-import-open">Import records</button><button id="mobile-print-open">Print route</button><a class="button" href="/api/canvassing/export/routes.csv">Export route CSV</a></div></details><details><summary>Account</summary><div class="mobile-account-actions"><span>${escapeHtml(authenticatedUser.display_name)} · ${authenticatedUser.role === "volunteer" ? "Volunteer" : "Candidate"}</span>${authenticatedUser.role === "candidate" ? '<a class="button" href="/canvassing/admin/users">Users</a>' : ""}<button id="mobile-change-password" type="button">Change password</button><button id="mobile-logout" type="button">Log out</button></div></details></section>
     <section class="mobile-sheet mobile-coverage-sheet" id="mobile-coverage-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Coverage</strong><button id="mobile-coverage-close" class="mobile-close" aria-label="Close coverage legend">Close</button></div><div id="mobile-coverage-content"></div></section>
     <section class="mobile-sheet mobile-summary-sheet" id="mobile-summary-sheet" hidden aria-hidden="true"><div class="mobile-sheet-handle" aria-hidden="true"></div><div class="mobile-sheet-head"><strong>Campaign totals</strong><button id="mobile-summary-close" class="mobile-close" aria-label="Close campaign totals">Close</button></div><div id="mobile-summary-content"></div></section>
     <section class="bulk-selection-bar" id="bulk-selection-bar" aria-label="Bulk household selection"><button id="multi-select" aria-pressed="false">Bulk flyer</button><span id="bulk-selection-status" aria-live="polite">Tap Bulk flyer, then tap roofs</span><button id="bulk-flyer" disabled>Mark selected flyered</button><button id="clear-selection" disabled>Clear</button></section>
@@ -363,6 +423,62 @@ export async function canvassingMain() {
     <dialog id="quality-dialog" class="workflow-dialog"><h2>Address quality</h2><div id="quality-metrics"></div><div id="quality-queue"></div><menu><button type="button" data-close="quality-dialog">Close</button></menu></dialog>
     <dialog id="flyer-dialog" class="workflow-dialog"><h2>Flyer catalogue</h2><p>Names and descriptions are private campaign metadata. Delivery history keeps stable flyer IDs.</p><div id="flyer-catalogue-workspace"></div><menu><button type="button" data-close="flyer-dialog">Close</button></menu></dialog>
     <div class="toast" id="toast"></div></div>`;
+  const accountTools = document.createElement("div");
+  accountTools.className = "account-tools";
+  accountTools.innerHTML = `<details class="account-menu"><summary><span id="authenticated-user">${escapeHtml(authenticatedUser.display_name)} · ${authenticatedUser.role === "volunteer" ? "Volunteer" : "Candidate"}</span></summary><div class="account-menu-panel">${authenticatedUser.role === "candidate" ? '<a class="account-link" href="/canvassing/admin/users">Users</a>' : ""}<button id="change-password" type="button">Change password</button><button id="logout" type="button">Log out</button></div></details>`;
+  document.querySelector("header")?.append(accountTools);
+  const passwordButton = accountTools.querySelector<HTMLButtonElement>("#change-password")!;
+  const passwordDialog = document.createElement("dialog");
+  passwordDialog.id = "password-dialog";
+  passwordDialog.className = "workflow-dialog";
+  passwordDialog.innerHTML = `<h2>Change password</h2><form id="password-form" class="workflow-form"><label>Current password<input name="current_password" type="password" autocomplete="current-password" required></label><label>New password<input name="new_password" type="password" autocomplete="new-password" minlength="14" required></label><label>Confirm new password<input name="confirm_password" type="password" autocomplete="new-password" minlength="14" required></label><p id="password-error" class="auth-error" role="alert"></p><button>Change password</button></form><menu><button type="button" data-close="password-dialog">Cancel</button></menu>`;
+  document.body.append(passwordDialog);
+  passwordButton.addEventListener("click", () => passwordDialog.showModal());
+  document.querySelector("#mobile-change-password")?.addEventListener("click", () => passwordDialog.showModal());
+  passwordDialog.querySelector('[data-close="password-dialog"]')?.addEventListener("click", () => passwordDialog.close());
+  passwordDialog.querySelector<HTMLFormElement>("#password-form")!.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const error = passwordDialog.querySelector<HTMLElement>("#password-error")!;
+    error.textContent = "";
+    try {
+      const response = await fetch("/api/me/password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? "Password change failed");
+      form.reset();
+      passwordDialog.close();
+      toast("Your password was changed");
+    } catch (errorValue) {
+      error.textContent = errorValue instanceof Error ? errorValue.message : "Password change failed";
+    }
+  });
+  document.querySelector("#volunteer-mode")?.closest("label")?.setAttribute("hidden", "true");
+  if (isVolunteer()) {
+    for (const id of [
+      "followup-open",
+      "mobile-followup-open",
+      "recruitment-open",
+      "mobile-recruitment-open",
+      "quality-open",
+      "mobile-quality-open",
+      "flyer-catalogue-open",
+      "mobile-flyer-catalogue-open",
+      "import-open",
+      "mobile-import-open",
+    ])
+      document.querySelector<HTMLElement>(`#${id}`)?.setAttribute("hidden", "true");
+  }
+  const logout = async () => {
+    await fetch("/api/logout", { method: "POST", credentials: "same-origin" });
+    window.location.reload();
+  };
+  document.querySelector("#logout")?.addEventListener("click", logout);
+  document.querySelector("#mobile-logout")?.addEventListener("click", logout);
   // Bind the primary mobile sheets before the larger offline data payload loads.
   // A volunteer can open the menu immediately while the map is still preparing.
   const earlyMobilePanels = [
@@ -430,7 +546,7 @@ export async function canvassingMain() {
     earlyMobileScrim.hidden = true;
   });
   document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked =
-    saved.volunteer ?? false;
+    Boolean(isVolunteer());
   const statePromise = fetchJson<State>("/api/canvassing/state");
   const mapDataPromise = Promise.all([
     geo(`/canvassing/structures.geojson?v=${canvassingDataVersion}`),
@@ -1834,7 +1950,7 @@ export async function canvassingMain() {
     homes: Household[],
     separateReference = false,
   ) => {
-    if (document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked)
+    if (isVolunteer())
       return;
     const section = document.createElement("section"),
       civic = document.createElement("input"),
@@ -2030,7 +2146,7 @@ export async function canvassingMain() {
     drawer.innerHTML = `<div class="drawer-head"><div><small>Reference roof</small><h2>Address needs review</h2><span>${String(structure.properties.building_type ?? "unclassified").replaceAll("_", " ")}</span></div><button id="drawer-close" class="drawer-close" aria-label="Close roof details">Close</button></div><section class="association-review"><h3>Building source</h3><p>${structure.properties.external_source} ${structure.properties.external_id} · ${structure.properties.confidence}</p></section>`;
     openMobileDrawer();
     appendCivicEditor(drawer, structure, []);
-    if (!document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked) {
+    if (!isVolunteer()) {
       const split = document.createElement("button");
       split.textContent = "Split roof";
       split.addEventListener("click", () => renderSplitEditor(structure));
@@ -2181,8 +2297,7 @@ export async function canvassingMain() {
   }
   function showHouseholds(homes: Household[], clickedStructure?: any) {
     active = homes[0];
-    const volunteer =
-        document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked,
+    const volunteer = Boolean(isVolunteer()),
       today = localDateValue(),
       latestDate = active.last_updated_at
         ? localDateValue(active.last_updated_at)
@@ -2192,7 +2307,7 @@ export async function canvassingMain() {
       talkedCurrent = Boolean(active.conversation_occurred),
       revisitCurrent = Boolean(active.revisit_requested);
     document.querySelector("#drawer")!.innerHTML =
-      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span></div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
+      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span>${active.address_review_required ? `<strong class="address-review-flag">Historical address activity requires review</strong>` : ""}</div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
         volunteer
           ? ""
           : `<div class="private-fields"><label>Political outcome<select id="outcome" data-initial="${escapeHtml(active.political_outcome ?? "")}"><option value="">Not recorded</option>${[
@@ -2215,7 +2330,7 @@ export async function canvassingMain() {
     openMobileDrawer();
     const historySection = document.createElement("section");
     historySection.className = "flyer-history";
-    historySection.innerHTML = `<h3>Flyer delivery history</h3>${active.flyer_history?.length ? `<ul>${active.flyer_history.map((event) => `<li><strong>${escapeHtml(event.flyer_name)}</strong> · ${escapeHtml(localDateValue(event.occurred_at))}<small>${escapeHtml(event.source)}</small></li>`).join("")}</ul>` : "<p>No flyer delivery recorded.</p>"}`;
+    historySection.innerHTML = `<h3>Flyer delivery history</h3>${active.flyer_history?.length ? `<ul>${active.flyer_history.map((event) => `<li><strong>${escapeHtml(event.flyer_name)}</strong> · ${escapeHtml(localDateValue(event.occurred_at))}${event.source ? `<small>${escapeHtml(event.source)}</small>` : ""}</li>`).join("")}</ul>` : "<p>No flyer delivery recorded.</p>"}`;
     document.querySelector("#drawer .visit-flags")?.before(historySection);
     const addressFeature = addresses.features.find(
         (feature: any) => feature.properties.address_id === active!.address_id,
@@ -2462,8 +2577,7 @@ export async function canvassingMain() {
       const occurredAt = dateWasManuallyEdited
           ? `${visitDate.value}T12:00:00.000Z`
           : undefined,
-        source = document.querySelector<HTMLInputElement>("#volunteer-mode")!
-          .checked
+        source = isVolunteer()
           ? "volunteer"
           : "candidate";
       if (outcome)
@@ -3339,9 +3453,7 @@ export async function canvassingMain() {
               flyer_id: activeFlyerId,
               allow_duplicate_flyer: allowDuplicateFlyer,
               door_knocked: false,
-              source: document.querySelector<HTMLInputElement>(
-                "#volunteer-mode",
-              )!.checked
+              source: isVolunteer()
                 ? "volunteer"
                 : "candidate",
             }),
@@ -3474,14 +3586,6 @@ export async function canvassingMain() {
     applyMapFilters();
     updateLabels();
   });
-  document
-    .querySelector("#volunteer-mode")!
-    .addEventListener("change", async (e) => {
-      persist({ volunteer: (e.target as HTMLInputElement).checked });
-      recruitmentDialog.close();
-      await refresh();
-      if (active) showHouseholds([active]);
-    });
   document.querySelector("#coverage-toggle")!.addEventListener("click", () => {
     coverage = !coverage;
     persist({ coverage_mode: coverage, coverage_mode_user_set: true });
@@ -3652,7 +3756,7 @@ export async function canvassingMain() {
   });
   const flyerDialog = document.querySelector<HTMLDialogElement>("#flyer-dialog")!;
   const openFlyerCatalogue = () => {
-    if (document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked)
+    if (isVolunteer())
       return toast("Flyer catalogue editing is hidden in volunteer mode");
     renderFlyerCatalogue();
     flyerDialog.showModal();
@@ -3665,7 +3769,7 @@ export async function canvassingMain() {
   const followupDialog =
     document.querySelector<HTMLDialogElement>("#followup-dialog")!;
   document.querySelector("#followup-open")!.addEventListener("click", () => {
-    if (document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked)
+    if (isVolunteer())
       return toast("Follow-up planning is hidden in volunteer mode");
     renderFollowups();
     followupDialog.showModal();
@@ -3674,7 +3778,7 @@ export async function canvassingMain() {
     "#recruitment-dialog",
   )!;
   document.querySelector("#recruitment-open")!.addEventListener("click", () => {
-    if (document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked)
+    if (isVolunteer())
       return toast("Recruitment details are hidden in volunteer mode");
     renderRecruitment();
     recruitmentDialog.showModal();
@@ -3683,8 +3787,7 @@ export async function canvassingMain() {
     "#conversation-dialog",
   )!;
   const openConversation = () => {
-    const volunteerMode =
-      document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked;
+    const volunteerMode = Boolean(isVolunteer());
     document.querySelector<HTMLInputElement>(
       "#conversation-household",
     )!.checked = Boolean(active);
@@ -3764,8 +3867,7 @@ export async function canvassingMain() {
           },
         );
         if (
-          !document.querySelector<HTMLInputElement>("#volunteer-mode")!
-            .checked &&
+          !isVolunteer() &&
           (possibleRepresentative || possibleCouncillor)
         )
           await postJson("/api/canvassing/recruitment/prospects", {
@@ -3817,9 +3919,6 @@ export async function canvassingMain() {
       await refresh();
       toast("CSV import complete");
     });
-  const volunteer =
-    document.querySelector<HTMLInputElement>("#volunteer-mode")!;
-  volunteer.checked = saved.volunteer ?? false;
   const statusFilter =
     document.querySelector<HTMLSelectElement>("#status-filter")!;
   statusFilter.value = saved.status_filter ?? "all";

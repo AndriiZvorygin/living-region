@@ -1,16 +1,5 @@
 {
-  "generated_at": "2026-08-26T20:16:36.030Z",
-  "published_counts": {
-    "raw_nar_records_in_ontario_files": 6246543,
-    "raw_owen_sound_named_records": 11270,
-    "rejected_outside_municipal_boundary": 12,
-    "rejected_missing_usable_coordinates": 14,
-    "retained_all_address_units": 11244,
-    "retained_primary_canvassing_units": 10909,
-    "mappable_physical_locations_all_uses": 7156,
-    "mappable_primary_canvassing_locations": 6857,
-    "exclusions_are_applied_before_retained_counts": true
-  },
+  "generated_at": "2026-08-26T21:36:14.423Z",
   "source_counts": {
     "residential": 8875,
     "partly_residential": 2034,
@@ -155,20 +144,90 @@
   "unique_streets": 125,
   "records_lacking_usable_coordinates": 14,
   "records_outside_municipal_boundary": 12,
-  "activation_audit": {
-    "observed_at": "2026-08-26T20:19:45.919Z",
-    "database_integrity_check": "ok",
-    "foreign_key_check_rows": 0,
-    "active_database_households": 10912,
-    "active_database_households_from_nar_primary_bundle": 10909,
-    "active_manual_split_inferred_exceptions": 3,
-    "legacy_unmatched_manifest_rows": 6462,
-    "legacy_unmatched_active_rows": 0,
-    "legacy_unmatched_visible_in_fresh_state": 0,
-    "legacy_unmatched_historical_visits_preserved": 1799,
-    "historical_visits_total": 2177,
-    "historical_corrections_total": 1,
-    "historical_flyer_events_total": 1,
-    "runtime_physical_location_grouping": "not yet implemented; canonical LOC_GUID grouping is present in canvassing-locations.geojson but current state/map selection remains address-unit/structure based"
+  "published_counts": {
+    "raw_nar_records_in_ontario_files": 6246543,
+    "raw_owen_sound_named_records": 11270,
+    "rejected_outside_municipal_boundary": 12,
+    "rejected_missing_usable_coordinates": 14,
+    "retained_all_address_units": 11244,
+    "retained_primary_canvassing_units": 10909,
+    "mappable_physical_locations_all_uses": 7156,
+    "mappable_primary_canvassing_locations": 6857,
+    "exclusions_are_applied_before_retained_counts": true
+  },
+  "primary_footprint_placement": {
+    "total_locations": 6857,
+    "exact_matches": 766,
+    "nearest_matches": 5978,
+    "ambiguous_matches": 87,
+    "unmatched_matches": 26,
+    "distance_m": {
+      "p50": 7.884382967996858,
+      "p90": 16.631302532981532,
+      "p95": 20.932001776437488,
+      "p99": 33.28279772057044,
+      "max": 618.3287699807915
+    },
+    "grey_exact_matches": 177,
+    "grey_nearest_matches": 151,
+    "review_required": 113
+  },
+  "address_display": {
+    "authoritative_labels_applied_to_locations": 1342,
+    "estimated_structure_labels_replaced": 846,
+    "active_address_labels_are_nar_formatted": true,
+    "former_estimated_labels_are_not_used_for_nar_address_units": true
+  },
+  "physical_footprint_audit": {
+    "usable_existing_footprints": 7201,
+    "grey_footprints_retrieved": 1940,
+    "unaddressed_usable_footprints_excluded_from_canvassing_locations": 7799,
+    "multi_address_structures": 1195
+  },
+  "footprint_placement": {
+    "total_locations": 7156,
+    "exact_matches": 807,
+    "nearest_matches": 6211,
+    "ambiguous_matches": 91,
+    "unmatched_matches": 47,
+    "distance_m": {
+      "p50": 7.968686029312722,
+      "p90": 17.331619674533904,
+      "p95": 21.8657465772309,
+      "p99": 38.638464659679954,
+      "max": 618.3287699807915
+    },
+    "grey_exact_matches": 180,
+    "grey_nearest_matches": 164,
+    "review_required": 138
+  },
+  "numbering": {
+    "address_units": 10909,
+    "matched_same_road": 9723,
+    "road_match_distance_m": {
+      "p50": 9.805638114059997,
+      "p90": 16.12841621734907,
+      "p95": 17.388653292019086,
+      "max": 2487.8714419865228
+    },
+    "parity_anomalies": 335,
+    "hundred_block_anomalies": 314,
+    "direction_anomalies": 0,
+    "suffix_anomalies": 0,
+    "monotonic_progression_anomalies": 3035,
+    "cross_road_matches": 9427
+  },
+  "legacy_history": {
+    "legacy_rows": 6462,
+    "confident": 232,
+    "ambiguous": 4631,
+    "unmatched": 1599,
+    "activity_visibility_candidates": 6230,
+    "distance_m": {
+      "p50": 35.72066655269315,
+      "p90": 62.405324982878774,
+      "p95": 67.8979501790596,
+      "max": 74.93680101177235
+    }
   }
 }

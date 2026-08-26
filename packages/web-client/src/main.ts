@@ -834,7 +834,11 @@ async function main(): Promise<void> {
   animate();
 }
 
-if (window.location.pathname === "/canvassing" || window.location.pathname === "/canvassing/") {
+if (window.location.pathname === "/canvassing/admin/users") {
+  import("./canvassing-admin")
+    .then(({ canvassingAdminMain }) => canvassingAdminMain())
+    .catch(console.error);
+} else if (window.location.pathname === "/canvassing" || window.location.pathname === "/canvassing/") {
   import("./canvassing").then(({ canvassingMain }) => canvassingMain()).catch(console.error);
 } else {
   main().catch((error: unknown) => console.error(error));

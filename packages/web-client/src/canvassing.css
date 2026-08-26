@@ -10,6 +10,111 @@ body {
   margin: 0;
   overflow: hidden;
 }
+.auth-shell {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 20px;
+  background: #eef0eb;
+}
+.auth-card {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 380px);
+  padding: 28px;
+  border: 1px solid #c5cec8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 40px #17211d18;
+}
+.auth-card h1,
+.auth-card p {
+  margin: 0;
+}
+.auth-card label {
+  display: grid;
+  gap: 6px;
+  color: #56625d;
+  font-size: 13px;
+  font-weight: 700;
+}
+.auth-card input {
+  min-height: 42px;
+  padding: 8px 10px;
+}
+.auth-error {
+  min-height: 18px;
+  color: #9b2d2d;
+  font-size: 13px;
+}
+.account-tools {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  color: #d6e2dc;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.canvass-shell header .account-tools {
+  display: flex;
+}
+.account-menu {
+  position: relative;
+}
+.account-menu > summary {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid #52776c;
+  border-radius: 5px;
+  background: #28584b;
+  color: #fff;
+  cursor: pointer;
+  list-style: none;
+}
+.account-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.account-menu > summary::after {
+  content: " ▾";
+  color: #bcd0c8;
+}
+.account-menu[open] > summary {
+  border-color: #fff;
+  background: #fff;
+  color: #173e35;
+}
+.account-menu[open] > summary span {
+  color: #173e35;
+}
+.account-menu[open] > summary::after {
+  color: #52776c;
+}
+.account-menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: 6px;
+  min-width: 170px;
+  padding: 8px;
+  border: 1px solid #52776c;
+  border-radius: 5px;
+  background: #173e35;
+  box-shadow: 0 5px 16px #17211d40;
+}
+.account-menu-panel button,
+.account-menu-panel .account-link {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 9px;
+  text-align: left;
+}
+.account-tools .account-link {
+  color: #fff;
+  text-decoration: none;
+}
 .canvass-shell {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -620,6 +725,13 @@ dialog menu {
   color: #ffdf8a !important;
   font-weight: 700;
 }
+.address-review-flag {
+  display: block;
+  margin-top: 4px;
+  color: #8a4b00;
+  font-size: 0.82rem;
+}
+
 .association-review {
   margin-top: 18px;
   padding-top: 12px;
@@ -1283,6 +1395,26 @@ dialog menu {
   }
   .mobile-menu-actions button,
   .mobile-menu-actions .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 8px;
+    text-align: center;
+  }
+  .mobile-account-actions {
+    display: grid;
+    gap: 8px;
+    padding: 4px 0 8px;
+  }
+  .mobile-account-actions > span {
+    padding: 6px 4px;
+    color: #56625d;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .mobile-account-actions button,
+  .mobile-account-actions .button {
     display: flex;
     align-items: center;
     justify-content: center;
