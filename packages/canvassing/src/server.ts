@@ -385,6 +385,18 @@ if (!postAddressMigrations.has(18)) {
       (18,'legacy_activity_preservation_across_authoritative_address_reconciliation',datetime('now'));
     COMMIT;`);
 }
+if (!postAddressMigrations.has(19)) {
+  db.exec(`BEGIN;
+    CREATE INDEX IF NOT EXISTS legacy_history_links_legacy_household
+      ON legacy_history_links(legacy_household_id,match_status,canonical_household_id);
+    CREATE INDEX IF NOT EXISTS neighbourhood_conversations_household
+      ON neighbourhood_conversations(household_id,occurred_at);
+    CREATE INDEX IF NOT EXISTS people_household
+      ON people(household_id,created_at);
+    INSERT INTO schema_migrations VALUES
+      (19,'canvassing_state_legacy_activity_lookup_indexes',datetime('now'));
+    COMMIT;`);
+}
 db.exec(`DROP VIEW IF EXISTS household_flyer_state;
 DROP VIEW IF EXISTS effective_people;
 DROP VIEW IF EXISTS activity_people;
@@ -501,7 +513,7 @@ SELECT p.id,p.household_id,
 FROM activity_people p;`);
 
 const now = () => new Date().toISOString();
-const SCHEMA_VERSION = 18;
+const SCHEMA_VERSION = 19;
 const configuredHoldMinutes = Number(
   process.env.CANVASS_RECOMMENDATION_HOLD_MINUTES ?? "30",
 );

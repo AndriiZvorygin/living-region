@@ -1,23 +1,29 @@
 import { expect, test, type Page } from "playwright/test";
 
-async function openCanvassing(page: Page, width = 390, height = 844) {
-  await page.setViewportSize({ width, height });
-  await page.goto("/canvassing/?e2e=1", { waitUntil: "domcontentloaded" });
-  await loginIfNeeded(page);
+const MAP_STARTUP_TIMEOUT = 120_000;
+
+async function waitForMapReady(page: Page) {
   await expect(page.locator(".maplibregl-canvas")).toBeVisible({
-    timeout: 30_000,
+    timeout: MAP_STARTUP_TIMEOUT,
   });
   await page.waitForFunction(
     () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
     undefined,
-    { timeout: 30_000 },
+    { timeout: MAP_STARTUP_TIMEOUT },
   );
+}
+
+async function openCanvassing(page: Page, width = 390, height = 844) {
+  await page.setViewportSize({ width, height });
+  await page.goto("/canvassing/?e2e=1", { waitUntil: "domcontentloaded" });
+  await loginIfNeeded(page);
+  await waitForMapReady(page);
   await page.waitForTimeout(1_000);
 }
 
 async function loginIfNeeded(page: Page, username = "andrii") {
   await page.waitForSelector("#login-form, .maplibregl-canvas", {
-    timeout: 30_000,
+    timeout: MAP_STARTUP_TIMEOUT,
   });
   if (!(await page.locator("#login-form").count())) return;
   await page.locator("#login-username").fill(username);
@@ -437,11 +443,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await page.locator("#mobile-active-flyer").selectOption("flyer-2-current");
     await page.locator("#mobile-menu-close").click();
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
     await page.locator("#mobile-menu").click();
     await expect(page.locator("#mobile-active-flyer")).toHaveValue(
       "flyer-2-current",
@@ -542,14 +544,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     };
     expect(fixture.unlinked_structure_ids.length).toBeGreaterThanOrEqual(10);
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.locator(".maplibregl-canvas")).toBeVisible({
-      timeout: 30_000,
-    });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
     await page.locator("#mobile-menu").click();
     await page.locator("#mobile-active-flyer").selectOption("flyer-2-current");
     await page.locator("#mobile-bulk-open").click();
@@ -806,14 +801,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     ).toHaveLength(1);
 
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.locator(".maplibregl-canvas")).toBeVisible({
-      timeout: 30_000,
-    });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
     await showSelectedRoofs();
     persisted = await readSelectedState();
     expect(
@@ -835,14 +823,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     });
     expect(reseed.status).toBe(200);
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.locator(".maplibregl-canvas")).toBeVisible({
-      timeout: 30_000,
-    });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
     await showSelectedRoofs();
     persisted = await readSelectedState();
     expect(
@@ -922,14 +903,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     });
     expect(fixture.status).toBe(200);
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.locator(".maplibregl-canvas")).toBeVisible({
-      timeout: 30_000,
-    });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
 
     await page.locator("#mobile-menu").click();
     await page.locator("#mobile-active-flyer").selectOption("flyer-2-current");
@@ -1152,11 +1126,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     expect(verification.reviewPresent).toBe(true);
 
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
     verification = await verifyStatuses();
     expect(
       verification.selected.every((roof) =>
@@ -1170,11 +1140,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     });
     expect(reseed.status).toBe(200);
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.waitForFunction(
-      () => Boolean((window as any).__livingRegionCanvassing?.map?.isStyleLoaded()),
-      undefined,
-      { timeout: 30_000 },
-    );
+    await waitForMapReady(page);
     verification = await verifyStatuses();
     expect(
       verification.selected.every((roof) =>

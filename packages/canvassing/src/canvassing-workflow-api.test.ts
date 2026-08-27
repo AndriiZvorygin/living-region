@@ -143,7 +143,7 @@ describe.sequential("canvassing weekly workflow API", () => {
       created = after.households.find(
         (home: any) => home.structure_id === unlinked.properties.structure_id,
       );
-    expect(after.schema_version).toBe(18);
+    expect(after.schema_version).toBe(19);
     expect(created).toMatchObject({
       civic_number: "1234",
       street: "Test Street",

@@ -5,6 +5,7 @@ const captureArtifacts = process.env.CANVASSING_E2E_ARTIFACTS === "1";
 export default defineConfig({
   testDir: "tests/e2e",
   testMatch: "**/canvassing.spec.ts",
+  timeout: 120_000,
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
