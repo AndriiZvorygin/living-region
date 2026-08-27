@@ -251,6 +251,10 @@ blank active target addresses, zero distant-review references used for
 targeting, and zero canvassable roofs without a target. The current production
 backup made before this repair is stored outside Git under
 `private/canvassing/backups/recovery-before-address-repair-2026-08-27T03-51-34Z`.
+The final pre-deployment recovery backup is under
+`private/canvassing/backups/recovery-before-final-address-deploy-2026-08-27T05-14-53Z`;
+the post-activation stale-target cleanup backup is under the timestamped
+`recovery-before-stale-target-cleanup-*` directory.
 
 The old city-wide nearest-building references are no longer used to create
 household targets. A roof with a direct NAR placement uses its NAR address

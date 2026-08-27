@@ -267,6 +267,21 @@ async function main() {
 
   const activeFeatures = structuresDocument.features.filter((feature) => feature.properties.canvassable);
   const activeResidentialTargets = activeFeatures.filter((feature) => feature.properties.selection_target_id);
+  const databaseActiveTargetFailures = rows(current, `
+    SELECT a.id,a.label
+      FROM addresses a
+      JOIN households h ON h.address_id=a.id
+      JOIN structures s ON s.id=a.structure_id
+     WHERE a.source_active=1 AND s.source_active=1
+       AND (trim(a.civic_number)='' OR trim(a.street)=''
+            OR a.label LIKE 'Canvassing roof %')`);
+  const databaseActiveAnonymousLabels = rows(current, `
+    SELECT a.id
+      FROM addresses a
+      JOIN households h ON h.address_id=a.id
+      JOIN structures s ON s.id=a.structure_id
+     WHERE a.source_active=1 AND s.source_active=1
+       AND a.label LIKE 'Canvassing roof %'`);
   const report = {
     generated_at: new Date().toISOString(),
     source: {
@@ -299,6 +314,8 @@ async function main() {
       distant_review_targets_used_as_addresses: activeFeatures.filter((feature) => feature.properties.address_relation_confidence === "distant_review" || feature.properties.address_source_status === "distant_review").length,
       previously_flyered_physical_roofs_lost: inventory.filter((item) => item.current_status !== "flyer_delivered").length,
       rendered_canvassable_roofs_without_selectable_target: activeFeatures.filter((feature) => !String(feature.properties.selection_target_id ?? "")).length,
+      active_database_targets_without_human_address: databaseActiveTargetFailures.length,
+      active_database_canvassing_roof_labels: databaseActiveAnonymousLabels.length,
     },
     current_address_source_counts: activeFeatures.reduce((acc, feature) => {
       const key = String(feature.properties.address_source_status ?? feature.properties.address_label_source ?? "unknown");
