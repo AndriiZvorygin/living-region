@@ -1188,8 +1188,8 @@ dialog menu {
   }
 }
 
-/* The phone layout keeps the map as the primary field surface. Desktop keeps the
-   existing grid and all of its controls. */
+/* The field layout keeps the map as the primary surface at every viewport size.
+   Desktop and phone use the same compact menu and bottom-sheet controls. */
 .mobile-topbar,
 .mobile-sheet,
 .mobile-scrim,
@@ -1197,7 +1197,7 @@ dialog menu {
 .mobile-sheet-close {
   display: none;
 }
-@media (max-width: 760px), (max-height: 600px) and (orientation: landscape) {
+@media (max-width: 760px), (max-height: 600px) and (orientation: landscape), (min-width: 761px) {
   html,
   body {
     width: 100%;
@@ -1236,7 +1236,8 @@ dialog menu {
   }
   .canvass-shell > header > div,
   .canvass-shell > header > nav,
-  .canvass-shell > header > .backup-warning {
+  .canvass-shell > header > .backup-warning,
+  .canvass-shell > header > .account-tools {
     display: none;
   }
   .canvass-shell > header > .mobile-topbar {
@@ -1650,5 +1651,93 @@ dialog menu {
   .mobile-tools-open + .mobile-route-bar,
   .mobile-tools-open .mobile-route-bar {
     display: none;
+  }
+}
+
+/* Desktop uses the same controls as the phone layout, with narrower floating
+   sheets so the map remains visible while a tool is open. */
+@media (min-width: 761px) {
+  .mobile-topbar {
+    width: 100%;
+  }
+  .mobile-active-flyer-chip {
+    max-width: 220px;
+    font-size: 11px;
+  }
+  .mobile-sheet {
+    top: 72px;
+    right: 24px;
+    bottom: auto;
+    left: auto;
+    width: min(420px, calc(100vw - 48px));
+    max-height: calc(100dvh - 96px);
+    padding-bottom: 14px;
+    border-bottom: 1px solid #b9c2bd;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px #17211d30;
+  }
+  .mobile-sheet[hidden],
+  .mobile-route-bar[hidden] {
+    display: none;
+  }
+  .mobile-scrim {
+    background: #17211d28;
+  }
+  .drawer {
+    top: auto;
+    right: 24px;
+    bottom: 24px;
+    left: auto;
+    width: min(460px, calc(100vw - 48px));
+    max-height: min(76dvh, 720px);
+    padding: 14px 16px 18px;
+    border: 1px solid #b9c2bd;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px #17211d30;
+  }
+  .mobile-route-bar {
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+    min-height: 64px;
+    border-radius: 14px;
+  }
+  .bulk-selection-bar.active,
+  .bulk-selection-bar.has-selection {
+    right: 24px;
+    bottom: 104px;
+    left: 24px;
+    margin: 0;
+  }
+  .bulk-selection-bar:not(.active):not(.has-selection) {
+    display: none;
+  }
+  .mobile-tools-open > footer {
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+    max-height: min(72dvh, 640px);
+    padding: 12px 16px 16px;
+    border: 1px solid #b9c2bd;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px #17211d30;
+  }
+  .mobile-tools-open > .session-strip {
+    right: 34px;
+    bottom: min(72dvh, 640px);
+    left: 34px;
+  }
+  .maplibregl-ctrl-bottom-right {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media print {
+  .canvass-shell > header,
+  .mobile-scrim,
+  .mobile-sheet,
+  .mobile-route-bar {
+    display: none !important;
   }
 }

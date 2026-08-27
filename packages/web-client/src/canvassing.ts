@@ -908,7 +908,6 @@ export async function canvassingMain() {
     resizeMap();
   };
   const openMobileDrawer = () => {
-    if (!window.matchMedia("(max-width: 760px)").matches) return;
     mobilePanels.forEach((panel) => {
       panel.hidden = true;
       panel.setAttribute("aria-hidden", "true");

@@ -260,8 +260,13 @@ test.describe("Owen Sound canvassing field workflows", () => {
   test("catalogue editing, active selection, inspection filter, and route creation work on desktop", async ({
     page,
   }) => {
+    test.setTimeout(60_000);
     await openCanvassing(page, 1280, 900);
-    await page.locator("#flyer-catalogue-open").click();
+    await expect(page.locator(".canvass-shell > header > nav")).toBeHidden();
+    await expect(page.locator("#mobile-menu")).toBeVisible();
+    await expect(page.locator(".canvass-shell > footer")).toBeHidden();
+    await page.locator("#mobile-menu").click();
+    await page.locator("#mobile-flyer-catalogue-open").click();
     await expect(page.locator("#flyer-dialog")).toBeVisible();
     await page
       .locator('[data-flyer-field="short_name"][data-flyer-id="flyer-2-current"]')
@@ -271,14 +276,20 @@ test.describe("Owen Sound canvassing field workflows", () => {
       timeout: 10_000,
     });
     await page.locator("#flyer-dialog [data-close='flyer-dialog']").click();
-    await page.locator("#active-flyer").selectOption("flyer-2-current");
-    await page.locator("#flyer-filter").selectOption("flyer-2-current");
-    await expect(page.locator("#active-flyer")).toHaveValue("flyer-2-current");
-    await expect(page.locator("#flyer-filter")).toHaveValue("flyer-2-current");
-    await page.locator("#flyer-filter").selectOption("");
+    await page.locator("#mobile-menu").click();
+    await page.locator("#mobile-active-flyer").selectOption("flyer-2-current");
+    await page.locator("#mobile-flyer-filter").selectOption("flyer-2-current");
+    await expect(page.locator("#mobile-active-flyer")).toHaveValue("flyer-2-current");
+    await expect(page.locator("#mobile-flyer-filter")).toHaveValue("flyer-2-current");
+    await page.locator("#mobile-flyer-filter").selectOption("");
+    await page.locator("#mobile-menu-close").click();
 
-    await page.locator("#multi-select").click();
+    await page.locator("#mobile-menu").click();
+    await page.locator("#mobile-bulk-open").click();
     await clickRoofs(page, 2);
+    await expect(page.locator("#selection-count")).toHaveText("2");
+    await page.locator("#mobile-menu").click();
+    await page.locator("#mobile-tools-open").click();
     await page.locator("#route-name").fill("Playwright route");
     await page.locator("#create-route").click();
     await expect(page.locator("#toast")).toContainText("Route created", {
