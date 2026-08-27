@@ -777,6 +777,33 @@ test.describe("Owen Sound canvassing field workflows", () => {
         .find((roof) => roof.structureId === fixture.needs_review_structure_id)
         ?.homes.some((home) => home.legacy_history_review === 1),
     ).toBe(true);
+    const recordedEvents = persisted.flatMap((roof) =>
+      roof.homes.flatMap((home) =>
+        home.flyer_history.filter(
+          (event: any) => event.flyer_id === "flyer-2-current",
+        ),
+      ),
+    );
+    expect(recordedEvents.length).toBe(selectedHouseholds);
+    expect(
+      recordedEvents.every(
+        (event: any) =>
+          event.user_id === "andrii" &&
+          event.source === "candidate" &&
+          Number.isFinite(Date.parse(event.occurred_at)),
+      ),
+    ).toBe(true);
+    const preexisting = await page.evaluate((householdId) =>
+      (window as any).__livingRegionCanvassing
+        .state()
+        .households.find((home: any) => home.household_id === householdId),
+      fixture.previously_flyered_household_id,
+    );
+    expect(
+      preexisting?.flyer_history.filter(
+        (event: any) => event.event_id === "e2e_previously_flyered",
+      ),
+    ).toHaveLength(1);
 
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.locator(".maplibregl-canvas")).toBeVisible({
@@ -866,7 +893,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
     ).toEqual([]);
   });
 
-  test("bulk flyer selection works for every rendered roof before any individual click", async ({
+  test("bulk flyer preserves already-materialized roof selection and statuses", async ({
     page,
   }, testInfo) => {
     test.setTimeout(120_000);
