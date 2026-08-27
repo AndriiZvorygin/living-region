@@ -16,6 +16,7 @@ type Household = {
   household_id: string;
   address_id: string;
   structure_id: string | null;
+  source_address_guid?: string | null;
   label: string;
   civic_number: string;
   street: string;
@@ -36,7 +37,7 @@ type Household = {
   number_corrected: number;
   last_updated_at: string | null;
   historical_only?: number;
-  address_review_required?: number;
+  legacy_history_review?: number;
   legacy_review_status?: string | null;
 };
 type AuthUser = {
@@ -602,8 +603,11 @@ export async function canvassingMain() {
   const walkingGraph = new WalkingRoadGraph(roads);
   const byStructure = new Map<string, Household[]>();
   const byAddress = new Map<string, Household>();
+  const bySourceAddressGuid = new Map<string, Household>();
   for (const h of state.households) {
     byAddress.set(h.address_id, h);
+    if (h.source_address_guid)
+      bySourceAddressGuid.set(h.source_address_guid, h);
     if (h.structure_id)
       byStructure.set(h.structure_id, [
         ...(byStructure.get(h.structure_id) ?? []),
@@ -615,12 +619,16 @@ export async function canvassingMain() {
       byStructure.get(String(feature.properties.structure_id ?? "")) ?? [];
     if (direct.length) return direct;
     return [
-      ...new Map(
-        (feature.properties.address_reference_ids ?? [])
+      ...new Map([
+        ...(feature.properties.address_reference_ids ?? [])
           .map((id: string) => byAddress.get(id))
           .filter(Boolean)
-          .map((home: Household) => [home.household_id, home]),
-      ).values(),
+          .map((home: Household) => [home.household_id, home] as const),
+        ...(feature.properties.authoritative_address_ids ?? [])
+          .map((id: string) => bySourceAddressGuid.get(id))
+          .filter(Boolean)
+          .map((home: Household) => [home.household_id, home] as const),
+      ]).values(),
     ] as Household[];
   };
   const selected = new Set(
@@ -1715,7 +1723,9 @@ export async function canvassingMain() {
         layers: ["structures"],
       });
       if (roofs.length) {
-        pickStructure({ ...event, features: roofs } as any);
+        void pickStructure({ ...event, features: roofs } as any).catch((error) =>
+          toast(error instanceof Error ? error.message : "Roof selection failed"),
+        );
         return;
       }
       const addressPoints = map.queryRenderedFeatures(event.point, {
@@ -1915,7 +1925,21 @@ export async function canvassingMain() {
       `${selected.size} household${selected.size === 1 ? "" : "s"} selected`,
     );
   };
-  function pickStructure(
+  async function ensureSelectableHomes(feature: any) {
+    const existing = homesForStructure(feature);
+    if (existing.length) return existing;
+    const structureId = String(feature.properties.structure_id ?? "");
+    if (!structureId) throw new Error("This roof has no selectable identifier");
+    await fetchJson(
+      `/api/canvassing/structures/${encodeURIComponent(structureId)}/selection-target`,
+      { method: "POST", body: "{}" },
+    );
+    await refresh();
+    const created = homesForStructure(feature);
+    if (!created.length) throw new Error("This roof could not be made selectable");
+    return created;
+  }
+  async function pickStructure(
     e: MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
   ) {
     const rendered = map.queryRenderedFeatures(e.point, {
@@ -1929,14 +1953,12 @@ export async function canvassingMain() {
         )
         .filter(Boolean)
         .map((feature) => ({ feature, homes: homesForStructure(feature) }))
-        .sort((left, right) => right.homes.length - left.homes.length)[0],
-      homes = picked?.homes ?? [];
-    if (!homes.length) {
-      const structureId = String(rendered[0]?.properties?.structure_id ?? ""),
-        structure = structureFeatureById.get(structureId);
-      if (structure) return showUnlinkedStructure(structure);
-      return toast("No civic address is linked to this structure");
-    }
+        .sort((left, right) => right.homes.length - left.homes.length)[0];
+    const structure = picked?.feature ?? structureFeatureById.get(
+      String(rendered[0]?.properties?.structure_id ?? ""),
+    );
+    if (!structure) return toast("This roof has no selectable identifier");
+    const homes = await ensureSelectableHomes(structure);
     if (multiSelectMode) {
       toggleHouseholds(homes, true);
       return;
@@ -2141,18 +2163,6 @@ export async function canvassingMain() {
       }
     });
   }
-  function showUnlinkedStructure(structure: any) {
-    const drawer = document.querySelector<HTMLElement>("#drawer")!;
-    drawer.innerHTML = `<div class="drawer-head"><div><small>Reference roof</small><h2>Address needs review</h2><span>${String(structure.properties.building_type ?? "unclassified").replaceAll("_", " ")}</span></div><button id="drawer-close" class="drawer-close" aria-label="Close roof details">Close</button></div><section class="association-review"><h3>Building source</h3><p>${structure.properties.external_source} ${structure.properties.external_id} · ${structure.properties.confidence}</p></section>`;
-    openMobileDrawer();
-    appendCivicEditor(drawer, structure, []);
-    if (!isVolunteer()) {
-      const split = document.createElement("button");
-      split.textContent = "Split roof";
-      split.addEventListener("click", () => renderSplitEditor(structure));
-      drawer.append(split);
-    }
-  }
   function pickAddress(
     e: MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
   ) {
@@ -2307,7 +2317,7 @@ export async function canvassingMain() {
       talkedCurrent = Boolean(active.conversation_occurred),
       revisitCurrent = Boolean(active.revisit_requested);
     document.querySelector("#drawer")!.innerHTML =
-      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address needs review"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span>${active.address_review_required ? `<strong class="address-review-flag">Historical address activity requires review</strong>` : ""}</div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
+      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Canvassing roof"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span>${active.legacy_history_review ? `<strong class="address-review-flag">Historical linkage review · field activity is enabled</strong>` : ""}</div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
         volunteer
           ? ""
           : `<div class="private-fields"><label>Political outcome<select id="outcome" data-initial="${escapeHtml(active.political_outcome ?? "")}"><option value="">Not recorded</option>${[
@@ -2649,14 +2659,27 @@ export async function canvassingMain() {
     state = await fetchJson<State>("/api/canvassing/state");
     byStructure.clear();
     byAddress.clear();
+    bySourceAddressGuid.clear();
     for (const h of state.households) {
       byAddress.set(h.address_id, h);
+      if (h.source_address_guid)
+        bySourceAddressGuid.set(h.source_address_guid, h);
       if (h.structure_id)
         byStructure.set(h.structure_id, [
           ...(byStructure.get(h.structure_id) ?? []),
           h,
         ]);
       if (active?.household_id === h.household_id) active = h;
+    }
+    structureIdsByHousehold.clear();
+    for (const feature of structures.features) {
+      const structureId = String(feature.properties.structure_id);
+      for (const home of homesForStructure(feature)) {
+        const ids =
+          structureIdsByHousehold.get(home.household_id) ?? new Set<string>();
+        ids.add(structureId);
+        structureIdsByHousehold.set(home.household_id, ids);
+      }
     }
     for (const feature of structures.features) {
       const homes = homesForStructure(feature);

@@ -749,7 +749,7 @@ async function seed() {
   db.exec("BEGIN");
   try {
     db.exec(
-      "UPDATE structures SET source_active=0 WHERE external_source!='manual_canvassing_split'; UPDATE addresses SET source_active=0 WHERE external_source NOT IN ('manual_canvassing','manual_split_inferred'); UPDATE address_review_records SET source_active=0;",
+      "UPDATE structures SET source_active=0 WHERE external_source!='manual_canvassing_split'; UPDATE addresses SET source_active=0 WHERE external_source NOT IN ('manual_canvassing','manual_split_inferred','operational_roof_target'); UPDATE address_review_records SET source_active=0;",
     );
     if (historicalOnlyAddressIds.length) {
       const placeholders = historicalOnlyAddressIds.map(() => "?").join(",");
@@ -1085,7 +1085,7 @@ function state(role = "candidate") {
     a.lon,a.lat,a.number_event_id,CASE WHEN a.number_event_id IS NOT NULL THEN 1 ELSE 0 END number_corrected,
     CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae WHERE ae.address_id=a.id) THEN 'manual_verified' ELSE a.association_status END association_status,
     CASE WHEN a.source_active=1 THEN 0 ELSE 1 END historical_only,
-    CASE WHEN a.source_active=1 THEN 0 ELSE 1 END address_review_required,
+    CASE WHEN EXISTS(SELECT 1 FROM legacy_history_reviews r WHERE r.legacy_address_id=a.id) THEN 1 ELSE 0 END legacy_history_review,
     (SELECT review_status FROM legacy_history_reviews r WHERE r.legacy_address_id=a.id) legacy_review_status,
     COALESCE((SELECT CASE WHEN v.revisit_requested=1 THEN 'revisit' ELSE v.outcome END FROM active_visits v WHERE v.household_id=h.id AND (fs.flyer_delivered=1 OR v.outcome!='flyer_delivered') ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),CASE WHEN EXISTS(SELECT 1 FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id) THEN 'conversation' ELSE 'untouched' END) status,
     fs.flyer_delivered,
@@ -1446,12 +1446,10 @@ function serverCoverageSnapshot(
     ).map((row) => [row.id, String(row.building_type ?? "").toLowerCase()]),
   );
   const locations = current.map((home) => {
-    const historicalOnly = Boolean(home.historical_only);
     const nonResidential = knownNonResidentialBuildingTypes.has(
       buildingTypes.get(String(home.structure_id ?? "")) ?? "",
     );
     const eligible =
-      !historicalOnly &&
       !nonResidential &&
       isCoverageEligible({
         household_id: home.household_id,
@@ -2099,6 +2097,103 @@ const server = createServer(async (req, res) => {
       });
       return json(res, 200, { changed: true });
     }
+    if (
+      req.method === "POST" &&
+      /^\/api\/canvassing\/structures\/[^/]+\/selection-target$/.test(
+        url.pathname,
+      )
+    ) {
+      const structureId = url.pathname.split("/").at(-2)!;
+      const structure = db
+        .prepare(
+          "SELECT id,geometry_json FROM structures WHERE id=? AND source_active=1",
+        )
+        .get(structureId) as
+        | { id: string; geometry_json: string }
+        | undefined;
+      if (!structure) return json(res, 404, { error: "roof not found" });
+
+      // A visible roof without a current address still needs a stable target
+      // so field activity can use the normal visit/flyer workflow. This is an
+      // operational canvassing identity, not an address-quality decision.
+      const targetAddressId = `address_${createHash("sha256")
+          .update(`operational-roof-target:${structureId}`)
+          .digest("hex")
+          .slice(0, 20)}`,
+        targetHouseholdId = `household_${targetAddressId.slice(8)}`,
+        label = `Canvassing roof ${structureId.slice(-8)}`;
+      const existing = () =>
+        db
+          .prepare(
+            `SELECT h.id household_id
+             FROM households h JOIN addresses a ON a.id=h.address_id
+             WHERE a.structure_id=? AND a.source_active=1
+             ORDER BY h.id`,
+          )
+          .all(structureId) as Array<{ household_id: string }>;
+      if (existing().length)
+        return json(res, 200, {
+          structure_id: structureId,
+          household_ids: existing().map((row) => row.household_id),
+          created: false,
+        });
+
+      const [lon, lat] = geometryCenter(structure.geometry_json),
+        timestamp = now();
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        const lockedExisting = existing();
+        if (!lockedExisting.length) {
+          db.prepare(
+            `INSERT INTO addresses
+             (id,structure_id,civic_number,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)
+             ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,source_active=1`,
+          ).run(
+            targetAddressId,
+            structureId,
+            "",
+            "",
+            "",
+            label,
+            lon,
+            lat,
+            "operational_roof_target",
+            structureId,
+            "operational_roof_target",
+            timestamp,
+          );
+          db.prepare("INSERT OR IGNORE INTO households VALUES (?,?,?,?)").run(
+            targetHouseholdId,
+            targetAddressId,
+            "",
+            timestamp,
+          );
+        }
+        db.exec("COMMIT");
+      } catch (error) {
+        try {
+          db.exec("ROLLBACK");
+        } catch {}
+        throw error;
+      }
+      const householdIds = existing().map((row) => row.household_id);
+      audit(user, "ensure", "roof_selection_target", structureId, {
+        household_ids: householdIds,
+        source: "operational_roof_target",
+      });
+      await recordEvent({
+        type: "canvassing.roof.selection_target_created",
+        user_id: user,
+        structure_id: structureId,
+        household_ids: householdIds,
+      });
+      return json(res, 201, {
+        structure_id: structureId,
+        household_ids: householdIds,
+        created: true,
+      });
+    }
     if (url.pathname.startsWith("/api/admin/")) {
       if (role !== "candidate")
         return json(res, 403, { error: "candidate role required" });
@@ -2483,6 +2578,11 @@ const server = createServer(async (req, res) => {
         return json(res, 403, {
           error: "political outcome recording requires candidate role",
         });
+      const householdId = String(input.household_id ?? "").trim();
+      if (!householdId)
+        return json(res, 400, { error: "household_id is required" });
+      if (!db.prepare("SELECT 1 FROM households WHERE id=?").get(householdId))
+        return json(res, 404, { error: "household not found" });
       try {
         db.prepare("INSERT INTO submission_keys VALUES (?,?,'visit',NULL)").run(
           submissionKey,
@@ -2515,7 +2615,7 @@ const server = createServer(async (req, res) => {
         id: randomUUID(),
         occurred_at: input.occurred_at ?? now(),
         user_id: user,
-        household_id: input.household_id,
+        household_id: householdId,
         route_id: input.route_id ?? null,
         flyer_delivered: Boolean(input.flyer_delivered),
         door_knocked: Boolean(input.door_knocked),
