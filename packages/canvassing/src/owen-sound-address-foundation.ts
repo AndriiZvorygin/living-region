@@ -546,7 +546,7 @@ export async function extractOwenSoundNar(options: {
 
 function existingFromFeature(feature: Feature): ExistingAddress | null {
   const p = feature.properties;
-  const internal = asString(p.address_id ?? feature.id);
+  const internal = asString(p.address_id ?? p.internal_address_id ?? feature.id);
   if (!internal) return null;
   const civic = asString(p.civic_number);
   const street = asString(p.street);

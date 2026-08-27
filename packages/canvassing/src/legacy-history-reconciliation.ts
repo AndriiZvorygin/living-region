@@ -124,7 +124,9 @@ const canonicalStreetKey = (properties: Record<string, any>) =>
 
 function legacyFromFeature(feature: Feature): LegacyAddress | null {
   const properties = feature.properties;
-  const id = String(properties.address_id ?? feature.id ?? "");
+  const id = String(
+    properties.address_id ?? properties.internal_address_id ?? feature.id ?? "",
+  );
   const street = String(properties.street ?? "").trim();
   if (!id || !street) return null;
   const coordinates = feature.geometry.coordinates as Position;

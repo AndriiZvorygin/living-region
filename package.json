@@ -127,6 +127,8 @@
     "canvassing:prepare": "tsx packages/canvassing/src/prepare-data.ts",
     "canvassing:materialize-targets": "tsx packages/canvassing/src/materialize-selection-targets.ts",
     "canvassing:addresses": "tsx packages/canvassing/src/retrieve-owen-sound-addresses.ts",
+    "canvassing:history-crosswalk": "tsx packages/canvassing/src/build-structure-history-crosswalk.ts",
+    "canvassing:audit-address-recovery": "tsx packages/canvassing/src/audit-address-recovery.ts",
     "canvassing:grey-footprints": "tsx packages/canvassing/src/retrieve-grey-building-footprints.ts",
     "canvassing:prepare-osm-import": "tsx packages/canvassing/src/prepare-osm-import.ts",
     "canvassing:verify-operations": "tsx packages/canvassing/src/verify-operations.ts",

@@ -336,13 +336,14 @@ async function main() {
         buildings,
         linkedByStructure,
       );
+    const roadById = new Map(
+      roads.map((road) => [String(road.properties.road_id ?? ""), road]),
+    );
     for (const building of buildings) {
       const structureId = String(building.properties.structure_id),
+        linked = linkedByStructure.get(structureId) ?? [],
         addressIds = [
-          ...(linkedByStructure.get(structureId) ?? []).map(
-            (address) => address.address_id,
-          ),
-          ...(building.properties.address_reference_ids ?? []),
+          ...linked.map((address) => address.address_id),
         ],
         householdIds = [
           ...new Set(
@@ -353,15 +354,54 @@ async function main() {
           ),
         ],
         canvassable =
-          householdIds.length > 0 ||
-          isCanvassableStructureType(building.properties.building_type);
+          isCanvassableStructureType(building.properties.building_type) &&
+          (householdIds.length > 0 ||
+            isCanvassableStructureType(building.properties.building_type));
       if (canvassable && !householdIds.length) {
+        const rangeRoad = roadById.get(
+          String(building.properties.address_range_road_id ?? ""),
+        );
+        let road = rangeRoad;
+        if (!road) {
+          const point = centroid(building);
+          road = roads
+            .map((candidate) => ({
+              candidate,
+              distance: distanceToFeature(point, candidate),
+            }))
+            .sort(
+              (left, right) =>
+                left.distance - right.distance ||
+                String(left.candidate.properties.name ?? "").localeCompare(
+                  String(right.candidate.properties.name ?? ""),
+                ),
+            )[0]?.candidate;
+        }
+        const inferredNumber = String(
+          building.properties.inferred_civic_number ??
+            building.properties.civic_numbers?.[0] ??
+            String(building.properties.civic_label ?? "").match(/\d+/)?.[0] ??
+            "1",
+        );
+        const inferredStreet = String(road?.properties.name ?? "Owen Sound Road");
+        building.properties.fallback_civic_number = inferredNumber;
+        building.properties.fallback_street = inferredStreet;
+        building.properties.fallback_unit = "";
+        building.properties.address_label_source =
+          "owen_sound_grid_estimate";
+        building.properties.address_source_status = "estimated";
+        building.properties.address_quality = "grid_estimated";
+        building.properties.civic_numbers = [inferredNumber];
+        building.properties.civic_label = `~${inferredNumber} ${inferredStreet}`;
         householdIds.push(
           operationalTargetForStructure(structureId).householdId,
         );
         building.properties.selection_target_kind = "operational_roof";
-      } else if (householdIds.length) {
+      } else if (canvassable && householdIds.length) {
         building.properties.selection_target_kind = "address_household";
+      } else if (!canvassable) {
+        householdIds.length = 0;
+        building.properties.selection_target_kind = null;
       }
       building.properties.canvassable = canvassable;
       building.properties.selection_target_ids = householdIds;

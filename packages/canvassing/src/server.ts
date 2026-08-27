@@ -15,6 +15,7 @@ import { DatabaseSync, backup } from "node:sqlite";
 import { basename, dirname, join, resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { gzipSync } from "node:zlib";
+import { physicalRoofActivityFromDatabase } from "./structure-history";
 import {
   applySampleOverrides,
   defaultFollowupDate,
@@ -73,6 +74,10 @@ if (!["127.0.0.1", "localhost", "::1"].includes(host) && !token)
 const storePath = resolve(
   process.env.CANVASS_DB ?? "private/canvassing/owen-sound.sqlite",
 );
+const preparedStructuresPath = resolve(
+  process.env.CANVASS_STRUCTURES_ASSET ??
+    "packages/web-client/public/canvassing/structures.geojson",
+);
 const journalPath = resolve(
   process.env.CANVASS_EVENT_LOG ?? "private/canvassing/visits.pya.jsonl",
 );
@@ -86,6 +91,18 @@ const splitCalibrationPath = resolve(
 );
 const LEGACY_FLYER_ID = "flyer-1-original";
 const CURRENT_FLYER_ID = "flyer-2-current";
+const preparedStructureMetadata = new Map<string, any>();
+try {
+  const prepared = JSON.parse(await readFile(preparedStructuresPath, "utf8"));
+  for (const feature of prepared.features ?? []) {
+    const structureId = String(feature.properties?.structure_id ?? "");
+    if (structureId) preparedStructureMetadata.set(structureId, feature.properties);
+  }
+} catch {
+  // The API can still start for migrations or health checks when the public
+  // map asset is not mounted. The selection-target endpoint will fail closed
+  // rather than inventing an address in that situation.
+}
 await mkdir(dirname(storePath), { recursive: true });
 const db = new DatabaseSync(storePath);
 db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON;
@@ -397,6 +414,27 @@ if (!postAddressMigrations.has(19)) {
       (19,'canvassing_state_legacy_activity_lookup_indexes',datetime('now'));
     COMMIT;`);
 }
+if (!postAddressMigrations.has(20)) {
+  db.exec(`BEGIN;
+    CREATE TABLE structure_history_crosswalk (
+      historical_household_id TEXT PRIMARY KEY REFERENCES households(id),
+      historical_structure_id TEXT NOT NULL,
+      historical_address_id TEXT NOT NULL,
+      canonical_structure_id TEXT NOT NULL REFERENCES structures(id),
+      match_method TEXT NOT NULL,
+      confidence TEXT NOT NULL CHECK(confidence IN ('exact_structure_geometry','review')),
+      historical_label TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX structure_history_crosswalk_structure
+      ON structure_history_crosswalk(canonical_structure_id);
+    CREATE INDEX structure_history_crosswalk_address
+      ON structure_history_crosswalk(historical_address_id);
+    INSERT INTO schema_migrations VALUES
+      (20,'permanent_physical_roof_history_crosswalk',datetime('now'));
+    COMMIT;`);
+}
 db.exec(`DROP VIEW IF EXISTS household_flyer_state;
 DROP VIEW IF EXISTS effective_people;
 DROP VIEW IF EXISTS activity_people;
@@ -513,7 +551,7 @@ SELECT p.id,p.household_id,
 FROM activity_people p;`);
 
 const now = () => new Date().toISOString();
-const SCHEMA_VERSION = 19;
+const SCHEMA_VERSION = 20;
 const configuredHoldMinutes = Number(
   process.env.CANVASS_RECOMMENDATION_HOLD_MINUTES ?? "30",
 );
@@ -758,6 +796,23 @@ async function seed() {
   const historicalOnlyAddressIds = Array.isArray(legacyUnmatchedIds)
     ? legacyUnmatchedIds.filter((id): id is string => typeof id === "string")
     : [];
+  const structureHistory = JSON.parse(
+    await readFile(join(base, "structure-history-crosswalk.json"), "utf8").catch(
+      () => '{"rows":[]}',
+    ),
+  );
+  const structureHistoryRows = Array.isArray(structureHistory.rows)
+    ? structureHistory.rows.filter(
+        (row: any) =>
+          row &&
+          typeof row.historical_household_id === "string" &&
+          typeof row.historical_structure_id === "string" &&
+          typeof row.historical_address_id === "string" &&
+          typeof row.canonical_structure_id === "string" &&
+          row.canonical_structure_id &&
+          ["exact_structure_geometry", "review"].includes(row.confidence),
+      )
+    : [];
   const timestamp = now();
   db.exec("BEGIN");
   try {
@@ -823,12 +878,21 @@ async function seed() {
     }
     const insertOperationalAddress = db.prepare(
       `INSERT INTO addresses
-       (id,structure_id,civic_number,street,unit,label,lon,lat,
-        external_source,external_id,association_status,imported_at,source_active)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)
+       (id,structure_id,civic_number,civic_number_base,civic_number_suffix,
+        street,unit,label,lon,lat,external_source,external_id,
+        association_status,imported_at,source_active)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
        ON CONFLICT(id) DO UPDATE SET
          structure_id=excluded.structure_id,
+         civic_number=excluded.civic_number,
+         civic_number_base=excluded.civic_number_base,
+         civic_number_suffix=excluded.civic_number_suffix,
+         street=excluded.street,
+         unit=excluded.unit,
          label=excluded.label,
+         external_source=excluded.external_source,
+         external_id=excluded.external_id,
+         association_status=excluded.association_status,
          source_active=1`,
     );
     for (const feature of structures.features) {
@@ -841,22 +905,63 @@ async function seed() {
         throw new Error(
           `Canvassing data invariant failed: ${structureId} has an invalid operational target`,
         );
+      const civicNumber = String(p.fallback_civic_number ?? "").trim();
+      const street = String(p.fallback_street ?? "").trim();
+      const unit = String(p.fallback_unit ?? "").trim();
+      if (!civicNumber || !street || /^Canvassing roof\b/i.test(String(p.civic_label ?? "")))
+        throw new Error(
+          `Canvassing address invariant failed: ${structureId} has no materialized human-readable address`,
+        );
       insertOperationalAddress.run(
         target.addressId,
         structureId,
+        civicNumber,
+        civicNumber,
         "",
-        "",
-        "",
-        `Canvassing roof ${structureId.slice(-8)}`,
+        street,
+        unit,
+        String(p.civic_label),
         lon,
         lat,
         "operational_roof_target",
         structureId,
-        "operational_roof_target",
+        String(p.address_source_status ?? "estimated"),
         timestamp,
       );
       insertHousehold.run(target.householdId, target.addressId, "", timestamp);
     }
+    const insertStructureHistory = db.prepare(
+      `INSERT INTO structure_history_crosswalk
+       (historical_household_id,historical_structure_id,historical_address_id,
+        canonical_structure_id,match_method,confidence,historical_label,
+        created_at,updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?)
+       ON CONFLICT(historical_household_id) DO UPDATE SET
+        historical_structure_id=excluded.historical_structure_id,
+        historical_address_id=excluded.historical_address_id,
+        canonical_structure_id=excluded.canonical_structure_id,
+        match_method=excluded.match_method,
+        confidence=excluded.confidence,
+        historical_label=excluded.historical_label,
+        updated_at=excluded.updated_at`,
+    );
+    for (const row of structureHistoryRows)
+      if (
+        db
+          .prepare("SELECT 1 FROM households WHERE id=?")
+          .get(row.historical_household_id)
+      )
+        insertStructureHistory.run(
+          row.historical_household_id,
+          row.historical_structure_id,
+          row.historical_address_id,
+          row.canonical_structure_id,
+          String(row.match_method),
+          row.confidence,
+          String(row.historical_label ?? ""),
+          timestamp,
+          timestamp,
+        );
     const persistedHouseholdIds = new Set(
       (
         db.prepare("SELECT id FROM households").all() as Array<{ id: string }>
@@ -1144,6 +1249,141 @@ function sessionSummary(sessionId: string) {
   };
 }
 
+function selectionTargetHousehold(
+  householdId: string,
+  role: "candidate" | "volunteer" = "candidate",
+) {
+  const household = db
+    .prepare(
+      `SELECT h.id household_id,h.unit_label,a.id address_id,a.structure_id,
+              a.civic_number_effective civic_number,a.civic_number_base,
+              a.civic_number_suffix,a.street_effective street,a.unit_effective unit,
+              a.source_address_guid,a.source_location_guid,a.official_street_name,
+              a.official_street_type,a.official_street_direction,
+              a.lon,a.lat,a.number_event_id,
+              CASE WHEN EXISTS(SELECT 1 FROM address_association_events ae
+                               WHERE ae.address_id=a.id)
+                   THEN 'manual_verified' ELSE a.association_status END association_status,
+              CASE WHEN a.source_active=1 THEN 0 ELSE 1 END historical_only,
+              CASE WHEN EXISTS(SELECT 1 FROM legacy_history_reviews r
+                               WHERE r.legacy_address_id=a.id) THEN 1 ELSE 0 END legacy_history_review,
+              (SELECT review_status FROM legacy_history_reviews r
+                WHERE r.legacy_address_id=a.id) legacy_review_status,
+              fs.flyer_delivered
+         FROM households h
+         JOIN effective_addresses a ON a.id=h.address_id
+         JOIN household_flyer_state fs ON fs.household_id=h.id
+        WHERE h.id=?`,
+    )
+    .get(householdId) as any;
+  if (!household) return null;
+  const visits = db
+    .prepare(
+      `SELECT id,occurred_at,flyer_id,flyer_delivered,door_knocked,
+              conversation_occurred,revisit_requested,no_answer,outcome
+         FROM active_visits WHERE household_id=? ORDER BY occurred_at DESC,id DESC`,
+    )
+    .all(householdId) as any[];
+  const flyerHistory = db
+    .prepare(
+      `SELECT v.id event_id,v.occurred_at,v.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              v.user_id,v.source
+         FROM active_visits v LEFT JOIN flyer_catalogue fc ON fc.id=v.flyer_id
+        WHERE v.household_id=? AND v.flyer_delivered=1
+       UNION ALL
+       SELECT f.id event_id,f.occurred_at,f.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              f.user_id,f.source
+         FROM activity_flyer_events f LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
+        WHERE f.household_id=? AND f.flyer_delivered=1
+        ORDER BY occurred_at DESC,event_id DESC`,
+    )
+    .all(householdId, householdId) as any[];
+  const conversation = db
+    .prepare(
+      "SELECT 1 FROM activity_neighbourhood_conversations WHERE household_id=? LIMIT 1",
+    )
+    .get(householdId);
+  const latest = visits[0];
+  household.label = household.number_event_id
+    ? `${household.civic_number} ${household.street}${household.unit ? ` Unit ${household.unit}` : ""}`.trim()
+    : household.source_address_guid && household.official_street_name
+      ? formatOfficialAddress({
+          civicNumber: household.civic_number_base ?? household.civic_number,
+          civicNumberSuffix: household.civic_number_suffix,
+          streetName: household.official_street_name,
+          streetType: household.official_street_type,
+          streetDirection: household.official_street_direction,
+          unit: household.unit,
+        })
+      : `${household.civic_number} ${household.street}`.trim();
+  household.status = latest
+    ? latest.revisit_requested
+      ? "revisit"
+      : latest.outcome
+    : conversation
+      ? "conversation"
+      : "untouched";
+  household.door_knocked = visits.some((visit) => visit.door_knocked) ? 1 : 0;
+  household.conversation_occurred = conversation || visits.some((visit) => visit.conversation_occurred) ? 1 : 0;
+  household.revisit_requested = visits.some((visit) => visit.revisit_requested) ? 1 : 0;
+  household.no_answer = visits.some((visit) => visit.no_answer) ? 1 : 0;
+  household.political_outcome = visits.find((visit) =>
+    [
+      "supportive",
+      "undecided",
+      "opposed",
+      "volunteer_interest",
+      "lawn_sign_interest",
+      "vacant",
+      "no_campaign_material_requested",
+    ].includes(visit.outcome),
+  )?.outcome ?? null;
+  household.visit_count = visits.length;
+  household.number_corrected = household.number_event_id ? 1 : 0;
+  household.last_updated_at = visits[0]?.occurred_at ?? null;
+  household.flyer_history = flyerHistory.map((event) => ({
+    event_id: event.event_id,
+    occurred_at: event.occurred_at,
+    flyer_id: event.flyer_id,
+    flyer_name: event.flyer_name,
+    ...(role === "volunteer" ? {} : { user_id: event.user_id }),
+    source: event.source,
+  }));
+  household.flyer_ids = [
+    ...new Set(flyerHistory.map((event) => event.flyer_id).filter(Boolean)),
+  ];
+  if (role === "volunteer") {
+    household.political_outcome = null;
+    household.flyer_history = household.flyer_history.map(
+      ({ event_id, occurred_at, flyer_id, flyer_name }: any) => ({
+        event_id,
+        occurred_at,
+        flyer_id,
+        flyer_name,
+      }),
+    );
+    if (
+      [
+        "supportive",
+        "undecided",
+        "opposed",
+        "volunteer_interest",
+        "lawn_sign_interest",
+      ].includes(household.status)
+    )
+      household.status = household.conversation_occurred
+        ? "conversation"
+        : household.door_knocked
+          ? "knocked_no_answer"
+          : household.flyer_delivered
+            ? "flyer_delivered"
+            : "untouched";
+  }
+  return household;
+}
+
 function state(role = "candidate") {
   const households = db
     .prepare(
@@ -1240,6 +1480,24 @@ function state(role = "candidate") {
       ...new Set(history.map((event) => event.flyer_id).filter(Boolean)),
     ];
   }
+  const physical_roof_activity = [...physicalRoofActivityFromDatabase(db)].map(
+    ([structure_id, activity]) => ({
+      ...activity,
+      structure_id,
+      flyer_history:
+        role === "volunteer"
+          ? activity.flyer_history.map(
+              ({ event_id, occurred_at, flyer_id, flyer_name, source }) => ({
+                event_id,
+                occurred_at,
+                flyer_id,
+                flyer_name,
+                source,
+              }),
+            )
+          : activity.flyer_history,
+    }),
+  );
   if (role === "volunteer") {
     for (const household of households) {
       household.political_outcome = null;
@@ -1461,6 +1719,7 @@ function state(role = "candidate") {
     recruitment_areas,
     recruitment_prospects,
     address_review_counts: role === "volunteer" ? {} : address_review_counts,
+    physical_roof_activity,
     schema_version: SCHEMA_VERSION,
     summary,
   };
@@ -2368,13 +2627,6 @@ const server = createServer(async (req, res) => {
         | undefined;
       if (!structure) return json(res, 404, { error: "roof not found" });
 
-      // A visible roof without a current address still needs a stable target
-      // so field activity can use the normal visit/flyer workflow. This is an
-      // operational canvassing identity, not an address-quality decision.
-      const target = operationalTargetForStructure(structureId),
-        targetAddressId = target.addressId,
-        targetHouseholdId = target.householdId,
-        label = `Canvassing roof ${structureId.slice(-8)}`;
       const existing = () =>
         db
           .prepare(
@@ -2391,6 +2643,27 @@ const server = createServer(async (req, res) => {
           created: false,
         });
 
+      // Normal seeding materializes every target with a human-readable
+      // fallback address. A stale or partially seeded database can still
+      // reach this defensive path (for example after an address source was
+      // disabled). Reuse the prepared roof metadata and stable target IDs;
+      // never manufacture an anonymous roof label.
+      const metadata = preparedStructureMetadata.get(structureId),
+        target = operationalTargetForStructure(structureId),
+        civicNumber = String(metadata?.fallback_civic_number ?? "").trim(),
+        street = String(metadata?.fallback_street ?? "").trim(),
+        label = String(metadata?.civic_label ?? "").trim();
+      if (
+        !metadata?.canvassable ||
+        metadata.selection_target_kind !== "operational_roof" ||
+        !civicNumber ||
+        !street ||
+        !label ||
+        /^Canvassing roof\b/i.test(label)
+      )
+        return json(res, 409, {
+          error: "roof target is not materialized; refresh the canvassing data",
+        });
       const [lon, lat] = geometryCenter(structure.geometry_json),
         timestamp = now();
       db.exec("BEGIN IMMEDIATE");
@@ -2399,27 +2672,45 @@ const server = createServer(async (req, res) => {
         if (!lockedExisting.length) {
           db.prepare(
             `INSERT INTO addresses
-             (id,structure_id,civic_number,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)
-             ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,source_active=1`,
+             (id,structure_id,civic_number,civic_number_base,civic_number_suffix,
+              street,unit,label,lon,lat,external_source,external_id,
+              association_status,imported_at,source_active)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+             ON CONFLICT(id) DO UPDATE SET
+              structure_id=excluded.structure_id,
+              civic_number=excluded.civic_number,
+              civic_number_base=excluded.civic_number_base,
+              civic_number_suffix=excluded.civic_number_suffix,
+              street=excluded.street,
+              unit=excluded.unit,
+              label=excluded.label,
+              lon=excluded.lon,
+              lat=excluded.lat,
+              external_source=excluded.external_source,
+              external_id=excluded.external_id,
+              association_status=excluded.association_status,
+              imported_at=excluded.imported_at,
+              source_active=1`,
           ).run(
-            targetAddressId,
+            target.addressId,
             structureId,
-            "",
-            "",
-            "",
+            civicNumber,
+            civicNumber,
+            String(metadata.fallback_civic_number_suffix ?? ""),
+            street,
+            String(metadata.fallback_unit ?? ""),
             label,
             lon,
             lat,
             "operational_roof_target",
             structureId,
-            "operational_roof_target",
+            String(metadata.address_source_status ?? "estimated"),
             timestamp,
           );
           db.prepare("INSERT OR IGNORE INTO households VALUES (?,?,?,?)").run(
-            targetHouseholdId,
-            targetAddressId,
-            "",
+            target.householdId,
+            target.addressId,
+            String(metadata.fallback_unit ?? ""),
             timestamp,
           );
         }
@@ -2434,18 +2725,17 @@ const server = createServer(async (req, res) => {
       audit(user, "ensure", "roof_selection_target", structureId, {
         household_ids: householdIds,
         source: "operational_roof_target",
+        recovered: true,
       });
-      await recordEvent({
-        type: "canvassing.roof.selection_target_created",
-        user_id: user,
+      return json(res, 200, {
         structure_id: structureId,
         household_ids: householdIds,
-      });
-      return json(res, 201, {
-        structure_id: structureId,
-        household_ids: householdIds,
+        households: householdIds
+          .map((householdId) => selectionTargetHousehold(householdId, role))
+          .filter(Boolean),
         created: true,
       });
+
     }
     if (url.pathname.startsWith("/api/admin/")) {
       if (role !== "candidate")

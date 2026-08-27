@@ -137,4 +137,25 @@ describe("Owen Sound address foundation utilities", () => {
     });
     expect(result.unmatchedExisting).toHaveLength(0);
   });
+
+  it("accepts legacy exports that name the stable id internal_address_id", () => {
+    const result = reconcileExistingAddresses(
+      [unit({ address_id: "nar-guid", civic_number: "12", official_street_name: "Main", official_street_type: "ST" })],
+      [{
+        type: "Feature",
+        properties: {
+          internal_address_id: "address_legacy",
+          civic_number: "99",
+          street: "Old Street",
+          unit: "",
+          label: "99 Old Street",
+          external_source: "legacy",
+          structure_id: "structure-old",
+        },
+        geometry: { type: "Point", coordinates: [-80.95, 44.56] },
+      }],
+    );
+    expect(result.unmatchedExisting).toHaveLength(1);
+    expect(result.unmatchedExisting[0].internal_address_id).toBe("address_legacy");
+  });
 });

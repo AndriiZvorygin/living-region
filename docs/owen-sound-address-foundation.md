@@ -73,7 +73,9 @@ The command writes `data/derived/owen-sound-address-foundation/`:
 - `canvassing-locations.geojson`: one point per `LOC_GUID`, with unit counts
   and address GUIDs;
 - `legacy-unmatched-stops.geojson`: existing rows not matched to the new
-  source, retained for review and not deleted from SQLite;
+  source, retained for review and not deleted from SQLite. The immutable
+  `legacy-address-source.geojson` is the input snapshot used to make repeated
+  extraction runs reproducible;
 - `legacy-unmatched-address-ids.json`: the stable internal IDs that the server
   keeps historical-only during its transactional seed;
 - `reconciliation.json`, `validation-report.json`, and
@@ -93,6 +95,12 @@ npm run canvassing:addresses -- \
   --publish
 ```
 
+The legacy comparison input defaults to
+`data/derived/owen-sound-address-foundation/legacy-address-source.geojson`.
+Override it with `CANVASS_LEGACY_ADDRESS_SOURCE` when using a separately
+archived pre-migration snapshot; the generated unmatched output is deliberately
+not used as its own next-run input.
+
 Restarting the canvassing server runs its existing transactional prepared-data
 seed. Make a backup before production restart as usual. The seed applies the
 generated unmatched-ID list as a historical-only deny list, so an old row that
@@ -103,7 +111,7 @@ NAR units.
 
 ## Current generated validation snapshot
 
-The checked-in report is generated with retrieval date 2026-08-26. It records
+The checked-in report is generated with retrieval date 2026-08-27. It records
 the exact counts, duplicate/conflict groups, coordinate and boundary checks,
 and the existing-stop reconciliation. In particular, one physical location
 can have many address units, so those two counts must not be treated as
@@ -128,18 +136,19 @@ shared by all units at an apartment or mixed-use location. The generated
 `canvassing-locations.geojson` has one feature per `LOC_GUID` and the primary
 NAR units represent 6,857 physical locations (7,156 across all retained use
 categories). The generated primary unit bundle is published at
-`packages/web-client/public/canvassing/addresses.geojson`.
+`packages/web-client/public/canvassing/addresses.geojson`; the map publishes
+one physical roof feature per building and attaches unit targets to it.
 
 The final activation audit is recorded in
 `data/derived/owen-sound-address-foundation/validation-report.json`. The
 11,244 retained all-use units and 10,909 primary units both exclude the 12
 outside-boundary and 14 no-coordinate records. The live database currently
-contains 10,912 selectable household rows: the 10,909 NAR primary rows plus
-three pre-existing manual roof-split exceptions. The current runtime does not
-yet consume `LOC_GUID` as its map/selection identity; it still groups linked
-records by legacy `structure_id` and otherwise exposes address-unit points.
-That is an explicit remaining address-foundation limitation, not a count that
-should be hidden by the published source totals.
+publishes 8,000 selectable physical roof features: 1,288 with direct NAR units
+and 6,712 with stable operational targets backed by same-roof legacy or
+explicit Owen Sound grid-estimated addresses. The API retains unit-level
+household rows and uses the physical-roof activity projection for historical
+status, so apartment buildings can remain one roof stop without losing unit
+coverage.
 
 ## Authoritative number and footprint activation
 
@@ -148,8 +157,9 @@ official street name/type/direction, and `APT_NO_LABEL` directly. The shared
 formatter in `packages/canvassing/src/official-address.ts` produces labels such
 as `808 2nd Avenue East`, `254 8th Street East`, `155A 10th Street West`, and
 `305 14th Street West Unit 101`. Estimated or interpolated numbers are not
-used for an active NAR unit. Legacy estimates remain only on legacy or
-unaddressed review geometry.
+used for an active NAR unit. Legacy same-roof addresses and grid estimates are
+explicitly marked fallback metadata for roofs without a direct NAR unit; they
+remain human-readable and selectable.
 
 `npm run canvassing:grey-footprints` retrieves the Owen Sound envelope from the
 public Grey County Building Footprints ArcGIS layer using IPv4, paginates the
@@ -170,9 +180,9 @@ no resident or roll-number data.
 The latest generated snapshot reports 7,156 retained physical `LOC_GUID`
 locations, of which 6,857 contain residential or partly residential units;
 10,909 primary address units remain published. Footprint placement reports
-807 containing matches, 6,211 nearest matches, 91 ambiguous matches, and 47
+807 containing matches, 6,218 nearest matches, 84 ambiguous matches, and 47
 unmatched points. Its distance distribution is p50 7.97m, p90 17.33m, p95
-21.87m, p99 38.64m, and maximum 618.33m. The 138 review points are not removed
+21.87m, p99 38.64m, and maximum 618.33m. The 131 review points are not removed
 from the address bundle. Numbering diagnostics record anomalies for review,
 including 335 parity, 314 hundred-block, and 3,035 monotonic-progression
 flags; these are data/geometry flags rather than corrections to NAR.
@@ -207,3 +217,46 @@ selection, and route targeting. The review set is derived from the event
 tables during every seed, so reseeding and restarting cannot reset a roof's
 colour or hide an activity-bearing historical roof. A later safe reconciliation
 can update the link table without modifying the original events.
+
+## Physical-roof recovery and operational address fallback
+
+Schema migration 20 creates `structure_history_crosswalk`. It is keyed by the
+historical household and records the historical structure, current physical
+structure, match method, and confidence. The crosswalk is generated from the
+verified pre-migration snapshot with:
+
+```sh
+npm run canvassing:history-crosswalk
+```
+
+The API derives physical-roof activity from the original visits and flyer
+events through that crosswalk. It does not copy, rewrite, or re-identify those
+events, so event IDs, timestamps, actors, flyer IDs, notes, corrections, and
+sources remain intact. When several historical rows resolve to one roof, their
+effective activity is unioned for the roof status while unit history remains
+available at household level.
+
+Generate the machine-readable recovery comparison and invariant report with:
+
+```sh
+npm run canvassing:audit-address-recovery -- \
+  --current-db private/canvassing/owen-sound.sqlite \
+  --pre-migration-db private/canvassing/backups/owen-sound-pre-address-history-2026-08-26.sqlite
+```
+
+The 2026-08-27 production-shaped recovery clone reported 2,046
+pre-migration flyered physical roofs and 2,046 recovered roofs, with zero
+missing visit rows. It also verified zero anonymous canvassing labels, zero
+blank active target addresses, zero distant-review references used for
+targeting, and zero canvassable roofs without a target. The current production
+backup made before this repair is stored outside Git under
+`private/canvassing/backups/recovery-before-address-repair-2026-08-27T03-51-34Z`.
+
+The old city-wide nearest-building references are no longer used to create
+household targets. A roof with a direct NAR placement uses its NAR address
+units. An otherwise canvassable roof uses a same-physical-roof legacy civic
+label when one exists, or an explicitly marked Owen Sound grid estimate. Both
+remain human-readable and selectable; review confidence is informational and
+cannot suppress physical-roof activity or field actions. Accessory structures
+remain outside the canvassable structure type set unless they have an explicit
+residential address placement.

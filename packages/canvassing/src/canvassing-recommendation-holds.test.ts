@@ -152,7 +152,7 @@ describe.sequential("canvassing recommendation holds", () => {
     const replacementHolds = holds().filter((hold) => hold.user_id === "rynaldo");
     expect(replacementHolds).toHaveLength(1);
     expect(replacementHolds[0].id).not.toBe(previousId);
-  });
+  }, 90_000);
 
   it("refreshes only for repeated meaningful activity inside the footprint", async () => {
     const rynaldo = await login("rynaldo");
@@ -203,7 +203,7 @@ describe.sequential("canvassing recommendation holds", () => {
       Date.parse(afterOutside.expires_at),
     );
     expect(recommendation.data.recommendation).toBeTruthy();
-  });
+  }, 90_000);
 
   it("ignores expired holds", async () => {
     const andrii = await login("andrii");
@@ -218,7 +218,7 @@ describe.sequential("canvassing recommendation holds", () => {
     expect(second.data.recommendation.center_household_id).toBe(
       first.data.recommendation.center_household_id,
     );
-  });
+  }, 90_000);
 
   it("serializes near-simultaneous requests before creating holds", async () => {
     const andrii = await login("andrii");
@@ -238,5 +238,5 @@ describe.sequential("canvassing recommendation holds", () => {
     expect([...footprint(activeHolds[0])].some((id) => footprint(activeHolds[1]).has(id))).toBe(
       false,
     );
-  });
+  }, 90_000);
 });

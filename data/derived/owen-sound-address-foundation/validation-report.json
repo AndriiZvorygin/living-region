@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-26T21:36:14.423Z",
+  "generated_at": "2026-08-27T04:56:16.611Z",
   "source_counts": {
     "residential": 8875,
     "partly_residential": 2034,
@@ -130,13 +130,13 @@
     ]
   },
   "reconciliation": {
-    "matched_exact": 916,
-    "matched_base_distance": 75,
-    "new": 9918,
-    "existing_feature_count": 7467,
-    "existing_osm_stop_features": 3426,
-    "existing_address_rows": 7453,
-    "existing_3426_osm_stops": 3426,
+    "matched_exact": 10909,
+    "matched_base_distance": 0,
+    "new": 0,
+    "existing_feature_count": 17371,
+    "existing_osm_stop_features": 3119,
+    "existing_address_rows": 17371,
+    "existing_3426_osm_stops": 3119,
     "unmatched_existing_rows": 6462
   },
   "unique_physical_locations": 7156,
@@ -158,8 +158,8 @@
   "primary_footprint_placement": {
     "total_locations": 6857,
     "exact_matches": 766,
-    "nearest_matches": 5978,
-    "ambiguous_matches": 87,
+    "nearest_matches": 5985,
+    "ambiguous_matches": 80,
     "unmatched_matches": 26,
     "distance_m": {
       "p50": 7.884382967996858,
@@ -170,25 +170,32 @@
     },
     "grey_exact_matches": 177,
     "grey_nearest_matches": 151,
-    "review_required": 113
+    "review_required": 106
   },
   "address_display": {
-    "authoritative_labels_applied_to_locations": 1342,
-    "estimated_structure_labels_replaced": 846,
+    "authoritative_labels_applied_to_locations": 1351,
+    "estimated_structure_labels_replaced": 30,
     "active_address_labels_are_nar_formatted": true,
-    "former_estimated_labels_are_not_used_for_nar_address_units": true
+    "former_estimated_labels_are_not_used_for_nar_address_units": true,
+    "operational_roof_address_repair": {
+      "authoritative": 1288,
+      "legacy_fallback": 5254,
+      "estimated_fallback": 1458,
+      "unresolved": 0,
+      "removed_reference_ids": 0
+    }
   },
   "physical_footprint_audit": {
-    "usable_existing_footprints": 7201,
+    "usable_existing_footprints": 7269,
     "grey_footprints_retrieved": 1940,
-    "unaddressed_usable_footprints_excluded_from_canvassing_locations": 7799,
-    "multi_address_structures": 1195
+    "unaddressed_usable_footprints_excluded_from_canvassing_locations": 7802,
+    "multi_address_structures": 1016
   },
   "footprint_placement": {
     "total_locations": 7156,
     "exact_matches": 807,
-    "nearest_matches": 6211,
-    "ambiguous_matches": 91,
+    "nearest_matches": 6218,
+    "ambiguous_matches": 84,
     "unmatched_matches": 47,
     "distance_m": {
       "p50": 7.968686029312722,
@@ -199,7 +206,7 @@
     },
     "grey_exact_matches": 180,
     "grey_nearest_matches": 164,
-    "review_required": 138
+    "review_required": 131
   },
   "numbering": {
     "address_units": 10909,

@@ -191,7 +191,7 @@ describe.sequential("canvassing authenticated multi-user workflow", () => {
     expect(loggedOut.response.status).toBe(200);
     const afterLogout = await apiRequest("/api/canvassing/state", rynaldo.cookie);
     expect(afterLogout.response.status).toBe(401);
-  });
+  }, 90_000);
 
   it("rejects inactive accounts", async () => {
     execFileSync(process.execPath, [

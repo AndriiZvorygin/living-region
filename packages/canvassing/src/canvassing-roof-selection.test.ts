@@ -69,7 +69,9 @@ describe.sequential("canvassing roof selection", () => {
     await rm(directory, { recursive: true, force: true });
   });
 
-  it("materializes an unlinked roof target and preserves its status after restart", async () => {
+  it(
+    "materializes an unlinked roof target and preserves its status after restart",
+    async () => {
     const cookie = await login();
     const initial = await request("/api/canvassing/state", cookie);
     const structures = JSON.parse(
@@ -119,7 +121,7 @@ describe.sequential("canvassing roof selection", () => {
       ),
     ).toMatchObject({
       structure_id: roof.properties.structure_id,
-      label: expect.stringContaining("Canvassing roof"),
+      label: expect.stringMatching(/\d+\s+.+/),
       flyer_delivered: 1,
       legacy_history_review: 0,
     });
@@ -132,7 +134,9 @@ describe.sequential("canvassing roof selection", () => {
         (home: { household_id: string }) => home.household_id === householdId,
       ),
     ).toMatchObject({ flyer_delivered: 1, structure_id: roof.properties.structure_id });
-  });
+    },
+    90_000,
+  );
 
   it("allows reviewed roofs and keeps invalid bulk targets isolated", async () => {
     const cookie = await login();

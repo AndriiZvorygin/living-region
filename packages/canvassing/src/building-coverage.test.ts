@@ -548,7 +548,7 @@ describe("canvassing building coverage", () => {
       linked = addAddressLabels([home, garage], [address], associations),
       audit = addUnaddressedStructureReferences([home, garage], linked);
     expect(garage.properties).toMatchObject({
-      civic_label: "1142",
+      civic_label: "1142 3rd Avenue West",
       address_relation: "shared_accessory",
       address_reference_structure_id: "home",
       address_reference_ids: ["address-home"],

@@ -15,10 +15,8 @@ const addresses = JSON.parse(await readFile(addressesPath, "utf8")) as {
 };
 const addressesByStructure = new Map<string, string[]>();
 const addressIdBySourceGuid = new Map<string, string>();
-const knownAddressIds = new Set<string>();
 for (const address of addresses.features) {
   const addressId = String(address.properties.address_id ?? "");
-  if (addressId) knownAddressIds.add(addressId);
   const sourceGuid = String(address.properties.source_address_guid ?? "");
   if (sourceGuid && addressId) addressIdBySourceGuid.set(sourceGuid, addressId);
   const structureId = String(address.properties.structure_id ?? "");
@@ -34,9 +32,6 @@ for (const structure of structures.features) {
     structureId = String(properties.structure_id ?? ""),
     addressIds = [
       ...(addressesByStructure.get(structureId) ?? []),
-      ...(properties.address_reference_ids ?? []).filter((id: unknown) =>
-        knownAddressIds.has(String(id)),
-      ),
       ...(properties.authoritative_address_ids ?? [])
         .map((id: unknown) => addressIdBySourceGuid.get(String(id)))
         .filter(Boolean),

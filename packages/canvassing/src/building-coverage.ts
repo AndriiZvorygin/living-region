@@ -1392,7 +1392,13 @@ export function addAddressLabels(
       );
     building.properties.civic_label =
       civicNumbers.length <= 3
-        ? `${inferredOnly ? "~" : ""}${civicNumbers.join(" / ")}`
+        ? `${inferredOnly ? "~" : ""}${linked
+            .map((address) =>
+              [address.civic_number, address.street, address.unit]
+                .filter(Boolean)
+                .join(" "),
+            )
+            .join(" / ")}`
         : `${inferredOnly ? "~" : ""}${civicNumbers[0]} +${civicNumbers.length - 1}`;
   }
   return byStructure;
@@ -1438,21 +1444,22 @@ export function addUnaddressedStructureReferences(
           distance_m,
         };
     }
-    if (!nearest) {
+    const type = String(building.properties.building_type ?? "unclassified"),
+      isAccessory = type === "accessory" || featureArea(building) < 35;
+    // A nearby accessory can share the primary property's address. A normal
+    // roof must not inherit an address from another building: a citywide
+    // nearest roof is not evidence of a civic-address association.
+    if (!nearest || !isAccessory || nearest.distance_m > 35) {
+      delete building.properties.address_reference_ids;
+      delete building.properties.address_reference_structure_id;
+      delete building.properties.address_reference_distance_m;
+      delete building.properties.address_relation;
+      delete building.properties.address_relation_confidence;
       counts.unresolved++;
       continue;
     }
-    const type = String(building.properties.building_type ?? "unclassified"),
-      relation =
-        type === "accessory" || featureArea(building) < 35
-          ? "shared_accessory"
-          : "provisional_nearest",
-      confidence =
-        nearest.distance_m <= 35
-          ? "high_confidence"
-          : nearest.distance_m <= 70
-            ? "probable"
-            : "distant_review",
+    const relation = "shared_accessory",
+      confidence = "high_confidence",
       civicNumbers = [
         ...new Set(nearest.addresses.map((address) => address.civic_number)),
       ].sort((left, right) =>
@@ -1470,7 +1477,13 @@ export function addUnaddressedStructureReferences(
     building.properties.civic_numbers = civicNumbers;
     building.properties.civic_label =
       civicNumbers.length <= 3
-        ? civicNumbers.join(" / ")
+        ? nearest.addresses
+            .map((address) =>
+              [address.civic_number, address.street, address.unit]
+                .filter(Boolean)
+                .join(" "),
+            )
+            .join(" / ")
         : `${civicNumbers[0]} +${civicNumbers.length - 1}`;
     counts[relation]++;
     counts[confidence]++;

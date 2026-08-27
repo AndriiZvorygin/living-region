@@ -138,6 +138,23 @@ describe.sequential("authoritative address history preservation", () => {
       "test-location",
       timestamp,
     );
+    db.prepare(
+      `INSERT INTO structure_history_crosswalk
+       (historical_household_id,historical_structure_id,historical_address_id,
+        canonical_structure_id,match_method,confidence,historical_label,
+        created_at,updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?)`,
+    ).run(
+      legacyHouseholdId,
+      canonical.structure_id,
+      legacyAddressId,
+      canonical.structure_id,
+      "test_structure_geometry",
+      "exact_structure_geometry",
+      "999 Historical Street East",
+      timestamp,
+      timestamp,
+    );
     db.close();
   }, 120_000);
 
@@ -158,6 +175,15 @@ describe.sequential("authoritative address history preservation", () => {
     });
     expect(canonical.flyer_history).toContainEqual(
       expect.objectContaining({ event_id: eventId, user_id: "andrii" }),
+    );
+    expect(current.physical_roof_activity).toContainEqual(
+      expect.objectContaining({
+        structure_id: canonical.structure_id,
+        flyer_delivered: 1,
+        flyer_history: expect.arrayContaining([
+          expect.objectContaining({ event_id: eventId, user_id: "andrii" }),
+        ]),
+      }),
     );
     expect(current.households.some((home: any) => home.address_id === legacyAddressId)).toBe(false);
     const db = new DatabaseSync(join(directory, "canvassing.sqlite"), { readOnly: true });

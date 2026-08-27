@@ -70,6 +70,14 @@ type FlyerDelivery = {
   user_id?: string;
   source?: string;
 };
+type PhysicalRoofActivity = {
+  structure_id: string;
+  flyer_delivered: number;
+  status: string;
+  visit_count: number;
+  last_updated_at: string | null;
+  flyer_history: FlyerDelivery[];
+};
 type Contact = {
   person_id: string;
   name: string;
@@ -157,6 +165,7 @@ type State = {
   recruitment_areas: RecruitmentArea[];
   recruitment_prospects: RecruitmentProspect[];
   address_review_counts: Record<string, number>;
+  physical_roof_activity: PhysicalRoofActivity[];
   schema_version: number;
   summary: Record<string, number> & {
     flyer_breakdown?: Array<{
@@ -614,6 +623,10 @@ export async function canvassingMain() {
   const byAddress = new Map<string, Household>();
   const byHousehold = new Map<string, Household>();
   const bySourceAddressGuid = new Map<string, Household>();
+  const physicalRoofActivityByStructure = new Map<
+    string,
+    PhysicalRoofActivity
+  >();
   for (const h of state.households) {
     byHousehold.set(h.household_id, h);
     byAddress.set(h.address_id, h);
@@ -625,16 +638,14 @@ export async function canvassingMain() {
         h,
       ]);
   }
+  for (const activity of state.physical_roof_activity ?? [])
+    physicalRoofActivityByStructure.set(activity.structure_id, activity);
   const homesForStructure = (feature: any) => {
     const direct =
       byStructure.get(String(feature.properties.structure_id ?? "")) ?? [];
     if (direct.length) return direct;
     return [
       ...new Map([
-        ...(feature.properties.address_reference_ids ?? [])
-          .map((id: string) => byAddress.get(id))
-          .filter(Boolean)
-          .map((home: Household) => [home.household_id, home] as const),
         ...(feature.properties.authoritative_address_ids ?? [])
           .map((id: string) => bySourceAddressGuid.get(id))
           .filter(Boolean)
@@ -720,15 +731,28 @@ export async function canvassingMain() {
     ].indexOf(s);
   for (const f of structures.features) {
     const homes = homesForStructure(f);
+    const physicalActivity = physicalRoofActivityByStructure.get(
+      String(f.properties.structure_id),
+    );
     f.properties.household_count = homes.length;
     f.properties.selected = homes.some((home) =>
       selected.has(home.household_id),
     );
-    f.properties.status =
+    const currentStatus =
       homes.sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
         ?.status ?? "untouched";
+    f.properties.status =
+      physicalActivity &&
+      statusRank(physicalActivity.status) > statusRank(currentStatus)
+        ? physicalActivity.status
+        : currentStatus;
     f.properties.flyer_ids = [
-      ...new Set(homes.flatMap((home) => home.flyer_ids ?? [])),
+      ...new Set([
+        ...homes.flatMap((home) => home.flyer_ids ?? []),
+        ...(physicalActivity?.flyer_history ?? []).map(
+          (event) => event.flyer_id,
+        ),
+      ].filter(Boolean)),
     ];
   }
   const knownNonResidentialBuildingTypes = new Set([
@@ -1955,12 +1979,44 @@ export async function canvassingMain() {
     if (existing.length) return existing;
     const structureId = String(feature.properties.structure_id ?? "");
     if (!structureId) throw new Error("This roof has no selectable identifier");
-    await fetchJson(
+    const result = await fetchJson<{
+      household_ids: string[];
+      households?: Household[];
+    }>(
       `/api/canvassing/structures/${encodeURIComponent(structureId)}/selection-target`,
       { method: "POST", body: "{}" },
     );
-    await refresh();
-    const created = homesForStructure(feature);
+    for (const home of result.households ?? []) {
+      if (byHousehold.has(home.household_id)) continue;
+      state.households.push(home);
+      byHousehold.set(home.household_id, home);
+      byAddress.set(home.address_id, home);
+      if (home.source_address_guid)
+        bySourceAddressGuid.set(home.source_address_guid, home);
+      if (home.structure_id)
+        byStructure.set(home.structure_id, [
+          ...(byStructure.get(home.structure_id) ?? []),
+          home,
+        ]);
+      const ids =
+        structureIdsByHousehold.get(home.household_id) ?? new Set<string>();
+      ids.add(structureId);
+      structureIdsByHousehold.set(home.household_id, ids);
+    }
+    const createdFeature = structureFeatureById.get(structureId) ?? feature,
+      created = homesForStructure(createdFeature);
+    if (result.households?.length) {
+      createdFeature.properties.household_count = created.length;
+      createdFeature.properties.status = created
+        .slice()
+        .sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
+        ?.status ?? "untouched";
+      createdFeature.properties.flyer_ids = [
+        ...new Set(created.flatMap((home) => home.flyer_ids ?? [])),
+      ];
+    } else {
+      await refresh();
+    }
     if (!created.length) throw new Error("This roof could not be made selectable");
     return created;
   }
@@ -2332,17 +2388,24 @@ export async function canvassingMain() {
   }
   function showHouseholds(homes: Household[], clickedStructure?: any) {
     active = homes[0];
+    const physicalActivity = physicalRoofActivityByStructure.get(
+      String(
+        clickedStructure?.properties?.structure_id ?? active.structure_id ?? "",
+      ),
+    );
     const volunteer = Boolean(isVolunteer()),
       today = localDateValue(),
       latestDate = active.last_updated_at
         ? localDateValue(active.last_updated_at)
         : today,
-      flyerCurrent = Boolean(active.flyer_delivered),
+      flyerCurrent = Boolean(
+        active.flyer_delivered || physicalActivity?.flyer_delivered,
+      ),
       noAnswerCurrent = Boolean(active.no_answer),
       talkedCurrent = Boolean(active.conversation_occurred),
       revisitCurrent = Boolean(active.revisit_requested);
     document.querySelector("#drawer")!.innerHTML =
-      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Canvassing roof"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span>${active.legacy_history_review ? `<strong class="address-review-flag">Historical linkage review · field activity is enabled</strong>` : ""}</div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
+      `<div class="drawer-head"><div><small>${homes.length > 1 ? `${homes.length} units at structure` : "Household"}</small><h2>${active.label || "Address unavailable"}</h2><span>${active.association_status.replaceAll("_", " ")} · ${active.visit_count} visits${active.last_updated_at ? ` · updated ${latestDate}` : ""}</span>${active.legacy_history_review ? `<strong class="address-review-flag">Historical linkage review · field activity is enabled</strong>` : ""}</div><div class="drawer-head-actions"><button id="add-selection">${selected.has(active.household_id) ? "Remove" : "Add to route"}</button><button id="drawer-close" class="drawer-close" aria-label="Close household details">Close</button></div></div>${homes.length > 1 ? `<div class="unit-tabs">${homes.map((h) => `<button data-household="${h.household_id}">${h.unit || h.label}</button>`).join("")}</div>` : ""}<label class="visit-date">Visit date<input id="visit-date" type="date" value="${latestDate}"></label><div class="visit-flags"><label><input id="visit-flyer" type="checkbox" data-initial="${flyerCurrent}" ${flyerCurrent ? "checked" : ""}><span>${flyerCurrent ? "Flyered" : activeFlyerId ? `Flyer · ${escapeHtml(flyerLabel(activeFlyerId))}` : "Flyer · choose active flyer"}</span></label><label><input id="visit-no-answer" type="checkbox" data-initial="${noAnswerCurrent}" ${noAnswerCurrent ? "checked" : ""}><span>No answer</span></label><label><input id="visit-talked" type="checkbox" data-initial="${talkedCurrent}" ${talkedCurrent ? "checked" : ""}><span>Talked</span></label><label><input id="visit-revisit" type="checkbox" data-initial="${revisitCurrent}" ${revisitCurrent ? "checked" : ""}><span>Revisit</span></label></div><div class="visit-commands"><button id="save-visit">Save changes</button><button id="skip-household">Skip</button></div>${
         volunteer
           ? ""
           : `<div class="private-fields"><label>Political outcome<select id="outcome" data-initial="${escapeHtml(active.political_outcome ?? "")}"><option value="">Not recorded</option>${[
@@ -2365,7 +2428,15 @@ export async function canvassingMain() {
     openMobileDrawer();
     const historySection = document.createElement("section");
     historySection.className = "flyer-history";
-    historySection.innerHTML = `<h3>Flyer delivery history</h3>${active.flyer_history?.length ? `<ul>${active.flyer_history.map((event) => `<li><strong>${escapeHtml(event.flyer_name)}</strong> · ${escapeHtml(localDateValue(event.occurred_at))}${event.source ? `<small>${escapeHtml(event.source)}</small>` : ""}</li>`).join("")}</ul>` : "<p>No flyer delivery recorded.</p>"}`;
+    const history = [
+      ...(active.flyer_history ?? []),
+      ...(physicalActivity?.flyer_history ?? []),
+    ].filter(
+      (event, index, events) =>
+        events.findIndex((candidate) => candidate.event_id === event.event_id) ===
+        index,
+    );
+    historySection.innerHTML = `<h3>Flyer delivery history</h3>${history.length ? `<ul>${history.map((event) => `<li><strong>${escapeHtml(event.flyer_name)}</strong> · ${escapeHtml(localDateValue(event.occurred_at))}${event.source ? `<small>${escapeHtml(event.source)}</small>` : ""}</li>`).join("")}</ul>` : "<p>No flyer delivery recorded.</p>"}`;
     document.querySelector("#drawer .visit-flags")?.before(historySection);
     const addressFeature = addresses.features.find(
         (feature: any) => feature.properties.address_id === active!.address_id,
@@ -2682,6 +2753,9 @@ export async function canvassingMain() {
   }
   async function refresh() {
     state = await fetchJson<State>("/api/canvassing/state");
+    physicalRoofActivityByStructure.clear();
+    for (const activity of state.physical_roof_activity ?? [])
+      physicalRoofActivityByStructure.set(activity.structure_id, activity);
     byStructure.clear();
     byAddress.clear();
     byHousehold.clear();
@@ -2710,11 +2784,24 @@ export async function canvassingMain() {
     }
     for (const feature of structures.features) {
       const homes = homesForStructure(feature);
-      feature.properties.status =
+      const currentStatus =
         homes.sort((a, b) => statusRank(b.status) - statusRank(a.status))[0]
           ?.status ?? "untouched";
+      const physicalActivity = physicalRoofActivityByStructure.get(
+        String(feature.properties.structure_id),
+      );
+      feature.properties.status =
+        physicalActivity &&
+        statusRank(physicalActivity.status) > statusRank(currentStatus)
+          ? physicalActivity.status
+          : currentStatus;
       feature.properties.flyer_ids = [
-        ...new Set(homes.flatMap((home) => home.flyer_ids ?? [])),
+        ...new Set([
+          ...homes.flatMap((home) => home.flyer_ids ?? []),
+          ...(physicalActivity?.flyer_history ?? []).map(
+            (event) => event.flyer_id,
+          ),
+        ].filter(Boolean)),
       ];
       feature.properties.household_count = homes.length;
       const civicNumbers = [

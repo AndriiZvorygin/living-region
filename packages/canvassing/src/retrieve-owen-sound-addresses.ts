@@ -26,6 +26,11 @@ import {
   placeNarLocations,
 } from "./owen-sound-footprint-placement";
 import { validateOwenSoundAddressNumbering } from "./owen-sound-address-numbering";
+import { formatOfficialStreet } from "./official-address";
+import {
+  assertNoAnonymousActiveAddressLabels,
+  repairCanvassingStructureAddresses,
+} from "./repair-canvassing-addresses";
 
 const root = resolve(process.cwd());
 const defaultZip = resolve(
@@ -39,7 +44,8 @@ const defaultOut = resolve(
 const defaultBoundary = resolve("data/boundaries/owen-sound.geojson");
 const defaultExisting = resolve("packages/web-client/public/canvassing/addresses.geojson");
 const defaultLegacyExisting = resolve(
-  "data/derived/owen-sound-address-foundation/legacy-unmatched-stops.geojson",
+  process.env.CANVASS_LEGACY_ADDRESS_SOURCE ??
+    "data/derived/owen-sound-address-foundation/legacy-address-source.geojson",
 );
 const defaultStructures = resolve("packages/web-client/public/canvassing/structures.geojson");
 const defaultGreyFootprints = resolve("data/canvassing/grey-building-footprints-owen-sound.geojson");
@@ -87,7 +93,12 @@ async function main() {
   );
   const existingById = new Map<string, (typeof existing)[number]>();
   for (const feature of [...existing, ...legacyExisting]) {
-    const id = String(feature.properties.address_id ?? feature.id ?? "");
+    const id = String(
+      feature.properties.address_id ??
+        feature.properties.internal_address_id ??
+        feature.id ??
+        "",
+    );
     if (id && !existingById.has(id)) existingById.set(id, feature);
   }
   const reconciliationSourceFeatures = [...existingById.values()];
@@ -118,6 +129,41 @@ async function main() {
     previousAuthoritativeStructureIds,
     greyFootprints: placement.greyFootprints,
   });
+  const placementByLocation = new Map(
+    placement.placements.map((item) => [item.location_id, item.structure_id]),
+  );
+  const internalAddressIdByNarId = new Map(
+    reconciliation.matches.map((match) => [match.address_id, match.internal_address_id]),
+  );
+  const addressRepair = repairCanvassingStructureAddresses({
+    structures: placedStructures.structures,
+    roads: roadsFile,
+    addresses: primary.map((unit) => ({
+      type: "Feature" as const,
+      properties: {
+        // The published address feature and the household FK use the stable
+        // internal ID. Keep the NAR ADDR_GUID in source_address_guid so the
+        // structure target materialization cannot accidentally manufacture a
+        // second household ID from the external GUID.
+        address_id: internalAddressIdByNarId.get(unit.address_id) ?? unit.internal_address_id,
+        source_address_guid: unit.address_id,
+        civic_number: unit.civic_number,
+        civic_number_base: unit.civic_number,
+        street: formatOfficialStreet(
+          unit.official_street_name,
+          unit.official_street_type,
+          unit.official_street_direction,
+        ),
+        structure_id: placementByLocation.get(unit.location_id) ?? null,
+      },
+      geometry: {
+        type: "Point" as const,
+        coordinates: [unit.longitude, unit.latitude],
+      },
+    })),
+    legacyAddresses: legacyExisting,
+  });
+  assertNoAnonymousActiveAddressLabels(placedStructures.structures);
   const placementStructureIds = new Set(
     placement.placements
       .map((item) => item.structure_id)
@@ -223,6 +269,7 @@ async function main() {
         estimated_structure_labels_replaced: estimatedLabelsReplaced,
         active_address_labels_are_nar_formatted: true,
         former_estimated_labels_are_not_used_for_nar_address_units: true,
+        operational_roof_address_repair: addressRepair,
       },
       physical_footprint_audit: {
         usable_existing_footprints: usableOldFootprints.length,

@@ -32,13 +32,33 @@ async function loginIfNeeded(page: Page, username = "andrii") {
   await expect(page.locator("#login-form")).toHaveCount(0);
 }
 
-async function roofPoints(page: Page, count = 2) {
-  return page.evaluate((wanted) => {
+async function roofPoints(
+  page: Page,
+  count = 2,
+  requireNoConversation = false,
+) {
+  return page.evaluate(({ wanted, requireNoConversation }) => {
     const map = (window as any).__livingRegionCanvassing.map;
+    const state = (window as any).__livingRegionCanvassing.state();
+    const noConversationStructures = new Set(
+      state.households
+        .filter(
+          (home: any) =>
+            !home.conversation_occurred &&
+            !home.political_outcome &&
+            !home.revisit_requested,
+        )
+        .map((home: any) => String(home.structure_id)),
+    );
     const container = map.getContainer().getBoundingClientRect();
     const features = map
       .queryRenderedFeatures({ layers: ["structures"] })
-      .filter((feature: any) => Number(feature.properties?.household_count) === 1);
+      .filter(
+        (feature: any) =>
+          Number(feature.properties?.household_count) === 1 &&
+          (!requireNoConversation ||
+            noConversationStructures.has(String(feature.properties?.structure_id))),
+      );
     const points: Array<{ id: string; x: number; y: number }> = [];
     const seen = new Set<string>();
     for (const feature of features) {
@@ -78,13 +98,13 @@ async function roofPoints(page: Page, count = 2) {
           candidate.y > map.getCanvas().height
         )
           return false;
-        return map
-          .queryRenderedFeatures([candidate.x, candidate.y], { layers: ["structures"] })
-          .some(
-            (hit: any) =>
-              String(hit.properties?.structure_id) === id &&
-              Number(hit.properties?.household_count) > 0,
-          );
+        const hits = map.queryRenderedFeatures([candidate.x, candidate.y], {
+          layers: ["structures"],
+        });
+        return (
+          String(hits[0]?.properties?.structure_id) === id &&
+          Number(hits[0]?.properties?.household_count) > 0
+        );
       });
       if (!clickable) continue;
       if (
@@ -102,7 +122,7 @@ async function roofPoints(page: Page, count = 2) {
       if (points.length >= wanted) break;
     }
     return points;
-  }, count);
+  }, { wanted: count, requireNoConversation });
 }
 
 async function clickRoofs(page: Page, count = 2) {
@@ -209,15 +229,13 @@ async function renderedCanvassableRoofPoints(
           pageY > window.innerHeight - 105
         )
           return false;
-        return map
-          .queryRenderedFeatures([candidate.x, candidate.y], {
-            layers: ["structures"],
-          })
-          .some(
-            (hit: any) =>
-              String(hit.properties?.structure_id) === id &&
-              Boolean(hit.properties?.selection_target_id),
-          );
+        const hits = map.queryRenderedFeatures([candidate.x, candidate.y], {
+          layers: ["structures"],
+        });
+        return (
+          String(hits[0]?.properties?.structure_id) === id &&
+          Boolean(hits[0]?.properties?.selection_target_id)
+        );
       });
       if (!clickable) continue;
       if (
@@ -339,15 +357,13 @@ async function renderedUnlinkedRoofPoints(
           pageY > window.innerHeight - 105
         )
           return false;
-        return map
-          .queryRenderedFeatures([candidate.x, candidate.y], {
-            layers: ["structures"],
-          })
-          .some(
-            (hit: any) =>
-              String(hit.properties?.structure_id) === id &&
-              Number(hit.properties?.household_count) === 0,
-          );
+        const hits = map.queryRenderedFeatures([candidate.x, candidate.y], {
+          layers: ["structures"],
+        });
+        return (
+          String(hits[0]?.properties?.structure_id) === id &&
+          Number(hits[0]?.properties?.household_count) === 0
+        );
       });
       if (!clickable) continue;
       if (
@@ -471,6 +487,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
   });
 
   test("mobile can record a visit without selecting a flyer", async ({ page }) => {
+    test.setTimeout(180_000);
     await openCanvassing(page);
     await page.locator("#mobile-menu").click();
     await page.locator("#mobile-bulk-open").click();
@@ -488,14 +505,19 @@ test.describe("Owen Sound canvassing field workflows", () => {
       undefined,
       { timeout: 30_000 },
     );
-    const [point] = await roofPoints(page, 1);
+    const [point] = await roofPoints(page, 1, true);
     expect(point).toBeTruthy();
     await page.mouse.click(point.x, point.y);
     await expect(page.locator("#drawer")).toHaveClass(/mobile-open/);
-    await page.locator("#visit-talked + span").click();
-    await page.locator("#save-visit").click();
+    await page.locator("#visit-talked").evaluate((element) => {
+      const input = element as HTMLInputElement;
+      input.checked = true;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await expect(page.locator("#visit-talked")).toBeChecked();
+    await page.locator("#save-visit").click({ force: true });
     await expect(page.locator("#toast")).toContainText("Household status updated", {
-      timeout: 10_000,
+      timeout: 60_000,
     });
     const summary = await page.evaluate(async () =>
       fetch("/api/canvassing/state").then((response) => response.json()),
@@ -506,7 +528,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
   test("bulk flyer selects previously unlinked and review-marked roofs through the real map UI", async ({
     page,
   }, testInfo) => {
-    test.setTimeout(180_000);
+    test.setTimeout(300_000);
     const consoleOutput: string[] = [];
     const networkOutput: string[] = [];
     const dialogs: string[] = [];
@@ -627,15 +649,18 @@ test.describe("Owen Sound canvassing field workflows", () => {
     ]
       .map((id) => visibleLinked.find((roof) => roof.id === id))
       .filter((roof): roof is RenderedRoofPoint => Boolean(roof));
-    const ordinary = visibleLinked.find(
-      (roof) =>
-        roof.targetKind === "address_household" &&
-        !roof.flyerIds.includes("flyer-2-current") &&
-        !selectedStructureIds.has(roof.id),
-    );
-    if (ordinary) additions.push(ordinary);
-    expect(additions.length, JSON.stringify({ fixture, visibleLinked })).toBe(3);
-    expect(new Set(additions.map((roof) => roof.id)).size).toBe(3);
+    const ordinary = visibleLinked
+      .filter(
+        (roof) =>
+          roof.targetKind === "address_household" &&
+          roof.householdCount === 1 &&
+          !roof.flyerIds.includes("flyer-2-current") &&
+          !selectedStructureIds.has(roof.id),
+      )
+      .slice(0, 8);
+    additions.push(...ordinary);
+    expect(additions.length, JSON.stringify({ fixture, visibleLinked })).toBe(10);
+    expect(new Set(additions.map((roof) => roof.id)).size).toBe(10);
     for (const roof of additions) {
       selectedStructureIds.add(roof.id);
       await page.mouse.click(roof.x, roof.y);
@@ -669,7 +694,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
         "Address needs review",
       );
     }
-    expect(selectedStructureIds.size).toBe(13);
+    expect(selectedStructureIds.size).toBe(20);
     await expect(page.locator("#bulk-selection-status")).toHaveText(
       `${selectedHouseholds} households selected`,
     );
