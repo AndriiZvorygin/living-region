@@ -60,6 +60,7 @@ import {
   type CredentialDelivery,
 } from "./mail";
 import { formatOfficialAddress } from "./official-address";
+import { operationalTargetForStructure } from "./operational-target";
 
 const root = resolve(process.cwd());
 const host = process.env.CANVASS_HOST ?? "127.0.0.1";
@@ -808,6 +809,63 @@ async function seed() {
         timestamp,
       );
     }
+    const insertOperationalAddress = db.prepare(
+      `INSERT INTO addresses
+       (id,structure_id,civic_number,street,unit,label,lon,lat,
+        external_source,external_id,association_status,imported_at,source_active)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)
+       ON CONFLICT(id) DO UPDATE SET
+         structure_id=excluded.structure_id,
+         label=excluded.label,
+         source_active=1`,
+    );
+    for (const feature of structures.features) {
+      const p = feature.properties;
+      if (p.selection_target_kind !== "operational_roof") continue;
+      const structureId = String(p.structure_id ?? ""),
+        target = operationalTargetForStructure(structureId),
+        [lon, lat] = geometryCenter(JSON.stringify(feature.geometry));
+      if (p.selection_target_id !== target.householdId)
+        throw new Error(
+          `Canvassing data invariant failed: ${structureId} has an invalid operational target`,
+        );
+      insertOperationalAddress.run(
+        target.addressId,
+        structureId,
+        "",
+        "",
+        "",
+        `Canvassing roof ${structureId.slice(-8)}`,
+        lon,
+        lat,
+        "operational_roof_target",
+        structureId,
+        "operational_roof_target",
+        timestamp,
+      );
+      insertHousehold.run(target.householdId, target.addressId, "", timestamp);
+    }
+    const persistedHouseholdIds = new Set(
+      (
+        db.prepare("SELECT id FROM households").all() as Array<{ id: string }>
+      ).map((row) => row.id),
+    );
+    const missingSelectionTargets = structures.features.filter((feature: any) => {
+      const p = feature.properties ?? {};
+      if (!p.canvassable || !p.selection_target_id) return Boolean(p.canvassable);
+      const targetIds = Array.isArray(p.selection_target_ids)
+        ? p.selection_target_ids
+        : [p.selection_target_id];
+      return targetIds.some(
+        (targetId: unknown) =>
+          typeof targetId !== "string" ||
+          !persistedHouseholdIds.has(targetId),
+      );
+    });
+    if (missingSelectionTargets.length)
+      throw new Error(
+        `Canvassing data invariant failed: ${missingSelectionTargets.length} canvassable structures lack persisted selection targets`,
+      );
     const insertReview = db.prepare(
       "INSERT INTO address_review_records (id,address_id,external_source,external_id,label,lon,lat,within_boundary,queue_flags_json,imported_geometry_json,imported_at,source_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,1) ON CONFLICT(id) DO UPDATE SET address_id=excluded.address_id,external_source=excluded.external_source,external_id=excluded.external_id,label=excluded.label,lon=excluded.lon,lat=excluded.lat,within_boundary=excluded.within_boundary,queue_flags_json=excluded.queue_flags_json,imported_geometry_json=excluded.imported_geometry_json,imported_at=excluded.imported_at,source_active=1",
     );
@@ -1849,6 +1907,172 @@ async function ensureTestUsers() {
 }
 await ensureTestUsers();
 
+/**
+ * Adds a small, deterministic fixture for the browser acceptance test. It is
+ * intentionally unavailable outside the disposable test-user environment and
+ * never runs as part of production seeding.
+ */
+function prepareTestBulkFixture() {
+  if (process.env.CANVASS_TEST_USERS !== "1")
+    throw new Error("test fixture endpoint is disabled");
+  const operational = db
+    .prepare(
+      `SELECT h.id household_id,a.id address_id,a.structure_id,a.lon,a.lat
+         FROM households h JOIN addresses a ON a.id=h.address_id
+        WHERE a.external_source='operational_roof_target' AND a.source_active=1
+        ORDER BY h.id`,
+    )
+    .all() as Array<{
+    household_id: string;
+    address_id: string;
+    structure_id: string;
+    lon: number;
+    lat: number;
+  }>;
+  const activityFree = operational.filter(
+    (candidate) =>
+      !db
+        .prepare(
+          `SELECT 1 FROM active_visits WHERE household_id=?
+           UNION ALL SELECT 1 FROM activity_flyer_events WHERE household_id=?
+           LIMIT 1`,
+        )
+        .get(candidate.household_id, candidate.household_id),
+  );
+  if (activityFree.length < 34)
+    throw new Error("bulk-selection fixture needs thirty-four unused operational roofs");
+  const candidates = [...activityFree].sort(
+    (left, right) =>
+      Math.hypot(left.lon + 80.943, left.lat - 44.567) -
+      Math.hypot(right.lon + 80.943, right.lat - 44.567),
+  );
+  // Keep the two review fixtures on separately clickable roofs.  The second
+  // closest operational roof can be completely covered by a neighbouring
+  // MapLibre polygon at the acceptance-test zoom, which would make the
+  // fixture test the renderer's overlap ordering instead of bulk selection.
+  // The third candidate is still in the same central viewport but has a
+  // stable, exposed roof footprint.
+  const review = candidates[0],
+    needsReview = candidates[2],
+    unlinked = candidates.slice(3, 31),
+    previouslyFlyered = candidates[31];
+  const legacyFixtures = [
+    {
+      addressId: "address_e2e_ambiguous_review",
+      householdId: "household_e2e_ambiguous_review",
+      structureId: review.structure_id,
+      reviewStatus: "ambiguous_activity",
+    },
+    {
+      addressId: "address_e2e_needs_review",
+      householdId: "household_e2e_needs_review",
+      structureId: needsReview.structure_id,
+      reviewStatus: "needs_review",
+    },
+  ];
+  const timestamp = now();
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const insertFixtureAddress = db.prepare(
+        `INSERT OR IGNORE INTO addresses
+         (id,structure_id,civic_number,civic_number_base,civic_number_suffix,
+          street,unit,label,lon,lat,external_source,external_id,
+          association_status,imported_at,source_active)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)`,
+      ),
+      insertFixtureHousehold = db.prepare(
+        "INSERT OR IGNORE INTO households (id,address_id,unit_label,created_at) VALUES (?,?,?,?)",
+      ),
+      insertFixtureLink = db.prepare(
+        `INSERT OR IGNORE INTO legacy_history_links
+         (legacy_address_id,legacy_household_id,canonical_address_id,
+          canonical_household_id,canonical_location_id,match_status,distance_m,
+          candidate_count,candidate_location_count,reason,linked_at)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+      ),
+      insertFixtureReview = db.prepare(
+        `INSERT OR IGNORE INTO legacy_history_reviews
+         (legacy_address_id,review_status,reason,created_at,updated_at)
+         VALUES (?,?,?,?,?)`,
+      );
+    for (const [index, fixture] of legacyFixtures.entries()) {
+      const roof = index === 0 ? review : needsReview;
+      insertFixtureAddress.run(
+        fixture.addressId,
+        fixture.structureId,
+        "",
+        null,
+        "",
+        "",
+        "",
+        `E2E ${fixture.reviewStatus} roof`,
+        roof.lon,
+        roof.lat,
+        "e2e_fixture",
+        fixture.addressId,
+        "legacy_review",
+        timestamp,
+      );
+      insertFixtureHousehold.run(fixture.householdId, fixture.addressId, "", timestamp);
+      insertFixtureLink.run(
+        fixture.addressId,
+        fixture.householdId,
+        null,
+        null,
+        null,
+        "ambiguous",
+        null,
+        2,
+        1,
+        `disposable ${fixture.reviewStatus} fixture`,
+        timestamp,
+      );
+      insertFixtureReview.run(
+        fixture.addressId,
+        fixture.reviewStatus,
+        `disposable ${fixture.reviewStatus} fixture`,
+        timestamp,
+        timestamp,
+      );
+    }
+    for (const candidate of unlinked)
+      db.prepare(
+        "UPDATE addresses SET source_active=0 WHERE id=? AND external_source='operational_roof_target'",
+      ).run(candidate.address_id);
+    db.prepare(
+      `INSERT OR IGNORE INTO household_flyer_events
+       (id,household_id,occurred_at,user_id,flyer_delivered,reason,source,
+        previous_event_id,flyer_id)
+       VALUES (?,?,?,?,?,?,?,?,?)`,
+    ).run(
+      "e2e_previously_flyered",
+      previouslyFlyered.household_id,
+      "2026-08-25T12:00:00.000Z",
+      "system",
+      1,
+      "disposable previously-flyered fixture",
+      "e2e_fixture",
+      null,
+      CURRENT_FLYER_ID,
+    );
+    db.exec("COMMIT");
+  } catch (error) {
+    try {
+      db.exec("ROLLBACK");
+    } catch {}
+    throw error;
+  }
+  return {
+    review_structure_id: review.structure_id,
+    needs_review_structure_id: needsReview.structure_id,
+    review_household_id: legacyFixtures[0].householdId,
+    needs_review_household_id: legacyFixtures[1].householdId,
+    unlinked_structure_ids: unlinked.map((candidate) => candidate.structure_id),
+    unlinked_household_ids: unlinked.map((candidate) => candidate.household_id),
+    previously_flyered_household_id: previouslyFlyered.household_id,
+  };
+}
+
 function publicAdminUser(row: any) {
   return {
     id: String(row.id),
@@ -2066,6 +2290,25 @@ const server = createServer(async (req, res) => {
     const role = authenticated.role;
     if (req.method === "GET" && url.pathname === "/api/me")
       return json(res, 200, { user: authenticated });
+    if (
+      process.env.CANVASS_TEST_USERS === "1" &&
+      req.method === "POST" &&
+      url.pathname === "/api/canvassing/test/bulk-fixture"
+    ) {
+      if (role !== "candidate")
+        return json(res, 403, { error: "candidate role required" });
+      return json(res, 200, prepareTestBulkFixture());
+    }
+    if (
+      process.env.CANVASS_TEST_USERS === "1" &&
+      req.method === "POST" &&
+      url.pathname === "/api/canvassing/test/reseed"
+    ) {
+      if (role !== "candidate")
+        return json(res, 403, { error: "candidate role required" });
+      await seed();
+      return json(res, 200, { reseeded: true });
+    }
     if (url.pathname === "/api/me/password" && req.method === "POST") {
       let input: any;
       try {
@@ -2116,11 +2359,9 @@ const server = createServer(async (req, res) => {
       // A visible roof without a current address still needs a stable target
       // so field activity can use the normal visit/flyer workflow. This is an
       // operational canvassing identity, not an address-quality decision.
-      const targetAddressId = `address_${createHash("sha256")
-          .update(`operational-roof-target:${structureId}`)
-          .digest("hex")
-          .slice(0, 20)}`,
-        targetHouseholdId = `household_${targetAddressId.slice(8)}`,
+      const target = operationalTargetForStructure(structureId),
+        targetAddressId = target.addressId,
+        targetHouseholdId = target.householdId,
         label = `Canvassing roof ${structureId.slice(-8)}`;
       const existing = () =>
         db
@@ -4029,6 +4270,12 @@ const server = createServer(async (req, res) => {
             civic_label: linked.length
               ? linked.map((home) => home.civic_number).join(" / ")
               : "",
+            canvassable: true,
+            selection_target_kind: linked.length
+              ? "address_household"
+              : "manual_split_household",
+            selection_target_ids: linked.map((home) => home.household_id),
+            selection_target_id: linked[0]?.household_id ?? null,
           };
         });
       db.exec("BEGIN");
@@ -4117,6 +4364,9 @@ const server = createServer(async (req, res) => {
           );
           children[index].civic_numbers = [String(civic)];
           children[index].civic_label = `~${civic}`;
+          children[index].selection_target_kind = "manual_split_household";
+          children[index].selection_target_ids = [householdId];
+          children[index].selection_target_id = householdId;
         }
         const payload = {
           cuts,

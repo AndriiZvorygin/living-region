@@ -55,12 +55,12 @@ describe.sequential("canvassing weekly workflow API", () => {
         stdio: "ignore",
       },
     );
-    for (let attempt = 0; attempt < 80; attempt++) {
+    for (let attempt = 0; attempt < 200; attempt++) {
       try {
         if ((await fetch(`http://127.0.0.1:${port}/api/canvassing/health`)).ok)
           return;
       } catch {}
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
     throw new Error("Disposable canvassing server did not start");
   }

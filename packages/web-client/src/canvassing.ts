@@ -600,11 +600,22 @@ export async function canvassingMain() {
         !hiddenSplitParents.has(feature.properties.structure_id),
     )
     .concat(splitCorrections.features);
+  const missingSelectionTargets = structures.features.filter(
+    (feature: any) =>
+      feature.properties?.canvassable &&
+      !String(feature.properties.selection_target_id ?? ""),
+  );
+  if (missingSelectionTargets.length)
+    throw new Error(
+      `Canvassing map invariant failed: ${missingSelectionTargets.length} canvassable roofs lack selection targets`,
+    );
   const walkingGraph = new WalkingRoadGraph(roads);
   const byStructure = new Map<string, Household[]>();
   const byAddress = new Map<string, Household>();
+  const byHousehold = new Map<string, Household>();
   const bySourceAddressGuid = new Map<string, Household>();
   for (const h of state.households) {
+    byHousehold.set(h.household_id, h);
     byAddress.set(h.address_id, h);
     if (h.source_address_guid)
       bySourceAddressGuid.set(h.source_address_guid, h);
@@ -626,6 +637,10 @@ export async function canvassingMain() {
           .map((home: Household) => [home.household_id, home] as const),
         ...(feature.properties.authoritative_address_ids ?? [])
           .map((id: string) => bySourceAddressGuid.get(id))
+          .filter(Boolean)
+          .map((home: Household) => [home.household_id, home] as const),
+        ...(feature.properties.selection_target_ids ?? [])
+          .map((id: string) => byHousehold.get(id))
           .filter(Boolean)
           .map((home: Household) => [home.household_id, home] as const),
       ]).values(),
@@ -1712,15 +1727,26 @@ export async function canvassingMain() {
         }
         return;
       }
+      const roofs = map.queryRenderedFeatures(event.point, {
+        layers: ["structures"],
+      });
+      // In bulk mode a roof is the user's explicit target. Address-cluster
+      // bubbles can overlap the low-opacity roof fill at mobile zooms; let
+      // the exact roof hit reach pickStructure instead of treating the
+      // bubble as an intercepted map click. Coverage mode keeps the cluster
+      // zoom interaction below unchanged.
+      if (roofs.length && multiSelectMode) {
+        void pickStructure({ ...event, features: roofs } as any).catch((error) =>
+          toast(error instanceof Error ? error.message : "Roof selection failed"),
+        );
+        return;
+      }
       if (
         map.queryRenderedFeatures(event.point, {
           layers: ["address-clusters", "address-cluster-counts"],
         }).length
       )
         return;
-      const roofs = map.queryRenderedFeatures(event.point, {
-        layers: ["structures"],
-      });
       if (roofs.length) {
         void pickStructure({ ...event, features: roofs } as any).catch((error) =>
           toast(error instanceof Error ? error.message : "Roof selection failed"),
@@ -2658,8 +2684,10 @@ export async function canvassingMain() {
     state = await fetchJson<State>("/api/canvassing/state");
     byStructure.clear();
     byAddress.clear();
+    byHousehold.clear();
     bySourceAddressGuid.clear();
     for (const h of state.households) {
+      byHousehold.set(h.household_id, h);
       byAddress.set(h.address_id, h);
       if (h.source_address_guid)
         bySourceAddressGuid.set(h.source_address_guid, h);

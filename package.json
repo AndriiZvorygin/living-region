@@ -125,6 +125,7 @@
     "canvassing:acquire-buildings": "tsx packages/canvassing/src/acquire-building-data.ts",
     "canvassing:extract-city-roofs": "python3 scripts/extract_owen_sound_city_map_buildings.py",
     "canvassing:prepare": "tsx packages/canvassing/src/prepare-data.ts",
+    "canvassing:materialize-targets": "tsx packages/canvassing/src/materialize-selection-targets.ts",
     "canvassing:addresses": "tsx packages/canvassing/src/retrieve-owen-sound-addresses.ts",
     "canvassing:grey-footprints": "tsx packages/canvassing/src/retrieve-grey-building-footprints.ts",
     "canvassing:prepare-osm-import": "tsx packages/canvassing/src/prepare-osm-import.ts",

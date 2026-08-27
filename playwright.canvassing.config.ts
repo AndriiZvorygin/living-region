@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "playwright/test";
 
+const captureArtifacts = process.env.CANVASSING_E2E_ARTIFACTS === "1";
+
 export default defineConfig({
   testDir: "tests/e2e",
   testMatch: "**/canvassing.spec.ts",
@@ -9,9 +11,10 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: "http://127.0.0.1:4281",
-    trace: "retain-on-failure",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    headless: true,
+    trace: captureArtifacts ? "on" : "retain-on-failure",
+    screenshot: captureArtifacts ? "on" : "only-on-failure",
+  video: captureArtifacts ? "on" : "retain-on-failure",
   },
   projects: [
     {

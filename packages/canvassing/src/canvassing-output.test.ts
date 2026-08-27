@@ -123,6 +123,31 @@ describe("Owen Sound canvassing prepared data", () => {
     expect(audit.small_frontage_inferred).toBeGreaterThan(50);
   });
 
+  it("publishes a stable selection target for every canvassable roof", async () => {
+    const structures = await readJson(
+      "packages/web-client/public/canvassing/structures.geojson",
+    );
+    const canvassable = structures.features.filter(
+      (feature: any) => feature.properties.canvassable,
+    );
+    expect(canvassable.length).toBeGreaterThan(0);
+    expect(
+      canvassable.filter(
+        (feature: any) => !String(feature.properties.selection_target_id ?? ""),
+      ),
+    ).toHaveLength(0);
+    expect(
+      canvassable.every(
+        (feature: any) =>
+          Array.isArray(feature.properties.selection_target_ids) &&
+          feature.properties.selection_target_ids.length > 0 &&
+          feature.properties.selection_target_ids.includes(
+            feature.properties.selection_target_id,
+          ),
+      ),
+    ).toBe(true);
+  });
+
   it("records city-map provenance and keeps it private", async () => {
     const source = await readJson(
         "data/canvassing/owen-sound-city-map-source.json",

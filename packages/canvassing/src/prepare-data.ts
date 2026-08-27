@@ -15,6 +15,10 @@ import {
   type AddressInput,
   type Feature,
 } from "./building-coverage";
+import {
+  isCanvassableStructureType,
+  operationalTargetForStructure,
+} from "./operational-target";
 
 type Collection = { type: "FeatureCollection"; features: Feature[] };
 const root = resolve(process.cwd());
@@ -331,8 +335,48 @@ async function main() {
       unaddressedStructureReferences = addUnaddressedStructureReferences(
         buildings,
         linkedByStructure,
-      ),
-      matchCounts = {
+      );
+    for (const building of buildings) {
+      const structureId = String(building.properties.structure_id),
+        addressIds = [
+          ...(linkedByStructure.get(structureId) ?? []).map(
+            (address) => address.address_id,
+          ),
+          ...(building.properties.address_reference_ids ?? []),
+        ],
+        householdIds = [
+          ...new Set(
+            addressIds
+              .map((addressId) => String(addressId))
+              .filter((addressId) => addressId.startsWith("address_"))
+              .map((addressId) => `household_${addressId.slice(8)}`),
+          ),
+        ],
+        canvassable =
+          householdIds.length > 0 ||
+          isCanvassableStructureType(building.properties.building_type);
+      if (canvassable && !householdIds.length) {
+        householdIds.push(
+          operationalTargetForStructure(structureId).householdId,
+        );
+        building.properties.selection_target_kind = "operational_roof";
+      } else if (householdIds.length) {
+        building.properties.selection_target_kind = "address_household";
+      }
+      building.properties.canvassable = canvassable;
+      building.properties.selection_target_ids = householdIds;
+      building.properties.selection_target_id = householdIds[0] ?? null;
+    }
+    const missingSelectionTargets = buildings.filter(
+      (building) =>
+        building.properties.canvassable &&
+        !String(building.properties.selection_target_id ?? ""),
+    );
+    if (missingSelectionTargets.length)
+      throw new Error(
+        `Canvassing data invariant failed: ${missingSelectionTargets.length} canvassable structures lack selection targets`,
+      );
+    const matchCounts = {
         exact: 0,
         high_confidence: 0,
         probable_sourced: 0,
@@ -508,6 +552,11 @@ async function main() {
           (building) => !building.properties.civic_label,
         ).length,
         unaddressed_structure_references: unaddressedStructureReferences,
+        canvassable_structures: buildings.filter(
+          (building) => building.properties.canvassable,
+        ).length,
+        canvassable_structures_without_selection_target:
+          missingSelectionTargets.length,
         small_frontage_inferred: buildings.filter((building) =>
           Boolean(building.properties.small_frontage_inference),
         ).length,
@@ -708,6 +757,11 @@ async function main() {
             },
             counts: {
               structures: buildings.length,
+              canvassable_structures: buildings.filter(
+                (building) => building.properties.canvassable,
+              ).length,
+              canvassable_structures_without_selection_target:
+                missingSelectionTargets.length,
               addresses: addresses.length,
               matched_addresses: addresses.filter(
                 (a) => a.properties.structure_id,

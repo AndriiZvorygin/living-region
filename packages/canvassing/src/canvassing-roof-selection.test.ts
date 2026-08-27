@@ -69,7 +69,7 @@ describe.sequential("canvassing roof selection", () => {
     await rm(directory, { recursive: true, force: true });
   });
 
-  it("makes an unlinked roof selectable and preserves its status after restart", async () => {
+  it("materializes an unlinked roof target and preserves its status after restart", async () => {
     const cookie = await login();
     const initial = await request("/api/canvassing/state", cookie);
     const structures = JSON.parse(
@@ -81,10 +81,9 @@ describe.sequential("canvassing roof selection", () => {
     const roof = structures.features.find((feature: any) => {
       const properties = feature.properties ?? {};
       return (
-        !linked.has(properties.structure_id) &&
-        !properties.address_reference_ids?.length &&
-        !properties.authoritative_address_ids?.length &&
-        properties.building_type === "unclassified"
+        properties.selection_target_kind === "operational_roof" &&
+        properties.selection_target_id &&
+        linked.has(properties.structure_id)
       );
     });
     expect(roof).toBeTruthy();
@@ -94,8 +93,9 @@ describe.sequential("canvassing roof selection", () => {
       cookie,
       { method: "POST", headers: { "content-type": "application/json" }, body: "{}" },
     );
-    expect(target.response.status).toBe(201);
+    expect(target.response.status).toBe(200);
     expect(target.data.household_ids).toHaveLength(1);
+    expect(target.data.created).toBe(false);
 
     const householdId = target.data.household_ids[0];
     const delivery = await request("/api/canvassing/visits", cookie, {
