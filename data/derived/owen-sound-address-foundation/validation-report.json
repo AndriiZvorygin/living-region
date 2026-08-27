@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-08-27T04:56:16.611Z",
+  "generated_at": "2026-08-27T16:53:46.091Z",
   "source_counts": {
-    "residential": 8875,
-    "partly_residential": 2034,
+    "residential": 8861,
+    "partly_residential": 2032,
     "non_residential": 324,
     "unknown": 11
   },
   "validation": {
     "addresses_seen_in_ontario_files": 6246543,
     "addresses_with_owen_sound_name": 11270,
-    "addresses_joined_to_owen_sound_locations": 11244,
+    "addresses_joined_to_owen_sound_locations": 11228,
     "addresses_missing_location": 0,
     "locations_in_csd": 7170,
     "locations_with_coordinates": 7156,
-    "records_outside_boundary": 12,
+    "records_outside_boundary": 28,
     "records_missing_coordinates": 14,
     "duplicate_addr_guid": 0,
     "duplicate_normalized_addresses": 0,
@@ -25,8 +25,134 @@
         "civic_number": "1065",
         "street": "9TH AVE W",
         "building_use_code": "2",
-        "longitude": -80.962149,
-        "latitude": 44.566169
+        "longitude": -80.962118,
+        "latitude": 44.565968
+      },
+      {
+        "address_id": "20131ecc-4850-4f1c-bf61-ec1c26ec2351",
+        "location_id": "ce33ac68-cf3c-4b3b-bccd-61f283a1bc4a",
+        "civic_number": "950",
+        "street": "SUPERIOR ST",
+        "building_use_code": "1",
+        "longitude": -80.923018,
+        "latitude": 44.55853
+      },
+      {
+        "address_id": "847f1126-a165-4836-811f-eb042456fae9",
+        "location_id": "2d64444b-a64a-4ce2-b5e9-096a093cf5e6",
+        "civic_number": "1150",
+        "street": "SUPERIOR ST",
+        "building_use_code": "1",
+        "longitude": -80.910127,
+        "latitude": 44.559951
+      },
+      {
+        "address_id": "dbf2cc16-e49f-42ae-b4b8-5ee5b216dd19",
+        "location_id": "ab87726b-5a6a-4b5e-85c1-ccf6a608a5bb",
+        "civic_number": "1750",
+        "street": "SUPERIOR ST",
+        "building_use_code": "1",
+        "longitude": -80.910127,
+        "latitude": 44.559951
+      },
+      {
+        "address_id": "b3488d97-e924-4603-b79c-de360e2caa7d",
+        "location_id": "dccb414b-4514-433a-a8ec-0091a1968cd8",
+        "civic_number": "1950",
+        "street": "SUPERIOR ST",
+        "building_use_code": "1",
+        "longitude": -80.910127,
+        "latitude": 44.559951
+      },
+      {
+        "address_id": "78104128-7993-4066-ad0c-b6ba5e0673c6",
+        "location_id": "d19b75f8-84ea-4ba4-a1bf-72727fcc0a59",
+        "civic_number": "1550",
+        "street": "SUPERIOR ST",
+        "building_use_code": "1",
+        "longitude": -80.917351,
+        "latitude": 44.559109
+      },
+      {
+        "address_id": "73676e74-04ad-40a3-a519-a67dc87da079",
+        "location_id": "2d836e52-1d4d-4d21-b150-b28b436c0125",
+        "civic_number": "448",
+        "street": "1ST ST SW",
+        "building_use_code": "2",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "21f9e5a4-816e-4896-a48c-ce50deefd961",
+        "location_id": "dc717acc-6053-48bc-800b-e0eb1769cbab",
+        "civic_number": "408",
+        "street": "1ST ST SW",
+        "building_use_code": "2",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "501dfb0d-3301-423a-a27b-4daf2b10f64b",
+        "location_id": "465a8fe6-bec3-4b91-b6fd-a5af8db66db1",
+        "civic_number": "428",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "454ba19b-9ce0-49a5-9828-1201a422576b",
+        "location_id": "38f06692-9277-4bd9-95c0-a532e8fa00a6",
+        "civic_number": "438",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "384e8fa8-97b5-4c3f-86b8-ba37882e1f67",
+        "location_id": "742c5398-f87c-40a3-bc03-14da33833793",
+        "civic_number": "518",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "78f1a353-94fc-4506-aea7-68c0c43814a8",
+        "location_id": "9ee12972-ce2f-4641-93d4-82c7d1693622",
+        "civic_number": "528",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "9f85b865-d455-49ae-a342-cd2153f3d89d",
+        "location_id": "36ea7134-f248-4327-9f28-15a8ade53888",
+        "civic_number": "538",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "65630bbe-848f-4c92-ad86-b14b64858c12",
+        "location_id": "31478c7b-3c3d-453d-a65a-c9a2cda94571",
+        "civic_number": "548",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
+      },
+      {
+        "address_id": "d8abe8f0-0861-4a9b-bf00-d3129bd964bb",
+        "location_id": "51be7bef-de25-4537-a813-dcc45b0eba7a",
+        "civic_number": "558",
+        "street": "1ST ST SW",
+        "building_use_code": "1",
+        "longitude": -80.945435,
+        "latitude": 44.545742
       },
       {
         "address_id": "b399e360-e5de-4657-9da0-dd547cb32a95",
@@ -117,123 +243,352 @@
         "building_use_code": "1",
         "longitude": -80.894433,
         "latitude": 44.593581
-      },
-      {
-        "address_id": "728e3747-f9d3-4cba-8beb-7d7e4d98a4c5",
-        "location_id": "c6489a2c-3994-46dd-a454-5a9fa72502af",
-        "civic_number": "910",
-        "street": "10TH ST W",
-        "building_use_code": "1",
-        "longitude": -80.962342,
-        "latitude": 44.565887
       }
     ]
   },
   "reconciliation": {
-    "matched_exact": 10909,
-    "matched_base_distance": 0,
-    "new": 0,
-    "existing_feature_count": 17371,
-    "existing_osm_stop_features": 3119,
-    "existing_address_rows": 17371,
-    "existing_3426_osm_stops": 3119,
-    "unmatched_existing_rows": 6462
+    "matched_exact": 918,
+    "matched_base_distance": 91,
+    "new": 9884,
+    "existing_feature_count": 7467,
+    "existing_osm_stop_features": 3426,
+    "existing_address_rows": 7467,
+    "existing_3426_osm_stops": 3426,
+    "unmatched_existing_rows": 6458
   },
   "unique_physical_locations": 7156,
   "multi_unit_locations": 656,
   "unique_streets": 125,
   "records_lacking_usable_coordinates": 14,
-  "records_outside_municipal_boundary": 12,
+  "records_outside_municipal_boundary": 28,
   "published_counts": {
     "raw_nar_records_in_ontario_files": 6246543,
     "raw_owen_sound_named_records": 11270,
-    "rejected_outside_municipal_boundary": 12,
+    "rejected_outside_municipal_boundary": 28,
     "rejected_missing_usable_coordinates": 14,
-    "retained_all_address_units": 11244,
-    "retained_primary_canvassing_units": 10909,
+    "retained_all_address_units": 11228,
+    "retained_primary_canvassing_units": 10893,
     "mappable_physical_locations_all_uses": 7156,
-    "mappable_primary_canvassing_locations": 6857,
+    "mappable_primary_canvassing_locations": 6841,
     "exclusions_are_applied_before_retained_counts": true
   },
   "primary_footprint_placement": {
-    "total_locations": 6857,
-    "exact_matches": 766,
-    "nearest_matches": 5985,
-    "ambiguous_matches": 80,
-    "unmatched_matches": 26,
+    "total_locations": 6841,
+    "exact_matches": 353,
+    "nearest_matches": 2701,
+    "ambiguous_matches": 2669,
+    "unmatched_matches": 1118,
     "distance_m": {
-      "p50": 7.884382967996858,
-      "p90": 16.631302532981532,
-      "p95": 20.932001776437488,
-      "p99": 33.28279772057044,
-      "max": 618.3287699807915
+      "p50": 7.057856175134041,
+      "p90": 19.591244426923865,
+      "p95": 25.939443016645136,
+      "p99": 39.17705486167574,
+      "max": 60.687148344825005
     },
-    "grey_exact_matches": 177,
-    "grey_nearest_matches": 151,
-    "review_required": 106
+    "grey_exact_matches": 78,
+    "grey_nearest_matches": 276,
+    "review_required": 3787
+  },
+  "nar_placement_audit_summary": {
+    "primary_loc_guid_values": 6841,
+    "loc_guid_values_assigned_to_structure": 3054,
+    "unique_structures_receiving_nar_locations": 3019,
+    "loc_guid_values_per_structure_distribution": {
+      "1": 2990,
+      "2": 23,
+      "3": 6
+    },
+    "maximum_loc_guid_values_per_structure": 3,
+    "collision_groups": [
+      {
+        "structure_id": "structure_9e1f1f034d2983612a22",
+        "loc_guid_values": [
+          "00da6c7b-2fc8-46d8-a640-d09a78928b27",
+          "f5a3c384-d5c1-43c5-9b2b-dfbf79bdc4ab"
+        ]
+      },
+      {
+        "structure_id": "structure_0c6db5b1f464f912b1ae",
+        "loc_guid_values": [
+          "047b9edd-a955-4e18-a2f4-4fdac914c5b3",
+          "a8250695-5c8b-4124-bf46-9b272aae32db"
+        ]
+      },
+      {
+        "structure_id": "structure_517c61e39922797a0d13",
+        "loc_guid_values": [
+          "0e45e138-461d-44da-a293-87f340dd7ad4",
+          "cf716fca-c423-497f-a69e-21cf6734d493",
+          "ea6166a4-c7bb-42c4-a08a-c9b208a249be"
+        ]
+      },
+      {
+        "structure_id": "structure_e5ead5b833f5719cb162",
+        "loc_guid_values": [
+          "1a19f66a-42ff-4aa7-8126-47769bf40e9e",
+          "81ead116-a36b-4bd4-94ba-06dfbc115cca"
+        ]
+      },
+      {
+        "structure_id": "structure_21538e4a72f32b3bbc85",
+        "loc_guid_values": [
+          "1b1994ac-f83e-4bf4-afc9-c92ba7e52630",
+          "97cd7045-356f-43d0-8595-8eb62280a934"
+        ]
+      },
+      {
+        "structure_id": "structure_1a6fe8504989adc5bb07",
+        "loc_guid_values": [
+          "1cb19dea-e306-4511-b551-ebb04bda1c39",
+          "e572b97c-e175-4aa3-8863-1e790fdb63fd"
+        ]
+      },
+      {
+        "structure_id": "structure_d1c0dd48d710204a95d2",
+        "loc_guid_values": [
+          "263efb02-ace4-4b78-9976-3a41991d535e",
+          "66e2fd10-583c-4c80-bd8b-9c2c531b6892"
+        ]
+      },
+      {
+        "structure_id": "structure_58d606d8e0b8e39054ea",
+        "loc_guid_values": [
+          "28b6ba2d-d1c9-4aa9-beb6-3cdb5a406cca",
+          "5360b419-abec-4751-9fc2-f73597578e1c",
+          "fa651d1c-2b91-480a-af3b-cf5260226046"
+        ]
+      },
+      {
+        "structure_id": "structure_7c7902f74cd7c2f6b3b5",
+        "loc_guid_values": [
+          "29d398aa-653e-4530-954a-ca503d99d2a1",
+          "37807052-0ceb-4329-9745-1dd54c506f95"
+        ]
+      },
+      {
+        "structure_id": "structure_925371db4544430724b8",
+        "loc_guid_values": [
+          "2a3a998f-05c7-46e7-8c91-4f62b5a43a61",
+          "d4240f06-6d72-4285-a099-b5f2602f6107",
+          "e7ea0835-e0f5-4f65-8b14-b645dea37d9c"
+        ]
+      },
+      {
+        "structure_id": "structure_dc5d8d28fbe4f3066f3f",
+        "loc_guid_values": [
+          "40521eb6-b8e2-4a89-b837-c70c7c4891ab",
+          "bc9f78d6-2930-42e0-b883-1a79cf633181"
+        ]
+      },
+      {
+        "structure_id": "structure_7ecf96eaa61656b9da47",
+        "loc_guid_values": [
+          "41f54db0-87b1-4336-95b2-114223a9afe6",
+          "7e6e2002-3b34-46c8-a270-81910c63e23a"
+        ]
+      },
+      {
+        "structure_id": "structure_79bc0d1198791c468f66",
+        "loc_guid_values": [
+          "44e960d3-77ea-49b7-87fc-a5d40fdb03e3",
+          "b2df7c1c-ab2b-4167-86c4-8c6c030db256"
+        ]
+      },
+      {
+        "structure_id": "structure_ee9c2c192e2281012523",
+        "loc_guid_values": [
+          "4568bc00-d399-42fd-a70a-3259bdfb2220",
+          "5cdaacfc-8b43-4ae1-9102-727ced6d6704"
+        ]
+      },
+      {
+        "structure_id": "structure_a143efc5178d9709b830",
+        "loc_guid_values": [
+          "45c1e655-929b-4450-9250-8df2ca4124f1",
+          "a890be38-178e-4aad-a3fb-d6dc9c79e689"
+        ]
+      },
+      {
+        "structure_id": "structure_1d7d7c8bc8ef3c2092e6",
+        "loc_guid_values": [
+          "469b88df-fa71-46ad-a2c0-24ca260d060f",
+          "9b678f7c-c4f2-4b29-a0ac-5ce44a8ce4aa"
+        ]
+      },
+      {
+        "structure_id": "structure_104195608df328d167fc",
+        "loc_guid_values": [
+          "4e1adca3-e8b1-4118-87dd-562954e911a6",
+          "dc1dd929-be01-4a16-9fc6-b20dcbe79ac5"
+        ]
+      },
+      {
+        "structure_id": "structure_e3c3ca358f88132024d9",
+        "loc_guid_values": [
+          "50259d48-6b3c-4be9-92b3-5f69aed720fa",
+          "6416fb79-43f8-4e11-91ba-32a4c93f41a5"
+        ]
+      },
+      {
+        "structure_id": "structure_866bfbc626b6c273acb6",
+        "loc_guid_values": [
+          "5363072e-99e9-4de7-b91e-c5da48f7e6fd",
+          "ebce5c37-f688-486e-b30b-027b892b120c"
+        ]
+      },
+      {
+        "structure_id": "structure_8dacb85bddfa3ce08971",
+        "loc_guid_values": [
+          "5c040166-f03c-4fa8-b279-9eb40fc971c9",
+          "b4a4e1c7-c414-4135-be5e-11e8f922d2a0"
+        ]
+      },
+      {
+        "structure_id": "structure_d4dec8c5b9fb694e7156",
+        "loc_guid_values": [
+          "639f9130-303b-4d44-91fb-ad22ea1223f8",
+          "993f0a04-b1e9-4c33-aa4f-8568293ad9a3"
+        ]
+      },
+      {
+        "structure_id": "structure_5de758afc565e80ac249",
+        "loc_guid_values": [
+          "6ac2069a-e448-4333-bd3d-667499933633",
+          "6e99231d-5f64-4919-9125-6def67e30911",
+          "e28c7b07-8dcb-4db0-994f-5fb3e5fa899c"
+        ]
+      },
+      {
+        "structure_id": "structure_5c5d8be538c9b720f9d5",
+        "loc_guid_values": [
+          "701119a5-a22e-4e35-8104-bee3cc5893ce",
+          "748e4503-16b6-4cfa-b05e-6f5240a1f64f",
+          "c15e3be2-b088-4ff4-a3af-c6706687a32e"
+        ]
+      },
+      {
+        "structure_id": "structure_709591148d3a51953e6f",
+        "loc_guid_values": [
+          "885a7842-9458-4e64-b06a-dec8db738bf1",
+          "9a0ae1d1-a49b-4763-a896-bf9a04608cb8",
+          "fcc45d35-b5e6-4aca-99c5-ad255b8d2547"
+        ]
+      },
+      {
+        "structure_id": "structure_c6b3f8253af34747728e",
+        "loc_guid_values": [
+          "9b1e0cf2-3c7f-434a-891c-12fa9502d90d",
+          "e886575a-c12a-470a-bd20-3495c91c1fa4"
+        ]
+      },
+      {
+        "structure_id": "structure_6f297ba48c5eb6ab845a",
+        "loc_guid_values": [
+          "9baa449b-f499-4e80-ae50-8cfd2cb4f7ca",
+          "febaa01d-e0fd-4251-92d6-9144bc0a6077"
+        ]
+      },
+      {
+        "structure_id": "structure_048c0292e1dfafb34da4",
+        "loc_guid_values": [
+          "a5639009-dba2-4b81-9360-7de1114d4336",
+          "ad13c50d-9024-4326-8311-2bd0ecab2f99"
+        ]
+      },
+      {
+        "structure_id": "structure_21a8b691a9805f82efe4",
+        "loc_guid_values": [
+          "b8fd3260-8621-4afb-bda8-b7994c0c73f5",
+          "c54b25d8-5102-41a6-93b8-f2f5bd8d1b50"
+        ]
+      },
+      {
+        "structure_id": "structure_e2f55018a7b717bec2e7",
+        "loc_guid_values": [
+          "efb46509-87ed-4504-a9a1-3dfff000ad99",
+          "f2a41be6-9a41-45a6-8f32-35fb44b2f4cc"
+        ]
+      }
+    ],
+    "structures_with_incompatible_selected_street": 0,
+    "parity_anomalies": 335,
+    "hundred_block_anomalies": 161,
+    "neighbouring_address_sequence_anomalies": 763,
+    "nar_locations_with_no_credible_structure_match": 3787
+  },
+  "address_classification_counts": {
+    "nar_contained_footprint": 318,
+    "nar_validated_nearest": 2701,
+    "nar_documented_exception": 0,
+    "legacy_nar_confirmed": 0,
+    "legacy_spatially_consistent": 0,
+    "legacy_unverified": 4058,
+    "grid_estimated": 1216,
+    "unresolved": 0
   },
   "address_display": {
-    "authoritative_labels_applied_to_locations": 1351,
-    "estimated_structure_labels_replaced": 30,
+    "nar_locations_with_placement": 3181,
+    "unique_structures_receiving_nar": 3141,
+    "estimated_structure_labels_replaced": 1725,
     "active_address_labels_are_nar_formatted": true,
     "former_estimated_labels_are_not_used_for_nar_address_units": true,
     "operational_roof_address_repair": {
-      "authoritative": 1288,
-      "legacy_fallback": 5254,
-      "estimated_fallback": 1458,
+      "authoritative": 3019,
+      "legacy_fallback": 4058,
+      "estimated_fallback": 1216,
       "unresolved": 0,
-      "removed_reference_ids": 0
+      "removed_reference_ids": 212
     }
   },
   "physical_footprint_audit": {
-    "usable_existing_footprints": 7269,
+    "usable_existing_footprints": 7201,
     "grey_footprints_retrieved": 1940,
-    "unaddressed_usable_footprints_excluded_from_canvassing_locations": 7802,
-    "multi_address_structures": 1016
+    "unaddressed_usable_footprints_excluded_from_canvassing_locations": 6000,
+    "multi_address_structures": 350
   },
   "footprint_placement": {
     "total_locations": 7156,
-    "exact_matches": 807,
-    "nearest_matches": 6218,
-    "ambiguous_matches": 84,
-    "unmatched_matches": 47,
+    "exact_matches": 370,
+    "nearest_matches": 2811,
+    "ambiguous_matches": 2795,
+    "unmatched_matches": 1180,
     "distance_m": {
-      "p50": 7.968686029312722,
-      "p90": 17.331619674533904,
-      "p95": 21.8657465772309,
-      "p99": 38.638464659679954,
-      "max": 618.3287699807915
+      "p50": 7.227326809548687,
+      "p90": 21.088817991945497,
+      "p95": 28.073430655677775,
+      "p99": 41.08160799663172,
+      "max": 68.35914835819517
     },
-    "grey_exact_matches": 180,
-    "grey_nearest_matches": 164,
-    "review_required": 131
+    "grey_exact_matches": 78,
+    "grey_nearest_matches": 292,
+    "review_required": 3975
   },
   "numbering": {
-    "address_units": 10909,
-    "matched_same_road": 9723,
+    "address_units": 10893,
+    "matched_same_road": 9707,
     "road_match_distance_m": {
-      "p50": 9.805638114059997,
-      "p90": 16.12841621734907,
-      "p95": 17.388653292019086,
+      "p50": 11.027184923338984,
+      "p90": 14.966433375217695,
+      "p95": 16.678873944372164,
       "max": 2487.8714419865228
     },
-    "parity_anomalies": 335,
-    "hundred_block_anomalies": 314,
+    "parity_anomalies": 597,
+    "hundred_block_anomalies": 318,
     "direction_anomalies": 0,
     "suffix_anomalies": 0,
-    "monotonic_progression_anomalies": 3035,
-    "cross_road_matches": 9427
+    "monotonic_progression_anomalies": 418,
+    "cross_road_matches": 9416
   },
   "legacy_history": {
-    "legacy_rows": 6462,
-    "confident": 232,
-    "ambiguous": 4631,
-    "unmatched": 1599,
-    "activity_visibility_candidates": 6230,
+    "legacy_rows": 6458,
+    "confident": 1853,
+    "ambiguous": 3733,
+    "unmatched": 872,
+    "activity_visibility_candidates": 4605,
     "distance_m": {
-      "p50": 35.72066655269315,
-      "p90": 62.405324982878774,
-      "p95": 67.8979501790596,
+      "p50": 17.308989329396187,
+      "p90": 42.67584407480255,
+      "p95": 53.34699371945525,
       "max": 74.93680101177235
     }
   }

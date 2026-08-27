@@ -21,11 +21,22 @@ const polygon = (id: string, source = "openstreetmap", x = 0, y = 0): Feature =>
   geometry: { type: "Polygon", coordinates: [[[x, y], [x + 0.0001, y], [x + 0.0001, y + 0.0001], [x, y + 0.0001], [x, y]]] },
 });
 
+const unaddressedPolygon = (id: string, x = 0, y = 0): Feature => ({
+  ...polygon(id, "openstreetmap", x, y),
+  properties: {
+    structure_id: id,
+    external_source: "openstreetmap",
+    external_id: id,
+    building_type: "residential",
+  },
+});
+
 const location = (id: string, longitude: number, latitude: number): NarLocation => ({
   loc_guid: id,
   csd_code: "3542059",
   longitude,
   latitude,
+  coordinate_source: "nar_building",
   source_file: "test",
 });
 
@@ -45,6 +56,7 @@ const unit = (locationId: string, number = "100"): AddressUnit => ({
   mailing_municipality: "OWEN SOUND",
   mailing_province: "ON",
   postal_code: "N4K1A1",
+  coordinate_source: "nar_building",
   building_use_code: "1",
   building_use: "residential",
   source_retrieval_date: "2026-08-26",
@@ -70,13 +82,38 @@ describe("NAR location to building placement", () => {
   it("uses a nearby plausible footprint and sends an equidistant ambiguity to review", () => {
     const result = placeNarLocations({
       locations: [location("near", 0.00035, 0.00005), location("ambiguous", 0.00015, 0.00005)],
-      structures: [polygon("left", "openstreetmap", 0, 0), polygon("right", "openstreetmap", 0.0002, 0)],
+      structures: [unaddressedPolygon("left", 0, 0), unaddressedPolygon("right", 0.0002, 0)],
       units: [unit("near"), unit("ambiguous", "999")],
       thresholdM: 50,
     });
     expect(result.placements[0].status).toBe("nearest");
     expect(result.placements[1].status).toBe("ambiguous");
     expect(placementSummary(result.placements)).toMatchObject({ nearest_matches: 1, ambiguous_matches: 1 });
+    expect(result.placements[0].candidates[0].footprint_area_m2).toBeGreaterThan(0);
+  });
+
+  it("does not citywide-match a point beyond the conservative threshold", () => {
+    const result = placeNarLocations({
+      locations: [location("far", 0, 0)],
+      structures: [polygon("far-roof", "openstreetmap", 0.001, 0)],
+      units: [unit("far")],
+      thresholdM: 50,
+    });
+    expect(result.placements[0]).toMatchObject({
+      status: "unmatched",
+      structure_id: null,
+      rejection_reason: "no credible footprint within the conservative match threshold",
+    });
+  });
+
+  it("does not collapse distinct same-point locations onto an ordinary footprint", () => {
+    const result = placeNarLocations({
+      locations: [location("one", 0.00005, 0.00005), location("two", 0.00005, 0.00005)],
+      structures: [polygon("ordinary", "openstreetmap", 0, 0)],
+      units: [unit("one", "100"), unit("two", "100")],
+    });
+    expect(result.placements.filter((placement) => placement.structure_id)).toHaveLength(1);
+    expect(result.placements.filter((placement) => placement.status === "ambiguous")).toHaveLength(1);
   });
 
   it("keeps distinct units at one physical stop and applies authoritative labels", () => {

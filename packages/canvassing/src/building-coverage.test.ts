@@ -7,6 +7,7 @@ import {
   findGeneratedGeometryConflicts,
   mergeBuildingSources,
   mergeCityMapBuildingSource,
+  normalizeStreet,
   type AddressInput,
   type Feature,
 } from "./building-coverage";
@@ -94,6 +95,13 @@ const address = (
 });
 
 describe("canvassing building coverage", () => {
+  it("compares ordinal and numeric street spellings consistently", () => {
+    expect(normalizeStreet("7th Avenue East")).toBe(normalizeStreet("7 AVE E"));
+    expect(normalizeStreet("254 8th Street East")).toBe(
+      normalizeStreet("254 8 ST E"),
+    );
+  });
+
   it("preserves OSM geometry and removes an overlapping Canada Structures polygon", () => {
     const osm = rectangle("osm-1", -80.941, 44.5701, -80.9408, 44.57025, {
         external_id: "w123",

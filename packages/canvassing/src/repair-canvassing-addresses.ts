@@ -40,6 +40,7 @@ const firstNumber = (properties: Record<string, any>) =>
   String(
     properties.inferred_civic_number ??
       properties.civic_numbers?.[0] ??
+      properties.fallback_civic_number ??
       numericPart(properties.civic_label),
   ).replace(/\.0$/, "");
 
@@ -52,6 +53,7 @@ type LegacyAddress = {
   street?: string;
   unit?: string;
   structure_id?: string;
+  external_source?: string;
 };
 
 /**
@@ -112,6 +114,14 @@ export function repairCanvassingStructureAddresses(options: {
 
     if (current.length) {
       stats.authoritative++;
+      const placementStatuses = current.map((address) =>
+        String(address.properties.nar_placement_status ?? "nearest"),
+      );
+      const addressQuality = placementStatuses.every((status) => status === "exact")
+        ? "nar_contained_footprint"
+        : placementStatuses.every((status) => status === "nearest")
+          ? "nar_validated_nearest"
+          : "nar_documented_exception";
       const addressIds = current
         .map((address) => String(address.properties.address_id ?? ""))
         .filter((addressId) => addressId.startsWith("address_"));
@@ -126,10 +136,11 @@ export function repairCanvassingStructureAddresses(options: {
       properties.canvassable = true;
       properties.address_count = current.length;
       properties.residential_unit_count = current.length;
-      properties.address_quality = "authoritative_nar";
+      properties.address_quality = addressQuality;
       properties.address_source_status = "authoritative";
+      properties.address_label_source = addressQuality;
       properties.address_relation = "statcan_authoritative_location";
-      properties.address_relation_confidence = "authoritative";
+      properties.address_relation_confidence = addressQuality;
       delete properties.fallback_civic_number;
       delete properties.fallback_street;
       delete properties.fallback_unit;
@@ -166,11 +177,38 @@ export function repairCanvassingStructureAddresses(options: {
       properties.fallback_unit = String(legacy.unit ?? "");
       properties.civic_numbers = [String(legacy.civic_number)];
       properties.civic_label = label;
-      properties.address_label_source = "legacy_physical_roof_fallback";
+      const legacyQuality = String(legacy.external_source ?? "") ===
+        "statistics_canada_national_address_register"
+        ? "legacy_nar_confirmed"
+        : "legacy_unverified";
+      properties.address_label_source = legacyQuality;
       properties.address_source_status = "legacy_fallback";
-      properties.address_quality = "legacy_physical_roof";
+      properties.address_quality = legacyQuality;
       properties.address_relation = "legacy_same_structure";
-      properties.address_relation_confidence = "legacy_fallback";
+      properties.address_relation_confidence = legacyQuality;
+      properties.address_count = 1;
+      properties.selection_target_kind = "operational_roof";
+      properties.selection_target_ids = [
+        operationalTargetForStructure(structureId).householdId,
+      ];
+      properties.selection_target_id = properties.selection_target_ids[0];
+      stats.legacy_fallback++;
+      continue;
+    }
+
+    const priorAddressFallback =
+      String(properties.legacy_address_fallback_source ?? "") === "prior_nar_association" &&
+      String(properties.fallback_civic_number ?? "").trim() &&
+      String(properties.fallback_street ?? "").trim();
+    if (priorAddressFallback) {
+      const label = `${properties.fallback_civic_number} ${properties.fallback_street}`.trim();
+      properties.civic_label = label;
+      properties.civic_numbers = [String(properties.fallback_civic_number)];
+      properties.address_label_source = "legacy_unverified";
+      properties.address_source_status = "legacy_fallback";
+      properties.address_quality = "legacy_unverified";
+      properties.address_relation = "prior_nar_same_structure_unverified";
+      properties.address_relation_confidence = "legacy_unverified";
       properties.address_count = 1;
       properties.selection_target_kind = "operational_roof";
       properties.selection_target_ids = [
@@ -185,29 +223,7 @@ export function repairCanvassingStructureAddresses(options: {
     const rangeRoad = roadById(roads, properties.address_range_road_id);
     const road = rangeRoad ?? nearestRoad(point, roads);
     let number = firstNumber(properties);
-    let street = roadName(road);
-    if (!number || !street) {
-      const nearest = options.addresses
-        .map((address) => ({
-          address,
-          distance_m: metresBetween(point, address.geometry.coordinates as Position),
-        }))
-        .sort(
-          (left, right) =>
-            left.distance_m - right.distance_m ||
-            String(left.address.properties.address_id).localeCompare(
-              String(right.address.properties.address_id),
-            ),
-        )[0]?.address;
-      if (nearest) {
-        number ||= String(
-          nearest.properties.civic_number_base ??
-            nearest.properties.civic_number ??
-            "",
-        );
-        street ||= String(nearest.properties.street ?? "");
-      }
-    }
+    let street = String(properties.fallback_street ?? "").trim() || roadName(road);
     if (number && street) {
       properties.fallback_civic_number = number;
       properties.fallback_street = street;

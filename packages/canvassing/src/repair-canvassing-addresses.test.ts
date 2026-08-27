@@ -68,8 +68,8 @@ describe("canvassing roof address repair", () => {
     });
     expect(structures[0].properties).toMatchObject({
       civic_label: "1450 8th Street East",
-      address_quality: "legacy_physical_roof",
-      address_label_source: "legacy_physical_roof_fallback",
+      address_quality: "legacy_unverified",
+      address_label_source: "legacy_unverified",
     });
   });
 

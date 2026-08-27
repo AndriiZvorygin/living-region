@@ -640,19 +640,29 @@ export async function canvassingMain() {
   }
   for (const activity of state.physical_roof_activity ?? [])
     physicalRoofActivityByStructure.set(activity.structure_id, activity);
+  const stringArrayProperty = (value: unknown): string[] => {
+    if (Array.isArray(value)) return value.map(String);
+    if (typeof value !== "string" || !value.trim()) return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.map(String) : [];
+    } catch {
+      return [];
+    }
+  };
   const homesForStructure = (feature: any) => {
     const direct =
       byStructure.get(String(feature.properties.structure_id ?? "")) ?? [];
     if (direct.length) return direct;
     return [
       ...new Map([
-        ...(feature.properties.authoritative_address_ids ?? [])
+        ...stringArrayProperty(feature.properties.authoritative_address_ids)
           .map((id: string) => bySourceAddressGuid.get(id))
-          .filter(Boolean)
+          .filter((home): home is Household => Boolean(home))
           .map((home: Household) => [home.household_id, home] as const),
-        ...(feature.properties.selection_target_ids ?? [])
+        ...stringArrayProperty(feature.properties.selection_target_ids)
           .map((id: string) => byHousehold.get(id))
-          .filter(Boolean)
+          .filter((home): home is Household => Boolean(home))
           .map((home: Household) => [home.household_id, home] as const),
       ]).values(),
     ] as Household[];
@@ -1736,9 +1746,73 @@ export async function canvassingMain() {
       },
     });
     applyMapFilters();
-    map.on("click", (event) => {
+    // Bulk selection is deliberately handled at the canvas boundary. The
+    // native click coordinates remain stable even when closing a mobile
+    // sheet schedules a MapLibre resize, and the exact rendered feature is
+    // passed to pickStructure instead of being queried again later. The
+    // layer listener below is a fallback for the short interval in which a
+    // source repaint can make a canvas-level rendered query empty.
+    let lastBulkClick = { x: -1, y: -1, at: 0 };
+    const handleBulkRoofClick = (
+      point: [number, number],
+      features?: maplibregl.MapGeoJSONFeature[],
+      retry = 0,
+    ) => {
+      if (!multiSelectMode || (splitTarget && splitDrawing)) return;
+      const roofs = (features?.length
+        ? features
+        : map.queryRenderedFeatures(point, {
+            layers: ["structures"],
+          })
+      ).filter(
+        (feature: any) =>
+          String(feature.properties?.structure_id ?? "") &&
+          feature.properties?.canvassable,
+      );
+      if (!roofs.length) {
+        // A mobile sheet close or a source repaint can briefly leave the
+        // rendered query empty. Retry for a few frames without changing the
+        // click's map coordinate; this remains a single user action.
+        if (retry < 8)
+          window.requestAnimationFrame(() =>
+            handleBulkRoofClick(point, undefined, retry + 1),
+          );
+        return;
+      }
+      const now = performance.now();
+      if (
+        Math.hypot(point[0] - lastBulkClick.x, point[1] - lastBulkClick.y) < 2 &&
+        now - lastBulkClick.at < 450
+      )
+        return;
+      lastBulkClick = { x: point[0], y: point[1], at: now };
       closeMobileOverlays();
+      void pickStructure({
+        point: { x: point[0], y: point[1] },
+        features: roofs,
+      } as any).catch((error) =>
+        toast(error instanceof Error ? error.message : "Roof selection failed"),
+      );
+    };
+    map.getCanvas().addEventListener("click", (event: MouseEvent) => {
+      if (!multiSelectMode || (splitTarget && splitDrawing)) return;
+      const canvas = map.getCanvas().getBoundingClientRect();
+      const point: [number, number] = [
+        event.clientX - canvas.left,
+        event.clientY - canvas.top,
+      ];
+      handleBulkRoofClick(point);
+    });
+    map.on("click", "structures", (event) => {
+      if (!multiSelectMode || (splitTarget && splitDrawing)) return;
+      handleBulkRoofClick(
+        [event.point.x, event.point.y],
+        event.features as maplibregl.MapGeoJSONFeature[] | undefined,
+      );
+    });
+    map.on("click", (event) => {
       if (splitTarget && splitDrawing) {
+        closeMobileOverlays();
         const point: [number, number] = [event.lngLat.lng, event.lngLat.lat];
         if (!splitCutStart) {
           splitCutStart = point;
@@ -1751,20 +1825,14 @@ export async function canvassingMain() {
         }
         return;
       }
+      if (multiSelectMode) return;
+      // Read the feature at the pointer before closing mobile sheets. The
+      // close path calls resizeMap(), which can briefly invalidate the
+      // rendered-query result for this already-dispatched pointer event.
       const roofs = map.queryRenderedFeatures(event.point, {
         layers: ["structures"],
       });
-      // In bulk mode a roof is the user's explicit target. Address-cluster
-      // bubbles can overlap the low-opacity roof fill at mobile zooms; let
-      // the exact roof hit reach pickStructure instead of treating the
-      // bubble as an intercepted map click. Coverage mode keeps the cluster
-      // zoom interaction below unchanged.
-      if (roofs.length && multiSelectMode) {
-        void pickStructure({ ...event, features: roofs } as any).catch((error) =>
-          toast(error instanceof Error ? error.message : "Roof selection failed"),
-        );
-        return;
-      }
+      closeMobileOverlays();
       if (
         map.queryRenderedFeatures(event.point, {
           layers: ["address-clusters", "address-cluster-counts"],
@@ -2003,8 +2071,8 @@ export async function canvassingMain() {
       ids.add(structureId);
       structureIdsByHousehold.set(home.household_id, ids);
     }
-    const createdFeature = structureFeatureById.get(structureId) ?? feature,
-      created = homesForStructure(createdFeature);
+    const createdFeature = structureFeatureById.get(structureId) ?? feature;
+    let created = homesForStructure(createdFeature);
     if (result.households?.length) {
       createdFeature.properties.household_count = created.length;
       createdFeature.properties.status = created
@@ -2016,6 +2084,10 @@ export async function canvassingMain() {
       ];
     } else {
       await refresh();
+      // The target may already exist in SQLite even when this browser's
+      // initial state did not contain its household row. refresh() rebuilds
+      // byStructure; re-read it before declaring the roof unselectable.
+      created = homesForStructure(createdFeature);
     }
     if (!created.length) throw new Error("This roof could not be made selectable");
     return created;
@@ -2023,9 +2095,16 @@ export async function canvassingMain() {
   async function pickStructure(
     e: MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
   ) {
-    const rendered = map.queryRenderedFeatures(e.point, {
-      layers: ["structures"],
-    });
+    // Prefer the feature hit captured by the click handler. A mobile menu or
+    // drawer close can schedule a resize between dispatching the click and
+    // entering this async function; re-querying in that window can otherwise
+    // turn a valid roof click into an apparent miss.
+    const rendered =
+      e.features?.length
+        ? e.features
+        : map.queryRenderedFeatures(e.point, {
+            layers: ["structures"],
+          });
     const picked = rendered
         .map((renderedFeature) =>
           structureFeatureById.get(

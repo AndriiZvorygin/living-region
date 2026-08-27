@@ -379,11 +379,17 @@ async function main() {
         }
         const inferredNumber = String(
           building.properties.inferred_civic_number ??
-            building.properties.civic_numbers?.[0] ??
-            String(building.properties.civic_label ?? "").match(/\d+/)?.[0] ??
-            "1",
-        );
-        const inferredStreet = String(road?.properties.name ?? "Owen Sound Road");
+          building.properties.civic_numbers?.[0] ??
+          String(building.properties.civic_label ?? "").match(/\d+/)?.[0] ??
+          "",
+        ).trim();
+        const inferredStreet = String(
+          road?.properties.name ?? building.properties.fallback_street ?? "",
+        ).trim();
+        if (!inferredNumber || !inferredStreet)
+          throw new Error(
+            `Canvassing data invariant failed: ${structureId} has no authoritative, legacy, or grid-estimated civic address`,
+          );
         building.properties.fallback_civic_number = inferredNumber;
         building.properties.fallback_street = inferredStreet;
         building.properties.fallback_unit = "";

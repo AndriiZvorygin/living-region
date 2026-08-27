@@ -2281,19 +2281,57 @@ function prepareTestBulkFixture() {
     lon: number;
     lat: number;
   }>;
-  const activityFree = operational.filter(
-    (candidate) =>
-      !db
+  // The disposable fixture must not select a roof which earlier ordered E2E
+  // tests have already touched. Checking only the operational household is
+  // insufficient: address-history projection can expose activity recorded on
+  // a different historical household, and an address-association event can
+  // move a household's effective structure without changing addresses.id.
+  // Build the activity structure set once instead of repeating this correlated
+  // history query for every candidate roof. This endpoint is test-only, but
+  // it must not hold the single API event loop hostage while the browser test
+  // is waiting to exercise the real selection path.
+  const activityStructureIds = new Set(
+    (
+      db
         .prepare(
-          `SELECT 1 FROM active_visits WHERE household_id=?
-           UNION ALL SELECT 1 FROM activity_flyer_events WHERE household_id=?
-           LIMIT 1`,
+          `WITH activity_households(household_id) AS (
+             SELECT household_id FROM visits
+             UNION
+             SELECT household_id FROM household_flyer_events
+             UNION
+             SELECT household_id FROM neighbourhood_conversations
+           ),
+           current_activity(structure_id) AS (
+             SELECT CASE WHEN EXISTS(
+               SELECT 1 FROM address_association_events ae
+                WHERE ae.address_id=a.id
+             ) THEN (
+               SELECT CASE WHEN ae.event_type='clear' THEN NULL ELSE ae.structure_id END
+                 FROM address_association_events ae
+                WHERE ae.address_id=a.id
+                ORDER BY ae.occurred_at DESC,ae.rowid DESC LIMIT 1
+             ) ELSE a.structure_id END
+               FROM activity_households ah
+               JOIN households h ON h.id=ah.household_id
+               JOIN addresses a ON a.id=h.address_id
+           )
+           SELECT structure_id FROM current_activity WHERE structure_id IS NOT NULL
+           UNION
+           SELECT c.canonical_structure_id
+             FROM activity_households ah
+             JOIN structure_history_crosswalk c
+               ON c.historical_household_id=ah.household_id
+            WHERE c.canonical_structure_id IS NOT NULL`,
         )
-        .get(candidate.household_id, candidate.household_id),
+        .all() as Array<{ structure_id: string }>
+    ).map((row) => String(row.structure_id)),
   );
-  if (activityFree.length < 34)
+  const structureActivityFree = operational.filter(
+    (candidate) => !activityStructureIds.has(candidate.structure_id),
+  );
+  if (structureActivityFree.length < 34)
     throw new Error("bulk-selection fixture needs thirty-four unused operational roofs");
-  const candidates = [...activityFree].sort(
+  const candidates = [...structureActivityFree].sort(
     (left, right) =>
       Math.hypot(left.lon + 80.943, left.lat - 44.567) -
       Math.hypot(right.lon + 80.943, right.lat - 44.567),

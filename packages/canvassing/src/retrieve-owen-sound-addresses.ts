@@ -121,6 +121,7 @@ async function main() {
     greyFootprints: greyFile,
     units: result.units,
     preferredStructureByLocation,
+    roads: roadsFile,
   });
   const placedStructures = applyAuthoritativePlacements({
     structures: structuresFile,
@@ -131,6 +132,9 @@ async function main() {
   });
   const placementByLocation = new Map(
     placement.placements.map((item) => [item.location_id, item.structure_id]),
+  );
+  const placementDetailsByLocation = new Map(
+    placement.placements.map((item) => [item.location_id, item]),
   );
   const internalAddressIdByNarId = new Map(
     reconciliation.matches.map((match) => [match.address_id, match.internal_address_id]),
@@ -155,6 +159,10 @@ async function main() {
           unit.official_street_direction,
         ),
         structure_id: placementByLocation.get(unit.location_id) ?? null,
+        nar_placement_status:
+          placementDetailsByLocation.get(unit.location_id)?.status ?? "unmatched",
+        nar_placement_distance_m:
+          placementDetailsByLocation.get(unit.location_id)?.distance_m ?? null,
       },
       geometry: {
         type: "Point" as const,
@@ -207,6 +215,7 @@ async function main() {
       licence: "Statistics Canada Open Licence Agreement",
       raw_cache_path: "/tmp/living-region-address-cache/202606.zip (outside the repository; override with CANVASS_ADDRESS_SOURCE_CACHE)",
       raw_files_are_not_committed: true,
+      coordinate_selection: "paired BG_LATITUDE/BG_LONGITUDE building coordinate; BF_REPPOINT used only when BG is unavailable and labelled as a fallback",
     },
     supplemental_source: {
       name: "Grey County Building Footprints - Open Data",
@@ -263,9 +272,11 @@ async function main() {
     structures: placedStructures.structures,
     placements: placement.placements,
     numberingReport,
+    roadCount: roadsFile.length,
     audit: {
       address_display: {
-        authoritative_labels_applied_to_locations: placementStructureIds.size,
+        nar_locations_with_placement: placement.placements.filter((item) => item.structure_id).length,
+        unique_structures_receiving_nar: placementStructureIds.size,
         estimated_structure_labels_replaced: estimatedLabelsReplaced,
         active_address_labels_are_nar_formatted: true,
         former_estimated_labels_are_not_used_for_nar_address_units: true,

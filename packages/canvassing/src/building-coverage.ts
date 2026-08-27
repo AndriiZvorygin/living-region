@@ -187,6 +187,11 @@ const featureArea = (feature: Feature) => {
 export const normalizeStreet = (value: unknown) =>
   String(value ?? "")
     .toLowerCase()
+    // Address sources alternate between ordinal street names ("7th") and
+    // numeric names ("7"). Treat the ordinal suffix as presentation, not as
+    // a different street, so official NAR components can be compared with
+    // footprint labels and road names safely.
+    .replace(/\b(\d+)(?:st|nd|rd|th)\b/g, "$1")
     .replace(/\bstreet\b/g, "st")
     .replace(/\bavenue\b/g, "ave")
     .replace(/\broad\b/g, "rd")
@@ -1444,12 +1449,15 @@ export function addUnaddressedStructureReferences(
           distance_m,
         };
     }
-    const type = String(building.properties.building_type ?? "unclassified"),
-      isAccessory = type === "accessory" || featureArea(building) < 35;
+    const type = String(building.properties.building_type ?? "unclassified").toLowerCase(),
+      isAccessory = new Set(["accessory", "garage", "shed", "carport"]).has(type);
     // A nearby accessory can share the primary property's address. A normal
     // roof must not inherit an address from another building: a citywide
     // nearest roof is not evidence of a civic-address association.
-    if (!nearest || !isAccessory || nearest.distance_m > 35) {
+    // This legacy pre-processing hook is deliberately limited to an explicitly
+    // tagged accessory immediately beside a primary building. It never gives
+    // a normal roof an address and never searches beyond the local footprint.
+    if (!nearest || !isAccessory || nearest.distance_m > 20) {
       delete building.properties.address_reference_ids;
       delete building.properties.address_reference_structure_id;
       delete building.properties.address_reference_distance_m;

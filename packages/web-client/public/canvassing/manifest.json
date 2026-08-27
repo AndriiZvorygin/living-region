@@ -1,49 +1,35 @@
 {
-  "generated_at": "2026-08-26T21:12:21.848Z",
+  "generated_at": "2026-08-27T16:53:44.569Z",
   "crs": "OGC:CRS84 / WGS84 longitude-latitude",
-  "extent": [
-    -80.961715,
-    44.547725,
-    -80.894634,
-    44.605075
-  ],
-  "sources": {
-    "addresses": "Statistics Canada National Address Register, June 2026",
-    "address_catalogue": "https://www150.statcan.gc.ca/n1/en/catalogue/46260002",
-    "structures": "Grey County Building Footprints Open Data, with existing sourced fallback footprints; see source-provenance.json",
-    "roads": "know/input/gis/road-centrelines-grey.geojson",
-    "boundary": "data/boundaries/owen-sound.geojson"
-  },
   "counts": {
-    "structures": 8095,
-    "addresses": 10909,
-    "matched_addresses": 10759,
-    "sourced_structures": 7269,
-    "estimated_structures": 826,
-    "unresolved_addresses": 150,
+    "structures": 8377,
+    "addresses": 10893,
+    "canvassable_structures": 8293,
+    "canvassable_structures_without_selection_target": 0,
+    "primary_nar_address_units": 10893,
+    "primary_nar_physical_locations": 6841,
+    "primary_nar_locations_with_structure": 3054,
     "roads": 883,
-    "address_review_records": 1589,
-    "match_confidence": {
-      "authoritative_residential": 8875,
-      "authoritative_partly_residential": 2034
+    "address_classification_counts": {
+      "nar_contained_footprint": 318,
+      "nar_validated_nearest": 2701,
+      "nar_documented_exception": 0,
+      "legacy_nar_confirmed": 0,
+      "legacy_spatially_consistent": 0,
+      "legacy_unverified": 4058,
+      "grid_estimated": 1216,
+      "unresolved": 0
     }
   },
   "address_foundation": {
     "source": "statistics_canada_national_address_register",
-    "retrieval_date": "2026-08-26",
-    "all_in_bound_units": 11244,
-    "residential_units": 8875,
-    "partly_residential_units": 2034,
-    "non_residential_units": 324,
-    "unknown_use_units": 11,
-    "physical_locations": 7156,
-    "multi_unit_locations": 656,
-    "matched_legacy_rows": 991,
-    "unmatched_legacy_rows_retained": 6462
+    "release": "June 2026",
+    "residential_units": 8861,
+    "partly_residential_units": 2032,
+    "primary_units": 10893,
+    "primary_physical_locations": 6841,
+    "note": "Residential and partly residential primary units after municipal-boundary and coordinate exclusions."
   },
-  "source_currency": {
-    "national_address_register": "June 2026 release retrieved 2026-08-26",
-    "structures": "see building source audit",
-    "official_roads": "see source manifest; feature-level currency not supplied"
-  }
+  "address_source": "Statistics Canada National Address Register, June 2026",
+  "address_quality": "See address-quality.json and validation-report.json; review and estimated labels are not authoritative NAR addresses."
 }

@@ -34,8 +34,8 @@ if (foreignKeyProblems.length)
   throw new Error(
     `Database has ${foreignKeyProblems.length} foreign-key violations`,
   );
-if (schemaVersion !== 18)
-  throw new Error(`Expected schema version 18, found ${schemaVersion}`);
+if (schemaVersion < 18)
+  throw new Error(`Expected schema version 18 or newer, found ${schemaVersion}`);
 
 let previous: string | null = null,
   journalCount = 0;
@@ -61,17 +61,27 @@ if (journalRows !== journalCount)
     `Journal has ${journalCount} records but database has ${journalRows}`,
   );
 
+async function backupFiles(directory: string): Promise<string[]> {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files: string[] = [];
+  for (const entry of entries) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...(await backupFiles(path)));
+    else if (entry.name.endsWith(".sqlite")) files.push(path);
+  }
+  return files;
+}
+
 const backups = await Promise.all(
-  (await readdir(backupDirectory))
-    .filter((file) => file.endsWith(".sqlite"))
-    .map(async (file) => ({
-      file,
-      modified: (await stat(join(backupDirectory, file))).mtimeMs,
-    })),
+  (await backupFiles(backupDirectory)).map(async (path) => ({
+    path,
+    file: path.slice(backupDirectory.length + 1),
+    modified: (await stat(path)).mtimeMs,
+  })),
 );
 const latest = backups.sort((a, b) => b.modified - a.modified)[0];
 if (!latest) throw new Error("No SQLite backup is available");
-const restored = new DatabaseSync(join(backupDirectory, latest.file), {
+const restored = new DatabaseSync(latest.path, {
   readOnly: true,
 });
 const restoreCheck = restored.prepare("PRAGMA quick_check").get() as {

@@ -44,13 +44,13 @@ describe("Owen Sound canvassing preparation", () => {
     expect(manifest.crs).toContain("CRS84");
     expect(manifest.counts.structures).toBeGreaterThan(6_000);
     expect(manifest.counts.addresses).toBeGreaterThan(6_000);
-    if (manifest.address_foundation?.source === "statistics_canada_national_address_register")
-      expect(manifest.address_foundation.residential_units +
-        manifest.address_foundation.partly_residential_units).toBe(10_909);
-    else
-      expect(manifest.counts.match_confidence.inferred_range).toBeGreaterThan(
-        2_000,
-      );
+    expect(manifest.address_foundation?.source).toBe(
+      "statistics_canada_national_address_register",
+    );
+    expect(manifest.address_foundation.residential_units +
+      manifest.address_foundation.partly_residential_units).toBe(
+      manifest.counts.primary_nar_address_units,
+    );
     const coverage = await readJson(
       "packages/web-client/public/canvassing/building-coverage-audit.json",
     );

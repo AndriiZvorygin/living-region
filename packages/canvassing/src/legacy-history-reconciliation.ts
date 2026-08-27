@@ -128,7 +128,10 @@ function legacyFromFeature(feature: Feature): LegacyAddress | null {
     properties.address_id ?? properties.internal_address_id ?? feature.id ?? "",
   );
   const street = String(properties.street ?? "").trim();
-  if (!id || !street) return null;
+  // A few older OSM rows have only a rough civic number and coordinates.
+  // They are still historical roofs and must remain in reconciliation output;
+  // missing street components make them unmatched, not nonexistent.
+  if (!id) return null;
   const coordinates = feature.geometry.coordinates as Position;
   if (!Number.isFinite(Number(coordinates?.[0])) || !Number.isFinite(Number(coordinates?.[1])))
     return null;

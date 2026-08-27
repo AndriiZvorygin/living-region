@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-27T04:56:15.327Z",
+  "generated_at": "2026-08-27T16:53:44.138Z",
   "geography": {
     "province_code": "35",
     "csd_code": "3542059",
@@ -17,7 +17,8 @@
     "retrieval_date": "2026-08-27",
     "licence": "Statistics Canada Open Licence Agreement",
     "raw_cache_path": "/tmp/living-region-address-cache/202606.zip (outside the repository; override with CANVASS_ADDRESS_SOURCE_CACHE)",
-    "raw_files_are_not_committed": true
+    "raw_files_are_not_committed": true,
+    "coordinate_selection": "paired BG_LATITUDE/BG_LONGITUDE building coordinate; BF_REPPOINT used only when BG is unavailable and labelled as a fallback"
   },
   "supplemental_source": {
     "name": "Grey County Building Footprints - Open Data",
@@ -58,14 +59,14 @@
     "unmatched_existing_policy": "retain in SQLite through the existing source_active lifecycle and export for review; do not delete historical households or events"
   },
   "counts": {
-    "existing_total": 17371,
-    "existing_feature_count": 17371,
-    "existing_3426_osm_stops": 3119,
-    "official_primary_units": 10909,
-    "matched_exact": 10909,
-    "matched_base_distance": 0,
-    "new": 0,
-    "unmatched_existing": 6462
+    "existing_total": 7467,
+    "existing_feature_count": 7467,
+    "existing_3426_osm_stops": 3426,
+    "official_primary_units": 10893,
+    "matched_exact": 918,
+    "matched_base_distance": 91,
+    "new": 9884,
+    "unmatched_existing": 6458
   },
   "physical_footprint_matching": {
     "threshold_m": 50,

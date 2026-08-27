@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-08-26T19:06:12.318Z",
+  "generated_at": "2026-08-27T16:53:44.566Z",
   "source": "statistics_canada_national_address_register",
-  "source_release": "June 2026",
-  "config": {
-    "boundary": "CSD 3542059 plus repository Owen Sound municipal boundary",
-    "coordinates": "NAR BF representative point, falling back to building representative point"
-  },
   "totals": {
-    "civic_addresses": 10909,
+    "civic_addresses": 10893,
+    "primary_nar_units": 10893,
+    "primary_nar_locations": 6841,
+    "mapped_primary_nar_locations": 3054,
+    "contained_primary_nar_locations": 353,
+    "validated_nearest_primary_nar_locations": 2701,
+    "unresolved_primary_nar_locations": 3787,
     "duplicate_normalized_addresses": 0,
-    "outside_municipal_boundary": 12,
-    "records_missing_usable_coordinates": 14,
-    "unique_physical_locations": 7156,
-    "multi_unit_physical_locations": 656,
-    "unique_streets": 125
+    "outside_municipal_boundary": 28,
+    "missing_usable_coordinates": 14,
+    "multi_unit_locations": 671
   },
   "automatic_join_counts": {
-    "authoritative_residential": 8875,
-    "authoritative_partly_residential": 2034
+    "nar_contained_footprint": 479,
+    "nar_validated_nearest": 4701,
+    "nar_documented_exception": 0,
+    "unresolved": 5713
   },
-  "methodology": "The June 2026 Statistics Canada National Address Register is the authoritative civic-address source. Residential and partly residential address units are published as separate address stops; LOC_GUID groups units at one physical location. Twelve records outside the repository municipal boundary and fourteen records without usable coordinates are excluded from the primary bundle. Building-footprint association remains a separate, reviewable layer; an unmatched NAR point is an explicit review point rather than an invented roof. No resident, owner, telephone, or roll-number fields are retained."
+  "methodology": "Statistics Canada June 2026 NAR CIVIC_NO and official street fields are authoritative. BG building coordinates are preferred; BF_REPPOINT is used only as a labelled fallback. A NAR unit is mapped only to a containing or conservative, address-compatible footprint. Unresolved placement is retained as a review flag and never blocks canvassing."
 }

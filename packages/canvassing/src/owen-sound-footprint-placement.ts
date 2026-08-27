@@ -2,6 +2,7 @@ import {
   centroid,
   distanceToGeometry,
   geometryContains,
+  normalizeStreet,
   metresBetween,
   stableId,
   type Feature,
@@ -28,6 +29,10 @@ export type FootprintCandidate = {
   source: string;
   distance_m: number;
   centroid_distance_m: number;
+  street_compatibility?: "match" | "mismatch" | "unknown";
+  civic_number_compatibility?: "match" | "mismatch" | "unknown";
+  compatibility_score?: number;
+  footprint_area_m2?: number;
 };
 
 export type FootprintPlacement = {
@@ -39,12 +44,36 @@ export type FootprintPlacement = {
   footprint_source: string | null;
   candidates: FootprintCandidate[];
   point: Position;
+  coordinate_source?: NarLocation["coordinate_source"];
+  address_ids?: string[];
+  official_street?: string;
+  rejection_reason?: string;
 };
 
 type IndexedFeature = { feature: Feature; bbox: [number, number, number, number] };
 
 const geometryIsPolygon = (feature: Feature) =>
   feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon";
+
+const footprintAreaM2 = (feature: Feature) => {
+  const center = centroid(feature);
+  const latitudeScale = 111320 * Math.cos((center[1] * Math.PI) / 180);
+  const latitudeScaleSquared = 111320;
+  let area = 0;
+  const visitRing = (ring: Position[]) => {
+    for (let index = 1; index < ring.length; index++)
+      area +=
+        ring[index - 1][0] * latitudeScale * ring[index][1] * latitudeScaleSquared -
+        ring[index][0] * latitudeScale * ring[index - 1][1] * latitudeScaleSquared;
+  };
+  const rings = feature.geometry.type === "Polygon"
+    ? [feature.geometry.coordinates[0]]
+    : feature.geometry.coordinates.map((polygon: Position[][]) => polygon[0]);
+  for (const ring of rings) {
+    if (ring?.length) visitRing(ring);
+  }
+  return Math.abs(area) / 2;
+};
 
 const bboxFor = (feature: Feature): [number, number, number, number] => {
   const points: Position[] = [];
@@ -117,8 +146,74 @@ const isUsableExistingFootprint = (feature: Feature) => {
   return source !== "living_region_estimate" && type !== "accessory";
 };
 
-function candidateFor(feature: Feature, point: Position): FootprintCandidate {
+type PlacementContext = {
+  civicNumbers: string[];
+  officialStreet: string;
+  preferredStructureId?: string;
+};
+
+const civicNumberValue = (value: unknown) => {
+  const match = String(value ?? "").match(/\d+/);
+  return match ? Number(match[0]) : null;
+};
+
+const candidateStreetKeys = (feature: Feature) => {
+  const properties = feature.properties;
+  const labelStreet = String(properties.civic_label ?? "")
+    .replace(/^~?\d+[A-Z0-9/-]*\s*/i, "")
+    .replace(/\s+\+\d+$/, "")
+    .trim();
+  return [...new Set(
+    [properties.fallback_street, properties.address_range_street, labelStreet]
+      .map((value) => normalizeStreet(value))
+      .filter(Boolean),
+  )];
+};
+
+const candidateCivicNumbers = (feature: Feature) => [
+  ...(Array.isArray(feature.properties.civic_numbers)
+    ? feature.properties.civic_numbers
+    : []),
+  feature.properties.inferred_civic_number,
+  feature.properties.fallback_civic_number,
+  String(feature.properties.civic_label ?? "").match(/^~?(\d+)/)?.[1],
+]
+  .map(civicNumberValue)
+  .filter((value): value is number => value != null);
+
+function candidateFor(
+  feature: Feature,
+  point: Position,
+  context: PlacementContext,
+): FootprintCandidate {
   const source = sourceName(feature);
+  const officialStreet = normalizeStreet(context.officialStreet);
+  const streets = candidateStreetKeys(feature);
+  const streetCompatibility: FootprintCandidate["street_compatibility"] =
+    !officialStreet || !streets.length
+      ? "unknown"
+      : streets.includes(officialStreet)
+        ? "match"
+        : "mismatch";
+  const numbers = context.civicNumbers
+    .map(civicNumberValue)
+    .filter((value): value is number => value != null);
+  const candidateNumbers = candidateCivicNumbers(feature);
+  const candidateAddressIsAuthoritative =
+    String(feature.properties.address_source_status ?? "") === "authoritative" ||
+    String(feature.properties.address_label_source ?? "") ===
+      "statistics_canada_national_address_register";
+  const civicCompatibility: FootprintCandidate["civic_number_compatibility"] =
+    !numbers.length || !candidateNumbers.length
+      ? "unknown"
+      : !candidateAddressIsAuthoritative
+        ? "unknown"
+      : candidateNumbers.some((value) => numbers.includes(value))
+        ? "match"
+        : "mismatch";
+  const compatibilityScore =
+    (streetCompatibility === "match" ? 2 : streetCompatibility === "unknown" ? 1 : 0) +
+    (civicCompatibility === "match" ? 2 : civicCompatibility === "unknown" ? 1 : 0);
   return {
     footprint_id:
       source === "grey_county_building_footprints"
@@ -128,6 +223,10 @@ function candidateFor(feature: Feature, point: Position): FootprintCandidate {
     source,
     distance_m: distanceToGeometry(point, feature.geometry),
     centroid_distance_m: metresBetween(point, centroid(feature)),
+    street_compatibility: streetCompatibility,
+    civic_number_compatibility: civicCompatibility,
+    compatibility_score: compatibilityScore,
+    footprint_area_m2: footprintAreaM2(feature),
   };
 }
 
@@ -143,47 +242,21 @@ function chooseCandidate(
   point: Position,
   candidates: Feature[],
   thresholdM: number,
-  context: { civicNumbers: string[]; preferredStructureId?: string },
+  context: PlacementContext,
 ): FootprintPlacement {
-  const addressMatches = (feature: Feature) => {
-    const labels = [
-      ...(feature.properties.civic_numbers ?? []),
-      feature.properties.civic_label ?? "",
-    ].map((value) => String(value));
-    return context.civicNumbers.some((number) =>
-      labels.some((label) => new RegExp(`(?:^|\\D)${number}(?:$|\\D)`).test(label)),
-    );
-  };
-  const civicHintDistance = (feature: Feature) => {
-    const hints = [
-      ...(feature.properties.civic_numbers ?? []),
-      feature.properties.inferred_civic_number,
-      feature.properties.civic_label,
-    ]
-      .map((value) => Number(String(value ?? "").match(/\d+/)?.[0]))
-      .filter((value) => Number.isFinite(value));
-    const numbers = context.civicNumbers
-      .map((value) => Number(String(value).match(/\d+/)?.[0]))
-      .filter((value) => Number.isFinite(value));
-    if (!hints.length || !numbers.length) return Infinity;
-    return Math.min(...hints.flatMap((hint) => numbers.map((number) => Math.abs(hint - number))));
-  };
   const ranked = candidates
-    .map((feature) => ({ feature, candidate: candidateFor(feature, point) }))
+    .map((feature) => ({ feature, candidate: candidateFor(feature, point, context) }))
     .sort((a, b) => {
-      const preference = (item: { feature: Feature; candidate: FootprintCandidate }) =>
-        item.candidate.structure_id === context.preferredStructureId
-          ? 2
-          : addressMatches(item.feature)
-            ? 1
-            : 0;
-      const preferenceDifference = preference(b) - preference(a);
+      const compatibilityDifference =
+        (b.candidate.compatibility_score ?? 0) - (a.candidate.compatibility_score ?? 0);
       const distanceDifference = a.candidate.distance_m - b.candidate.distance_m;
-      const hintDifference = civicHintDistance(a.feature) - civicHintDistance(b.feature);
-      return (preferenceDifference && Math.abs(distanceDifference) <= 10
-        ? preferenceDifference
-        : distanceDifference) ||
-        (Math.abs(distanceDifference) <= FOOTPRINT_AMBIGUITY_TOLERANCE_M && hintDifference) ||
+      const areaDifference =
+        (a.candidate.footprint_area_m2 ?? Infinity) -
+        (b.candidate.footprint_area_m2 ?? Infinity);
+      const preferenceDifference =
+        (b.candidate.structure_id === context.preferredStructureId ? 1 : 0) -
+        (a.candidate.structure_id === context.preferredStructureId ? 1 : 0);
+      return distanceDifference || compatibilityDifference || areaDifference || preferenceDifference ||
         (a.candidate.source === "grey_county_building_footprints" ? -1 : 0) -
           (b.candidate.source === "grey_county_building_footprints" ? -1 : 0) ||
         a.candidate.centroid_distance_m - b.candidate.centroid_distance_m ||
@@ -201,16 +274,15 @@ function chooseCandidate(
       footprint_source: null,
       candidates: allCandidates,
       point,
+      official_street: context.officialStreet,
+      rejection_reason: "no credible footprint within the conservative match threshold",
     };
-
-  const sameSourceNearBest = ranked.filter(
-    (item) =>
-      item.candidate.source === best.candidate.source &&
-      item.candidate.distance_m - best.candidate.distance_m <= FOOTPRINT_AMBIGUITY_TOLERANCE_M &&
-      item.candidate.structure_id !== context.preferredStructureId &&
-      !addressMatches(item.feature) &&
-      civicHintDistance(item.feature) === civicHintDistance(best.feature) &&
-      item.candidate.structure_id !== best.candidate.structure_id,
+  const sameSourceNearBest = ranked.filter((item) =>
+    item.candidate.source === best.candidate.source &&
+    item.candidate.distance_m - best.candidate.distance_m <= FOOTPRINT_AMBIGUITY_TOLERANCE_M &&
+    item.candidate.structure_id !== context.preferredStructureId &&
+    item.candidate.structure_id !== best.candidate.structure_id &&
+    (item.candidate.compatibility_score ?? 0) === (best.candidate.compatibility_score ?? 0),
   );
   if (sameSourceNearBest.length) {
     return {
@@ -222,6 +294,8 @@ function chooseCandidate(
       footprint_source: best.candidate.source,
       candidates: allCandidates,
       point,
+      official_street: context.officialStreet,
+      rejection_reason: "multiple nearby footprints remain similarly plausible",
     };
   }
   return {
@@ -233,7 +307,38 @@ function chooseCandidate(
     footprint_source: best.candidate.source,
     candidates: allCandidates,
     point,
+    official_street: context.officialStreet,
   };
+}
+
+function compatibleMultipleLocations(
+  structure: Feature | undefined,
+  placements: FootprintPlacement[],
+  unitsByLocation: Map<string, AddressUnit[]>,
+) {
+  if (!structure || placements.length <= 1) return true;
+  const properties = structure.properties;
+  const buildingType = String(properties.building_type ?? "").toLowerCase();
+  const sourceTag = String(properties.source_building_tag ?? "").toLowerCase();
+  const apartment = buildingType === "apartment" || sourceTag === "apartments";
+  const points = new Set(placements.map((placement) => placement.point.join(",")));
+  const streets = new Set(
+    placements
+      .map((placement) => normalizeStreet(placement.official_street ?? ""))
+      .filter(Boolean),
+  );
+  const civicNumbers = placements.flatMap((placement) =>
+    (unitsByLocation.get(placement.location_id) ?? []).map((unit) => civicNumberValue(unit.civic_number)),
+  ).filter((value): value is number => value != null);
+  const numberSpan = civicNumbers.length ? Math.max(...civicNumbers) - Math.min(...civicNumbers) : Infinity;
+  const everyContained = placements.every((placement) => placement.status === "exact");
+  // Multiple distinct NAR locations are accepted only for a typed apartment
+  // structure, or for a small number of demonstrably distinct points inside
+  // one footprint. Identical/repeated NAR points cannot justify collapsing
+  // unrelated civic addresses onto an ordinary house.
+  return streets.size <= 1 && numberSpan <= 100 &&
+    ((apartment && everyContained && placements.length <= 12) ||
+      (points.size === placements.length && everyContained && placements.length <= 4));
 }
 
 export function placeNarLocations(options: {
@@ -243,6 +348,7 @@ export function placeNarLocations(options: {
   units?: AddressUnit[];
   preferredStructureByLocation?: Map<string, string>;
   thresholdM?: number;
+  roads?: Feature[];
 }) {
   const grey = (options.greyFootprints ?? [])
     .filter(geometryIsPolygon)
@@ -277,17 +383,89 @@ export function placeNarLocations(options: {
       (item) => bboxDistanceM(point, item.bbox) === 0 &&
         sourceName(item.feature) !== "grey_county_building_footprints" && geometryContains(item.feature.geometry, point),
     );
-    let poolEntries = containingGrey.length ? containingGrey : containingExisting.length ? containingExisting : nearbyEntries.filter((item) => bboxDistanceM(point, item.bbox) <= thresholdM + 25);
-    if (!poolEntries.length) poolEntries = index.nearby(point, 12).filter((item) => bboxDistanceM(point, item.bbox) <= thresholdM + 25);
-    if (!poolEntries.length) poolEntries = [...new Set([...grey, ...existing])].map((feature) => ({ feature, bbox: bboxFor(feature) }));
-    const civicNumbers = [...new Set((unitsByLocation.get(location.loc_guid) ?? []).map((unit) => formatCivicNumber(unit.civic_number, unit.civic_number_suffix)))];
+    const unitsAtLocation = unitsByLocation.get(location.loc_guid) ?? [];
+    const officialStreet = unitsAtLocation[0]
+      ? [
+          unitsAtLocation[0].official_street_name,
+          unitsAtLocation[0].official_street_type,
+          unitsAtLocation[0].official_street_direction,
+        ].filter(Boolean).join(" ")
+      : "";
+    const civicNumbers = [...new Set(unitsAtLocation.map((unit) =>
+      formatCivicNumber(unit.civic_number, unit.civic_number_suffix),
+    ))];
+    const nearbyWithinThreshold = nearbyEntries.filter(
+      (item) => bboxDistanceM(point, item.bbox) <= thresholdM,
+    );
+    const compatibleNearby = nearbyWithinThreshold.filter((item) => {
+      const candidate = candidateFor(item.feature, point, { civicNumbers, officialStreet });
+      // An explicit street or civic-number contradiction is evidence that a
+      // nearby footprint is the wrong property. Unknown metadata is allowed
+      // because an OSM/municipal footprint may not carry address fields, but
+      // a known contradiction must not be turned into a false NAR match.
+      return candidate.street_compatibility !== "mismatch" &&
+        candidate.civic_number_compatibility !== "mismatch";
+    });
+    const addressCompatible = compatibleNearby.filter((item) => {
+      const candidate = candidateFor(item.feature, point, { civicNumbers, officialStreet });
+      return candidate.street_compatibility === "match" &&
+        candidate.civic_number_compatibility === "match";
+    });
+    // A known civic/street match is stronger evidence than a merely
+    // containing polygon. In every other case containment and then distance
+    // are used, but only inside the conservative threshold.
+    let poolEntries = addressCompatible.length
+      ? compatibleNearby
+          .filter((item) => addressCompatible.some((match) => match.feature === item.feature))
+      : containingGrey.length
+        ? containingGrey.filter((item) => compatibleNearby.some((candidate) => candidate.feature === item.feature))
+        : containingExisting.length
+          ? containingExisting.filter((item) => compatibleNearby.some((candidate) => candidate.feature === item.feature))
+          : compatibleNearby;
+    // Do not reintroduce an incompatible footprint through a broader search.
+    // If the conservative local candidates all contradict the official NAR
+    // street or civic number, leave this LOC_GUID unresolved for review.
+    // Never fall back to a city-wide nearest building. An unresolved NAR
+    // location is safer than a false civic-address association.
     const placement = chooseCandidate(point, poolEntries.map((item) => item.feature), thresholdM, {
       civicNumbers,
+      officialStreet,
       preferredStructureId: options.preferredStructureByLocation?.get(location.loc_guid),
     });
     placement.location_id = location.loc_guid;
+    placement.coordinate_source = location.coordinate_source;
+    placement.address_ids = unitsAtLocation.map((unit) => unit.address_id);
     return placement;
   });
+  const byStructure = new Map<string, FootprintPlacement[]>();
+  for (const placement of placements) {
+    if (!placement.structure_id) continue;
+    const values = byStructure.get(placement.structure_id) ?? [];
+    values.push(placement);
+    byStructure.set(placement.structure_id, values);
+  }
+  const allByStructure = new Map(
+    all.map((feature) => [structureId(feature, sourceName(feature)), feature]),
+  );
+  for (const [assignedStructureId, grouped] of byStructure) {
+    if (compatibleMultipleLocations(allByStructure.get(assignedStructureId), grouped, unitsByLocation)) continue;
+    const [keep, ...reject] = [...grouped].sort(
+      (left, right) =>
+        (right.status === "exact" ? 1 : 0) - (left.status === "exact" ? 1 : 0) ||
+        (right.candidates[0]?.compatibility_score ?? 0) - (left.candidates[0]?.compatibility_score ?? 0) ||
+        (left.distance_m ?? Infinity) - (right.distance_m ?? Infinity) ||
+        left.location_id.localeCompare(right.location_id),
+    );
+    void keep;
+    for (const placement of reject) {
+      placement.structure_id = null;
+      placement.footprint_id = null;
+      placement.footprint_source = null;
+      placement.status = "ambiguous";
+      placement.rejection_reason =
+        "distinct LOC_GUIDs share one footprint without sufficient multi-entrance or apartment evidence";
+    }
+  }
   return { placements, greyFootprints: grey, existingFootprints: existing };
 }
 
@@ -326,11 +504,18 @@ export function applyAuthoritativePlacements(options: {
     structures.map((feature) => [String(feature.properties.structure_id ?? feature.id), feature]),
   );
   const greyById = new Map((options.greyFootprints ?? []).map((feature) => [greyFootprintId(feature), feature]));
+  const primaryLocationIds = new Set(
+    options.units
+      .filter((unit) => ["residential", "partly_residential"].includes(unit.building_use))
+      .map((unit) => unit.location_id),
+  );
   const structureForPlacement = new Map<string, FootprintPlacement>();
   for (const placement of options.placements) {
     if (!placement.structure_id) continue;
     structureForPlacement.set(placement.structure_id, placement);
-    if (!byStructure.has(placement.structure_id) && placement.footprint_source === "grey_county_building_footprints") {
+    if (!byStructure.has(placement.structure_id) &&
+        placement.footprint_source === "grey_county_building_footprints" &&
+        primaryLocationIds.has(placement.location_id)) {
       const grey = greyById.get(placement.footprint_id ?? "");
       if (grey) {
         const created = cloneGreyStructure(grey, placement.structure_id);
@@ -344,6 +529,23 @@ export function applyAuthoritativePlacements(options: {
     if (authoritativeIds.has(oldId)) continue;
     const feature = byStructure.get(oldId);
     if (!feature) continue;
+    // Keep the last human address as provenance when a formerly authoritative
+    // NAR association is no longer credible under the corrected BG point.
+    // It is intentionally reclassified by repairCanvassingStructureAddresses
+    // as an unverified legacy fallback; deleting it would create an anonymous
+    // roof and erase useful physical-roof evidence.
+    const oldLabel = String(feature.properties.civic_label ?? "").trim();
+    const oldNumbers = Array.isArray(feature.properties.civic_numbers)
+      ? feature.properties.civic_numbers.map(String).filter(Boolean)
+      : [];
+    if (oldLabel && !feature.properties.fallback_civic_number) {
+      const leading = oldLabel.match(/^\s*(?:\d+[A-Z0-9/-]*\s*\/\s*)*(\d+[A-Z0-9/-]*)\s+(.+)$/i);
+      const fallbackStreet = leading?.[2]?.trim() ?? oldLabel.replace(/^\S+\s+/, "");
+      feature.properties.fallback_civic_number = oldNumbers[0] ?? leading?.[1] ?? "";
+      feature.properties.fallback_street = fallbackStreet;
+      feature.properties.fallback_unit = String(feature.properties.fallback_unit ?? "");
+      feature.properties.legacy_address_fallback_source = "prior_nar_association";
+    }
     delete feature.properties.civic_label;
     delete feature.properties.civic_numbers;
     delete feature.properties.address_count;

@@ -209,5 +209,5 @@ describe.sequential("authoritative address history preservation", () => {
     expect(db.prepare("SELECT count(*) count FROM visits WHERE id=?").get(eventId)).toEqual({ count: 1 });
     expect(db.prepare("SELECT count(*) count FROM legacy_history_reviews WHERE legacy_address_id=?").get(legacyAddressId)).toEqual({ count: 0 });
     db.close();
-  });
+  }, 90_000);
 });

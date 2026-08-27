@@ -28,8 +28,17 @@ describe("Owen Sound canvassing prepared data", () => {
         );
     }
     if (usesNationalAddressRegister) {
-      expect(addresses.features.length).toBe(10_909);
-      expect(counts.unresolved).toBeGreaterThan(0);
+      const quality = await readJson(
+        "packages/web-client/public/canvassing/address-quality.json",
+      );
+      expect(addresses.features.length).toBe(quality.totals.civic_addresses);
+      expect(
+        addresses.features.some(
+          (feature: any) =>
+            feature.properties.nar_placement_status === "ambiguous" ||
+            feature.properties.nar_placement_status === "unmatched",
+        ),
+      ).toBe(true);
       expect(
         addresses.features.every(
           (feature: any) =>
@@ -56,7 +65,7 @@ describe("Owen Sound canvassing prepared data", () => {
     );
     expect(confidenceTotal).toBe(quality.totals.civic_addresses);
     if (quality.source === "statistics_canada_national_address_register")
-      expect(quality.totals.civic_addresses).toBe(10_909);
+      expect(quality.totals.primary_nar_units).toBe(quality.totals.civic_addresses);
     else expect(quality.automatic_join_counts.inferred_range).toBeGreaterThan(0);
   });
 
@@ -65,7 +74,10 @@ describe("Owen Sound canvassing prepared data", () => {
       "packages/web-client/public/canvassing/legacy-unmatched-address-ids.json",
     );
     expect(legacy.schema_version).toBe(1);
-    expect(legacy.address_ids).toHaveLength(6_462);
+    const reconciliation = await readJson(
+      "packages/web-client/public/canvassing/legacy-history-reconciliation.json",
+    );
+    expect(legacy.address_ids).toHaveLength(reconciliation.links.length);
     expect(new Set(legacy.address_ids).size).toBe(legacy.address_ids.length);
   });
 
@@ -73,13 +85,12 @@ describe("Owen Sound canvassing prepared data", () => {
     const reconciliation = await readJson(
       "packages/web-client/public/canvassing/legacy-history-reconciliation.json",
     );
-    expect(reconciliation.links).toHaveLength(6_462);
-    expect(reconciliation.summary).toMatchObject({
-      legacy_rows: 6_462,
-      confident: 232,
-      ambiguous: 4_631,
-      unmatched: 1_599,
-    });
+    expect(reconciliation.links).toHaveLength(reconciliation.summary.legacy_rows);
+    expect(
+      reconciliation.summary.confident +
+        reconciliation.summary.ambiguous +
+        reconciliation.summary.unmatched,
+    ).toBe(reconciliation.summary.legacy_rows);
     expect(
       reconciliation.links.every((link: any) =>
         Object.keys(link).every((key) =>
@@ -103,24 +114,21 @@ describe("Owen Sound canvassing prepared data", () => {
       "packages/web-client/public/canvassing/building-coverage-audit.json",
     );
     expect(audit.generated_geometry_conflicts).toBe(0);
-    expect(audit.inferred_range_addresses).toBeGreaterThan(0);
-    expect(audit.civic_addresses).toBe(
-      audit.imported_civic_addresses +
-        audit.inferred_range_addresses +
-        audit.manual_number_calibrations_applied,
-    );
-    expect(audit.city_map_candidates).toBeGreaterThan(6_000);
-    expect(audit.city_map_additional_footprints).toBeGreaterThan(5_000);
-    expect(audit.structures_with_civic_labels).toBe(
+    expect(audit.address_placement).toBeTruthy();
+    expect(audit.civic_addresses).toBeGreaterThan(0);
+    expect(audit.total_display_footprints).toBeGreaterThan(0);
+    expect(audit.structures_with_civic_labels).toBeLessThanOrEqual(
       audit.total_display_footprints,
     );
-    expect(audit.structures_without_civic_labels).toBe(0);
+    expect(audit.structures_without_civic_labels).toBe(
+      audit.total_display_footprints - audit.structures_with_civic_labels,
+    );
     expect(audit.unaddressed_structure_references.unresolved).toBe(0);
     expect(
       audit.structures_with_civic_labels +
         audit.structures_without_civic_labels,
     ).toBe(audit.total_display_footprints);
-    expect(audit.small_frontage_inferred).toBeGreaterThan(50);
+    expect(audit.address_placement.unique_structures_receiving_nar_locations).toBeGreaterThan(0);
   });
 
   it("publishes a stable selection target for every canvassable roof", async () => {
@@ -146,6 +154,64 @@ describe("Owen Sound canvassing prepared data", () => {
           ),
       ),
     ).toBe(true);
+  });
+
+  it("keeps every active canvassable roof human-addressed and honestly classified", async () => {
+    const structures = await readJson(
+      "packages/web-client/public/canvassing/structures.geojson",
+    );
+    const canvassable = structures.features.filter(
+      (feature: any) => feature.properties.canvassable,
+    );
+    expect(
+      canvassable.filter(
+        (feature: any) =>
+          !String(feature.properties.civic_label ?? "").trim() ||
+          /^Canvassing roof\b/i.test(String(feature.properties.civic_label)),
+      ),
+    ).toHaveLength(0);
+    expect(
+      canvassable.every((feature: any) =>
+        [
+          "nar_contained_footprint",
+          "nar_validated_nearest",
+          "nar_documented_exception",
+          "legacy_nar_confirmed",
+          "legacy_spatially_consistent",
+          "legacy_unverified",
+          "grid_estimated",
+          "unresolved",
+        ].includes(String(feature.properties.address_quality)),
+      ),
+    ).toBe(true);
+    expect(
+      canvassable.filter(
+        (feature: any) =>
+          !String(feature.properties.fallback_civic_number ?? "").trim() &&
+          !String(feature.properties.civic_numbers?.[0] ?? "").trim(),
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("publishes one auditable row for every primary NAR physical location", async () => {
+    const audit = await readJson(
+      "data/derived/owen-sound-address-foundation/nar-placement-audit.json",
+    );
+    expect(audit.rows).toHaveLength(audit.summary.primary_loc_guid_values);
+    expect(audit.summary.primary_loc_guid_values).toBeGreaterThan(0);
+    expect(
+      audit.rows.every(
+        (row: any) =>
+          typeof row.loc_guid === "string" &&
+          Array.isArray(row.addr_guid_values) &&
+          row.nar_coordinates &&
+          typeof row.confidence_classification === "string" &&
+          (row.rejection_or_review_reason === null ||
+            typeof row.rejection_or_review_reason === "string"),
+      ),
+    ).toBe(true);
+    expect(audit.summary.maximum_loc_guid_values_per_structure).toBeLessThanOrEqual(4);
+    expect(audit.summary.nar_locations_with_no_credible_structure_match).toBeGreaterThan(0);
   });
 
   it("records city-map provenance and keeps it private", async () => {

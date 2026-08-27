@@ -8,6 +8,7 @@ import {
   parseCsvLine,
   pointInBoundary,
   reconcileExistingAddresses,
+  selectNarCoordinates,
   utm17NorthToWgs84,
   type AddressUnit,
 } from "./owen-sound-address-foundation";
@@ -110,6 +111,25 @@ describe("Owen Sound address foundation utilities", () => {
     const [longitude, latitude] = utm17NorthToWgs84(500000, 4930000);
     expect(longitude).toBeCloseTo(-81, 4);
     expect(latitude).toBeCloseTo(44.523, 2);
+  });
+
+  it("uses the NAR building coordinate before the shared block-face point", () => {
+    expect(selectNarCoordinates({
+      BG_LATITUDE: "44.5806",
+      BG_LONGITUDE: "-80.9333",
+      BF_REPPOINT_LATITUDE: "44.5860",
+      BF_REPPOINT_LONGITUDE: "-80.9298",
+    })).toEqual({
+      latitude: 44.5806,
+      longitude: -80.9333,
+      coordinate_source: "nar_building",
+    });
+    expect(selectNarCoordinates({
+      BG_LATITUDE: "",
+      BG_LONGITUDE: "",
+      BF_REPPOINT_LATITUDE: "44.5860",
+      BF_REPPOINT_LONGITUDE: "-80.9298",
+    }).coordinate_source).toBe("nar_block_face_fallback");
   });
 
   it("reuses existing internal IDs for exact and distance-safe matches", () => {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T01:35:07.872Z",
+  "generated_at": "2026-08-27T11:15:38.677Z",
   "result": "The official Owen Sound city-map building layer fills local roof gaps while preserving suitable OSM footprints; Canada Structures fills remaining gaps. Official Grey County address ranges create stable inferred household stops; unmatched imported civic addresses receive collision-checked local roofs or review points.",
   "usable_sources": [
     {
@@ -56,7 +56,7 @@
   "private_reference_layer_added": true,
   "os_map_import_allowed": false,
   "coverage": {
-    "generated_at": "2026-08-06T01:35:07.566Z",
+    "generated_at": "2026-08-27T11:15:38.420Z",
     "existing_osm_footprints": 1111,
     "city_map_candidates": 6915,
     "city_map_additional_footprints": 5962,
@@ -68,18 +68,20 @@
     "total_sourced_footprints": 7201,
     "estimated_footprints": 826,
     "total_display_footprints": 8027,
-    "structures_with_civic_labels": 8027,
-    "structures_without_civic_labels": 0,
+    "structures_with_civic_labels": 7976,
+    "structures_without_civic_labels": 51,
     "unaddressed_structure_references": {
-      "shared_accessory": 214,
-      "provisional_nearest": 675,
-      "high_confidence": 612,
-      "probable": 137,
-      "distant_review": 140,
-      "unresolved": 0
+      "shared_accessory": 206,
+      "provisional_nearest": 0,
+      "high_confidence": 206,
+      "probable": 0,
+      "distant_review": 0,
+      "unresolved": 683
     },
+    "canvassable_structures": 7918,
+    "canvassable_structures_without_selection_target": 0,
     "small_frontage_inferred": 71,
-    "manual_number_calibrations_applied": 1,
+    "manual_number_calibrations_applied": 3,
     "manual_number_calibrations_unmatched": 0,
     "civic_addresses": 7467,
     "imported_civic_addresses": 3426,

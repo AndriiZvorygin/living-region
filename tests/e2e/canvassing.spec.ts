@@ -167,6 +167,7 @@ async function renderedCanvassableRoofPoints(
 ): Promise<RenderedRoofPoint[]> {
   return page.evaluate((requested) => {
     const map = (window as any).__livingRegionCanvassing.map;
+    const state = (window as any).__livingRegionCanvassing.state();
     const canvas = map.getCanvas().getBoundingClientRect();
     const features = map
       .queryRenderedFeatures({ layers: ["structures"] })
@@ -191,6 +192,16 @@ async function renderedCanvassableRoofPoints(
       const properties = feature.properties ?? {};
       const id = String(properties.structure_id ?? "");
       if (!id || seen.has(id)) continue;
+      // The structure source is intentionally static.  Its flyer_ids can be
+      // stale for a moment after an earlier ordered test has recorded a visit
+      // or a history projection has attached activity to the physical roof.
+      // Use the live state as well when choosing untouched roofs for this
+      // write scenario; otherwise the test can select a roof that is already
+      // covered and mistake duplicate protection for a selection failure.
+      const stateFlyerIds = state.households
+        .filter((home: any) => home.structure_id === id)
+        .flatMap((home: any) => home.flyer_ids ?? [])
+        .map(String);
       const coordinates: Array<[number, number]> = [];
       const walk = (value: any) => {
         if (typeof value?.[0] === "number") coordinates.push(value);
@@ -228,6 +239,11 @@ async function renderedCanvassableRoofPoints(
           pageY < 90 ||
           pageY > window.innerHeight - 105
         )
+          return false;
+        // queryRenderedFeatures can see through the fixed mobile selection
+        // bar. Require the actual page point to be on the MapLibre canvas so
+        // page.mouse.click() cannot be swallowed by a button or overlay.
+        if (document.elementFromPoint(pageX, pageY) !== map.getCanvas())
           return false;
         const hits = map.queryRenderedFeatures([candidate.x, candidate.y], {
           layers: ["structures"],
@@ -269,8 +285,8 @@ async function renderedCanvassableRoofPoints(
         householdCount: Number(properties.household_count),
         targetIds,
         flyerIds: Array.isArray(properties.flyer_ids)
-          ? properties.flyer_ids.map(String)
-          : [],
+          ? [...new Set([...properties.flyer_ids, ...stateFlyerIds].map(String))]
+          : [...new Set(stateFlyerIds)],
         targetKind: String(properties.selection_target_kind ?? ""),
         hasAuthoritativeAddress:
           Array.isArray(properties.authoritative_address_ids) &&
@@ -356,6 +372,8 @@ async function renderedUnlinkedRoofPoints(
           pageY < 90 ||
           pageY > window.innerHeight - 105
         )
+          return false;
+        if (document.elementFromPoint(canvas.left + candidate.x, pageY) !== map.getCanvas())
           return false;
         const hits = map.queryRenderedFeatures([candidate.x, candidate.y], {
           layers: ["structures"],
@@ -605,23 +623,54 @@ test.describe("Owen Sound canvassing field workflows", () => {
       body: JSON.stringify(unlinked, null, 2),
       contentType: "application/json",
     });
-
     let selectedHouseholds = 0;
     const selectedStructureIds = new Set<string>();
     for (const roof of unlinked) {
       selectedStructureIds.add(roof.id);
       await page.mouse.click(roof.x, roof.y);
       selectedHouseholds += 1;
-      await expect
-        .poll(async () =>
-          Number(
-            (await page.locator("#bulk-selection-status").textContent())?.match(
-              /(\d+) household/,
-            )?.[1] ?? 0,
-          ),
-          { timeout: 30_000 },
-        )
-        .toBe(selectedHouseholds);
+      try {
+        await expect
+          .poll(async () =>
+            Number(
+              (await page.locator("#bulk-selection-status").textContent())?.match(
+                /(\d+) household/,
+              )?.[1] ?? 0,
+            ),
+            { timeout: 30_000 },
+          )
+          .toBe(selectedHouseholds);
+      } catch (error) {
+        const details = await page.evaluate((structureId) => {
+          const app = (window as any).__livingRegionCanvassing;
+          const feature = app.map
+            .queryRenderedFeatures({ layers: ["structures"] })
+            .find((item: any) => String(item.properties?.structure_id) === structureId);
+          const homes = app
+            .state()
+            .households.filter((home: any) => home.structure_id === structureId);
+          const targetIds = Array.isArray(feature?.properties?.selection_target_ids)
+            ? feature.properties.selection_target_ids
+            : [];
+          return {
+            structureId,
+            feature: feature?.properties ?? null,
+            homes,
+            targetHomes: app.state().households.filter((home: any) =>
+              targetIds.includes(home.household_id),
+            ),
+            savedLocalStorage: Object.fromEntries(
+              Object.entries(localStorage).filter(([key]) =>
+                key.includes("living-region.canvassing.field-state"),
+              ),
+            ),
+            status: document.querySelector("#bulk-selection-status")?.textContent,
+            toast: document.querySelector("#toast")?.textContent,
+            drawer: document.querySelector("#drawer")?.className,
+          };
+        }, roof.id);
+        throw new Error(`${error instanceof Error ? error.message : error}\nselection debug: ${JSON.stringify({ details, network: networkOutput.slice(-20), console: consoleOutput.slice(-20) })}`);
+      }
       await expect
         .poll(async () =>
           page.evaluate((structureId) =>
@@ -717,6 +766,8 @@ test.describe("Owen Sound canvassing field workflows", () => {
         );
         return structureIds.map((structureId: string) => ({
           structureId,
+          addressLabel: String(visible.get(structureId)?.civic_label ?? ""),
+          addressQuality: String(visible.get(structureId)?.address_quality ?? ""),
           homes: state.households
             .filter((home: any) => home.structure_id === structureId)
             .map((home: any) => ({
@@ -731,11 +782,20 @@ test.describe("Owen Sound canvassing field workflows", () => {
         }));
       }, selectedIds);
     const beforeWrite = await readSelectedState();
+    expect(
+      beforeWrite.every(
+        (roof) =>
+          /^~?\d/.test(roof.addressLabel) &&
+          !/^Canvassing roof\b/i.test(roof.addressLabel) &&
+          Boolean(roof.addressQuality),
+      ),
+    ).toBe(true);
     expect(beforeWrite.every((roof) => roof.homes.length > 0)).toBe(true);
     expect(
       beforeWrite
         .flatMap((roof) => roof.homes)
         .every((home) => !home.flyer_ids.includes("flyer-2-current")),
+      JSON.stringify(beforeWrite),
     ).toBe(true);
 
     await page.locator("#bulk-flyer").click();
@@ -902,7 +962,10 @@ test.describe("Owen Sound canvassing field workflows", () => {
   test("bulk flyer preserves already-materialized roof selection and statuses", async ({
     page,
   }, testInfo) => {
-    test.setTimeout(120_000);
+    // This scenario intentionally exercises the production-sized map and
+    // state payload after a cold API start. Keep the test's limit above the
+    // normal Playwright default without changing the user-facing workflow.
+    test.setTimeout(180_000);
     const consoleOutput: string[] = [];
     const networkOutput: string[] = [];
     const dialogs: string[] = [];
@@ -1194,7 +1257,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
   test("catalogue editing, active selection, inspection filter, and route creation work on desktop", async ({
     page,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(180_000);
     await openCanvassing(page, 1280, 900);
     await expect(page.locator(".canvass-shell > header > nav")).toBeHidden();
     await expect(page.locator("#mobile-menu")).toBeVisible();
@@ -1207,7 +1270,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
       .fill("Desktop test flyer");
     await page.locator('[data-save-flyer="flyer-2-current"]').click();
     await expect(page.locator("#toast")).toContainText("catalogue updated", {
-      timeout: 10_000,
+      timeout: 30_000,
     });
     await page.locator("#flyer-dialog [data-close='flyer-dialog']").click();
     await page.locator("#mobile-menu").click();
@@ -1227,7 +1290,10 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await page.locator("#route-name").fill("Playwright route");
     await page.locator("#create-route").click();
     await expect(page.locator("#toast")).toContainText("Route created", {
-      timeout: 10_000,
+      // Route creation refreshes the production-sized canvassing state before
+      // publishing its success toast. Allow that refresh to finish on a cold
+      // test API without weakening the assertion.
+      timeout: 60_000,
     });
     await expect(page.locator("#active-route option", { hasText: "Playwright route" })).toHaveCount(1);
   });

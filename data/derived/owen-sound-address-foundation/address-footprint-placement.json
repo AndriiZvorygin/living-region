@@ -1,17 +1,17 @@
 {
   "total_locations": 7156,
-  "exact_matches": 807,
-  "nearest_matches": 6218,
-  "ambiguous_matches": 84,
-  "unmatched_matches": 47,
+  "exact_matches": 370,
+  "nearest_matches": 2811,
+  "ambiguous_matches": 2795,
+  "unmatched_matches": 1180,
   "distance_m": {
-    "p50": 7.968686029312722,
-    "p90": 17.331619674533904,
-    "p95": 21.8657465772309,
-    "p99": 38.638464659679954,
-    "max": 618.3287699807915
+    "p50": 7.227326809548687,
+    "p90": 21.088817991945497,
+    "p95": 28.073430655677775,
+    "p99": 41.08160799663172,
+    "max": 68.35914835819517
   },
-  "grey_exact_matches": 180,
-  "grey_nearest_matches": 164,
-  "review_required": 131
+  "grey_exact_matches": 78,
+  "grey_nearest_matches": 292,
+  "review_required": 3975
 }

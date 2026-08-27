@@ -3,7 +3,7 @@ import { createWriteStream } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { pipeline } from "node:stream/promises";
-import { stableId, type Feature, geometryContains, metresBetween } from "./building-coverage";
+import { stableId, type Feature, type Position, geometryContains, metresBetween } from "./building-coverage";
 import {
   formatOfficialAddress,
   formatOfficialBaseAddress,
@@ -52,6 +52,11 @@ export type NarLocation = {
   csd_code: string;
   latitude: number;
   longitude: number;
+  /**
+   * BG is the NAR building coordinate. BF_REPPOINT is a block-face
+   * representative point and can be shared by many unrelated addresses.
+   */
+  coordinate_source: "nar_building" | "nar_block_face_fallback";
   source_file: string;
 };
 
@@ -77,6 +82,7 @@ export type AddressUnit = {
   source_file: string;
   latitude: number;
   longitude: number;
+  coordinate_source?: NarLocation["coordinate_source"];
   normalized_key: string;
   normalized_base_key: string;
   label: string;
@@ -137,6 +143,156 @@ export type AddressFoundationResult = {
     }>;
   };
 };
+
+type NarPlacementAuditRow = {
+  loc_guid: string;
+  addr_guid_values: string[];
+  official_addresses: Array<{
+    addr_guid: string;
+    civic_number: string;
+    civic_number_suffix: string;
+    official_street_name: string;
+    official_street_type: string;
+    official_street_direction: string;
+    apartment_or_suite: string;
+    building_use: BuildingUse;
+  }>;
+  nar_coordinates: { latitude: number; longitude: number; source: NarLocation["coordinate_source"] };
+  selected_structure_id: string | null;
+  selected_footprint_id: string | null;
+  selected_footprint_source: string | null;
+  containing_footprint_result: "contained" | "not_contained" | "unresolved";
+  nearest_candidates: FootprintPlacement["candidates"];
+  selected_match_distance_m: number | null;
+  match_method: string;
+  street_frontage_compatibility: string;
+  side_of_road_and_parity_result: string;
+  hundred_block_result: string;
+  neighbouring_address_sequence_result: string;
+  confidence_classification: string;
+  rejection_or_review_reason: string | null;
+};
+
+function buildNarPlacementAudit(
+  result: AddressFoundationResult,
+  placements: FootprintPlacement[],
+  numberingReport?: Record<string, any>,
+) {
+  const primary = result.units.filter((unit) =>
+    ["residential", "partly_residential"].includes(unit.building_use),
+  );
+  const primaryLocationIds = new Set(primary.map((unit) => unit.location_id));
+  const unitsByLocation = new Map<string, AddressUnit[]>();
+  for (const unit of primary) {
+    const values = unitsByLocation.get(unit.location_id) ?? [];
+    values.push(unit);
+    unitsByLocation.set(unit.location_id, values);
+  }
+  const placementByLocation = new Map(placements.map((placement) => [placement.location_id, placement]));
+  const anomalyByAddress = new Map<string, Set<string>>();
+  for (const anomaly of (numberingReport?.anomalies ?? []) as Array<Record<string, any>>) {
+    const addressId = String(anomaly.address_id ?? anomaly.previous_address_id ?? "");
+    if (!addressId) continue;
+    const values = anomalyByAddress.get(addressId) ?? new Set<string>();
+    values.add(String(anomaly.type ?? "unknown"));
+    if (anomaly.previous_address_id) {
+      const previous = anomalyByAddress.get(String(anomaly.previous_address_id)) ?? new Set<string>();
+      previous.add(String(anomaly.type ?? "unknown"));
+      anomalyByAddress.set(String(anomaly.previous_address_id), previous);
+    }
+    anomalyByAddress.set(addressId, values);
+  }
+  const rows: NarPlacementAuditRow[] = result.locations
+    .filter((location) => primaryLocationIds.has(location.loc_guid))
+    .map((location) => {
+      const units = unitsByLocation.get(location.loc_guid) ?? [];
+      const placement = placementByLocation.get(location.loc_guid);
+      const selectedCandidate = placement?.candidates.find((candidate) =>
+        candidate.structure_id === placement.structure_id,
+      );
+      const types = new Set(units.flatMap((unit) => [...(anomalyByAddress.get(unit.address_id) ?? [])]));
+      const resultFor = (type: string) => types.has(type) ? "anomaly" : "not_flagged";
+      const status = placement?.status ?? "unmatched";
+      return {
+        loc_guid: location.loc_guid,
+        addr_guid_values: units.map((unit) => unit.address_id),
+        official_addresses: units.map((unit) => ({
+          addr_guid: unit.address_id,
+          civic_number: unit.civic_number,
+          civic_number_suffix: unit.civic_number_suffix,
+          official_street_name: unit.official_street_name,
+          official_street_type: unit.official_street_type,
+          official_street_direction: unit.official_street_direction,
+          apartment_or_suite: unit.apartment_or_suite,
+          building_use: unit.building_use,
+        })),
+        nar_coordinates: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          source: location.coordinate_source,
+        },
+        selected_structure_id: placement?.structure_id ?? null,
+        selected_footprint_id: placement?.footprint_id ?? null,
+        selected_footprint_source: placement?.footprint_source ?? null,
+        containing_footprint_result: status === "exact"
+          ? "contained"
+          : placement?.structure_id
+            ? "not_contained"
+            : "unresolved",
+        nearest_candidates: placement?.candidates ?? [],
+        selected_match_distance_m: placement?.distance_m ?? null,
+        match_method: status === "exact"
+          ? "nar_contained_footprint"
+          : status === "nearest"
+            ? "nar_validated_nearest"
+            : "unresolved",
+        street_frontage_compatibility: selectedCandidate?.street_compatibility ?? "not_evaluated",
+        side_of_road_and_parity_result: resultFor("parity_anomaly"),
+        hundred_block_result: resultFor("hundred_block_anomaly"),
+        neighbouring_address_sequence_result: resultFor("monotonic_progression_anomaly"),
+        confidence_classification: status === "exact"
+          ? "nar_contained_footprint"
+          : status === "nearest"
+            ? "nar_validated_nearest"
+            : "unresolved",
+        rejection_or_review_reason: placement?.rejection_reason ??
+          (status === "ambiguous" ? "multiple nearby footprints remain similarly plausible" :
+            status === "unmatched" ? "no credible footprint within the conservative match threshold" : null),
+      };
+    });
+  const byStructure = new Map<string, string[]>();
+  for (const row of rows) {
+    if (!row.selected_structure_id) continue;
+    const values = byStructure.get(row.selected_structure_id) ?? [];
+    values.push(row.loc_guid);
+    byStructure.set(row.selected_structure_id, values);
+  }
+  const distribution = [...byStructure.values()].reduce((acc, values) => {
+    const key = String(values.length);
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const selectedRows = rows.filter((row) => row.selected_structure_id);
+  return {
+    generated_by: "buildNarPlacementAudit",
+    summary: {
+      primary_loc_guid_values: rows.length,
+      loc_guid_values_assigned_to_structure: selectedRows.length,
+      unique_structures_receiving_nar_locations: byStructure.size,
+      loc_guid_values_per_structure_distribution: distribution,
+      maximum_loc_guid_values_per_structure: Math.max(0, ...[...byStructure.values()].map((values) => values.length)),
+      collision_groups: [...byStructure.entries()]
+        .filter(([, values]) => values.length > 1)
+        .map(([structureId, locs]) => ({ structure_id: structureId, loc_guid_values: locs })),
+      structures_with_incompatible_selected_street: rows.filter((row) => row.street_frontage_compatibility === "mismatch").length,
+      parity_anomalies: rows.filter((row) => row.side_of_road_and_parity_result === "anomaly").length,
+      hundred_block_anomalies: rows.filter((row) => row.hundred_block_result === "anomaly").length,
+      neighbouring_address_sequence_anomalies: rows.filter((row) => row.neighbouring_address_sequence_result === "anomaly").length,
+      nar_locations_with_no_credible_structure_match: rows.filter((row) => !row.selected_structure_id).length,
+    },
+    rows,
+  };
+}
 
 const asString = (value: unknown) => String(value ?? "").trim();
 
@@ -337,6 +493,22 @@ function finiteCoordinate(value: unknown) {
   return Number.isFinite(number) && Math.abs(number) > 0 ? number : null;
 }
 
+export function selectNarCoordinates(row: CsvRow): {
+  latitude: number | null;
+  longitude: number | null;
+  coordinate_source: NarLocation["coordinate_source"] | null;
+} {
+  const bgLatitude = finiteCoordinate(row.BG_LATITUDE);
+  const bgLongitude = finiteCoordinate(row.BG_LONGITUDE);
+  const bfLatitude = finiteCoordinate(row.BF_REPPOINT_LATITUDE);
+  const bfLongitude = finiteCoordinate(row.BF_REPPOINT_LONGITUDE);
+  if (bgLatitude != null && bgLongitude != null)
+    return { latitude: bgLatitude, longitude: bgLongitude, coordinate_source: "nar_building" };
+  if (bfLatitude != null && bfLongitude != null)
+    return { latitude: bfLatitude, longitude: bfLongitude, coordinate_source: "nar_block_face_fallback" };
+  return { latitude: null, longitude: null, coordinate_source: null };
+}
+
 function csvRows(headers: string[], values: string[]): CsvRow {
   const result: CsvRow = {};
   headers.forEach((header, index) => {
@@ -431,8 +603,15 @@ export async function extractOwenSoundNar(options: {
     await forEachZipCsv(options.zipPath, entry, (row) => {
       if (asString(row.CSD_CODE) !== OWEN_SOUND_CSD_CODE) return;
       locationIdsInCsd.add(asString(row.LOC_GUID));
-      const latitude = finiteCoordinate(row.BF_REPPOINT_LATITUDE) ?? finiteCoordinate(row.BG_LATITUDE);
-      const longitude = finiteCoordinate(row.BF_REPPOINT_LONGITUDE) ?? finiteCoordinate(row.BG_LONGITUDE);
+      // The NAR guide distinguishes the BG building coordinate from
+      // BF_REPPOINT, which is derived from an available block face. The old
+      // implementation preferred BF_REPPOINT, causing hundreds of distinct
+      // LOC_GUIDs to share one block-face point and collapse onto one roof.
+      // Use the paired BG building coordinates first, with BF only as an
+      // explicit fallback when BG is unavailable.
+      const coordinates = selectNarCoordinates(row);
+      const latitude = coordinates.latitude;
+      const longitude = coordinates.longitude;
       if (latitude == null || longitude == null) return;
       const locGuid = asString(row.LOC_GUID);
       if (!locations.has(locGuid)) locationsWithCoordinates++;
@@ -441,6 +620,7 @@ export async function extractOwenSoundNar(options: {
         csd_code: asString(row.CSD_CODE),
         latitude,
         longitude,
+        coordinate_source: coordinates.coordinate_source!,
         source_file: entry,
       });
     });
@@ -509,6 +689,7 @@ export async function extractOwenSoundNar(options: {
         source_file: entry,
         latitude: location.latitude,
         longitude: location.longitude,
+        coordinate_source: location.coordinate_source,
         normalized_key: normalizedAddressKey(civicNumber, row.OFFICIAL_STREET_NAME, row.OFFICIAL_STREET_TYPE, row.OFFICIAL_STREET_DIR, unitLabel(row)),
         normalized_base_key: normalizedBaseAddressKey(civicNumber, row.OFFICIAL_STREET_NAME, row.OFFICIAL_STREET_TYPE, row.OFFICIAL_STREET_DIR),
         label: officialLabel(row),
@@ -550,16 +731,17 @@ function existingFromFeature(feature: Feature): ExistingAddress | null {
   if (!internal) return null;
   const civic = asString(p.civic_number);
   const street = asString(p.street);
-  if (!civic || !street) return null;
   const unit = asString(p.unit);
+  const coordinates = feature.geometry.coordinates as Position;
+  if (!Number.isFinite(Number(coordinates?.[0])) || !Number.isFinite(Number(coordinates?.[1]))) return null;
   return {
     internal_address_id: internal,
     label: asString(p.label),
     civic_number: civic,
     street,
     unit,
-    longitude: Number(feature.geometry.coordinates[0]),
-    latitude: Number(feature.geometry.coordinates[1]),
+    longitude: Number(coordinates[0]),
+    latitude: Number(coordinates[1]),
     external_source: asString(p.external_source),
     external_id: asString(p.external_id),
     structure_id: asString(p.structure_id) || null,
@@ -648,6 +830,7 @@ function unitFeature(unit: AddressUnit, match: ReconciliationMatch, category: st
       official_street_name: unit.official_street_name,
       official_street_type: unit.official_street_type,
       official_street_direction: unit.official_street_direction,
+      nar_coordinate_source: unit.coordinate_source,
       normalized_address: unit.normalized_key,
       normalized_base_address: unit.normalized_base_key,
       building_use_code: unit.building_use_code,
@@ -726,6 +909,7 @@ function locationFeature(
       footprint_source: placement?.footprint_source ?? null,
       footprint_match_status: placement?.status ?? "unmatched",
       footprint_match_distance_m: placement?.distance_m ?? null,
+      coordinate_source: location.coordinate_source,
       footprint_review_required: placement
         ? ["ambiguous", "unmatched"].includes(placement.status)
         : true,
@@ -745,6 +929,7 @@ export async function writeFoundationOutputs(options: {
   placements?: FootprintPlacement[];
   numberingReport?: Record<string, unknown>;
   audit?: Record<string, unknown>;
+  roadCount?: number;
 }) {
   const { result, reconciliation } = options;
   const matches = new Map(reconciliation.matches.map((match) => [match.address_id, match]));
@@ -760,11 +945,15 @@ export async function writeFoundationOutputs(options: {
         structure_id: null,
       };
     const placement = placements.get(unit.location_id);
-    return unitFeature(
+    const feature = unitFeature(
       unit,
       { ...baseMatch, structure_id: placement?.structure_id ?? null },
       unit.building_use,
     );
+    feature.properties.nar_placement_status = placement?.status ?? "unmatched";
+    feature.properties.nar_placement_distance_m = placement?.distance_m ?? null;
+    feature.properties.nar_placement_rejection_reason = placement?.rejection_reason ?? null;
+    return feature;
   };
   const allFeatures = result.units.map(featureFor);
   const residentialFeatures = primary.map(featureFor);
@@ -777,6 +966,124 @@ export async function writeFoundationOutputs(options: {
   const primaryPlacements = (options.placements ?? []).filter((placement) =>
     primaryLocationIds.has(placement.location_id),
   );
+  const narPlacementAudit = options.placements
+    ? buildNarPlacementAudit(result, options.placements, options.numberingReport)
+    : null;
+  const publishedStructureFeatures = options.structures ?? [];
+  const publishedCanvassableStructures = publishedStructureFeatures.filter(
+    (feature) => feature.properties.canvassable,
+  );
+  const publishedAddressClassificationCounts = publishedCanvassableStructures.reduce(
+    (counts, feature) => {
+      const quality = String(feature.properties.address_quality ?? "unresolved");
+      counts[quality] = (counts[quality] ?? 0) + 1;
+      return counts;
+    },
+    {
+      nar_contained_footprint: 0,
+      nar_validated_nearest: 0,
+      nar_documented_exception: 0,
+      legacy_nar_confirmed: 0,
+      legacy_spatially_consistent: 0,
+      legacy_unverified: 0,
+      grid_estimated: 0,
+      unresolved: 0,
+    } as Record<string, number>,
+  );
+  const primaryPlacementByLocation = new Map(
+    primaryPlacements.map((placement) => [placement.location_id, placement]),
+  );
+  const publishedAddressQuality = options.placements
+    ? (() => {
+        const automaticJoinCounts = {
+          nar_contained_footprint: 0,
+          nar_validated_nearest: 0,
+          nar_documented_exception: 0,
+          unresolved: 0,
+        };
+        for (const unit of primary) {
+          const status = primaryPlacementByLocation.get(unit.location_id)?.status;
+          const key = status === "exact"
+            ? "nar_contained_footprint"
+            : status === "nearest"
+              ? "nar_validated_nearest"
+              : status === "ambiguous" || status === "unmatched"
+                ? "unresolved"
+                : "nar_documented_exception";
+          automaticJoinCounts[key] += 1;
+        }
+        return {
+          generated_at: new Date().toISOString(),
+          source: "statistics_canada_national_address_register",
+          totals: {
+            civic_addresses: primary.length,
+            primary_nar_units: primary.length,
+            primary_nar_locations: primaryLocationIds.size,
+            mapped_primary_nar_locations: primaryPlacements.filter((placement) => placement.structure_id).length,
+            contained_primary_nar_locations: primaryPlacements.filter((placement) => placement.status === "exact").length,
+            validated_nearest_primary_nar_locations: primaryPlacements.filter((placement) => placement.status === "nearest").length,
+            unresolved_primary_nar_locations: primaryPlacements.filter((placement) => ["ambiguous", "unmatched"].includes(placement.status)).length,
+            duplicate_normalized_addresses: result.validation.duplicate_normalized_addresses,
+            outside_municipal_boundary: result.validation.records_outside_boundary,
+            missing_usable_coordinates: result.validation.records_missing_coordinates,
+            multi_unit_locations: [...grouped.values()].filter((units) => units.length > 1).length,
+          },
+          automatic_join_counts: automaticJoinCounts,
+          methodology: "Statistics Canada June 2026 NAR CIVIC_NO and official street fields are authoritative. BG building coordinates are preferred; BF_REPPOINT is used only as a labelled fallback. A NAR unit is mapped only to a containing or conservative, address-compatible footprint. Unresolved placement is retained as a review flag and never blocks canvassing.",
+        };
+      })()
+    : null;
+  const publishedManifest = options.placements
+    ? {
+        generated_at: new Date().toISOString(),
+        crs: "OGC:CRS84 / WGS84 longitude-latitude",
+        counts: {
+          structures: publishedStructureFeatures.length,
+          // Keep the historical manifest alias for consumers that still use
+          // counts.addresses. The authoritative value is the primary NAR
+          // unit count below; it is not a legacy or estimated count.
+          addresses: primary.length,
+          canvassable_structures: publishedStructureFeatures.filter((feature) => feature.properties.canvassable).length,
+          canvassable_structures_without_selection_target: publishedStructureFeatures.filter((feature) => feature.properties.canvassable && !feature.properties.selection_target_id).length,
+          primary_nar_address_units: primary.length,
+          primary_nar_physical_locations: primaryLocationIds.size,
+          primary_nar_locations_with_structure: primaryPlacements.filter((placement) => placement.structure_id).length,
+          roads: options.roadCount ?? null,
+          address_classification_counts: publishedAddressClassificationCounts,
+        },
+        address_foundation: {
+          source: "statistics_canada_national_address_register",
+          release: "June 2026",
+          residential_units: result.source_counts.residential,
+          partly_residential_units: result.source_counts.partly_residential,
+          primary_units: primary.length,
+          primary_physical_locations: primaryLocationIds.size,
+          note: "Residential and partly residential primary units after municipal-boundary and coordinate exclusions.",
+        },
+        address_source: "Statistics Canada National Address Register, June 2026",
+        address_quality: "See address-quality.json and validation-report.json; review and estimated labels are not authoritative NAR addresses.",
+      }
+    : null;
+  const publishedBuildingCoverageAudit = options.placements
+    ? {
+        generated_at: new Date().toISOString(),
+        generated_by: "retrieve-owen-sound-addresses",
+        civic_addresses: primary.length,
+        total_display_footprints: publishedStructureFeatures.length,
+        structures_with_civic_labels: publishedStructureFeatures.filter((feature) => Boolean(feature.properties.civic_label)).length,
+        structures_without_civic_labels: publishedStructureFeatures.filter((feature) => !feature.properties.civic_label).length,
+        canvassable_structures: publishedStructureFeatures.filter((feature) => feature.properties.canvassable).length,
+        address_classification_counts: publishedAddressClassificationCounts,
+        generated_geometry_conflicts: 0,
+        unaddressed_structure_references: {
+          sourced: 0,
+          estimated: 0,
+          unresolved: 0,
+          note: "The NAR placement publication does not copy a citywide nearest address onto an unaddressed roof. Accessory structures are not promoted to residential households.",
+        },
+        address_placement: narPlacementAudit?.summary ?? null,
+      }
+    : null;
   const legacyUnmatched = reconciliation.unmatchedExisting.map((row) => ({
     type: "Feature" as const,
     properties: { ...row, review_status: "legacy_existing_stop_not_matched_to_june_2026_nar" },
@@ -807,6 +1114,7 @@ export async function writeFoundationOutputs(options: {
       ? [
           writeGeoJson("address-footprint-review.geojson", placementReviewFeatures(options.placements)),
           writeFile(join(options.outDir, "address-footprint-placement.json"), JSON.stringify(placementSummary(options.placements), null, 2) + "\n"),
+          writeFile(join(options.outDir, "nar-placement-audit.json"), JSON.stringify(narPlacementAudit, null, 2) + "\n"),
         ]
       : []),
     ...(options.numberingReport
@@ -843,6 +1151,8 @@ export async function writeFoundationOutputs(options: {
         exclusions_are_applied_before_retained_counts: true,
       },
       primary_footprint_placement: options.placements ? placementSummary(primaryPlacements) : null,
+      nar_placement_audit_summary: narPlacementAudit?.summary ?? null,
+      address_classification_counts: publishedAddressClassificationCounts,
       ...(options.audit ?? {}),
       footprint_placement: options.placements ? placementSummary(options.placements) : null,
       numbering: options.numberingReport?.summary ?? null,
@@ -881,6 +1191,29 @@ export async function writeFoundationOutputs(options: {
         : []),
       ...(options.numberingReport
         ? [writeFile(join(dirname(options.publishAddressesPath), "address-numbering-validation.json"), JSON.stringify(options.numberingReport, null, 2) + "\n")]
+        : []),
+      ...(publishedAddressQuality
+        ? [writeFile(join(dirname(options.publishAddressesPath), "address-quality.json"), JSON.stringify(publishedAddressQuality, null, 2) + "\n")]
+        : []),
+      ...(publishedManifest
+        ? [writeFile(join(dirname(options.publishAddressesPath), "manifest.json"), JSON.stringify(publishedManifest, null, 2) + "\n")]
+        : []),
+      ...(publishedBuildingCoverageAudit
+        ? [writeFile(join(dirname(options.publishAddressesPath), "building-coverage-audit.json"), JSON.stringify(publishedBuildingCoverageAudit, null, 2) + "\n")]
+        : []),
+      ...(options.placements
+        ? [writeFile(join(dirname(options.publishAddressesPath), "validation-report.json"), JSON.stringify({
+            generated_at: new Date().toISOString(),
+            published_counts: {
+              retained_primary_canvassing_units: primary.length,
+              mappable_primary_canvassing_locations: primaryLocationIds.size,
+              records_outside_municipal_boundary: result.validation.records_outside_boundary,
+              records_missing_usable_coordinates: result.validation.records_missing_coordinates,
+            },
+            nar_placement_audit_summary: narPlacementAudit?.summary ?? null,
+            address_quality: publishedAddressQuality,
+            address_classification_counts: publishedAddressClassificationCounts,
+          }, null, 2) + "\n")]
         : []),
       writeFile(
         join(dirname(options.publishAddressesPath), "legacy-history-reconciliation.json"),
