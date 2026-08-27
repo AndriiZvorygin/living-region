@@ -585,6 +585,9 @@ describe.sequential("canvassing weekly workflow API", () => {
   });
 
   it("survives a server restart without changing the accepted sample", async () => {
+    // The production-shaped state rebuild includes the historical roof
+    // projection and may take longer than Vitest's default 30 seconds.
+    // Restart persistence is still bounded by the suite's normal API wait.
     const before = (await request("/state")).data.followup_samples.find(
       (sample: any) => sample.id === sampleId,
     );
@@ -596,7 +599,7 @@ describe.sequential("canvassing weekly workflow API", () => {
     expect(after.household_ids).toEqual(before.household_ids);
     expect(after.followup_route_id).toBe(followupRouteId);
     expect(after.status).toBe("accepted");
-  });
+  }, 90_000);
 
   it("records area and household-associated neighbourhood conversations with volunteer redaction", async () => {
     const accepted = (await request("/state")).data.followup_samples.find(

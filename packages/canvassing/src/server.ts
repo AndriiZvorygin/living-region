@@ -813,6 +813,12 @@ async function seed() {
           ["exact_structure_geometry", "review"].includes(row.confidence),
       )
     : [];
+  const currentOperationalStructureIds = new Set(
+    structures.features
+      .filter((feature: any) => feature.properties?.selection_target_kind === "operational_roof")
+      .map((feature: any) => String(feature.properties?.structure_id ?? ""))
+      .filter(Boolean),
+  );
   const timestamp = now();
   db.exec("BEGIN");
   try {
@@ -930,6 +936,66 @@ async function seed() {
       );
       insertHousehold.run(target.householdId, target.addressId, "", timestamp);
     }
+    // Older seeds left anonymous operational targets active even after the
+    // same physical roof acquired a real NAR/legacy address. Retire only
+    // those stale target addresses. Any activity on one is first linked to
+    // the current address on the same structure, so history is projected
+    // without changing its event IDs or payloads.
+    const staleOperationalTargets = db
+      .prepare(
+        `SELECT a.id address_id,a.structure_id
+           FROM addresses a
+          WHERE a.source_active=1
+            AND a.external_source='operational_roof_target'`,
+      )
+      .all() as Array<{ address_id: string; structure_id: string }>;
+    const findCurrentAddress = db.prepare(
+      `SELECT id,source_location_guid
+         FROM addresses
+        WHERE structure_id=? AND source_active=1
+          AND external_source!='operational_roof_target'
+        ORDER BY CASE WHEN source_address_guid IS NOT NULL THEN 0 ELSE 1 END,id
+        LIMIT 1`,
+    );
+    const linkStaleTarget = db.prepare(
+      `INSERT INTO legacy_history_links
+       (legacy_address_id,legacy_household_id,canonical_address_id,
+        canonical_household_id,canonical_location_id,match_status,distance_m,
+        candidate_count,candidate_location_count,reason,linked_at)
+       SELECT ?,h.id,?,?,?,'confident',0,1,1,?,?
+         FROM households h WHERE h.address_id=?
+       ON CONFLICT(legacy_address_id) DO UPDATE SET
+        legacy_household_id=excluded.legacy_household_id,
+        canonical_address_id=excluded.canonical_address_id,
+        canonical_household_id=excluded.canonical_household_id,
+        canonical_location_id=excluded.canonical_location_id,
+        match_status=excluded.match_status,
+        distance_m=excluded.distance_m,
+        candidate_count=excluded.candidate_count,
+        candidate_location_count=excluded.candidate_location_count,
+        reason=excluded.reason,
+        linked_at=excluded.linked_at`,
+    );
+    for (const stale of staleOperationalTargets) {
+      if (currentOperationalStructureIds.has(String(stale.structure_id))) continue;
+      const canonical = findCurrentAddress.get(stale.structure_id) as
+        | { id: string; source_location_guid: string | null }
+        | undefined;
+      if (canonical) {
+        linkStaleTarget.run(
+          stale.address_id,
+          canonical.id,
+          db.prepare("SELECT id FROM households WHERE address_id=? LIMIT 1").get(canonical.id)?.id ?? null,
+          canonical.source_location_guid ?? null,
+          "stale operational target linked to current same-roof address",
+          timestamp,
+          stale.address_id,
+        );
+      }
+      db.prepare("UPDATE addresses SET source_active=0 WHERE id=?").run(
+        stale.address_id,
+      );
+    }
     const insertStructureHistory = db.prepare(
       `INSERT INTO structure_history_crosswalk
        (historical_household_id,historical_structure_id,historical_address_id,
@@ -982,6 +1048,21 @@ async function seed() {
     if (missingSelectionTargets.length)
       throw new Error(
         `Canvassing data invariant failed: ${missingSelectionTargets.length} canvassable structures lack persisted selection targets`,
+      );
+    const invalidActiveTargets = db
+      .prepare(
+        `SELECT a.id
+           FROM addresses a
+           JOIN households h ON h.address_id=a.id
+           JOIN structures s ON s.id=a.structure_id
+          WHERE a.source_active=1 AND s.source_active=1
+            AND (trim(a.civic_number)='' OR trim(a.street)=''
+                 OR a.label LIKE 'Canvassing roof %')`,
+      )
+      .all() as Array<{ id: string }>;
+    if (invalidActiveTargets.length)
+      throw new Error(
+        `Canvassing data invariant failed: ${invalidActiveTargets.length} active household targets lack human-readable addresses`,
       );
     const insertReview = db.prepare(
       "INSERT INTO address_review_records (id,address_id,external_source,external_id,label,lon,lat,within_boundary,queue_flags_json,imported_geometry_json,imported_at,source_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,1) ON CONFLICT(id) DO UPDATE SET address_id=excluded.address_id,external_source=excluded.external_source,external_id=excluded.external_id,label=excluded.label,lon=excluded.lon,lat=excluded.lat,within_boundary=excluded.within_boundary,queue_flags_json=excluded.queue_flags_json,imported_geometry_json=excluded.imported_geometry_json,imported_at=excluded.imported_at,source_active=1",
