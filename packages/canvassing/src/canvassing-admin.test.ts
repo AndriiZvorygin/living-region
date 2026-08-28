@@ -27,6 +27,7 @@ describe.sequential("canvassing admin user management", () => {
         CANVASS_TEST_PASSWORD: password,
         CANVASSING_ADMIN_EMAIL: "andrii@example.test",
         CANVASSING_FROM_EMAIL: "canvassing@example.test",
+        CANVASSING_REPLY_TO_EMAIL: "andrii@example.test",
         CANVASSING_TEST_MAIL_FILE: join(directory, "mail.jsonl"),
         CANVASSING_BASE_URL: "https://canvassing.example.test",
         ...extra,
@@ -179,6 +180,7 @@ describe.sequential("canvassing admin user management", () => {
     expect(mail).toMatchObject({
       to: "andrii@example.test",
       subject: "Owen Sound canvassing account for New Volunteer",
+      reply_to: "andrii@example.test",
     });
     expect(mail.text).toContain("Username: new-volunteer");
     expect(mail.text).toContain(`Password: ${created.data.temporary_password}`);

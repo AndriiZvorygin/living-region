@@ -23,6 +23,10 @@ export function configuredAdminEmail() {
   return configured("CANVASSING_ADMIN_EMAIL") || null;
 }
 
+export function configuredReplyToEmail() {
+  return configured("CANVASSING_REPLY_TO_EMAIL") || null;
+}
+
 export function canvassingLoginUrl() {
   const base = configured("CANVASSING_BASE_URL") || "http://localhost";
   return `${base.replace(/\/+$/, "")}/canvassing/`;
@@ -88,9 +92,15 @@ export async function sendCredentialsEmail(
   const testFile = configured("CANVASSING_TEST_MAIL_FILE");
   if (testFile) {
     await mkdir(dirname(testFile), { recursive: true });
+    const replyTo = configuredReplyToEmail();
     await appendFile(
       testFile,
-      JSON.stringify({ from, to: recipient, ...content }) + "\n",
+      JSON.stringify({
+        from,
+        to: recipient,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+        ...content,
+      }) + "\n",
       { mode: 0o600 },
     );
     return { recipient, subject: content.subject };
@@ -101,6 +111,9 @@ export async function sendCredentialsEmail(
     to: recipient,
     subject: content.subject,
     text: content.text,
+    ...(configuredReplyToEmail()
+      ? { replyTo: configuredReplyToEmail()! }
+      : {}),
   });
   return { recipient, subject: content.subject };
 }
