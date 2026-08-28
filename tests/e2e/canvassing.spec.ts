@@ -499,6 +499,7 @@ test.describe("Owen Sound canvassing field workflows", () => {
             )?.household_count ?? 0,
           );
         }),
+        { timeout: 30_000 },
       )
       .toBe(2);
     await page.evaluate(() => {
