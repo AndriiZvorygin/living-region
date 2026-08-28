@@ -69,6 +69,11 @@ editing its display name/email/role, disabling or enabling it, resetting its
 password, and viewing operational contribution totals. Accounts are disabled
 rather than deleted so historical attribution remains intact.
 
+Candidates can also open the **Lawn signs** worklist at
+`/canvassing/admin/lawn-signs` to search households and record lawn-sign
+interest using the existing canvassing visit outcome. See
+`docs/owen-sound-canvassing-lawn-signs.md` for the workflow.
+
 When Andrii adds a volunteer, the server generates a fresh password using
 `crypto.randomInt()` and an unambiguous alphabet (20 random characters, over
 100 bits of entropy before formatting). Only the Argon2id password hash is

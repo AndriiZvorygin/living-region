@@ -838,6 +838,10 @@ if (window.location.pathname === "/canvassing/admin/users") {
   import("./canvassing-admin")
     .then(({ canvassingAdminMain }) => canvassingAdminMain())
     .catch(console.error);
+} else if (window.location.pathname === "/canvassing/admin/lawn-signs") {
+  import("./canvassing-admin")
+    .then(({ canvassingLawnSignsAdminMain }) => canvassingLawnSignsAdminMain())
+    .catch(console.error);
 } else if (window.location.pathname === "/canvassing" || window.location.pathname === "/canvassing/") {
   import("./canvassing").then(({ canvassingMain }) => canvassingMain()).catch(console.error);
 } else {

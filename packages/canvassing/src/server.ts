@@ -2542,6 +2542,177 @@ function adminUsers() {
     .map(publicAdminUser);
 }
 
+function adminAddressLabel(row: any) {
+  if (row.source_address_guid && row.official_street_name) {
+    return formatOfficialAddress({
+      civicNumber: row.civic_number_base ?? row.civic_number_effective,
+      civicNumberSuffix: row.civic_number_suffix,
+      streetName: row.official_street_name,
+      streetType: row.official_street_type,
+      streetDirection: row.official_street_direction,
+      unit: row.unit_effective,
+    });
+  }
+  return String(
+    row.label ??
+      `${row.civic_number_effective ?? ""} ${row.street_effective ?? ""}`,
+  ).trim();
+}
+
+function adminHouseholdSearch(query: string) {
+  const normalized = query.trim().toLocaleLowerCase("en-CA");
+  if (!normalized) return [];
+  const pattern = `%${normalized}%`;
+  return (
+    db
+      .prepare(
+        `WITH contact_ranked AS (
+           SELECT household_id,id,name,phone,email,last_updated_at,
+                  ROW_NUMBER() OVER (
+                    PARTITION BY household_id
+                    ORDER BY last_updated_at DESC,id DESC
+                  ) row_number
+           FROM effective_people
+         ), contacts AS (
+           SELECT household_id,
+             max(CASE WHEN row_number=1 THEN id END) contact_person_id,
+             max(CASE WHEN row_number=1 THEN name END) contact_name,
+             max(CASE WHEN row_number=1 THEN phone END) contact_phone,
+             max(CASE WHEN row_number=1 THEN email END) contact_email
+           FROM contact_ranked GROUP BY household_id
+         )
+         SELECT h.id household_id,h.unit_label,a.id address_id,a.structure_id,
+           a.civic_number_effective,a.civic_number_base,a.civic_number_suffix,
+           a.street_effective,a.unit_effective,a.label,a.source_address_guid,
+           a.official_street_name,a.official_street_type,
+           a.official_street_direction,a.number_event_id,
+           COALESCE(c.contact_person_id,'') contact_person_id,
+           COALESCE(c.contact_name,'') contact_name,
+           COALESCE(c.contact_phone,'') contact_phone,
+           COALESCE(c.contact_email,'') contact_email,
+           (SELECT count(*) FROM households h2
+              JOIN effective_addresses a2 ON a2.id=h2.address_id
+             WHERE a2.structure_id=a.structure_id) unit_count
+         FROM households h
+         JOIN effective_addresses a ON a.id=h.address_id
+         LEFT JOIN contacts c ON c.household_id=h.id
+         WHERE (a.source_active=1 OR EXISTS(
+                  SELECT 1 FROM legacy_history_reviews r
+                   WHERE r.legacy_address_id=a.id
+                ))
+           AND lower(
+             COALESCE(a.label,'') || ' ' ||
+             COALESCE(a.civic_number_effective,'') || ' ' ||
+             COALESCE(a.street_effective,'') || ' ' ||
+             COALESCE(a.official_street_name,'') || ' ' ||
+             COALESCE(c.contact_name,'') || ' ' || h.id
+           ) LIKE ?
+         ORDER BY lower(COALESCE(a.street_effective,'')),
+                  CAST(COALESCE(a.civic_number_effective,'0') AS INTEGER),
+                  h.unit_label,h.id
+         LIMIT 40`,
+      )
+      .all(pattern) as any[]
+  ).map((row) => ({
+    household_id: String(row.household_id),
+    address_id: String(row.address_id),
+    structure_id: row.structure_id == null ? null : String(row.structure_id),
+    unit: String(row.unit_effective ?? row.unit_label ?? ""),
+    unit_count: Math.max(1, Number(row.unit_count ?? 1)),
+    address_label: adminAddressLabel(row),
+    contact_person_id: String(row.contact_person_id ?? "") || null,
+    contact_name: String(row.contact_name ?? ""),
+    contact_phone: String(row.contact_phone ?? ""),
+    contact_email: String(row.contact_email ?? ""),
+  }));
+}
+
+function adminLawnSignEntries() {
+  return (
+    db
+      .prepare(
+        `WITH sign_signals AS (
+           SELECT v.household_id,v.occurred_at,v.id signal_id,v.user_id,
+                  'visit' source
+           FROM active_visits v
+           WHERE v.outcome='lawn_sign_interest'
+           UNION ALL
+           SELECT n.household_id,n.occurred_at,n.id signal_id,n.user_id,
+                  'conversation' source
+           FROM activity_neighbourhood_conversations n
+           WHERE n.household_id IS NOT NULL
+             AND n.political_outcome='lawn_sign_interest'
+         ), grouped_signals AS (
+           SELECT household_id,min(occurred_at) first_approved_at,
+                  max(occurred_at) last_approved_at,count(*) approval_count
+           FROM sign_signals GROUP BY household_id
+         ), latest_signal AS (
+           SELECT household_id,source,user_id,
+                  ROW_NUMBER() OVER (
+                    PARTITION BY household_id
+                    ORDER BY occurred_at DESC,signal_id DESC
+                  ) row_number
+           FROM sign_signals
+         ), contact_ranked AS (
+           SELECT household_id,id,name,phone,email,last_updated_at,
+                  ROW_NUMBER() OVER (
+                    PARTITION BY household_id
+                    ORDER BY last_updated_at DESC,id DESC
+                  ) row_number
+           FROM effective_people
+         ), contacts AS (
+           SELECT household_id,
+             max(CASE WHEN row_number=1 THEN name END) contact_name,
+             max(CASE WHEN row_number=1 THEN phone END) contact_phone,
+             max(CASE WHEN row_number=1 THEN email END) contact_email
+           FROM contact_ranked GROUP BY household_id
+         )
+         SELECT g.household_id,g.first_approved_at,g.last_approved_at,
+           g.approval_count,a.id address_id,a.structure_id,
+           a.civic_number_effective,a.civic_number_base,a.civic_number_suffix,
+           a.street_effective,a.unit_effective,a.label,a.source_address_guid,
+           a.official_street_name,a.official_street_type,
+           a.official_street_direction,a.number_event_id,h.unit_label,
+           COALESCE(c.contact_name,'') contact_name,
+           COALESCE(c.contact_phone,'') contact_phone,
+           COALESCE(c.contact_email,'') contact_email,
+           (SELECT count(*) FROM households h2
+              JOIN effective_addresses a2 ON a2.id=h2.address_id
+             WHERE a2.structure_id=a.structure_id) unit_count,
+           ls.source latest_source,ls.user_id latest_user_id,
+           COALESCE(u.display_name,u.username,ls.user_id) latest_recorded_by
+         FROM grouped_signals g
+         JOIN households h ON h.id=g.household_id
+         JOIN effective_addresses a ON a.id=h.address_id
+         LEFT JOIN contacts c ON c.household_id=g.household_id
+         LEFT JOIN latest_signal ls
+           ON ls.household_id=g.household_id AND ls.row_number=1
+         LEFT JOIN users u ON u.id=ls.user_id
+         WHERE a.source_active=1 OR EXISTS(
+           SELECT 1 FROM legacy_history_reviews r
+            WHERE r.legacy_address_id=a.id
+         )
+         ORDER BY g.last_approved_at DESC,g.household_id`
+      )
+      .all() as any[]
+  ).map((row) => ({
+    household_id: String(row.household_id),
+    address_id: String(row.address_id),
+    structure_id: row.structure_id == null ? null : String(row.structure_id),
+    unit: String(row.unit_effective ?? row.unit_label ?? ""),
+    unit_count: Math.max(1, Number(row.unit_count ?? 1)),
+    address_label: adminAddressLabel(row),
+    contact_name: String(row.contact_name ?? ""),
+    contact_phone: String(row.contact_phone ?? ""),
+    contact_email: String(row.contact_email ?? ""),
+    first_approved_at: row.first_approved_at,
+    last_approved_at: row.last_approved_at,
+    approval_count: Number(row.approval_count ?? 0),
+    latest_source: row.latest_source,
+    latest_recorded_by: String(row.latest_recorded_by ?? "Unknown"),
+  }));
+}
+
 function findAdminUser(userId: string) {
   return adminUsers().find((row) => row.id === userId) ?? null;
 }
@@ -2860,6 +3031,16 @@ const server = createServer(async (req, res) => {
     if (url.pathname.startsWith("/api/admin/")) {
       if (role !== "candidate")
         return json(res, 403, { error: "candidate role required" });
+      if (req.method === "GET" && url.pathname === "/api/admin/lawn-signs") {
+        const query = String(url.searchParams.get("q") ?? "")
+          .trim()
+          .slice(0, 100);
+        return json(res, 200, {
+          entries: adminLawnSignEntries(),
+          households: query ? adminHouseholdSearch(query) : [],
+          note: "Entries are recorded lawn-sign interest signals, not proof of installation.",
+        });
+      }
       if (req.method === "GET" && url.pathname === "/api/admin/users")
         return json(res, 200, { users: adminUsers() });
       if (req.method === "POST" && url.pathname === "/api/admin/users") {

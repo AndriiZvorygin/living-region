@@ -134,6 +134,67 @@ describe.sequential("canvassing admin user management", () => {
     expect((await apiRequest("/api/admin/users")).response.status).toBe(401);
   });
 
+  it("provides a candidate-only lawn-sign worklist from canonical canvassing data", async () => {
+    const andrii = await login("andrii");
+    const state = await apiRequest("/api/canvassing/state", andrii.cookie);
+    const household = state.data.households.find((home: any) => home.status === "untouched");
+    expect(household).toBeTruthy();
+
+    const recorded = await apiRequest("/api/canvassing/visits", andrii.cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        submission_key: "admin-lawn-sign-worklist-test",
+        household_id: household.household_id,
+        outcome: "lawn_sign_interest",
+        flyer_delivered: false,
+        conversation_occurred: true,
+      }),
+    });
+    expect(recorded.response.status).toBe(201);
+
+    const contact = await apiRequest(
+      `/api/canvassing/households/${encodeURIComponent(household.household_id)}/contacts`,
+      andrii.cookie,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: "Lawn Sign Test", email: "sign@example.test" }),
+      },
+    );
+    expect(contact.response.status).toBe(201);
+
+    const list = await apiRequest("/api/admin/lawn-signs", andrii.cookie);
+    expect(list.response.status).toBe(200);
+    expect(list.data.entries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          household_id: household.household_id,
+          address_label: household.label,
+          contact_name: "Lawn Sign Test",
+          contact_email: "sign@example.test",
+          approval_count: 1,
+          latest_recorded_by: "Andrii",
+        }),
+      ]),
+    );
+
+    const search = await apiRequest(
+      `/api/admin/lawn-signs?q=${encodeURIComponent(String(household.label))}`,
+      andrii.cookie,
+    );
+    expect(search.response.status).toBe(200);
+    expect(search.data.households).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ household_id: household.household_id }),
+      ]),
+    );
+
+    const rynaldo = await login("rynaldo");
+    expect((await apiRequest("/api/admin/lawn-signs", rynaldo.cookie)).response.status).toBe(403);
+    expect((await apiRequest("/api/admin/lawn-signs")).response.status).toBe(401);
+  });
+
   it("generates readable passwords with sufficient random material", () => {
     const generated = new Set(Array.from({ length: 32 }, () => generateTemporaryPassword()));
     expect(generated.size).toBe(32);
@@ -276,7 +337,7 @@ describe.sequential("canvassing admin user management", () => {
     expect(rynaldoRow).toMatchObject({ current_flagship_flyers: 1, total_flyer_deliveries: 1 });
     expect(andriiRow).toMatchObject({ current_flagship_flyers: 1, total_flyer_deliveries: 1 });
     expect(rynaldoRow.visits).toBe(2);
-    expect(andriiRow.visits).toBe(1);
+    expect(andriiRow.visits).toBe(2);
   });
 
   it("resets passwords, invalidates old sessions, and records no password contents", async () => {
