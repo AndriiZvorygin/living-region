@@ -100,6 +100,7 @@ CANVASSING_SMTP_PASSWORD=...
 CANVASSING_FROM_EMAIL=canvassing@example.org
 CANVASSING_ADMIN_EMAIL=andrii@example.org
 CANVASSING_REPLY_TO_EMAIL=andrii@example.org
+CANVASSING_LOGIN_URL=https://campaign.example.org/canvassing
 CANVASSING_BASE_URL=https://campaign.example.org
 ```
 

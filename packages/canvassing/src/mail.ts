@@ -28,30 +28,37 @@ export function configuredReplyToEmail() {
 }
 
 export function canvassingLoginUrl() {
+  const configuredUrl = configured("CANVASSING_LOGIN_URL");
+  if (configuredUrl) return configuredUrl.replace(/\/+$/, "");
   const base = configured("CANVASSING_BASE_URL") || "http://localhost";
   return `${base.replace(/\/+$/, "")}/canvassing/`;
 }
 
 export function credentialEmailContent(input: CredentialsEmail) {
-  const recipientKind = input.delivery === "admin" ? "campaign administrator" : "volunteer";
-  const forwarding =
-    input.delivery === "admin"
-      ? "You can forward this message privately to the volunteer."
-      : "This message contains private login credentials; keep it private.";
   return {
-    subject: `Owen Sound canvassing account for ${input.displayName}`,
-    text: `A canvassing volunteer account has been created for ${input.displayName}.
+    subject: "Your Andrii for Mayor canvassing login",
+    text: `Hi ${input.displayName},
 
+Thanks for helping with the campaign.
+
+Your canvassing-app login is ready:
+
+Canvassing app: ${canvassingLoginUrl()}
 Username: ${input.username}
 Password: ${input.password}
 
-Login:
-${canvassingLoginUrl()}
+For neighbourhood flyer delivery, the app shows grey roofs that are available to flyer. You can deliver near your home or use the Next Area recommendation, then mark the homes you reached as flyered.
 
-This message was sent to the ${recipientKind}.
-${forwarding}
-The generated password is already strong and does not need to be changed. The user may change it later if desired.
-${input.volunteerEmail ? `Volunteer email on the account: ${input.volunteerEmail}\n` : ""}
+The full volunteer guide is here:
+
+https://helpos.ca/vol
+
+If you need more flyers or help getting started, reply to this email or come by Thursdays from 5:30–6:30 p.m. at 254 8th Street East.
+
+Thanks,
+Andrii Zvorygin
+Candidate for Mayor of Owen Sound
+andrii@zvorygin.ca
 `,
   };
 }
