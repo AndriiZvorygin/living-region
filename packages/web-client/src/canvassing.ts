@@ -1760,6 +1760,7 @@ export async function canvassingMain() {
     // layer listener below is a fallback for the short interval in which a
     // source repaint can make a canvas-level rendered query empty.
     let lastBulkClick = { x: -1, y: -1, at: 0 };
+    let bulkPointerDown: [number, number] | undefined;
     const handleBulkRoofClick = (
       point: [number, number],
       features?: maplibregl.MapGeoJSONFeature[],
@@ -1801,14 +1802,32 @@ export async function canvassingMain() {
         toast(error instanceof Error ? error.message : "Roof selection failed"),
       );
     };
-    map.getCanvas().addEventListener("click", (event: MouseEvent) => {
+    const canvas = map.getCanvas();
+    const canvasPoint = (event: MouseEvent | PointerEvent): [number, number] => {
+      const bounds = canvas.getBoundingClientRect();
+      return [event.clientX - bounds.left, event.clientY - bounds.top];
+    };
+    canvas.addEventListener("pointerdown", (event: PointerEvent) => {
+      if (!multiSelectMode || event.button !== 0) return;
+      bulkPointerDown = canvasPoint(event);
+    });
+    canvas.addEventListener("pointercancel", () => {
+      bulkPointerDown = undefined;
+    });
+    canvas.addEventListener("pointerup", (event: PointerEvent) => {
+      if (!multiSelectMode || event.button !== 0) return;
+      const point = canvasPoint(event);
+      const start = bulkPointerDown;
+      bulkPointerDown = undefined;
+      // A pointerup is a tap fallback, not a second selection mechanism for
+      // map panning. MapLibre's click event follows it when available; the
+      // shared point/time guard prevents that click from toggling twice.
+      if (start && Math.hypot(point[0] - start[0], point[1] - start[1]) <= 8)
+        handleBulkRoofClick(point);
+    });
+    canvas.addEventListener("click", (event: MouseEvent) => {
       if (!multiSelectMode || (splitTarget && splitDrawing)) return;
-      const canvas = map.getCanvas().getBoundingClientRect();
-      const point: [number, number] = [
-        event.clientX - canvas.left,
-        event.clientY - canvas.top,
-      ];
-      handleBulkRoofClick(point);
+      handleBulkRoofClick(canvasPoint(event));
     });
     map.on("click", "structures", (event) => {
       if (!multiSelectMode || (splitTarget && splitDrawing)) return;
