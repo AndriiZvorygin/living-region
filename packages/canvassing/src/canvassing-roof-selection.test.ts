@@ -223,4 +223,114 @@ describe.sequential("canvassing roof selection", () => {
     expect((results[0] as PromiseFulfilledResult<any>).value.response.status).toBe(201);
     expect((results[1] as PromiseFulfilledResult<any>).value.response.status).toBe(404);
   });
+
+  it("keeps linked operational-roof flyer status visible and idempotent", async () => {
+    const cookie = await login();
+    const databasePath = join(directory, "canvassing.sqlite");
+    const queryCandidate = `
+      const { DatabaseSync } = require('node:sqlite');
+      const db = new DatabaseSync(${JSON.stringify(databasePath)});
+      const legacy = db.prepare(\`
+        SELECT h.id household_id,h.address_id,a.structure_id
+          FROM households h
+          JOIN addresses a ON a.id=h.address_id
+         WHERE a.external_source='operational_roof_target'
+           AND a.structure_id IS NOT NULL
+           AND NOT EXISTS (SELECT 1 FROM visits v WHERE v.household_id=h.id)
+           AND NOT EXISTS (
+             SELECT 1 FROM household_flyer_events f
+              WHERE f.household_id=h.id
+           )
+         ORDER BY h.id
+         LIMIT 1\`).get();
+      const canonical = legacy && db.prepare(\`
+        SELECT h.id household_id,h.address_id
+          FROM households h
+          JOIN addresses a ON a.id=h.address_id
+         WHERE h.id<>? AND a.source_active=1
+           AND a.external_source<>'operational_roof_target'
+         ORDER BY h.id
+         LIMIT 1\`).get(legacy.household_id);
+      if (legacy && canonical) {
+        db.prepare(\`
+          INSERT OR REPLACE INTO legacy_history_links
+            (legacy_address_id,legacy_household_id,canonical_address_id,
+             canonical_household_id,canonical_location_id,match_status,
+             distance_m,candidate_count,candidate_location_count,reason,linked_at)
+          VALUES (?,?,?,?,?,'confident',0,1,1,'test same-roof reconciliation',?)\`).run(
+            legacy.address_id, legacy.household_id, canonical.address_id,
+            canonical.household_id, null, new Date().toISOString());
+      }
+      console.log(JSON.stringify(legacy && canonical ? {
+        household_id: legacy.household_id,
+        structure_id: legacy.structure_id,
+        canonical_household_id: canonical.household_id,
+      } : null));
+      db.close();`;
+    const candidate = JSON.parse(
+      execFileSync(process.execPath, ["-e", queryCandidate], {
+        encoding: "utf8",
+      }),
+    ) as
+      | { household_id: string; structure_id: string; canonical_household_id: string }
+      | null;
+    expect(candidate).toBeTruthy();
+
+    const delivered = await request("/api/canvassing/visits", cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        submission_key: "linked-operational-roof-delivery",
+        household_id: candidate!.household_id,
+        outcome: "flyer_delivered",
+        flyer_delivered: true,
+        flyer_id: "flyer-2-current",
+      }),
+    });
+    expect(delivered.response.status).toBe(201);
+
+    const after = await request("/api/canvassing/state", cookie),
+      household = after.data.households.find(
+        (home: any) => home.household_id === candidate!.household_id,
+      ),
+      physicalRoof = after.data.physical_roof_activity.find(
+        (activity: any) => activity.structure_id === candidate!.structure_id,
+      );
+    expect(household).toMatchObject({
+      flyer_delivered: 1,
+      status: "flyer_delivered",
+    });
+    expect(household.flyer_ids).toContain("flyer-2-current");
+    expect(physicalRoof).toMatchObject({
+      structure_id: candidate!.structure_id,
+      flyer_delivered: 1,
+    });
+    expect(physicalRoof.flyer_history).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          event_id: delivered.data.id,
+          flyer_id: "flyer-2-current",
+        }),
+      ]),
+    );
+
+    const duplicate = await request("/api/canvassing/visits", cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        submission_key: "linked-operational-roof-duplicate",
+        household_id: candidate!.household_id,
+        outcome: "flyer_delivered",
+        flyer_delivered: true,
+        flyer_id: "flyer-2-current",
+      }),
+    });
+    expect(duplicate.response.status).toBe(409);
+    const countScript = `
+      const { DatabaseSync } = require('node:sqlite');
+      const db = new DatabaseSync(${JSON.stringify(databasePath)});
+      console.log(db.prepare('SELECT count(*) count FROM visits WHERE household_id=?').get(${JSON.stringify(candidate!.household_id)}).count);
+      db.close();`;
+    expect(Number(execFileSync(process.execPath, ["-e", countScript], { encoding: "utf8" }).trim())).toBe(1);
+  });
 });

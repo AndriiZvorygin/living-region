@@ -139,11 +139,62 @@ export function physicalRoofActivityFromDatabase(
               f.user_id,f.source,
               f.flyer_delivered,
               CASE WHEN f.flyer_delivered=1 THEN 'flyer_delivered' ELSE 'untouched' END status
-         FROM structure_history_crosswalk c
-         JOIN household_flyer_events f ON f.household_id=c.historical_household_id
+       FROM structure_history_crosswalk c
+       JOIN household_flyer_events f ON f.household_id=c.historical_household_id
+       LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
+       WHERE f.flyer_delivered=1
+        UNION ALL
+       /*
+        * Some visible roofs still use an operational household target while
+        * legacy_history_links projects that target's activity to a newer NAR
+        * household.  Project the raw target event back to its physical roof
+        * for display.  This is deliberately read-only: event IDs and rows are
+        * never copied or rewritten.
+        */
+       SELECT a.structure_id structure_id,
+              v.id event_id,v.occurred_at,v.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              v.user_id,v.source,
+              v.flyer_delivered,
+              CASE
+                WHEN v.revisit_requested=1 THEN 'revisit'
+                WHEN v.outcome='flyer_delivered' AND v.flyer_delivered=1 THEN 'flyer_delivered'
+                WHEN v.conversation_occurred=1 THEN 'conversation'
+                WHEN v.door_knocked=1 AND v.outcome='no_answer' THEN 'knocked_no_answer'
+                ELSE v.outcome
+              END status
+         FROM visits v
+         JOIN households h ON h.id=v.household_id
+         JOIN addresses a ON a.id=h.address_id
+         LEFT JOIN flyer_catalogue fc ON fc.id=v.flyer_id
+        WHERE a.external_source='operational_roof_target'
+          AND a.structure_id IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM structure_history_crosswalk c
+             WHERE c.historical_household_id=v.household_id
+          )
+          AND COALESCE((SELECT correction_type FROM visit_corrections vc
+                          WHERE vc.visit_id=v.id
+                       ORDER BY vc.occurred_at DESC,vc.rowid DESC LIMIT 1),'restore')!='undo'
+        UNION ALL
+       SELECT a.structure_id structure_id,
+              f.id event_id,f.occurred_at,f.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              f.user_id,f.source,
+              f.flyer_delivered,
+              CASE WHEN f.flyer_delivered=1 THEN 'flyer_delivered' ELSE 'untouched' END status
+         FROM household_flyer_events f
+         JOIN households h ON h.id=f.household_id
+         JOIN addresses a ON a.id=h.address_id
          LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
-        WHERE f.flyer_delivered=1
-        ORDER BY occurred_at,event_id`,
+        WHERE a.external_source='operational_roof_target'
+          AND a.structure_id IS NOT NULL
+          AND f.flyer_delivered=1
+          AND NOT EXISTS (
+            SELECT 1 FROM structure_history_crosswalk c
+             WHERE c.historical_household_id=f.household_id
+          )
+       ORDER BY occurred_at,event_id`,
     )
     .all() as ActivityEvent[];
   void flyerNames;

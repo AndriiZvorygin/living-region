@@ -534,6 +534,24 @@ SELECT h.id household_id,
       SELECT f.occurred_at,f.id,1 sort_priority,f.flyer_delivered state
       FROM activity_flyer_events f
       WHERE f.household_id=h.id
+      UNION ALL
+      /*
+       * A visible operational roof can retain its original household target
+       * while legacy_history_links projects that target's activity to a newer
+       * NAR household. Include raw rows in this per-household projection so a
+       * saved flyer cannot disappear from the roof. These are read aliases;
+       * no historical event is copied or changed.
+       */
+      SELECT v.occurred_at,v.id,0 sort_priority,1 state
+      FROM visits v
+      WHERE v.household_id=h.id AND v.flyer_delivered=1
+        AND COALESCE((SELECT correction_type FROM visit_corrections c
+                      WHERE c.visit_id=v.id
+                   ORDER BY c.occurred_at DESC,c.rowid DESC LIMIT 1),'restore')!='undo'
+      UNION ALL
+      SELECT f.occurred_at,f.id,1 sort_priority,f.flyer_delivered state
+      FROM household_flyer_events f
+      WHERE f.household_id=h.id
     )
     ORDER BY occurred_at DESC,sort_priority DESC,id DESC LIMIT 1
   ),0) flyer_delivered
@@ -1378,9 +1396,36 @@ function selectionTargetHousehold(
               f.user_id,f.source
          FROM activity_flyer_events f LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
         WHERE f.household_id=? AND f.flyer_delivered=1
+       UNION ALL
+       SELECT v.id event_id,v.occurred_at,v.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              v.user_id,v.source
+         FROM visits v LEFT JOIN flyer_catalogue fc ON fc.id=v.flyer_id
+        WHERE v.household_id=? AND v.flyer_delivered=1
+          AND EXISTS (
+            SELECT 1 FROM legacy_history_links l
+             WHERE l.legacy_household_id=v.household_id
+               AND l.match_status='confident'
+               AND l.canonical_household_id IS NOT NULL
+          )
+          AND COALESCE((SELECT correction_type FROM visit_corrections vc
+                          WHERE vc.visit_id=v.id
+                       ORDER BY vc.occurred_at DESC,vc.rowid DESC LIMIT 1),'restore')!='undo'
+       UNION ALL
+       SELECT f.id event_id,f.occurred_at,f.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              f.user_id,f.source
+         FROM household_flyer_events f LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
+        WHERE f.household_id=? AND f.flyer_delivered=1
+          AND EXISTS (
+            SELECT 1 FROM legacy_history_links l
+             WHERE l.legacy_household_id=f.household_id
+               AND l.match_status='confident'
+               AND l.canonical_household_id IS NOT NULL
+          )
         ORDER BY occurred_at DESC,event_id DESC`,
     )
-    .all(householdId, householdId) as any[];
+    .all(householdId, householdId, householdId, householdId) as any[];
   const conversation = db
     .prepare(
       "SELECT 1 FROM activity_neighbourhood_conversations WHERE household_id=? LIMIT 1",
@@ -1405,7 +1450,9 @@ function selectionTargetHousehold(
       : latest.outcome
     : conversation
       ? "conversation"
-      : "untouched";
+      : household.flyer_delivered
+        ? "flyer_delivered"
+        : "untouched";
   household.door_knocked = visits.some((visit) => visit.door_knocked) ? 1 : 0;
   household.conversation_occurred = conversation || visits.some((visit) => visit.conversation_occurred) ? 1 : 0;
   household.revisit_requested = visits.some((visit) => visit.revisit_requested) ? 1 : 0;
@@ -1478,7 +1525,7 @@ function state(role = "candidate") {
     CASE WHEN a.source_active=1 THEN 0 ELSE 1 END historical_only,
     CASE WHEN EXISTS(SELECT 1 FROM legacy_history_reviews r WHERE r.legacy_address_id=a.id) THEN 1 ELSE 0 END legacy_history_review,
     (SELECT review_status FROM legacy_history_reviews r WHERE r.legacy_address_id=a.id) legacy_review_status,
-    COALESCE((SELECT CASE WHEN v.revisit_requested=1 THEN 'revisit' ELSE v.outcome END FROM active_visits v WHERE v.household_id=h.id AND (fs.flyer_delivered=1 OR v.outcome!='flyer_delivered') ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),CASE WHEN EXISTS(SELECT 1 FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id) THEN 'conversation' ELSE 'untouched' END) status,
+    COALESCE((SELECT CASE WHEN v.revisit_requested=1 THEN 'revisit' ELSE v.outcome END FROM active_visits v WHERE v.household_id=h.id AND (fs.flyer_delivered=1 OR v.outcome!='flyer_delivered') ORDER BY v.occurred_at DESC,v.id DESC LIMIT 1),CASE WHEN EXISTS(SELECT 1 FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id) THEN 'conversation' WHEN fs.flyer_delivered=1 THEN 'flyer_delivered' ELSE 'untouched' END) status,
     fs.flyer_delivered,
     COALESCE((SELECT max(v.door_knocked) FROM active_visits v WHERE v.household_id=h.id),0) door_knocked,
     CASE WHEN EXISTS(SELECT 1 FROM activity_neighbourhood_conversations n WHERE n.household_id=h.id) THEN 1 ELSE COALESCE((SELECT max(v.conversation_occurred) FROM active_visits v WHERE v.household_id=h.id),0) END conversation_occurred,
@@ -1538,6 +1585,35 @@ function state(role = "candidate") {
          FROM activity_flyer_events f
          LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
         WHERE f.flyer_delivered=1
+       UNION ALL
+       SELECT v.household_id,v.id event_id,v.occurred_at,v.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              v.user_id,v.source
+         FROM visits v
+         LEFT JOIN flyer_catalogue fc ON fc.id=v.flyer_id
+        WHERE v.flyer_delivered=1
+          AND EXISTS (
+            SELECT 1 FROM legacy_history_links l
+             WHERE l.legacy_household_id=v.household_id
+               AND l.match_status='confident'
+               AND l.canonical_household_id IS NOT NULL
+          )
+          AND COALESCE((SELECT correction_type FROM visit_corrections vc
+                          WHERE vc.visit_id=v.id
+                       ORDER BY vc.occurred_at DESC,vc.rowid DESC LIMIT 1),'restore')!='undo'
+       UNION ALL
+       SELECT f.household_id,f.id event_id,f.occurred_at,f.flyer_id,
+              COALESCE(fc.short_name,'Unknown legacy flyer') flyer_name,
+              f.user_id,f.source
+         FROM household_flyer_events f
+         LEFT JOIN flyer_catalogue fc ON fc.id=f.flyer_id
+        WHERE f.flyer_delivered=1
+          AND EXISTS (
+            SELECT 1 FROM legacy_history_links l
+             WHERE l.legacy_household_id=f.household_id
+               AND l.match_status='confident'
+               AND l.canonical_household_id IS NOT NULL
+          )
         ORDER BY occurred_at DESC,event_id DESC`,
     )
     .all() as any[];
@@ -3500,9 +3576,27 @@ const server = createServer(async (req, res) => {
              UNION ALL
              SELECT occurred_at FROM activity_flyer_events
               WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+             UNION ALL
+             SELECT occurred_at FROM visits
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+                AND COALESCE((SELECT correction_type FROM visit_corrections vc
+                                WHERE vc.visit_id=visits.id
+                             ORDER BY vc.occurred_at DESC,vc.rowid DESC LIMIT 1),'restore')!='undo'
+             UNION ALL
+             SELECT occurred_at FROM household_flyer_events
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
              ORDER BY occurred_at DESC LIMIT 1`,
           )
-          .get(event.household_id, event.flyer_id, event.household_id, event.flyer_id) as
+          .get(
+            event.household_id,
+            event.flyer_id,
+            event.household_id,
+            event.flyer_id,
+            event.household_id,
+            event.flyer_id,
+            event.household_id,
+            event.flyer_id,
+          ) as
           | { occurred_at: string }
           | undefined;
         if (prior && !event.allow_duplicate_flyer) {
@@ -3631,9 +3725,27 @@ const server = createServer(async (req, res) => {
              UNION ALL
              SELECT occurred_at FROM activity_flyer_events
               WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+             UNION ALL
+             SELECT occurred_at FROM visits
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
+                AND COALESCE((SELECT correction_type FROM visit_corrections vc
+                                WHERE vc.visit_id=visits.id
+                             ORDER BY vc.occurred_at DESC,vc.rowid DESC LIMIT 1),'restore')!='undo'
+             UNION ALL
+             SELECT occurred_at FROM household_flyer_events
+              WHERE household_id=? AND flyer_delivered=1 AND flyer_id=?
              ORDER BY occurred_at DESC LIMIT 1`,
           )
-          .get(householdId, event.flyer_id, householdId, event.flyer_id) as
+          .get(
+            householdId,
+            event.flyer_id,
+            householdId,
+            event.flyer_id,
+            householdId,
+            event.flyer_id,
+            householdId,
+            event.flyer_id,
+          ) as
           | { occurred_at: string }
           | undefined;
         if (prior && !input.allow_duplicate_flyer)
