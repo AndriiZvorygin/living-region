@@ -300,7 +300,10 @@ const coverageClusterRadius = [
   40,
   34,
 ];
-const canvassingDataVersion = "all-roofs-addressable-20260726";
+// The map payloads are served immutable by Caddy. Bump this whenever the
+// published roof/target data changes so field browsers cannot retain a
+// pre-selection-target GeoJSON payload indefinitely.
+const canvassingDataVersion = "all-roofs-addressable-20260828-bulk-selection";
 let authenticatedUser: AuthUser | null = null;
 const isVolunteer = () => authenticatedUser?.role === "volunteer";
 const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
@@ -870,6 +873,7 @@ export async function canvassingMain() {
         ? activeFilters[0]
         : ["all", ...activeFilters];
   };
+  const canvassableRoofFilter = ["==", ["get", "canvassable"], true];
   const flyerMapFilter = () =>
     flyerFilter ? ["in", flyerFilter, ["get", "flyer_ids"]] : null;
   const applyMapFilters = () => {
@@ -879,11 +883,15 @@ export async function canvassingMain() {
     const statusFilter =
       status === "all" ? null : ["==", ["get", "status"], status];
     if (map.getLayer("structures"))
-      map.setFilter("structures", combinedMapFilter(statusFilter, flyerMapFilter()));
+      map.setFilter(
+        "structures",
+        combinedMapFilter(canvassableRoofFilter, statusFilter, flyerMapFilter()),
+      );
     if (map.getLayer("estimated-structure-outlines"))
       map.setFilter(
         "estimated-structure-outlines",
         combinedMapFilter(
+          canvassableRoofFilter,
           ["==", ["get", "geometry_provenance"], "estimated"],
           statusFilter,
           flyerMapFilter(),
@@ -893,6 +901,7 @@ export async function canvassingMain() {
       map.setFilter(
         "city-map-structure-outlines",
         combinedMapFilter(
+          canvassableRoofFilter,
           ["==", ["get", "external_source"], "owen_sound_city_map_pdf"],
           statusFilter,
           flyerMapFilter(),
@@ -1815,7 +1824,14 @@ export async function canvassingMain() {
       bulkPointerDown = undefined;
     });
     canvas.addEventListener("pointerup", (event: PointerEvent) => {
-      if (!multiSelectMode || event.button !== 0) return;
+      // Some mobile WebKit builds report button=-1 on pointerup even though
+      // the primary pointer started with button=0. Treat that as the same
+      // primary tap; secondary/middle-button interactions remain ignored.
+      if (
+        !multiSelectMode ||
+        (event.button !== 0 && event.button !== -1)
+      )
+        return;
       const point = canvasPoint(event);
       const start = bulkPointerDown;
       bulkPointerDown = undefined;
