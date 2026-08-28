@@ -5,6 +5,11 @@
 	header @canvassing_app Cache-Control "no-cache, must-revalidate"
 	@canvassing_data path /canvassing/*.json /canvassing/*.geojson
 	header @canvassing_data Cache-Control "public, max-age=31536000, immutable"
+	# The canvassing UI is a pathname-selected SPA entry point. The public
+	# /canvassing directory also contains data assets, so an implicit directory
+	# lookup can otherwise serve the root Yurt Hamlet index instead of the
+	# canvassing bootstrap document.
+	rewrite @canvassing_app /index.html
 
 	handle /api/* {
 		reverse_proxy canvassing-api:4174 {
