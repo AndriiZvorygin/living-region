@@ -3,7 +3,14 @@ import { createWriteStream } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { pipeline } from "node:stream/promises";
-import { stableId, type Feature, type Position, geometryContains, metresBetween } from "./building-coverage";
+import {
+  stableId,
+  type Feature,
+  type Position,
+  type StructureAlias,
+  geometryContains,
+  metresBetween,
+} from "./building-coverage";
 import {
   formatOfficialAddress,
   formatOfficialBaseAddress,
@@ -973,6 +980,8 @@ export async function writeFoundationOutputs(options: {
   numberingReport?: Record<string, unknown>;
   audit?: Record<string, unknown>;
   roadCount?: number;
+  structureAliases?: StructureAlias[];
+  duplicateResolutionReport?: Record<string, unknown>;
 }) {
   const { result, reconciliation } = options;
   const matches = new Map(reconciliation.matches.map((match) => [match.address_id, match]));
@@ -1121,6 +1130,7 @@ export async function writeFoundationOutputs(options: {
           roads: options.roadCount ?? null,
           address_classification_counts: publishedAddressClassificationCounts,
           address_source_counts: publishedAddressSourceCounts,
+          duplicate_resolution: options.duplicateResolutionReport?.summary ?? null,
         },
         address_foundation: {
           source: "statistics_canada_national_address_register",
@@ -1153,6 +1163,7 @@ export async function writeFoundationOutputs(options: {
           note: "The NAR placement publication does not copy a citywide nearest address onto an unaddressed roof. Accessory structures are not promoted to residential households.",
         },
         address_placement: narPlacementAudit?.summary ?? null,
+        duplicate_resolution: options.duplicateResolutionReport?.summary ?? null,
       }
     : null;
   const legacyUnmatched = reconciliation.unmatchedExisting.map((row) => ({
@@ -1233,6 +1244,17 @@ export async function writeFoundationOutputs(options: {
       matches: reconciliation.matches,
       unmatched_existing: reconciliation.unmatchedExisting,
     }, null, 2) + "\n"),
+    ...(options.structureAliases
+      ? [writeFile(join(options.outDir, "structure-aliases.json"), JSON.stringify({
+          schema_version: 1,
+          generated_at: new Date().toISOString(),
+          purpose: "Append-only physical-roof aliases created by conservative polygon-overlap duplicate resolution",
+          rows: options.structureAliases,
+        }, null, 2) + "\n")]
+      : []),
+    ...(options.duplicateResolutionReport
+      ? [writeFile(join(options.outDir, "duplicate-resolution.json"), JSON.stringify(options.duplicateResolutionReport, null, 2) + "\n")]
+      : []),
   ]);
   if (options.publishAddressesPath)
     await Promise.all([
@@ -1268,6 +1290,17 @@ export async function writeFoundationOutputs(options: {
         : []),
       ...(publishedManifest
         ? [writeFile(join(dirname(options.publishAddressesPath), "manifest.json"), JSON.stringify(publishedManifest, null, 2) + "\n")]
+        : []),
+      ...(options.structureAliases
+        ? [writeFile(join(dirname(options.publishAddressesPath), "structure-aliases.json"), JSON.stringify({
+            schema_version: 1,
+            generated_at: new Date().toISOString(),
+            purpose: "Append-only physical-roof aliases created by conservative polygon-overlap duplicate resolution",
+            rows: options.structureAliases,
+          }, null, 2) + "\n")]
+        : []),
+      ...(options.duplicateResolutionReport
+        ? [writeFile(join(dirname(options.publishAddressesPath), "duplicate-resolution.json"), JSON.stringify(options.duplicateResolutionReport, null, 2) + "\n")]
         : []),
       ...(publishedBuildingCoverageAudit
         ? [writeFile(join(dirname(options.publishAddressesPath), "building-coverage-audit.json"), JSON.stringify(publishedBuildingCoverageAudit, null, 2) + "\n")]

@@ -27,4 +27,23 @@ describe("physical roof history projection", () => {
     expect(selectPhysicalRoofStatus("untouched", "flyer_delivered")).toBe("flyer_delivered");
     expect(selectPhysicalRoofStatus("conversation", "flyer_delivered")).toBe("conversation");
   });
+
+  it("counts an event once when duplicate source projections reach one roof", () => {
+    const result = aggregatePhysicalRoofActivity([
+      {
+        structure_id: "absorbed-roof", event_id: "same-event", occurred_at: "2026-08-03T10:00:00Z",
+        flyer_id: "flyer-2-current", flyer_name: "Current", user_id: "andrii",
+        source: "operational-target", flyer_delivered: 1, status: "flyer_delivered",
+      },
+      {
+        structure_id: "canonical-roof", event_id: "same-event", occurred_at: "2026-08-03T10:00:00Z",
+        flyer_id: "flyer-2-current", flyer_name: "Current", user_id: "andrii",
+        source: "history-crosswalk", flyer_delivered: 1, status: "flyer_delivered",
+      },
+    ]);
+    expect(result.size).toBe(1);
+    const activity = [...result.values()][0];
+    expect(activity.visit_count).toBe(1);
+    expect(activity.flyer_history).toHaveLength(1);
+  });
 });

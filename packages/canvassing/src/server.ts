@@ -435,6 +435,25 @@ if (!postAddressMigrations.has(20)) {
       (20,'permanent_physical_roof_history_crosswalk',datetime('now'));
     COMMIT;`);
 }
+if (!postAddressMigrations.has(21)) {
+  db.exec(`BEGIN;
+    CREATE TABLE structure_aliases (
+      absorbed_structure_id TEXT PRIMARY KEY,
+      canonical_structure_id TEXT NOT NULL REFERENCES structures(id),
+      duplicate_detection_method TEXT NOT NULL,
+      overlap_json TEXT NOT NULL,
+      original_source TEXT NOT NULL,
+      original_external_id TEXT NOT NULL,
+      original_address TEXT NOT NULL,
+      original_operational_household_ids_json TEXT NOT NULL,
+      merged_at TEXT NOT NULL
+    );
+    CREATE INDEX structure_aliases_canonical
+      ON structure_aliases(canonical_structure_id);
+    INSERT INTO schema_migrations VALUES
+      (21,'append_only_physical_roof_duplicate_aliases',datetime('now'));
+    COMMIT;`);
+}
 db.exec(`DROP VIEW IF EXISTS household_flyer_state;
 DROP VIEW IF EXISTS effective_people;
 DROP VIEW IF EXISTS activity_people;
@@ -569,7 +588,7 @@ SELECT p.id,p.household_id,
 FROM activity_people p;`);
 
 const now = () => new Date().toISOString();
-const SCHEMA_VERSION = 20;
+const SCHEMA_VERSION = 21;
 const configuredHoldMinutes = Number(
   process.env.CANVASS_RECOMMENDATION_HOLD_MINUTES ?? "30",
 );
@@ -831,6 +850,36 @@ async function seed() {
           ["exact_structure_geometry", "review"].includes(row.confidence),
       )
     : [];
+  const structureAliasDocument = JSON.parse(
+    await readFile(join(base, "structure-aliases.json"), "utf8").catch(
+      () => '{"rows":[]}',
+    ),
+  );
+  const structureAliasRows = Array.isArray(structureAliasDocument.rows)
+    ? structureAliasDocument.rows.filter(
+        (row: any) =>
+          row &&
+          typeof row.absorbed_structure_id === "string" &&
+          typeof row.canonical_structure_id === "string" &&
+          row.absorbed_structure_id &&
+          row.canonical_structure_id,
+      )
+    : [];
+  const structureAliasMap = new Map<string, string>(
+    structureAliasRows.map((row: any) => [
+      row.absorbed_structure_id,
+      row.canonical_structure_id,
+    ]),
+  );
+  const resolveStructureAlias = (structureId: string) => {
+    let current = structureId;
+    const seen = new Set<string>();
+    while (structureAliasMap.has(current) && !seen.has(current)) {
+      seen.add(current);
+      current = structureAliasMap.get(current)!;
+    }
+    return current;
+  };
   const currentOperationalStructureIds = new Set(
     structures.features
       .filter((feature: any) => feature.properties?.selection_target_kind === "operational_roof")
@@ -862,6 +911,44 @@ async function seed() {
         feature.properties.confidence,
         timestamp,
     );
+    const insertStructureAlias = db.prepare(
+      `INSERT INTO structure_aliases
+       (absorbed_structure_id,canonical_structure_id,duplicate_detection_method,
+        overlap_json,original_source,original_external_id,original_address,
+        original_operational_household_ids_json,merged_at)
+       VALUES (?,?,?,?,?,?,?,?,?)
+       ON CONFLICT(absorbed_structure_id) DO UPDATE SET
+        canonical_structure_id=excluded.canonical_structure_id,
+        duplicate_detection_method=excluded.duplicate_detection_method,
+        overlap_json=excluded.overlap_json,
+        original_source=excluded.original_source,
+        original_external_id=excluded.original_external_id,
+        original_address=excluded.original_address,
+        original_operational_household_ids_json=excluded.original_operational_household_ids_json,
+        merged_at=excluded.merged_at`,
+    );
+    for (const row of structureAliasRows) {
+      const canonicalStructureId = resolveStructureAlias(
+        String(row.canonical_structure_id),
+      );
+      if (!structures.features.some(
+        (feature: any) => String(feature.properties?.structure_id ?? "") === canonicalStructureId,
+      ))
+        continue;
+      insertStructureAlias.run(
+        String(row.absorbed_structure_id),
+        canonicalStructureId,
+        String(row.duplicate_detection_method ?? "polygon_overlap"),
+        JSON.stringify(row.overlap ?? null),
+        String(row.original_source ?? "unknown"),
+        String(row.original_external_id ?? ""),
+        String(row.original_address ?? ""),
+        JSON.stringify(Array.isArray(row.original_operational_household_ids)
+          ? row.original_operational_household_ids
+          : []),
+        String(row.merged_at ?? timestamp),
+      );
+    }
     const insertAddress = db.prepare(
       "INSERT INTO addresses (id,structure_id,civic_number,civic_number_base,civic_number_suffix,street,unit,label,lon,lat,external_source,external_id,association_status,imported_at,source_active,source_address_guid,source_location_guid,official_street_name,official_street_type,official_street_direction,source_retrieval_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET structure_id=excluded.structure_id,civic_number=excluded.civic_number,civic_number_base=excluded.civic_number_base,civic_number_suffix=excluded.civic_number_suffix,street=excluded.street,unit=excluded.unit,label=excluded.label,lon=excluded.lon,lat=excluded.lat,association_status=excluded.association_status,imported_at=excluded.imported_at,source_active=1,source_address_guid=excluded.source_address_guid,source_location_guid=excluded.source_location_guid,official_street_name=excluded.official_street_name,official_street_type=excluded.official_street_type,official_street_direction=excluded.official_street_direction,source_retrieval_date=excluded.source_retrieval_date",
     );
@@ -1039,7 +1126,7 @@ async function seed() {
           row.historical_household_id,
           row.historical_structure_id,
           row.historical_address_id,
-          row.canonical_structure_id,
+          resolveStructureAlias(row.canonical_structure_id),
           String(row.match_method),
           row.confidence,
           String(row.historical_label ?? ""),

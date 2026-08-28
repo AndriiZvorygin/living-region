@@ -4,7 +4,10 @@ import {
   addUnaddressedStructureReferences,
   applyAddressNumberCalibrations,
   associateAddressesWithBuildings,
+  calculateFootprintOverlap,
+  consolidateDuplicateStructures,
   findGeneratedGeometryConflicts,
+  isLikelyDuplicateFootprint,
   mergeBuildingSources,
   mergeCityMapBuildingSource,
   normalizeStreet,
@@ -95,6 +98,109 @@ const address = (
 });
 
 describe("canvassing building coverage", () => {
+  it("uses polygon overlap rather than centroid proximity for duplicate footprints", () => {
+    const grey = rectangle("grey-roof", -80.941, 44.5701, -80.9408, 44.57025, {
+        external_source: "grey_county_building_footprints",
+      }),
+      city = rectangle("city-roof", -80.94101, 44.57009, -80.94079, 44.57026, {
+        external_source: "owen_sound_city_map_pdf",
+      }),
+      overlap = calculateFootprintOverlap(grey, city),
+      result = consolidateDuplicateStructures([grey, city], {
+        generatedAt: "2026-08-28T00:00:00Z",
+      });
+    expect(overlap.intersection_over_union).toBeGreaterThan(0.8);
+    expect(isLikelyDuplicateFootprint(overlap)).toBe(true);
+    expect(result.structures.filter((feature) => feature.properties.canvassable !== false)).toHaveLength(1);
+    expect(result.aliases).toHaveLength(1);
+    expect(result.aliases[0].absorbed_structure_id).toBe("city-roof");
+  });
+
+  it("does not merge neighbouring roofs that only share a boundary", () => {
+    const left = rectangle("left", -80.941, 44.5701, -80.9408, 44.57025),
+      right = rectangle("right", -80.9408, 44.5701, -80.9406, 44.57025),
+      overlap = calculateFootprintOverlap(left, right),
+      result = consolidateDuplicateStructures([left, right]);
+    expect(overlap.intersection_area_m2).toBe(0);
+    expect(result.aliases).toHaveLength(0);
+    expect(result.structures.filter((feature) => feature.properties.canvassable !== false)).toHaveLength(2);
+  });
+
+  it("keeps a parent footprint and tiled child dwellings separate", () => {
+    const parent = rectangle("parent", -80.941, 44.570, -80.940, 44.571, {
+        external_source: "grey_county_building_footprints",
+      }),
+      child = rectangle("child", -80.941, 44.570, -80.9405, 44.5705, {
+        external_source: "owen_sound_city_map_pdf",
+        source_parent_geometry_id: "parent",
+        subdivision_method: "frontage",
+      }),
+      childTwo = rectangle("child-two", -80.9405, 44.5705, -80.940, 44.571, {
+        external_source: "owen_sound_city_map_pdf",
+        source_parent_geometry_id: "parent",
+        subdivision_method: "frontage",
+      }),
+      result = consolidateDuplicateStructures([parent, child, childTwo]);
+    expect(result.aliases).toHaveLength(0);
+    expect(result.structures.filter((feature) => feature.properties.canvassable !== false)).toHaveLength(3);
+  });
+
+  it("merges a three-source apartment cluster and preserves all unit IDs", () => {
+    const osm = rectangle("osm-apartment", -80.941, 44.5701, -80.9408, 44.57025, {
+        external_source: "openstreetmap",
+        selection_target_id: "household-old",
+        authoritative_location_ids: ["loc-apartment"],
+        authoritative_address_ids: ["addr-1", "addr-2"],
+        address_count: 2,
+      }),
+      grey = rectangle("grey-apartment", -80.94101, 44.57009, -80.94079, 44.57026, {
+        external_source: "grey_county_building_footprints",
+        selection_target_ids: ["household-1", "household-2"],
+        authoritative_location_ids: ["loc-apartment"],
+        authoritative_address_ids: ["addr-1", "addr-2"],
+        address_count: 2,
+      }),
+      city = rectangle("city-apartment", -80.941005, 44.570095, -80.940795, 44.570255, {
+        external_source: "owen_sound_city_map_pdf",
+        selection_target_id: "household-city",
+      }),
+      result = consolidateDuplicateStructures([osm, grey, city], {
+        preservedStructureIds: new Set(["osm-apartment"]),
+      }),
+      canonical = result.structures.find((feature) => feature.properties.structure_id === "osm-apartment");
+    expect(result.aliases).toHaveLength(2);
+    expect(canonical).toBeTruthy();
+    expect(canonical?.properties.authoritative_location_ids).toEqual(["loc-apartment"]);
+    expect(canonical?.properties.authoritative_address_ids).toEqual(["addr-1", "addr-2"]);
+    expect(canonical?.properties.selection_target_ids).toEqual([
+      "household-old",
+      "household-1",
+      "household-2",
+      "household-city",
+    ]);
+  });
+
+  it("uses the preserved history structure ID and prefers Grey geometry", () => {
+    const old = rectangle("history-roof", -80.941, 44.5701, -80.9408, 44.57025, {
+        external_source: "openstreetmap",
+        has_canvassing_history: true,
+      }),
+      grey = rectangle("grey-roof", -80.94101, 44.57009, -80.94079, 44.57026, {
+        external_source: "grey_county_building_footprints",
+      }),
+      result = consolidateDuplicateStructures([old, grey], {
+        preservedStructureIds: new Set(["history-roof"]),
+      });
+    const canonical = result.structures.find((feature) => feature.properties.structure_id === "history-roof");
+    expect(canonical).toBeTruthy();
+    expect(canonical?.properties.external_source).toBe("openstreetmap");
+    expect(canonical?.properties.source_structure_ids).toEqual([
+      "history-roof",
+      "grey-roof",
+    ]);
+    expect(canonical?.geometry).toEqual(grey.geometry);
+  });
+
   it("compares ordinal and numeric street spellings consistently", () => {
     expect(normalizeStreet("7th Avenue East")).toBe(normalizeStreet("7 AVE E"));
     expect(normalizeStreet("254 8th Street East")).toBe(

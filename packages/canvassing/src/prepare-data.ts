@@ -7,6 +7,7 @@ import {
   addUnaddressedStructureReferences,
   applyAddressNumberCalibrations,
   associateAddressesWithBuildings,
+  consolidateDuplicateStructures,
   findGeneratedGeometryConflicts,
   mergeBuildingSources,
   mergeCityMapBuildingSource,
@@ -240,7 +241,10 @@ async function main() {
         canadaStructures.features,
         ring,
       ),
-      sourcedBuildings = merged.buildings;
+      duplicateResolution = consolidateDuplicateStructures(merged.buildings, {
+        generatedAt: new Date().toISOString(),
+      }),
+      sourcedBuildings = duplicateResolution.structures;
     const osmRoads = raw.features.filter(
       (feature) =>
         feature.properties.highway &&
@@ -589,6 +593,7 @@ async function main() {
           cityMerged.audit.city_map_deduplicated_polygons +
           merged.audit.deduplicated_polygons,
         total_sourced_footprints: sourcedBuildings.length,
+        duplicate_resolution: duplicateResolution.audit,
         estimated_footprints: coverage.estimated.length,
         total_display_footprints: buildings.length,
         structures_with_civic_labels: buildings.filter((building) =>
@@ -717,6 +722,23 @@ async function main() {
           null,
           2,
         ) + "\n",
+      ),
+      writeFile(
+        join(output, "structure-aliases.json"),
+        JSON.stringify({
+          schema_version: 1,
+          generated_at: new Date().toISOString(),
+          purpose: "Append-only physical-roof aliases created by conservative polygon-overlap duplicate resolution",
+          rows: duplicateResolution.aliases,
+        }, null, 2) + "\n",
+      ),
+      writeFile(
+        join(output, "duplicate-resolution.json"),
+        JSON.stringify({
+          generated_at: new Date().toISOString(),
+          summary: duplicateResolution.audit,
+          clusters: duplicateResolution.clusters,
+        }, null, 2) + "\n",
       ),
       writeFile(
         join(output, "building-source-audit.json"),

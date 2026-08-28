@@ -68,7 +68,14 @@ type ActivityEvent = {
  */
 export function aggregatePhysicalRoofActivity(events: ActivityEvent[]) {
   const result = new Map<string, PhysicalRoofActivity>();
+  const seenEventIds = new Set<string>();
   for (const event of events) {
+    // A historical event can be reachable through both its explicit
+    // structure-history row and an absorbed operational target.  Event IDs
+    // are the immutable identity; count each source row once after physical
+    // roof aliases have been resolved.
+    if (seenEventIds.has(event.event_id)) continue;
+    seenEventIds.add(event.event_id);
     const current = result.get(event.structure_id) ?? {
       structure_id: event.structure_id,
       flyer_delivered: 0,
@@ -197,6 +204,37 @@ export function physicalRoofActivityFromDatabase(
        ORDER BY occurred_at,event_id`,
     )
     .all() as ActivityEvent[];
+  let aliases: Array<{ absorbed_structure_id: string; canonical_structure_id: string }> = [];
+  try {
+    aliases = db
+      .prepare(
+        "SELECT absorbed_structure_id,canonical_structure_id FROM structure_aliases",
+      )
+      .all() as Array<{
+      absorbed_structure_id: string;
+      canonical_structure_id: string;
+    }>;
+  } catch {
+    // The projection remains compatible with databases created before the
+    // duplicate-roof migration.  New server databases always have the table.
+  }
+  const aliasMap = new Map(
+    aliases.map((row) => [row.absorbed_structure_id, row.canonical_structure_id]),
+  );
+  const resolveStructure = (structureId: string) => {
+    let current = structureId;
+    const seen = new Set<string>();
+    while (aliasMap.has(current) && !seen.has(current)) {
+      seen.add(current);
+      current = aliasMap.get(current)!;
+    }
+    return current;
+  };
   void flyerNames;
-  return aggregatePhysicalRoofActivity(events);
+  return aggregatePhysicalRoofActivity(
+    events.map((event) => ({
+      ...event,
+      structure_id: resolveStructure(event.structure_id),
+    })),
+  );
 }

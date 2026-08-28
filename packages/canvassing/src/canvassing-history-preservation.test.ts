@@ -16,6 +16,8 @@ describe.sequential("authoritative address history preservation", () => {
   let canonicalAddressId = "";
   let legacyAddressId = "address-history-preservation-test";
   const eventId = "history-preservation-visit-test";
+  let absorbedEventId = "history-preservation-absorbed-event-test";
+  let absorbedCanonicalStructureId = "";
 
   async function startServer() {
     server = spawn("node_modules/.bin/tsx", ["packages/canvassing/src/server.ts"], {
@@ -73,6 +75,51 @@ describe.sequential("authoritative address history preservation", () => {
       .prepare("SELECT id,structure_id,lon,lat FROM addresses WHERE source_active=1 ORDER BY id LIMIT 1")
       .get() as { id: string; structure_id: string | null; lon: number; lat: number };
     canonicalAddressId = canonical.id;
+    const aliasTarget = db.prepare(
+      `SELECT sa.absorbed_structure_id,sa.canonical_structure_id,
+              h.id household_id
+         FROM structure_aliases sa
+         JOIN addresses a ON a.structure_id=sa.absorbed_structure_id
+         JOIN households h ON h.address_id=a.id
+        WHERE a.external_source='operational_roof_target'
+        LIMIT 1`,
+    ).get() as {
+      absorbed_structure_id: string;
+      canonical_structure_id: string;
+      household_id: string;
+    } | undefined;
+    if (aliasTarget) {
+      absorbedCanonicalStructureId = aliasTarget.canonical_structure_id;
+      db.prepare(
+        `INSERT INTO visits
+         (id,occurred_at,user_id,household_id,route_id,flyer_delivered,
+          door_knocked,outcome,conversation_occurred,issue_categories_json,
+          notes,follow_up_action,follow_up_date,support_category,source,
+          imported_at,session_id,revisit_requested,no_answer,flyer_id)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      ).run(
+        absorbedEventId,
+        "2026-08-26T20:30:00.000Z",
+        "andrii",
+        aliasTarget.household_id,
+        null,
+        1,
+        1,
+        "flyer_delivered",
+        0,
+        "[]",
+        "absorbed roof history preserved",
+        null,
+        null,
+        null,
+        "candidate",
+        "2026-08-26T20:30:00.000Z",
+        null,
+        0,
+        0,
+        "flyer-2-current",
+      );
+    }
     const timestamp = "2026-08-26T20:00:00.000Z";
     db.prepare(
       `INSERT INTO addresses
@@ -185,6 +232,15 @@ describe.sequential("authoritative address history preservation", () => {
         ]),
       }),
     );
+    if (absorbedCanonicalStructureId)
+      expect(current.physical_roof_activity).toContainEqual(
+        expect.objectContaining({
+          structure_id: absorbedCanonicalStructureId,
+          flyer_history: expect.arrayContaining([
+            expect.objectContaining({ event_id: absorbedEventId }),
+          ]),
+        }),
+      );
     expect(current.households.some((home: any) => home.address_id === legacyAddressId)).toBe(false);
     const db = new DatabaseSync(join(directory, "canvassing.sqlite"), { readOnly: true });
     expect(db.prepare("SELECT notes FROM visits WHERE id=?").get(eventId)).toEqual({

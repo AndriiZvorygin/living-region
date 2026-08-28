@@ -217,6 +217,43 @@ describe("Owen Sound canvassing prepared data", () => {
     expect(audit.summary.nar_locations_with_no_credible_structure_match).toBeGreaterThan(0);
   });
 
+  it("publishes one physical roof for each resolved duplicate cluster", async () => {
+    const structures = await readJson(
+      "packages/web-client/public/canvassing/structures.geojson",
+    );
+    const aliases = await readJson(
+      "packages/web-client/public/canvassing/structure-aliases.json",
+    );
+    const resolution = await readJson(
+      "packages/web-client/public/canvassing/duplicate-resolution.json",
+    );
+    const visibleIds = new Set(
+      structures.features.map((feature: any) => String(feature.properties.structure_id)),
+    );
+    expect(resolution.clusters).toHaveLength(391);
+    expect(aliases.rows.length).toBe(resolution.summary.absorbed_structures);
+    expect(
+      aliases.rows.every((row: any) =>
+        !visibleIds.has(row.absorbed_structure_id) &&
+        visibleIds.has(row.canonical_structure_id),
+      ),
+    ).toBe(true);
+    for (const row of aliases.rows) {
+      const canonical = structures.features.find(
+        (feature: any) => feature.properties.structure_id === row.canonical_structure_id,
+      );
+      expect(canonical?.properties.absorbed_structure_ids).toContain(row.absorbed_structure_id);
+      expect(canonical?.properties.absorbed_operational_household_ids).toEqual(
+        expect.arrayContaining(row.original_operational_household_ids),
+      );
+    }
+    for (const address of ["566 Alpha Street", "1029 4th Avenue West", "990 16th Avenue East"]) {
+      expect(
+        structures.features.filter((feature: any) => feature.properties.civic_label === address),
+      ).toHaveLength(1);
+    }
+  });
+
   it("records city-map provenance and keeps it private", async () => {
     const source = await readJson(
         "data/canvassing/owen-sound-city-map-source.json",

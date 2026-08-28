@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import polygonClipping from "polygon-clipping";
 
 export type Position = [number, number];
 export type Feature = {
@@ -28,6 +29,64 @@ export type AddressNumberCalibration = {
   street: string;
   unit: string;
 };
+
+export type FootprintOverlap = {
+  intersection_area_m2: number;
+  union_area_m2: number;
+  intersection_over_union: number;
+  smaller_covered_fraction: number;
+  larger_covered_fraction: number;
+  centroid_distance_m: number;
+  source_combination: string;
+  address_compatible: boolean | null;
+  location_compatible: boolean | null;
+};
+
+export type StructureAlias = {
+  absorbed_structure_id: string;
+  canonical_structure_id: string;
+  duplicate_detection_method: string;
+  overlap: FootprintOverlap;
+  original_source: string;
+  original_external_id: string;
+  original_address: string;
+  original_operational_household_ids: string[];
+  merged_at: string;
+};
+
+export type DuplicateResolutionCluster = {
+  cluster_id: string;
+  member_structure_ids: string[];
+  canonical_structure_id: string;
+  canonical_geometry_source: string;
+  decision: "merge" | "retain";
+  reason: string;
+  members: Array<{
+    structure_id: string;
+    source: string;
+    external_id: string;
+    civic_label: string;
+    address_count: number;
+    selection_target_ids: string[];
+    geometry_source: string;
+    resolution: "canonical" | "absorbed" | "retained";
+  }>;
+  overlaps: Array<FootprintOverlap & {
+    left_structure_id: string;
+    right_structure_id: string;
+  }>;
+};
+
+/**
+ * These thresholds are deliberately conservative.  A shared edge has zero
+ * intersection area and cannot enter a merge cluster.  The IoU threshold is
+ * calibrated against the current source-layer duplicates (rather than a
+ * distance-only rule); the smaller-coverage rule is only allowed when the
+ * address/building identity also agrees.
+ */
+export const DUPLICATE_FOOTPRINT_IOU_THRESHOLD = 0.55;
+export const DUPLICATE_FOOTPRINT_SMALLER_COVERAGE_THRESHOLD = 0.88;
+export const DUPLICATE_FOOTPRINT_COMPATIBLE_IOU_THRESHOLD = 0.3;
 
 export type CoverageAssociation = {
   structure_id: string | null;
@@ -88,6 +147,636 @@ export const geometryContains = (
         .some((hole: number[][]) => polygonContains(point, hole)),
   );
 };
+
+const geometryAsMultiPolygon = (geometry: Feature["geometry"]) =>
+  geometry.type === "Polygon"
+    ? [geometry.coordinates]
+    : geometry.type === "MultiPolygon"
+      ? geometry.coordinates
+      : [];
+
+const ringAreaM2 = (ring: Position[]) => {
+  if (ring.length < 3) return 0;
+  const latitude =
+    (ring.reduce((sum, point) => sum + point[1], 0) / ring.length) *
+    (Math.PI / 180);
+  const scaleX = 111320 * Math.cos(latitude);
+  const scaleY = 111320;
+  let area = 0;
+  for (let index = 0; index < ring.length - 1; index++)
+    area +=
+      ring[index][0] * scaleX * ring[index + 1][1] * scaleY -
+      ring[index + 1][0] * scaleX * ring[index][1] * scaleY;
+  return Math.abs(area) / 2;
+};
+
+const multiPolygonAreaM2 = (geometry: {
+  type: string;
+  coordinates: any;
+}) =>
+  geometryAsMultiPolygon(geometry).reduce(
+    (total: number, polygon: Position[][]) =>
+      total +
+      ringAreaM2(polygon[0] ?? []) -
+      polygon.slice(1).reduce((holes, ring) => holes + ringAreaM2(ring), 0),
+    0,
+  );
+
+const geometryBbox = (geometry: Feature["geometry"]) => {
+  const points: Position[] = [];
+  walkCoordinates(geometry.coordinates, (point) => points.push(point));
+  return [
+    Math.min(...points.map((point) => point[0])),
+    Math.min(...points.map((point) => point[1])),
+    Math.max(...points.map((point) => point[0])),
+    Math.max(...points.map((point) => point[1])),
+  ] as [number, number, number, number];
+};
+
+const bboxIntersects = (
+  left: [number, number, number, number],
+  right: [number, number, number, number],
+) =>
+  left[0] <= right[2] &&
+  right[0] <= left[2] &&
+  left[1] <= right[3] &&
+  right[1] <= left[3];
+
+const normalizedAddressTokens = (properties: Record<string, any>) =>
+  [
+    properties.authoritative_address_labels,
+    properties.civic_label,
+    properties.fallback_civic_number && properties.fallback_street
+      ? `${properties.fallback_civic_number} ${properties.fallback_street}`
+      : null,
+  ]
+    .flatMap((value) => (Array.isArray(value) ? value : [value]))
+    .map((value) => String(value ?? "").trim().toLowerCase())
+    .filter(Boolean)
+    .map((value) => value.replace(/[^a-z0-9]+/g, ""));
+
+const propertyIds = (properties: Record<string, any>, key: string) =>
+  (Array.isArray(properties[key]) ? properties[key] : [properties[key]])
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean);
+
+const sharedValue = (left: string[], right: string[]) =>
+  left.some((value) => right.includes(value));
+
+const addressCompatibility = (
+  left: Record<string, any>,
+  right: Record<string, any>,
+) => {
+  const leftLocations = propertyIds(left, "authoritative_location_ids");
+  const rightLocations = propertyIds(right, "authoritative_location_ids");
+  if (sharedValue(leftLocations, rightLocations)) return true;
+  const leftAddresses = propertyIds(left, "authoritative_address_ids");
+  const rightAddresses = propertyIds(right, "authoritative_address_ids");
+  if (sharedValue(leftAddresses, rightAddresses)) return true;
+  const leftLabels = normalizedAddressTokens(left);
+  const rightLabels = normalizedAddressTokens(right);
+  if (!leftLabels.length || !rightLabels.length) return null;
+  return sharedValue(leftLabels, rightLabels);
+};
+
+export function calculateFootprintOverlap(
+  left: Feature,
+  right: Feature,
+): FootprintOverlap {
+  const leftArea = multiPolygonAreaM2(left.geometry);
+  const rightArea = multiPolygonAreaM2(right.geometry);
+  let intersectionArea = 0;
+  if (bboxIntersects(geometryBbox(left.geometry), geometryBbox(right.geometry))) {
+    try {
+      intersectionArea = multiPolygonAreaM2({
+        type: "MultiPolygon",
+        coordinates: polygonClipping.intersection(
+          geometryAsMultiPolygon(left.geometry) as any,
+          geometryAsMultiPolygon(right.geometry) as any,
+        ),
+      });
+    } catch {
+      // Invalid source rings are not merged based on an incomplete metric.
+      intersectionArea = 0;
+    }
+  }
+  const unionArea = Math.max(0, leftArea + rightArea - intersectionArea);
+  const smallerArea = Math.min(leftArea, rightArea);
+  const largerArea = Math.max(leftArea, rightArea);
+  return {
+    intersection_area_m2: +intersectionArea.toFixed(3),
+    union_area_m2: +unionArea.toFixed(3),
+    intersection_over_union: unionArea
+      ? +(intersectionArea / unionArea).toFixed(6)
+      : 0,
+    smaller_covered_fraction: smallerArea
+      ? +(intersectionArea / smallerArea).toFixed(6)
+      : 0,
+    larger_covered_fraction: largerArea
+      ? +(intersectionArea / largerArea).toFixed(6)
+      : 0,
+    centroid_distance_m: +metresBetween(centroid(left), centroid(right)).toFixed(3),
+    source_combination: [
+      String(left.properties.external_source ?? "unknown"),
+      String(right.properties.external_source ?? "unknown"),
+    ]
+      .sort()
+      .join(" + "),
+    address_compatible: addressCompatibility(left.properties, right.properties),
+    location_compatible:
+      sharedValue(
+        propertyIds(left.properties, "authoritative_location_ids"),
+        propertyIds(right.properties, "authoritative_location_ids"),
+      ) ||
+      sharedValue(
+        propertyIds(left.properties, "source_location_guid"),
+        propertyIds(right.properties, "source_location_guid"),
+      )
+        ? true
+        : null,
+  };
+}
+
+export function isLikelyDuplicateFootprint(
+  overlap: FootprintOverlap,
+) {
+  if (overlap.intersection_area_m2 <= 0) return false;
+  if (overlap.intersection_over_union >= DUPLICATE_FOOTPRINT_IOU_THRESHOLD)
+    return true;
+  const compatible =
+    overlap.address_compatible === true || overlap.location_compatible === true;
+  return (
+    compatible &&
+    overlap.smaller_covered_fraction >=
+      DUPLICATE_FOOTPRINT_SMALLER_COVERAGE_THRESHOLD &&
+    (overlap.intersection_over_union >= DUPLICATE_FOOTPRINT_COMPATIBLE_IOU_THRESHOLD ||
+      overlap.address_compatible === true)
+  );
+}
+
+export type DuplicateResolutionResult = {
+  structures: Feature[];
+  aliases: StructureAlias[];
+  clusters: DuplicateResolutionCluster[];
+  aliasMap: Map<string, string>;
+  audit: {
+    input_canvassable_structures: number;
+    output_canvassable_structures: number;
+    candidate_overlap_pairs: number;
+    candidate_clusters: number;
+    merged_clusters: number;
+    retained_overlap_clusters: number;
+    absorbed_structures: number;
+    canonical_structure_ids: string[];
+  };
+};
+
+const duplicateSourceRank = (properties: Record<string, any>) => {
+  if (properties.structure_history_crosswalk || properties.has_canvassing_history)
+    return 0;
+  if (properties.selection_target_id || properties.selection_target_ids?.length)
+    return 1;
+  if (
+    properties.authoritative_location_ids?.length ||
+    properties.authoritative_address_ids?.length ||
+    properties.address_source_status === "authoritative"
+  )
+    return 2;
+  switch (String(properties.external_source ?? "")) {
+    case "grey_county_building_footprints":
+      return 3;
+    case "openstreetmap":
+      return 4;
+    case "canada_structures":
+      return 5;
+    case "owen_sound_city_map_pdf":
+      return 6;
+    default:
+      return 7;
+  }
+};
+
+const geometrySourceRank = (properties: Record<string, any>) => {
+  switch (String(properties.external_source ?? "")) {
+    case "grey_county_building_footprints":
+      return 0;
+    case "openstreetmap":
+      return 1;
+    case "canada_structures":
+      return 2;
+    case "owen_sound_city_map_pdf":
+      return 3;
+    default:
+      return 4;
+  }
+};
+
+const stringArrayProperty = (properties: Record<string, any>, key: string) =>
+  (Array.isArray(properties[key]) ? properties[key] : [properties[key]])
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean);
+
+const uniqueStrings = (values: string[]) => [...new Set(values)];
+
+const cloneFeature = (feature: Feature): Feature => ({
+  ...feature,
+  properties: { ...feature.properties },
+  geometry: {
+    ...feature.geometry,
+    coordinates: structuredClone(feature.geometry.coordinates),
+  },
+});
+
+const isCanvassableStructure = (feature: Feature) =>
+  feature.properties.canvassable !== false &&
+  ["Polygon", "MultiPolygon"].includes(feature.geometry.type);
+
+const sourceExternalId = (feature: Feature) =>
+  String(feature.properties.external_id ?? feature.id ?? "");
+
+const shouldPreferGeometry = (candidate: Feature, current: Feature) => {
+  const candidateRank = geometrySourceRank(candidate.properties);
+  const currentRank = geometrySourceRank(current.properties);
+  if (candidateRank !== currentRank) return candidateRank < currentRank;
+  const candidateArea = multiPolygonAreaM2(candidate.geometry);
+  const currentArea = multiPolygonAreaM2(current.geometry);
+  return candidateArea > currentArea;
+};
+
+const hasExplicitSubdivisionRelationship = (left: Feature, right: Feature) => {
+  const leftParent = String(left.properties.source_parent_geometry_id ?? "");
+  const rightParent = String(right.properties.source_parent_geometry_id ?? "");
+  const leftExternal = sourceExternalId(left);
+  const rightExternal = sourceExternalId(right);
+  return Boolean(
+    (leftParent && (leftParent === rightExternal || leftParent === String(right.properties.structure_id ?? right.id ?? ""))) ||
+      (rightParent && (rightParent === leftExternal || rightParent === String(left.properties.structure_id ?? left.id ?? ""))),
+  );
+};
+
+/**
+ * Resolve duplicate source polygons into one published physical roof.
+ *
+ * This is intentionally a publication-layer operation.  It does not rewrite
+ * address, household, visit, flyer, or correction rows.  The returned alias
+ * map lets the database history projection continue to identify the same
+ * physical roof after source polygons are absorbed.
+ */
+export function consolidateDuplicateStructures(
+  input: Feature[],
+  options: {
+    preservedStructureIds?: Set<string>;
+    generatedAt?: string;
+  } = {},
+): DuplicateResolutionResult {
+  const structures = input.map(cloneFeature);
+  const candidates = structures.filter(isCanvassableStructure);
+  const byStructureId = new Map(
+    candidates.map((feature, index) => [
+      String(feature.properties.structure_id ?? feature.id ?? `structure-${index}`),
+      { feature, index },
+    ]),
+  );
+  const grid = new Map<string, number[]>();
+  const cellDegrees = 0.0005;
+  const cellKey = (x: number, y: number) => `${x}:${y}`;
+  for (const [index, feature] of candidates.entries()) {
+    const box = geometryBbox(feature.geometry);
+    const minX = Math.floor(box[0] / cellDegrees);
+    const maxX = Math.floor(box[2] / cellDegrees);
+    const minY = Math.floor(box[1] / cellDegrees);
+    const maxY = Math.floor(box[3] / cellDegrees);
+    // A very large parent footprint should not make the grid explode.  Its
+    // centroid cell still catches ordinary nearby source polygons through the
+    // neighbouring-cell query below; explicit parent/child relationships are
+    // never merged by distance alone.
+    const span = (maxX - minX + 1) * (maxY - minY + 1);
+    if (span > 256) {
+      const center = centroid(feature);
+      const x = Math.floor(center[0] / cellDegrees);
+      const y = Math.floor(center[1] / cellDegrees);
+      grid.set(cellKey(x, y), [...(grid.get(cellKey(x, y)) ?? []), index]);
+      continue;
+    }
+    for (let x = minX; x <= maxX; x++)
+      for (let y = minY; y <= maxY; y++)
+        grid.set(cellKey(x, y), [...(grid.get(cellKey(x, y)) ?? []), index]);
+  }
+  const pairs: Array<{
+    left: number;
+    right: number;
+    overlap: FootprintOverlap;
+    merge: boolean;
+  }> = [];
+  const seenPairs = new Set<string>();
+  for (const [index, feature] of candidates.entries()) {
+    const box = geometryBbox(feature.geometry);
+    const minX = Math.floor(box[0] / cellDegrees) - 1;
+    const maxX = Math.floor(box[2] / cellDegrees) + 1;
+    const minY = Math.floor(box[1] / cellDegrees) - 1;
+    const maxY = Math.floor(box[3] / cellDegrees) + 1;
+    const nearby = new Set<number>();
+    for (let x = minX; x <= maxX; x++)
+      for (let y = minY; y <= maxY; y++)
+        for (const other of grid.get(cellKey(x, y)) ?? []) nearby.add(other);
+    for (const otherIndex of nearby) {
+      if (otherIndex <= index) continue;
+      const pairKey = `${index}:${otherIndex}`;
+      if (seenPairs.has(pairKey)) continue;
+      seenPairs.add(pairKey);
+      const other = candidates[otherIndex];
+      const overlap = calculateFootprintOverlap(feature, other);
+      // This is a reportable candidate even when it is retained as a
+      // legitimate parent/subdivision or adjacent-source overlap.
+      if (overlap.intersection_area_m2 <= 0 || overlap.smaller_covered_fraction < 0.8)
+        continue;
+      const explicitSubdivision = hasExplicitSubdivisionRelationship(feature, other);
+      const areaRatio =
+        Math.max(multiPolygonAreaM2(feature.geometry), multiPolygonAreaM2(other.geometry)) /
+        Math.max(0.001, Math.min(multiPolygonAreaM2(feature.geometry), multiPolygonAreaM2(other.geometry)));
+      const merge =
+        isLikelyDuplicateFootprint(overlap) &&
+        !(explicitSubdivision && areaRatio >= 2 && overlap.location_compatible !== true);
+      pairs.push({ left: index, right: otherIndex, overlap, merge });
+    }
+  }
+
+  const makeDisjointSet = () => {
+    const parent = candidates.map((_, index) => index);
+    const find = (index: number): number => {
+      let root = index;
+      while (parent[root] !== root) root = parent[root];
+      while (parent[index] !== index) {
+        const next = parent[index];
+        parent[index] = root;
+        index = next;
+      }
+      return root;
+    };
+    return {
+      find,
+      unite(left: number, right: number) {
+        const leftRoot = find(left), rightRoot = find(right);
+        if (leftRoot !== rightRoot) parent[rightRoot] = leftRoot;
+      },
+    };
+  };
+  const reportSet = makeDisjointSet();
+  const mergeSet = makeDisjointSet();
+  for (const pair of pairs) {
+    reportSet.unite(pair.left, pair.right);
+    if (pair.merge) mergeSet.unite(pair.left, pair.right);
+  }
+  const groupsFrom = (set: ReturnType<typeof makeDisjointSet>, mergeOnly = false) => {
+    const groups = new Map<number, number[]>();
+    for (const pair of pairs) {
+      if (mergeOnly && !pair.merge) continue;
+      const root = set.find(pair.left);
+      const values = groups.get(root) ?? [];
+      if (!values.includes(pair.left)) values.push(pair.left);
+      if (!values.includes(pair.right)) values.push(pair.right);
+      groups.set(root, values);
+    }
+    return groups;
+  };
+  const candidateGroups = groupsFrom(reportSet);
+  const mergeGroups = groupsFrom(mergeSet, true);
+
+  const canonicalFor = (members: number[]) =>
+    [...members].sort((left, right) => {
+      const leftFeature = candidates[left];
+      const rightFeature = candidates[right];
+      const leftId = String(leftFeature.properties.structure_id ?? leftFeature.id ?? "");
+      const rightId = String(rightFeature.properties.structure_id ?? rightFeature.id ?? "");
+      const preserved = options.preservedStructureIds ?? new Set<string>();
+      return (
+        Number(!preserved.has(leftId)) - Number(!preserved.has(rightId)) ||
+        duplicateSourceRank(leftFeature.properties) - duplicateSourceRank(rightFeature.properties) ||
+        left - right
+      );
+    })[0];
+
+  const aliases: StructureAlias[] = [];
+  const aliasMap = new Map<string, string>();
+  const clusters: DuplicateResolutionCluster[] = [];
+  const outputById = new Map<string, Feature>();
+  const generatedAt = options.generatedAt ?? new Date().toISOString();
+  const mergePair = (left: number, right: number) =>
+    pairs.find((pair) =>
+      (pair.left === left && pair.right === right) ||
+      (pair.left === right && pair.right === left),
+    )?.overlap ?? calculateFootprintOverlap(candidates[left], candidates[right]);
+
+  for (const [groupIndex, memberIndices] of candidateGroups) {
+    const memberIds = memberIndices.map((index) =>
+      String(candidates[index].properties.structure_id ?? candidates[index].id ?? `structure-${index}`),
+    );
+    const canonicalIndex = canonicalFor(memberIndices);
+    const canonicalId = String(
+      candidates[canonicalIndex].properties.structure_id ?? candidates[canonicalIndex].id ?? `structure-${canonicalIndex}`,
+    );
+    const shouldMerge = memberIndices.some((index) =>
+      [...mergeGroups.values()].some((members) => members.includes(index)),
+    );
+    const geometryFeature = memberIndices.reduce(
+      (current, index) =>
+        shouldPreferGeometry(candidates[index], current) ? candidates[index] : current,
+      candidates[canonicalIndex],
+    );
+    const mergeMemberSet = new Set(
+      [...mergeGroups.values()]
+        .filter((members) => memberIndices.some((member) => members.includes(member)))
+        .flat(),
+    );
+    const memberSummary = memberIndices.map((index) => {
+      const feature = candidates[index];
+      return {
+        structure_id: String(feature.properties.structure_id ?? feature.id ?? `structure-${index}`),
+        source: String(feature.properties.external_source ?? "unknown"),
+        external_id: sourceExternalId(feature),
+        civic_label: String(feature.properties.civic_label ?? ""),
+        address_count: Number(feature.properties.address_count ?? 0),
+        selection_target_ids: uniqueStrings([
+          ...stringArrayProperty(feature.properties, "selection_target_ids"),
+          ...stringArrayProperty(feature.properties, "selection_target_id"),
+        ]),
+        geometry_source: String(feature.properties.external_source ?? "unknown"),
+        resolution: (index === canonicalIndex
+          ? "canonical"
+          : mergeMemberSet.has(index)
+            ? "absorbed"
+            : "retained") as "canonical" | "absorbed" | "retained",
+      };
+    });
+    const overlaps = pairs
+      .filter((pair) => memberIndices.includes(pair.left) && memberIndices.includes(pair.right))
+      .map((pair) => ({
+        left_structure_id: String(candidates[pair.left].properties.structure_id ?? candidates[pair.left].id ?? ""),
+        right_structure_id: String(candidates[pair.right].properties.structure_id ?? candidates[pair.right].id ?? ""),
+        ...pair.overlap,
+      }));
+    clusters.push({
+      cluster_id: `duplicate_cluster_${String(groupIndex + 1).padStart(4, "0")}`,
+      member_structure_ids: memberIds,
+      canonical_structure_id: canonicalId,
+      canonical_geometry_source: String(geometryFeature.properties.external_source ?? "unknown"),
+      decision: shouldMerge ? "merge" : "retain",
+      reason: shouldMerge
+        ? "polygon overlap met conservative duplicate threshold"
+        : "overlap retained because geometry/address evidence did not support a safe merge",
+      members: memberSummary,
+      overlaps,
+    });
+  }
+
+  for (const memberIndices of mergeGroups.values()) {
+    const canonicalIndex = canonicalFor(memberIndices);
+    const canonicalId = String(
+      candidates[canonicalIndex].properties.structure_id ?? candidates[canonicalIndex].id ?? `structure-${canonicalIndex}`,
+    );
+    const geometryFeature = memberIndices.reduce(
+      (current, index) =>
+        shouldPreferGeometry(candidates[index], current) ? candidates[index] : current,
+      candidates[canonicalIndex],
+    );
+    const memberIds = memberIndices.map((index) =>
+      String(candidates[index].properties.structure_id ?? candidates[index].id ?? `structure-${index}`),
+    );
+    const reportCluster = clusters.find((cluster) =>
+      memberIndices.some((index) =>
+        cluster.member_structure_ids.includes(
+          String(candidates[index].properties.structure_id ?? candidates[index].id ?? `structure-${index}`),
+        ),
+      ),
+    );
+    const canonical = cloneFeature(candidates[canonicalIndex]);
+    canonical.id = canonicalId;
+    canonical.geometry = structuredClone(geometryFeature.geometry);
+    const allMembers = memberIndices.map((index) => candidates[index]);
+    const allAddressIds = uniqueStrings(
+      allMembers.flatMap((feature) => stringArrayProperty(feature.properties, "authoritative_address_ids")),
+    );
+    const allLocationIds = uniqueStrings(
+      allMembers.flatMap((feature) => [
+        ...stringArrayProperty(feature.properties, "authoritative_location_ids"),
+        ...stringArrayProperty(feature.properties, "source_location_guid"),
+      ]),
+    );
+    const allTargets = uniqueStrings(
+      allMembers.flatMap((feature) => [
+        ...stringArrayProperty(feature.properties, "selection_target_ids"),
+        ...stringArrayProperty(feature.properties, "selection_target_id"),
+      ]),
+    );
+    const labels = uniqueStrings(
+      allMembers.flatMap((feature) => [
+        ...stringArrayProperty(feature.properties, "authoritative_address_labels"),
+        ...stringArrayProperty(feature.properties, "civic_label"),
+      ]),
+    );
+    const absorbedIds = memberIndices
+      .filter((index) => index !== canonicalIndex)
+      .map((index) => String(candidates[index].properties.structure_id ?? candidates[index].id ?? ""));
+    canonical.properties = {
+      ...canonical.properties,
+      source_components: uniqueStrings(allMembers.flatMap((feature) =>
+        Array.isArray(feature.properties.source_components)
+          ? feature.properties.source_components.map(String)
+          : [String(feature.properties.source_components ?? feature.properties.external_source ?? "")],
+      ).filter(Boolean)),
+      source_structure_ids: memberIds,
+      source_external_ids: uniqueStrings(allMembers.map(sourceExternalId).filter(Boolean)),
+      source_geometry_ids: allMembers.map((feature) => ({
+        structure_id: String(feature.properties.structure_id ?? feature.id ?? ""),
+        source: String(feature.properties.external_source ?? "unknown"),
+        external_id: sourceExternalId(feature),
+      })),
+      canonical_geometry_source: String(geometryFeature.properties.external_source ?? "unknown"),
+      absorbed_structure_ids: absorbedIds,
+      absorbed_operational_household_ids: uniqueStrings(
+        allMembers
+          .filter((feature) => String(feature.properties.structure_id ?? feature.id ?? "") !== canonicalId)
+          .flatMap((feature) => [
+            ...stringArrayProperty(feature.properties, "selection_target_ids"),
+            ...stringArrayProperty(feature.properties, "selection_target_id"),
+          ]),
+      ),
+      former_civic_labels: labels,
+      authoritative_address_ids: allAddressIds,
+      authoritative_location_ids: allLocationIds,
+      selection_target_ids: allTargets,
+      selection_target_id: allTargets[0] ?? canonical.properties.selection_target_id ?? null,
+      address_count: allAddressIds.length || Math.max(...allMembers.map((feature) => Number(feature.properties.address_count ?? 0)), 0),
+      duplicate_cluster_id: reportCluster?.cluster_id ?? null,
+      duplicate_alias_count: absorbedIds.length,
+      duplicate_resolution: "canonical_physical_roof",
+    };
+    outputById.set(canonicalId, canonical);
+    for (const index of memberIndices) {
+      const feature = candidates[index];
+      const structureId = String(feature.properties.structure_id ?? feature.id ?? `structure-${index}`);
+      if (structureId === canonicalId) continue;
+      aliasMap.set(structureId, canonicalId);
+      aliases.push({
+        absorbed_structure_id: structureId,
+        canonical_structure_id: canonicalId,
+        duplicate_detection_method: "polygon_overlap_conservative_threshold",
+        overlap: mergePair(index, canonicalIndex),
+        original_source: String(feature.properties.external_source ?? "unknown"),
+        original_external_id: sourceExternalId(feature),
+        original_address: String(feature.properties.civic_label ?? ""),
+        original_operational_household_ids: uniqueStrings([
+          ...stringArrayProperty(feature.properties, "selection_target_ids"),
+          ...stringArrayProperty(feature.properties, "selection_target_id"),
+        ]),
+        merged_at: generatedAt,
+      });
+    }
+  }
+
+  const resultStructures: Feature[] = [];
+  const emittedCanonicalIds = new Set<string>();
+  for (const [index, feature] of structures.entries()) {
+    if (!isCanvassableStructure(feature)) {
+      resultStructures.push(feature);
+      continue;
+    }
+    const structureId = String(feature.properties.structure_id ?? feature.id ?? `structure-${index}`);
+    if (aliasMap.has(structureId)) continue;
+    const merged = outputById.get(structureId);
+    if (merged) {
+      if (!emittedCanonicalIds.has(structureId)) {
+        resultStructures.push(merged);
+        emittedCanonicalIds.add(structureId);
+      }
+      continue;
+    }
+    if (![...mergeGroups.values()].some((members) => members.some((member) =>
+      String(candidates[member]?.properties.structure_id ?? candidates[member]?.id ?? `structure-${member}`) === structureId,
+    ))) {
+      resultStructures.push(feature);
+      continue;
+    }
+  }
+  return {
+    structures: resultStructures,
+    aliases,
+    clusters,
+    aliasMap,
+    audit: {
+      input_canvassable_structures: candidates.length,
+      output_canvassable_structures: resultStructures.filter(isCanvassableStructure).length,
+      candidate_overlap_pairs: pairs.length,
+      candidate_clusters: clusters.length,
+      merged_clusters: clusters.filter((cluster) => cluster.decision === "merge").length,
+      retained_overlap_clusters: clusters.filter((cluster) => cluster.decision === "retain").length,
+      absorbed_structures: aliases.length,
+      canonical_structure_ids: clusters
+        .filter((cluster) => cluster.decision === "merge")
+        .map((cluster) => cluster.canonical_structure_id),
+    },
+  };
+}
 
 export const centroid = (feature: Feature): Position => {
   const points: Position[] = [];
@@ -434,11 +1123,17 @@ export function mergeBuildingSources(
       duplicate =
         (sourceOsmId && osmByNumericId.get(sourceOsmId)) ||
         nearby.find(
-          (osm) =>
-            geometryContains(osm.geometry, center) ||
-            geometryContains(source.geometry, centroid(osm)) ||
-            (metresBetween(center, centroid(osm)) <= 5 &&
-              distanceToGeometry(center, osm.geometry) <= 3),
+          (osm) => {
+            const overlap = calculateFootprintOverlap(osm, {
+              ...source,
+              properties: {
+                ...source.properties,
+                external_source: "canada_structures",
+                external_id: String(source.properties.CS_ID ?? source.id ?? ""),
+              },
+            });
+            return isLikelyDuplicateFootprint(overlap);
+          },
         );
     if (duplicate) {
       deduplicated++;
@@ -510,12 +1205,17 @@ export function mergeCityMapBuildingSource(
       outsideBoundary++;
       continue;
     }
-    const duplicate = nearbyGridValues(existingGrid, center, 2).find(
-      (existing) =>
-        geometryContains(existing.geometry, center) ||
-        geometryContains(source.geometry, centroid(existing)) ||
-        (metresBetween(center, centroid(existing)) <= 5 &&
-          distanceToGeometry(center, existing.geometry) <= 3),
+    const duplicate = nearbyGridValues(existingGrid, center, 2).find((existing) =>
+      isLikelyDuplicateFootprint(
+        calculateFootprintOverlap(existing, {
+          ...source,
+          properties: {
+            ...source.properties,
+            external_source: "owen_sound_city_map_pdf",
+            external_id: String(source.properties.CITY_MAP_ID ?? source.id ?? ""),
+          },
+        }),
+      ),
     );
     if (duplicate) {
       deduplicated++;

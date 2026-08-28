@@ -25,7 +25,10 @@ import {
   applyAuthoritativePlacements,
   placeNarLocations,
 } from "./owen-sound-footprint-placement";
-import type { Feature } from "./building-coverage";
+import {
+  consolidateDuplicateStructures,
+  type Feature,
+} from "./building-coverage";
 import { validateOwenSoundAddressNumbering } from "./owen-sound-address-numbering";
 import { formatOfficialStreet } from "./official-address";
 import {
@@ -170,17 +173,60 @@ async function main() {
     previousAuthoritativeStructureIds,
     greyFootprints: placement.greyFootprints,
   });
+  const structureHistory = JSON.parse(
+    await readFile(
+      resolve("packages/web-client/public/canvassing/structure-history-crosswalk.json"),
+      "utf8",
+    ).catch(() => '{"rows":[]}'),
+  );
+  const structureHistoryRows = Array.isArray(structureHistory.rows)
+    ? structureHistory.rows
+        .filter((row: any) => row && typeof row === "object")
+        .flatMap((row: any) => [row.historical_structure_id, row.canonical_structure_id])
+        .map((value: unknown) => String(value ?? "").trim())
+        .filter(Boolean)
+    : [];
+  const duplicateResolution = consolidateDuplicateStructures(
+    placedStructures.structures,
+    {
+      // A structure already named by the permanent history crosswalk wins
+      // canonical-ID selection.  This preserves physical identity while the
+      // address assignment itself remains the unchanged NAR placement result.
+      preservedStructureIds: new Set([
+        ...previousAuthoritativeStructureIds,
+        ...structureHistoryRows,
+      ]),
+      generatedAt: new Date().toISOString(),
+    },
+  );
+  const canonicalStructures = duplicateResolution.structures;
+  const remappedPlacements = placement.placements.map((item) => ({
+    ...item,
+    structure_id: item.structure_id
+      ? duplicateResolution.aliasMap.get(item.structure_id) ?? item.structure_id
+      : item.structure_id,
+  }));
+  const remappedLegacyExisting = legacyExisting.map((feature) => ({
+    ...feature,
+    properties: {
+      ...feature.properties,
+      structure_id: feature.properties.structure_id
+        ? duplicateResolution.aliasMap.get(String(feature.properties.structure_id)) ??
+          feature.properties.structure_id
+        : feature.properties.structure_id,
+    },
+  }));
   const placementByLocation = new Map(
-    placement.placements.map((item) => [item.location_id, item.structure_id]),
+    remappedPlacements.map((item) => [item.location_id, item.structure_id]),
   );
   const placementDetailsByLocation = new Map(
-    placement.placements.map((item) => [item.location_id, item]),
+    remappedPlacements.map((item) => [item.location_id, item]),
   );
   const internalAddressIdByNarId = new Map(
     reconciliation.matches.map((match) => [match.address_id, match.internal_address_id]),
   );
   const addressRepair = repairCanvassingStructureAddresses({
-    structures: placedStructures.structures,
+    structures: canonicalStructures,
     roads: roadsFile,
     addresses: primary.map((unit) => ({
       type: "Feature" as const,
@@ -215,16 +261,16 @@ async function main() {
         coordinates: [unit.longitude, unit.latitude],
       },
     })),
-    legacyAddresses: legacyExisting,
+    legacyAddresses: remappedLegacyExisting,
   });
-  assertNoAnonymousActiveAddressLabels(placedStructures.structures);
+  assertNoAnonymousActiveAddressLabels(canonicalStructures);
   const placementStructureIds = new Set(
-    placement.placements
+    remappedPlacements
       .map((item) => item.structure_id)
       .filter((value): value is string => Boolean(value)),
   );
   const selectedGreyFootprintIds = new Set(
-    placement.placements
+    remappedPlacements
       .filter((item) => item.footprint_source === "grey_county_building_footprints")
       .map((item) => item.footprint_id)
       .filter((value): value is string => Boolean(value)),
@@ -317,8 +363,14 @@ async function main() {
     outDir,
     publishAddressesPath: hasArgument("--publish") ? defaultExisting : undefined,
     sourceManifest,
-    structures: placedStructures.structures,
-    placements: placement.placements,
+    structures: canonicalStructures,
+    placements: remappedPlacements,
+    structureAliases: duplicateResolution.aliases,
+    duplicateResolutionReport: {
+      generated_at: new Date().toISOString(),
+      summary: duplicateResolution.audit,
+      clusters: duplicateResolution.clusters,
+    },
     numberingReport,
     roadCount: roadsFile.length,
     audit: {
@@ -336,7 +388,8 @@ async function main() {
         unaddressed_usable_footprints_excluded_from_canvassing_locations:
           usableOldFootprints.filter((feature) => !placementStructureIds.has(String(feature.properties.structure_id ?? feature.id))).length +
           greyFile.filter((feature) => !selectedGreyFootprintIds.has(String(feature.properties.OBJECTID ?? feature.properties.objectid ?? feature.id))).length,
-        multi_address_structures: placedStructures.structures.filter((feature) => Number(feature.properties.address_count ?? 0) > 1).length,
+        multi_address_structures: canonicalStructures.filter((feature) => Number(feature.properties.address_count ?? 0) > 1).length,
+        duplicate_resolution: duplicateResolution.audit,
       },
     },
   });

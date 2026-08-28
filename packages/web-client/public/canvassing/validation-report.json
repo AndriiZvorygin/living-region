@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-28T12:17:12.936Z",
+  "generated_at": "2026-08-28T20:47:54.763Z",
   "published_counts": {
     "retained_primary_canvassing_units": 10893,
     "mappable_primary_canvassing_locations": 6841,
@@ -9,12 +9,12 @@
   "nar_placement_audit_summary": {
     "primary_loc_guid_values": 6841,
     "loc_guid_values_assigned_to_structure": 3891,
-    "unique_structures_receiving_nar_locations": 3843,
+    "unique_structures_receiving_nar_locations": 3790,
     "loc_guid_values_per_structure_distribution": {
-      "1": 3805,
-      "2": 29,
+      "1": 3701,
+      "2": 79,
       "3": 8,
-      "4": 1
+      "4": 2
     },
     "maximum_loc_guid_values_per_structure": 4,
     "coordinate_source_counts": {
@@ -60,9 +60,17 @@
     },
     "collision_groups": [
       {
-        "structure_id": "structure_9e1f1f034d2983612a22",
+        "structure_id": "structure_0af8f5367a95ffb8221f",
+        "loc_guid_values": [
+          "00042c7b-fcb9-4ca1-afdd-4a1f77d29dd1",
+          "395dc3e6-c2fc-4d31-a148-f10058c52371"
+        ]
+      },
+      {
+        "structure_id": "structure_52c16ba6a96c272215b8",
         "loc_guid_values": [
           "00da6c7b-2fc8-46d8-a640-d09a78928b27",
+          "d4aa6fa3-87b8-4c66-a675-9f2dd6219716",
           "f5a3c384-d5c1-43c5-9b2b-dfbf79bdc4ab"
         ]
       },
@@ -74,11 +82,104 @@
         ]
       },
       {
+        "structure_id": "structure_501936f8e5852c512754",
+        "loc_guid_values": [
+          "05b5a289-6192-40a9-af38-092876f0c4b2",
+          "6c51584f-9171-4aea-ad70-6420eacd0eee"
+        ]
+      },
+      {
+        "structure_id": "structure_d3a63cd6cad118cebc7d",
+        "loc_guid_values": [
+          "0652dd00-6dd8-4598-9dd2-f40b688f1b32",
+          "67f7460d-b76a-4f79-b3fe-607890726f38"
+        ]
+      },
+      {
+        "structure_id": "structure_aeb13cd6f4bb9b338da7",
+        "loc_guid_values": [
+          "074cb155-38e0-4a9d-88fa-fb82a3734b9b",
+          "d53edbd2-e8cd-4a6e-85fc-804015440d5e"
+        ]
+      },
+      {
+        "structure_id": "structure_1eed1fd713f68f4d3295",
+        "loc_guid_values": [
+          "07fdc494-ddbf-4339-9a78-5f0633555a8a",
+          "8a3a1bd7-d3b2-4fbc-8a8c-1987fa51b8c7"
+        ]
+      },
+      {
+        "structure_id": "structure_ca5eabc84a111263a7d1",
+        "loc_guid_values": [
+          "093a4feb-bd16-4b3e-9ce0-181506a3e8cd",
+          "bcb10b03-57a7-4a7c-95dd-aacd3b8d3a31"
+        ]
+      },
+      {
+        "structure_id": "structure_4c53cee120c9f1ddde93",
+        "loc_guid_values": [
+          "0c737be1-7866-46a5-be16-f43a1c1ea772",
+          "484b6273-d80f-406b-a60a-ac595c0b8633"
+        ]
+      },
+      {
+        "structure_id": "structure_4cfaf9674c6c28a10e62",
+        "loc_guid_values": [
+          "0c7d5f32-e543-4566-bd83-1836e9d40f66",
+          "413d32c9-6266-4597-a99e-1b57808dcb6f"
+        ]
+      },
+      {
         "structure_id": "structure_517c61e39922797a0d13",
         "loc_guid_values": [
           "0e45e138-461d-44da-a293-87f340dd7ad4",
           "cf716fca-c423-497f-a69e-21cf6734d493",
           "ea6166a4-c7bb-42c4-a08a-c9b208a249be"
+        ]
+      },
+      {
+        "structure_id": "structure_f501159ffa164ee5dab6",
+        "loc_guid_values": [
+          "0ed8edd9-6101-4bc2-bcb4-cb14b40538fc",
+          "e9599ac3-56fc-47b6-ba02-fb04d6bc42cf"
+        ]
+      },
+      {
+        "structure_id": "structure_7fe1d2b71e11a0a45dde",
+        "loc_guid_values": [
+          "162a5ad1-fb59-4dbd-a148-05a403ae4abc",
+          "6b4b8bdb-988e-4bca-82e0-3e435c595897"
+        ]
+      },
+      {
+        "structure_id": "structure_4f06f53500ca2c10312b",
+        "loc_guid_values": [
+          "16567c15-2c23-4992-b4cd-f32d65bf906e",
+          "bc22c85f-7181-4dab-af8b-2633e3113c7f"
+        ]
+      },
+      {
+        "structure_id": "structure_83fd702ff51b3f707440",
+        "loc_guid_values": [
+          "17574172-c0b6-40cc-b89d-c7c5e54bd33e",
+          "6fb75849-fc06-483a-95d1-a5043f029a69",
+          "db1f9229-1f13-478a-ae08-f2753035cc0f",
+          "f205510d-fee5-46c4-96b5-70f3adc028e5"
+        ]
+      },
+      {
+        "structure_id": "structure_a61c4f26eacbd1438daf",
+        "loc_guid_values": [
+          "18999fde-0fae-4c3c-893c-0a05c47ede3e",
+          "75359340-c696-4744-bcdc-a6f3ca9858e3"
+        ]
+      },
+      {
+        "structure_id": "structure_a3bc968074c6d1ca0720",
+        "loc_guid_values": [
+          "18db785b-e2e0-4fb1-a440-95d9bfdb0ae3",
+          "51193bba-7aa0-4fa8-948f-189addf41711"
         ]
       },
       {
@@ -96,10 +197,31 @@
         ]
       },
       {
+        "structure_id": "structure_ba1222aec3277c190fed",
+        "loc_guid_values": [
+          "1b84f64b-0dff-41fb-b406-59429dd98d1c",
+          "1f65cef2-f193-44bd-8da9-506e92d7e30e"
+        ]
+      },
+      {
         "structure_id": "structure_1a6fe8504989adc5bb07",
         "loc_guid_values": [
           "1cb19dea-e306-4511-b551-ebb04bda1c39",
           "e572b97c-e175-4aa3-8863-1e790fdb63fd"
+        ]
+      },
+      {
+        "structure_id": "structure_45cc0129239b707f54f9",
+        "loc_guid_values": [
+          "1d52ce7f-0ffd-467d-8ec5-d7840fe894a1",
+          "792abc04-8360-4a46-9c39-ce06ee933b87"
+        ]
+      },
+      {
+        "structure_id": "structure_3267b6ca7e1ea5bb99f1",
+        "loc_guid_values": [
+          "1da93114-8f6c-4f4d-be28-69b14b24f6bc",
+          "44d3c8b3-3210-4e58-a2e8-a58307f013b7"
         ]
       },
       {
@@ -127,6 +249,13 @@
         ]
       },
       {
+        "structure_id": "structure_18dfe70f51f2e8724f83",
+        "loc_guid_values": [
+          "28332cb9-c93d-43d1-ad44-3a068ab64616",
+          "72ee7518-2a9c-452f-935d-a3083e336004"
+        ]
+      },
+      {
         "structure_id": "structure_58d606d8e0b8e39054ea",
         "loc_guid_values": [
           "28b6ba2d-d1c9-4aa9-beb6-3cdb5a406cca",
@@ -147,6 +276,20 @@
           "2a3a998f-05c7-46e7-8c91-4f62b5a43a61",
           "d4240f06-6d72-4285-a099-b5f2602f6107",
           "e7ea0835-e0f5-4f65-8b14-b645dea37d9c"
+        ]
+      },
+      {
+        "structure_id": "structure_b1cba8aafdc906f15bbb",
+        "loc_guid_values": [
+          "2a8c7630-ef86-4294-870e-0d6153fe6538",
+          "42046840-6838-40da-a500-4532a11a4ba2"
+        ]
+      },
+      {
+        "structure_id": "structure_638070f1c303758e1360",
+        "loc_guid_values": [
+          "2c946702-eacf-4fe5-9e88-ea6129208d34",
+          "a8121475-99db-498e-869f-f5dd392a18e9"
         ]
       },
       {
@@ -171,10 +314,38 @@
         ]
       },
       {
+        "structure_id": "structure_cc34c3a316e8eb10ad6d",
+        "loc_guid_values": [
+          "31dbe910-c9b4-47ef-924f-b742e2b6c1ae",
+          "65250228-1df2-4296-b15b-6fbdd5030f6f"
+        ]
+      },
+      {
         "structure_id": "structure_f9c9c45cfe6471da2d9c",
         "loc_guid_values": [
           "37b80b2c-8cd4-4f3a-937a-30b5164ec5c3",
           "bb3821bb-145c-43ea-b188-f0f0175ddfff"
+        ]
+      },
+      {
+        "structure_id": "structure_698a447cd35386f58296",
+        "loc_guid_values": [
+          "3dd980fa-2fc8-43cb-8a9a-a6481915f6e0",
+          "fd2d65d5-e836-492a-aba7-7854478b3d83"
+        ]
+      },
+      {
+        "structure_id": "structure_5e2aeb6244ada80fda77",
+        "loc_guid_values": [
+          "3dfccf34-5ae0-4833-bf62-9fb4b5666303",
+          "ba5ae6ea-7288-4d6d-8ef0-3dbd603a009b"
+        ]
+      },
+      {
+        "structure_id": "structure_83b5dbcb0d7d28b93667",
+        "loc_guid_values": [
+          "402d1f43-6509-4485-bdef-3029f278a48a",
+          "d9596752-391b-4175-8331-a4cf4ada09b6"
         ]
       },
       {
@@ -185,10 +356,24 @@
         ]
       },
       {
+        "structure_id": "structure_31ff0b51e9e77fcfc0b3",
+        "loc_guid_values": [
+          "405a5e01-d38b-4279-b231-f696c0f2bd34",
+          "ab831b31-dcd5-40ff-a969-24a38d7b1611"
+        ]
+      },
+      {
         "structure_id": "structure_7ecf96eaa61656b9da47",
         "loc_guid_values": [
           "41f54db0-87b1-4336-95b2-114223a9afe6",
           "7e6e2002-3b34-46c8-a270-81910c63e23a"
+        ]
+      },
+      {
+        "structure_id": "structure_ef165f86551288dbae27",
+        "loc_guid_values": [
+          "4307fcec-36eb-40e6-be3f-96cbee94cfe4",
+          "ecdc8218-a7fb-4b4d-854c-065d1c069a08"
         ]
       },
       {
@@ -220,6 +405,20 @@
         ]
       },
       {
+        "structure_id": "structure_2b3e60d6c03c5e3515fa",
+        "loc_guid_values": [
+          "483fcb84-ea67-4a60-829c-9bfe4bc231bb",
+          "65d07bd7-6721-4e84-910e-9fbc8bc14708"
+        ]
+      },
+      {
+        "structure_id": "structure_a5ad72cba8469efecfc6",
+        "loc_guid_values": [
+          "4d3c759f-cf09-4b3f-b816-a067d3eff461",
+          "8bdba2e2-fe9b-44f3-a587-6c66dd002144"
+        ]
+      },
+      {
         "structure_id": "structure_3cf1647aa6c0022f4b86",
         "loc_guid_values": [
           "4d665971-44fb-4744-bda6-40e3562c1d8f",
@@ -241,10 +440,38 @@
         ]
       },
       {
+        "structure_id": "structure_d1cf12be0a0f270dcfc8",
+        "loc_guid_values": [
+          "53918a13-9af4-4309-9290-9ae6b56a2028",
+          "a38ddb31-f80a-4379-aff1-1830fe3fcb5c"
+        ]
+      },
+      {
+        "structure_id": "structure_3b068adaf5ee14639f60",
+        "loc_guid_values": [
+          "54d44b7d-eb01-4d82-81a4-b0f9736e0a13",
+          "82f40ec6-5848-42b4-bb88-5cf664a7ed79"
+        ]
+      },
+      {
+        "structure_id": "structure_e724f3a47cfe7e376591",
+        "loc_guid_values": [
+          "59b3a40e-ea74-4a73-bdfa-ce5e9a8a27b7",
+          "c22e6258-c397-443c-9a76-d00e17dd49e4"
+        ]
+      },
+      {
         "structure_id": "structure_8dacb85bddfa3ce08971",
         "loc_guid_values": [
           "5c040166-f03c-4fa8-b279-9eb40fc971c9",
           "b4a4e1c7-c414-4135-be5e-11e8f922d2a0"
+        ]
+      },
+      {
+        "structure_id": "structure_1e3346ca39198cf1dffc",
+        "loc_guid_values": [
+          "6284675b-7f7a-4cd8-8611-7b1a48d47d98",
+          "bdab29cd-11f0-422e-b9ed-f5270b392d40"
         ]
       },
       {
@@ -255,10 +482,24 @@
         ]
       },
       {
+        "structure_id": "structure_9a4ce18b9ed829ce7285",
+        "loc_guid_values": [
+          "63dd5b62-2bc8-4e54-8805-2c74aae792f9",
+          "cd2d451c-9647-4ef8-a9dd-5f7172b15253"
+        ]
+      },
+      {
         "structure_id": "structure_c3527aa8c85e2b66807f",
         "loc_guid_values": [
           "64992f89-08f9-41be-a973-a447f7370325",
           "b4de3867-4d7b-4517-b71a-a02cb8cb937c"
+        ]
+      },
+      {
+        "structure_id": "structure_c82328f8efcc837c6ca0",
+        "loc_guid_values": [
+          "65fe2242-a24b-43bd-9ae6-2531e6dd42a6",
+          "d1f2039a-b83f-41f7-95c1-1cdcdf6ae4b8"
         ]
       },
       {
@@ -270,11 +511,10 @@
         ]
       },
       {
-        "structure_id": "structure_98097e44ed5766ca838c",
+        "structure_id": "structure_63c6191df8941698941c",
         "loc_guid_values": [
-          "6fb75849-fc06-483a-95d1-a5043f029a69",
-          "db1f9229-1f13-478a-ae08-f2753035cc0f",
-          "f205510d-fee5-46c4-96b5-70f3adc028e5"
+          "6c049feb-2e2e-44ff-9dab-20ab037f291d",
+          "ce9f13ac-3475-4889-9d96-acc2dcc1d954"
         ]
       },
       {
@@ -286,11 +526,81 @@
         ]
       },
       {
+        "structure_id": "structure_a1abeb41f238c5bd0b5b",
+        "loc_guid_values": [
+          "70c42c39-aab2-49d7-b24e-1aa45f3e3d69",
+          "cfeac7f2-ad3a-4664-8cf2-23efe57331b0"
+        ]
+      },
+      {
+        "structure_id": "structure_19876b98da11bd3b5de5",
+        "loc_guid_values": [
+          "74d52722-1600-4215-8506-eec22a71879d",
+          "f9758280-a7a7-46b7-bdd1-3ac8e1d7d6e8"
+        ]
+      },
+      {
+        "structure_id": "structure_56810dd3eebd3359c99e",
+        "loc_guid_values": [
+          "77926654-430c-4a7c-93ef-ac06eef24858",
+          "7a1f22cd-7466-4d24-85fd-98bb6a448401"
+        ]
+      },
+      {
+        "structure_id": "structure_da0a3eeed7a39ae1d996",
+        "loc_guid_values": [
+          "7f921934-5abe-449d-be05-49b811080681",
+          "ab9fa43e-21cc-4c81-b870-7aac6b9b2461"
+        ]
+      },
+      {
         "structure_id": "structure_709591148d3a51953e6f",
         "loc_guid_values": [
           "885a7842-9458-4e64-b06a-dec8db738bf1",
           "9a0ae1d1-a49b-4763-a896-bf9a04608cb8",
           "fcc45d35-b5e6-4aca-99c5-ad255b8d2547"
+        ]
+      },
+      {
+        "structure_id": "structure_576f7dd22b55965da111",
+        "loc_guid_values": [
+          "898a3b71-aadd-4451-a10e-cff66d49cb8d",
+          "efca76e3-dd3f-4ce4-9581-6fd5944868b4"
+        ]
+      },
+      {
+        "structure_id": "structure_691831e2b13ab8931cbb",
+        "loc_guid_values": [
+          "8a736a45-42b8-417d-b8fb-71ed6bcf2a1e",
+          "f2d43d38-c777-4f94-b3a0-9d6bed7dc8f9"
+        ]
+      },
+      {
+        "structure_id": "structure_8531ff4e1e334edb7013",
+        "loc_guid_values": [
+          "8babab6a-0b22-48e7-84e9-a9f05c4dfeb2",
+          "eb6de09f-64ef-4038-a436-0457e0cf3b41"
+        ]
+      },
+      {
+        "structure_id": "structure_f4033c545878f4f9d148",
+        "loc_guid_values": [
+          "9265dff5-6101-450a-bbfa-c5e5ce5ebcfd",
+          "ef00f52d-ca9f-4dd5-aea8-53fbbb31af87"
+        ]
+      },
+      {
+        "structure_id": "structure_8696aa5c56383d5fb9b4",
+        "loc_guid_values": [
+          "9532794c-a18b-4cc9-b852-7cdc694b32a9",
+          "fa1080ff-9402-430f-9743-e0da1d3c9807"
+        ]
+      },
+      {
+        "structure_id": "structure_cf0c548be7d4b18661be",
+        "loc_guid_values": [
+          "97a83bb0-4a95-4900-9897-26056841e7ef",
+          "addd2d07-ac24-4cd3-a496-1be502a22ed7"
         ]
       },
       {
@@ -308,6 +618,20 @@
         ]
       },
       {
+        "structure_id": "structure_6d9ffe1d25e369ca8f46",
+        "loc_guid_values": [
+          "9d8ccbf3-42ae-4285-a353-d0acdcc31e9d",
+          "bcfe5fab-5de9-42c1-adf2-327eb830dd7c"
+        ]
+      },
+      {
+        "structure_id": "structure_b8aeceb8c6d6a426d2b0",
+        "loc_guid_values": [
+          "9e8a389d-3747-4d82-9b73-8da4ba32db4c",
+          "ccc4c1be-1237-44c7-a624-da7102f2e597"
+        ]
+      },
+      {
         "structure_id": "structure_048c0292e1dfafb34da4",
         "loc_guid_values": [
           "a5639009-dba2-4b81-9360-7de1114d4336",
@@ -315,10 +639,45 @@
         ]
       },
       {
+        "structure_id": "structure_25b15bb12d80b683ad47",
+        "loc_guid_values": [
+          "abeecef8-a0d6-421c-9c01-d5e045843ff3",
+          "b93eb06e-57b1-4c97-9c40-c4611b7c8aa7"
+        ]
+      },
+      {
+        "structure_id": "structure_e805ede160db938eae9b",
+        "loc_guid_values": [
+          "af8e548a-34cf-412d-886e-8c82931374a7",
+          "b5c02bb5-68de-4d92-b457-574423655f08"
+        ]
+      },
+      {
         "structure_id": "structure_21a8b691a9805f82efe4",
         "loc_guid_values": [
           "b8fd3260-8621-4afb-bda8-b7994c0c73f5",
           "c54b25d8-5102-41a6-93b8-f2f5bd8d1b50"
+        ]
+      },
+      {
+        "structure_id": "structure_119e7ec4eff833361547",
+        "loc_guid_values": [
+          "c2949a16-9626-4cb4-bfd2-c1ab44a63fd0",
+          "fc24b892-93ad-446e-b29e-93fb07717310"
+        ]
+      },
+      {
+        "structure_id": "structure_4ab911a9a1f18fcfa3f8",
+        "loc_guid_values": [
+          "c3ac82c7-7af9-4002-b512-d69cbaccf432",
+          "f258c0a1-3e04-4c45-8266-95c122f87de5"
+        ]
+      },
+      {
+        "structure_id": "structure_8349ebd5bd557b52bb3a",
+        "loc_guid_values": [
+          "c87fcd30-176d-4ff1-ae4a-0a52664391c1",
+          "e8301aae-58a7-44b9-a8ca-1a400c8368b0"
         ]
       },
       {
@@ -343,7 +702,7 @@
     "nar_locations_with_no_credible_structure_match": 2950
   },
   "address_quality": {
-    "generated_at": "2026-08-28T12:17:10.947Z",
+    "generated_at": "2026-08-28T20:47:52.225Z",
     "source": "statistics_canada_national_address_register",
     "totals": {
       "civic_addresses": 10893,
@@ -379,23 +738,23 @@
     },
     "methodology": "Statistics Canada June 2026 NAR CIVIC_NO and official street fields are authoritative. BG building coordinates are preferred; BF_REPPOINT is assigned only by same-segment street-side sequence. NAR locations are grouped by prepared road segment, interpolated civic hundred block, and side, official addresses are restricted to that exact block and ordered by civic number/suffix, and roofs are ordered by physical along-segment position with explicit skips. Unresolved placement is retained as a review flag and never blocks canvassing.",
     "address_source_counts": {
-      "legacy_fallback": 3751,
-      "grid_estimated": 809,
-      "nar_segment_assigned": 3447,
-      "nar_contained": 396
+      "legacy_fallback": 3488,
+      "grid_estimated": 791,
+      "nar_segment_assigned": 3412,
+      "nar_contained": 378
     }
   },
   "address_classification_counts": {
-    "nar_building_contained": 396,
+    "nar_building_contained": 378,
     "nar_building_validated_nearest": 0,
     "nar_building_sequence": 0,
     "nar_block_face_sequence": 0,
-    "nar_nearest_no_known_conflict": 3447,
-    "nar_documented_exception": 0,
+    "nar_nearest_no_known_conflict": 3397,
+    "nar_documented_exception": 15,
     "legacy_nar_confirmed": 0,
     "legacy_spatially_consistent": 0,
-    "legacy_unverified": 3751,
-    "grid_estimated": 809,
+    "legacy_unverified": 3488,
+    "grid_estimated": 791,
     "unresolved": 0
   }
 }
