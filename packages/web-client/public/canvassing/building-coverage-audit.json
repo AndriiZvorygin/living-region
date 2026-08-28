@@ -1,19 +1,20 @@
 {
-  "generated_at": "2026-08-27T16:53:44.573Z",
+  "generated_at": "2026-08-28T01:49:47.247Z",
   "generated_by": "retrieve-owen-sound-addresses",
   "civic_addresses": 10893,
-  "total_display_footprints": 8377,
-  "structures_with_civic_labels": 8344,
-  "structures_without_civic_labels": 33,
-  "canvassable_structures": 8293,
+  "total_display_footprints": 8481,
+  "structures_with_civic_labels": 8446,
+  "structures_without_civic_labels": 35,
+  "canvassable_structures": 8396,
   "address_classification_counts": {
-    "nar_contained_footprint": 318,
-    "nar_validated_nearest": 2701,
+    "nar_contained_footprint": 301,
+    "nar_validated_nearest": 282,
+    "nar_nearest_no_known_conflict": 3790,
     "nar_documented_exception": 0,
     "legacy_nar_confirmed": 0,
-    "legacy_spatially_consistent": 0,
-    "legacy_unverified": 4058,
-    "grid_estimated": 1216,
+    "legacy_spatially_consistent": 1,
+    "legacy_unverified": 3109,
+    "grid_estimated": 913,
     "unresolved": 0
   },
   "generated_geometry_conflicts": 0,
@@ -25,51 +26,36 @@
   },
   "address_placement": {
     "primary_loc_guid_values": 6841,
-    "loc_guid_values_assigned_to_structure": 3054,
-    "unique_structures_receiving_nar_locations": 3019,
+    "loc_guid_values_assigned_to_structure": 4378,
+    "unique_structures_receiving_nar_locations": 4374,
     "loc_guid_values_per_structure_distribution": {
-      "1": 2990,
-      "2": 23,
-      "3": 6
+      "1": 4370,
+      "2": 4
     },
-    "maximum_loc_guid_values_per_structure": 3,
+    "maximum_loc_guid_values_per_structure": 2,
+    "coordinate_source_counts": {
+      "nar_building": 5720,
+      "nar_block_face_fallback": 1121
+    },
+    "match_method_counts": {
+      "nar_contained_footprint": 318,
+      "nar_nearest": 3992,
+      "unresolved": 2463,
+      "street_side_sequence": 68
+    },
+    "confidence_classification_counts": {
+      "nar_contained_footprint": 305,
+      "nar_nearest_no_known_conflict": 3790,
+      "unresolved": 2463,
+      "nar_validated_nearest": 282,
+      "legacy_spatially_consistent": 1
+    },
+    "review_reason_counts": {
+      "distinct LOC_GUIDs share one footprint without sufficient multi-entrance or apartment evidence": 501,
+      "no credible footprint within the conservative match threshold": 1737,
+      "multiple nearby footprints remain similarly plausible": 225
+    },
     "collision_groups": [
-      {
-        "structure_id": "structure_9e1f1f034d2983612a22",
-        "loc_guid_values": [
-          "00da6c7b-2fc8-46d8-a640-d09a78928b27",
-          "f5a3c384-d5c1-43c5-9b2b-dfbf79bdc4ab"
-        ]
-      },
-      {
-        "structure_id": "structure_0c6db5b1f464f912b1ae",
-        "loc_guid_values": [
-          "047b9edd-a955-4e18-a2f4-4fdac914c5b3",
-          "a8250695-5c8b-4124-bf46-9b272aae32db"
-        ]
-      },
-      {
-        "structure_id": "structure_517c61e39922797a0d13",
-        "loc_guid_values": [
-          "0e45e138-461d-44da-a293-87f340dd7ad4",
-          "cf716fca-c423-497f-a69e-21cf6734d493",
-          "ea6166a4-c7bb-42c4-a08a-c9b208a249be"
-        ]
-      },
-      {
-        "structure_id": "structure_e5ead5b833f5719cb162",
-        "loc_guid_values": [
-          "1a19f66a-42ff-4aa7-8126-47769bf40e9e",
-          "81ead116-a36b-4bd4-94ba-06dfbc115cca"
-        ]
-      },
-      {
-        "structure_id": "structure_21538e4a72f32b3bbc85",
-        "loc_guid_values": [
-          "1b1994ac-f83e-4bf4-afc9-c92ba7e52630",
-          "97cd7045-356f-43d0-8595-8eb62280a934"
-        ]
-      },
       {
         "structure_id": "structure_1a6fe8504989adc5bb07",
         "loc_guid_values": [
@@ -85,64 +71,6 @@
         ]
       },
       {
-        "structure_id": "structure_58d606d8e0b8e39054ea",
-        "loc_guid_values": [
-          "28b6ba2d-d1c9-4aa9-beb6-3cdb5a406cca",
-          "5360b419-abec-4751-9fc2-f73597578e1c",
-          "fa651d1c-2b91-480a-af3b-cf5260226046"
-        ]
-      },
-      {
-        "structure_id": "structure_7c7902f74cd7c2f6b3b5",
-        "loc_guid_values": [
-          "29d398aa-653e-4530-954a-ca503d99d2a1",
-          "37807052-0ceb-4329-9745-1dd54c506f95"
-        ]
-      },
-      {
-        "structure_id": "structure_925371db4544430724b8",
-        "loc_guid_values": [
-          "2a3a998f-05c7-46e7-8c91-4f62b5a43a61",
-          "d4240f06-6d72-4285-a099-b5f2602f6107",
-          "e7ea0835-e0f5-4f65-8b14-b645dea37d9c"
-        ]
-      },
-      {
-        "structure_id": "structure_dc5d8d28fbe4f3066f3f",
-        "loc_guid_values": [
-          "40521eb6-b8e2-4a89-b837-c70c7c4891ab",
-          "bc9f78d6-2930-42e0-b883-1a79cf633181"
-        ]
-      },
-      {
-        "structure_id": "structure_7ecf96eaa61656b9da47",
-        "loc_guid_values": [
-          "41f54db0-87b1-4336-95b2-114223a9afe6",
-          "7e6e2002-3b34-46c8-a270-81910c63e23a"
-        ]
-      },
-      {
-        "structure_id": "structure_79bc0d1198791c468f66",
-        "loc_guid_values": [
-          "44e960d3-77ea-49b7-87fc-a5d40fdb03e3",
-          "b2df7c1c-ab2b-4167-86c4-8c6c030db256"
-        ]
-      },
-      {
-        "structure_id": "structure_ee9c2c192e2281012523",
-        "loc_guid_values": [
-          "4568bc00-d399-42fd-a70a-3259bdfb2220",
-          "5cdaacfc-8b43-4ae1-9102-727ced6d6704"
-        ]
-      },
-      {
-        "structure_id": "structure_a143efc5178d9709b830",
-        "loc_guid_values": [
-          "45c1e655-929b-4450-9250-8df2ca4124f1",
-          "a890be38-178e-4aad-a3fb-d6dc9c79e689"
-        ]
-      },
-      {
         "structure_id": "structure_1d7d7c8bc8ef3c2092e6",
         "loc_guid_values": [
           "469b88df-fa71-46ad-a2c0-24ca260d060f",
@@ -150,97 +78,10 @@
         ]
       },
       {
-        "structure_id": "structure_104195608df328d167fc",
+        "structure_id": "structure_403b0498f77e9e155f31",
         "loc_guid_values": [
-          "4e1adca3-e8b1-4118-87dd-562954e911a6",
-          "dc1dd929-be01-4a16-9fc6-b20dcbe79ac5"
-        ]
-      },
-      {
-        "structure_id": "structure_e3c3ca358f88132024d9",
-        "loc_guid_values": [
-          "50259d48-6b3c-4be9-92b3-5f69aed720fa",
-          "6416fb79-43f8-4e11-91ba-32a4c93f41a5"
-        ]
-      },
-      {
-        "structure_id": "structure_866bfbc626b6c273acb6",
-        "loc_guid_values": [
-          "5363072e-99e9-4de7-b91e-c5da48f7e6fd",
-          "ebce5c37-f688-486e-b30b-027b892b120c"
-        ]
-      },
-      {
-        "structure_id": "structure_8dacb85bddfa3ce08971",
-        "loc_guid_values": [
-          "5c040166-f03c-4fa8-b279-9eb40fc971c9",
-          "b4a4e1c7-c414-4135-be5e-11e8f922d2a0"
-        ]
-      },
-      {
-        "structure_id": "structure_d4dec8c5b9fb694e7156",
-        "loc_guid_values": [
-          "639f9130-303b-4d44-91fb-ad22ea1223f8",
-          "993f0a04-b1e9-4c33-aa4f-8568293ad9a3"
-        ]
-      },
-      {
-        "structure_id": "structure_5de758afc565e80ac249",
-        "loc_guid_values": [
-          "6ac2069a-e448-4333-bd3d-667499933633",
-          "6e99231d-5f64-4919-9125-6def67e30911",
-          "e28c7b07-8dcb-4db0-994f-5fb3e5fa899c"
-        ]
-      },
-      {
-        "structure_id": "structure_5c5d8be538c9b720f9d5",
-        "loc_guid_values": [
-          "701119a5-a22e-4e35-8104-bee3cc5893ce",
-          "748e4503-16b6-4cfa-b05e-6f5240a1f64f",
-          "c15e3be2-b088-4ff4-a3af-c6706687a32e"
-        ]
-      },
-      {
-        "structure_id": "structure_709591148d3a51953e6f",
-        "loc_guid_values": [
-          "885a7842-9458-4e64-b06a-dec8db738bf1",
-          "9a0ae1d1-a49b-4763-a896-bf9a04608cb8",
-          "fcc45d35-b5e6-4aca-99c5-ad255b8d2547"
-        ]
-      },
-      {
-        "structure_id": "structure_c6b3f8253af34747728e",
-        "loc_guid_values": [
-          "9b1e0cf2-3c7f-434a-891c-12fa9502d90d",
-          "e886575a-c12a-470a-bd20-3495c91c1fa4"
-        ]
-      },
-      {
-        "structure_id": "structure_6f297ba48c5eb6ab845a",
-        "loc_guid_values": [
-          "9baa449b-f499-4e80-ae50-8cfd2cb4f7ca",
-          "febaa01d-e0fd-4251-92d6-9144bc0a6077"
-        ]
-      },
-      {
-        "structure_id": "structure_048c0292e1dfafb34da4",
-        "loc_guid_values": [
-          "a5639009-dba2-4b81-9360-7de1114d4336",
-          "ad13c50d-9024-4326-8311-2bd0ecab2f99"
-        ]
-      },
-      {
-        "structure_id": "structure_21a8b691a9805f82efe4",
-        "loc_guid_values": [
-          "b8fd3260-8621-4afb-bda8-b7994c0c73f5",
-          "c54b25d8-5102-41a6-93b8-f2f5bd8d1b50"
-        ]
-      },
-      {
-        "structure_id": "structure_e2f55018a7b717bec2e7",
-        "loc_guid_values": [
-          "efb46509-87ed-4504-a9a1-3dfff000ad99",
-          "f2a41be6-9a41-45a6-8f32-35fb44b2f4cc"
+          "ce173f2b-3497-4b7c-bbed-106773ed9d99",
+          "fa663f9f-939f-4bdc-8c4a-72672661f359"
         ]
       }
     ],
@@ -248,6 +89,6 @@
     "parity_anomalies": 335,
     "hundred_block_anomalies": 161,
     "neighbouring_address_sequence_anomalies": 763,
-    "nar_locations_with_no_credible_structure_match": 3787
+    "nar_locations_with_no_credible_structure_match": 2463
   }
 }

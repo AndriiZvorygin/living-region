@@ -128,18 +128,23 @@ contains 10,893 residential/partly-residential units. These figures exclude
 both rejection groups; see the generated validation report for raw, rejected,
 retained, and primary counts separately.
 
-The current placement run found 6,841 primary NAR physical locations. It
-assigned 3,054 NAR locations to 3,019 unique structures: 353 containing
-matches and 2,701 conservative nearest matches. The other 3,787 primary NAR
-locations remain unresolved as NAR-to-footprint associations and are not
-silently assigned to unrelated roofs. The improvement over the earlier
-1,577-location run comes from normalizing numeric and ordinal street forms
-(for example, `7 AVE E` and `7th Avenue East`) while retaining the conservative
-distance and street-compatibility checks. Of the 7,467 legacy address rows, 918
-matched exactly and 91 matched by normalized civic-address components within
-the configured distance; 6,458 remain legacy-only after four rows acquired a
-safe current NAR match. All 6,462 original legacy source IDs remain preserved
-in the reconciliation/history tables.
+The current placement run found 6,841 primary NAR physical locations. The
+current generated audit assigns 4,378 locations to 4,374 unique structures;
+4,310 are direct/nearby footprint matches and 68 are constrained street-side
+sequence matches. The remaining 2,463 primary locations remain unresolved as
+NAR-to-footprint associations and are not silently assigned to unrelated
+roofs. This is deliberately a placement count, not a claim that every
+assigned roof is fully validated. The current structure-level classifications
+are 301 `nar_contained_footprint`, 282 `nar_validated_nearest`, 3,790
+`nar_nearest_no_known_conflict`, one `legacy_spatially_consistent`, 3,109
+`legacy_unverified`, and 913 `grid_estimated`. There are currently zero
+`legacy_nar_confirmed` or documented-exception classifications. A nearest
+match is fully validated only when the official street/direction, frontage
+side, parity, block, sequence, unique plausible residential footprint, and
+conservative BG-coordinate distance checks all pass. Unknown/unclassified
+footprint metadata therefore remains `nar_nearest_no_known_conflict`, not
+validated. All 6,462 original legacy source IDs remain preserved in the
+reconciliation/history tables.
 
 Unknown-use records are not silently promoted to residential. Non-residential
 records are kept in their own file. Earlier OSM/range-derived records that do
@@ -158,13 +163,15 @@ The final placement audit is recorded in
 `data/derived/owen-sound-address-foundation/validation-report.json`, with one
 machine-readable row per primary NAR `LOC_GUID` in `nar-placement-audit.json`.
 The 11,228 retained all-use units and 10,893 primary units both exclude the
-28 outside-boundary rows and 14 no-coordinate rows. The published map contains
-8,293 active canvassable physical roofs out of 8,377 structure features, with
-zero missing selection targets. Address classification is explicit: 318 active
-roofs have NAR contained-footprint placement, 2,701 have validated NAR nearest
-placement, 4,058 use an unverified legacy fallback, and 1,216 use a
-grid-estimated fallback. The latter two are human-readable operational
-fallbacks, never authoritative NAR addresses. The
+28 outside-boundary rows and 14 no-coordinate rows. The latest publication
+contains 8,396 active canvassable physical roofs out of 8,481 structure
+features, with zero missing selection targets. Address classification is
+explicit: 309 active roofs have NAR contained-footprint placement, 282 have
+fully validated NAR nearest placement, 3,789 have NAR nearest placement with
+no known conflict but incomplete validation evidence, 3,102 use an unverified
+legacy fallback, 913 use a grid-estimated fallback, and one is a legacy
+spatially consistent sequence match. The latter fallbacks are human-readable
+operational labels, never authoritative NAR addresses. The
 API retains unit-level household rows and uses physical-roof activity for
 historical status, so apartment buildings remain one roof stop without losing
 unit coverage.
@@ -198,15 +205,20 @@ no resident or roll-number data.
 
 The latest generated snapshot reports 7,156 retained physical `LOC_GUID`
 locations, of which 6,841 contain primary residential or partly-residential
-units; 10,893 primary address units remain published. Across primary NAR
-locations, placement reports 353 containing matches, 2,701 validated nearest
-matches, 2,669 ambiguous candidates, and 1,118 unresolved matches. For assigned
-primary locations, selected-footprint distance is p50 7.06m, p90 19.59m, p95
-25.94m, p99 39.18m, and maximum 60.69m. The 50m threshold and explicit
-street/civic contradiction checks prevent unrelated citywide copies;
-unresolved locations remain review records. The primary placement audit flags
-335 parity, 161 hundred-block, and 763 neighbouring-sequence anomalies; these
-are review diagnostics and do not overwrite NAR values.
+units; 10,893 primary address units remain published. Primary NAR coordinates
+are 5,720 BG building coordinates and 1,121 BF_REPPOINT block-face fallbacks.
+The placement audit reports 334 exact, 4,211 nearest, 810 ambiguous, and 1,801
+unmatched locations across all-use records; for primary records the
+corresponding unresolved total is 2,463. Across primary NAR locations, 4,378
+have a selected structure and 2,463 do not. The selected-distance distribution
+for the current all-use placement set is p50 8.04m, p90 29.16m, p95 37.94m,
+p99 50.56m, and maximum 723.38m; the maximum includes records that
+are not fully validated and is not used to certify a nearest match. The
+constrained pass is monotonic within normalized street/side/hundred-block
+groups, permits explicit skipped lots, and never performs a city-wide nearest
+fallback. The primary numbering diagnostics currently flag 335 parity, 161
+hundred-block, and 763 monotonic-progression anomalies; these are review
+signals and do not overwrite NAR values.
 
 The live database seed stores the NAR GUIDs, suffix, official street parts,
 retrieval date, and footprint provenance in the address row. Existing matched
@@ -220,8 +232,8 @@ The authoritative reseed also publishes
 `legacy-history-reconciliation.json`. It contains only internal address IDs,
 NAR address/location IDs, match status, and matching diagnostics; it contains
 no event payloads or resident information. In the current placement run it
-contains 6,458 legacy-only rows after four former rows matched a current NAR
-address: 1,853 confident, 3,733 ambiguous, and 872 unmatched. The original
+contains 6,437 legacy-only rows after 25 former rows matched a current NAR
+address: 1,852 confident, 3,731 ambiguous, and 854 unmatched. The original
 6,462 legacy source IDs remain preserved independently in the recovery and
 history tables.
 

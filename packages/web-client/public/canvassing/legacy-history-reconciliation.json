@@ -8491,16 +8491,6 @@
       "reason": "same_street_unique_nearest_single_unit_location"
     },
     {
-      "legacy_address_id": "address_e2b591b7730e514c6c11",
-      "canonical_address_id": "address_89e40016c617177d0373",
-      "canonical_location_id": "0b9bcdd7-a77c-4356-a31b-c67fe57aeb4b",
-      "match_status": "confident",
-      "distance_m": 29.83813114090803,
-      "candidate_count": 1,
-      "candidate_location_count": 1,
-      "reason": "same_street_unique_nearest_single_unit_location"
-    },
-    {
       "legacy_address_id": "address_71e2530621055a850649",
       "canonical_address_id": null,
       "canonical_location_id": "919dae8c-22c9-4716-93ae-4b3e8e175d0d",
@@ -17421,16 +17411,6 @@
       "reason": "same_street_unique_nearest_single_unit_location"
     },
     {
-      "legacy_address_id": "address_66c1038b930a8fe1a6de",
-      "canonical_address_id": null,
-      "canonical_location_id": "8f78d848-7d6f-47b2-a2eb-a48a06b642a9",
-      "match_status": "ambiguous",
-      "distance_m": 17.922906482699354,
-      "candidate_count": 19,
-      "candidate_location_count": 6,
-      "reason": "multiple_plausible_canonical_locations"
-    },
-    {
       "legacy_address_id": "address_37db64ee0178a00941dd",
       "canonical_address_id": null,
       "canonical_location_id": "ae933db7-886b-4808-81f4-f50618cc1640",
@@ -25061,16 +25041,6 @@
       "reason": "same_location_has_multiple_canonical_units"
     },
     {
-      "legacy_address_id": "address_f32052b2817fefdb451e",
-      "canonical_address_id": null,
-      "canonical_location_id": "a383082d-5e5c-4005-907e-0a7d4b7cf6a3",
-      "match_status": "ambiguous",
-      "distance_m": 6.1147898479114735,
-      "candidate_count": 5,
-      "candidate_location_count": 4,
-      "reason": "multiple_plausible_canonical_locations"
-    },
-    {
       "legacy_address_id": "address_74311a69475b960b02c1",
       "canonical_address_id": null,
       "canonical_location_id": "0ae8067d-b5e0-4225-87f2-be17ca379c53",
@@ -27821,16 +27791,6 @@
       "reason": "no_same_street_canonical_location_within_75m"
     },
     {
-      "legacy_address_id": "address_5f18a8a9403627ea678a",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
       "legacy_address_id": "address_11e455e27adc39318617",
       "canonical_address_id": null,
       "canonical_location_id": null,
@@ -27961,36 +27921,6 @@
       "reason": "same_street_unique_nearest_single_unit_location"
     },
     {
-      "legacy_address_id": "address_bae75d7e7f28b4166c68",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_39f32ef373013d07e930",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_819212437f6d7022cbe8",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
       "legacy_address_id": "address_86b60f479f2defd0e21d",
       "canonical_address_id": null,
       "canonical_location_id": "06ac7820-b5fc-45f5-9d2e-efb7b6e269c2",
@@ -27999,16 +27929,6 @@
       "candidate_count": 4,
       "candidate_location_count": 1,
       "reason": "same_location_has_multiple_canonical_units"
-    },
-    {
-      "legacy_address_id": "address_3ac0cfc38cf6d3e98894",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
     },
     {
       "legacy_address_id": "address_4f1da26ec399ce2b1491",
@@ -28099,16 +28019,6 @@
       "candidate_count": 46,
       "candidate_location_count": 16,
       "reason": "same_location_has_multiple_canonical_units"
-    },
-    {
-      "legacy_address_id": "address_c6259815ac7c44527583",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
     },
     {
       "legacy_address_id": "address_2f24b9ff70424afe6278",
@@ -30281,46 +30191,6 @@
       "reason": "multiple_plausible_canonical_locations"
     },
     {
-      "legacy_address_id": "address_cb1c362f8fde7f48554f",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_a901bc5d5141a3585b8c",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_b2f55a4c61090d150fd0",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_f528dc432be6fa38670e",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
       "legacy_address_id": "address_2feeead4117deb825686",
       "canonical_address_id": null,
       "canonical_location_id": null,
@@ -30339,16 +30209,6 @@
       "candidate_count": 2,
       "candidate_location_count": 2,
       "reason": "same_street_unique_nearest_single_unit_location"
-    },
-    {
-      "legacy_address_id": "address_633025b5a555790c8015",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
     },
     {
       "legacy_address_id": "address_e84902e1e57f4256e30c",
@@ -30811,16 +30671,6 @@
       "reason": "no_same_street_canonical_location_within_75m"
     },
     {
-      "legacy_address_id": "address_6d3034e17c65c4bb92ad",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
       "legacy_address_id": "address_e320a535b81bab916f09",
       "canonical_address_id": null,
       "canonical_location_id": "beebc8b4-3cc4-49d7-a073-5b43de924f04",
@@ -31149,56 +30999,6 @@
       "candidate_count": 4,
       "candidate_location_count": 4,
       "reason": "multiple_plausible_canonical_locations"
-    },
-    {
-      "legacy_address_id": "address_1a4d9efdfd6d54a6535c",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_722f1b97b288a0fb6eee",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_7421cf8385a27c9bec0b",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_1dd62a4b1a4eda5b628b",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_fed5c68a1a59b756c751",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
     },
     {
       "legacy_address_id": "address_fd02fbaf542f13dd688e",
@@ -36032,16 +35832,6 @@
     },
     {
       "legacy_address_id": "address_9c67267c7a656663e6f5",
-      "canonical_address_id": null,
-      "canonical_location_id": null,
-      "match_status": "unmatched",
-      "distance_m": null,
-      "candidate_count": 0,
-      "candidate_location_count": 0,
-      "reason": "no_same_street_canonical_location_within_75m"
-    },
-    {
-      "legacy_address_id": "address_839ca08aee49033fa23a",
       "canonical_address_id": null,
       "canonical_location_id": null,
       "match_status": "unmatched",
@@ -64582,11 +64372,11 @@
     }
   ],
   "summary": {
-    "legacy_rows": 6458,
-    "confident": 1853,
-    "ambiguous": 3733,
-    "unmatched": 872,
-    "activity_visibility_candidates": 4605,
+    "legacy_rows": 6437,
+    "confident": 1852,
+    "ambiguous": 3731,
+    "unmatched": 854,
+    "activity_visibility_candidates": 4585,
     "distance_m": {
       "p50": 17.308989329396187,
       "p90": 42.67584407480255,

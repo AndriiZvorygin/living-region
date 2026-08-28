@@ -123,4 +123,34 @@ describe("NAR location to building placement", () => {
     expect(result.structures[0].properties.civic_label).toBe("100 Example Street");
     expect(result.structures[0].properties.address_count).toBe(2);
   });
+
+  it("uses a generated Grey structure's external footprint ID as its stable identity", () => {
+    const rawGrey = {
+      ...polygon("raw-grey", "grey_county_building_footprints", 0, 0),
+      id: 42,
+      properties: {
+        ...polygon("raw-grey", "grey_county_building_footprints", 0, 0).properties,
+        OBJECTID: 42,
+      },
+    };
+    const stableGreyId = stableId("structure", "grey:42");
+    const generatedGrey = {
+      ...rawGrey,
+      id: stableGreyId,
+      properties: {
+        ...rawGrey.properties,
+        structure_id: stableGreyId,
+        external_id: "42",
+        external_source: "grey_county_building_footprints",
+      },
+    };
+    const result = placeNarLocations({
+      locations: [location("grey-location", 0.00005, 0.00005)],
+      structures: [generatedGrey],
+      greyFootprints: [rawGrey],
+      units: [unit("grey-location")],
+    });
+    expect(result.placements[0].structure_id).toBe(stableGreyId);
+    expect(result.placements[0].footprint_id).toBe("42");
+  });
 });

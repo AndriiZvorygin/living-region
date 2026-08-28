@@ -13,6 +13,12 @@ import {
   formatOfficialBaseAddress,
 } from "./official-address";
 import type { AddressUnit, NarLocation } from "./owen-sound-address-foundation";
+import {
+  matchUnresolvedNarLocations,
+  validateNarPlacementEvidence,
+  type AddressQualityClassification,
+  type StreetSideEvidence,
+} from "./owen-sound-street-side-matching";
 
 export const DEFAULT_FOOTPRINT_MATCH_THRESHOLD_M = 50;
 export const FOOTPRINT_AMBIGUITY_TOLERANCE_M = 2;
@@ -48,6 +54,10 @@ export type FootprintPlacement = {
   address_ids?: string[];
   official_street?: string;
   rejection_reason?: string;
+  /** Placement method and confidence are separate from the coarse status. */
+  match_method?: "nar_contained_footprint" | "nar_nearest" | "street_side_sequence" | "unresolved";
+  confidence_classification?: AddressQualityClassification;
+  validation?: StreetSideEvidence;
 };
 
 type IndexedFeature = { feature: Feature; bbox: [number, number, number, number] };
@@ -138,7 +148,14 @@ const structureId = (feature: Feature, source: string) =>
       );
 
 const greyFootprintId = (feature: Feature) =>
-  String(feature.properties.OBJECTID ?? feature.properties.objectid ?? feature.id ?? "unknown");
+  String(
+    feature.properties.OBJECTID ??
+      feature.properties.objectid ??
+      feature.properties.external_id ??
+      feature.properties.grey_county_footprint_id ??
+      feature.id ??
+      "unknown",
+  );
 
 const isUsableExistingFootprint = (feature: Feature) => {
   const source = sourceName(feature);
@@ -362,7 +379,19 @@ export function placeNarLocations(options: {
   const existing = options.structures.filter(
     (feature) => geometryIsPolygon(feature) && isUsableExistingFootprint(feature),
   );
-  const all = [...grey, ...existing];
+  // The published bundle may already contain Grey-derived structures created
+  // by an earlier address run.  The same stable Grey footprint is also in the
+  // fresh licensed snapshot.  Keep one candidate per physical structure and
+  // prefer the fresh raw geometry so newly published address metadata cannot
+  // feed back into the next placement decision and make regeneration drift.
+  const allById = new Map<string, Feature>();
+  for (const feature of grey)
+    allById.set(structureId(feature, sourceName(feature)), feature);
+  for (const feature of existing) {
+    const id = structureId(feature, sourceName(feature));
+    if (!allById.has(id)) allById.set(id, feature);
+  }
+  const all = [...allById.values()];
   const index = new SpatialIndex(all);
   const thresholdM = options.thresholdM ?? DEFAULT_FOOTPRINT_MATCH_THRESHOLD_M;
   const unitsByLocation = new Map<string, AddressUnit[]>();
@@ -437,6 +466,88 @@ export function placeNarLocations(options: {
     placement.address_ids = unitsAtLocation.map((unit) => unit.address_id);
     return placement;
   });
+  const structuresById = new Map(
+    options.structures.map((feature) => [
+      String(feature.properties.structure_id ?? feature.id ?? ""),
+      feature,
+    ]),
+  );
+  const locationById = new Map(options.locations.map((location) => [location.loc_guid, location]));
+  // A coarse `nearest` status is retained for compatibility with existing
+  // consumers, but the published confidence is now evidence-based. In
+  // particular, a BF_REPPOINT can never satisfy the validated-nearest rule.
+  for (const placement of placements) {
+    if (!placement.structure_id) {
+      placement.match_method = "unresolved";
+      placement.confidence_classification = "unresolved";
+      continue;
+    }
+    const location = locationById.get(placement.location_id);
+    const structure = structuresById.get(placement.structure_id);
+    if (!location) continue;
+    const validation = validateNarPlacementEvidence({
+      location,
+      units: options.units ?? [],
+      placement,
+      structure,
+      placements,
+      structures: options.structures,
+      roads: options.roads ?? [],
+    });
+    placement.validation = validation;
+    placement.match_method = placement.status === "exact"
+      ? "nar_contained_footprint"
+      : "nar_nearest";
+    placement.confidence_classification = placement.status === "exact"
+      ? location.coordinate_source === "nar_building"
+        ? "nar_contained_footprint"
+        : "nar_nearest_no_known_conflict"
+      : validation.street_match && validation.side_match && validation.parity_match &&
+          validation.hundred_block_match && validation.neighbouring_sequence_match &&
+          validation.unique_plausible_footprint && validation.conservative_distance_match
+        ? "nar_validated_nearest"
+        : "nar_nearest_no_known_conflict";
+  }
+  // The direct point/containment matcher intentionally leaves ambiguous
+  // points unresolved. A second, constrained pass can resolve only those
+  // cases where official street-side ordering supplies enough evidence. It
+  // never searches for the nearest address city-wide and it never reuses a
+  // structure already occupied by another LOC_GUID.
+  const sequenceAssignments = matchUnresolvedNarLocations({
+    locations: options.locations,
+    units: options.units ?? [],
+    structures: options.structures,
+    roads: options.roads ?? [],
+    placements,
+  });
+  for (const assignment of sequenceAssignments) {
+    const placement = placements.find((candidate) => candidate.location_id === assignment.location_id);
+    if (!placement) continue;
+    const structure = structuresById.get(assignment.structure_id);
+    if (!structure) continue;
+    placement.structure_id = assignment.structure_id;
+    placement.status = "nearest";
+    placement.distance_m = assignment.distance_m;
+    placement.footprint_id = String(structure.properties.external_id ?? structure.id ?? "");
+    placement.footprint_source = sourceName(structure);
+    placement.match_method = assignment.method;
+    placement.confidence_classification = assignment.classification;
+    placement.validation = assignment.evidence;
+    placement.rejection_reason = undefined;
+    if (!placement.candidates.some((candidate) => candidate.structure_id === assignment.structure_id))
+      placement.candidates = [
+        ...placement.candidates,
+        {
+          footprint_id: placement.footprint_id,
+          structure_id: assignment.structure_id,
+          source: placement.footprint_source,
+          distance_m: assignment.distance_m ?? Infinity,
+          centroid_distance_m: assignment.distance_m ?? Infinity,
+          street_compatibility: "match" as const,
+          civic_number_compatibility: "match" as const,
+        },
+      ].slice(0, 8);
+  }
   const byStructure = new Map<string, FootprintPlacement[]>();
   for (const placement of placements) {
     if (!placement.structure_id) continue;
@@ -462,6 +573,9 @@ export function placeNarLocations(options: {
       placement.footprint_id = null;
       placement.footprint_source = null;
       placement.status = "ambiguous";
+      placement.match_method = "unresolved";
+      placement.confidence_classification = "unresolved";
+      placement.validation = undefined;
       placement.rejection_reason =
         "distinct LOC_GUIDs share one footprint without sufficient multi-entrance or apartment evidence";
     }

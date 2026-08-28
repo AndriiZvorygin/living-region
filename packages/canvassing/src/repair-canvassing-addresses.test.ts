@@ -73,6 +73,29 @@ describe("canvassing roof address repair", () => {
     });
   });
 
+  it("does not treat legacy NAR provenance as roof validation", () => {
+    const structures = [roof("roof-1", { civic_label: "1450" })];
+    repairCanvassingStructureAddresses({
+      structures,
+      roads: [road],
+      addresses: [],
+      legacyAddresses: [
+        {
+          type: "Feature",
+          properties: {
+            structure_id: "roof-1",
+            civic_number: "1450",
+            street: "8th Street East",
+            label: "1450 8th Street East",
+            external_source: "statistics_canada_national_address_register",
+          },
+          geometry: { type: "Point", coordinates: [-80.95, 44.57] },
+        },
+      ],
+    });
+    expect(structures[0].properties.address_quality).toBe("legacy_unverified");
+  });
+
   it("never accepts an anonymous or blank canvassable label", () => {
     expect(() =>
       assertNoAnonymousActiveAddressLabels([

@@ -175,6 +175,7 @@ describe("Owen Sound canvassing prepared data", () => {
         [
           "nar_contained_footprint",
           "nar_validated_nearest",
+          "nar_nearest_no_known_conflict",
           "nar_documented_exception",
           "legacy_nar_confirmed",
           "legacy_spatially_consistent",

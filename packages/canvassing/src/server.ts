@@ -2336,16 +2336,17 @@ function prepareTestBulkFixture() {
       Math.hypot(left.lon + 80.943, left.lat - 44.567) -
       Math.hypot(right.lon + 80.943, right.lat - 44.567),
   );
-  // Keep the two review fixtures on separately clickable roofs.  The second
-  // closest operational roof can be completely covered by a neighbouring
-  // MapLibre polygon at the acceptance-test zoom, which would make the
-  // fixture test the renderer's overlap ordering instead of bulk selection.
-  // The third candidate is still in the same central viewport but has a
-  // stable, exposed roof footprint.
-  const review = candidates[0],
-    needsReview = candidates[2],
-    unlinked = candidates.slice(3, 31),
-    previouslyFlyered = candidates[31];
+  // Keep the two review fixtures on separately clickable roofs.  The closest
+  // operational roof can be completely covered by a neighbouring MapLibre
+  // polygon at the acceptance-test zoom, which would make the fixture test
+  // the renderer's overlap ordering instead of bulk selection.  The third
+  // and fifth candidates are in the same central viewport but have stable,
+  // exposed roof footprints; leave a gap between them and the unlinked set
+  // for the same reason.
+  const review = candidates[2],
+    needsReview = candidates[4],
+    unlinked = candidates.slice(5, 33),
+    previouslyFlyered = candidates[33];
   const legacyFixtures = [
     {
       addressId: "address_e2e_ambiguous_review",

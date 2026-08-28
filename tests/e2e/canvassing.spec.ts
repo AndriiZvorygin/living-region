@@ -702,7 +702,6 @@ test.describe("Owen Sound canvassing field workflows", () => {
       .filter(
         (roof) =>
           roof.targetKind === "address_household" &&
-          roof.householdCount === 1 &&
           !roof.flyerIds.includes("flyer-2-current") &&
           !selectedStructureIds.has(roof.id),
       )
@@ -851,11 +850,13 @@ test.describe("Owen Sound canvassing field workflows", () => {
       persisted
         .find((roof) => roof.structureId === fixture.review_structure_id)
         ?.homes.some((home) => home.legacy_history_review === 1),
+      JSON.stringify({ fixture, persisted }),
     ).toBe(true);
     expect(
       persisted
         .find((roof) => roof.structureId === fixture.needs_review_structure_id)
         ?.homes.some((home) => home.legacy_history_review === 1),
+      JSON.stringify({ fixture, persisted }),
     ).toBe(true);
     const recordedEvents = persisted.flatMap((roof) =>
       roof.homes.flatMap((home) =>

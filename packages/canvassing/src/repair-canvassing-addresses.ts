@@ -54,6 +54,7 @@ type LegacyAddress = {
   unit?: string;
   structure_id?: string;
   external_source?: string;
+  address_quality?: string;
 };
 
 /**
@@ -117,11 +118,17 @@ export function repairCanvassingStructureAddresses(options: {
       const placementStatuses = current.map((address) =>
         String(address.properties.nar_placement_status ?? "nearest"),
       );
-      const addressQuality = placementStatuses.every((status) => status === "exact")
-        ? "nar_contained_footprint"
-        : placementStatuses.every((status) => status === "nearest")
-          ? "nar_validated_nearest"
-          : "nar_documented_exception";
+      const placementQualities = current
+        .map((address) => String(address.properties.nar_address_quality ?? ""))
+        .filter(Boolean);
+      const addressQuality = placementQualities.length &&
+          placementQualities.every((quality) => quality === placementQualities[0])
+        ? placementQualities[0]
+        : placementStatuses.every((status) => status === "exact")
+          ? "nar_contained_footprint"
+          : placementStatuses.every((status) => status === "nearest")
+            ? "nar_nearest_no_known_conflict"
+            : "nar_documented_exception";
       const addressIds = current
         .map((address) => String(address.properties.address_id ?? ""))
         .filter((addressId) => addressId.startsWith("address_"));
@@ -177,8 +184,12 @@ export function repairCanvassingStructureAddresses(options: {
       properties.fallback_unit = String(legacy.unit ?? "");
       properties.civic_numbers = [String(legacy.civic_number)];
       properties.civic_label = label;
-      const legacyQuality = String(legacy.external_source ?? "") ===
-        "statistics_canada_national_address_register"
+      // Source provenance alone is not validation. A legacy row may have
+      // been imported from a NAR-shaped file without a credible NAR-to-roof
+      // placement. Only the evidence-based matcher may explicitly promote a
+      // row to `legacy_nar_confirmed`.
+      const legacyQuality = String(legacy.address_quality ?? "") ===
+        "legacy_nar_confirmed"
         ? "legacy_nar_confirmed"
         : "legacy_unverified";
       properties.address_label_source = legacyQuality;

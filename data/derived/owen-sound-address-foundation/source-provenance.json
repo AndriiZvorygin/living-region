@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-27T16:53:44.138Z",
+  "generated_at": "2026-08-28T01:49:46.858Z",
   "geography": {
     "province_code": "35",
     "csd_code": "3542059",
@@ -14,7 +14,7 @@
     "product_url": "https://www150.statcan.gc.ca/n1/pub/46-26-0002/462600022022001-eng.htm",
     "user_guide_url": "https://www150.statcan.gc.ca/n1/pub/46-26-0002/462600022026001-eng.htm",
     "download_url": "https://www150.statcan.gc.ca/n1/pub/46-26-0002/2022001/202606.zip",
-    "retrieval_date": "2026-08-27",
+    "retrieval_date": "2026-08-28",
     "licence": "Statistics Canada Open Licence Agreement",
     "raw_cache_path": "/tmp/living-region-address-cache/202606.zip (outside the repository; override with CANVASS_ADDRESS_SOURCE_CACHE)",
     "raw_files_are_not_committed": true,
@@ -59,14 +59,14 @@
     "unmatched_existing_policy": "retain in SQLite through the existing source_active lifecycle and export for review; do not delete historical households or events"
   },
   "counts": {
-    "existing_total": 7467,
-    "existing_feature_count": 7467,
-    "existing_3426_osm_stops": 3426,
+    "existing_total": 17330,
+    "existing_feature_count": 17330,
+    "existing_3426_osm_stops": 3102,
     "official_primary_units": 10893,
-    "matched_exact": 918,
-    "matched_base_distance": 91,
-    "new": 9884,
-    "unmatched_existing": 6458
+    "matched_exact": 10893,
+    "matched_base_distance": 0,
+    "new": 0,
+    "unmatched_existing": 6437
   },
   "physical_footprint_matching": {
     "threshold_m": 50,

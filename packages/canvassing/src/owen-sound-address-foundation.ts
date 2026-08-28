@@ -170,6 +170,7 @@ type NarPlacementAuditRow = {
   hundred_block_result: string;
   neighbouring_address_sequence_result: string;
   confidence_classification: string;
+  validation_evidence: Record<string, unknown> | null;
   rejection_or_review_reason: string | null;
 };
 
@@ -241,20 +242,21 @@ function buildNarPlacementAudit(
             : "unresolved",
         nearest_candidates: placement?.candidates ?? [],
         selected_match_distance_m: placement?.distance_m ?? null,
-        match_method: status === "exact"
+        match_method: placement?.match_method ?? (status === "exact"
           ? "nar_contained_footprint"
           : status === "nearest"
-            ? "nar_validated_nearest"
-            : "unresolved",
+            ? "nar_nearest"
+            : "unresolved"),
         street_frontage_compatibility: selectedCandidate?.street_compatibility ?? "not_evaluated",
         side_of_road_and_parity_result: resultFor("parity_anomaly"),
         hundred_block_result: resultFor("hundred_block_anomaly"),
         neighbouring_address_sequence_result: resultFor("monotonic_progression_anomaly"),
-        confidence_classification: status === "exact"
+        confidence_classification: placement?.confidence_classification ?? (status === "exact"
           ? "nar_contained_footprint"
           : status === "nearest"
-            ? "nar_validated_nearest"
-            : "unresolved",
+            ? "nar_nearest_no_known_conflict"
+            : "unresolved"),
+        validation_evidence: placement?.validation ?? null,
         rejection_or_review_reason: placement?.rejection_reason ??
           (status === "ambiguous" ? "multiple nearby footprints remain similarly plausible" :
             status === "unmatched" ? "no credible footprint within the conservative match threshold" : null),
@@ -273,6 +275,10 @@ function buildNarPlacementAudit(
     return acc;
   }, {} as Record<string, number>);
   const selectedRows = rows.filter((row) => row.selected_structure_id);
+  const countBy = (values: string[]) => values.reduce((counts, value) => {
+    counts[value] = (counts[value] ?? 0) + 1;
+    return counts;
+  }, {} as Record<string, number>);
   return {
     generated_by: "buildNarPlacementAudit",
     summary: {
@@ -281,6 +287,12 @@ function buildNarPlacementAudit(
       unique_structures_receiving_nar_locations: byStructure.size,
       loc_guid_values_per_structure_distribution: distribution,
       maximum_loc_guid_values_per_structure: Math.max(0, ...[...byStructure.values()].map((values) => values.length)),
+      coordinate_source_counts: countBy(rows.map((row) => row.nar_coordinates.source)),
+      match_method_counts: countBy(rows.map((row) => row.match_method)),
+      confidence_classification_counts: countBy(rows.map((row) => row.confidence_classification)),
+      review_reason_counts: countBy(rows
+        .map((row) => row.rejection_or_review_reason)
+        .filter((reason): reason is string => Boolean(reason))),
       collision_groups: [...byStructure.entries()]
         .filter(([, values]) => values.length > 1)
         .map(([structureId, locs]) => ({ structure_id: structureId, loc_guid_values: locs })),
@@ -982,6 +994,7 @@ export async function writeFoundationOutputs(options: {
     {
       nar_contained_footprint: 0,
       nar_validated_nearest: 0,
+      nar_nearest_no_known_conflict: 0,
       nar_documented_exception: 0,
       legacy_nar_confirmed: 0,
       legacy_spatially_consistent: 0,
@@ -998,18 +1011,24 @@ export async function writeFoundationOutputs(options: {
         const automaticJoinCounts = {
           nar_contained_footprint: 0,
           nar_validated_nearest: 0,
+          nar_nearest_no_known_conflict: 0,
           nar_documented_exception: 0,
+          legacy_nar_confirmed: 0,
+          legacy_spatially_consistent: 0,
+          legacy_unverified: 0,
+          grid_estimated: 0,
           unresolved: 0,
         };
         for (const unit of primary) {
-          const status = primaryPlacementByLocation.get(unit.location_id)?.status;
-          const key = status === "exact"
+          const placement = primaryPlacementByLocation.get(unit.location_id);
+          const status = placement?.status;
+          const key = placement?.confidence_classification ?? (status === "exact"
             ? "nar_contained_footprint"
             : status === "nearest"
-              ? "nar_validated_nearest"
+              ? "nar_nearest_no_known_conflict"
               : status === "ambiguous" || status === "unmatched"
                 ? "unresolved"
-                : "nar_documented_exception";
+                : "nar_documented_exception");
           automaticJoinCounts[key] += 1;
         }
         return {
@@ -1021,11 +1040,18 @@ export async function writeFoundationOutputs(options: {
             primary_nar_locations: primaryLocationIds.size,
             mapped_primary_nar_locations: primaryPlacements.filter((placement) => placement.structure_id).length,
             contained_primary_nar_locations: primaryPlacements.filter((placement) => placement.status === "exact").length,
-            validated_nearest_primary_nar_locations: primaryPlacements.filter((placement) => placement.status === "nearest").length,
+            validated_nearest_primary_nar_locations: primaryPlacements.filter((placement) => placement.confidence_classification === "nar_validated_nearest").length,
+            nearest_no_known_conflict_primary_nar_locations: primaryPlacements.filter((placement) => placement.confidence_classification === "nar_nearest_no_known_conflict").length,
+            street_side_sequence_primary_nar_locations: primaryPlacements.filter((placement) => placement.match_method === "street_side_sequence").length,
             unresolved_primary_nar_locations: primaryPlacements.filter((placement) => ["ambiguous", "unmatched"].includes(placement.status)).length,
             duplicate_normalized_addresses: result.validation.duplicate_normalized_addresses,
             outside_municipal_boundary: result.validation.records_outside_boundary,
             missing_usable_coordinates: result.validation.records_missing_coordinates,
+            coordinate_source_counts: primaryPlacements.reduce((counts, placement) => {
+              const source = String(placement.coordinate_source ?? "unknown");
+              counts[source] = (counts[source] ?? 0) + 1;
+              return counts;
+            }, {} as Record<string, number>),
             multi_unit_locations: [...grouped.values()].filter((units) => units.length > 1).length,
           },
           automatic_join_counts: automaticJoinCounts,

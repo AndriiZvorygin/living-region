@@ -163,6 +163,12 @@ async function main() {
           placementDetailsByLocation.get(unit.location_id)?.status ?? "unmatched",
         nar_placement_distance_m:
           placementDetailsByLocation.get(unit.location_id)?.distance_m ?? null,
+        nar_match_method:
+          placementDetailsByLocation.get(unit.location_id)?.match_method ?? "unresolved",
+        nar_address_quality:
+          placementDetailsByLocation.get(unit.location_id)?.confidence_classification ?? "unresolved",
+        nar_validation:
+          placementDetailsByLocation.get(unit.location_id)?.validation ?? null,
       },
       geometry: {
         type: "Point" as const,
