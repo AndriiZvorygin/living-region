@@ -89,8 +89,8 @@ The normal volunteer setup is:
 1. Open **Users**.
 2. Click **Add User** and enter the display name, username, optional email, and
    volunteer role.
-3. Leave **Email credentials to me** selected if Andrii will forward them, or
-   choose direct delivery when the volunteer email is present.
+3. Direct delivery to the volunteer is selected by default when an email is
+   provided. Choose **Email credentials to me** if Andrii will forward them.
 4. Copy the one-time password if delivery fails, then give the credentials to
    the volunteer privately.
 
