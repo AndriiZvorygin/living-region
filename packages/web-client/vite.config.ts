@@ -16,5 +16,11 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true
-  }
+  },
+  // A developer worktree may contain generated .js twins beside the
+  // maintained TypeScript sources. Prefer TypeScript for extensionless source
+  // imports so production cannot silently bundle a stale generated module.
+  resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+  },
 });

@@ -300,10 +300,6 @@ const coverageClusterRadius = [
   40,
   34,
 ];
-// The map payloads are served immutable by Caddy. Bump this whenever the
-// published roof/target data changes so field browsers cannot retain a
-// pre-selection-target GeoJSON payload indefinitely.
-const canvassingDataVersion = "all-roofs-addressable-20260828-bulk-selection";
 let authenticatedUser: AuthUser | null = null;
 const isVolunteer = () => authenticatedUser?.role === "volunteer";
 const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
@@ -320,8 +316,11 @@ const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
 };
 // Prepared geography is versioned and immutable between data regenerations.
 // Reuse it across reloads instead of redownloading it on every phone visit.
-const fetchStaticJson = async <T>(url: string): Promise<T> => {
-  const response = await fetch(url, { cache: "force-cache" });
+const fetchStaticJson = async <T>(
+  url: string,
+  cache: RequestCache = "force-cache",
+): Promise<T> => {
+  const response = await fetch(url, { cache });
   if (!response.ok) throw new Error(await response.text());
   return response.json();
 };
@@ -562,18 +561,31 @@ export async function canvassingMain() {
   document.querySelector<HTMLInputElement>("#volunteer-mode")!.checked =
     Boolean(isVolunteer());
   const statePromise = fetchJson<State>("/api/canvassing/state");
-  const mapDataPromise = Promise.all([
-    geo(`/canvassing/structures.geojson?v=${canvassingDataVersion}`),
-    geo(`/canvassing/addresses.geojson?v=${canvassingDataVersion}`),
-    geo(`/canvassing/roads.geojson?v=${canvassingDataVersion}`),
-    geo(`/canvassing/boundary.geojson?v=${canvassingDataVersion}`),
-    geo(`/canvassing/address-quality.json?v=${canvassingDataVersion}`),
-    geo(`/canvassing/building-coverage-audit.json?v=${canvassingDataVersion}`),
-    fetchJson<{
-      hidden_parent_ids: string[];
-      features: any[];
-    }>("/api/canvassing/structure-splits"),
-  ]);
+  // Geography files are immutable at the HTTP layer for efficient field
+  // use. The generation timestamp must therefore come from a fresh manifest;
+  // a fixed query string here lets a browser retain a roof/address payload
+  // from an earlier deployment while the API has already moved on.
+  const mapDataPromise = (async () => {
+    const manifest = await fetchStaticJson<{ generated_at?: string }>(
+      `/canvassing/manifest.json?fresh=${Date.now()}`,
+      "no-store",
+    );
+    const version = encodeURIComponent(
+      String(manifest.generated_at ?? `uncached-${Date.now()}`),
+    );
+    return Promise.all([
+      geo(`/canvassing/structures.geojson?v=${version}`),
+      geo(`/canvassing/addresses.geojson?v=${version}`),
+      geo(`/canvassing/roads.geojson?v=${version}`),
+      geo(`/canvassing/boundary.geojson?v=${version}`),
+      geo(`/canvassing/address-quality.json?v=${version}`),
+      geo(`/canvassing/building-coverage-audit.json?v=${version}`),
+      fetchJson<{
+        hidden_parent_ids: string[];
+        features: any[];
+      }>("/api/canvassing/structure-splits"),
+    ]);
+  })();
   // These payloads are independent. Start them together so a slow API or a
   // slow map file does not block the other half of the initial screen.
   let state: State;

@@ -3,7 +3,12 @@
 
 	@canvassing_app path /canvassing /canvassing/
 	header @canvassing_app Cache-Control "no-cache, must-revalidate"
-	@canvassing_data path /canvassing/*.json /canvassing/*.geojson
+	@canvassing_manifest path /canvassing/manifest.json
+	header @canvassing_manifest Cache-Control "no-cache, must-revalidate"
+	@canvassing_data {
+		path /canvassing/*.json /canvassing/*.geojson
+		not path /canvassing/manifest.json
+	}
 	header @canvassing_data Cache-Control "public, max-age=31536000, immutable"
 	# The canvassing UI is a pathname-selected SPA entry point. The public
 	# /canvassing directory also contains data assets, so an implicit directory
