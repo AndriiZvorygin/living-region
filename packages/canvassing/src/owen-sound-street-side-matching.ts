@@ -15,7 +15,8 @@ import type { FootprintPlacement } from "./owen-sound-footprint-placement";
  * based on the observed p95 of the current Owen Sound placement set.
  */
 export const NAR_VALIDATED_DISTANCE_M = 25;
-export const NAR_SEQUENCE_DISTANCE_M = 40;
+/** Building-coordinate sequence assignments must still be physically local. */
+export const NAR_SEQUENCE_DISTANCE_M = 50;
 /** Differences below this are not meaningful orientation evidence. */
 export const ORIENTATION_COST_EPSILON = 0.05;
 /** Keep floating-point DP noise from selecting a different path. */
@@ -33,6 +34,13 @@ export type AddressQualityClassification =
   | "legacy_unverified"
   | "grid_estimated"
   | "unresolved";
+
+/** Small operational provenance value used by the published roof layer. */
+export type AddressSource =
+  | "nar_contained"
+  | "nar_segment_assigned"
+  | "legacy_fallback"
+  | "grid_estimated";
 
 export type StreetSideEvidence = {
   street_match: boolean;
@@ -80,6 +88,7 @@ export type StreetSideAssignment = {
   classification: AddressQualityClassification;
   evidence: StreetSideEvidence;
   cost: number;
+  address_source: "nar_segment_assigned";
 };
 
 type Road = Feature & { properties: Record<string, any> };
@@ -95,6 +104,7 @@ type RoadProjection = {
   fraction: number;
   distance_m: number;
   road: Road | null;
+  segment_key: string | null;
 };
 
 const roadIndexCache = new WeakMap<object, Map<string, Road[]>>();
@@ -112,6 +122,10 @@ const roadsByStreet = (roads: Road[]) => {
   roadIndexCache.set(roads, index);
   return index;
 };
+
+const roadSegmentKey = (road: Road | null) => road
+  ? String(road.properties.road_id ?? road.id ?? "") || null
+  : null;
 
 const numericCivic = (value: unknown) => {
   const match = String(value ?? "").trim().match(/^(\d+)/);
@@ -264,14 +278,50 @@ const sideForNumber = (road: Road, number: number): Side | null => {
   return matches.length === 1 ? matches[0] : null;
 };
 
+const blockAtProjection = (projection: RoadProjection, side = projection.side) => {
+  if (!projection.road || !side) return null;
+  const range = rangeForSide(projection.road, side);
+  if (!range) return null;
+  const interpolated = range.start + (range.end - range.start) * projection.fraction;
+  return Number.isFinite(interpolated) ? Math.floor(interpolated / 100) : null;
+};
+
+/**
+ * A road feature can cover more than one civic block (notably some numbered
+ * streets). A NAR point may be closest to the join between two features, so
+ * the range/block test is deliberately separate from geometric distance.
+ * Both side ranges are considered here: the geometric side remains the side
+ * used for pairing, while the prepared range/parity metadata is a validation
+ * check and must not make reversed line geometry change the result.
+ */
+const numberBelongsToSegment = (projection: RoadProjection, number: number) => {
+  if (!projection.road) return true;
+  const ranges = (["left", "right"] as Side[])
+    .map((side) => ({ side, range: rangeForSide(projection.road!, side) }))
+    .filter((item): item is {
+      side: Side;
+      range: NonNullable<ReturnType<typeof rangeForSide>>;
+    } => Boolean(item.range));
+  if (!ranges.length) return true;
+  return ranges.some(({ side, range }) => {
+    if (number < range.from || number > range.to) return false;
+    if (range.parity && (number % 2 === 0 ? "E" : "O") !== range.parity) return false;
+    const block = blockAtProjection(projection, side);
+    return block == null || civicHundredBlock(number) === block;
+  });
+};
+
 function roadProjection(
   point: Position,
   streetKey: string,
   number: number | null,
   roads: Road[],
 ): RoadProjection {
-  let best: RoadProjection | null = null;
-  for (const road of roadsByStreet(roads).get(streetKey) ?? []) {
+  const candidates: RoadProjection[] = [];
+  const roadCandidates = streetKey
+    ? roadsByStreet(roads).get(streetKey) ?? []
+    : roads;
+  for (const road of roadCandidates) {
     const lines = lineCoordinates(road);
     const roadLength = lines.reduce((total, line) => total + line.slice(1).reduce(
       (length, point, index) => length + metresBetween(line[index], point), 0,
@@ -294,28 +344,51 @@ function roadProjection(
           fraction: roadLength ? (alongRoad + projected.along_m) / roadLength : 0,
           distance_m: projected.distance_m,
           road,
+          segment_key: roadSegmentKey(road),
         } satisfies RoadProjection;
-        if (!best || candidate.distance_m < best.distance_m) best = candidate;
+        candidates.push(candidate);
         alongRoad += length;
       }
     }
   }
-  return best ?? { side: null, along_m: 0, fraction: 0, distance_m: Infinity, road: null };
+  // For official NAR records, exact block membership is the primary choice
+  // when more than one same-named prepared segment is geometrically nearby.
+  // If the road metadata cannot establish a block, retain the nearest
+  // geometric projection as an explicit exception path.
+  const blockCandidates = number == null
+    ? candidates
+    : candidates.filter((candidate) => numberBelongsToSegment(candidate, number));
+  const pool = blockCandidates.length ? blockCandidates : candidates;
+  const best = pool.reduce<RoadProjection | null>(
+    (current, candidate) => !current || candidate.distance_m < current.distance_m ? candidate : current,
+    null,
+  );
+  return best ?? {
+    side: null,
+    along_m: 0,
+    fraction: 0,
+    distance_m: Infinity,
+    road: null,
+    segment_key: null,
+  };
 }
-
-const blockAtProjection = (projection: RoadProjection) => {
-  if (!projection.road || !projection.side) return null;
-  const range = rangeForSide(projection.road, projection.side);
-  if (!range) return null;
-  const interpolated = range.start + (range.end - range.start) * projection.fraction;
-  return Number.isFinite(interpolated) ? Math.floor(interpolated / 100) : null;
-};
 
 const parityMatchesRoadRange = (projection: RoadProjection, number: number | null) => {
   if (!projection.road || number == null || !projection.side) return null;
   const range = rangeForSide(projection.road, projection.side);
   if (!range || !range.parity || number < range.from || number > range.to) return null;
   return (number % 2 === 0 ? "E" : "O") === range.parity;
+};
+
+const authoritativeSide = (projection: RoadProjection, number: number) =>
+  projection.side ?? (projection.road ? sideForNumber(projection.road, number) : null);
+
+const segmentBlockKey = (projection: RoadProjection, side: Side, number?: number | null) => {
+  const block = blockAtProjection(projection, side) ??
+    (number == null ? null : civicHundredBlock(number));
+  return projection.segment_key
+    ? `${projection.segment_key}|${block == null ? "unknown" : block}`
+    : null;
 };
 
 const blockCompatible = (left: number | null, right: number | null) =>
@@ -346,8 +419,8 @@ export function streetSideForPoint(
   ).side;
 }
 
-const streetSideBlockKey = (streetKey: string, side: Side, number: number) =>
-  `${streetKey}|${side}|${Math.floor(number / 100)}`;
+const streetSideSegmentKey = (segmentKey: string, side: Side) =>
+  `${segmentKey}|${side}`;
 
 const roofPoint = (feature: Feature): Position => centroid(feature);
 
@@ -507,10 +580,10 @@ export function validateNarPlacementEvidence(options: {
   const roofPointValue = options.structure ? roofPoint(options.structure) : null;
   const narProjection = official
     ? roadProjection(narPoint, official.street_key, official.number, roads)
-    : { side: null, along_m: 0, fraction: 0, distance_m: Infinity, road: null };
+    : { side: null, along_m: 0, fraction: 0, distance_m: Infinity, road: null, segment_key: null };
   const roofProjectionValue = roof && roofPointValue
     ? roadProjection(roofPointValue, roof.street_key, roof.number, roads)
-    : { side: null, along_m: 0, fraction: 0, distance_m: Infinity, road: null };
+    : { side: null, along_m: 0, fraction: 0, distance_m: Infinity, road: null, segment_key: null };
   const distance = options.structure && options.location.coordinate_source === "nar_building"
     ? distanceToGeometry(narPoint, options.structure.geometry)
     : null;
@@ -603,18 +676,22 @@ function structureCandidate(
   nar: SequenceNar,
   roof: SequenceRoof,
 ) {
-  if (roof.address.street_key !== nar.address.street_key || roof.side !== nar.side)
+  if (roof.segment_key !== nar.segment_key || roof.side !== nar.side)
     return null;
   const distance = nar.location.coordinate_source === "nar_building"
     ? distanceToGeometry(nar.point, feature.geometry)
     : null;
   if (distance != null && distance > NAR_SEQUENCE_DISTANCE_M) return null;
-  const blockMatch = roof.block == null || roof.block === civicHundredBlock(nar.address.number);
-  const parityMatch = roof.address.number % 2 === nar.address.number % 2;
+  const roofNumber = roof.address?.number ?? null;
+  const blockMatch = roof.block == null || roofNumber == null ||
+    roof.block === civicHundredBlock(nar.address.number);
+  const parityMatch = roofNumber == null || roofNumber % 2 === nar.address.number % 2;
   // Civic labels on roofs are often estimates. They remain a weak cost after
   // spatial ordering has been established; they are never used to order a
   // roof and a local number mismatch cannot prevent a spatial correction.
-  const numberPenalty = Math.min(6, Math.abs(nar.address.number - roof.address.number) / 100);
+  const numberPenalty = roofNumber == null
+    ? 0
+    : Math.min(6, Math.abs(nar.address.number - roofNumber) / 100);
   const blockPenalty = blockMatch ? 0 : 4;
   const parityPenalty = parityMatch ? 0 : 1.5;
   const buildingGeometryPenalty = distance == null ? 0 : distance / 20;
@@ -643,13 +720,15 @@ type SequenceNar = {
   side: Side;
   along_m: number;
   point: Position;
+  segment_key: string;
 };
 type SequenceRoof = {
   feature: Feature;
-  address: NumberedAddress;
+  address: NumberedAddress | null;
   side: Side;
   along_m: number;
   block: number | null;
+  segment_key: string;
 };
 
 const stableCompare = (left: { number: number; suffix: string; id: string }, right: { number: number; suffix: string; id: string }) =>
@@ -773,6 +852,7 @@ function matchGroup(
             classification,
             evidence,
             cost: candidate.cost,
+            address_source: "nar_segment_assigned",
           });
         }
       }
@@ -803,7 +883,7 @@ function inferOrientationFromTrustedAnchors(options: {
 }): 1 | -1 | null {
   const group = options.nars[0];
   if (!group) return null;
-  const groupKey = streetSideBlockKey(group.address.street_key, group.side, group.address.number);
+  const groupKey = streetSideSegmentKey(group.segment_key, group.side);
   const structuresById = new Map(options.structures.map((feature) => [
     String(feature.properties.structure_id ?? feature.id), feature,
   ]));
@@ -815,7 +895,12 @@ function inferOrientationFromTrustedAnchors(options: {
     const projection = roadProjection(
       roofPoint(structure), official.street_key, official.number, options.roads,
     );
-    if (!projection.side || streetSideBlockKey(official.street_key, projection.side, official.number) !== groupKey)
+    if (!projection.side || projection.segment_key == null ||
+        !numberBelongsToSegment(projection, official.number))
+      return [];
+    const anchorSegmentKey = segmentBlockKey(projection, projection.side, official.number);
+    if (!anchorSegmentKey ||
+        streetSideSegmentKey(anchorSegmentKey, projection.side) !== groupKey)
       return [];
     return [{ number: official.number, along_m: projection.along_m }];
   }).sort((a, b) => a.number - b.number || a.along_m - b.along_m);
@@ -841,6 +926,15 @@ function chooseOrientationResult(
     return normal.matched > reversed.matched ? normal : reversed;
   if (normal.consistent !== reversed.consistent)
     return normal.consistent > reversed.consistent ? normal : reversed;
+  // Reversing a one-roof (or otherwise uniquely paired) segment does not
+  // change the assignment. Accept it without inventing an orientation
+  // preference; only orientation-dependent pairings need a material cost
+  // difference.
+  const pairKey = (result: MatchGroupResult) => result.assignments
+    .map((assignment) => `${assignment.location_id}|${assignment.structure_id}`)
+    .sort()
+    .join(";");
+  if (pairKey(normal) === pairKey(reversed)) return normal;
   const difference = Math.abs(normal.cost - reversed.cost);
   // If both orientations explain the same number of roofs equally well, do
   // not let an arbitrary legacy label or floating-point noise choose one.
@@ -851,10 +945,13 @@ function chooseOrientationResult(
 }
 
 /**
- * Match unresolved NAR locations to still-unassigned roofs without a
- * city-wide nearest fallback.  The DP permits vacant lots, missing footprints
- * and accessory structures by charging explicit skip penalties; only low-cost
- * one-to-one matches survive.
+ * Match unresolved NAR locations to still-unassigned roofs one prepared road
+ * segment at a time.  The road segment is the unit of geography here: NAR
+ * addresses are ordered by their official civic number, while roofs are
+ * ordered only by their physical projection along that segment.  The small
+ * DP permits vacant lots, missing footprints, accessory structures, and
+ * legitimate civic-number gaps without falling back to a city-wide nearest
+ * building.
  */
 export function matchUnresolvedNarLocations(options: {
   locations: NarLocation[];
@@ -864,12 +961,6 @@ export function matchUnresolvedNarLocations(options: {
   placements: FootprintPlacement[];
 }) {
   const roads = options.roads as Road[];
-  const unitsByLocation = new Map<string, AddressUnit[]>();
-  for (const unit of options.units) {
-    const values = unitsByLocation.get(unit.location_id) ?? [];
-    values.push(unit);
-    unitsByLocation.set(unit.location_id, values);
-  }
   const occupied = new Set(
     options.placements.map((placement) => placement.structure_id).filter((id): id is string => Boolean(id)),
   );
@@ -877,26 +968,36 @@ export function matchUnresolvedNarLocations(options: {
   for (const feature of options.structures) {
     const structureId = String(feature.properties.structure_id ?? feature.id ?? "");
     // Grey footprints are already considered by the direct point/containment
-    // pass.  Generated Grey structures carry a published address label; if
-    // they entered this second pass they would become new sequence candidates
-    // on the next run and make repeated publication drift.  Keep the ordered
-    // fallback limited to the pre-existing roof inventory.
+    // pass. Keep the sequence candidates limited to the pre-existing roof
+    // inventory so a generated Grey clone cannot feed back into publication.
     if (!structureId || occupied.has(structureId) || feature.properties.canvassable === false ||
         feature.properties.external_source === "grey_county_building_footprints")
       continue;
     const parsed = parseRoofAddress(feature, roads);
-    if (!parsed) continue;
-    const projection = roadProjection(roofPoint(feature), parsed.street_key, parsed.number, roads);
-    if (!projection.side) continue;
+    // A legacy roof may have no usable source civic label after the published
+    // address fields have been stripped. It is still a physical canvassing
+    // roof, so project it to its nearest named road and let the official NAR
+    // sequence supply the address. A prior number, when present, is only a
+    // weak cost after the physical ordering has been established.
+    const projection = roadProjection(
+      // A previous roof label is not used to choose the road segment. It is
+      // only retained as weak evidence after the physical projection exists.
+      roofPoint(feature), parsed?.street_key ?? "", null, roads,
+    );
+    const side = projection.side ??
+      (parsed && projection.road ? sideForNumber(projection.road, parsed.number) : null);
+    const segmentKey = side ? segmentBlockKey(projection, side, parsed?.number) : null;
+    if (!side || !segmentKey) continue;
     roofs.push({
       feature,
       address: parsed,
-      side: projection.side,
+      side,
       along_m: projection.along_m,
-      // The road's prepared address range is the primary coarse block
-      // grouping. The old roof number is only a fallback when the road has no
-      // usable range; it never orders the roof.
-      block: blockAtProjection(projection) ?? civicHundredBlock(parsed.number),
+      // The road's prepared range supplies the primary block. The old roof
+      // number is only a fallback on named roads without prepared ranges.
+      block: blockAtProjection(projection, side) ??
+        (parsed ? civicHundredBlock(parsed.number) : null),
+      segment_key: segmentKey,
     });
   }
   const locationsByGroup = new Map<string, SequenceNar[]>();
@@ -911,21 +1012,26 @@ export function matchUnresolvedNarLocations(options: {
       address.number,
       roads,
     );
-    if (!projection.side) continue;
-    const group = streetSideBlockKey(address.street_key, projection.side, address.number);
+    const side = authoritativeSide(projection, address.number);
+    if (!side || !projection.segment_key ||
+        !numberBelongsToSegment(projection, address.number)) continue;
+    const segmentKey = segmentBlockKey(projection, side, address.number);
+    if (!segmentKey) continue;
+    const group = streetSideSegmentKey(segmentKey, side);
     const values = locationsByGroup.get(group) ?? [];
     values.push({
       location,
       address,
-      side: projection.side,
+      side,
       along_m: projection.along_m,
       point: [location.longitude, location.latitude],
+      segment_key: segmentKey,
     });
     locationsByGroup.set(group, values);
   }
   const roofsByGroup = new Map<string, SequenceRoof[]>();
   for (const roof of roofs) {
-    const group = streetSideBlockKey(roof.address.street_key, roof.side, roof.address.number);
+    const group = streetSideSegmentKey(roof.segment_key, roof.side);
     const values = roofsByGroup.get(group) ?? [];
     values.push(roof);
     roofsByGroup.set(group, values);
@@ -939,8 +1045,7 @@ export function matchUnresolvedNarLocations(options: {
       { number: b.address.number, suffix: b.address.suffix, id: b.location.loc_guid },
     ));
     // Official NAR addresses define the civic sequence. Physical roofs are
-    // ordered only by their road projection, never by their prior estimated
-    // civic labels.
+    // ordered only by their road projection, never by their prior civic label.
     candidates.sort((a, b) => a.along_m - b.along_m ||
       String(a.feature.properties.structure_id ?? a.feature.id).localeCompare(
         String(b.feature.properties.structure_id ?? b.feature.id),

@@ -149,7 +149,15 @@ describe("Owen Sound street-side NAR matching", () => {
       roads,
       placements,
     });
-    expect(assignments).toHaveLength(0);
+    // The old roof label is intentionally wrong. Segment ordering is allowed
+    // to correct that approximate label; the authoritative NAR number is not
+    // rejected because of the stale value.
+    expect(assignments).toHaveLength(1);
+    expect(assignments[0]).toMatchObject({
+      location_id: "loc-702",
+      structure_id: "odd-roof",
+      address_source: "nar_segment_assigned",
+    });
   });
 
   it("matches official addresses monotonically one-to-one while permitting a skipped roof", () => {
@@ -184,7 +192,7 @@ describe("Owen Sound street-side NAR matching", () => {
     expect(assignments.every((item) => item.evidence.side_match)).toBe(true);
   });
 
-  it("never calls a BF_REPPOINT proximity/containment match fully validated", () => {
+  it("assigns BF_REPPOINT addresses by segment sequence, never by containment", () => {
     const structure = roof("bf-roof", "702", 0.003, 0.0002);
     const result = placeNarLocations({
       locations: [location("bf-loc", "702", 0.003, 0.0002, "nar_block_face_fallback")],
@@ -193,9 +201,10 @@ describe("Owen Sound street-side NAR matching", () => {
       roads: [road()],
     });
     expect(result.placements[0]).toMatchObject({
-      status: "exact",
-      match_method: "nar_contained_footprint",
-      confidence_classification: "nar_nearest_no_known_conflict",
+      status: "nearest",
+      match_method: "street_side_sequence",
+      confidence_classification: "nar_block_face_sequence",
+      address_source: "nar_segment_assigned",
     });
   });
 
@@ -290,6 +299,95 @@ describe("Owen Sound street-side NAR matching", () => {
       new Map([
         ["loc-702", "roof-at-702"],
         ["loc-706", "roof-at-706"],
+      ]),
+    );
+  });
+
+  it("keeps same-named road segments independent while ordering roofs physically", () => {
+    const firstSegment = road();
+    firstSegment.properties.road_id = "segment-first";
+    const secondSegment = {
+      ...road(),
+      id: "segment-second",
+      properties: { ...road().properties, road_id: "segment-second" },
+      geometry: { type: "LineString" as const, coordinates: [[0.02, 0], [0.03, 0]] },
+    };
+    const firstRoof = roof("first-roof", "798", 0.001);
+    firstRoof.properties.inferred_civic_number = 702;
+    firstRoof.properties.address_range_road_id = "segment-first";
+    const secondRoof = roof("second-roof", "702", 0.021);
+    secondRoof.properties.inferred_civic_number = 706;
+    secondRoof.properties.address_range_road_id = "segment-second";
+    const locations = [location("loc-first", "702", 0.001), location("loc-second", "706", 0.021)];
+    const placements = locations.map((item) => ({
+      location_id: item.loc_guid,
+      structure_id: null,
+      status: "unmatched" as const,
+      distance_m: null,
+      footprint_id: null,
+      footprint_source: null,
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+    }));
+    const assignments = matchUnresolvedNarLocations({
+      locations,
+      units: [unit("loc-first", "702"), unit("loc-second", "706")],
+      structures: [firstRoof, secondRoof],
+      roads: [firstSegment, secondSegment],
+      placements,
+    });
+    expect(new Map(assignments.map((item) => [item.location_id, item.structure_id]))).toEqual(
+      new Map([["loc-first", "first-roof"], ["loc-second", "second-roof"]]),
+    );
+  });
+
+  it("uses the exact civic hundred block before geometric proximity at a segment join", () => {
+    const firstSegment = road();
+    firstSegment.properties.road_id = "block-7";
+    const secondSegment = {
+      ...road(),
+      id: "block-8",
+      properties: {
+        ...road().properties,
+        road_id: "block-8",
+        left_from: 800,
+        left_to: 898,
+        right_from: 801,
+        right_to: 899,
+      },
+      geometry: { type: "LineString" as const, coordinates: [[0.01, 0], [0.02, 0]] },
+    };
+    const locations = [
+      location("loc-702", "702", 0.005),
+      // At the shared endpoint, the block range—not nearest geometry—must
+      // place 802 on the second segment.
+      location("loc-802", "802", 0.01),
+    ];
+    const structures = [
+      roof("roof-702", "999", 0.005),
+      roof("roof-802", "999", 0.01005),
+    ];
+    const placements = locations.map((item) => ({
+      location_id: item.loc_guid,
+      structure_id: null,
+      status: "unmatched" as const,
+      distance_m: null,
+      footprint_id: null,
+      footprint_source: null,
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+    }));
+    const assignments = matchUnresolvedNarLocations({
+      locations,
+      units: [unit("loc-702", "702"), unit("loc-802", "802")],
+      structures,
+      roads: [firstSegment, secondSegment],
+      placements,
+    });
+    expect(new Map(assignments.map((item) => [item.location_id, item.structure_id]))).toEqual(
+      new Map([
+        ["loc-702", "roof-702"],
+        ["loc-802", "roof-802"],
       ]),
     );
   });

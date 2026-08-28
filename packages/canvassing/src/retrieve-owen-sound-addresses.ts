@@ -66,6 +66,7 @@ const DERIVED_STRUCTURE_ADDRESS_KEYS = new Set([
   "civic_numbers",
   "civic_label",
   "address_source_status",
+  "address_source",
   "address_quality",
   "address_relation",
   "address_relation_confidence",
@@ -301,8 +302,8 @@ async function main() {
         grey_snapshot_path: "data/canvassing/grey-building-footprints-owen-sound.geojson",
         fallback_structure_path: "packages/web-client/public/canvassing/structures.geojson",
         placement_statuses: "exact, nearest, street-side sequence, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved",
-        ordering: "sequence matching orders roofs by physical road along_m and official NAR addresses by civic number/suffix; trusted building-coordinate anchors determine or validate orientation, and unresolved orientation remains unassigned",
-        coordinate_sources: "nar_building coordinates are used for containment and conservative distance validation; BF_REPPOINT block-face coordinates are used only for street-side sequence matching and are reported separately",
+        ordering: "sequence matching groups one prepared road segment, interpolated civic hundred block, and physical side at a time, restricts NAR numbers to that exact block, orders roofs by physical road along_m and official NAR addresses by civic number/suffix, and uses trusted building-coordinate anchors or a guarded two-orientation comparison; explicit skips handle vacant or missing roofs",
+        coordinate_sources: "nar_building coordinates are used for containment and conservative 50m sequence matching; BF_REPPOINT block-face coordinates are used only for same-segment street-side sequence matching and are reported separately",
       },
       numbering_validation: {
         rules: "Owen Sound numbered-grid parity, direction, hundred-block, cross-road, and monotonic progression checks; authoritative NAR values are preserved and anomalies are review flags",

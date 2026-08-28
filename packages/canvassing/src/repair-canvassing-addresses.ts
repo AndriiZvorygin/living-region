@@ -145,6 +145,10 @@ export function repairCanvassingStructureAddresses(options: {
       properties.residential_unit_count = current.length;
       properties.address_quality = addressQuality;
       properties.address_source_status = "authoritative";
+      properties.address_source = current.some((address) =>
+        String(address.properties.nar_match_method ?? "") !== "nar_contained_footprint" ||
+        String(address.properties.nar_placement_status ?? "") !== "exact",
+      ) ? "nar_segment_assigned" : "nar_contained";
       properties.address_label_source = addressQuality;
       properties.address_relation = "statcan_authoritative_location";
       properties.address_relation_confidence = addressQuality;
@@ -195,6 +199,7 @@ export function repairCanvassingStructureAddresses(options: {
       properties.address_label_source = legacyQuality;
       properties.address_source_status = "legacy_fallback";
       properties.address_quality = legacyQuality;
+      properties.address_source = "legacy_fallback";
       properties.address_relation = "legacy_same_structure";
       properties.address_relation_confidence = legacyQuality;
       properties.address_count = 1;
@@ -218,6 +223,7 @@ export function repairCanvassingStructureAddresses(options: {
       properties.address_label_source = "legacy_unverified";
       properties.address_source_status = "legacy_fallback";
       properties.address_quality = "legacy_unverified";
+      properties.address_source = "legacy_fallback";
       properties.address_relation = "prior_nar_same_structure_unverified";
       properties.address_relation_confidence = "legacy_unverified";
       properties.address_count = 1;
@@ -244,6 +250,7 @@ export function repairCanvassingStructureAddresses(options: {
       properties.address_label_source = "owen_sound_grid_estimate";
       properties.address_source_status = "estimated";
       properties.address_quality = "grid_estimated";
+      properties.address_source = "grid_estimated";
       properties.address_relation = "grid_estimated_same_road";
       properties.address_relation_confidence = "estimated";
       properties.address_count = 1;
@@ -257,6 +264,7 @@ export function repairCanvassingStructureAddresses(options: {
       properties.civic_label = "";
       properties.address_quality = "unresolved";
       properties.address_source_status = "unresolved";
+      properties.address_source = "legacy_fallback";
       properties.selection_target_kind = "operational_roof";
       properties.selection_target_ids = [
         operationalTargetForStructure(structureId).householdId,

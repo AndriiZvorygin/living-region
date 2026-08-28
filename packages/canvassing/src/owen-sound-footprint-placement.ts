@@ -17,6 +17,7 @@ import {
   matchUnresolvedNarLocations,
   validateNarPlacementEvidence,
   type AddressQualityClassification,
+  type AddressSource,
   type StreetSideEvidence,
 } from "./owen-sound-street-side-matching";
 
@@ -59,6 +60,8 @@ export type FootprintPlacement = {
   /** Placement method and confidence are separate from the coarse status. */
   match_method?: "nar_contained_footprint" | "nar_nearest" | "street_side_sequence" | "unresolved";
   confidence_classification?: AddressQualityClassification;
+  /** Compact provenance used by the field-facing structure layer. */
+  address_source?: AddressSource;
   validation?: StreetSideEvidence;
 };
 
@@ -490,11 +493,29 @@ export function placeNarLocations(options: {
     // street or civic number, leave this LOC_GUID unresolved for review.
     // Never fall back to a city-wide nearest building. An unresolved NAR
     // location is safer than a false civic-address association.
-    const placement = chooseCandidate(point, poolEntries.map((item) => item.feature), thresholdM, {
-      civicNumbers,
-      officialStreet,
-      preferredStructureId: options.preferredStructureByLocation?.get(location.loc_guid),
-    });
+    // A BF_REPPOINT is shared block-face evidence, not a building location.
+    // Never let the representative point happen to fall inside one roof and
+    // turn that roof into a false containment match. The street-segment pass
+    // below distributes BF addresses by official civic order and physical
+    // roof order instead.
+    const placement = location.coordinate_source === "nar_block_face_fallback"
+      ? {
+          location_id: "",
+          structure_id: null,
+          status: "unmatched" as const,
+          distance_m: null,
+          footprint_id: null,
+          footprint_source: null,
+          candidates: compatibleNearby.slice(0, 8).map((item) => candidateFor(item.feature, point, { civicNumbers, officialStreet })),
+          point,
+          official_street: officialStreet,
+          rejection_reason: "BF_REPPOINT is assigned by road-segment sequence, not point containment",
+        }
+      : chooseCandidate(point, poolEntries.map((item) => item.feature), thresholdM, {
+          civicNumbers,
+          officialStreet,
+          preferredStructureId: options.preferredStructureByLocation?.get(location.loc_guid),
+        });
     placement.location_id = location.loc_guid;
     placement.coordinate_source = location.coordinate_source;
     placement.address_ids = unitsAtLocation.map((unit) => unit.address_id);
@@ -546,6 +567,10 @@ export function placeNarLocations(options: {
           validation.unique_plausible_footprint && validation.conservative_distance_match
         ? "nar_building_validated_nearest"
         : "nar_nearest_no_known_conflict";
+    placement.address_source = placement.status === "exact" &&
+      location.coordinate_source === "nar_building"
+      ? "nar_contained"
+      : "nar_segment_assigned";
   }
   // The direct point/containment matcher intentionally leaves ambiguous
   // points unresolved. A second, constrained pass can resolve only those
@@ -571,6 +596,7 @@ export function placeNarLocations(options: {
     placement.footprint_source = sourceName(structure);
     placement.match_method = assignment.method;
     placement.confidence_classification = assignment.classification;
+    placement.address_source = assignment.address_source;
     placement.validation = assignment.evidence;
     placement.rejection_reason = undefined;
     if (!placement.candidates.some((candidate) => candidate.structure_id === assignment.structure_id))
@@ -713,6 +739,7 @@ export function applyAuthoritativePlacements(options: {
     unitsByLocation.set(unit.location_id, list);
   }
   const primaryByStructure = new Map<string, AddressUnit[]>();
+  const placementsByStructure = new Map<string, FootprintPlacement[]>();
   for (const placement of options.placements) {
     if (!placement.structure_id) continue;
     const units = (unitsByLocation.get(placement.location_id) ?? []).filter((unit) =>
@@ -722,6 +749,10 @@ export function applyAuthoritativePlacements(options: {
     primaryByStructure.set(placement.structure_id, [
       ...(primaryByStructure.get(placement.structure_id) ?? []),
       ...units,
+    ]);
+    placementsByStructure.set(placement.structure_id, [
+      ...(placementsByStructure.get(placement.structure_id) ?? []),
+      placement,
     ]);
     const structure = byStructure.get(placement.structure_id);
     if (structure) {
@@ -758,6 +789,12 @@ export function applyAuthoritativePlacements(options: {
     structure.properties.authoritative_address_labels = baseLabels;
     structure.properties.authoritative_address_ids = units.map((unit) => unit.address_id);
     structure.properties.address_label_source = "statistics_canada_national_address_register";
+    const structurePlacements = placementsByStructure.get(structureIdValue) ?? [];
+    structure.properties.address_source = structurePlacements.some((placement) =>
+        placement.address_source === "nar_segment_assigned" ||
+        placement.match_method !== "nar_contained_footprint" ||
+        placement.coordinate_source !== "nar_building",
+      ) ? "nar_segment_assigned" : "nar_contained";
     structure.properties.address_source_status = "authoritative";
     structure.properties.residential_unit_count = units.length;
   }

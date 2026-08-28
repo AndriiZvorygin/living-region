@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-28T08:02:09.310Z",
+  "generated_at": "2026-08-28T12:17:10.951Z",
   "crs": "OGC:CRS84 / WGS84 longitude-latitude",
   "counts": {
     "structures": 8482,
@@ -8,20 +8,26 @@
     "canvassable_structures_without_selection_target": 0,
     "primary_nar_address_units": 10893,
     "primary_nar_physical_locations": 6841,
-    "primary_nar_locations_with_structure": 3568,
+    "primary_nar_locations_with_structure": 3891,
     "roads": 883,
     "address_classification_counts": {
       "nar_building_contained": 396,
       "nar_building_validated_nearest": 0,
       "nar_building_sequence": 0,
       "nar_block_face_sequence": 0,
-      "nar_nearest_no_known_conflict": 3124,
+      "nar_nearest_no_known_conflict": 3447,
       "nar_documented_exception": 0,
       "legacy_nar_confirmed": 0,
       "legacy_spatially_consistent": 0,
-      "legacy_unverified": 4021,
-      "grid_estimated": 862,
+      "legacy_unverified": 3751,
+      "grid_estimated": 809,
       "unresolved": 0
+    },
+    "address_source_counts": {
+      "legacy_fallback": 3751,
+      "grid_estimated": 809,
+      "nar_segment_assigned": 3447,
+      "nar_contained": 396
     }
   },
   "address_foundation": {

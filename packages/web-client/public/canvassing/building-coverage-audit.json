@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-28T08:02:09.313Z",
+  "generated_at": "2026-08-28T12:17:10.954Z",
   "generated_by": "retrieve-owen-sound-addresses",
   "civic_addresses": 10893,
   "total_display_footprints": 8482,
@@ -11,12 +11,12 @@
     "nar_building_validated_nearest": 0,
     "nar_building_sequence": 0,
     "nar_block_face_sequence": 0,
-    "nar_nearest_no_known_conflict": 3124,
+    "nar_nearest_no_known_conflict": 3447,
     "nar_documented_exception": 0,
     "legacy_nar_confirmed": 0,
     "legacy_spatially_consistent": 0,
-    "legacy_unverified": 4021,
-    "grid_estimated": 862,
+    "legacy_unverified": 3751,
+    "grid_estimated": 809,
     "unresolved": 0
   },
   "generated_geometry_conflicts": 0,
@@ -28,10 +28,10 @@
   },
   "address_placement": {
     "primary_loc_guid_values": 6841,
-    "loc_guid_values_assigned_to_structure": 3568,
-    "unique_structures_receiving_nar_locations": 3520,
+    "loc_guid_values_assigned_to_structure": 3891,
+    "unique_structures_receiving_nar_locations": 3843,
     "loc_guid_values_per_structure_distribution": {
-      "1": 3482,
+      "1": 3805,
       "2": 29,
       "3": 8,
       "4": 1
@@ -42,40 +42,41 @@
       "nar_block_face_fallback": 1121
     },
     "match_method_counts": {
-      "nar_contained_footprint": 471,
-      "nar_nearest": 2618,
-      "unresolved": 3273,
-      "street_side_sequence": 479
+      "nar_contained_footprint": 444,
+      "nar_nearest": 2535,
+      "unresolved": 2950,
+      "street_side_sequence": 912
     },
     "confidence_classification_counts": {
       "nar_building_contained": 444,
-      "nar_nearest_no_known_conflict": 3124,
-      "unresolved": 3273
+      "nar_nearest_no_known_conflict": 3447,
+      "unresolved": 2950
     },
     "sequence_assignment_counts_by_coordinate_source": {
-      "nar_building": 462,
-      "nar_block_face_fallback": 17
+      "nar_building": 831,
+      "nar_block_face_fallback": 81
     },
     "sequence_assignment_counts_by_ordering_basis": {
-      "two_orientation_comparison": 424,
-      "trusted_anchors": 55
+      "two_orientation_comparison": 845,
+      "trusted_anchors": 67
     },
     "building_coordinate_sequence_distance_m": {
-      "p50": 11.146441689027672,
-      "p90": 30.36315835629923,
-      "p95": 34.445331928862686,
-      "max": 39.986789539890715
+      "p50": 10.514242201564148,
+      "p90": 31.62872018119686,
+      "p95": 38.8298012836867,
+      "max": 49.45119296089255
     },
     "block_face_sequence_coordinate_offset_m": {
-      "p50": 51.78197466280589,
-      "p90": 96.86122543140833,
-      "p95": 119.48513021823082,
-      "max": 148.280704338883
+      "p50": 42.0707507725195,
+      "p90": 283.20002302201226,
+      "p95": 367.8374341444969,
+      "max": 451.2410324098086
     },
     "review_reason_counts": {
-      "distinct LOC_GUIDs share one footprint without sufficient multi-entrance or apartment evidence": 2257,
-      "multiple nearby footprints remain similarly plausible": 977,
-      "no credible footprint within the conservative match threshold": 39
+      "distinct LOC_GUIDs share one footprint without sufficient multi-entrance or apartment evidence": 1625,
+      "BF_REPPOINT is assigned by road-segment sequence, not point containment": 1040,
+      "multiple nearby footprints remain similarly plausible": 254,
+      "no credible footprint within the conservative match threshold": 31
     },
     "collision_groups": [
       {
@@ -359,6 +360,6 @@
     "parity_anomalies": 335,
     "hundred_block_anomalies": 161,
     "neighbouring_address_sequence_anomalies": 763,
-    "nar_locations_with_no_credible_structure_match": 3273
+    "nar_locations_with_no_credible_structure_match": 2950
   }
 }

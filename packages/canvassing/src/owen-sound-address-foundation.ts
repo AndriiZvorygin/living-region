@@ -1036,6 +1036,14 @@ export async function writeFoundationOutputs(options: {
       unresolved: 0,
     } as Record<string, number>,
   );
+  const publishedAddressSourceCounts = publishedCanvassableStructures.reduce(
+    (counts, feature) => {
+      const source = String(feature.properties.address_source ?? "unknown");
+      counts[source] = (counts[source] ?? 0) + 1;
+      return counts;
+    },
+    {} as Record<string, number>,
+  );
   const primaryPlacementByLocation = new Map(
     primaryPlacements.map((placement) => [placement.location_id, placement]),
   );
@@ -1090,7 +1098,8 @@ export async function writeFoundationOutputs(options: {
             multi_unit_locations: [...grouped.values()].filter((units) => units.length > 1).length,
           },
           automatic_join_counts: automaticJoinCounts,
-          methodology: "Statistics Canada June 2026 NAR CIVIC_NO and official street fields are authoritative. BG building coordinates are preferred; BF_REPPOINT is used only as a labelled fallback. A NAR unit is mapped only to a containing or conservative, address-compatible footprint. Unresolved placement is retained as a review flag and never blocks canvassing.",
+          methodology: "Statistics Canada June 2026 NAR CIVIC_NO and official street fields are authoritative. BG building coordinates are preferred; BF_REPPOINT is assigned only by same-segment street-side sequence. NAR locations are grouped by prepared road segment, interpolated civic hundred block, and side, official addresses are restricted to that exact block and ordered by civic number/suffix, and roofs are ordered by physical along-segment position with explicit skips. Unresolved placement is retained as a review flag and never blocks canvassing.",
+          address_source_counts: publishedAddressSourceCounts,
         };
       })()
     : null;
@@ -1111,6 +1120,7 @@ export async function writeFoundationOutputs(options: {
           primary_nar_locations_with_structure: primaryPlacements.filter((placement) => placement.structure_id).length,
           roads: options.roadCount ?? null,
           address_classification_counts: publishedAddressClassificationCounts,
+          address_source_counts: publishedAddressSourceCounts,
         },
         address_foundation: {
           source: "statistics_canada_national_address_register",
