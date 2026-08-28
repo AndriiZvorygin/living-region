@@ -3287,7 +3287,7 @@ const server = createServer(async (req, res) => {
         revisit_requested: Boolean(input.revisit_requested),
         no_answer: Boolean(input.no_answer),
         flyer_id: input.flyer_delivered
-          ? String(input.flyer_id ?? LEGACY_FLYER_ID)
+          ? String(input.flyer_id ?? CURRENT_FLYER_ID)
           : null,
         allow_duplicate_flyer: Boolean(input.allow_duplicate_flyer),
         issue_categories: input.issue_categories ?? [],
@@ -3434,7 +3434,7 @@ const server = createServer(async (req, res) => {
           source: input.source ?? "manual_correction",
           previous_event_id: previous?.id ?? null,
           flyer_id: flyerDelivered
-            ? String(input.flyer_id ?? LEGACY_FLYER_ID)
+            ? String(input.flyer_id ?? CURRENT_FLYER_ID)
             : null,
         };
       if (event.flyer_id) {

@@ -456,11 +456,14 @@ test.describe("Owen Sound canvassing field workflows", () => {
     );
   });
 
-  test("mobile bulk delivery selects roofs, requires a flyer, and marks them", async ({
+  test("mobile bulk delivery defaults to the city flyer and marks roofs", async ({
     page,
   }) => {
     await openCanvassing(page);
     await page.locator("#mobile-menu").click();
+    await expect(page.locator("#mobile-active-flyer")).toHaveValue(
+      "flyer-2-current",
+    );
     await page.locator("#mobile-bulk-open").click();
     await expect(page.locator("#multi-select")).toHaveText("Done selecting");
     await expect(page.locator("#coverage-toggle")).toHaveText("Coverage");
@@ -471,22 +474,6 @@ test.describe("Owen Sound canvassing field workflows", () => {
     await expect(page.locator("#bulk-selection-status")).toContainText(
       "2 households selected",
     );
-    await page.locator("#bulk-flyer").click();
-    await expect(page.locator("#mobile-menu-sheet")).toBeVisible();
-    await expect(page.locator("#toast")).toContainText("Choose an active flyer");
-    await page.locator("#mobile-active-flyer").selectOption("flyer-2-current");
-    await page.locator("#mobile-menu-close").click();
-    await page.reload({ waitUntil: "domcontentloaded" });
-    await waitForMapReady(page);
-    await page.locator("#mobile-menu").click();
-    await expect(page.locator("#mobile-active-flyer")).toHaveValue(
-      "flyer-2-current",
-    );
-    await page.locator("#mobile-menu-close").click();
-    await expect(page.locator("#bulk-selection-status")).toContainText(
-      "2 households selected",
-    );
-
     await page.locator("#bulk-flyer").click();
     await expect(page.locator("#toast")).toContainText("marked flyer delivered", {
       timeout: 10_000,

@@ -192,6 +192,7 @@ type FieldPrefs = {
   active_flyer_id: string;
   flyer_filter: string;
 };
+const DEFAULT_ACTIVE_FLYER_ID = "flyer-2-current";
 const statusColors: Record<string, string> = {
   untouched: "#8b9297",
   flyer_delivered: "#edc949",
@@ -592,11 +593,17 @@ export async function canvassingMain() {
       splitCorrections,
     ],
   ] = await Promise.all([statePromise, mapDataPromise]);
-  let activeFlyerId = saved.active_flyer_id ?? "";
-  let flyerFilter = saved.flyer_filter ?? "";
   const availableFlyers = state.flyers ?? [];
-  if (!availableFlyers.some((flyer) => flyer.id === activeFlyerId))
-    activeFlyerId = "";
+  const defaultActiveFlyerId =
+    availableFlyers.find(
+      (flyer) => flyer.id === DEFAULT_ACTIVE_FLYER_ID && Boolean(flyer.active),
+    )?.id ?? availableFlyers.find((flyer) => Boolean(flyer.active))?.id ?? "";
+  let activeFlyerId = saved.active_flyer_id || defaultActiveFlyerId;
+  let flyerFilter = saved.flyer_filter ?? "";
+  if (!availableFlyers.some((flyer) => flyer.id === activeFlyerId && Boolean(flyer.active)))
+    activeFlyerId = defaultActiveFlyerId;
+  if (activeFlyerId !== saved.active_flyer_id)
+    persist({ active_flyer_id: activeFlyerId });
   if (
     flyerFilter &&
     !availableFlyers.some((flyer) => flyer.id === flyerFilter)
@@ -1915,13 +1922,16 @@ export async function canvassingMain() {
   }
   function renderFlyerControls() {
     if (
-      activeFlyerId &&
       !state.flyers.some(
         (flyer) => flyer.id === activeFlyerId && Boolean(flyer.active),
       )
     ) {
-      activeFlyerId = "";
-      persist({ active_flyer_id: "" });
+      activeFlyerId =
+        state.flyers.find(
+          (flyer) =>
+            flyer.id === DEFAULT_ACTIVE_FLYER_ID && Boolean(flyer.active),
+        )?.id ?? state.flyers.find((flyer) => Boolean(flyer.active))?.id ?? "";
+      persist({ active_flyer_id: activeFlyerId });
     }
     if (flyerFilter && !state.flyers.some((flyer) => flyer.id === flyerFilter)) {
       flyerFilter = "";
@@ -1943,7 +1953,7 @@ export async function canvassingMain() {
     for (const id of ["active-flyer", "mobile-active-flyer"]) {
       const select = document.querySelector<HTMLSelectElement>(`#${id}`);
       if (!select) continue;
-      select.innerHTML = `<option value="">Choose flyer</option>${activeOptions}`;
+      select.innerHTML = activeOptions;
       select.value = activeFlyerId;
     }
     for (const id of ["flyer-filter", "mobile-flyer-filter"]) {
@@ -1954,7 +1964,7 @@ export async function canvassingMain() {
     }
     const label = activeFlyerId
       ? `Flyer: ${flyerLabel(activeFlyerId)}`
-      : "Flyer: choose";
+      : "Flyer unavailable";
     for (const id of ["mobile-active-flyer-chip", "mobile-route-flyer-chip"]) {
       const chip = document.querySelector<HTMLElement>(`#${id}`);
       if (chip) chip.textContent = label;
@@ -2749,11 +2759,10 @@ export async function canvassingMain() {
       return toast("Change at least one household status");
     let allowDuplicateFlyer = false;
     if (flyerAdded) {
-      if (!activeFlyerId)
-        return toast("Choose an active flyer before recording delivery");
-      if (active.flyer_ids?.includes(activeFlyerId)) {
+      const deliveryFlyerId = activeFlyerId || DEFAULT_ACTIVE_FLYER_ID;
+      if (active.flyer_ids?.includes(deliveryFlyerId)) {
         allowDuplicateFlyer = window.confirm(
-          `${flyerLabel(activeFlyerId)} was already delivered here. Deliver it again intentionally?`,
+          `${flyerLabel(deliveryFlyerId)} was already delivered here. Deliver it again intentionally?`,
         );
         if (!allowDuplicateFlyer) return;
       }
@@ -2782,7 +2791,9 @@ export async function canvassingMain() {
             occurred_at: occurredAt,
             outcome,
             flyer_delivered: flyerAdded,
-            flyer_id: flyerAdded ? activeFlyerId : null,
+            flyer_id: flyerAdded
+              ? activeFlyerId || DEFAULT_ACTIVE_FLYER_ID
+              : null,
             allow_duplicate_flyer: allowDuplicateFlyer,
             door_knocked: noAnswer || talked || Boolean(politicalOutcome),
             conversation_occurred: talked || Boolean(politicalOutcome),
@@ -3646,21 +3657,16 @@ export async function canvassingMain() {
   });
   document.querySelector("#bulk-flyer")!.addEventListener("click", async () => {
     if (submitting || !selected.size) return;
-    if (!activeFlyerId) {
-      toast("Choose an active flyer before marking delivery");
-      if (window.matchMedia("(max-width: 760px)").matches)
-        setMobilePanel(mobilePanels[0], true);
-      return;
-    }
+    const deliveryFlyerId = activeFlyerId || DEFAULT_ACTIVE_FLYER_ID;
     const householdIds = [...selected];
     const duplicateCount = householdIds.filter((householdId) =>
       state.households
         .find((home) => home.household_id === householdId)
-        ?.flyer_ids?.includes(activeFlyerId),
+        ?.flyer_ids?.includes(deliveryFlyerId),
     ).length;
     const allowDuplicateFlyer = duplicateCount
       ? window.confirm(
-          `${duplicateCount} selected household${duplicateCount === 1 ? " has" : "s have"} already received ${flyerLabel(activeFlyerId)}. Deliver again intentionally?`,
+          `${duplicateCount} selected household${duplicateCount === 1 ? " has" : "s have"} already received ${flyerLabel(deliveryFlyerId)}. Deliver again intentionally?`,
         )
       : false;
     if (duplicateCount && !allowDuplicateFlyer) return;
@@ -3678,7 +3684,7 @@ export async function canvassingMain() {
               household_id,
               outcome: "flyer_delivered",
               flyer_delivered: true,
-              flyer_id: activeFlyerId,
+              flyer_id: deliveryFlyerId,
               allow_duplicate_flyer: allowDuplicateFlyer,
               door_knocked: false,
               source: isVolunteer()

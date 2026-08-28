@@ -273,18 +273,18 @@ describe.sequential("canvassing weekly workflow API", () => {
     });
     routeId = route.data.id;
     for (const [index, householdId] of sourceHouseholds.entries()) {
-      expect(
-        (
-          await request("/visits", {
-            submission_key: `flyer-${index}`,
-            household_id: householdId,
-            route_id: routeId,
-            outcome: "flyer_delivered",
-            flyer_delivered: true,
-            door_knocked: false,
-          })
-        ).status,
-      ).toBe(201);
+      const delivery = await request("/visits", {
+        submission_key: `flyer-${index}`,
+        household_id: householdId,
+        route_id: routeId,
+        outcome: "flyer_delivered",
+        flyer_delivered: true,
+        door_knocked: false,
+        flyer_id: "flyer-1-original",
+      });
+      expect(delivery.status).toBe(201);
+      if (index === 0)
+        expect(delivery.data.flyer_id).toBe("flyer-1-original");
     }
     const sample = await request(`/routes/${routeId}/followup-sample`, {
       flyer_date: "2026-07-20",
@@ -370,6 +370,21 @@ describe.sequential("canvassing weekly workflow API", () => {
     expect(await readFile(join(directory, "events.jsonl"), "utf8")).toContain(
       '"flyer_id":"flyer-2-current"',
     );
+  });
+
+  it("defaults an unspecified new delivery to the current city flyer", async () => {
+    const state = (await request("/state")).data;
+    const household = state.households.find((home: any) => !home.flyer_delivered);
+    expect(household).toBeTruthy();
+    const delivery = await request("/visits", {
+      submission_key: "city-flyer-default",
+      household_id: household.household_id,
+      outcome: "flyer_delivered",
+      flyer_delivered: true,
+      door_knocked: false,
+    });
+    expect(delivery.status).toBe(201);
+    expect(delivery.data.flyer_id).toBe("flyer-2-current");
   });
 
   it("records flyer, conversation, revisit, and political outcome together", async () => {
