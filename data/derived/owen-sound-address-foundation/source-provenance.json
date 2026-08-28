@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-28T01:49:46.858Z",
+  "generated_at": "2026-08-28T08:02:08.937Z",
   "geography": {
     "province_code": "35",
     "csd_code": "3542059",
@@ -72,7 +72,9 @@
     "threshold_m": 50,
     "grey_snapshot_path": "data/canvassing/grey-building-footprints-owen-sound.geojson",
     "fallback_structure_path": "packages/web-client/public/canvassing/structures.geojson",
-    "placement_statuses": "exact, nearest, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved"
+    "placement_statuses": "exact, nearest, street-side sequence, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved",
+    "ordering": "sequence matching orders roofs by physical road along_m and official NAR addresses by civic number/suffix; trusted building-coordinate anchors determine or validate orientation, and unresolved orientation remains unassigned",
+    "coordinate_sources": "nar_building coordinates are used for containment and conservative distance validation; BF_REPPOINT block-face coordinates are used only for street-side sequence matching and are reported separately"
   },
   "numbering_validation": {
     "rules": "Owen Sound numbered-grid parity, direction, hundred-block, cross-road, and monotonic progression checks; authoritative NAR values are preserved and anomalies are review flags",

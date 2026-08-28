@@ -173,8 +173,10 @@ describe("Owen Sound canvassing prepared data", () => {
     expect(
       canvassable.every((feature: any) =>
         [
-          "nar_contained_footprint",
-          "nar_validated_nearest",
+          "nar_building_contained",
+          "nar_building_validated_nearest",
+          "nar_building_sequence",
+          "nar_block_face_sequence",
           "nar_nearest_no_known_conflict",
           "nar_documented_exception",
           "legacy_nar_confirmed",

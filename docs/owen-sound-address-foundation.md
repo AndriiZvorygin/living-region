@@ -129,19 +129,21 @@ both rejection groups; see the generated validation report for raw, rejected,
 retained, and primary counts separately.
 
 The current placement run found 6,841 primary NAR physical locations. The
-current generated audit assigns 4,378 locations to 4,374 unique structures;
-4,310 are direct/nearby footprint matches and 68 are constrained street-side
-sequence matches. The remaining 2,463 primary locations remain unresolved as
+current generated audit assigns 3,568 locations to 3,520 unique structures;
+3,089 are direct/nearby footprint matches and 479 are constrained street-side
+sequence matches. The remaining 3,273 primary locations remain unresolved as
 NAR-to-footprint associations and are not silently assigned to unrelated
 roofs. This is deliberately a placement count, not a claim that every
 assigned roof is fully validated. The current structure-level classifications
-are 301 `nar_contained_footprint`, 282 `nar_validated_nearest`, 3,790
-`nar_nearest_no_known_conflict`, one `legacy_spatially_consistent`, 3,109
-`legacy_unverified`, and 913 `grid_estimated`. There are currently zero
-`legacy_nar_confirmed` or documented-exception classifications. A nearest
-match is fully validated only when the official street/direction, frontage
-side, parity, block, sequence, unique plausible residential footprint, and
-conservative BG-coordinate distance checks all pass. Unknown/unclassified
+are 396 `nar_building_contained`, 3,124 `nar_nearest_no_known_conflict`, 4,021
+`legacy_unverified`, and 862 `grid_estimated`; the stronger validated-nearest,
+building-sequence, block-face-sequence, legacy-confirmed, and documented-exception
+classes currently have zero published roof records. The 479 sequence assignments
+remain visible in the machine-readable audit, but are classified as no-known-conflict
+unless every stronger evidence condition passes. A building nearest match is fully
+validated only when the official street/direction,
+frontage side, parity, block, sequence, unique plausible residential footprint,
+and conservative BG-coordinate distance checks all pass. Unknown/unclassified
 footprint metadata therefore remains `nar_nearest_no_known_conflict`, not
 validated. All 6,462 original legacy source IDs remain preserved in the
 reconciliation/history tables.
@@ -164,14 +166,15 @@ The final placement audit is recorded in
 machine-readable row per primary NAR `LOC_GUID` in `nar-placement-audit.json`.
 The 11,228 retained all-use units and 10,893 primary units both exclude the
 28 outside-boundary rows and 14 no-coordinate rows. The latest publication
-contains 8,396 active canvassable physical roofs out of 8,481 structure
+contains 8,403 active canvassable physical roofs out of 8,482 structure
 features, with zero missing selection targets. Address classification is
-explicit: 309 active roofs have NAR contained-footprint placement, 282 have
-fully validated NAR nearest placement, 3,789 have NAR nearest placement with
-no known conflict but incomplete validation evidence, 3,102 use an unverified
-legacy fallback, 913 use a grid-estimated fallback, and one is a legacy
-spatially consistent sequence match. The latter fallbacks are human-readable
-operational labels, never authoritative NAR addresses. The
+explicit: 396 active roofs have building-coordinate contained placement,
+3,124 have nearest placement with no known conflict but incomplete validation
+evidence, 4,021 use an unverified legacy fallback, and 862 use a grid-estimated
+fallback. The stronger validated and sequence classes are retained in the
+placement audit and are not promoted without the full evidence set. These
+fallbacks are human-readable operational labels, never authoritative NAR
+addresses. The
 API retains unit-level household rows and uses physical-roof activity for
 historical status, so apartment buildings remain one roof stop without losing
 unit coverage.
@@ -191,10 +194,13 @@ remain human-readable and selectable.
 public Grey County Building Footprints ArcGIS layer using IPv4, paginates the
 service response, and writes a reproducible snapshot plus source metadata. The
 address generator combines those polygons with the existing sourced footprint
-bundle. It first tests containing polygons, then a nearest plausible polygon
-within 50 metres; ambiguous and unmatched points are retained as NAR address
-points and written to `address-footprint-review.geojson`. The 50-metre value is
-a conservative review threshold, not a hard address exclusion.
+bundle. It first tests containing polygons, then a nearby plausible building
+coordinate within the conservative threshold. Unresolved records are passed
+to a constrained street-side sequence matcher that orders roofs by physical
+road position and NAR records by official civic number; it permits explicit
+skips and never performs a city-wide nearest fallback. Ambiguous and
+unmatched points are retained as NAR address points and written to
+`address-footprint-review.geojson`.
 
 `address-footprint-placement.json` and
 `address-numbering-validation.json` are developer-facing diagnostics. The
@@ -207,18 +213,21 @@ The latest generated snapshot reports 7,156 retained physical `LOC_GUID`
 locations, of which 6,841 contain primary residential or partly-residential
 units; 10,893 primary address units remain published. Primary NAR coordinates
 are 5,720 BG building coordinates and 1,121 BF_REPPOINT block-face fallbacks.
-The placement audit reports 334 exact, 4,211 nearest, 810 ambiguous, and 1,801
-unmatched locations across all-use records; for primary records the
-corresponding unresolved total is 2,463. Across primary NAR locations, 4,378
-have a selected structure and 2,463 do not. The selected-distance distribution
-for the current all-use placement set is p50 8.04m, p90 29.16m, p95 37.94m,
-p99 50.56m, and maximum 723.38m; the maximum includes records that
-are not fully validated and is not used to certify a nearest match. The
+The placement audit reports 501 exact, 3,209 nearest, 3,378 ambiguous, and 68
+unmatched locations across all-use records; for primary records 3,568 have a
+selected structure and 3,273 do not. Building-coordinate distances are
+reported separately from block-face sequence offsets. The selected building
+distance distribution for the current all-use placement set is p50 6.32m,
+p90 17.37m, p95 23.71m, p99 36.51m, and maximum 56.70m; BF_REPPOINT offsets
+are excluded from this accuracy distribution and are reported separately as
+p50 5.61m, p90 18.65m, p95 31.75m, p99 51.78m, and maximum 148.28m. The
 constrained pass is monotonic within normalized street/side/hundred-block
-groups, permits explicit skipped lots, and never performs a city-wide nearest
-fallback. The primary numbering diagnostics currently flag 335 parity, 161
-hundred-block, and 763 monotonic-progression anomalies; these are review
-signals and do not overwrite NAR values.
+groups, orders roofs by physical along-road position, infers line orientation
+from trusted anchors or a guarded two-orientation comparison, permits
+explicit skipped lots, and never performs a city-wide nearest fallback. The
+primary numbering diagnostics currently flag 335 parity, 161 hundred-block,
+and 763 monotonic-progression anomalies; these are review signals and do not
+overwrite NAR values.
 
 The live database seed stores the NAR GUIDs, suffix, official street parts,
 retrieval date, and footprint provenance in the address row. Existing matched

@@ -2105,15 +2105,19 @@ export async function canvassingMain() {
         : map.queryRenderedFeatures(e.point, {
             layers: ["structures"],
           });
-    const picked = rendered
-        .map((renderedFeature) =>
-          structureFeatureById.get(
-            String(renderedFeature.properties?.structure_id ?? ""),
-          ),
-        )
-        .filter(Boolean)
-        .map((feature) => ({ feature, homes: homesForStructure(feature) }))
-        .sort((left, right) => right.homes.length - left.homes.length)[0];
+    // MapLibre orders the hit features from the rendered roof at the pointer
+    // outward. Preserve that physical target instead of choosing a different
+    // overlapping roof merely because it already has more household rows.
+    const pickedFeature = rendered
+      .map((renderedFeature) =>
+        structureFeatureById.get(
+          String(renderedFeature.properties?.structure_id ?? ""),
+        ),
+      )
+      .find(Boolean);
+    const picked = pickedFeature
+      ? { feature: pickedFeature, homes: homesForStructure(pickedFeature) }
+      : undefined;
     const structure = picked?.feature ?? structureFeatureById.get(
       String(rendered[0]?.properties?.structure_id ?? ""),
     );
@@ -2941,7 +2945,13 @@ export async function canvassingMain() {
       structures,
     );
     applyMapFilters();
-    map.once("idle", scheduleNextAreaUpdate);
+    map.once("idle", () => {
+      // setData can clear GeoJSON feature state while an operational target
+      // is being materialized. Reapply the still-selected physical roofs
+      // after MapLibre has installed the refreshed source data.
+      applySelectionFeatureState();
+      scheduleNextAreaUpdate();
+    });
     updateLabels();
     renderSummary();
     if (active) showHouseholds([active]);
@@ -3396,11 +3406,13 @@ export async function canvassingMain() {
           { selected: false },
         );
     for (const structureId of nextStructures)
-      if (!selectedStructureStates.has(structureId))
-        map.setFeatureState(
-          { source: "structures", id: structureId },
-          { selected: true },
-        );
+      // Reapply even when our bookkeeping says this roof was selected before:
+      // a GeoJSON source refresh can clear MapLibre's feature-state without
+      // changing the selected household set.
+      map.setFeatureState(
+        { source: "structures", id: structureId },
+        { selected: true },
+      );
     for (const addressId of selectedAddressStates)
       if (!nextAddresses.has(addressId))
         map.setFeatureState(

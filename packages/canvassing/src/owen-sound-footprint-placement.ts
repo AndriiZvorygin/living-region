@@ -51,6 +51,8 @@ export type FootprintPlacement = {
   candidates: FootprintCandidate[];
   point: Position;
   coordinate_source?: NarLocation["coordinate_source"];
+  /** Geometric offset is diagnostic only; BF_REPPOINT is not building evidence. */
+  coordinate_offset_m?: number | null;
   address_ids?: string[];
   official_street?: string;
   rejection_reason?: string;
@@ -174,26 +176,61 @@ const civicNumberValue = (value: unknown) => {
   return match ? Number(match[0]) : null;
 };
 
+const hasManualAddressCorrection = (feature: Feature) => {
+  const properties = feature.properties;
+  return properties.manual_civic_correction === true ||
+    String(properties.address_source_status ?? "") === "manual_verified" ||
+    String(properties.address_label_source ?? "") === "manual_correction" ||
+    String(properties.address_quality ?? "") === "manually_verified";
+};
+
 const candidateStreetKeys = (feature: Feature) => {
   const properties = feature.properties;
+  // Published NAR labels are derived output, not immutable footprint
+  // evidence. Feeding them back into the next placement run makes the result
+  // drift as the previous run changes which roof received the label. Keep
+  // only source/range metadata for matching; the official NAR address is the
+  // value being placed, not a reason to choose the same roof again.
+  const hasDerivedNarAddress = (
+    String(properties.address_source_status ?? "") === "authoritative" ||
+    String(properties.legacy_address_fallback_source ?? "") === "prior_nar_association"
+  ) && !hasManualAddressCorrection(feature);
+  const canUseAddressLabel = !hasDerivedNarAddress || hasManualAddressCorrection(feature);
   const labelStreet = String(properties.civic_label ?? "")
     .replace(/^~?\d+[A-Z0-9/-]*\s*/i, "")
     .replace(/\s+\+\d+$/, "")
     .trim();
   return [...new Set(
-    [properties.fallback_street, properties.address_range_street, labelStreet]
+    [
+      hasDerivedNarAddress
+        ? properties.address_range_street
+        : properties.fallback_street,
+      properties.address_range_street,
+      canUseAddressLabel ? labelStreet : undefined,
+    ]
       .map((value) => normalizeStreet(value))
       .filter(Boolean),
   )];
 };
 
 const candidateCivicNumbers = (feature: Feature) => [
-  ...(Array.isArray(feature.properties.civic_numbers)
-    ? feature.properties.civic_numbers
-    : []),
+  // Road-range inference is stable source metadata and is only weak support;
+  // it is never used to order roofs. Published NAR labels are deliberately
+  // excluded because they are the output being placed.
   feature.properties.inferred_civic_number,
-  feature.properties.fallback_civic_number,
-  String(feature.properties.civic_label ?? "").match(/^~?(\d+)/)?.[1],
+  ...(hasManualAddressCorrection(feature)
+    ? [
+        ...(Array.isArray(feature.properties.civic_numbers) ? feature.properties.civic_numbers : []),
+        feature.properties.fallback_civic_number,
+        String(feature.properties.civic_label ?? "").match(/^~?(\d+)/)?.[1],
+      ]
+    : String(feature.properties.legacy_address_fallback_source ?? "") === "prior_nar_association"
+      ? []
+      : [
+          ...(Array.isArray(feature.properties.civic_numbers) ? feature.properties.civic_numbers : []),
+          feature.properties.fallback_civic_number,
+          String(feature.properties.civic_label ?? "").match(/^~?(\d+)/)?.[1],
+        ]),
 ]
   .map(civicNumberValue)
   .filter((value): value is number => value != null);
@@ -216,10 +253,7 @@ function candidateFor(
     .map(civicNumberValue)
     .filter((value): value is number => value != null);
   const candidateNumbers = candidateCivicNumbers(feature);
-  const candidateAddressIsAuthoritative =
-    String(feature.properties.address_source_status ?? "") === "authoritative" ||
-    String(feature.properties.address_label_source ?? "") ===
-      "statistics_canada_national_address_register";
+  const candidateAddressIsAuthoritative = hasManualAddressCorrection(feature);
   const civicCompatibility: FootprintCandidate["civic_number_compatibility"] =
     !numbers.length || !candidateNumbers.length
       ? "unknown"
@@ -495,17 +529,22 @@ export function placeNarLocations(options: {
       roads: options.roads ?? [],
     });
     placement.validation = validation;
+    placement.coordinate_offset_m = validation.coordinate_offset_m;
+    // Keep representative block-face offsets out of the placement-distance
+    // field used for building-coordinate accuracy reports.
+    if (location.coordinate_source === "nar_block_face_fallback")
+      placement.distance_m = null;
     placement.match_method = placement.status === "exact"
       ? "nar_contained_footprint"
       : "nar_nearest";
     placement.confidence_classification = placement.status === "exact"
       ? location.coordinate_source === "nar_building"
-        ? "nar_contained_footprint"
+        ? "nar_building_contained"
         : "nar_nearest_no_known_conflict"
       : validation.street_match && validation.side_match && validation.parity_match &&
           validation.hundred_block_match && validation.neighbouring_sequence_match &&
           validation.unique_plausible_footprint && validation.conservative_distance_match
-        ? "nar_validated_nearest"
+        ? "nar_building_validated_nearest"
         : "nar_nearest_no_known_conflict";
   }
   // The direct point/containment matcher intentionally leaves ambiguous
@@ -743,6 +782,7 @@ export function placementReviewFeatures(placements: FootprintPlacement[]) {
 
 export function placementSummary(placements: FootprintPlacement[]) {
   const distances = placements
+    .filter((placement) => placement.coordinate_source === "nar_building")
     .map((placement) => placement.distance_m)
     .filter((distance): distance is number => distance != null && Number.isFinite(distance))
     .sort((a, b) => a - b);
@@ -761,6 +801,17 @@ export function placementSummary(placements: FootprintPlacement[]) {
       p99: percentile(0.99),
       max: distances.at(-1) ?? null,
     },
+    block_face_coordinate_offset_m: (() => {
+      const values = placements
+        .filter((placement) => placement.coordinate_source === "nar_block_face_fallback")
+        .map((placement) => placement.coordinate_offset_m ?? placement.validation?.coordinate_offset_m)
+        .filter((distance): distance is number => distance != null && Number.isFinite(distance))
+        .sort((a, b) => a - b);
+      const percentile = (fraction: number) => values.length
+        ? values[Math.min(values.length - 1, Math.floor((values.length - 1) * fraction))]
+        : null;
+      return { p50: percentile(0.5), p90: percentile(0.9), p95: percentile(0.95), p99: percentile(0.99), max: values.at(-1) ?? null };
+    })(),
     grey_exact_matches: placements.filter(
       (placement) => placement.status === "exact" && placement.footprint_source === "grey_county_building_footprints",
     ).length,

@@ -8,6 +8,7 @@ import {
   matchUnresolvedNarLocations,
   parseRoofAddress,
   streetSideForPoint,
+  validateNarPlacementEvidence,
 } from "./owen-sound-street-side-matching";
 import { placeNarLocations } from "./owen-sound-footprint-placement";
 
@@ -114,6 +115,21 @@ describe("Owen Sound street-side NAR matching", () => {
     expect(civicParity(809)).toBe("odd");
   });
 
+  it("uses stable road-range metadata instead of a published label for roof ordering", () => {
+    const feature = roof("range-roof", "999", 0.001);
+    feature.properties.address_source_status = "authoritative";
+    feature.properties.inferred_civic_number = 702;
+    feature.properties.address_range_road_id = "example-road";
+    delete feature.properties.fallback_civic_number;
+    delete feature.properties.fallback_street;
+    feature.properties.civic_label = "999 Wrong Street";
+    expect(parseRoofAddress(feature, [road()])).toEqual({
+      number: 702,
+      suffix: "",
+      street_key: addressStreetKey("7", "Avenue", "East"),
+    });
+  });
+
   it("determines frontage side and rejects an incompatible parity", () => {
     const roads = [road()];
     expect(streetSideForPoint(
@@ -191,7 +207,7 @@ describe("Owen Sound street-side NAR matching", () => {
       roads: [road()],
     });
     expect(result.placements[0].status).toBe("nearest");
-    expect(result.placements[0].confidence_classification).toBe("nar_validated_nearest");
+    expect(result.placements[0].confidence_classification).toBe("nar_building_validated_nearest");
     expect(result.placements[0].validation).toMatchObject({
       street_match: true,
       side_match: true,
@@ -213,5 +229,195 @@ describe("Owen Sound street-side NAR matching", () => {
     expect(result.placements[0].status).toBe("nearest");
     expect(result.placements[0].confidence_classification).toBe("nar_nearest_no_known_conflict");
     expect(result.placements[0].validation?.unique_plausible_footprint).toBe(false);
+  });
+
+  it("orders roofs by their physical along-road position, correcting a wrong legacy number", () => {
+    const locations = [
+      location("loc-702", "702", 0.001),
+      location("loc-706", "706", 0.005),
+    ];
+    const placements = locations.map((item) => ({
+      location_id: item.loc_guid,
+      structure_id: null,
+      status: "unmatched" as const,
+      distance_m: null,
+      footprint_id: null,
+      footprint_source: null,
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+    }));
+    const assignments = matchUnresolvedNarLocations({
+      locations,
+      // The labels are intentionally reversed. They may support a cost, but
+      // they must not establish the physical order of the roofs.
+      structures: [roof("roof-at-702", "706", 0.001), roof("roof-at-706", "702", 0.005)],
+      units: [unit("loc-702", "702"), unit("loc-706", "706")],
+      roads: [road()],
+      placements,
+    });
+    expect(new Map(assignments.map((item) => [item.location_id, item.structure_id]))).toEqual(
+      new Map([
+        ["loc-702", "roof-at-702"],
+        ["loc-706", "roof-at-706"],
+      ]),
+    );
+  });
+
+  it("preserves the same assignments when the road geometry direction is reversed", () => {
+    const reversed = {
+      ...road(),
+      geometry: { type: "LineString" as const, coordinates: [[0.01, 0], [0, 0]] },
+    };
+    const locations = [location("loc-702", "702", 0.001), location("loc-706", "706", 0.005)];
+    const placements = locations.map((item) => ({
+      location_id: item.loc_guid,
+      structure_id: null,
+      status: "unmatched" as const,
+      distance_m: null,
+      footprint_id: null,
+      footprint_source: null,
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+    }));
+    const assignments = matchUnresolvedNarLocations({
+      locations,
+      structures: [roof("roof-at-702", "706", 0.001), roof("roof-at-706", "702", 0.005)],
+      units: [unit("loc-702", "702"), unit("loc-706", "706")],
+      roads: [reversed],
+      placements,
+    });
+    expect(new Map(assignments.map((item) => [item.location_id, item.structure_id]))).toEqual(
+      new Map([
+        ["loc-702", "roof-at-702"],
+        ["loc-706", "roof-at-706"],
+      ]),
+    );
+  });
+
+  it("records trusted lower and higher anchors for an interior address", () => {
+    const structures = [roof("roof-702", "702", 0.001), roof("roof-704", "704", 0.003), roof("roof-706", "706", 0.005)];
+    const locations = [location("loc-702", "702", 0.001), location("loc-704", "704", 0.003), location("loc-706", "706", 0.005)];
+    const placements = locations.map((item, index) => ({
+      location_id: item.loc_guid,
+      structure_id: String(structures[index].properties.structure_id),
+      status: "nearest" as const,
+      distance_m: 2,
+      footprint_id: String(structures[index].id ?? structures[index].properties.structure_id),
+      footprint_source: "openstreetmap",
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+      coordinate_source: "nar_building" as const,
+      confidence_classification: index === 1
+        ? "nar_nearest_no_known_conflict" as const
+        : "nar_building_validated_nearest" as const,
+    }));
+    const evidence = validateNarPlacementEvidence({
+      location: locations[1],
+      units: locations.flatMap((item) => [unit(item.loc_guid, item.loc_guid === "loc-704" ? "704" : item.loc_guid === "loc-706" ? "706" : "702")]),
+      placement: placements[1],
+      structure: structures[1],
+      placements,
+      structures,
+      roads: [road()],
+    });
+    expect(evidence.neighbouring_sequence_match).toBe(true);
+    expect(evidence.neighbouring_anchors).toMatchObject({
+      lower: { location_id: "loc-702", civic_number: 702 },
+      higher: { location_id: "loc-706", civic_number: 706 },
+      orientation: "increasing",
+    });
+  });
+
+  it("does not promote a one-sided endpoint without stronger physical evidence", () => {
+    const structures = [roof("roof-702", "702", 0.001), roof("roof-704", "704", 0.003)];
+    const locations = [location("loc-702", "702", 0.001), location("loc-704", "704", 0.003)];
+    const units = locations.map((item) => unit(item.loc_guid, item.loc_guid === "loc-702" ? "702" : "704"));
+    const anchor = {
+      location_id: "loc-702",
+      structure_id: "roof-702",
+      status: "nearest" as const,
+      distance_m: 2,
+      footprint_id: "roof-702",
+      footprint_source: "openstreetmap",
+      candidates: [],
+      point: [0.001, 0.0002] as [number, number],
+      coordinate_source: "nar_building" as const,
+      confidence_classification: "nar_building_validated_nearest" as const,
+    };
+    const endpoint = {
+      location_id: "loc-704",
+      structure_id: "roof-704",
+      status: "nearest" as const,
+      distance_m: 20,
+      footprint_id: "roof-704",
+      footprint_source: "openstreetmap",
+      candidates: [],
+      point: [0.003, 0.0002] as [number, number],
+      coordinate_source: "nar_building" as const,
+      confidence_classification: "nar_nearest_no_known_conflict" as const,
+    };
+    const weak = validateNarPlacementEvidence({
+      location: locations[1], units, placement: endpoint, structure: structures[1],
+      placements: [anchor, endpoint], structures, roads: [road()],
+    });
+    expect(weak.neighbouring_sequence_match).toBe(false);
+    const strong = validateNarPlacementEvidence({
+      location: locations[1], units, placement: { ...endpoint, status: "exact", distance_m: 0 }, structure: structures[1],
+      placements: [anchor, { ...endpoint, status: "exact", distance_m: 0 }], structures, roads: [road()],
+    });
+    expect(strong.neighbouring_sequence_match).toBe(true);
+  });
+
+  it("uses street-side sequencing for shared block-face points without a geometric distance claim", () => {
+    const locations = [
+      location("bf-702", "702", 0.003, 0.0002, "nar_block_face_fallback"),
+      location("bf-704", "704", 0.003, 0.0002, "nar_block_face_fallback"),
+      location("bf-706", "706", 0.003, 0.0002, "nar_block_face_fallback"),
+    ];
+    const placements = locations.map((item) => ({
+      location_id: item.loc_guid,
+      structure_id: null,
+      status: "unmatched" as const,
+      distance_m: null,
+      footprint_id: null,
+      footprint_source: null,
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+    }));
+    const assignments = matchUnresolvedNarLocations({
+      locations,
+      units: [unit("bf-702", "702"), unit("bf-704", "704"), unit("bf-706", "706")],
+      structures: [roof("roof-702", "702", 0.001), roof("roof-704", "704", 0.003), roof("roof-706", "706", 0.005)],
+      roads: [road()],
+      placements,
+    });
+    expect(assignments).toHaveLength(3);
+    expect(assignments.every((assignment) => assignment.classification === "nar_block_face_sequence")).toBe(true);
+    expect(assignments.every((assignment) => assignment.distance_m === null)).toBe(true);
+    expect(assignments.every((assignment) =>
+      Number.isFinite(assignment.evidence.coordinate_offset_m ?? NaN),
+    )).toBe(true);
+  });
+
+  it("leaves a symmetric block unresolved when neither orientation is superior", () => {
+    const locations = [location("loc-a", "702", 0.003), location("loc-b", "702", 0.003)];
+    const placements = locations.map((item) => ({
+      location_id: item.loc_guid,
+      structure_id: null,
+      status: "unmatched" as const,
+      distance_m: null,
+      footprint_id: null,
+      footprint_source: null,
+      candidates: [],
+      point: [item.longitude, item.latitude] as [number, number],
+    }));
+    const assignments = matchUnresolvedNarLocations({
+      locations,
+      units: [unit("loc-a", "702"), unit("loc-b", "702")],
+      structures: [roof("roof-a", "702", 0.001), roof("roof-b", "702", 0.005)],
+      roads: [road()],
+      placements,
+    });
+    expect(assignments).toHaveLength(0);
   });
 });

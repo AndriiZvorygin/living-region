@@ -125,7 +125,7 @@ export function repairCanvassingStructureAddresses(options: {
           placementQualities.every((quality) => quality === placementQualities[0])
         ? placementQualities[0]
         : placementStatuses.every((status) => status === "exact")
-          ? "nar_contained_footprint"
+          ? "nar_building_contained"
           : placementStatuses.every((status) => status === "nearest")
             ? "nar_nearest_no_known_conflict"
             : "nar_documented_exception";

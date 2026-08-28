@@ -25,6 +25,7 @@ import {
   applyAuthoritativePlacements,
   placeNarLocations,
 } from "./owen-sound-footprint-placement";
+import type { Feature } from "./building-coverage";
 import { validateOwenSoundAddressNumbering } from "./owen-sound-address-numbering";
 import { formatOfficialStreet } from "./official-address";
 import {
@@ -60,6 +61,46 @@ function hasArgument(name: string) {
   return process.argv.includes(name);
 }
 
+const DERIVED_STRUCTURE_ADDRESS_KEYS = new Set([
+  "address_count",
+  "civic_numbers",
+  "civic_label",
+  "address_source_status",
+  "address_quality",
+  "address_relation",
+  "address_relation_confidence",
+  "address_label_source",
+  "authoritative_location_ids",
+  "authoritative_address_ids",
+  "authoritative_address_labels",
+  "footprint_match_status",
+  "footprint_match_distance_m",
+  "footprint_source",
+  "footprint_review_required",
+  "residential_unit_count",
+  "selection_target_kind",
+  "selection_target_ids",
+  "selection_target_id",
+  "fallback_civic_number",
+  "fallback_street",
+  "fallback_unit",
+  "legacy_address_fallback_source",
+]);
+
+/**
+ * Placement must not use an address label emitted by an earlier publication
+ * as physical evidence on the next run. Keep only source footprint metadata,
+ * including stable road-range fields used by the street-side matcher.
+ */
+function placementInputFeatures(features: Feature[]) {
+  return features.map((feature) => ({
+    ...feature,
+    properties: Object.fromEntries(
+      Object.entries(feature.properties).filter(([key]) => !DERIVED_STRUCTURE_ADDRESS_KEYS.has(key)),
+    ),
+  }));
+}
+
 async function main() {
   const zipPath = resolve(argument("--zip") ?? defaultZip);
   const outDir = resolve(argument("--out") ?? defaultOut);
@@ -83,6 +124,7 @@ async function main() {
     loadExistingFeatures(greyFootprintsPath).catch(() => []),
     loadExistingFeatures(roadsPath).catch(() => []),
   ]);
+  const structuresForPlacement = placementInputFeatures(structuresFile);
   const result = await extractOwenSoundNar({
     zipPath,
     boundary,
@@ -108,19 +150,16 @@ async function main() {
     .filter((properties) => properties.external_source === "statistics_canada_national_address_register")
     .map((properties) => String(properties.structure_id ?? ""))
     .filter(Boolean);
-  const preferredStructureByLocation = new Map<string, string>();
-  const reconciliationByAddress = new Map(reconciliation.matches.map((match) => [match.address_id, match]));
-  for (const unit of primary) {
-    const match = reconciliationByAddress.get(unit.address_id);
-    if (match?.structure_id && !preferredStructureByLocation.has(unit.location_id))
-      preferredStructureByLocation.set(unit.location_id, match.structure_id);
-  }
+  // A prior NAR publication is derived output, not physical placement
+  // evidence. Reusing its structure preference would make successive runs
+  // reinforce their own previous choices. Physical matching below is based on
+  // fresh geometry and source road metadata; a future explicitly verified
+  // manual correction can be passed through a separate input.
   const placement = placeNarLocations({
     locations: result.locations,
-    structures: structuresFile,
+    structures: structuresForPlacement,
     greyFootprints: greyFile,
     units: result.units,
-    preferredStructureByLocation,
     roads: roadsFile,
   });
   const placedStructures = applyAuthoritativePlacements({
@@ -261,7 +300,9 @@ async function main() {
         threshold_m: 50,
         grey_snapshot_path: "data/canvassing/grey-building-footprints-owen-sound.geojson",
         fallback_structure_path: "packages/web-client/public/canvassing/structures.geojson",
-        placement_statuses: "exact, nearest, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved",
+        placement_statuses: "exact, nearest, street-side sequence, ambiguous, unmatched; authoritative points are never discarded because a footprint is unresolved",
+        ordering: "sequence matching orders roofs by physical road along_m and official NAR addresses by civic number/suffix; trusted building-coordinate anchors determine or validate orientation, and unresolved orientation remains unassigned",
+        coordinate_sources: "nar_building coordinates are used for containment and conservative distance validation; BF_REPPOINT block-face coordinates are used only for street-side sequence matching and are reported separately",
       },
       numbering_validation: {
         rules: "Owen Sound numbered-grid parity, direction, hundred-block, cross-road, and monotonic progression checks; authoritative NAR values are preserved and anomalies are review flags",

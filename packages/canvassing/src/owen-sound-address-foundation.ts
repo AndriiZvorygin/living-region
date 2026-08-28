@@ -171,6 +171,9 @@ type NarPlacementAuditRow = {
   neighbouring_address_sequence_result: string;
   confidence_classification: string;
   validation_evidence: Record<string, unknown> | null;
+  coordinate_offset_m: number | null;
+  ordering_orientation: string | null;
+  ordering_basis: string;
   rejection_or_review_reason: string | null;
 };
 
@@ -241,7 +244,9 @@ function buildNarPlacementAudit(
             ? "not_contained"
             : "unresolved",
         nearest_candidates: placement?.candidates ?? [],
-        selected_match_distance_m: placement?.distance_m ?? null,
+        selected_match_distance_m: placement?.coordinate_source === "nar_block_face_fallback"
+          ? null
+          : placement?.distance_m ?? null,
         match_method: placement?.match_method ?? (status === "exact"
           ? "nar_contained_footprint"
           : status === "nearest"
@@ -252,11 +257,14 @@ function buildNarPlacementAudit(
         hundred_block_result: resultFor("hundred_block_anomaly"),
         neighbouring_address_sequence_result: resultFor("monotonic_progression_anomaly"),
         confidence_classification: placement?.confidence_classification ?? (status === "exact"
-          ? "nar_contained_footprint"
+          ? "nar_building_contained"
           : status === "nearest"
             ? "nar_nearest_no_known_conflict"
             : "unresolved"),
         validation_evidence: placement?.validation ?? null,
+        coordinate_offset_m: placement?.validation?.coordinate_offset_m ?? null,
+        ordering_orientation: placement?.validation?.ordering_orientation ?? null,
+        ordering_basis: placement?.validation?.ordering_basis ?? "unresolved",
         rejection_or_review_reason: placement?.rejection_reason ??
           (status === "ambiguous" ? "multiple nearby footprints remain similarly plausible" :
             status === "unmatched" ? "no credible footprint within the conservative match threshold" : null),
@@ -279,6 +287,19 @@ function buildNarPlacementAudit(
     counts[value] = (counts[value] ?? 0) + 1;
     return counts;
   }, {} as Record<string, number>);
+  const sequenceRows = rows.filter((row) => row.match_method === "street_side_sequence");
+  const percentile = (values: number[], fraction: number) => {
+    const ordered = values.filter(Number.isFinite).sort((a, b) => a - b);
+    return ordered.length
+      ? ordered[Math.min(ordered.length - 1, Math.floor((ordered.length - 1) * fraction))]
+      : null;
+  };
+  const distanceDistribution = (values: number[]) => ({
+    p50: percentile(values, 0.5),
+    p90: percentile(values, 0.9),
+    p95: percentile(values, 0.95),
+    max: percentile(values, 1),
+  });
   return {
     generated_by: "buildNarPlacementAudit",
     summary: {
@@ -290,6 +311,16 @@ function buildNarPlacementAudit(
       coordinate_source_counts: countBy(rows.map((row) => row.nar_coordinates.source)),
       match_method_counts: countBy(rows.map((row) => row.match_method)),
       confidence_classification_counts: countBy(rows.map((row) => row.confidence_classification)),
+      sequence_assignment_counts_by_coordinate_source: countBy(sequenceRows.map((row) => row.nar_coordinates.source)),
+      sequence_assignment_counts_by_ordering_basis: countBy(sequenceRows.map((row) => row.ordering_basis)),
+      building_coordinate_sequence_distance_m: distanceDistribution(sequenceRows
+        .filter((row) => row.nar_coordinates.source === "nar_building")
+        .map((row) => row.selected_match_distance_m)
+        .filter((value): value is number => value != null)),
+      block_face_sequence_coordinate_offset_m: distanceDistribution(sequenceRows
+        .filter((row) => row.nar_coordinates.source === "nar_block_face_fallback")
+        .map((row) => row.coordinate_offset_m)
+        .filter((value): value is number => value != null)),
       review_reason_counts: countBy(rows
         .map((row) => row.rejection_or_review_reason)
         .filter((reason): reason is string => Boolean(reason))),
@@ -992,8 +1023,10 @@ export async function writeFoundationOutputs(options: {
       return counts;
     },
     {
-      nar_contained_footprint: 0,
-      nar_validated_nearest: 0,
+      nar_building_contained: 0,
+      nar_building_validated_nearest: 0,
+      nar_building_sequence: 0,
+      nar_block_face_sequence: 0,
       nar_nearest_no_known_conflict: 0,
       nar_documented_exception: 0,
       legacy_nar_confirmed: 0,
@@ -1009,8 +1042,10 @@ export async function writeFoundationOutputs(options: {
   const publishedAddressQuality = options.placements
     ? (() => {
         const automaticJoinCounts = {
-          nar_contained_footprint: 0,
-          nar_validated_nearest: 0,
+          nar_building_contained: 0,
+          nar_building_validated_nearest: 0,
+          nar_building_sequence: 0,
+          nar_block_face_sequence: 0,
           nar_nearest_no_known_conflict: 0,
           nar_documented_exception: 0,
           legacy_nar_confirmed: 0,
@@ -1023,7 +1058,7 @@ export async function writeFoundationOutputs(options: {
           const placement = primaryPlacementByLocation.get(unit.location_id);
           const status = placement?.status;
           const key = placement?.confidence_classification ?? (status === "exact"
-            ? "nar_contained_footprint"
+            ? "nar_building_contained"
             : status === "nearest"
               ? "nar_nearest_no_known_conflict"
               : status === "ambiguous" || status === "unmatched"
@@ -1040,7 +1075,7 @@ export async function writeFoundationOutputs(options: {
             primary_nar_locations: primaryLocationIds.size,
             mapped_primary_nar_locations: primaryPlacements.filter((placement) => placement.structure_id).length,
             contained_primary_nar_locations: primaryPlacements.filter((placement) => placement.status === "exact").length,
-            validated_nearest_primary_nar_locations: primaryPlacements.filter((placement) => placement.confidence_classification === "nar_validated_nearest").length,
+            validated_nearest_primary_nar_locations: primaryPlacements.filter((placement) => placement.confidence_classification === "nar_building_validated_nearest").length,
             nearest_no_known_conflict_primary_nar_locations: primaryPlacements.filter((placement) => placement.confidence_classification === "nar_nearest_no_known_conflict").length,
             street_side_sequence_primary_nar_locations: primaryPlacements.filter((placement) => placement.match_method === "street_side_sequence").length,
             unresolved_primary_nar_locations: primaryPlacements.filter((placement) => ["ambiguous", "unmatched"].includes(placement.status)).length,

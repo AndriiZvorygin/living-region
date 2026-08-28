@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-08-28T01:49:47.237Z",
+  "generated_at": "2026-08-28T08:02:09.305Z",
   "source": "statistics_canada_national_address_register",
   "totals": {
     "civic_addresses": 10893,
     "primary_nar_units": 10893,
     "primary_nar_locations": 6841,
-    "mapped_primary_nar_locations": 4378,
-    "contained_primary_nar_locations": 318,
-    "validated_nearest_primary_nar_locations": 282,
-    "nearest_no_known_conflict_primary_nar_locations": 3790,
-    "street_side_sequence_primary_nar_locations": 68,
-    "unresolved_primary_nar_locations": 2463,
+    "mapped_primary_nar_locations": 3568,
+    "contained_primary_nar_locations": 471,
+    "validated_nearest_primary_nar_locations": 0,
+    "nearest_no_known_conflict_primary_nar_locations": 3124,
+    "street_side_sequence_primary_nar_locations": 479,
+    "unresolved_primary_nar_locations": 3273,
     "duplicate_normalized_addresses": 0,
     "outside_municipal_boundary": 28,
     "missing_usable_coordinates": 14,
@@ -21,15 +21,17 @@
     "multi_unit_locations": 671
   },
   "automatic_join_counts": {
-    "nar_contained_footprint": 451,
-    "nar_validated_nearest": 686,
-    "nar_nearest_no_known_conflict": 6076,
+    "nar_building_contained": 691,
+    "nar_building_validated_nearest": 0,
+    "nar_building_sequence": 0,
+    "nar_block_face_sequence": 0,
+    "nar_nearest_no_known_conflict": 5402,
     "nar_documented_exception": 0,
     "legacy_nar_confirmed": 0,
-    "legacy_spatially_consistent": 1,
+    "legacy_spatially_consistent": 0,
     "legacy_unverified": 0,
     "grid_estimated": 0,
-    "unresolved": 3679
+    "unresolved": 4800
   },
   "methodology": "Statistics Canada June 2026 NAR CIVIC_NO and official street fields are authoritative. BG building coordinates are preferred; BF_REPPOINT is used only as a labelled fallback. A NAR unit is mapped only to a containing or conservative, address-compatible footprint. Unresolved placement is retained as a review flag and never blocks canvassing."
 }
