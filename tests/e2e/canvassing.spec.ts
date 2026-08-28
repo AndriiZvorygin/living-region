@@ -459,6 +459,11 @@ test.describe("Owen Sound canvassing field workflows", () => {
   test("mobile bulk delivery defaults to the city flyer and marks roofs", async ({
     page,
   }) => {
+    const dialogs: string[] = [];
+    page.on("dialog", async (dialog) => {
+      dialogs.push(dialog.message());
+      await dialog.dismiss();
+    });
     await openCanvassing(page);
     await page.locator("#mobile-menu").click();
     await expect(page.locator("#mobile-active-flyer")).toHaveValue(
@@ -479,6 +484,61 @@ test.describe("Owen Sound canvassing field workflows", () => {
       timeout: 10_000,
     });
     await expect(page.locator("#coverage-toggle")).toHaveText("Households");
+    // Submitting the same roof again must be an idempotent no-op. It should
+    // not ask the canvasser to authorize a second delivery or append another
+    // flyer event.
+    await expect
+      .poll(async () =>
+        page.evaluate(async () => {
+          const state = await fetch("/api/canvassing/state").then((response) =>
+            response.json(),
+          );
+          return Number(
+            state.summary.flyer_breakdown.find(
+              (row: any) => row.flyer_id === "flyer-2-current",
+            )?.household_count ?? 0,
+          );
+        }),
+      )
+      .toBe(2);
+    await page.evaluate(() => {
+      (window as any).__livingRegionCanvassing.map.jumpTo({ zoom: 15.5 });
+    });
+    await page.waitForTimeout(700);
+    const alreadyFlyered = (await renderedCanvassableRoofPoints(page, 2_000)).find(
+      (roof) => roof.flyerIds.includes("flyer-2-current"),
+    );
+    expect(alreadyFlyered).toBeTruthy();
+    const householdId = alreadyFlyered!.targetIds[0];
+    const historyBefore = await page.evaluate((id) => {
+      const home = (window as any).__livingRegionCanvassing
+        .state()
+        .households.find((candidate: any) => candidate.household_id === id);
+      return (home?.flyer_history ?? []).filter(
+        (event: any) => event.flyer_id === "flyer-2-current",
+      ).length;
+    }, householdId);
+    await page.locator("#mobile-menu").click();
+    await page.locator("#mobile-bulk-open").click();
+    await expect(page.locator("#multi-select")).toHaveText("Done selecting");
+    await page.mouse.click(alreadyFlyered!.x, alreadyFlyered!.y);
+    await expect(page.locator("#bulk-selection-status")).toHaveText(
+      "1 household selected",
+    );
+    await page.locator("#bulk-flyer").click();
+    await expect(page.locator("#toast")).toContainText("already flyered", {
+      timeout: 10_000,
+    });
+    expect(dialogs).toEqual([]);
+    const historyAfter = await page.evaluate((id) => {
+      const home = (window as any).__livingRegionCanvassing
+        .state()
+        .households.find((candidate: any) => candidate.household_id === id);
+      return (home?.flyer_history ?? []).filter(
+        (event: any) => event.flyer_id === "flyer-2-current",
+      ).length;
+    }, householdId);
+    expect(historyAfter).toBe(historyBefore);
     const summary = await page.evaluate(async () => {
       const state = await fetch("/api/canvassing/state").then((response) =>
         response.json(),

@@ -3702,23 +3702,41 @@ export async function canvassingMain() {
     if (submitting || !selected.size) return;
     const deliveryFlyerId = activeFlyerId || DEFAULT_ACTIVE_FLYER_ID;
     const householdIds = [...selected];
-    const duplicateCount = householdIds.filter((householdId) =>
+    // Marking a roof as flyered is an idempotent field operation. Do not ask
+    // the canvasser to confirm a second delivery: already-covered households
+    // are simply treated as successful no-ops, while untouched households
+    // still get their normal append-only visit events.
+    const alreadyFlyeredIds = householdIds.filter((householdId) =>
       state.households
         .find((home) => home.household_id === householdId)
         ?.flyer_ids?.includes(deliveryFlyerId),
-    ).length;
-    const allowDuplicateFlyer = duplicateCount
-      ? window.confirm(
-          `${duplicateCount} selected household${duplicateCount === 1 ? " has" : "s have"} already received ${flyerLabel(deliveryFlyerId)}. Deliver again intentionally?`,
-        )
-      : false;
-    if (duplicateCount && !allowDuplicateFlyer) return;
+    );
+    const pendingHouseholdIds = householdIds.filter(
+      (householdId) => !alreadyFlyeredIds.includes(householdId),
+    );
+    if (!pendingHouseholdIds.length) {
+      selected.clear();
+      multiSelectMode = false;
+      if (coverageBeforeMultiSelect && !coverage) {
+        coverage = true;
+        persist({ coverage_mode: true });
+        setCoverageMode(true);
+        map.easeTo({ zoom: 12.2, duration: 250 });
+      }
+      updateSelection();
+      toast(
+        `${alreadyFlyeredIds.length} household${
+          alreadyFlyeredIds.length === 1 ? " is" : "s are"
+        } already flyered`,
+      );
+      return;
+    }
     const batchKey = crypto.randomUUID();
     submitting = true;
     updateSelection();
     try {
       const results = await Promise.allSettled(
-        householdIds.map((household_id) =>
+        pendingHouseholdIds.map((household_id) =>
           fetchJson("/api/canvassing/visits", {
             method: "POST",
             body: JSON.stringify({
@@ -3728,7 +3746,6 @@ export async function canvassingMain() {
               outcome: "flyer_delivered",
               flyer_delivered: true,
               flyer_id: deliveryFlyerId,
-              allow_duplicate_flyer: allowDuplicateFlyer,
               door_knocked: false,
               source: isVolunteer()
                 ? "volunteer"
@@ -3737,8 +3754,27 @@ export async function canvassingMain() {
           }),
         ),
       );
-      const failedIds = householdIds.filter(
-        (_, index) => results[index].status === "rejected",
+      // A second device may have recorded one of the pending deliveries
+      // after the local state was loaded. Treat the server's duplicate
+      // response as the same idempotent success, without enabling duplicate
+      // event creation.
+      const serverDuplicateIds = pendingHouseholdIds.filter(
+        (_, index) =>
+          results[index].status === "rejected" &&
+          /duplicate flyer delivery|already received this flyer/i.test(
+            String(
+              results[index].status === "rejected"
+                ? results[index].reason instanceof Error
+                  ? results[index].reason.message
+                  : results[index].reason
+                : "",
+            ),
+          ),
+      );
+      const failedIds = pendingHouseholdIds.filter(
+        (householdId, index) =>
+          results[index].status === "rejected" &&
+          !serverDuplicateIds.includes(householdId),
       );
       selected.clear();
       failedIds.forEach((id) => selected.add(id));
@@ -3750,10 +3786,17 @@ export async function canvassingMain() {
         map.easeTo({ zoom: 12.2, duration: 250 });
       }
       updateSelection();
-      const savedCount = householdIds.length - failedIds.length;
+      const duplicateCount =
+        alreadyFlyeredIds.length + serverDuplicateIds.length;
+      const savedCount =
+        pendingHouseholdIds.length -
+        failedIds.length -
+        serverDuplicateIds.length;
       toast(
         failedIds.length
-          ? `${savedCount} marked flyered; ${failedIds.length} still selected for retry`
+          ? `${savedCount} marked flyered; ${duplicateCount} already flyered; ${failedIds.length} still selected for retry`
+          : duplicateCount
+            ? `${savedCount ? `${savedCount} marked flyer delivered; ` : ""}${duplicateCount} already flyered`
           : `${savedCount} household${
               savedCount === 1 ? "" : "s"
             } marked flyer delivered`,
