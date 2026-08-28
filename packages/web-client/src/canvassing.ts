@@ -1832,7 +1832,15 @@ export async function canvassingMain() {
         }
         return;
       }
-      if (multiSelectMode) return;
+      if (multiSelectMode) {
+        // The layer-specific listener is the fast path, but MapLibre does not
+        // dispatch it for every rendered roof hit (for example when another
+        // rendered layer is above the structure or during a source repaint).
+        // Keep the generic map click as a fallback so bulk mode never becomes
+        // a silent no-op when the canvas itself received a real map click.
+        handleBulkRoofClick([event.point.x, event.point.y]);
+        return;
+      }
       // Read the feature at the pointer before closing mobile sheets. The
       // close path calls resizeMap(), which can briefly invalidate the
       // rendered-query result for this already-dispatched pointer event.
