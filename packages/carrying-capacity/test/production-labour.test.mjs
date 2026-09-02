@@ -4,7 +4,7 @@ import plantSource from '../data/source/agroecosystem-plants.json' with {type: '
 import {buildPlantDatabase} from '../src/plant-database.mjs';
 import {FOOD_NUTRIENT_PROFILES} from '../src/nutrition.mjs';
 import {calculateAgroecosystemPlan} from '../src/agroecosystem.mjs';
-import {calculateFoodProductionLabour} from '../src/production-labour.mjs';
+import {calculateFoodProductionLabour, LABOUR_CATEGORIES, CLOSED_LOOP_WORK_ITEMS} from '../src/production-labour.mjs';
 
 const database = buildPlantDatabase(plantSource);
 
@@ -65,4 +65,40 @@ test('missing labour mappings are surfaced instead of becoming zero', () => {
   const ledger = calculateFoodProductionLabour({foodSuccessionLedger: {rows: [{year: 1, household_food_demand_gj_year: 10, annual_food_energy_gj_year: 10, foods: [{id: 'unmapped-crop', production_type: 'annual', area_ha: 1}]}]}});
   assert.equal(ledger.stages[1].data_quality.status, 'partial');
   assert.ok(ledger.missing_data.some((row) => row.id === 'unmapped-crop'));
+});
+
+test('fixed reference demand and additive task rows remain auditable through maturity', () => {
+  const ledger = planFor(70).labour;
+  const producingStages = ledger.stages.filter((row) => row.year !== 0);
+  assert.equal(new Set(producingStages.map((row) => row.food.household_food_demand_gj_year)).size, 1);
+  assert.ok(ledger.stages[0].annual_area_ha > 0);
+  assert.ok(ledger.stages.every((row) => row.task_hours_reconciliation.balanced));
+  assert.equal(ledger.reference_reconciliation.find((row) => row.id === 'annual_staple_low_input').additive_task_hours_per_ha, 245);
+  assert.equal(ledger.reference_reconciliation.find((row) => row.id === 'intermediate_nut_shrub').additive_task_hours_per_ha, 215);
+  assert.equal(ledger.projection_mode, 'fixed_household');
+  assert.equal(ledger.people_fed, 1);
+});
+
+test('perennial maintenance exists before bearing and harvest follows actual production', () => {
+  const ledger = planFor(70).labour;
+  const yearOne = ledger.stages.find((row) => row.year === 1);
+  const yearFive = ledger.stages.find((row) => row.year === 5);
+  const youngMaintenance = yearOne.task_rows.filter((row) => row.production_type === 'perennial' && ['pruning', 'orchard', 'perennial_weeding', 'irrigation', 'pest'].includes(row.task));
+  assert.ok(youngMaintenance.some((row) => row.calculated_hours > 0));
+  assert.equal(yearOne.task_rows.filter((row) => row.production_type === 'perennial' && row.task === 'harvest').reduce((sum, row) => sum + row.calculated_hours, 0), 0);
+  assert.ok(yearFive.task_rows.filter((row) => row.production_type === 'perennial' && row.task === 'harvest').reduce((sum, row) => sum + row.calculated_hours, 0) > 0);
+});
+
+test('closed-loop dependencies are exposed instead of being counted as free labour', () => {
+  const ledger = planFor(70).labour;
+  const mature = ledger.stages.find((row) => row.year === 'mature');
+  assert.equal(mature.closed_loop_status, 'unresolved');
+  assert.ok(mature.unresolved_work.some((row) => row.id === 'fertility_and_biomass_cycling'));
+  assert.ok(mature.unresolved_work.some((row) => row.id === 'seed_saving_and_propagation'));
+  assert.deepEqual(ledger.categories, LABOUR_CATEGORIES);
+  assert.ok(CLOSED_LOOP_WORK_ITEMS.some((row) => row.id === 'fertility_and_biomass_cycling' && row.labour_category === 'fertility_nutrient_cycling'));
+  assert.ok(mature.closed_loop_labour_gaps.some((row) => row.id === 'fertility_and_biomass_cycling' && row.hours_year === null));
+  assert.equal(mature.external_input_ledger.recurring_external_inputs.find((row) => row.id === 'fuel_electricity_and_equipment').input_category, 'externally_purchased_imported');
+  assert.equal(ledger.closed_loop_assessment.status, 'unresolved');
+  assert.equal(ledger.historical_reconciliation.previous_time_aware_reference_adult_mature_hours_year, 93.228);
 });

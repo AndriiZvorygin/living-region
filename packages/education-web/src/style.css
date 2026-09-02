@@ -211,3 +211,29 @@ main { max-width: 1180px; }
 .checkbox-control span { display: block; }
 .checkbox-control em { font-style: normal; color: var(--muted); font-size: .72rem; }
 @media (max-width: 700px) { .agro-summary { grid-template-columns: 1fr; } }
+
+/* Owen Sound transit cost model. */
+.transit-hero { border-bottom: 4px solid var(--teal); }
+.transit-hero .updated { margin-top: 22px; color: var(--muted); font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.transit-nav { margin-bottom: 0; }
+.transit-baseline { background: #fff; }
+.transit-answer { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); gap: 18px; margin: 26px 0 18px; padding: 22px; border-top: 4px solid var(--amber); background: var(--ink); color: #fff; }
+.transit-answer h2 { margin: 4px 0 8px; color: #f6d67b; font-size: clamp(1.8rem, 4vw, 3rem); }
+.transit-answer h3 { margin: 4px 0 8px; color: #f6d67b; font-size: 1.55rem; }
+.transit-answer p { color: #e8eee8; }
+.household-equivalent-note { max-width: 900px; padding: 14px 16px; border-left: 4px solid var(--amber); background: #f7f7f2; }
+.transit-stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
+.transit-stack > div, .funding-panel { padding: 18px; border: 1px solid var(--line); background: #fff; }
+.transit-stack h3, .funding-panel h3 { margin-top: 0; }
+.transit-controls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0; }
+.transit-controls-grid .checkbox-control { min-width: 0; }
+.transit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 18px; }
+.evidence-status { display: inline-block; padding: 3px 6px; border: 1px solid var(--line); color: var(--muted); background: #f7f7f2; font-size: .68rem; font-weight: 800; }
+.transit-links { padding-top: 18px; border-top: 1px solid var(--line); }
+.transit-table { min-width: 920px; }
+.transit-table caption { padding: 0 0 10px; color: var(--muted); text-align: left; font-size: .8rem; font-weight: 700; }
+.evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 22px; }
+.evidence-grid > div { padding: 18px; border-top: 3px solid var(--sage); background: #fff; }
+.evidence-grid ul { margin: 10px 0 0; padding-left: 20px; }
+@media (max-width: 800px) { .transit-answer, .transit-stack, .evidence-grid { grid-template-columns: 1fr; } .transit-controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 430px) { .transit-controls-grid { grid-template-columns: 1fr; } .transit-answer { padding: 18px; } .transit-answer h2 { font-size: 1.8rem; } }

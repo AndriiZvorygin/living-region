@@ -1,0 +1,67 @@
+{
+  "model_version": "1.0.0",
+  "last_updated": "2026-09-02",
+  "sources": [
+    {
+      "id": "city_2026_mayors_budget",
+      "institution": "City of Owen Sound",
+      "title": "2026 Mayor's Budget",
+      "url": "https://www.owensound.ca/media/lujd1fw3/2026-mayor-s-budget.pdf",
+      "classification": "Official figure",
+      "supports": ["2026 contract services", "2026 fuel", "2026 gross cost", "2026 grants", "2026 other revenue", "2026 net cost", "2026 internal allocation", "2026 division levy requirement"]
+    },
+    {
+      "id": "city_transit_study",
+      "institution": "City of Owen Sound",
+      "title": "Transit Study and Route Optimization reports",
+      "url": "https://www.owensound.ca/city-government/reports-studies-and-plans/transit-study/",
+      "related_urls": [
+        "https://www.owensound.ca/media/fngpjncx/owen-sound-existing-services-web.pdf",
+        "https://www.owensound.ca/media/n4mnlrfe/21-03-owen-sound-final-report-v5-003.pdf"
+      ],
+      "classification": "Official figure",
+      "supports": ["historical vehicle-hours", "reported boardings per vehicle-hour", "service-model context"]
+    },
+    {
+      "id": "city_transit_op_22_024",
+      "institution": "City of Owen Sound",
+      "title": "Staff Report OP-22-024, Transit Service Delivery",
+      "url": "https://pub-owensound.escribemeetings.com/filestream.ashx?DocumentId=31620",
+      "classification": "Official figure",
+      "supports": ["Mobility Transit and service-delivery context"]
+    },
+    {
+      "id": "city_transit_op_22_032",
+      "institution": "City of Owen Sound",
+      "title": "Staff Report OP-22-032, Transit Service Delivery",
+      "url": "https://pub-owensound.escribemeetings.com/filestream.ashx?DocumentId=34341",
+      "classification": "Official figure",
+      "supports": ["Mobility Transit and service-delivery context"]
+    },
+    {
+      "id": "ontario_regulation_191_11",
+      "institution": "Government of Ontario",
+      "title": "O. Reg. 191/11, Integrated Accessibility Standards",
+      "url": "https://www.ontario.ca/laws/regulation/110191",
+      "classification": "Official figure",
+      "supports": ["specialized transportation service obligations"]
+    },
+    {
+      "id": "cfos_2025_results",
+      "institution": "CFOS News",
+      "title": "Slight ridership decline, revenue increase for Owen Sound Transit",
+      "url": "https://www.893cfos.ca/2026/03/18/slight-ridership-decline-revenue-increase-for-owen-sound-transit/",
+      "classification": "Quotation or operating data required",
+      "supports": ["reported 2025 trips", "reported 2025 transit revenue"],
+      "note": "Secondary report citing the City's annual results; replace with the underlying City annual transit report when publicly available."
+    },
+    {
+      "id": "helpos_transportation",
+      "institution": "HelpOS",
+      "title": "Transportation policy",
+      "url": "https://helpos.ca/mayor/transportation",
+      "classification": "Campaign planning assumption",
+      "supports": ["policy context only"]
+    }
+  ]
+}
