@@ -454,6 +454,31 @@ if (!postAddressMigrations.has(21)) {
       (21,'append_only_physical_roof_duplicate_aliases',datetime('now'));
     COMMIT;`);
 }
+if (!postAddressMigrations.has(22)) {
+  db.exec(`BEGIN;
+    CREATE TABLE lawn_sign_approvals (
+      id TEXT PRIMARY KEY,
+      household_id TEXT REFERENCES households(id),
+      visit_id TEXT REFERENCES visits(id),
+      provided_name TEXT NOT NULL,
+      provided_address TEXT NOT NULL,
+      phone TEXT NOT NULL DEFAULT '',
+      email TEXT NOT NULL DEFAULT '',
+      signature_media_type TEXT NOT NULL,
+      signature_filename TEXT NOT NULL,
+      signature_data_base64 TEXT NOT NULL,
+      signature_sha256 TEXT NOT NULL,
+      created_by TEXT NOT NULL REFERENCES users(id),
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX lawn_sign_approvals_household
+      ON lawn_sign_approvals(household_id,created_at);
+    CREATE INDEX lawn_sign_approvals_created
+      ON lawn_sign_approvals(created_at);
+    INSERT INTO schema_migrations VALUES
+      (22,'lawn_sign_supplied_details_and_signatures',datetime('now'));
+    COMMIT;`);
+}
 db.exec(`DROP VIEW IF EXISTS household_flyer_state;
 DROP VIEW IF EXISTS effective_people;
 DROP VIEW IF EXISTS activity_people;
@@ -588,7 +613,7 @@ SELECT p.id,p.household_id,
 FROM activity_people p;`);
 
 const now = () => new Date().toISOString();
-const SCHEMA_VERSION = 21;
+const SCHEMA_VERSION = 22;
 const configuredHoldMinutes = Number(
   process.env.CANVASS_RECOMMENDATION_HOLD_MINUTES ?? "30",
 );
@@ -2722,6 +2747,44 @@ function adminAddressLabel(row: any) {
   ).trim();
 }
 
+const lawnSignSignatureMediaTypes = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "application/pdf",
+]);
+const lawnSignSignatureMaxBytes = 5 * 1024 * 1024;
+
+function parseLawnSignSignature(input: any) {
+  const mediaType = String(input?.media_type ?? "")
+    .trim()
+    .toLowerCase();
+  if (!lawnSignSignatureMediaTypes.has(mediaType))
+    throw new Error("Signature must be a PNG, JPEG, WebP, or PDF file");
+  const encoded = String(input?.data_base64 ?? "").replace(/\s/g, "");
+  if (
+    !encoded ||
+    encoded.length % 4 === 1 ||
+    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(
+      encoded,
+    )
+  )
+    throw new Error("Signature upload is invalid");
+  const bytes = Buffer.from(encoded, "base64");
+  if (!bytes.length || bytes.byteLength > lawnSignSignatureMaxBytes)
+    throw new Error("Signature upload must be between 1 byte and 5 MB");
+  const filename = String(input?.filename ?? "signature")
+    .replace(/[\\/\u0000-\u001f]/g, "")
+    .trim()
+    .slice(0, 200) || "signature";
+  return {
+    mediaType,
+    filename,
+    data: bytes.toString("base64"),
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+  };
+}
+
 function adminHouseholdSearch(query: string) {
   const normalized = query.trim().toLocaleLowerCase("en-CA");
   if (!normalized) return [];
@@ -2791,74 +2854,74 @@ function adminHouseholdSearch(query: string) {
 }
 
 function adminLawnSignEntries() {
-  return (
-    db
-      .prepare(
-        `WITH sign_signals AS (
-           SELECT v.household_id,v.occurred_at,v.id signal_id,v.user_id,
-                  'visit' source
-           FROM active_visits v
-           WHERE v.outcome='lawn_sign_interest'
-           UNION ALL
-           SELECT n.household_id,n.occurred_at,n.id signal_id,n.user_id,
-                  'conversation' source
-           FROM activity_neighbourhood_conversations n
-           WHERE n.household_id IS NOT NULL
-             AND n.political_outcome='lawn_sign_interest'
-         ), grouped_signals AS (
-           SELECT household_id,min(occurred_at) first_approved_at,
-                  max(occurred_at) last_approved_at,count(*) approval_count
-           FROM sign_signals GROUP BY household_id
-         ), latest_signal AS (
-           SELECT household_id,source,user_id,
-                  ROW_NUMBER() OVER (
-                    PARTITION BY household_id
-                    ORDER BY occurred_at DESC,signal_id DESC
-                  ) row_number
-           FROM sign_signals
-         ), contact_ranked AS (
-           SELECT household_id,id,name,phone,email,last_updated_at,
-                  ROW_NUMBER() OVER (
-                    PARTITION BY household_id
-                    ORDER BY last_updated_at DESC,id DESC
-                  ) row_number
-           FROM effective_people
-         ), contacts AS (
-           SELECT household_id,
-             max(CASE WHEN row_number=1 THEN name END) contact_name,
-             max(CASE WHEN row_number=1 THEN phone END) contact_phone,
-             max(CASE WHEN row_number=1 THEN email END) contact_email
-           FROM contact_ranked GROUP BY household_id
-         )
-         SELECT g.household_id,g.first_approved_at,g.last_approved_at,
-           g.approval_count,a.id address_id,a.structure_id,
-           a.civic_number_effective,a.civic_number_base,a.civic_number_suffix,
-           a.street_effective,a.unit_effective,a.label,a.source_address_guid,
-           a.official_street_name,a.official_street_type,
-           a.official_street_direction,a.number_event_id,h.unit_label,
-           COALESCE(c.contact_name,'') contact_name,
-           COALESCE(c.contact_phone,'') contact_phone,
-           COALESCE(c.contact_email,'') contact_email,
-           (SELECT count(*) FROM households h2
-              JOIN effective_addresses a2 ON a2.id=h2.address_id
-             WHERE a2.structure_id=a.structure_id) unit_count,
-           ls.source latest_source,ls.user_id latest_user_id,
-           COALESCE(u.display_name,u.username,ls.user_id) latest_recorded_by
-         FROM grouped_signals g
-         JOIN households h ON h.id=g.household_id
-         JOIN effective_addresses a ON a.id=h.address_id
-         LEFT JOIN contacts c ON c.household_id=g.household_id
-         LEFT JOIN latest_signal ls
-           ON ls.household_id=g.household_id AND ls.row_number=1
-         LEFT JOIN users u ON u.id=ls.user_id
-         WHERE a.source_active=1 OR EXISTS(
-           SELECT 1 FROM legacy_history_reviews r
-            WHERE r.legacy_address_id=a.id
-         )
-         ORDER BY g.last_approved_at DESC,g.household_id`
-      )
-      .all() as any[]
-  ).map((row) => ({
+  const signalRows = db
+    .prepare(
+      `WITH sign_signals AS (
+         SELECT v.household_id,v.occurred_at,v.id signal_id,v.user_id,
+                'visit' source
+         FROM active_visits v
+         WHERE v.outcome='lawn_sign_interest'
+         UNION ALL
+         SELECT n.household_id,n.occurred_at,n.id signal_id,n.user_id,
+                'conversation' source
+         FROM activity_neighbourhood_conversations n
+         WHERE n.household_id IS NOT NULL
+           AND n.political_outcome='lawn_sign_interest'
+       ), grouped_signals AS (
+         SELECT household_id,min(occurred_at) first_approved_at,
+                max(occurred_at) last_approved_at,count(*) approval_count
+         FROM sign_signals GROUP BY household_id
+       ), latest_signal AS (
+         SELECT household_id,source,user_id,
+                ROW_NUMBER() OVER (
+                  PARTITION BY household_id
+                  ORDER BY occurred_at DESC,signal_id DESC
+                ) row_number
+         FROM sign_signals
+       ), contact_ranked AS (
+         SELECT household_id,id,name,phone,email,last_updated_at,
+                ROW_NUMBER() OVER (
+                  PARTITION BY household_id
+                  ORDER BY last_updated_at DESC,id DESC
+                ) row_number
+         FROM effective_people
+       ), contacts AS (
+         SELECT household_id,
+           max(CASE WHEN row_number=1 THEN name END) contact_name,
+           max(CASE WHEN row_number=1 THEN phone END) contact_phone,
+           max(CASE WHEN row_number=1 THEN email END) contact_email
+         FROM contact_ranked GROUP BY household_id
+       )
+       SELECT g.household_id,g.first_approved_at,g.last_approved_at,
+         g.approval_count,a.id address_id,a.structure_id,
+         a.civic_number_effective,a.civic_number_base,a.civic_number_suffix,
+         a.street_effective,a.unit_effective,a.label,a.source_address_guid,
+         a.official_street_name,a.official_street_type,
+         a.official_street_direction,a.number_event_id,h.unit_label,
+         COALESCE(c.contact_name,'') contact_name,
+         COALESCE(c.contact_phone,'') contact_phone,
+         COALESCE(c.contact_email,'') contact_email,
+         (SELECT count(*) FROM households h2
+            JOIN effective_addresses a2 ON a2.id=h2.address_id
+           WHERE a2.structure_id=a.structure_id) unit_count,
+         ls.source latest_source,ls.user_id latest_user_id,
+         COALESCE(u.display_name,u.username,ls.user_id) latest_recorded_by
+       FROM grouped_signals g
+       JOIN households h ON h.id=g.household_id
+       JOIN effective_addresses a ON a.id=h.address_id
+       LEFT JOIN contacts c ON c.household_id=g.household_id
+       LEFT JOIN latest_signal ls
+         ON ls.household_id=g.household_id AND ls.row_number=1
+       LEFT JOIN users u ON u.id=ls.user_id
+       WHERE a.source_active=1 OR EXISTS(
+         SELECT 1 FROM legacy_history_reviews r
+          WHERE r.legacy_address_id=a.id
+       )
+       ORDER BY g.last_approved_at DESC,g.household_id`,
+    )
+    .all() as any[];
+  const entries: any[] = signalRows.map((row) => ({
+    approval_id: null as string | null,
     household_id: String(row.household_id),
     address_id: String(row.address_id),
     structure_id: row.structure_id == null ? null : String(row.structure_id),
@@ -2873,7 +2936,62 @@ function adminLawnSignEntries() {
     approval_count: Number(row.approval_count ?? 0),
     latest_source: row.latest_source,
     latest_recorded_by: String(row.latest_recorded_by ?? "Unknown"),
+    signature_uploaded: false,
   }));
+  const byHousehold = new Map(entries.map((entry) => [entry.household_id, entry]));
+  const approvalRows = db
+    .prepare(
+      `SELECT a.id approval_id,a.household_id,a.provided_name,
+              a.provided_address,a.phone,a.email,a.created_at,
+              COALESCE(u.display_name,u.username,a.created_by) created_by,
+              h.unit_label,ea.id address_id,ea.structure_id,
+              ea.civic_number_effective,ea.civic_number_base,
+              ea.civic_number_suffix,ea.street_effective,ea.unit_effective,
+              ea.label,ea.source_address_guid,ea.official_street_name,
+              ea.official_street_type,ea.official_street_direction,
+              ea.number_event_id
+       FROM lawn_sign_approvals a
+       LEFT JOIN users u ON u.id=a.created_by
+       LEFT JOIN households h ON h.id=a.household_id
+       LEFT JOIN effective_addresses ea ON ea.id=h.address_id
+       ORDER BY a.created_at DESC,a.id DESC`,
+    )
+    .all() as any[];
+  for (const row of approvalRows) {
+    const householdId = row.household_id == null ? null : String(row.household_id);
+    const current = householdId ? byHousehold.get(householdId) : undefined;
+    if (current) {
+      current.approval_id = String(row.approval_id);
+      current.address_label = String(row.provided_address);
+      current.contact_name = String(row.provided_name);
+      current.contact_phone = String(row.phone ?? "");
+      current.contact_email = String(row.email ?? "");
+      current.signature_uploaded = true;
+      continue;
+    }
+    entries.push({
+      approval_id: String(row.approval_id),
+      household_id: householdId,
+      address_id: row.address_id == null ? null : String(row.address_id),
+      structure_id: row.structure_id == null ? null : String(row.structure_id),
+      unit: String(row.unit_effective ?? row.unit_label ?? ""),
+      unit_count: 1,
+      address_label: String(row.provided_address),
+      contact_name: String(row.provided_name),
+      contact_phone: String(row.phone ?? ""),
+      contact_email: String(row.email ?? ""),
+      first_approved_at: row.created_at,
+      last_approved_at: row.created_at,
+      approval_count: 1,
+      latest_source: "manual",
+      latest_recorded_by: String(row.created_by ?? "Unknown"),
+      signature_uploaded: true,
+    });
+  }
+  return entries.sort((a, b) =>
+    String(b.last_approved_at).localeCompare(String(a.last_approved_at)) ||
+    String(a.household_id ?? a.approval_id).localeCompare(String(b.household_id ?? b.approval_id)),
+  );
 }
 
 function findAdminUser(userId: string) {
@@ -3202,6 +3320,177 @@ const server = createServer(async (req, res) => {
           entries: adminLawnSignEntries(),
           households: query ? adminHouseholdSearch(query) : [],
           note: "Entries are recorded lawn-sign interest signals, not proof of installation.",
+        });
+      }
+      const signaturePath = url.pathname.match(
+        /^\/api\/admin\/lawn-signs\/([^/]+)\/signature$/,
+      );
+      if (req.method === "GET" && signaturePath) {
+        const approval = db
+          .prepare(
+            "SELECT signature_media_type,signature_data_base64 FROM lawn_sign_approvals WHERE id=?",
+          )
+          .get(decodeURIComponent(signaturePath[1])) as
+          | { signature_media_type: string; signature_data_base64: string }
+          | undefined;
+        if (!approval) return json(res, 404, { error: "signature not found" });
+        const signature = Buffer.from(approval.signature_data_base64, "base64");
+        res.writeHead(200, {
+          "content-type": approval.signature_media_type,
+          "cache-control": "no-store",
+          "content-length": signature.byteLength,
+          "content-disposition": "inline",
+        });
+        res.end(signature);
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/api/admin/lawn-signs") {
+        const contentLength = Number(req.headers["content-length"] ?? 0);
+        // A 5 MB binary file is about 6.7 MB once base64 encoded, plus JSON
+        // metadata. Keep the request ceiling above that while retaining a
+        // bounded admin-only upload path.
+        if (Number.isFinite(contentLength) && contentLength > 8 * 1024 * 1024)
+          return json(res, 413, { error: "signature upload is too large" });
+        let input: any;
+        try {
+          input = JSON.parse(await body(req));
+        } catch {
+          return json(res, 400, { error: "invalid JSON body" });
+        }
+        const submissionKey = String(input.submission_key ?? "").trim();
+        if (!submissionKey)
+          return json(res, 400, { error: "submission_key is required" });
+        const providedName = String(input.name ?? "").trim();
+        const providedAddress = String(input.address ?? "").trim();
+        const phone = String(input.phone ?? "").trim();
+        let email: string | null;
+        if (!providedName || providedName.length > 200)
+          return json(res, 400, { error: "name is required and must be 200 characters or fewer" });
+        if (!providedAddress || providedAddress.length > 300)
+          return json(res, 400, { error: "address is required and must be 300 characters or fewer" });
+        if (phone.length > 50)
+          return json(res, 400, { error: "phone number is invalid" });
+        try {
+          email = validateUserEmail(input.email);
+        } catch (error) {
+          return json(res, 400, {
+            error: error instanceof Error ? error.message : "email address is invalid",
+          });
+        }
+        let signature: ReturnType<typeof parseLawnSignSignature>;
+        try {
+          signature = parseLawnSignSignature(input.signature);
+        } catch (error) {
+          return json(res, 400, {
+            error: error instanceof Error ? error.message : "signature upload is invalid",
+          });
+        }
+        const householdId = String(input.household_id ?? "").trim() || null;
+        if (
+          householdId &&
+          !db.prepare("SELECT 1 FROM households WHERE id=?").get(householdId)
+        )
+          return json(res, 404, { error: "household not found" });
+        const previous = db
+          .prepare("SELECT entity_id FROM submission_keys WHERE submission_key=?")
+          .get(submissionKey) as { entity_id: string | null } | undefined;
+        if (previous)
+          return json(res, 200, {
+            duplicate: true,
+            approval_id: previous.entity_id,
+            message: "This lawn-sign approval was already recorded.",
+          });
+        const approvalId = randomUUID();
+        const visitId = householdId ? randomUUID() : null;
+        const timestamp = now();
+        try {
+          db.exec("BEGIN");
+          db.prepare("INSERT INTO submission_keys VALUES (?,?,'lawn_sign_approval',NULL)").run(
+            submissionKey,
+            timestamp,
+          );
+          if (householdId) {
+            db.prepare(
+              "INSERT INTO visits (id,occurred_at,user_id,household_id,route_id,flyer_delivered,door_knocked,outcome,conversation_occurred,issue_categories_json,notes,follow_up_action,follow_up_date,support_category,source,imported_at,session_id,revisit_requested,no_answer,flyer_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ).run(
+              visitId,
+              timestamp,
+              user,
+              householdId,
+              null,
+              0,
+              0,
+              "lawn_sign_interest",
+              1,
+              "[]",
+              "",
+              null,
+              null,
+              null,
+              "candidate",
+              timestamp,
+              null,
+              0,
+              0,
+              null,
+            );
+          }
+          db.prepare(
+            "INSERT INTO lawn_sign_approvals (id,household_id,visit_id,provided_name,provided_address,phone,email,signature_media_type,signature_filename,signature_data_base64,signature_sha256,created_by,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+          ).run(
+            approvalId,
+            householdId,
+            visitId,
+            providedName,
+            providedAddress,
+            phone,
+            email ?? "",
+            signature.mediaType,
+            signature.filename,
+            signature.data,
+            signature.sha256,
+            user,
+            timestamp,
+          );
+          db.prepare("UPDATE submission_keys SET entity_id=? WHERE submission_key=?").run(
+            approvalId,
+            submissionKey,
+          );
+          db.exec("COMMIT");
+        } catch (error) {
+          try {
+            db.exec("ROLLBACK");
+          } catch {}
+          throw error;
+        }
+        audit(user, "append", "lawn_sign_approval", approvalId, {
+          household_id: householdId,
+          visit_id: visitId,
+          provided_address: providedAddress,
+          signature_sha256: signature.sha256,
+        });
+        await recordEvent({
+          type: "canvassing.admin.lawn_sign_approval.recorded",
+          user_id: user,
+          approval_id: approvalId,
+          household_id: householdId,
+          visit_id: visitId,
+          provided_name: providedName,
+          provided_address: providedAddress,
+          signature_media_type: signature.mediaType,
+          signature_sha256: signature.sha256,
+        });
+        return json(res, 201, {
+          approval_id: approvalId,
+          visit_id: visitId,
+          household_id: householdId,
+          name: providedName,
+          address: providedAddress,
+          signature: {
+            uploaded: true,
+            media_type: signature.mediaType,
+            filename: signature.filename,
+          },
         });
       }
       if (req.method === "GET" && url.pathname === "/api/admin/users")

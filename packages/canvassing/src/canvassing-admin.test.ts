@@ -195,6 +195,146 @@ describe.sequential("canvassing admin user management", () => {
     expect((await apiRequest("/api/admin/lawn-signs")).response.status).toBe(401);
   });
 
+  it("records supplied sign details and a private signature for linked and manual approvals", async () => {
+    const andrii = await login("andrii");
+    const state = await apiRequest("/api/canvassing/state", andrii.cookie);
+    const household = state.data.households.find((home: any) => home.status === "untouched");
+    expect(household).toBeTruthy();
+    const signature = {
+      media_type: "image/png",
+      filename: "signed-consent.png",
+      data_base64: Buffer.from("test-signature").toString("base64"),
+    };
+    const linkedInput = {
+      submission_key: "admin-lawn-sign-linked-details-test",
+      household_id: household.household_id,
+      name: "Provided Resident",
+      address: "169 2nd Avenue West",
+      phone: "519-555-0100",
+      email: "resident@example.test",
+      signature,
+    };
+    const linked = await apiRequest("/api/admin/lawn-signs", andrii.cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(linkedInput),
+    });
+    expect(linked.response.status).toBe(201);
+    expect(linked.data).toMatchObject({
+      household_id: household.household_id,
+      name: "Provided Resident",
+      address: "169 2nd Avenue West",
+      signature: { uploaded: true, media_type: "image/png" },
+    });
+
+    const duplicate = await apiRequest("/api/admin/lawn-signs", andrii.cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(linkedInput),
+    });
+    expect(duplicate.response.status).toBe(200);
+    expect(duplicate.data).toMatchObject({ duplicate: true, approval_id: linked.data.approval_id });
+
+    const manual = await apiRequest("/api/admin/lawn-signs", andrii.cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        submission_key: "admin-lawn-sign-manual-details-test",
+        name: "Manual Resident",
+        address: "999 Test Street, Owen Sound",
+        signature: { ...signature, filename: "manual-consent.png" },
+      }),
+    });
+    expect(manual.response.status).toBe(201);
+    expect(manual.data.household_id).toBeNull();
+
+    const stored = database<
+      Array<{
+        household_id: string | null;
+        visit_id: string | null;
+        provided_name: string;
+        provided_address: string;
+        signature_data_base64: string;
+      }>
+    >(
+      "SELECT household_id,visit_id,provided_name,provided_address,signature_data_base64 FROM lawn_sign_approvals WHERE id IN (?,?) ORDER BY provided_name",
+      linked.data.approval_id,
+      manual.data.approval_id,
+    );
+    expect(stored).toHaveLength(2);
+    expect(stored[0]).toMatchObject({
+      provided_name: "Manual Resident",
+      provided_address: "999 Test Street, Owen Sound",
+      household_id: null,
+      visit_id: null,
+    });
+    expect(stored[1]).toMatchObject({
+      provided_name: "Provided Resident",
+      provided_address: "169 2nd Avenue West",
+      household_id: household.household_id,
+      visit_id: linked.data.visit_id,
+      signature_data_base64: signature.data_base64,
+    });
+
+    const list = await apiRequest("/api/admin/lawn-signs", andrii.cookie);
+    expect(list.data.entries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          approval_id: linked.data.approval_id,
+          address_label: "169 2nd Avenue West",
+          signature_uploaded: true,
+        }),
+        expect.objectContaining({
+          approval_id: manual.data.approval_id,
+          household_id: null,
+          address_label: "999 Test Street, Owen Sound",
+          signature_uploaded: true,
+        }),
+      ]),
+    );
+    const signatureResponse = await fetch(
+      `${api}/api/admin/lawn-signs/${manual.data.approval_id}/signature`,
+      { headers: { cookie: andrii.cookie } },
+    );
+    expect(signatureResponse.status).toBe(200);
+    expect(signatureResponse.headers.get("content-type")).toContain("image/png");
+    expect(Buffer.from(await signatureResponse.arrayBuffer()).toString()).toBe("test-signature");
+
+    // The linked approval deliberately exercises the canonical visit path.
+    // Correct that fixture visit before the following stats test so this
+    // sequential server remains isolated without deleting history.
+    const undone = await apiRequest("/api/canvassing/undo-latest", andrii.cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ reason: "test fixture cleanup" }),
+    });
+    expect(undone.response.status).toBe(201);
+  });
+
+  it("requires a signature and keeps signature access candidate-only", async () => {
+    const andrii = await login("andrii");
+    const missing = await apiRequest("/api/admin/lawn-signs", andrii.cookie, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        submission_key: "admin-lawn-sign-missing-signature-test",
+        name: "No Signature",
+        address: "1 Test Street",
+      }),
+    });
+    expect(missing.response.status).toBe(400);
+    expect(missing.data.error).toMatch(/signature/i);
+    const rynaldo = await login("rynaldo");
+    expect(
+      (
+        await apiRequest(
+          "/api/admin/lawn-signs/manual/signature",
+          rynaldo.cookie,
+        )
+      ).response.status,
+    ).toBe(403);
+  });
+
   it("generates readable passwords with sufficient random material", () => {
     const generated = new Set(Array.from({ length: 32 }, () => generateTemporaryPassword()));
     expect(generated.size).toBe(32);

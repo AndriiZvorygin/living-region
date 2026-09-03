@@ -88,6 +88,15 @@ function suggestedUsername(displayName: string) {
   return /^[a-z]/.test(value) ? value : value ? `user-${value}`.slice(0, 64) : "volunteer";
 }
 
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(String(reader.result ?? "")));
+    reader.addEventListener("error", () => reject(new Error("The signature file could not be read")));
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function canvassingAdminMain() {
   let user = await currentUser();
   if (!user) user = await login();
@@ -264,7 +273,14 @@ type LawnSignHousehold = {
   contact_email: string;
 };
 
-type LawnSignEntry = Omit<LawnSignHousehold, "contact_person_id"> & {
+type LawnSignEntry = Omit<
+  LawnSignHousehold,
+  "contact_person_id" | "household_id" | "address_id"
+> & {
+  household_id: string | null;
+  address_id: string | null;
+  approval_id: string | null;
+  signature_uploaded: boolean;
   first_approved_at: string;
   last_approved_at: string;
   approval_count: number;
@@ -287,8 +303,8 @@ export async function canvassingLawnSignsAdminMain() {
       <p class="admin-help">This is an operational interest list, not proof that a sign has been installed. Entries remain connected to the canvassing household and its history.</p>
       <section class="admin-stat-grid"><div class="admin-stat"><strong id="sign-count">0</strong><span>Recorded approvals</span></div><div class="admin-stat"><strong id="sign-contact-count">0</strong><span>With contact details</span></div></section>
       <p class="admin-message" id="sign-message" role="status"></p>
-      <section class="admin-card"><h2>Add a lawn-sign approval</h2><p class="admin-help">Search by address, household ID, or contact name. Choose the real household first; the map and canvassing history stay linked.</p><div class="admin-search-row"><input id="sign-search" type="search" placeholder="Search 254 8th Street or a name" autocomplete="off"><button id="sign-search-button" type="button">Search</button></div><div id="sign-household-results" class="admin-search-results"></div><form id="sign-entry-form" class="admin-card admin-sign-entry" hidden><h3 id="sign-selected-address"></h3><p id="sign-selected-units" class="admin-help"></p><div class="admin-form-grid"><label>Contact name <small>optional</small><input id="sign-contact-name" autocomplete="name"></label><label>Phone <small>optional</small><input id="sign-contact-phone" type="tel" autocomplete="tel"></label><label>Email <small>optional</small><input id="sign-contact-email" type="email" autocomplete="email"></label></div><div class="admin-form-actions"><button type="submit">Record approval</button><button type="button" id="sign-cancel-entry">Cancel</button></div></form></section>
-      <section class="admin-card"><div class="admin-section-heading"><h2>Recorded approvals</h2><button id="sign-refresh" type="button">Refresh</button></div><div class="admin-table-wrap"><table class="admin-sign-table"><thead><tr><th>Contact</th><th>Address</th><th>Last recorded</th><th>Recorded by</th><th>Signals</th></tr></thead><tbody id="sign-list"></tbody></table></div></section>
+      <section class="admin-card"><h2>Add a lawn-sign approval</h2><p class="admin-help">Search by address, household ID, or contact name to link this approval to canvassing history, or add a new sign location with the name and address provided.</p><div class="admin-search-row"><input id="sign-search" type="search" placeholder="Search 254 8th Street or a name" autocomplete="off"><button id="sign-search-button" type="button">Search</button><button id="sign-manual-entry" type="button">Add new sign location</button></div><div id="sign-household-results" class="admin-search-results"></div><form id="sign-entry-form" class="admin-card admin-sign-entry" hidden><h3 id="sign-selected-address"></h3><p id="sign-selected-units" class="admin-help"></p><div class="admin-form-grid"><label>Name <small>required</small><input id="sign-name" autocomplete="name" required></label><label>Address <small>as provided</small><input id="sign-address" autocomplete="street-address" required></label><label>Phone <small>optional</small><input id="sign-contact-phone" type="tel" autocomplete="tel"></label><label>Email <small>optional</small><input id="sign-contact-email" type="email" autocomplete="email"></label><label>Signed approval <small>PNG, JPEG, WebP, or PDF · required</small><input id="sign-signature" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" required></label></div><p class="admin-help">The signature is stored privately with this approval and is available only to candidate administrators.</p><div class="admin-form-actions"><button type="submit">Record approval</button><button type="button" id="sign-cancel-entry">Cancel</button></div></form></section>
+      <section class="admin-card"><div class="admin-section-heading"><h2>Recorded approvals</h2><button id="sign-refresh" type="button">Refresh</button></div><div class="admin-table-wrap"><table class="admin-sign-table"><thead><tr><th>Name</th><th>Address</th><th>Last recorded</th><th>Recorded by</th><th>Signals</th></tr></thead><tbody id="sign-list"></tbody></table></div></section>
     </section>
   </main>`;
 
@@ -299,9 +315,12 @@ export async function canvassingLawnSignsAdminMain() {
   const entryForm = document.querySelector<HTMLFormElement>("#sign-entry-form")!;
   const selectedAddress = document.querySelector<HTMLElement>("#sign-selected-address")!;
   const selectedUnits = document.querySelector<HTMLElement>("#sign-selected-units")!;
-  const contactName = document.querySelector<HTMLInputElement>("#sign-contact-name")!;
+  const providedName = document.querySelector<HTMLInputElement>("#sign-name")!;
+  const providedAddress = document.querySelector<HTMLInputElement>("#sign-address")!;
   const contactPhone = document.querySelector<HTMLInputElement>("#sign-contact-phone")!;
   const contactEmail = document.querySelector<HTMLInputElement>("#sign-contact-email")!;
+  const signatureInput = document.querySelector<HTMLInputElement>("#sign-signature")!;
+  const manualEntryButton = document.querySelector<HTMLButtonElement>("#sign-manual-entry")!;
   let selected: LawnSignHousehold | null = null;
   let searchHouseholds: LawnSignHousehold[] = [];
   let selectedContactSnapshot = { name: "", phone: "", email: "" };
@@ -327,7 +346,7 @@ export async function canvassingLawnSignsAdminMain() {
     document.querySelector<HTMLTableSectionElement>("#sign-list")!.innerHTML = entries.length
       ? entries
           .map(
-            (entry) => `<tr><td><strong>${escapeHtml(entry.contact_name || "No contact name")}</strong><small>${escapeHtml([entry.contact_phone, entry.contact_email].filter(Boolean).join(" · "))}</small></td><td><strong>${escapeHtml(entry.address_label || "Address unavailable")}</strong><small>${entry.unit_count > 1 ? `${entry.unit_count} known units` : ""}</small></td><td>${escapeHtml(date(entry.last_approved_at))}<small>First: ${escapeHtml(date(entry.first_approved_at))}</small></td><td>${escapeHtml(entry.latest_recorded_by)}</td><td>${entry.approval_count.toLocaleString()} · ${escapeHtml(entry.latest_source)}</td></tr>`,
+            (entry) => `<tr><td><strong>${escapeHtml(entry.contact_name || "No name")}</strong><small>${escapeHtml([entry.contact_phone, entry.contact_email].filter(Boolean).join(" · "))}</small></td><td><strong>${escapeHtml(entry.address_label || "Address unavailable")}</strong><small>${entry.unit_count > 1 ? `${entry.unit_count} known units · ` : ""}${entry.signature_uploaded ? "Signature on file" : "No signature on file"}${entry.approval_id ? ` · <a href="/api/admin/lawn-signs/${encodeURIComponent(entry.approval_id)}/signature" target="_blank" rel="noreferrer">View</a>` : ""}</small></td><td>${escapeHtml(date(entry.last_approved_at))}<small>First: ${escapeHtml(date(entry.first_approved_at))}</small></td><td>${escapeHtml(entry.latest_recorded_by)}</td><td>${entry.approval_count.toLocaleString()} · ${escapeHtml(entry.latest_source)}</td></tr>`,
           )
           .join("")
       : `<tr><td colspan="5">No lawn-sign approvals recorded yet.</td></tr>`;
@@ -372,34 +391,65 @@ export async function canvassingLawnSignsAdminMain() {
     selected = household;
     selectedAddress.textContent = household.address_label || "Address unavailable";
     selectedUnits.textContent = household.unit_count > 1 ? `${household.unit_count} known residential units at this physical location.` : "One canvassing household.";
-    contactName.value = household.contact_name;
+    providedName.value = household.contact_name;
+    providedAddress.value = household.address_label;
     contactPhone.value = household.contact_phone;
     contactEmail.value = household.contact_email;
     selectedContactSnapshot = { name: household.contact_name, phone: household.contact_phone, email: household.contact_email };
+    signatureInput.value = "";
+    entryForm.hidden = false;
+    entryForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  manualEntryButton.addEventListener("click", () => {
+    selected = null;
+    selectedAddress.textContent = "Manual lawn-sign approval";
+    selectedUnits.textContent = "This approval will be saved without linking to a current canvassing household.";
+    providedName.value = "";
+    providedAddress.value = "";
+    contactPhone.value = "";
+    contactEmail.value = "";
+    signatureInput.value = "";
+    selectedContactSnapshot = { name: "", phone: "", email: "" };
     entryForm.hidden = false;
     entryForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
   entryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!selected) return;
     const button = entryForm.querySelector<HTMLButtonElement>("button[type=submit]")!;
+    const signatureFile = signatureInput.files?.[0];
+    if (!signatureFile) {
+      setMessage("Attach the signed approval before recording it.", true);
+      return;
+    }
+    if (signatureFile.size > 5 * 1024 * 1024) {
+      setMessage("The signature file must be 5 MB or smaller.", true);
+      return;
+    }
     button.disabled = true;
     try {
-      await request("/api/canvassing/visits", {
+      const dataUrl = await readFileAsDataUrl(signatureFile);
+      const comma = dataUrl.indexOf(",");
+      if (!dataUrl.startsWith("data:") || comma < 0)
+        throw new Error("The signature file could not be prepared");
+      const mediaType = dataUrl.slice(5, comma).split(";", 1)[0].toLowerCase();
+      const recorded = await request<{ address: string; duplicate?: boolean }>("/api/admin/lawn-signs", {
         method: "POST",
         body: JSON.stringify({
           submission_key: `admin-lawn-sign-${crypto.randomUUID()}`,
-          household_id: selected.household_id,
-          outcome: "lawn_sign_interest",
-          flyer_delivered: false,
-          door_knocked: false,
-          conversation_occurred: true,
-          issue_categories: [],
-          notes: "",
+          household_id: selected?.household_id ?? null,
+          name: providedName.value.trim(),
+          address: providedAddress.value.trim(),
+          phone: contactPhone.value.trim(),
+          email: contactEmail.value.trim(),
+          signature: {
+            media_type: mediaType,
+            filename: signatureFile.name,
+            data_base64: dataUrl.slice(comma + 1),
+          },
         }),
       });
-      const contact = { name: contactName.value.trim(), phone: contactPhone.value.trim(), email: contactEmail.value.trim() };
-      if (contact.name || contact.phone || contact.email) {
+      if (selected) {
+        const contact = { name: providedName.value.trim(), phone: contactPhone.value.trim(), email: contactEmail.value.trim() };
         const changed = contact.name !== selectedContactSnapshot.name || contact.phone !== selectedContactSnapshot.phone || contact.email !== selectedContactSnapshot.email;
         if (changed)
           await request(`/api/canvassing/households/${encodeURIComponent(selected.household_id)}/contacts`, {
@@ -407,7 +457,7 @@ export async function canvassingLawnSignsAdminMain() {
             body: JSON.stringify({ ...contact, ...(selected.contact_person_id ? { person_id: selected.contact_person_id } : {}) }),
           });
       }
-      setMessage(`Lawn-sign approval recorded for ${selected.address_label}.`);
+      setMessage(recorded.duplicate ? "This lawn-sign approval was already recorded." : `Lawn-sign approval recorded for ${recorded.address}.`);
       selected = null;
       entryForm.reset();
       entryForm.hidden = true;
