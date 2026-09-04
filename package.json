@@ -55,6 +55,7 @@
     "report:carrying-capacity:agroecosystem": "node command/report_agroecosystem.mjs",
     "report:carrying-capacity:food-labour": "node packages/carrying-capacity/scripts/report-food-production-labour.mjs",
     "report:owen-sound-transit-cost": "tsx packages/transit-planner/src/cli/report-cost-model.ts",
+    "report:owen-sound-local-representation-cost": "tsx packages/transit-planner/src/cli/report-local-representation-cost.ts",
     "report:agroecosystem": "node command/report_agroecosystem.mjs",
     "report:arc:site-lease": "node command/report_arc_site_lease.mjs",
     "report:arc:adult-scale": "node command/report_arc_adult_scale.mjs",

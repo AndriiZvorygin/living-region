@@ -1,0 +1,48 @@
+{
+  "contract_version": "1.0.0",
+  "last_updated": "2026-09-04",
+  "sources": [
+    {
+      "id": "helpos_neighbourhoods",
+      "institution": "HelpOS",
+      "title": "Neighbourhoods and Local Representation policy",
+      "url": "https://helpos.ca/mayor/neighbourhoods",
+      "classification": "Campaign planning assumption",
+      "note": "Policy context for demand-led Local Areas, representatives and ward relationships; this calculator does not determine legal authority or employment classification."
+    },
+    {
+      "id": "ontario_living_wage_2025",
+      "institution": "Ontario Living Wage Network",
+      "title": "Updated 2025 living-wage rates",
+      "url": "https://www.ontariolivingwage.ca/updated_2025_rates",
+      "classification": "Official figure",
+      "note": "The Bruce Grey Huron Perth Simcoe 2025 planning rate used here is CAD 24.60/hour. Rates are normally updated annually in November."
+    },
+    {
+      "id": "city_2026_mayors_budget",
+      "institution": "City of Owen Sound",
+      "title": "2026 Mayor's Budget",
+      "url": "https://www.owensound.ca/media/lujd1fw3/2026-mayor-s-budget.pdf",
+      "classification": "Official figure",
+      "note": "The budget reports a 33% full-time employee overhead comparison and an existing resident levy base of CAD 38,133,221."
+    },
+    {
+      "id": "household_equivalent_convention",
+      "institution": "Living Region",
+      "title": "Owen Sound transit household-equivalent convention",
+      "url": "https://andriizvorygin.github.io/living-region/owen-sound-transit",
+      "classification": "Campaign planning assumption",
+      "note": "10,000 is an editable comparison denominator reused from the transit cost model. It is not presented as an official household count."
+    }
+  ],
+  "input_status": {
+    "living_wage": "Official figure",
+    "employer_overhead": "Campaign planning assumption",
+    "time_coefficients": "Campaign planning assumption",
+    "program_costs": "Campaign planning assumption",
+    "local_area_counts": "Campaign planning assumption",
+    "participating_households": "Campaign planning assumption",
+    "avoided_costs": "Quotation or operating data required",
+    "city_support_costs": "Quotation or operating data required"
+  }
+}

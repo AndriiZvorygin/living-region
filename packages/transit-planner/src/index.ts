@@ -459,3 +459,4 @@ export function calculateCoverage(population: GeoCollection, walkingGraph: Stree
 export type { GeoCollection, GeoFeature };
 
 export * from "./cost-model";
+export * from "./local-representation-cost-model";

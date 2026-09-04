@@ -46,6 +46,8 @@ jobs:
           test -f packages/education-web/dist/carrying-capacity/index.html
           test -f packages/education-web/dist/grey-county-transition/index.html
           test -f packages/education-web/dist/arc-affordability/index.html
+          test -f packages/education-web/dist/owen-sound-transit/index.html
+          test -f packages/education-web/dist/owen-sound-local-representation/index.html
           test -f packages/education-web/dist/404.html
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

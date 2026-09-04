@@ -22,3 +22,13 @@ if (JSON.stringify(contract).match(/\bkcal\b/i)) throw new Error('public present
 if (JSON.stringify(contract).match(/\bcalories?\b/i)) throw new Error('public presentation contract leaked a customary calorie term');
 if (JSON.stringify(contract).match(/"(?:wall|roof|floor)_r"\s*:/)) throw new Error('public presentation contract leaked source-style thermal R fields; expose RSI instead');
 console.log(`validated carrying-capacity presentation contract ${contract.contract_version} (${contract.household_presets.length} presets, ${contract.regional.grey.scenarios.length} regional scenarios)`);
+
+const localRoot = path.resolve('packages/education-web/public/generated/local-representation');
+const localPath = path.join(localRoot, 'cost-model.json');
+if (!fs.existsSync(localPath)) throw new Error('local-representation cost contract is missing');
+const local = JSON.parse(fs.readFileSync(localPath, 'utf8'));
+if (!local.contract_version || !local.summary || !Array.isArray(local.tiers) || !local.participation) throw new Error('local-representation cost contract is incomplete');
+if (local.summary.active_local_areas > 70 || local.participation.maximum_active_areas !== 70) throw new Error('local-representation contract has an invalid area cap');
+if (local.tiers.find((row) => row.tier_id === 'tier0')?.gross_annual_cost_cad !== 0) throw new Error('Tier 0 must have zero representative cost');
+if (local.summary.net_municipal_requirement_cad < 0) throw new Error('local-representation net requirement cannot be negative');
+console.log(`validated local-representation cost contract ${local.contract_version} (${local.summary.active_local_areas} active areas)`);
