@@ -32,3 +32,13 @@ if (local.summary.active_local_areas > 70 || local.participation.maximum_active_
 if (local.tiers.find((row) => row.tier_id === 'tier0')?.gross_annual_cost_cad !== 0) throw new Error('Tier 0 must have zero representative cost');
 if (local.summary.net_municipal_requirement_cad < 0) throw new Error('local-representation net requirement cannot be negative');
 console.log(`validated local-representation cost contract ${local.contract_version} (${local.summary.active_local_areas} active areas)`);
+
+const houseRoot = path.resolve('packages/education-web/public/generated/house-cost');
+const housePath = path.join(houseRoot, 'cost-model.json');
+if (!fs.existsSync(housePath)) throw new Error('house-cost contract is missing');
+const house = JSON.parse(fs.readFileSync(housePath, 'utf8'));
+if (!house.contract_version || house.model_id !== 'arc_yurt_house_cost' || !house.central || !house.bands || !house.central.geometry) throw new Error('house-cost contract is incomplete');
+if (!house.central.accounting?.utility_single_home) throw new Error('house-cost contract must enforce one household utility package');
+if (house.central.geometry.roof_sloping_area_m2 <= house.central.geometry.footprint_m2) throw new Error('house-cost contract must use sloping roof area');
+if (!Array.isArray(house.diameter_sensitivity) || house.diameter_sensitivity.length < 5) throw new Error('house-cost contract is missing diameter sensitivity');
+console.log(`validated house-cost contract ${house.contract_version} (${house.central.geometry.usable_floor_area_m2} m2 usable reference)`);

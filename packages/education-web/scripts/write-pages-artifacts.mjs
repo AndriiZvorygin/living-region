@@ -4,10 +4,12 @@ import path from 'node:path';
 const dist = path.resolve('packages/education-web/dist');
 const index = fs.readFileSync(path.join(dist, 'index.html'));
 
-for (const route of ['carrying-capacity', 'grey-county-transition', 'arc-affordability', 'owen-sound-transit', 'owen-sound-local-representation']) {
+for (const route of ['carrying-capacity', 'grey-county-transition', 'arc-affordability', 'house-cost', 'owen-sound-transit', 'owen-sound-local-representation']) {
   const routeDir = path.join(dist, route);
   fs.mkdirSync(routeDir, {recursive: true});
-  const routeIndex = route === 'owen-sound-transit'
+  const routeIndex = route === 'house-cost'
+    ? index.toString().replace('<title>Land &amp; Carrying Capacity | Living Region</title>', '<title>House Cost Calculator | Living Region</title>').replace('Explore the physical land, food, labour and heating constraints in Living Region\'s carrying-capacity model.', 'Explore how yurt size, construction choices, utilities, owner labour and financing affect a resident-owned dwelling cost.')
+    : route === 'owen-sound-transit'
     ? index.toString().replace('<title>Land &amp; Carrying Capacity | Living Region</title>', '<title>Owen Sound Transit Cost Model | Living Region</title>').replace('Explore the physical land, food, labour and heating constraints in Living Region\'s carrying-capacity model.', 'Explore how Owen Sound transit service hours, ridership, fares, grants and recurring savings affect annual municipal funding requirements.')
     : route === 'owen-sound-local-representation'
       ? index.toString().replace('<title>Land &amp; Carrying Capacity | Living Region</title>', '<title>Owen Sound Local Representation Cost Calculator | Living Region</title>').replace('Explore the physical land, food, labour and heating constraints in Living Region\'s carrying-capacity model.', 'Explore how service levels and resident participation affect the annual cost of Local Representatives in Owen Sound.')

@@ -1,0 +1,128 @@
+{
+  "contract_version": "1.0.0",
+  "model_id": "arc_yurt_house_cost",
+  "title": "ARC four-season yurt house cost model",
+  "currency": "CAD",
+  "price_basis_date": "2026-09",
+  "defaults": {
+    "diameter_m": 9.144,
+    "wall_height_m": 2.4,
+    "roof_pitch_degrees": 30,
+    "household_size": 2,
+    "layout": "single_storey",
+    "window_count": 6,
+    "door_count": 2,
+    "partition_loss_fraction": 0.04,
+    "labour_mode": "mixed_labour",
+    "servicing_mode": "arc_household_systems",
+    "tax_rate": 0.13,
+    "contingency_rate": 0.08,
+    "labour_rate_cad_per_hour": 45,
+    "owner_labour_value_rate_cad_per_hour": 24.6,
+    "financing": {
+      "ownership": "financed",
+      "down_payment_rate": 0.1,
+      "interest_rate_annual": 0.06,
+      "amortization_years": 25,
+      "loan_term_years": 5
+    }
+  },
+  "diameter_presets": [
+    {"id": "20ft", "label": "6.096 m / 20 ft", "diameter_m": 6.096},
+    {"id": "24ft", "label": "7.315 m / 24 ft", "diameter_m": 7.3152},
+    {"id": "30ft", "label": "9.144 m / 30 ft", "diameter_m": 9.144},
+    {"id": "35ft", "label": "10.668 m / 35 ft", "diameter_m": 10.668},
+    {"id": "40ft", "label": "12.192 m / 40 ft", "diameter_m": 12.192}
+  ],
+  "layout_rules": {
+    "single_storey": {"label": "Single storey", "upper_floor_fraction": 0, "stair_opening_m2": 0, "restricted_headroom_fraction": 0, "guard_length_m": 0},
+    "partial_loft": {"label": "Partial loft", "upper_floor_fraction": 0.45, "stair_opening_m2": 5.5, "restricted_headroom_fraction": 0.2, "guard_length_m": 8},
+    "full_two_storeys": {"label": "Full two storeys", "upper_floor_fraction": 1, "stair_opening_m2": 8, "restricted_headroom_fraction": 0.15, "guard_length_m": 12}
+  },
+  "labour_modes": {
+    "owner_builder": {"label": "Owner-builder", "paid_labour_share": 0, "owner_labour_share": 1, "description": "Owner labour reduces cash expenditure and remains visible as imputed value."},
+    "mixed_labour": {"label": "Mixed labour", "paid_labour_share": 0.5, "owner_labour_share": 0.5, "description": "A planning split between paid trades and owner work; adjust when a work plan or quotation exists."},
+    "contractor_built": {"label": "Contractor-built", "paid_labour_share": 1, "owner_labour_share": 0, "description": "All owner-eligible construction labour is treated as paid labour at the selected planning rate."}
+  },
+  "servicing_modes": {
+    "arc_household_systems": {
+      "label": "ARC household systems",
+      "description": "The existing ARC low-cost package: roof rainwater collection, first flush, indoor food-grade storage, demand pump, sediment filtration, UV, under-sink RO, compact PEX, private shower, drainless composting toilet, approved greywater pathway, off-grid electricity and seasonal hot water.",
+      "status": "legacy_design_specification_reconciled_planning_assumption",
+      "components": {"water_plumbing": 3940, "sanitation_greywater": 2000, "household_electrical": 3300, "hot_water": 2000}
+    },
+    "generic_well_septic_grid": {
+      "label": "Generic well / septic / grid alternatives",
+      "description": "Site-specific alternative placeholders retained for sites where the ARC household package cannot be approved.",
+      "status": "working_alternative_placeholder",
+      "components": {"water_plumbing": 14000, "sanitation_greywater": 16000, "household_electrical": 12000, "hot_water": 2000}
+    },
+    "centralized_shared_services": {
+      "label": "Centralized shared services",
+      "description": "Household water, sanitation and electrical capital is removed from the dwelling layer and must be quoted in the shared-infrastructure layer. No centralized quote is invented here.",
+      "status": "site_specific_alternative",
+      "components": {"water_plumbing": 0, "sanitation_greywater": 0, "household_electrical": 0, "hot_water": 2000},
+      "shared_infrastructure_additions": {"centralized_water": "quote required", "centralized_sewage": "quote required", "centralized_electrical": "quote required"}
+    }
+  },
+  "tax_and_contingency": {
+    "tax_rate": {"low": 0.05, "central": 0.13, "high": 0.13, "status": "provisional_tax_treatment", "note": "Ontario HST treatment, rebates and owner-builder eligibility require project-specific CRA review."},
+    "contingency_rate": {"low": 0.05, "central": 0.08, "high": 0.12, "status": "campaign_planning_assumption"}
+  },
+  "components": [
+    {"id": "platform_foundation", "label": "Platform / foundation", "stage": "shell", "driver": "footprint_m2", "unit": "CAD/m2", "rates": {"low": 110, "central": 130, "high": 170}, "labour_hours_per_unit": {"low": 0.32, "central": 0.42, "high": 0.6}, "owner_eligible": true, "taxable": true, "status": "planning_rate", "source_note": "Foundation geometry and site loads require design; Ontario tiny-home guidance confirms footing/foundation and anchorage review."},
+    {"id": "frame", "label": "Yurt frame and tension structure", "stage": "shell", "driver": "perimeter_m", "unit": "CAD/m", "rates": {"low": 180, "central": 225, "high": 290}, "labour_hours_per_unit": {"low": 1.3, "central": 1.8, "high": 2.4}, "owner_eligible": true, "taxable": true, "status": "planning_rate", "source_note": "Canadian yurt supplier specifications support diameter, lattice, rafters, crown/dome and cable as distinct physical elements; structural sizing remains engineered."},
+    {"id": "roof", "label": "Roof structure and covering", "stage": "shell", "driver": "roof_area_m2", "unit": "CAD/m2", "rates": {"low": 65, "central": 85, "high": 115}, "labour_hours_per_unit": {"low": 0.7, "central": 1.1, "high": 1.6}, "owner_eligible": true, "taxable": true, "status": "planning_rate", "source_note": "Actual sloping roof area is calculated from radius and roof pitch; Canadian yurt suppliers publish roof and cold-weather package specifications."},
+    {"id": "insulation", "label": "Insulation", "stage": "shell", "driver": "envelope_area_m2", "unit": "CAD/m2", "rates": {"low": 24, "central": 30, "high": 42}, "labour_hours_per_unit": {"low": 0.25, "central": 0.38, "high": 0.55}, "owner_eligible": true, "taxable": true, "status": "planning_rate", "source_note": "Ontario guidance requires year-round energy efficiency and insulation; exact assembly requires envelope design."},
+    {"id": "weatherproofing", "label": "Weatherproofing and air control", "stage": "shell", "driver": "envelope_area_m2", "unit": "CAD/m2", "rates": {"low": 18, "central": 24, "high": 34}, "labour_hours_per_unit": {"low": 0.15, "central": 0.22, "high": 0.32}, "owner_eligible": true, "taxable": true, "status": "planning_rate", "source_note": "Water, moisture and draft control are required design outcomes; product and assembly pricing remains quotation-dependent."},
+    {"id": "windows", "label": "Windows / dome glazing", "stage": "shell", "driver": "window_count", "unit": "CAD/window", "rates": {"low": 400, "central": 550, "high": 850}, "labour_hours_per_unit": {"low": 2.2, "central": 3, "high": 5}, "owner_eligible": true, "taxable": true, "status": "supplier_range_planning_rate", "source_note": "Canadian suppliers publish standard window/dome options and limits; thermal performance and framing are design-specific."},
+    {"id": "doors", "label": "Exterior and interior doors", "stage": "shell", "driver": "door_count", "unit": "CAD/door", "rates": {"low": 900, "central": 1100, "high": 1600}, "labour_hours_per_unit": {"low": 4, "central": 5.5, "high": 8}, "owner_eligible": true, "taxable": true, "status": "supplier_range_planning_rate", "source_note": "Canadian yurt supplier standard door and jamb packages provide a market-spec reference; installed code-compliant openings require confirmation."},
+    {"id": "interior_finishes", "label": "Interior finishes and floor finish", "stage": "insulated_heated", "driver": "usable_floor_area_m2", "unit": "CAD/m2", "rates": {"low": 55, "central": 75, "high": 110}, "labour_hours_per_unit": {"low": 0.7, "central": 1, "high": 1.5}, "owner_eligible": true, "taxable": true, "status": "planning_rate", "source_note": "Open-plan finish allowance; material choice and moisture detailing require a design."},
+    {"id": "upper_floor_structure", "label": "Upper-floor structure and load path", "stage": "shell", "driver": "upper_floor_area_m2", "unit": "CAD/m2", "rates": {"low": 90, "central": 130, "high": 190}, "labour_hours_per_unit": {"low": 0.8, "central": 1.3, "high": 2}, "owner_eligible": true, "taxable": true, "layout_condition": "not_single_storey", "status": "provisional_layout_allowance", "source_note": "Two-storey/loft structure requires span, support, connection and foundation engineering; diameter alone cannot establish feasibility."},
+    {"id": "stairs", "label": "Stairs and access opening", "stage": "insulated_heated", "driver": "stair_count", "unit": "CAD/stair", "rates": {"low": 1200, "central": 1800, "high": 2800}, "labour_hours_per_unit": {"low": 12, "central": 18, "high": 26}, "owner_eligible": true, "taxable": true, "layout_condition": "not_single_storey", "status": "provisional_layout_allowance", "source_note": "Stairs, guards and opening are included as separate upper-floor consequences; code review required."},
+    {"id": "guards", "label": "Loft guards / edge protection", "stage": "insulated_heated", "driver": "guard_length_m", "unit": "CAD/m", "rates": {"low": 85, "central": 120, "high": 170}, "labour_hours_per_unit": {"low": 0.3, "central": 0.5, "high": 0.8}, "owner_eligible": true, "taxable": true, "layout_condition": "not_single_storey", "status": "provisional_layout_allowance", "source_note": "Guard geometry is layout-specific and requires building-code confirmation."},
+    {"id": "kitchen", "label": "Kitchen and food-preparation fixtures", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 2400, "central": 3500, "high": 5000}, "labour_hours_per_unit": {"low": 24, "central": 32, "high": 48}, "owner_eligible": true, "taxable": true, "status": "planning_allowance", "source_note": "Fixture package allowance; appliance selection and utility connections are site/design-specific."},
+    {"id": "bathroom", "label": "Bathroom fixtures and finish", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 2200, "central": 3000, "high": 4500}, "labour_hours_per_unit": {"low": 28, "central": 38, "high": 55}, "owner_eligible": false, "taxable": true, "status": "planning_allowance", "source_note": "Ontario tiny-home guidance identifies sink, bath/shower and toilet/sanitation requirements; qualified trades and approval remain required."},
+    {"id": "heating", "label": "Heating appliance and system", "stage": "insulated_heated", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 3500, "central": 5000, "high": 8000}, "labour_hours_per_unit": {"low": 12, "central": 18, "high": 28}, "owner_eligible": false, "taxable": true, "status": "arc_planning_allocation", "source_note": "Existing ARC winter masonry-heater concept; appliance, chimney/fire safety and installation require design confirmation."},
+    {"id": "ventilation", "label": "Ventilation / air exchange", "stage": "insulated_heated", "driver": "usable_floor_area_m2", "unit": "CAD/m2", "rates": {"low": 12, "central": 20, "high": 32}, "labour_hours_per_unit": {"low": 0.1, "central": 0.16, "high": 0.25}, "owner_eligible": false, "taxable": true, "status": "planning_rate", "source_note": "Ontario guidance recommends HVAC appropriate to small year-round spaces; system selection requires design."},
+    {"id": "household_electrical", "label": "Household electrical equipment", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 2800, "central": 3300, "high": 5000}, "labour_hours_per_unit": {"low": 16, "central": 20, "high": 28}, "owner_eligible": false, "taxable": true, "status": "legacy_design_package_planning_value", "source_note": "Existing ARC approximately 400 Wh/day, 400 W PV, MPPT, 2.52 kWh nominal flooded lead-acid storage and 1,000 W pure-sine inverter."},
+    {"id": "water_plumbing", "label": "Water collection, treatment and plumbing", "stage": "completed", "driver": "servicing_mode", "unit": "CAD/dwelling", "rates": {"low": 0, "central": 0, "high": 0}, "labour_hours_per_unit": {"low": 35, "central": 45, "high": 60}, "owner_eligible": false, "taxable": true, "status": "legacy_design_package_planning_value", "source_note": "Existing ARC package component; service-mode cost is supplied by the servicing evidence record."},
+    {"id": "sanitation_greywater", "label": "Sanitation and greywater", "stage": "completed", "driver": "servicing_mode", "unit": "CAD/dwelling", "rates": {"low": 0, "central": 0, "high": 0}, "labour_hours_per_unit": {"low": 12, "central": 16, "high": 24}, "owner_eligible": false, "taxable": true, "status": "legacy_design_package_planning_value", "source_note": "Existing ARC package component; approval and site-specific Class 2/other sewage pathway remain unresolved."},
+    {"id": "hot_water", "label": "Domestic hot water", "stage": "completed", "driver": "servicing_mode", "unit": "CAD/dwelling", "rates": {"low": 0, "central": 0, "high": 0}, "labour_hours_per_unit": {"low": 10, "central": 14, "high": 20}, "owner_eligible": false, "taxable": true, "status": "legacy_design_package_planning_value", "source_note": "Existing ARC winter thermosiphon and summer solar-thermal concept; plumbing/temperature safety review required."},
+    {"id": "demand_upgrade", "label": "Household demand upgrade", "stage": "completed", "driver": "people_above_two", "unit": "CAD/person above 2", "rates": {"low": 400, "central": 600, "high": 900}, "labour_hours_per_unit": {"low": 2, "central": 4, "high": 6}, "owner_eligible": false, "taxable": true, "status": "planning_assumption", "source_note": "Explicit allowance for larger household storage, fixtures and electrical demand; replace with a design takeoff."},
+    {"id": "delivery", "label": "Delivery and logistics", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 800, "central": 1200, "high": 2500}, "labour_hours_per_unit": {"low": 4, "central": 6, "high": 10}, "owner_eligible": false, "taxable": true, "status": "site_specific_quote_required", "source_note": "Distance, access, crane/hauling and seasonal road conditions require a quotation."},
+    {"id": "equipment_hire", "label": "Equipment hire", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 0, "central": 750, "high": 2500}, "labour_hours_per_unit": {"low": 0, "central": 4, "high": 8}, "owner_eligible": false, "taxable": true, "status": "site_specific_quote_required", "source_note": "Lifting, access and foundation equipment vary with site and layout."},
+    {"id": "design_engineering", "label": "Design and engineering", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 1500, "central": 2500, "high": 5000}, "labour_hours_per_unit": {"low": 0, "central": 0, "high": 0}, "owner_eligible": false, "taxable": true, "status": "quotation_or_engineering_required", "source_note": "Yurt structural system, snow/wind loads, fire separation, envelope, foundation and servicing require qualified design."},
+    {"id": "permits", "label": "Permits and approvals", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "rates": {"low": 500, "central": 1000, "high": 2500}, "labour_hours_per_unit": {"low": 0, "central": 0, "high": 0}, "owner_eligible": false, "taxable": false, "status": "site_specific_fee_required", "source_note": "Ontario requires building permits for tiny homes; local permit/development fees depend on the approving municipality and project."}
+  ],
+  "threshold_rules": [
+    {"id": "large_diameter_9_144", "label": "Diameter above 9.144 m", "trigger": "diameter_m > 9.144", "affected_components": ["platform_foundation", "frame", "roof", "design_engineering"], "added_cost_cad": {"platform_foundation": 1000, "frame": 1400, "roof": 800, "design_engineering": 500}, "confidence": "provisional", "source": "Structural system must be engineered for span, snow and wind loads; the model exposes a planning threshold rather than an approval rule."},
+    {"id": "large_diameter_10_668", "label": "Diameter above 10.668 m", "trigger": "diameter_m > 10.668", "affected_components": ["platform_foundation", "frame", "roof", "design_engineering"], "added_cost_cad": {"platform_foundation": 1800, "frame": 2400, "roof": 1600, "design_engineering": 1000}, "confidence": "provisional", "source": "Larger span and load-path review required; supplier and engineer quotation needed."},
+    {"id": "roof_pitch_above_35", "label": "Roof pitch above 35 degrees", "trigger": "roof_pitch_degrees > 35", "rate_multipliers": {"roof": 1.15, "frame": 1.1}, "confidence": "provisional", "source": "Planning allowance for changed roof geometry and connections; not a code threshold."},
+    {"id": "partial_or_full_upper_floor", "label": "Loft or second storey", "trigger": "layout != single_storey", "affected_components": ["upper_floor_structure", "stairs", "guards", "design_engineering"], "confidence": "provisional", "source": "Upper floor creates additional structure, access, guards and load-path design; design approval required."}
+  ],
+  "legacy_arc_benchmark": {
+    "range_cad": {"low": 51000, "central": 61000, "high": 74000},
+    "diameter_m_rounded": 9.1,
+    "diameter_m_internal": 9.144,
+    "gross_floor_area_m2": 65.6,
+    "note": "The legacy package was an integrated planning benchmark. Its original itemized quote was not recovered; the new model shows the integrated utility package and any new soft-cost/tax/contingency additions separately."
+  },
+  "sources": [
+    {"id": "arc_legacy", "institution": "Living Region", "title": "ARC dwelling cost evidence", "url": "https://github.com/AndriiZvorygin/living-region/blob/main/packages/carrying-capacity/data/source/arc-dwelling-costs.json", "classification": "derived from existing Living Region evidence", "note": "Existing integrated ARC package and utility components; original underlying quote remains unrecovered."},
+    {"id": "biome_yurt", "institution": "Biome Canada", "title": "The Yurt", "url": "https://biome-canada.ca/products/the-yurt/", "classification": "supplier specification", "note": "Canadian diameter options and included structural/envelope elements support geometry and component boundaries; price is not adopted as a local installed quote."},
+    {"id": "yurts_canada", "institution": "Yurts Canada", "title": "Pricing and FAQs", "url": "https://www.yurts-canada.ca/pricing-faqs1", "classification": "supplier specification", "note": "Canadian four-season package and installation/specification context; current quote required for a project."},
+    {"id": "ontario_tiny_code", "institution": "Government of Ontario", "title": "Build or buy a tiny home: Building Code requirements", "url": "https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-requirements", "classification": "official requirement guidance", "note": "Year-round homes require Building Code compliance, plumbing, energy efficiency, foundations/anchorage and site-specific water/sewage review."},
+    {"id": "ontario_tiny_permits", "institution": "Government of Ontario", "title": "Build or buy a tiny home: permits and inspections", "url": "https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-permits-and-inspections", "classification": "official requirement guidance", "note": "Building permits and inspections apply to on-site and factory-built tiny homes."},
+    {"id": "grey_development_charges", "institution": "Grey County", "title": "Development charges", "url": "https://www.grey.ca/government/development-charges", "classification": "official fee schedule", "note": "Development charges are payable when a building permit is issued; actual applicability and current fee require municipal confirmation."},
+    {"id": "cra_hst", "institution": "Canada Revenue Agency", "title": "GST/HST new housing rebate", "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4052.html", "classification": "official tax guidance", "note": "Tax treatment and any rebate depend on owner-builder/builder facts, timing and eligibility; the calculator keeps HST as an editable planning assumption."}
+  ],
+  "accounting_rules": [
+    "A component is assigned one physical driver and appears once in the completed dwelling total.",
+    "The ARC household utility package is carried forward as water/plumbing 3,940 CAD, sanitation/greywater 2,000 CAD, hot water 2,000 CAD and electrical 3,300 CAD; it is not added again as a generic distributed-services placeholder.",
+    "Centralized servicing removes the corresponding household component from resident dwelling capital and exposes the unresolved cost as a shared-infrastructure quotation requirement.",
+    "Owner labour reduces upfront cash but remains visible as owner hours and imputed value; professional work is not treated as owner-replaceable.",
+    "Taxes and contingency are explicit additions. They are not used to force agreement with the legacy CAD 61,000 benchmark.",
+    "A custom completed-dwelling quote overrides financing headline value but leaves the modelled component ledger and unallocated quote difference visible."
+  ]
+}

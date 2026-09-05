@@ -278,3 +278,42 @@ main { max-width: 1180px; }
 .local-rep-nav { margin-bottom: 0; }
 @media (max-width: 900px) { .local-rep-tier-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .local-rep-cost-stack, .local-rep-control-grid { grid-template-columns: 1fr; } .local-rep-field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 430px) { .local-rep-answer-grid { grid-template-columns: 1fr; } .local-rep-total { padding: 19px; } .local-rep-total strong { font-size: 2.15rem; } .local-rep-tier-grid, .local-rep-field-grid { grid-template-columns: 1fr; } .local-rep-bar-row { grid-template-columns: 54px minmax(0, 1fr); } .local-rep-bar-row strong { grid-column: 2; } }
+
+/* Resident-owned house cost calculator. */
+.house-cost-hero { border-bottom: 4px solid var(--amber); }
+.house-cost-nav { margin-bottom: 0; }
+.house-answer { background: #fff; }
+.house-answer-stack { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr); gap: 24px; margin-top: 24px; }
+.house-cost-list { margin: 0; }
+.house-cost-list > div { display: flex; justify-content: space-between; gap: 18px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.house-cost-list dt { color: var(--muted); }
+.house-cost-list dd { margin: 0; font-weight: 800; }
+.house-cost-list .total { border-top: 3px solid var(--teal); border-bottom: 0; padding-top: 16px; color: var(--teal); font-size: 1.12rem; }
+.house-highlight { padding: 23px; border-top: 4px solid var(--amber); background: var(--ink); color: #fff; }
+.house-highlight p { color: #e8eee8; }
+.house-highlight strong { display: block; margin: 10px 0; color: #f6d67b; font: 700 2.5rem/1 Georgia, serif; }
+.house-highlight .button.secondary { color: #fff; border-color: #f6d67b; }
+.house-boundary-note { margin: 28px 0 0; padding: 15px 17px; border-left: 4px solid var(--sage); background: #edf2ec; }
+.house-control-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.house-control-grid > div { min-width: 0; padding: 19px; border-top: 3px solid var(--sage); background: #fff; }
+.house-control-grid h3 { margin-top: 0; }
+.house-control-grid .controls-row { margin-bottom: 12px; }
+.house-quote-control { max-width: 430px; margin-top: 15px; }
+.house-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 22px; }
+.house-cost-table { min-width: 1120px; }
+.house-cost-table input { width: 96px; min-height: 36px; padding: 6px 7px; }
+.house-cost-table td:nth-child(4) { white-space: nowrap; }
+.house-cost-table details p { max-width: 280px; }
+.house-sensitivity-table { min-width: 760px; margin: 22px 0; }
+.house-bars { display: grid; gap: 12px; max-width: 850px; margin: 24px 0 28px; padding: 18px; border: 1px solid var(--line); background: #fff; }
+.house-bar-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: .82rem; }
+.house-bar-row > span { font-weight: 800; }
+.house-bar-track { height: 16px; background: #e4e9e2; }
+.house-bar-track i { display: block; height: 100%; background: var(--teal); }
+.house-bar-row strong { min-width: 90px; text-align: right; }
+.house-evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.house-evidence-grid > div { min-width: 0; padding: 19px; border-top: 3px solid var(--sage); background: #fff; }
+.house-evidence-grid h3 { margin-top: 0; }
+.house-evidence-grid ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); line-height: 1.65; }
+@media (max-width: 900px) { .house-answer-stack, .house-control-grid, .house-evidence-grid { grid-template-columns: 1fr; } }
+@media (max-width: 430px) { .house-bar-row { grid-template-columns: 1fr auto; } .house-bar-row span { grid-column: 1 / -1; } .house-bar-row strong { min-width: 0; } .house-highlight strong { font-size: 2.15rem; } }
