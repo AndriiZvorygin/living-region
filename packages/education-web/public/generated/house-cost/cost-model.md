@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 3.0.0 on 2026-09-06. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.0.0 on 2026-09-06. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -26,16 +26,32 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 
 - Supplier package: **Yurts Canada 30 ft**, $36,404.00 (exact_published_or_selected_package)
 - Geometry: 9.144 m diameter; 65.67 m² gross; 63.04 m² usable after explicit deductions
-- Direct cash before tax and contingency: **$84,927.65**
-- Taxes / HST allowance: $11,040.59
-- Contingency: $7,677.46
-- Completed dwelling cash construction budget: **$103,645.70**
-- Contributed owner-labour value: $2,466.59
-- Completed dwelling economic cost: **$106,112.29**
-- Initial financing contribution: $10,364.57; financed principal: $93,281.13
-- Illustrative financing: **$601.01/month** at 6% interest and 25-year amortization
+- Direct cash before tax and contingency: **$79,998.90**
+- Taxes / HST allowance: $10,399.86
+- Contingency: $7,231.90
+- Completed dwelling cash construction budget: **$97,630.66**
+- Contributed owner-labour value: $2,177.54
+- Completed dwelling economic cost: **$99,808.20**
+- Initial financing contribution: $9,763.07; financed principal: $87,867.59
+- Illustrative financing: **$566.13/month** at 6% interest and 25-year amortization
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Layered price from package to dwelling
+
+The public starting view is the selected supplier package. It is distinct from the completed dwelling. Select the **Basic completed ARC dwelling** stage to include all five layers, or stop earlier to see outstanding requirements before occupancy.
+
+| Layer | Incremental cash | Running cash total | Component rows |
+| --- | ---: | ---: | --- |
+| Yurt package | $36,404.00 | $36,404.00 | purchased_yurt_package |
+| Platform and foundation | $8,218.49 | $44,622.49 | platform_support_blocks, platform_pt_beams, platform_joists, platform_decking, platform_floor_insulation, platform_vapour_layer, platform_connectors |
+| Four-season completion | $11,600.79 | $56,223.28 | interior_finish_materials, wood_stove_and_chimney, balanced_ventilation |
+| Basic household amenities | $17,975.62 | $74,198.90 | kitchen_fitout_materials, bathroom_fitout_materials, water_collection_storage_first_flush, water_demand_pump, water_sediment_and_uv, compact_pex_and_fittings, sink_and_shower_fixtures, composting_toilet, class_2_greywater, qualified_water_installation, water_permit_allowance, solar_thermal_collector, hot_water_storage_and_controls, thermosiphon_integration, hot_water_integration_labour, pv_400w, mppt_controller, lead_acid_bank, pure_sine_inverter, dc_ac_wiring_protection, qualified_electrical_labour, electrical_inspection |
+| Project costs and optional upgrades | $23,431.76 | $97,630.66 | delivery_logistics, design_engineering, permits, taxes, contingency |
+
+- Selected public stage: **Yurt package**, $36,404.00 cash and $36,404.00 economic cost.
+- Selected-stage financing payment: **$211.10/month**.
+- Layer reconciliation: passed; economic layer reconciliation: passed.
 
 ## Platform and foundation BOM
 
@@ -89,8 +105,6 @@ Each row below has one home in the dwelling. Included supplier items are not rep
 | 2 in XPS floor insulation | 49 | panel | $43.49 | $2,131.01 | 27 h | $2,737.39 | provisional_quantity |
 | 6 mil vapour/protective layer | 1 | roll | $92.96 | $92.96 | 0.6 h | $105.34 | provisional_quantity |
 | Connectors, fasteners and anchors | 1 | allowance | $650.00 | $650.00 | 4 h | $740.00 | provisional_quote_required |
-| Additional insulated windows | 6 | CAD/window | $550.00 | $3,300.00 | 18 h | $3,705.00 | published_supplier_range_planning_rate |
-| Additional exterior/interior door | 1 | CAD/door | $1,100.00 | $1,100.00 | 5.5 h | $1,223.75 | published_supplier_range_planning_rate |
 | Interior floor finish and partitions | 63.043 | CAD/m2 | $45.00 | $2,836.91 | 50.4 h | $3,971.68 | provisional_material_and_labour_allowance |
 | Kitchen cabinetry, counter and basic appliances | 1 | CAD/dwelling | $2,750.00 | $2,750.00 | 26 h | $3,335.00 | provisional_itemized_fitout_allowance |
 | Bathroom non-plumbing fit-out | 1 | CAD/dwelling | $1,650.00 | $1,650.00 | 24 h | $2,190.00 | provisional_itemized_fitout_allowance |
@@ -157,7 +171,7 @@ The historical structural amount was a design-brief figure whose supporting take
 
 ## Former-model numerical reconciliation
 
-The former itemized model produced $108,247.21 economic cost. The audited first-principles result is $106,112.29, a change of -$2,134.92. This bridge keeps package scope, tax, contingency and contributed labour visible instead of applying a discount to reach the historical ARC benchmark.
+The former itemized model produced $108,247.21 economic cost. The audited first-principles result is $99,808.20, a change of -$8,439.01. This bridge keeps package scope, tax, contingency and contributed labour visible instead of applying a discount to reach the historical ARC benchmark.
 
 | Component | Original scope / amount | Former model cash | Audited scope / amount | Change from former | Evidence / reason |
 | --- | --- | ---: | --- | ---: | --- |
@@ -166,31 +180,31 @@ The former itemized model produced $108,247.21 economic cost. The audited first-
 | Household electrical | Inclusive off-grid package including qualified labour and inspection allowance / $3,300.00 | $4,200.00 | One inclusive package; labour and inspection allowance exposed inside package / $3,706.00 | -$494.00 | Historical ARC design brief; original itemized quotation unrecovered. |
 | General permits | The utility package includes CAD 600 permit allowance / $0.00 | $1,000.00 | Residual general permit allowance after CAD 600 package offset / $1,000.00 | $0.00 | Historical ARC package detail plus current municipal-fee placeholder. |
 
-The total bridge is direct cash -$120.08, tax $114.39, contingency -$0.46 and owner-labour economic value -$2,128.77. The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.
+The total bridge is direct cash -$5,048.83, tax -$526.35, contingency -$446.01 and owner-labour economic value -$2,417.82. The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.
 
 ## Labour modes
 
 | Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Owner-builder | $98,139.21 | $103,072.35 | 200.5 h | 82.7 h | $569.08 / month |
-| Mixed labour | $103,645.70 | $106,112.29 | 100.3 h | 182.9 h | $601.01 / month |
-| Contractor-built | $109,152.14 | $109,152.14 | 0 h | 283.2 h | $632.94 / month |
+| Owner-builder | $92,769.45 | $97,124.49 | 177 h | 82.7 h | $537.94 / month |
+| Mixed labour | $97,630.66 | $99,808.20 | 88.5 h | 171.2 h | $566.13 / month |
+| Contractor-built | $102,491.80 | $102,491.80 | 0 h | 259.7 h | $594.32 / month |
 
 ## Size and layout sensitivity
 
 | Diameter | Usable m² | Cash budget | Economic cost | Economic / usable m² | Thresholds |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 6.096 m / 20 ft | 28.0 | $74,257.35 | $75,905.76 | $2,709.09 | none |
-| 7.315 m / 24 ft | 40.3 | $85,161.79 | $87,107.39 | $2,158.95 | none |
-| 9.144 m / 30 ft | 63.0 | $103,645.70 | $106,112.29 | $1,683.19 | none |
-| 10.668 m / 35 ft | 85.8 | $112,814.28 | $115,822.83 | $1,349.79 | large_diameter_9_144 |
-| 12.192 m / 40 ft | 112.1 | $125,272.47 | $128,877.73 | $1,149.92 | large_diameter_9_144, large_diameter_10_668 |
+| 6.096 m / 20 ft | 28.0 | $68,242.30 | $69,601.66 | $2,484.10 | none |
+| 7.315 m / 24 ft | 40.3 | $79,146.75 | $80,803.30 | $2,002.70 | none |
+| 9.144 m / 30 ft | 63.0 | $97,630.66 | $99,808.20 | $1,583.19 | none |
+| 10.668 m / 35 ft | 85.8 | $106,799.23 | $109,518.73 | $1,276.32 | large_diameter_9_144 |
+| 12.192 m / 40 ft | 112.1 | $119,257.43 | $122,573.64 | $1,093.67 | large_diameter_9_144, large_diameter_10_668 |
 
 | Layout | Usable m² | Cash budget | Economic cost | Owner hours | Paid hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Single storey | 63.0 | $103,645.70 | $106,112.29 | 100.3 h | 182.9 h |
-| Partial loft | 76.2 | $114,718.76 | $118,058.15 | 135.8 h | 220 h |
-| Full two storeys | 118.1 | $126,691.04 | $131,044.50 | 177 h | 266.3 h |
+| Single storey | 63.0 | $97,630.66 | $99,808.20 | 88.5 h | 171.2 h |
+| Partial loft | 76.2 | $108,703.71 | $111,754.05 | 124 h | 208.3 h |
+| Full two storeys | 118.1 | $120,676.00 | $124,740.41 | 165.2 h | 254.5 h |
 
 Interpolated sizes are labelled in the JSON contract. Thresholds for larger spans, roof pitch and upper floors are provisional planning rules, not structural approval. Snow, wind, foundations, connections, fire safety and final assemblies require qualified design.
 

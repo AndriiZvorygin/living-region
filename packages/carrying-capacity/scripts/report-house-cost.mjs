@@ -29,6 +29,7 @@ const diameterRows = contract.diameter_sensitivity.map((row) => `| ${row.label} 
 const layoutRows = contract.layout_comparison.map((row) => `| ${row.label} | ${row.usable_floor_area_m2.toFixed(1)} | ${money(row.upfront_cash_required_cad)} | ${money(row.completed_dwelling_capital_cad)} | ${hours(row.owner_labour_hours)} | ${hours(row.paid_labour_hours)} |`).join('\n');
 const historicalRows = central.legacy_reconciliation.historical_scope_components.map((row) => `| ${row.scope} | ${money(row.amount_cad)} | ${row.status} |`).join('\n');
 const bridgeRows = central.legacy_reconciliation.bridge_rows.map((row) => `| ${row.component} | ${row.original_scope} / ${money(row.original_amount_cad)} | ${money(row.former_model_amount_cad)} | ${row.new_scope} / ${money(row.new_amount_cad)} | ${signedMoney(row.delta_from_former_model_cad)} | ${row.evidence} |`).join('\n');
+const layerRows = central.pricing_layers.map((layer) => `| ${layer.label} | ${money(layer.incremental_cash_cost_cad)} | ${money(layer.cumulative_cash_cost_cad)} | ${layer.component_ids.join(', ') || 'none'} |`).join('\n');
 const markdown = `# House Cost Calculator
 
 Generated from contract ${HOUSE_COST_CONTRACT_VERSION} on ${generatedDate}. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
@@ -57,6 +58,18 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 - Illustrative financing: **${money(central.financing.monthly_debt_service_cad)}/month** at ${central.financing.interest_rate_annual * 100}% interest and ${central.financing.amortization_years}-year amortization
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Layered price from package to dwelling
+
+The public starting view is the selected supplier package. It is distinct from the completed dwelling. Select the **Basic completed ARC dwelling** stage to include all five layers, or stop earlier to see outstanding requirements before occupancy.
+
+| Layer | Incremental cash | Running cash total | Component rows |
+| --- | ---: | ---: | --- |
+${layerRows}
+
+- Selected public stage: **${central.selected_stage.label}**, ${money(central.selected_stage.cash_cost_cad)} cash and ${money(central.selected_stage.economic_cost_cad)} economic cost.
+- Selected-stage financing payment: **${money(central.selected_financing.monthly_debt_service_cad)}/month**.
+- Layer reconciliation: ${central.accounting.pricing_layer_sum_check ? 'passed' : 'failed'}; economic layer reconciliation: ${central.accounting.pricing_layer_economic_sum_check ? 'passed' : 'failed'}.
 
 ## Platform and foundation BOM
 

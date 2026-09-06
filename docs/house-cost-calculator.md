@@ -15,6 +15,20 @@ published yurt package
   = dwelling cash construction budget
 ```
 
+The public calculator opens at the **Yurt package** layer. This is a package-only price, not an occupancy-ready home: supplier-bundled insulation and installation remain inside the supplier price when the selected product includes them. The user can stop at four explicit stages: package-only, platform-supported shell, four-season structure and Basic completed ARC dwelling. The last stage is a selectable modest completion preset rather than the default opening price.
+
+At the 30 ft reference diameter, the central cash layers are:
+
+| Layer | Incremental cash | Running cash total |
+| --- | ---: | ---: |
+| Yurt package | `$36,404.00` | `$36,404.00` |
+| Platform and foundation | `$8,218.49` | `$44,622.49` |
+| Four-season completion | `$11,600.79` | `$56,223.28` |
+| Basic household amenities | `$17,975.62` | `$74,198.90` |
+| Project costs and optional upgrades | `$23,431.76` | `$97,630.66` |
+
+The full cash total includes all five layers, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
+
 The household owns the dwelling and can build equity in it. Land purchase, site lease, shared infrastructure and household operating costs remain outside this calculator.
 
 ## Market evidence

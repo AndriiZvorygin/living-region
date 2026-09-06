@@ -40,7 +40,7 @@ const house = JSON.parse(fs.readFileSync(housePath, 'utf8'));
 if (!house.contract_version || house.model_id !== 'arc_yurt_house_cost' || !house.central || !house.bands || !house.central.geometry) throw new Error('house-cost contract is incomplete');
 if (!house.central.accounting?.utility_single_home) throw new Error('house-cost contract must enforce one household utility package');
 if (house.central.geometry.roof_sloping_area_m2 <= house.central.geometry.footprint_m2) throw new Error('house-cost contract must use sloping roof area');
-if (house.contract_version !== '3.0.0') throw new Error('house-cost contract must expose the first-principles v3 accounting');
+if (house.contract_version !== '4.0.0') throw new Error('house-cost contract must expose the layered first-principles v4 accounting');
 if (!house.market_evidence?.pricing_model_id || !house.market_evidence?.yurt_packages?.length) throw new Error('house-cost contract is missing sourced yurt package evidence');
 if (!house.central.supplier_package?.selected_price_cad || !house.central.supplier_package?.source_url) throw new Error('house-cost contract is missing the selected supplier package');
 if (!house.central.market_evidence?.platform_design?.rows?.length) throw new Error('house-cost contract is missing the platform quantity design');
@@ -48,4 +48,7 @@ if (house.central.accounting?.no_historical_input_used !== true || house.central
 if (!house.central.components.some((row) => row.id === 'water_collection_storage_first_flush') || !house.central.components.some((row) => row.id === 'pv_400w')) throw new Error('house-cost contract is missing itemized household systems');
 if (house.central.geometry.inputs.diameter_m === 9.144 && house.central.thresholds.applied.some((row) => row.id === 'large_diameter_9_144')) throw new Error('reference diameter incorrectly activates a structural threshold');
 if (!Array.isArray(house.diameter_sensitivity) || house.diameter_sensitivity.length < 5) throw new Error('house-cost contract is missing diameter sensitivity');
+if (!Array.isArray(house.pricing_layers) || house.pricing_layers.length !== 5) throw new Error('house-cost contract must expose five pricing layers');
+if (house.defaults?.completion_stage !== 'yurt_package') throw new Error('house-cost defaults must open at the yurt package layer');
+if (house.central?.accounting?.pricing_layer_sum_check !== true) throw new Error('house-cost central pricing layers must reconcile');
 console.log(`validated house-cost contract ${house.contract_version} (${house.central.geometry.usable_floor_area_m2} m2 usable reference)`);

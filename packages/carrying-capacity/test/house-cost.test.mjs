@@ -27,7 +27,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '3.0.0');
+  assert.equal(result.contract_version, '4.0.0');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -35,6 +35,11 @@ test('published supplier package is the first pricing input', () => {
   assert.equal(result.supplier_package.inclusion_matrix.platform, 'excluded');
   assert.equal(result.supplier_package.inclusion_matrix.utilities, 'excluded');
   assert.equal(result.accounting.no_historical_input_used, true);
+  assert.equal(result.completion_stage, 'yurt_package');
+  assert.equal(result.selected_stage.label, 'Yurt package');
+  assert.match(result.selected_stage.description, /not a platform-supported or habitable dwelling/);
+  assert.equal(result.components.find((row) => row.id === 'additional_windows'), undefined);
+  assert.equal(result.components.find((row) => row.id === 'additional_doors'), undefined);
 });
 
 test('priced supplier selection remains available without using the historical ARC total', () => {
@@ -161,16 +166,42 @@ test('custom quote overrides only the financing headline and stays auditable', (
 });
 
 test('ARC integration keeps dwelling finance separate from land and infrastructure', () => {
-  const house = calculateHouseCost();
+  const house = calculateHouseCost({completionStage: 'basic_completed_arc'});
   const integrated = buildArcDwellingAffordabilityIntegration({houseCost: house, landAndInfrastructureMonthlyCad: 268.22});
-  assert.equal(integrated.dwelling_capital_cad, house.totals.completed_dwelling_capital_cad);
+  assert.equal(integrated.dwelling_capital_cad, house.selected_stage.economic_cost_cad);
   assert.equal(integrated.land_and_shared_infrastructure_monthly_cad, 268.22);
-  assert.equal(integrated.combined_monthly_cad, Math.round((house.financing.monthly_debt_service_cad + 268.22) * 100) / 100);
+  assert.equal(integrated.completion_stage, 'basic_completed_arc');
+  assert.equal(integrated.combined_monthly_cad, Math.round((house.selected_financing.monthly_debt_service_cad + 268.22) * 100) / 100);
+});
+
+test('layered pricing starts with the supplier package and reconciles every layer', () => {
+  const bare = calculateHouseCost();
+  const complete = calculateHouseCost({completionStage: 'basic_completed_arc'});
+  assert.equal(bare.pricing_layers.length, 5);
+  assert.equal(bare.pricing_layers[0].incremental_cash_cost_cad, bare.supplier_package.selected_price_cad);
+  assert.equal(bare.selected_stage.cash_cost_cad, bare.pricing_layers[0].cumulative_cash_cost_cad);
+  assert.equal(complete.selected_stage.cash_cost_cad, complete.totals.upfront_cash_required_cad);
+  assert.equal(complete.pricing_layers.at(-1).cumulative_cash_cost_cad, complete.totals.upfront_cash_required_cad);
+  assert.equal(complete.accounting.pricing_layer_sum_check, true);
+  assert.equal(complete.accounting.pricing_layer_economic_sum_check, true);
+  assert.ok(complete.pricing_layers.every((layer) => layer.component_ids.every((id) => id)));
+});
+
+test('completion stages expose outstanding work and stage-specific financing', () => {
+  const packageStage = calculateHouseCost({completionStage: 'yurt_package'});
+  const platformStage = calculateHouseCost({completionStage: 'platform_supported_shell'});
+  const completed = calculateHouseCost({completionStage: 'basic_completed_arc'});
+  assert.deepEqual(packageStage.selected_stage.layer_ids, ['yurt_package']);
+  assert.deepEqual(packageStage.selected_stage.remaining_layer_ids, ['platform_foundation', 'four_season_completion', 'basic_household_amenities', 'project_costs']);
+  assert.ok(platformStage.selected_stage.cash_cost_cad > packageStage.selected_stage.cash_cost_cad);
+  assert.ok(completed.selected_financing.monthly_debt_service_cad > packageStage.selected_financing.monthly_debt_service_cad);
+  assert.equal(completed.selected_stage.label, 'Basic completed ARC dwelling');
+  assert.match(completed.selected_stage.description, /household systems/);
 });
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '3.0.0');
+  assert.equal(contract.contract_version, '4.0.0');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));
@@ -179,4 +210,6 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.ok(contract.diameter_sensitivity.length >= 5);
   assert.equal(contract.layout_comparison.length, 3);
   assert.ok(contract.central.supplier_package.source_url);
+  assert.equal(contract.pricing_layers.length, 5);
+  assert.equal(contract.defaults.completion_stage, 'yurt_package');
 });

@@ -2,7 +2,7 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {financeCapital} from './site-lease-browser.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '3.0.0';
+export const HOUSE_COST_CONTRACT_VERSION = '4.0.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 
@@ -14,6 +14,38 @@ const roundSigned = (value, digits = 2) => Math.round(finite(value) * 10 ** digi
 const sum = (rows, key) => rows.reduce((total, row) => total + finite(row[key]), 0);
 
 const SOFT_COMPONENTS = new Set(['delivery', 'equipment_hire', 'design_engineering', 'permits']);
+
+export const HOUSE_COST_PRICING_LAYERS = [
+  {id: 'yurt_package', label: 'Yurt package', stage: 'bare_package', description: 'The selected supplier package and its published inclusions only.'},
+  {id: 'platform_foundation', label: 'Platform and foundation', stage: 'platform_supported_shell', description: 'The preliminary platform/foundation BOM, supports, fasteners and assembly.'},
+  {id: 'four_season_completion', label: 'Four-season completion', stage: 'four_season_structure', description: 'Additional openings, envelope work, heating, chimney, ventilation and layout structure.'},
+  {id: 'basic_household_amenities', label: 'Basic household amenities', stage: 'basic_completed_arc', description: 'Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.'},
+  {id: 'project_costs', label: 'Project costs and optional upgrades', stage: 'basic_completed_arc', description: 'Delivery, design, permits, taxes, contingency and explicitly selected project allowances.'}
+];
+
+const COMPLETION_STAGE_IDS = new Set(HOUSE_COST_PRICING_LAYERS.map((layer) => layer.stage));
+const COMPLETION_STAGE_ALIASES = {package: 'yurt_package', bare_package: 'yurt_package', platform_shell: 'platform_supported_shell', four_season: 'four_season_structure', completed: 'basic_completed_arc'};
+const COMPLETION_STAGE_LAYER_COUNTS = {yurt_package: 1, platform_supported_shell: 2, four_season_structure: 3, basic_completed_arc: HOUSE_COST_PRICING_LAYERS.length};
+const COMPLETION_STAGE_PRESENTATION = {
+  yurt_package: {label: 'Yurt package', description: 'Package-only view: the selected supplier price and its published inclusions. It is not a platform-supported or habitable dwelling.'},
+  platform_supported_shell: {label: 'Platform-supported shell', description: 'Supplier package plus the preliminary platform and foundation BOM.'},
+  four_season_structure: {label: 'Four-season structure', description: 'Platform-supported shell plus additional four-season completion work.'},
+  basic_completed_arc: {label: 'Basic completed ARC dwelling', description: 'The modest ARC completion specification, including household systems and project-cost allowances.'}
+};
+
+function normalizeCompletionStage(value) {
+  const normalized = COMPLETION_STAGE_ALIASES[value] ?? value;
+  return COMPLETION_STAGE_IDS.has(normalized) ? normalized : (evidence.defaults.completion_stage ?? 'yurt_package');
+}
+
+function pricingLayerForRow(row) {
+  if (row.id === 'purchased_yurt_package') return 'yurt_package';
+  if (row.id.startsWith('platform_')) return 'platform_foundation';
+  if (['additional_windows', 'additional_doors', 'additional_interior_liner_and_furring', 'interior_finish_materials', 'upper_floor_structure', 'stairs', 'guards', 'wood_stove_and_chimney', 'balanced_ventilation'].includes(row.id)) return 'four_season_completion';
+  if (['kitchen_fitout_materials', 'bathroom_fitout_materials'].includes(row.id) || String(row.package_id ?? '').startsWith('utility_') || String(row.package_id ?? '').startsWith('alternative_')) return 'basic_household_amenities';
+  if (['delivery_logistics', 'design_engineering', 'permits'].includes(row.id)) return 'project_costs';
+  return row.stage === 'shell' ? 'four_season_completion' : 'basic_household_amenities';
+}
 
 function layoutRule(layout) {
   return evidence.layout_rules[layout] ?? evidence.layout_rules.single_storey;
@@ -30,7 +62,7 @@ function normalizeDesign(design = {}) {
     roof_pitch_degrees: clamp(design.roof_pitch_degrees ?? evidence.defaults.roof_pitch_degrees, 10, 60),
     household_size: Math.max(1, Math.round(finite(design.household_size, evidence.defaults.household_size))),
     layout,
-    window_count: Math.max(1, Math.round(finite(design.window_count, evidence.defaults.window_count))),
+    window_count: Math.max(0, Math.round(finite(design.window_count, evidence.defaults.window_count))),
     door_count: Math.max(1, Math.round(finite(design.door_count, evidence.defaults.door_count))),
     partition_loss_fraction: clamp(design.partition_loss_fraction ?? evidence.defaults.partition_loss_fraction, 0, .25),
     stair_opening_m2: Math.max(0, finite(design.stair_opening_m2, rule.stair_opening_m2)),
@@ -186,6 +218,7 @@ function normalizeOptions(options = {}) {
   const labourMode = evidence.labour_modes[options.labourMode] ? options.labourMode : evidence.defaults.labour_mode;
   return {
     band,
+    completionStage: normalizeCompletionStage(options.completionStage),
     servicingMode,
     labourMode,
     design: normalizeDesign(options.design),
@@ -319,6 +352,7 @@ function calculateLegacyRateHouseCost(options = {}) {
     package_label: evidence.title,
     price_basis_date: evidence.price_basis_date,
     band: input.band,
+    completion_stage: input.completionStage,
     design: geometry.inputs,
     geometry,
     servicing: {mode: input.servicingMode, ...evidence.servicing_modes[input.servicingMode], shared_infrastructure_additions: sharedServices},
@@ -649,7 +683,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   } else {
     rows.push(...firstPrinciplesUtilityRows(input));
   }
-  const activeRows = rows.filter((row) => row.active && row.quantity > 0);
+  const activeRows = rows.filter((row) => row.active && row.quantity > 0).map((row) => ({...row, pricing_layer: pricingLayerForRow(row)}));
   const itemizedPackage = utilityPackageBundle(input.servicingMode);
   const serviceComponents = itemizedPackage
     ? Object.fromEntries([...new Set(itemizedPackage.rows.map((row) => row.source_package_id))].map((packageId) => [packageId, round(sum(activeRows.filter((row) => row.source_package_id === packageId), 'cash_cost_cad'))]))
@@ -659,8 +693,8 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   const taxes = taxableCash * input.taxRate;
   const contingency = (directCashBeforeTax + taxes) * input.contingencyRate;
   const additionalRows = [
-    {id: 'taxes', label: 'Taxes / HST allowance', driver: 'taxable cash cost', unit: 'CAD', quantity: input.taxRate, unit_rate_cad: taxableCash, cash_cost_cad: taxes, status: 'provisional_tax_treatment', source_note: 'Tax treatment and any new-housing rebate require project-specific review.'},
-    {id: 'contingency', label: 'Contingency', driver: 'pre-contingency cash', unit: 'CAD', quantity: input.contingencyRate, unit_rate_cad: directCashBeforeTax + taxes, cash_cost_cad: contingency, status: 'campaign_planning_assumption', source_note: 'Explicit planning allowance; not a hidden calibration adjustment.'}
+    {id: 'taxes', label: 'Taxes / HST allowance', driver: 'taxable cash cost', unit: 'CAD', quantity: input.taxRate, unit_rate_cad: taxableCash, cash_cost_cad: taxes, economic_capital_cad: taxes, pricing_layer: 'project_costs', status: 'provisional_tax_treatment', source_note: 'Tax treatment and any new-housing rebate require project-specific review.'},
+    {id: 'contingency', label: 'Contingency', driver: 'pre-contingency cash', unit: 'CAD', quantity: input.contingencyRate, unit_rate_cad: directCashBeforeTax + taxes, cash_cost_cad: contingency, economic_capital_cad: contingency, pricing_layer: 'project_costs', status: 'campaign_planning_assumption', source_note: 'Explicit planning allowance; not a hidden calibration adjustment.'}
   ];
   const upfrontCash = directCashBeforeTax + taxes + contingency;
   const ownerImputed = sum(activeRows, 'owner_labour_imputed_cad');
@@ -670,6 +704,25 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   const financing = financeCapital({value: headlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, interestRateAnnual: input.financing.interestRateAnnual, amortizationYears: input.financing.amortizationYears, loanTermYears: input.financing.loanTermYears});
   const stageRows = (stage) => activeRows.filter((row) => stage === 'shell' ? row.stage === 'shell' : stage === 'insulated_heated' ? ['shell', 'insulated_heated'].includes(row.stage) : true);
   const stageTotal = (stage) => sum(stageRows(stage), 'cash_cost_cad');
+  const allLayerRows = [...activeRows, ...additionalRows];
+  let cumulativeLayerCash = 0;
+  let cumulativeLayerEconomic = 0;
+  const pricingLayers = HOUSE_COST_PRICING_LAYERS.map((definition) => {
+    const layerRows = allLayerRows.filter((row) => row.pricing_layer === definition.id);
+    const incrementalCash = sum(layerRows, 'cash_cost_cad');
+    const incrementalEconomic = sum(layerRows, 'economic_capital_cad');
+    cumulativeLayerCash += incrementalCash;
+    cumulativeLayerEconomic += incrementalEconomic;
+    return {...definition, incremental_cash_cost_cad: round(incrementalCash), incremental_economic_cost_cad: round(incrementalEconomic), cumulative_cash_cost_cad: round(cumulativeLayerCash), cumulative_economic_cost_cad: round(cumulativeLayerEconomic), component_ids: layerRows.map((row) => row.id)};
+  });
+  const selectedLayerIndex = Math.max(0, (COMPLETION_STAGE_LAYER_COUNTS[input.completionStage] ?? 1) - 1);
+  const selectedLayer = pricingLayers[selectedLayerIndex] ?? pricingLayers[0];
+  const selectedLayerIds = new Set(pricingLayers.slice(0, selectedLayerIndex + 1).map((layer) => layer.id));
+  const selectedRows = allLayerRows.filter((row) => selectedLayerIds.has(row.pricing_layer));
+  const selectedCash = sum(selectedRows, 'cash_cost_cad');
+  const selectedEconomic = sum(selectedRows, 'economic_capital_cad');
+  const selectedHeadlineCapital = customQuote && input.completionStage === 'basic_completed_arc' ? input.customCompletedQuoteCad : selectedCash;
+  const selectedFinancing = financeCapital({value: selectedHeadlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, interestRateAnnual: input.financing.interestRateAnnual, amortizationYears: input.financing.amortizationYears, loanTermYears: input.financing.loanTermYears});
   const sourceList = [...evidence.sources, ...marketEvidence.suppliers.map((supplier) => ({id: supplier.id, institution: supplier.name, title: 'Yurt package and price evidence', url: supplier.source_url, classification: supplier.price_status, note: supplier.note})), ...marketEvidence.material_catalog.filter((row) => row.source_url).map((row) => ({id: row.id, institution: row.label.split(' ')[0], title: row.label, url: row.source_url, classification: row.evidence_status, note: `Observed ${row.price_date}; ${row.note ?? ''}`}))];
   const legacy = evidence.legacy_arc_benchmark;
   const formerModel = evidence.former_model_reference;
@@ -698,6 +751,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     price_basis_date: marketEvidence.price_basis_date,
     pricing_model: marketEvidence.pricing_model_id,
     band: input.band,
+    completion_stage: input.completionStage,
     design: geometry.inputs,
     geometry,
     supplier_package: {...yurtPackage, selected_price_cad: round(marketPrice(yurtPackage.price_cad, input.band)), published_price_cad: yurtPackage.price_cad, price_currency: 'CAD', source_url: yurtPackage.source?.source_url, inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null},
@@ -707,15 +761,18 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     inactive_components: [...rows.filter((row) => !row.active), ...marketEvidence.additional_assemblies.filter((row) => row.id === 'additional_interior_liner_and_furring').map((row) => ({id: row.id, label: row.label, active: false, status: 'included_by_supplier_package', source_note: row.note}))],
     additional_costs: additionalRows,
     thresholds: {applied: threshold.applied, all_rules: [...evidence.threshold_rules, ...threshold.applied.filter((row) => !evidence.threshold_rules.some((rule) => rule.id === row.id))]},
+    pricing_layers: pricingLayers,
+    selected_stage: {id: input.completionStage, label: COMPLETION_STAGE_PRESENTATION[input.completionStage].label, description: COMPLETION_STAGE_PRESENTATION[input.completionStage].description, layer_ids: pricingLayers.slice(0, selectedLayerIndex + 1).map((layer) => layer.id), cash_cost_cad: round(selectedCash), economic_cost_cad: round(selectedEconomic), financing_value_cad: round(selectedHeadlineCapital), initial_cash_contribution_cad: round(selectedFinancing.down_payment_cad), financed_principal_cad: round(selectedFinancing.financed_principal_cad), remaining_layer_ids: pricingLayers.slice(selectedLayerIndex + 1).map((layer) => layer.id)},
     stages: {shell: {cash_cost_cad: round(stageTotal('shell')), includes: ['purchased_yurt_package', 'platform BOM', 'additional openings']}, insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'interior finish', 'heating', 'ventilation']}, completed_before_tax_and_contingency: {cash_cost_cad: round(directCashBeforeTax), includes: activeRows.map((row) => row.id)}, completed_dwelling: {cash_cost_cad: round(upfrontCash), economic_capital_cad: round(economicCapital), includes: [...activeRows.map((row) => row.id), 'taxes', 'contingency']}},
-    totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},
+    totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), selected_stage_cash_cost_cad: round(selectedCash), selected_stage_economic_cost_cad: round(selectedEconomic), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},
     financing: {...financing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
+    selected_financing: {...selectedFinancing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
     legacy_reconciliation: {legacy_range_cad: legacy.range_cad, legacy_central_cad: legacy.range_cad.central, legacy_diameter_m_rounded: legacy.diameter_m_rounded, model_diameter_m: geometry.inputs.diameter_m, legacy_gross_floor_area_m2: legacy.gross_floor_area_m2, model_gross_floor_area_m2: geometry.gross_floor_area_m2, model_completed_economic_capital_cad: round(economicCapital), delta_from_legacy_central_cad: roundSigned(economicCapital - legacy.range_cad.central), legacy_exact_integrated_total_cad: legacy.legacy_exact_integrated_total_cad, legacy_public_rounded_total_cad: legacy.legacy_public_rounded_total_cad, historical_scope_components: legacy.legacy_scope_components, former_model_reference: formerModel, bridge_rows: bridgeRows, bridge: formerModelBridge, explanation: 'The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model.'},
-    accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
+    accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), pricing_layer_sum_check: round(cumulativeLayerCash) === round(upfrontCash), pricing_layer_economic_sum_check: Math.abs(cumulativeLayerEconomic - economicCapital) < .05, pricing_layer_economic_residual_cad: roundSigned(cumulativeLayerEconomic - economicCapital, 4), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
     input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
     evidence: sourceList,
     market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors},
-    assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method}
+    assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method, completion_stage: input.completionStage}
   };
 }
 
@@ -740,6 +797,7 @@ export function buildHouseCostPresentationContract(options = {}) {
     defaults: evidence.defaults,
     diameter_presets: evidence.diameter_presets,
     layout_rules: evidence.layout_rules,
+    pricing_layers: HOUSE_COST_PRICING_LAYERS,
     labour_modes: evidence.labour_modes,
     servicing_modes: evidence.servicing_modes,
     service_package_accounting: evidence.service_package_accounting,
@@ -762,13 +820,19 @@ export function buildHouseCostPresentationContract(options = {}) {
 export function buildArcDwellingAffordabilityIntegration({houseCost, landAndInfrastructureMonthlyCad = null} = {}) {
   if (!houseCost?.totals) throw new Error('houseCost result is required');
   const monthlyLandAndInfrastructure = landAndInfrastructureMonthlyCad == null ? null : Math.max(0, finite(landAndInfrastructureMonthlyCad));
+  const selected = houseCost.selected_stage ?? {id: 'basic_completed_arc', label: 'Basic completed ARC dwelling', cash_cost_cad: houseCost.totals.upfront_cash_required_cad, economic_cost_cad: houseCost.totals.economic_cost_cad};
+  const financing = houseCost.selected_financing ?? houseCost.financing;
   return {
     contract_version: HOUSE_COST_CONTRACT_VERSION,
-    dwelling_capital_cad: houseCost.totals.completed_dwelling_capital_cad,
-    upfront_cash_required_cad: houseCost.totals.upfront_cash_required_cad,
-    dwelling_financing_monthly_cad: houseCost.financing.monthly_debt_service_cad,
+    dwelling_capital_cad: selected.economic_cost_cad,
+    upfront_cash_required_cad: selected.cash_cost_cad,
+    dwelling_financing_monthly_cad: financing.monthly_debt_service_cad,
+    completion_stage: selected.id,
+    completion_stage_label: selected.label,
+    included_layer_ids: selected.layer_ids ?? [],
+    outstanding_layer_ids: selected.remaining_layer_ids ?? [],
     land_and_shared_infrastructure_monthly_cad: monthlyLandAndInfrastructure,
-    combined_monthly_cad: monthlyLandAndInfrastructure == null ? null : round(houseCost.financing.monthly_debt_service_cad + monthlyLandAndInfrastructure),
+    combined_monthly_cad: monthlyLandAndInfrastructure == null ? null : round(financing.monthly_debt_service_cad + monthlyLandAndInfrastructure),
     accounting_boundary: 'resident-owned dwelling is separate from ARC site lease and shared infrastructure; centralized servicing additions are not silently added to either layer'
   };
 }

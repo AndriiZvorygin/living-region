@@ -1,5 +1,5 @@
 {
-  "contract_version": "3.0.0",
+  "contract_version": "4.0.0",
   "model_id": "arc_yurt_house_cost",
   "title": "ARC four-season yurt house cost model",
   "defaults": {
@@ -8,8 +8,9 @@
     "roof_pitch_degrees": 30,
     "household_size": 2,
     "layout": "single_storey",
-    "window_count": 6,
-    "door_count": 2,
+    "window_count": 0,
+    "door_count": 1,
+    "completion_stage": "yurt_package",
     "partition_loss_fraction": 0.04,
     "labour_mode": "mixed_labour",
     "servicing_mode": "arc_household_systems",
@@ -84,6 +85,38 @@
       "minimum_headroom_m": 1.98
     }
   },
+  "pricing_layers": [
+    {
+      "id": "yurt_package",
+      "label": "Yurt package",
+      "stage": "bare_package",
+      "description": "The selected supplier package and its published inclusions only."
+    },
+    {
+      "id": "platform_foundation",
+      "label": "Platform and foundation",
+      "stage": "platform_supported_shell",
+      "description": "The preliminary platform/foundation BOM, supports, fasteners and assembly."
+    },
+    {
+      "id": "four_season_completion",
+      "label": "Four-season completion",
+      "stage": "four_season_structure",
+      "description": "Additional openings, envelope work, heating, chimney, ventilation and layout structure."
+    },
+    {
+      "id": "basic_household_amenities",
+      "label": "Basic household amenities",
+      "stage": "basic_completed_arc",
+      "description": "Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out."
+    },
+    {
+      "id": "project_costs",
+      "label": "Project costs and optional upgrades",
+      "stage": "basic_completed_arc",
+      "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances."
+    }
+  ],
   "labour_modes": {
     "owner_builder": {
       "label": "Owner-builder",
@@ -1974,20 +2007,21 @@
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
   "central": {
-    "contract_version": "3.0.0",
+    "contract_version": "4.0.0",
     "model_id": "arc_yurt_house_cost",
     "package_label": "First-principles yurt package plus quantity-based completion model",
     "price_basis_date": "2026-09-05",
     "pricing_model": "first_principles_yurt_package_plus_quantity_bom",
     "band": "central",
+    "completion_stage": "yurt_package",
     "design": {
       "diameter_m": 9.144,
       "wall_height_m": 2.4,
       "roof_pitch_degrees": 30,
       "household_size": 2,
       "layout": "single_storey",
-      "window_count": 6,
-      "door_count": 2,
+      "window_count": 0,
+      "door_count": 1,
       "partition_loss_fraction": 0.04,
       "stair_opening_m2": 0,
       "restricted_headroom_override_used": false,
@@ -2001,8 +2035,8 @@
         "roof_pitch_degrees": 30,
         "household_size": 2,
         "layout": "single_storey",
-        "window_count": 6,
-        "door_count": 2,
+        "window_count": 0,
+        "door_count": 1,
         "partition_loss_fraction": 0.04,
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
@@ -2365,11 +2399,11 @@
       "description": "A planning split between paid trades and owner work; adjust when a work plan or quotation exists.",
       "labour_rate_cad_per_hour": 45,
       "owner_labour_value_rate_cad_per_hour": 24.6,
-      "paid_hours": 182.94,
-      "owner_hours": 100.27,
-      "paid_labour_cash_cad": 8232.46,
-      "owner_labour_imputed_cad": 2466.59,
-      "total_labour_hours": 283.21
+      "paid_hours": 171.19,
+      "owner_hours": 88.52,
+      "paid_labour_cash_cad": 7703.71,
+      "owner_labour_imputed_cad": 2177.54,
+      "total_labour_hours": 259.71
     },
     "components": [
       {
@@ -2424,7 +2458,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "yurt_package"
       },
       {
         "id": "platform_support_blocks",
@@ -2470,7 +2505,8 @@
         "excludes_scope_ids": [],
         "material_id": "oldcastle_deck_block",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "platform_pt_beams",
@@ -2516,7 +2552,8 @@
         "excludes_scope_ids": [],
         "material_id": "pt_2x8x16",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "platform_joists",
@@ -2562,7 +2599,8 @@
         "excludes_scope_ids": [],
         "material_id": "spf_2x8x16",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "platform_decking",
@@ -2608,7 +2646,8 @@
         "excludes_scope_ids": [],
         "material_id": "spruce_tg_plywood_3_4",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "platform_floor_insulation",
@@ -2654,7 +2693,8 @@
         "excludes_scope_ids": [],
         "material_id": "dupont_xps_r10_2in",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "platform_vapour_layer",
@@ -2700,7 +2740,8 @@
         "excludes_scope_ids": [],
         "material_id": "ccmc_vapour_barrier_1000sf",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "platform_connectors",
@@ -2746,95 +2787,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
-      },
-      {
-        "id": "additional_windows",
-        "label": "Additional insulated windows",
-        "stage": "shell",
-        "driver": "window_count",
-        "unit": "CAD/window",
-        "quantity": 6,
-        "base_unit_rate_cad": 550,
-        "unit_rate_cad": 550,
-        "base_material_cost_cad": 3300,
-        "threshold_addition_cad": 0,
-        "material_cost_cad": 3300,
-        "package_id": null,
-        "source_package_id": null,
-        "package_total_cad": null,
-        "package_included_paid_labour_cad": null,
-        "package_included_fee_cad": null,
-        "package_non_labour_cost_cad": null,
-        "package_included_installation": false,
-        "package_labour_override_delta_cad": 0,
-        "package_scope": [],
-        "package_source_note": null,
-        "labour_hours_total": 18,
-        "paid_labour_hours": 9,
-        "owner_labour_hours": 9,
-        "paid_labour_cash_cad": 405,
-        "owner_labour_imputed_cad": 221.4,
-        "cash_cost_cad": 3705,
-        "economic_capital_cad": 3926.4,
-        "owner_eligible": true,
-        "active": true,
-        "taxable": true,
-        "status": "published_supplier_range_planning_rate",
-        "evidence_status": "published_supplier_range_planning_rate",
-        "source_note": "Yurts Canada says no windows are included by default; standard window options and thermal installation need quotation.",
-        "source_url": null,
-        "price_date": "2026-09-05",
-        "source_service_rate": false,
-        "scope_ids": [],
-        "excludes_scope_ids": [],
-        "material_id": null,
-        "quantity_override_used": false,
-        "material_price_override_used": false
-      },
-      {
-        "id": "additional_doors",
-        "label": "Additional exterior/interior door",
-        "stage": "shell",
-        "driver": "door_count",
-        "unit": "CAD/door",
-        "quantity": 1,
-        "base_unit_rate_cad": 1100,
-        "unit_rate_cad": 1100,
-        "base_material_cost_cad": 1100,
-        "threshold_addition_cad": 0,
-        "material_cost_cad": 1100,
-        "package_id": null,
-        "source_package_id": null,
-        "package_total_cad": null,
-        "package_included_paid_labour_cad": null,
-        "package_included_fee_cad": null,
-        "package_non_labour_cost_cad": null,
-        "package_included_installation": false,
-        "package_labour_override_delta_cad": 0,
-        "package_scope": [],
-        "package_source_note": null,
-        "labour_hours_total": 5.5,
-        "paid_labour_hours": 2.75,
-        "owner_labour_hours": 2.75,
-        "paid_labour_cash_cad": 123.75,
-        "owner_labour_imputed_cad": 67.65,
-        "cash_cost_cad": 1223.75,
-        "economic_capital_cad": 1291.4,
-        "owner_eligible": true,
-        "active": true,
-        "taxable": true,
-        "status": "published_supplier_range_planning_rate",
-        "evidence_status": "published_supplier_range_planning_rate",
-        "source_note": null,
-        "source_url": null,
-        "price_date": "2026-09-05",
-        "source_service_rate": false,
-        "scope_ids": [],
-        "excludes_scope_ids": [],
-        "material_id": null,
-        "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "platform_foundation"
       },
       {
         "id": "interior_finish_materials",
@@ -2878,7 +2832,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "four_season_completion"
       },
       {
         "id": "kitchen_fitout_materials",
@@ -2922,7 +2877,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "bathroom_fitout_materials",
@@ -2966,7 +2922,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "wood_stove_and_chimney",
@@ -3010,7 +2967,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "four_season_completion"
       },
       {
         "id": "balanced_ventilation",
@@ -3054,7 +3012,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "four_season_completion"
       },
       {
         "id": "delivery_logistics",
@@ -3098,7 +3057,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "project_costs"
       },
       {
         "id": "design_engineering",
@@ -3142,7 +3102,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "project_costs"
       },
       {
         "id": "permits",
@@ -3186,7 +3147,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "project_costs"
       },
       {
         "id": "water_collection_storage_first_flush",
@@ -3231,7 +3193,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "water_demand_pump",
@@ -3276,7 +3239,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "water_sediment_and_uv",
@@ -3321,7 +3285,8 @@
         "excludes_scope_ids": [],
         "material_id": "ispring_ro_uv",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "compact_pex_and_fittings",
@@ -3366,7 +3331,8 @@
         "excludes_scope_ids": [],
         "material_id": "zurn_pex_100ft",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "sink_and_shower_fixtures",
@@ -3411,7 +3377,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "composting_toilet",
@@ -3456,7 +3423,8 @@
         "excludes_scope_ids": [],
         "material_id": "sunmar_composting_toilet_allowance",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "class_2_greywater",
@@ -3501,7 +3469,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "qualified_water_installation",
@@ -3546,7 +3515,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "water_permit_allowance",
@@ -3591,7 +3561,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "solar_thermal_collector",
@@ -3636,7 +3607,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "hot_water_storage_and_controls",
@@ -3681,7 +3653,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "thermosiphon_integration",
@@ -3726,7 +3699,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "hot_water_integration_labour",
@@ -3771,7 +3745,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "pv_400w",
@@ -3816,7 +3791,8 @@
         "excludes_scope_ids": [],
         "material_id": "rocksolar_400w_kit",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "mppt_controller",
@@ -3861,7 +3837,8 @@
         "excludes_scope_ids": [],
         "material_id": "rocksolar_40a_mppt",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "lead_acid_bank",
@@ -3906,7 +3883,8 @@
         "excludes_scope_ids": [],
         "material_id": "lead_acid_storage_allowance",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "pure_sine_inverter",
@@ -3951,7 +3929,8 @@
         "excludes_scope_ids": [],
         "material_id": "powerbright_1000w_inverter",
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "dc_ac_wiring_protection",
@@ -3996,7 +3975,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "qualified_electrical_labour",
@@ -4041,7 +4021,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       },
       {
         "id": "electrical_inspection",
@@ -4086,7 +4067,8 @@
         "excludes_scope_ids": [],
         "material_id": null,
         "quantity_override_used": false,
-        "material_price_override_used": false
+        "material_price_override_used": false,
+        "pricing_layer": "basic_household_amenities"
       }
     ],
     "inactive_components": [
@@ -4105,8 +4087,10 @@
         "driver": "taxable cash cost",
         "unit": "CAD",
         "quantity": 0.13,
-        "unit_rate_cad": 84927.64999999998,
-        "cash_cost_cad": 11040.594499999997,
+        "unit_rate_cad": 79998.9,
+        "cash_cost_cad": 10399.857,
+        "economic_capital_cad": 10399.857,
+        "pricing_layer": "project_costs",
         "status": "provisional_tax_treatment",
         "source_note": "Tax treatment and any new-housing rebate require project-specific review."
       },
@@ -4116,8 +4100,10 @@
         "driver": "pre-contingency cash",
         "unit": "CAD",
         "quantity": 0.08,
-        "unit_rate_cad": 95968.24449999997,
-        "cash_cost_cad": 7677.4595599999975,
+        "unit_rate_cad": 90398.757,
+        "cash_cost_cad": 7231.90056,
+        "economic_capital_cad": 7231.90056,
+        "pricing_layer": "project_costs",
         "status": "campaign_planning_assumption",
         "source_note": "Explicit planning allowance; not a hidden calibration adjustment."
       }
@@ -4189,9 +4175,128 @@
         }
       ]
     },
+    "pricing_layers": [
+      {
+        "id": "yurt_package",
+        "label": "Yurt package",
+        "stage": "bare_package",
+        "description": "The selected supplier package and its published inclusions only.",
+        "incremental_cash_cost_cad": 36404,
+        "incremental_economic_cost_cad": 36404,
+        "cumulative_cash_cost_cad": 36404,
+        "cumulative_economic_cost_cad": 36404,
+        "component_ids": [
+          "purchased_yurt_package"
+        ]
+      },
+      {
+        "id": "platform_foundation",
+        "label": "Platform and foundation",
+        "stage": "platform_supported_shell",
+        "description": "The preliminary platform/foundation BOM, supports, fasteners and assembly.",
+        "incremental_cash_cost_cad": 8218.49,
+        "incremental_economic_cost_cad": 9160.65,
+        "cumulative_cash_cost_cad": 44622.49,
+        "cumulative_economic_cost_cad": 45564.65,
+        "component_ids": [
+          "platform_support_blocks",
+          "platform_pt_beams",
+          "platform_joists",
+          "platform_decking",
+          "platform_floor_insulation",
+          "platform_vapour_layer",
+          "platform_connectors"
+        ]
+      },
+      {
+        "id": "four_season_completion",
+        "label": "Four-season completion",
+        "stage": "four_season_structure",
+        "description": "Additional openings, envelope work, heating, chimney, ventilation and layout structure.",
+        "incremental_cash_cost_cad": 11600.79,
+        "incremental_economic_cost_cad": 12221.13,
+        "cumulative_cash_cost_cad": 56223.28,
+        "cumulative_economic_cost_cad": 57785.78,
+        "component_ids": [
+          "interior_finish_materials",
+          "wood_stove_and_chimney",
+          "balanced_ventilation"
+        ]
+      },
+      {
+        "id": "basic_household_amenities",
+        "label": "Basic household amenities",
+        "stage": "basic_completed_arc",
+        "description": "Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.",
+        "incremental_cash_cost_cad": 17975.62,
+        "incremental_economic_cost_cad": 18590.62,
+        "cumulative_cash_cost_cad": 74198.9,
+        "cumulative_economic_cost_cad": 76376.4,
+        "component_ids": [
+          "kitchen_fitout_materials",
+          "bathroom_fitout_materials",
+          "water_collection_storage_first_flush",
+          "water_demand_pump",
+          "water_sediment_and_uv",
+          "compact_pex_and_fittings",
+          "sink_and_shower_fixtures",
+          "composting_toilet",
+          "class_2_greywater",
+          "qualified_water_installation",
+          "water_permit_allowance",
+          "solar_thermal_collector",
+          "hot_water_storage_and_controls",
+          "thermosiphon_integration",
+          "hot_water_integration_labour",
+          "pv_400w",
+          "mppt_controller",
+          "lead_acid_bank",
+          "pure_sine_inverter",
+          "dc_ac_wiring_protection",
+          "qualified_electrical_labour",
+          "electrical_inspection"
+        ]
+      },
+      {
+        "id": "project_costs",
+        "label": "Project costs and optional upgrades",
+        "stage": "basic_completed_arc",
+        "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+        "incremental_cash_cost_cad": 23431.76,
+        "incremental_economic_cost_cad": 23431.76,
+        "cumulative_cash_cost_cad": 97630.66,
+        "cumulative_economic_cost_cad": 99808.16,
+        "component_ids": [
+          "delivery_logistics",
+          "design_engineering",
+          "permits",
+          "taxes",
+          "contingency"
+        ]
+      }
+    ],
+    "selected_stage": {
+      "id": "yurt_package",
+      "label": "Yurt package",
+      "description": "Package-only view: the selected supplier price and its published inclusions. It is not a platform-supported or habitable dwelling.",
+      "layer_ids": [
+        "yurt_package"
+      ],
+      "cash_cost_cad": 36404,
+      "economic_cost_cad": 36404,
+      "financing_value_cad": 36404,
+      "initial_cash_contribution_cad": 3640.4,
+      "financed_principal_cad": 32763.6,
+      "remaining_layer_ids": [
+        "platform_foundation",
+        "four_season_completion",
+        "basic_household_amenities",
+        "project_costs"
+      ]
+    },
     "stages": {
       "shell": {
-        "cash_cost_cad": 49551.24,
+        "cash_cost_cad": 44622.49,
         "includes": [
           "purchased_yurt_package",
           "platform BOM",
@@ -4199,7 +4304,7 @@
         ]
       },
       "insulated_heated_structure": {
-        "cash_cost_cad": 61152.03,
+        "cash_cost_cad": 56223.28,
         "includes": [
           "shell",
           "interior finish",
@@ -4208,7 +4313,7 @@
         ]
       },
       "completed_before_tax_and_contingency": {
-        "cash_cost_cad": 84927.65,
+        "cash_cost_cad": 79998.9,
         "includes": [
           "purchased_yurt_package",
           "platform_support_blocks",
@@ -4218,8 +4323,6 @@
           "platform_floor_insulation",
           "platform_vapour_layer",
           "platform_connectors",
-          "additional_windows",
-          "additional_doors",
           "interior_finish_materials",
           "kitchen_fitout_materials",
           "bathroom_fitout_materials",
@@ -4251,8 +4354,8 @@
         ]
       },
       "completed_dwelling": {
-        "cash_cost_cad": 103645.7,
-        "economic_capital_cad": 106112.29,
+        "cash_cost_cad": 97630.66,
+        "economic_capital_cad": 99808.2,
         "includes": [
           "purchased_yurt_package",
           "platform_support_blocks",
@@ -4262,8 +4365,6 @@
           "platform_floor_insulation",
           "platform_vapour_layer",
           "platform_connectors",
-          "additional_windows",
-          "additional_doors",
           "interior_finish_materials",
           "kitchen_fitout_materials",
           "bathroom_fitout_materials",
@@ -4298,31 +4399,45 @@
       }
     },
     "totals": {
-      "direct_cash_before_tax_cad": 84927.65,
-      "taxes_cad": 11040.59,
-      "contingency_cad": 7677.46,
-      "upfront_cash_required_cad": 103645.7,
-      "construction_cash_expenditure_cad": 84927.65,
-      "initial_cash_contribution_cad": 10364.57,
-      "financed_principal_cad": 93281.13,
-      "owner_labour_imputed_cad": 2466.59,
-      "completed_dwelling_capital_cad": 106112.29,
-      "economic_cost_cad": 106112.29,
+      "direct_cash_before_tax_cad": 79998.9,
+      "taxes_cad": 10399.86,
+      "contingency_cad": 7231.9,
+      "upfront_cash_required_cad": 97630.66,
+      "construction_cash_expenditure_cad": 79998.9,
+      "initial_cash_contribution_cad": 9763.07,
+      "financed_principal_cad": 87867.59,
+      "owner_labour_imputed_cad": 2177.54,
+      "completed_dwelling_capital_cad": 99808.2,
+      "economic_cost_cad": 99808.2,
+      "selected_stage_cash_cost_cad": 36404,
+      "selected_stage_economic_cost_cad": 36404,
       "cash_plus_owner_labour_equals_economic": true,
-      "headline_financed_value_cad": 103645.7,
+      "headline_financed_value_cad": 97630.66,
       "custom_quote_applied": false,
       "quote_delta_unallocated_cad": 0,
       "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
     },
     "financing": {
-      "capital_value_cad": 103645.7,
+      "capital_value_cad": 97630.66,
       "ownership": "financed",
-      "down_payment_cad": 10364.57,
-      "financed_principal_cad": 93281.13,
+      "down_payment_cad": 9763.07,
+      "financed_principal_cad": 87867.59,
       "interest_rate_annual": 0.06,
       "amortization_years": 25,
       "loan_term_years": 5,
-      "monthly_debt_service_cad": 601.01,
+      "monthly_debt_service_cad": 566.13,
+      "assumption_status": "illustrative_dwelling_financing_scenario",
+      "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+    },
+    "selected_financing": {
+      "capital_value_cad": 36404,
+      "ownership": "financed",
+      "down_payment_cad": 3640.4,
+      "financed_principal_cad": 32763.6,
+      "interest_rate_annual": 0.06,
+      "amortization_years": 25,
+      "loan_term_years": 5,
+      "monthly_debt_service_cad": 211.1,
       "assumption_status": "illustrative_dwelling_financing_scenario",
       "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
     },
@@ -4337,8 +4452,8 @@
       "model_diameter_m": 9.144,
       "legacy_gross_floor_area_m2": 65.6,
       "model_gross_floor_area_m2": 65.6693,
-      "model_completed_economic_capital_cad": 106112.29,
-      "delta_from_legacy_central_cad": 45112.29,
+      "model_completed_economic_capital_cad": 99808.2,
+      "delta_from_legacy_central_cad": 38808.2,
       "legacy_exact_integrated_total_cad": 61240,
       "legacy_public_rounded_total_cad": 61000,
       "historical_scope_components": [
@@ -4428,20 +4543,23 @@
       ],
       "bridge": {
         "former_model_economic_capital_cad": 108247.209692,
-        "corrected_economic_capital_cad": 106112.29405999997,
-        "direct_cash_delta_cad": -120.0800000000163,
-        "tax_delta_cad": 114.38959999999679,
-        "contingency_delta_cad": -0.45523200000207,
-        "owner_labour_delta_cad": -2128.7699999999995,
-        "total_delta_cad": -2134.915632000033,
+        "corrected_economic_capital_cad": 99808.19755999999,
+        "direct_cash_delta_cad": -5048.830000000002,
+        "tax_delta_cad": -526.3479000000007,
+        "contingency_delta_cad": -446.01423199999954,
+        "owner_labour_delta_cad": -2417.8199999999997,
+        "total_delta_cad": -8439.012132000018,
         "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
       },
       "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
     },
     "accounting": {
       "component_sum_check": true,
-      "component_rows_plus_additional_cad": 103645.7,
-      "upfront_cash_required_cad": 103645.7,
+      "component_rows_plus_additional_cad": 97630.66,
+      "pricing_layer_sum_check": true,
+      "pricing_layer_economic_sum_check": true,
+      "pricing_layer_economic_residual_cad": -0.04,
+      "upfront_cash_required_cad": 97630.66,
       "resident_owned_dwelling_only": true,
       "excludes": [
         "land purchase",
@@ -5187,25 +5305,27 @@
       "tax_rate": 0.13,
       "contingency_rate": 0.08,
       "custom_quote": null,
-      "package_selection": "exact_published_or_selected_package"
+      "package_selection": "exact_published_or_selected_package",
+      "completion_stage": "yurt_package"
     }
   },
   "bands": {
     "low": {
-      "contract_version": "3.0.0",
+      "contract_version": "4.0.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
       "pricing_model": "first_principles_yurt_package_plus_quantity_bom",
       "band": "low",
+      "completion_stage": "yurt_package",
       "design": {
         "diameter_m": 9.144,
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
         "layout": "single_storey",
-        "window_count": 6,
-        "door_count": 2,
+        "window_count": 0,
+        "door_count": 1,
         "partition_loss_fraction": 0.04,
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
@@ -5219,8 +5339,8 @@
           "roof_pitch_degrees": 30,
           "household_size": 2,
           "layout": "single_storey",
-          "window_count": 6,
-          "door_count": 2,
+          "window_count": 0,
+          "door_count": 1,
           "partition_loss_fraction": 0.04,
           "stair_opening_m2": 0,
           "restricted_headroom_override_used": false,
@@ -5583,11 +5703,11 @@
         "description": "A planning split between paid trades and owner work; adjust when a work plan or quotation exists.",
         "labour_rate_cad_per_hour": 45,
         "owner_labour_value_rate_cad_per_hour": 24.6,
-        "paid_hours": 177.83,
-        "owner_hours": 100.27,
-        "paid_labour_cash_cad": 8002.46,
-        "owner_labour_imputed_cad": 2466.59,
-        "total_labour_hours": 278.1
+        "paid_hours": 166.08,
+        "owner_hours": 88.52,
+        "paid_labour_cash_cad": 7473.71,
+        "owner_labour_imputed_cad": 2177.54,
+        "total_labour_hours": 254.6
       },
       "components": [
         {
@@ -5642,7 +5762,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "yurt_package"
         },
         {
           "id": "platform_support_blocks",
@@ -5688,7 +5809,8 @@
           "excludes_scope_ids": [],
           "material_id": "oldcastle_deck_block",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_pt_beams",
@@ -5734,7 +5856,8 @@
           "excludes_scope_ids": [],
           "material_id": "pt_2x8x16",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_joists",
@@ -5780,7 +5903,8 @@
           "excludes_scope_ids": [],
           "material_id": "spf_2x8x16",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_decking",
@@ -5826,7 +5950,8 @@
           "excludes_scope_ids": [],
           "material_id": "spruce_tg_plywood_3_4",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_floor_insulation",
@@ -5872,7 +5997,8 @@
           "excludes_scope_ids": [],
           "material_id": "dupont_xps_r10_2in",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_vapour_layer",
@@ -5918,7 +6044,8 @@
           "excludes_scope_ids": [],
           "material_id": "ccmc_vapour_barrier_1000sf",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_connectors",
@@ -5964,95 +6091,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
-        },
-        {
-          "id": "additional_windows",
-          "label": "Additional insulated windows",
-          "stage": "shell",
-          "driver": "window_count",
-          "unit": "CAD/window",
-          "quantity": 6,
-          "base_unit_rate_cad": 550,
-          "unit_rate_cad": 495,
-          "base_material_cost_cad": 3300,
-          "threshold_addition_cad": 0,
-          "material_cost_cad": 2970,
-          "package_id": null,
-          "source_package_id": null,
-          "package_total_cad": null,
-          "package_included_paid_labour_cad": null,
-          "package_included_fee_cad": null,
-          "package_non_labour_cost_cad": null,
-          "package_included_installation": false,
-          "package_labour_override_delta_cad": 0,
-          "package_scope": [],
-          "package_source_note": null,
-          "labour_hours_total": 18,
-          "paid_labour_hours": 9,
-          "owner_labour_hours": 9,
-          "paid_labour_cash_cad": 405,
-          "owner_labour_imputed_cad": 221.4,
-          "cash_cost_cad": 3375,
-          "economic_capital_cad": 3596.4,
-          "owner_eligible": true,
-          "active": true,
-          "taxable": true,
-          "status": "published_supplier_range_planning_rate",
-          "evidence_status": "published_supplier_range_planning_rate",
-          "source_note": "Yurts Canada says no windows are included by default; standard window options and thermal installation need quotation.",
-          "source_url": null,
-          "price_date": "2026-09-05",
-          "source_service_rate": false,
-          "scope_ids": [],
-          "excludes_scope_ids": [],
-          "material_id": null,
-          "quantity_override_used": false,
-          "material_price_override_used": false
-        },
-        {
-          "id": "additional_doors",
-          "label": "Additional exterior/interior door",
-          "stage": "shell",
-          "driver": "door_count",
-          "unit": "CAD/door",
-          "quantity": 1,
-          "base_unit_rate_cad": 1100,
-          "unit_rate_cad": 990,
-          "base_material_cost_cad": 1100,
-          "threshold_addition_cad": 0,
-          "material_cost_cad": 990,
-          "package_id": null,
-          "source_package_id": null,
-          "package_total_cad": null,
-          "package_included_paid_labour_cad": null,
-          "package_included_fee_cad": null,
-          "package_non_labour_cost_cad": null,
-          "package_included_installation": false,
-          "package_labour_override_delta_cad": 0,
-          "package_scope": [],
-          "package_source_note": null,
-          "labour_hours_total": 5.5,
-          "paid_labour_hours": 2.75,
-          "owner_labour_hours": 2.75,
-          "paid_labour_cash_cad": 123.75,
-          "owner_labour_imputed_cad": 67.65,
-          "cash_cost_cad": 1113.75,
-          "economic_capital_cad": 1181.4,
-          "owner_eligible": true,
-          "active": true,
-          "taxable": true,
-          "status": "published_supplier_range_planning_rate",
-          "evidence_status": "published_supplier_range_planning_rate",
-          "source_note": null,
-          "source_url": null,
-          "price_date": "2026-09-05",
-          "source_service_rate": false,
-          "scope_ids": [],
-          "excludes_scope_ids": [],
-          "material_id": null,
-          "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "interior_finish_materials",
@@ -6096,7 +6136,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "kitchen_fitout_materials",
@@ -6140,7 +6181,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "bathroom_fitout_materials",
@@ -6184,7 +6226,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "wood_stove_and_chimney",
@@ -6228,7 +6271,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "balanced_ventilation",
@@ -6272,7 +6316,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "delivery_logistics",
@@ -6316,7 +6361,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "design_engineering",
@@ -6360,7 +6406,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "permits",
@@ -6404,7 +6451,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "water_collection_storage_first_flush",
@@ -6449,7 +6497,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_demand_pump",
@@ -6494,7 +6543,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_sediment_and_uv",
@@ -6539,7 +6589,8 @@
           "excludes_scope_ids": [],
           "material_id": "ispring_ro_uv",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "compact_pex_and_fittings",
@@ -6584,7 +6635,8 @@
           "excludes_scope_ids": [],
           "material_id": "zurn_pex_100ft",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "sink_and_shower_fixtures",
@@ -6629,7 +6681,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "composting_toilet",
@@ -6674,7 +6727,8 @@
           "excludes_scope_ids": [],
           "material_id": "sunmar_composting_toilet_allowance",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "class_2_greywater",
@@ -6719,7 +6773,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "qualified_water_installation",
@@ -6764,7 +6819,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_permit_allowance",
@@ -6809,7 +6865,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "solar_thermal_collector",
@@ -6854,7 +6911,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "hot_water_storage_and_controls",
@@ -6899,7 +6957,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "thermosiphon_integration",
@@ -6944,7 +7003,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "hot_water_integration_labour",
@@ -6989,7 +7049,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "pv_400w",
@@ -7034,7 +7095,8 @@
           "excludes_scope_ids": [],
           "material_id": "rocksolar_400w_kit",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "mppt_controller",
@@ -7079,7 +7141,8 @@
           "excludes_scope_ids": [],
           "material_id": "rocksolar_40a_mppt",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "lead_acid_bank",
@@ -7124,7 +7187,8 @@
           "excludes_scope_ids": [],
           "material_id": "lead_acid_storage_allowance",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "pure_sine_inverter",
@@ -7169,7 +7233,8 @@
           "excludes_scope_ids": [],
           "material_id": "powerbright_1000w_inverter",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "dc_ac_wiring_protection",
@@ -7214,7 +7279,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "qualified_electrical_labour",
@@ -7259,7 +7325,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "electrical_inspection",
@@ -7304,7 +7371,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         }
       ],
       "inactive_components": [
@@ -7323,8 +7391,10 @@
           "driver": "taxable cash cost",
           "unit": "CAD",
           "quantity": 0.05,
-          "unit_rate_cad": 77028.10999999999,
-          "cash_cost_cad": 3851.4054999999994,
+          "unit_rate_cad": 72539.35999999999,
+          "cash_cost_cad": 3626.9679999999994,
+          "economic_capital_cad": 3626.9679999999994,
+          "pricing_layer": "project_costs",
           "status": "provisional_tax_treatment",
           "source_note": "Tax treatment and any new-housing rebate require project-specific review."
         },
@@ -7334,8 +7404,10 @@
           "driver": "pre-contingency cash",
           "unit": "CAD",
           "quantity": 0.05,
-          "unit_rate_cad": 80879.51549999998,
-          "cash_cost_cad": 4043.975774999999,
+          "unit_rate_cad": 76166.32799999998,
+          "cash_cost_cad": 3808.3163999999992,
+          "economic_capital_cad": 3808.3163999999992,
+          "pricing_layer": "project_costs",
           "status": "campaign_planning_assumption",
           "source_note": "Explicit planning allowance; not a hidden calibration adjustment."
         }
@@ -7407,9 +7479,128 @@
           }
         ]
       },
+      "pricing_layers": [
+        {
+          "id": "yurt_package",
+          "label": "Yurt package",
+          "stage": "bare_package",
+          "description": "The selected supplier package and its published inclusions only.",
+          "incremental_cash_cost_cad": 32763.6,
+          "incremental_economic_cost_cad": 32763.6,
+          "cumulative_cash_cost_cad": 32763.6,
+          "cumulative_economic_cost_cad": 32763.6,
+          "component_ids": [
+            "purchased_yurt_package"
+          ]
+        },
+        {
+          "id": "platform_foundation",
+          "label": "Platform and foundation",
+          "stage": "platform_supported_shell",
+          "description": "The preliminary platform/foundation BOM, supports, fasteners and assembly.",
+          "incremental_cash_cost_cad": 7568.97,
+          "incremental_economic_cost_cad": 8511.15,
+          "cumulative_cash_cost_cad": 40332.57,
+          "cumulative_economic_cost_cad": 41274.75,
+          "component_ids": [
+            "platform_support_blocks",
+            "platform_pt_beams",
+            "platform_joists",
+            "platform_decking",
+            "platform_floor_insulation",
+            "platform_vapour_layer",
+            "platform_connectors"
+          ]
+        },
+        {
+          "id": "four_season_completion",
+          "label": "Four-season completion",
+          "stage": "four_season_structure",
+          "description": "Additional openings, envelope work, heating, chimney, ventilation and layout structure.",
+          "incremental_cash_cost_cad": 10696.23,
+          "incremental_economic_cost_cad": 11316.56,
+          "cumulative_cash_cost_cad": 51028.8,
+          "cumulative_economic_cost_cad": 52591.31,
+          "component_ids": [
+            "interior_finish_materials",
+            "wood_stove_and_chimney",
+            "balanced_ventilation"
+          ]
+        },
+        {
+          "id": "basic_household_amenities",
+          "label": "Basic household amenities",
+          "stage": "basic_completed_arc",
+          "description": "Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.",
+          "incremental_cash_cost_cad": 16290.56,
+          "incremental_economic_cost_cad": 16905.56,
+          "cumulative_cash_cost_cad": 67319.36,
+          "cumulative_economic_cost_cad": 69496.87,
+          "component_ids": [
+            "kitchen_fitout_materials",
+            "bathroom_fitout_materials",
+            "water_collection_storage_first_flush",
+            "water_demand_pump",
+            "water_sediment_and_uv",
+            "compact_pex_and_fittings",
+            "sink_and_shower_fixtures",
+            "composting_toilet",
+            "class_2_greywater",
+            "qualified_water_installation",
+            "water_permit_allowance",
+            "solar_thermal_collector",
+            "hot_water_storage_and_controls",
+            "thermosiphon_integration",
+            "hot_water_integration_labour",
+            "pv_400w",
+            "mppt_controller",
+            "lead_acid_bank",
+            "pure_sine_inverter",
+            "dc_ac_wiring_protection",
+            "qualified_electrical_labour",
+            "electrical_inspection"
+          ]
+        },
+        {
+          "id": "project_costs",
+          "label": "Project costs and optional upgrades",
+          "stage": "basic_completed_arc",
+          "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+          "incremental_cash_cost_cad": 12655.28,
+          "incremental_economic_cost_cad": 12655.28,
+          "cumulative_cash_cost_cad": 79974.64,
+          "cumulative_economic_cost_cad": 82152.15,
+          "component_ids": [
+            "delivery_logistics",
+            "design_engineering",
+            "permits",
+            "taxes",
+            "contingency"
+          ]
+        }
+      ],
+      "selected_stage": {
+        "id": "yurt_package",
+        "label": "Yurt package",
+        "description": "Package-only view: the selected supplier price and its published inclusions. It is not a platform-supported or habitable dwelling.",
+        "layer_ids": [
+          "yurt_package"
+        ],
+        "cash_cost_cad": 32763.6,
+        "economic_cost_cad": 32763.6,
+        "financing_value_cad": 32763.6,
+        "initial_cash_contribution_cad": 3276.36,
+        "financed_principal_cad": 29487.24,
+        "remaining_layer_ids": [
+          "platform_foundation",
+          "four_season_completion",
+          "basic_household_amenities",
+          "project_costs"
+        ]
+      },
       "stages": {
         "shell": {
-          "cash_cost_cad": 44821.32,
+          "cash_cost_cad": 40332.57,
           "includes": [
             "purchased_yurt_package",
             "platform BOM",
@@ -7417,7 +7608,7 @@
           ]
         },
         "insulated_heated_structure": {
-          "cash_cost_cad": 55517.55,
+          "cash_cost_cad": 51028.8,
           "includes": [
             "shell",
             "interior finish",
@@ -7426,7 +7617,7 @@
           ]
         },
         "completed_before_tax_and_contingency": {
-          "cash_cost_cad": 77028.11,
+          "cash_cost_cad": 72539.36,
           "includes": [
             "purchased_yurt_package",
             "platform_support_blocks",
@@ -7436,8 +7627,6 @@
             "platform_floor_insulation",
             "platform_vapour_layer",
             "platform_connectors",
-            "additional_windows",
-            "additional_doors",
             "interior_finish_materials",
             "kitchen_fitout_materials",
             "bathroom_fitout_materials",
@@ -7469,8 +7658,8 @@
           ]
         },
         "completed_dwelling": {
-          "cash_cost_cad": 84923.49,
-          "economic_capital_cad": 87390.08,
+          "cash_cost_cad": 79974.64,
+          "economic_capital_cad": 82152.18,
           "includes": [
             "purchased_yurt_package",
             "platform_support_blocks",
@@ -7480,8 +7669,6 @@
             "platform_floor_insulation",
             "platform_vapour_layer",
             "platform_connectors",
-            "additional_windows",
-            "additional_doors",
             "interior_finish_materials",
             "kitchen_fitout_materials",
             "bathroom_fitout_materials",
@@ -7516,31 +7703,45 @@
         }
       },
       "totals": {
-        "direct_cash_before_tax_cad": 77028.11,
-        "taxes_cad": 3851.41,
-        "contingency_cad": 4043.98,
-        "upfront_cash_required_cad": 84923.49,
-        "construction_cash_expenditure_cad": 77028.11,
-        "initial_cash_contribution_cad": 8492.35,
-        "financed_principal_cad": 76431.14,
-        "owner_labour_imputed_cad": 2466.59,
-        "completed_dwelling_capital_cad": 87390.08,
-        "economic_cost_cad": 87390.08,
+        "direct_cash_before_tax_cad": 72539.36,
+        "taxes_cad": 3626.97,
+        "contingency_cad": 3808.32,
+        "upfront_cash_required_cad": 79974.64,
+        "construction_cash_expenditure_cad": 72539.36,
+        "initial_cash_contribution_cad": 7997.46,
+        "financed_principal_cad": 71977.18,
+        "owner_labour_imputed_cad": 2177.54,
+        "completed_dwelling_capital_cad": 82152.18,
+        "economic_cost_cad": 82152.18,
+        "selected_stage_cash_cost_cad": 32763.6,
+        "selected_stage_economic_cost_cad": 32763.6,
         "cash_plus_owner_labour_equals_economic": true,
-        "headline_financed_value_cad": 84923.49,
+        "headline_financed_value_cad": 79974.64,
         "custom_quote_applied": false,
         "quote_delta_unallocated_cad": 0,
         "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
       },
       "financing": {
-        "capital_value_cad": 84923.49,
+        "capital_value_cad": 79974.64,
         "ownership": "financed",
-        "down_payment_cad": 8492.35,
-        "financed_principal_cad": 76431.14,
+        "down_payment_cad": 7997.46,
+        "financed_principal_cad": 71977.18,
         "interest_rate_annual": 0.06,
         "amortization_years": 25,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 492.45,
+        "monthly_debt_service_cad": 463.75,
+        "assumption_status": "illustrative_dwelling_financing_scenario",
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+      },
+      "selected_financing": {
+        "capital_value_cad": 32763.6,
+        "ownership": "financed",
+        "down_payment_cad": 3276.36,
+        "financed_principal_cad": 29487.24,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 25,
+        "loan_term_years": 5,
+        "monthly_debt_service_cad": 189.99,
         "assumption_status": "illustrative_dwelling_financing_scenario",
         "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
       },
@@ -7555,8 +7756,8 @@
         "model_diameter_m": 9.144,
         "legacy_gross_floor_area_m2": 65.6,
         "model_gross_floor_area_m2": 65.6693,
-        "model_completed_economic_capital_cad": 87390.08,
-        "delta_from_legacy_central_cad": 26390.08,
+        "model_completed_economic_capital_cad": 82152.18,
+        "delta_from_legacy_central_cad": 21152.18,
         "legacy_exact_integrated_total_cad": 61240,
         "legacy_public_rounded_total_cad": 61000,
         "historical_scope_components": [
@@ -7646,20 +7847,23 @@
         ],
         "bridge": {
           "former_model_economic_capital_cad": 108247.209692,
-          "corrected_economic_capital_cad": 87390.08127499997,
-          "direct_cash_delta_cad": -8019.62000000001,
-          "tax_delta_cad": -7074.799400000002,
-          "contingency_delta_cad": -3633.9390170000006,
-          "owner_labour_delta_cad": -2128.7699999999995,
-          "total_delta_cad": -20857.12841700003,
+          "corrected_economic_capital_cad": 82152.18439999997,
+          "direct_cash_delta_cad": -12508.37000000001,
+          "tax_delta_cad": -7299.236900000002,
+          "contingency_delta_cad": -3869.5983920000003,
+          "owner_labour_delta_cad": -2417.8199999999997,
+          "total_delta_cad": -26095.025292000035,
           "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
         },
         "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
       },
       "accounting": {
         "component_sum_check": true,
-        "component_rows_plus_additional_cad": 84923.49,
-        "upfront_cash_required_cad": 84923.49,
+        "component_rows_plus_additional_cad": 79974.64,
+        "pricing_layer_sum_check": true,
+        "pricing_layer_economic_sum_check": true,
+        "pricing_layer_economic_residual_cad": -0.03,
+        "upfront_cash_required_cad": 79974.64,
         "resident_owned_dwelling_only": true,
         "excludes": [
           "land purchase",
@@ -8405,24 +8609,26 @@
         "tax_rate": 0.05,
         "contingency_rate": 0.05,
         "custom_quote": null,
-        "package_selection": "exact_published_or_selected_package"
+        "package_selection": "exact_published_or_selected_package",
+        "completion_stage": "yurt_package"
       }
     },
     "central": {
-      "contract_version": "3.0.0",
+      "contract_version": "4.0.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
       "pricing_model": "first_principles_yurt_package_plus_quantity_bom",
       "band": "central",
+      "completion_stage": "yurt_package",
       "design": {
         "diameter_m": 9.144,
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
         "layout": "single_storey",
-        "window_count": 6,
-        "door_count": 2,
+        "window_count": 0,
+        "door_count": 1,
         "partition_loss_fraction": 0.04,
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
@@ -8436,8 +8642,8 @@
           "roof_pitch_degrees": 30,
           "household_size": 2,
           "layout": "single_storey",
-          "window_count": 6,
-          "door_count": 2,
+          "window_count": 0,
+          "door_count": 1,
           "partition_loss_fraction": 0.04,
           "stair_opening_m2": 0,
           "restricted_headroom_override_used": false,
@@ -8800,11 +9006,11 @@
         "description": "A planning split between paid trades and owner work; adjust when a work plan or quotation exists.",
         "labour_rate_cad_per_hour": 45,
         "owner_labour_value_rate_cad_per_hour": 24.6,
-        "paid_hours": 182.94,
-        "owner_hours": 100.27,
-        "paid_labour_cash_cad": 8232.46,
-        "owner_labour_imputed_cad": 2466.59,
-        "total_labour_hours": 283.21
+        "paid_hours": 171.19,
+        "owner_hours": 88.52,
+        "paid_labour_cash_cad": 7703.71,
+        "owner_labour_imputed_cad": 2177.54,
+        "total_labour_hours": 259.71
       },
       "components": [
         {
@@ -8859,7 +9065,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "yurt_package"
         },
         {
           "id": "platform_support_blocks",
@@ -8905,7 +9112,8 @@
           "excludes_scope_ids": [],
           "material_id": "oldcastle_deck_block",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_pt_beams",
@@ -8951,7 +9159,8 @@
           "excludes_scope_ids": [],
           "material_id": "pt_2x8x16",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_joists",
@@ -8997,7 +9206,8 @@
           "excludes_scope_ids": [],
           "material_id": "spf_2x8x16",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_decking",
@@ -9043,7 +9253,8 @@
           "excludes_scope_ids": [],
           "material_id": "spruce_tg_plywood_3_4",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_floor_insulation",
@@ -9089,7 +9300,8 @@
           "excludes_scope_ids": [],
           "material_id": "dupont_xps_r10_2in",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_vapour_layer",
@@ -9135,7 +9347,8 @@
           "excludes_scope_ids": [],
           "material_id": "ccmc_vapour_barrier_1000sf",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_connectors",
@@ -9181,95 +9394,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
-        },
-        {
-          "id": "additional_windows",
-          "label": "Additional insulated windows",
-          "stage": "shell",
-          "driver": "window_count",
-          "unit": "CAD/window",
-          "quantity": 6,
-          "base_unit_rate_cad": 550,
-          "unit_rate_cad": 550,
-          "base_material_cost_cad": 3300,
-          "threshold_addition_cad": 0,
-          "material_cost_cad": 3300,
-          "package_id": null,
-          "source_package_id": null,
-          "package_total_cad": null,
-          "package_included_paid_labour_cad": null,
-          "package_included_fee_cad": null,
-          "package_non_labour_cost_cad": null,
-          "package_included_installation": false,
-          "package_labour_override_delta_cad": 0,
-          "package_scope": [],
-          "package_source_note": null,
-          "labour_hours_total": 18,
-          "paid_labour_hours": 9,
-          "owner_labour_hours": 9,
-          "paid_labour_cash_cad": 405,
-          "owner_labour_imputed_cad": 221.4,
-          "cash_cost_cad": 3705,
-          "economic_capital_cad": 3926.4,
-          "owner_eligible": true,
-          "active": true,
-          "taxable": true,
-          "status": "published_supplier_range_planning_rate",
-          "evidence_status": "published_supplier_range_planning_rate",
-          "source_note": "Yurts Canada says no windows are included by default; standard window options and thermal installation need quotation.",
-          "source_url": null,
-          "price_date": "2026-09-05",
-          "source_service_rate": false,
-          "scope_ids": [],
-          "excludes_scope_ids": [],
-          "material_id": null,
-          "quantity_override_used": false,
-          "material_price_override_used": false
-        },
-        {
-          "id": "additional_doors",
-          "label": "Additional exterior/interior door",
-          "stage": "shell",
-          "driver": "door_count",
-          "unit": "CAD/door",
-          "quantity": 1,
-          "base_unit_rate_cad": 1100,
-          "unit_rate_cad": 1100,
-          "base_material_cost_cad": 1100,
-          "threshold_addition_cad": 0,
-          "material_cost_cad": 1100,
-          "package_id": null,
-          "source_package_id": null,
-          "package_total_cad": null,
-          "package_included_paid_labour_cad": null,
-          "package_included_fee_cad": null,
-          "package_non_labour_cost_cad": null,
-          "package_included_installation": false,
-          "package_labour_override_delta_cad": 0,
-          "package_scope": [],
-          "package_source_note": null,
-          "labour_hours_total": 5.5,
-          "paid_labour_hours": 2.75,
-          "owner_labour_hours": 2.75,
-          "paid_labour_cash_cad": 123.75,
-          "owner_labour_imputed_cad": 67.65,
-          "cash_cost_cad": 1223.75,
-          "economic_capital_cad": 1291.4,
-          "owner_eligible": true,
-          "active": true,
-          "taxable": true,
-          "status": "published_supplier_range_planning_rate",
-          "evidence_status": "published_supplier_range_planning_rate",
-          "source_note": null,
-          "source_url": null,
-          "price_date": "2026-09-05",
-          "source_service_rate": false,
-          "scope_ids": [],
-          "excludes_scope_ids": [],
-          "material_id": null,
-          "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "interior_finish_materials",
@@ -9313,7 +9439,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "kitchen_fitout_materials",
@@ -9357,7 +9484,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "bathroom_fitout_materials",
@@ -9401,7 +9529,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "wood_stove_and_chimney",
@@ -9445,7 +9574,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "balanced_ventilation",
@@ -9489,7 +9619,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "delivery_logistics",
@@ -9533,7 +9664,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "design_engineering",
@@ -9577,7 +9709,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "permits",
@@ -9621,7 +9754,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "water_collection_storage_first_flush",
@@ -9666,7 +9800,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_demand_pump",
@@ -9711,7 +9846,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_sediment_and_uv",
@@ -9756,7 +9892,8 @@
           "excludes_scope_ids": [],
           "material_id": "ispring_ro_uv",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "compact_pex_and_fittings",
@@ -9801,7 +9938,8 @@
           "excludes_scope_ids": [],
           "material_id": "zurn_pex_100ft",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "sink_and_shower_fixtures",
@@ -9846,7 +9984,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "composting_toilet",
@@ -9891,7 +10030,8 @@
           "excludes_scope_ids": [],
           "material_id": "sunmar_composting_toilet_allowance",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "class_2_greywater",
@@ -9936,7 +10076,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "qualified_water_installation",
@@ -9981,7 +10122,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_permit_allowance",
@@ -10026,7 +10168,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "solar_thermal_collector",
@@ -10071,7 +10214,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "hot_water_storage_and_controls",
@@ -10116,7 +10260,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "thermosiphon_integration",
@@ -10161,7 +10306,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "hot_water_integration_labour",
@@ -10206,7 +10352,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "pv_400w",
@@ -10251,7 +10398,8 @@
           "excludes_scope_ids": [],
           "material_id": "rocksolar_400w_kit",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "mppt_controller",
@@ -10296,7 +10444,8 @@
           "excludes_scope_ids": [],
           "material_id": "rocksolar_40a_mppt",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "lead_acid_bank",
@@ -10341,7 +10490,8 @@
           "excludes_scope_ids": [],
           "material_id": "lead_acid_storage_allowance",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "pure_sine_inverter",
@@ -10386,7 +10536,8 @@
           "excludes_scope_ids": [],
           "material_id": "powerbright_1000w_inverter",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "dc_ac_wiring_protection",
@@ -10431,7 +10582,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "qualified_electrical_labour",
@@ -10476,7 +10628,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "electrical_inspection",
@@ -10521,7 +10674,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         }
       ],
       "inactive_components": [
@@ -10540,8 +10694,10 @@
           "driver": "taxable cash cost",
           "unit": "CAD",
           "quantity": 0.13,
-          "unit_rate_cad": 84927.64999999998,
-          "cash_cost_cad": 11040.594499999997,
+          "unit_rate_cad": 79998.9,
+          "cash_cost_cad": 10399.857,
+          "economic_capital_cad": 10399.857,
+          "pricing_layer": "project_costs",
           "status": "provisional_tax_treatment",
           "source_note": "Tax treatment and any new-housing rebate require project-specific review."
         },
@@ -10551,8 +10707,10 @@
           "driver": "pre-contingency cash",
           "unit": "CAD",
           "quantity": 0.08,
-          "unit_rate_cad": 95968.24449999997,
-          "cash_cost_cad": 7677.4595599999975,
+          "unit_rate_cad": 90398.757,
+          "cash_cost_cad": 7231.90056,
+          "economic_capital_cad": 7231.90056,
+          "pricing_layer": "project_costs",
           "status": "campaign_planning_assumption",
           "source_note": "Explicit planning allowance; not a hidden calibration adjustment."
         }
@@ -10624,9 +10782,128 @@
           }
         ]
       },
+      "pricing_layers": [
+        {
+          "id": "yurt_package",
+          "label": "Yurt package",
+          "stage": "bare_package",
+          "description": "The selected supplier package and its published inclusions only.",
+          "incremental_cash_cost_cad": 36404,
+          "incremental_economic_cost_cad": 36404,
+          "cumulative_cash_cost_cad": 36404,
+          "cumulative_economic_cost_cad": 36404,
+          "component_ids": [
+            "purchased_yurt_package"
+          ]
+        },
+        {
+          "id": "platform_foundation",
+          "label": "Platform and foundation",
+          "stage": "platform_supported_shell",
+          "description": "The preliminary platform/foundation BOM, supports, fasteners and assembly.",
+          "incremental_cash_cost_cad": 8218.49,
+          "incremental_economic_cost_cad": 9160.65,
+          "cumulative_cash_cost_cad": 44622.49,
+          "cumulative_economic_cost_cad": 45564.65,
+          "component_ids": [
+            "platform_support_blocks",
+            "platform_pt_beams",
+            "platform_joists",
+            "platform_decking",
+            "platform_floor_insulation",
+            "platform_vapour_layer",
+            "platform_connectors"
+          ]
+        },
+        {
+          "id": "four_season_completion",
+          "label": "Four-season completion",
+          "stage": "four_season_structure",
+          "description": "Additional openings, envelope work, heating, chimney, ventilation and layout structure.",
+          "incremental_cash_cost_cad": 11600.79,
+          "incremental_economic_cost_cad": 12221.13,
+          "cumulative_cash_cost_cad": 56223.28,
+          "cumulative_economic_cost_cad": 57785.78,
+          "component_ids": [
+            "interior_finish_materials",
+            "wood_stove_and_chimney",
+            "balanced_ventilation"
+          ]
+        },
+        {
+          "id": "basic_household_amenities",
+          "label": "Basic household amenities",
+          "stage": "basic_completed_arc",
+          "description": "Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.",
+          "incremental_cash_cost_cad": 17975.62,
+          "incremental_economic_cost_cad": 18590.62,
+          "cumulative_cash_cost_cad": 74198.9,
+          "cumulative_economic_cost_cad": 76376.4,
+          "component_ids": [
+            "kitchen_fitout_materials",
+            "bathroom_fitout_materials",
+            "water_collection_storage_first_flush",
+            "water_demand_pump",
+            "water_sediment_and_uv",
+            "compact_pex_and_fittings",
+            "sink_and_shower_fixtures",
+            "composting_toilet",
+            "class_2_greywater",
+            "qualified_water_installation",
+            "water_permit_allowance",
+            "solar_thermal_collector",
+            "hot_water_storage_and_controls",
+            "thermosiphon_integration",
+            "hot_water_integration_labour",
+            "pv_400w",
+            "mppt_controller",
+            "lead_acid_bank",
+            "pure_sine_inverter",
+            "dc_ac_wiring_protection",
+            "qualified_electrical_labour",
+            "electrical_inspection"
+          ]
+        },
+        {
+          "id": "project_costs",
+          "label": "Project costs and optional upgrades",
+          "stage": "basic_completed_arc",
+          "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+          "incremental_cash_cost_cad": 23431.76,
+          "incremental_economic_cost_cad": 23431.76,
+          "cumulative_cash_cost_cad": 97630.66,
+          "cumulative_economic_cost_cad": 99808.16,
+          "component_ids": [
+            "delivery_logistics",
+            "design_engineering",
+            "permits",
+            "taxes",
+            "contingency"
+          ]
+        }
+      ],
+      "selected_stage": {
+        "id": "yurt_package",
+        "label": "Yurt package",
+        "description": "Package-only view: the selected supplier price and its published inclusions. It is not a platform-supported or habitable dwelling.",
+        "layer_ids": [
+          "yurt_package"
+        ],
+        "cash_cost_cad": 36404,
+        "economic_cost_cad": 36404,
+        "financing_value_cad": 36404,
+        "initial_cash_contribution_cad": 3640.4,
+        "financed_principal_cad": 32763.6,
+        "remaining_layer_ids": [
+          "platform_foundation",
+          "four_season_completion",
+          "basic_household_amenities",
+          "project_costs"
+        ]
+      },
       "stages": {
         "shell": {
-          "cash_cost_cad": 49551.24,
+          "cash_cost_cad": 44622.49,
           "includes": [
             "purchased_yurt_package",
             "platform BOM",
@@ -10634,7 +10911,7 @@
           ]
         },
         "insulated_heated_structure": {
-          "cash_cost_cad": 61152.03,
+          "cash_cost_cad": 56223.28,
           "includes": [
             "shell",
             "interior finish",
@@ -10643,7 +10920,7 @@
           ]
         },
         "completed_before_tax_and_contingency": {
-          "cash_cost_cad": 84927.65,
+          "cash_cost_cad": 79998.9,
           "includes": [
             "purchased_yurt_package",
             "platform_support_blocks",
@@ -10653,8 +10930,6 @@
             "platform_floor_insulation",
             "platform_vapour_layer",
             "platform_connectors",
-            "additional_windows",
-            "additional_doors",
             "interior_finish_materials",
             "kitchen_fitout_materials",
             "bathroom_fitout_materials",
@@ -10686,8 +10961,8 @@
           ]
         },
         "completed_dwelling": {
-          "cash_cost_cad": 103645.7,
-          "economic_capital_cad": 106112.29,
+          "cash_cost_cad": 97630.66,
+          "economic_capital_cad": 99808.2,
           "includes": [
             "purchased_yurt_package",
             "platform_support_blocks",
@@ -10697,8 +10972,6 @@
             "platform_floor_insulation",
             "platform_vapour_layer",
             "platform_connectors",
-            "additional_windows",
-            "additional_doors",
             "interior_finish_materials",
             "kitchen_fitout_materials",
             "bathroom_fitout_materials",
@@ -10733,31 +11006,45 @@
         }
       },
       "totals": {
-        "direct_cash_before_tax_cad": 84927.65,
-        "taxes_cad": 11040.59,
-        "contingency_cad": 7677.46,
-        "upfront_cash_required_cad": 103645.7,
-        "construction_cash_expenditure_cad": 84927.65,
-        "initial_cash_contribution_cad": 10364.57,
-        "financed_principal_cad": 93281.13,
-        "owner_labour_imputed_cad": 2466.59,
-        "completed_dwelling_capital_cad": 106112.29,
-        "economic_cost_cad": 106112.29,
+        "direct_cash_before_tax_cad": 79998.9,
+        "taxes_cad": 10399.86,
+        "contingency_cad": 7231.9,
+        "upfront_cash_required_cad": 97630.66,
+        "construction_cash_expenditure_cad": 79998.9,
+        "initial_cash_contribution_cad": 9763.07,
+        "financed_principal_cad": 87867.59,
+        "owner_labour_imputed_cad": 2177.54,
+        "completed_dwelling_capital_cad": 99808.2,
+        "economic_cost_cad": 99808.2,
+        "selected_stage_cash_cost_cad": 36404,
+        "selected_stage_economic_cost_cad": 36404,
         "cash_plus_owner_labour_equals_economic": true,
-        "headline_financed_value_cad": 103645.7,
+        "headline_financed_value_cad": 97630.66,
         "custom_quote_applied": false,
         "quote_delta_unallocated_cad": 0,
         "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
       },
       "financing": {
-        "capital_value_cad": 103645.7,
+        "capital_value_cad": 97630.66,
         "ownership": "financed",
-        "down_payment_cad": 10364.57,
-        "financed_principal_cad": 93281.13,
+        "down_payment_cad": 9763.07,
+        "financed_principal_cad": 87867.59,
         "interest_rate_annual": 0.06,
         "amortization_years": 25,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 601.01,
+        "monthly_debt_service_cad": 566.13,
+        "assumption_status": "illustrative_dwelling_financing_scenario",
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+      },
+      "selected_financing": {
+        "capital_value_cad": 36404,
+        "ownership": "financed",
+        "down_payment_cad": 3640.4,
+        "financed_principal_cad": 32763.6,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 25,
+        "loan_term_years": 5,
+        "monthly_debt_service_cad": 211.1,
         "assumption_status": "illustrative_dwelling_financing_scenario",
         "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
       },
@@ -10772,8 +11059,8 @@
         "model_diameter_m": 9.144,
         "legacy_gross_floor_area_m2": 65.6,
         "model_gross_floor_area_m2": 65.6693,
-        "model_completed_economic_capital_cad": 106112.29,
-        "delta_from_legacy_central_cad": 45112.29,
+        "model_completed_economic_capital_cad": 99808.2,
+        "delta_from_legacy_central_cad": 38808.2,
         "legacy_exact_integrated_total_cad": 61240,
         "legacy_public_rounded_total_cad": 61000,
         "historical_scope_components": [
@@ -10863,20 +11150,23 @@
         ],
         "bridge": {
           "former_model_economic_capital_cad": 108247.209692,
-          "corrected_economic_capital_cad": 106112.29405999997,
-          "direct_cash_delta_cad": -120.0800000000163,
-          "tax_delta_cad": 114.38959999999679,
-          "contingency_delta_cad": -0.45523200000207,
-          "owner_labour_delta_cad": -2128.7699999999995,
-          "total_delta_cad": -2134.915632000033,
+          "corrected_economic_capital_cad": 99808.19755999999,
+          "direct_cash_delta_cad": -5048.830000000002,
+          "tax_delta_cad": -526.3479000000007,
+          "contingency_delta_cad": -446.01423199999954,
+          "owner_labour_delta_cad": -2417.8199999999997,
+          "total_delta_cad": -8439.012132000018,
           "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
         },
         "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
       },
       "accounting": {
         "component_sum_check": true,
-        "component_rows_plus_additional_cad": 103645.7,
-        "upfront_cash_required_cad": 103645.7,
+        "component_rows_plus_additional_cad": 97630.66,
+        "pricing_layer_sum_check": true,
+        "pricing_layer_economic_sum_check": true,
+        "pricing_layer_economic_residual_cad": -0.04,
+        "upfront_cash_required_cad": 97630.66,
         "resident_owned_dwelling_only": true,
         "excludes": [
           "land purchase",
@@ -11622,24 +11912,26 @@
         "tax_rate": 0.13,
         "contingency_rate": 0.08,
         "custom_quote": null,
-        "package_selection": "exact_published_or_selected_package"
+        "package_selection": "exact_published_or_selected_package",
+        "completion_stage": "yurt_package"
       }
     },
     "high": {
-      "contract_version": "3.0.0",
+      "contract_version": "4.0.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
       "pricing_model": "first_principles_yurt_package_plus_quantity_bom",
       "band": "high",
+      "completion_stage": "yurt_package",
       "design": {
         "diameter_m": 9.144,
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
         "layout": "single_storey",
-        "window_count": 6,
-        "door_count": 2,
+        "window_count": 0,
+        "door_count": 1,
         "partition_loss_fraction": 0.04,
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
@@ -11653,8 +11945,8 @@
           "roof_pitch_degrees": 30,
           "household_size": 2,
           "layout": "single_storey",
-          "window_count": 6,
-          "door_count": 2,
+          "window_count": 0,
+          "door_count": 1,
           "partition_loss_fraction": 0.04,
           "stair_opening_m2": 0,
           "restricted_headroom_override_used": false,
@@ -12017,11 +12309,11 @@
         "description": "A planning split between paid trades and owner work; adjust when a work plan or quotation exists.",
         "labour_rate_cad_per_hour": 45,
         "owner_labour_value_rate_cad_per_hour": 24.6,
-        "paid_hours": 190.61,
-        "owner_hours": 100.27,
-        "paid_labour_cash_cad": 8577.46,
-        "owner_labour_imputed_cad": 2466.59,
-        "total_labour_hours": 290.88
+        "paid_hours": 178.86,
+        "owner_hours": 88.52,
+        "paid_labour_cash_cad": 8048.71,
+        "owner_labour_imputed_cad": 2177.54,
+        "total_labour_hours": 267.38
       },
       "components": [
         {
@@ -12076,7 +12368,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "yurt_package"
         },
         {
           "id": "platform_support_blocks",
@@ -12122,7 +12415,8 @@
           "excludes_scope_ids": [],
           "material_id": "oldcastle_deck_block",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_pt_beams",
@@ -12168,7 +12462,8 @@
           "excludes_scope_ids": [],
           "material_id": "pt_2x8x16",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_joists",
@@ -12214,7 +12509,8 @@
           "excludes_scope_ids": [],
           "material_id": "spf_2x8x16",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_decking",
@@ -12260,7 +12556,8 @@
           "excludes_scope_ids": [],
           "material_id": "spruce_tg_plywood_3_4",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_floor_insulation",
@@ -12306,7 +12603,8 @@
           "excludes_scope_ids": [],
           "material_id": "dupont_xps_r10_2in",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_vapour_layer",
@@ -12352,7 +12650,8 @@
           "excludes_scope_ids": [],
           "material_id": "ccmc_vapour_barrier_1000sf",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "platform_connectors",
@@ -12398,95 +12697,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
-        },
-        {
-          "id": "additional_windows",
-          "label": "Additional insulated windows",
-          "stage": "shell",
-          "driver": "window_count",
-          "unit": "CAD/window",
-          "quantity": 6,
-          "base_unit_rate_cad": 550,
-          "unit_rate_cad": 632.5,
-          "base_material_cost_cad": 3300,
-          "threshold_addition_cad": 0,
-          "material_cost_cad": 3795,
-          "package_id": null,
-          "source_package_id": null,
-          "package_total_cad": null,
-          "package_included_paid_labour_cad": null,
-          "package_included_fee_cad": null,
-          "package_non_labour_cost_cad": null,
-          "package_included_installation": false,
-          "package_labour_override_delta_cad": 0,
-          "package_scope": [],
-          "package_source_note": null,
-          "labour_hours_total": 18,
-          "paid_labour_hours": 9,
-          "owner_labour_hours": 9,
-          "paid_labour_cash_cad": 405,
-          "owner_labour_imputed_cad": 221.4,
-          "cash_cost_cad": 4200,
-          "economic_capital_cad": 4421.4,
-          "owner_eligible": true,
-          "active": true,
-          "taxable": true,
-          "status": "published_supplier_range_planning_rate",
-          "evidence_status": "published_supplier_range_planning_rate",
-          "source_note": "Yurts Canada says no windows are included by default; standard window options and thermal installation need quotation.",
-          "source_url": null,
-          "price_date": "2026-09-05",
-          "source_service_rate": false,
-          "scope_ids": [],
-          "excludes_scope_ids": [],
-          "material_id": null,
-          "quantity_override_used": false,
-          "material_price_override_used": false
-        },
-        {
-          "id": "additional_doors",
-          "label": "Additional exterior/interior door",
-          "stage": "shell",
-          "driver": "door_count",
-          "unit": "CAD/door",
-          "quantity": 1,
-          "base_unit_rate_cad": 1100,
-          "unit_rate_cad": 1265,
-          "base_material_cost_cad": 1100,
-          "threshold_addition_cad": 0,
-          "material_cost_cad": 1265,
-          "package_id": null,
-          "source_package_id": null,
-          "package_total_cad": null,
-          "package_included_paid_labour_cad": null,
-          "package_included_fee_cad": null,
-          "package_non_labour_cost_cad": null,
-          "package_included_installation": false,
-          "package_labour_override_delta_cad": 0,
-          "package_scope": [],
-          "package_source_note": null,
-          "labour_hours_total": 5.5,
-          "paid_labour_hours": 2.75,
-          "owner_labour_hours": 2.75,
-          "paid_labour_cash_cad": 123.75,
-          "owner_labour_imputed_cad": 67.65,
-          "cash_cost_cad": 1388.75,
-          "economic_capital_cad": 1456.4,
-          "owner_eligible": true,
-          "active": true,
-          "taxable": true,
-          "status": "published_supplier_range_planning_rate",
-          "evidence_status": "published_supplier_range_planning_rate",
-          "source_note": null,
-          "source_url": null,
-          "price_date": "2026-09-05",
-          "source_service_rate": false,
-          "scope_ids": [],
-          "excludes_scope_ids": [],
-          "material_id": null,
-          "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "platform_foundation"
         },
         {
           "id": "interior_finish_materials",
@@ -12530,7 +12742,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "kitchen_fitout_materials",
@@ -12574,7 +12787,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "bathroom_fitout_materials",
@@ -12618,7 +12832,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "wood_stove_and_chimney",
@@ -12662,7 +12877,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "balanced_ventilation",
@@ -12706,7 +12922,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "four_season_completion"
         },
         {
           "id": "delivery_logistics",
@@ -12750,7 +12967,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "design_engineering",
@@ -12794,7 +13012,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "permits",
@@ -12838,7 +13057,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "project_costs"
         },
         {
           "id": "water_collection_storage_first_flush",
@@ -12883,7 +13103,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_demand_pump",
@@ -12928,7 +13149,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_sediment_and_uv",
@@ -12973,7 +13195,8 @@
           "excludes_scope_ids": [],
           "material_id": "ispring_ro_uv",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "compact_pex_and_fittings",
@@ -13018,7 +13241,8 @@
           "excludes_scope_ids": [],
           "material_id": "zurn_pex_100ft",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "sink_and_shower_fixtures",
@@ -13063,7 +13287,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "composting_toilet",
@@ -13108,7 +13333,8 @@
           "excludes_scope_ids": [],
           "material_id": "sunmar_composting_toilet_allowance",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "class_2_greywater",
@@ -13153,7 +13379,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "qualified_water_installation",
@@ -13198,7 +13425,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "water_permit_allowance",
@@ -13243,7 +13471,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "solar_thermal_collector",
@@ -13288,7 +13517,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "hot_water_storage_and_controls",
@@ -13333,7 +13563,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "thermosiphon_integration",
@@ -13378,7 +13609,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "hot_water_integration_labour",
@@ -13423,7 +13655,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "pv_400w",
@@ -13468,7 +13701,8 @@
           "excludes_scope_ids": [],
           "material_id": "rocksolar_400w_kit",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "mppt_controller",
@@ -13513,7 +13747,8 @@
           "excludes_scope_ids": [],
           "material_id": "rocksolar_40a_mppt",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "lead_acid_bank",
@@ -13558,7 +13793,8 @@
           "excludes_scope_ids": [],
           "material_id": "lead_acid_storage_allowance",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "pure_sine_inverter",
@@ -13603,7 +13839,8 @@
           "excludes_scope_ids": [],
           "material_id": "powerbright_1000w_inverter",
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "dc_ac_wiring_protection",
@@ -13648,7 +13885,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "qualified_electrical_labour",
@@ -13693,7 +13931,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         },
         {
           "id": "electrical_inspection",
@@ -13738,7 +13977,8 @@
           "excludes_scope_ids": [],
           "material_id": null,
           "quantity_override_used": false,
-          "material_price_override_used": false
+          "material_price_override_used": false,
+          "pricing_layer": "basic_household_amenities"
         }
       ],
       "inactive_components": [
@@ -13757,8 +13997,10 @@
           "driver": "taxable cash cost",
           "unit": "CAD",
           "quantity": 0.13,
-          "unit_rate_cad": 96776.9,
-          "cash_cost_cad": 12580.997,
+          "unit_rate_cad": 91188.15,
+          "cash_cost_cad": 11854.459499999999,
+          "economic_capital_cad": 11854.459499999999,
+          "pricing_layer": "project_costs",
           "status": "provisional_tax_treatment",
           "source_note": "Tax treatment and any new-housing rebate require project-specific review."
         },
@@ -13768,8 +14010,10 @@
           "driver": "pre-contingency cash",
           "unit": "CAD",
           "quantity": 0.12,
-          "unit_rate_cad": 109357.897,
-          "cash_cost_cad": 13122.947639999999,
+          "unit_rate_cad": 103042.60949999999,
+          "cash_cost_cad": 12365.113139999998,
+          "economic_capital_cad": 12365.113139999998,
+          "pricing_layer": "project_costs",
           "status": "campaign_planning_assumption",
           "source_note": "Explicit planning allowance; not a hidden calibration adjustment."
         }
@@ -13841,9 +14085,128 @@
           }
         ]
       },
+      "pricing_layers": [
+        {
+          "id": "yurt_package",
+          "label": "Yurt package",
+          "stage": "bare_package",
+          "description": "The selected supplier package and its published inclusions only.",
+          "incremental_cash_cost_cad": 41864.6,
+          "incremental_economic_cost_cad": 41864.6,
+          "cumulative_cash_cost_cad": 41864.6,
+          "cumulative_economic_cost_cad": 41864.6,
+          "component_ids": [
+            "purchased_yurt_package"
+          ]
+        },
+        {
+          "id": "platform_foundation",
+          "label": "Platform and foundation",
+          "stage": "platform_supported_shell",
+          "description": "The preliminary platform/foundation BOM, supports, fasteners and assembly.",
+          "incremental_cash_cost_cad": 9192.72,
+          "incremental_economic_cost_cad": 10134.88,
+          "cumulative_cash_cost_cad": 51057.32,
+          "cumulative_economic_cost_cad": 51999.48,
+          "component_ids": [
+            "platform_support_blocks",
+            "platform_pt_beams",
+            "platform_joists",
+            "platform_decking",
+            "platform_floor_insulation",
+            "platform_vapour_layer",
+            "platform_connectors"
+          ]
+        },
+        {
+          "id": "four_season_completion",
+          "label": "Four-season completion",
+          "stage": "four_season_structure",
+          "description": "Additional openings, envelope work, heating, chimney, ventilation and layout structure.",
+          "incremental_cash_cost_cad": 12957.62,
+          "incremental_economic_cost_cad": 13577.96,
+          "cumulative_cash_cost_cad": 64014.94,
+          "cumulative_economic_cost_cad": 65577.44,
+          "component_ids": [
+            "interior_finish_materials",
+            "wood_stove_and_chimney",
+            "balanced_ventilation"
+          ]
+        },
+        {
+          "id": "basic_household_amenities",
+          "label": "Basic household amenities",
+          "stage": "basic_completed_arc",
+          "description": "Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.",
+          "incremental_cash_cost_cad": 20503.21,
+          "incremental_economic_cost_cad": 21118.21,
+          "cumulative_cash_cost_cad": 84518.15,
+          "cumulative_economic_cost_cad": 86695.65,
+          "component_ids": [
+            "kitchen_fitout_materials",
+            "bathroom_fitout_materials",
+            "water_collection_storage_first_flush",
+            "water_demand_pump",
+            "water_sediment_and_uv",
+            "compact_pex_and_fittings",
+            "sink_and_shower_fixtures",
+            "composting_toilet",
+            "class_2_greywater",
+            "qualified_water_installation",
+            "water_permit_allowance",
+            "solar_thermal_collector",
+            "hot_water_storage_and_controls",
+            "thermosiphon_integration",
+            "hot_water_integration_labour",
+            "pv_400w",
+            "mppt_controller",
+            "lead_acid_bank",
+            "pure_sine_inverter",
+            "dc_ac_wiring_protection",
+            "qualified_electrical_labour",
+            "electrical_inspection"
+          ]
+        },
+        {
+          "id": "project_costs",
+          "label": "Project costs and optional upgrades",
+          "stage": "basic_completed_arc",
+          "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+          "incremental_cash_cost_cad": 30889.57,
+          "incremental_economic_cost_cad": 30889.57,
+          "cumulative_cash_cost_cad": 115407.72,
+          "cumulative_economic_cost_cad": 117585.22,
+          "component_ids": [
+            "delivery_logistics",
+            "design_engineering",
+            "permits",
+            "taxes",
+            "contingency"
+          ]
+        }
+      ],
+      "selected_stage": {
+        "id": "yurt_package",
+        "label": "Yurt package",
+        "description": "Package-only view: the selected supplier price and its published inclusions. It is not a platform-supported or habitable dwelling.",
+        "layer_ids": [
+          "yurt_package"
+        ],
+        "cash_cost_cad": 41864.6,
+        "economic_cost_cad": 41864.6,
+        "financing_value_cad": 41864.6,
+        "initial_cash_contribution_cad": 4186.46,
+        "financed_principal_cad": 37678.14,
+        "remaining_layer_ids": [
+          "platform_foundation",
+          "four_season_completion",
+          "basic_household_amenities",
+          "project_costs"
+        ]
+      },
       "stages": {
         "shell": {
-          "cash_cost_cad": 56646.07,
+          "cash_cost_cad": 51057.32,
           "includes": [
             "purchased_yurt_package",
             "platform BOM",
@@ -13851,7 +14214,7 @@
           ]
         },
         "insulated_heated_structure": {
-          "cash_cost_cad": 69603.69,
+          "cash_cost_cad": 64014.94,
           "includes": [
             "shell",
             "interior finish",
@@ -13860,7 +14223,7 @@
           ]
         },
         "completed_before_tax_and_contingency": {
-          "cash_cost_cad": 96776.9,
+          "cash_cost_cad": 91188.15,
           "includes": [
             "purchased_yurt_package",
             "platform_support_blocks",
@@ -13870,8 +14233,6 @@
             "platform_floor_insulation",
             "platform_vapour_layer",
             "platform_connectors",
-            "additional_windows",
-            "additional_doors",
             "interior_finish_materials",
             "kitchen_fitout_materials",
             "bathroom_fitout_materials",
@@ -13903,8 +14264,8 @@
           ]
         },
         "completed_dwelling": {
-          "cash_cost_cad": 122480.84,
-          "economic_capital_cad": 124947.43,
+          "cash_cost_cad": 115407.72,
+          "economic_capital_cad": 117585.26,
           "includes": [
             "purchased_yurt_package",
             "platform_support_blocks",
@@ -13914,8 +14275,6 @@
             "platform_floor_insulation",
             "platform_vapour_layer",
             "platform_connectors",
-            "additional_windows",
-            "additional_doors",
             "interior_finish_materials",
             "kitchen_fitout_materials",
             "bathroom_fitout_materials",
@@ -13950,31 +14309,45 @@
         }
       },
       "totals": {
-        "direct_cash_before_tax_cad": 96776.9,
-        "taxes_cad": 12581,
-        "contingency_cad": 13122.95,
-        "upfront_cash_required_cad": 122480.84,
-        "construction_cash_expenditure_cad": 96776.9,
-        "initial_cash_contribution_cad": 12248.08,
-        "financed_principal_cad": 110232.76,
-        "owner_labour_imputed_cad": 2466.59,
-        "completed_dwelling_capital_cad": 124947.43,
-        "economic_cost_cad": 124947.43,
+        "direct_cash_before_tax_cad": 91188.15,
+        "taxes_cad": 11854.46,
+        "contingency_cad": 12365.11,
+        "upfront_cash_required_cad": 115407.72,
+        "construction_cash_expenditure_cad": 91188.15,
+        "initial_cash_contribution_cad": 11540.77,
+        "financed_principal_cad": 103866.95,
+        "owner_labour_imputed_cad": 2177.54,
+        "completed_dwelling_capital_cad": 117585.26,
+        "economic_cost_cad": 117585.26,
+        "selected_stage_cash_cost_cad": 41864.6,
+        "selected_stage_economic_cost_cad": 41864.6,
         "cash_plus_owner_labour_equals_economic": true,
-        "headline_financed_value_cad": 122480.84,
+        "headline_financed_value_cad": 115407.72,
         "custom_quote_applied": false,
         "quote_delta_unallocated_cad": 0,
         "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
       },
       "financing": {
-        "capital_value_cad": 122480.84,
+        "capital_value_cad": 115407.72,
         "ownership": "financed",
-        "down_payment_cad": 12248.08,
-        "financed_principal_cad": 110232.76,
+        "down_payment_cad": 11540.77,
+        "financed_principal_cad": 103866.95,
         "interest_rate_annual": 0.06,
         "amortization_years": 25,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 710.23,
+        "monthly_debt_service_cad": 669.22,
+        "assumption_status": "illustrative_dwelling_financing_scenario",
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+      },
+      "selected_financing": {
+        "capital_value_cad": 41864.6,
+        "ownership": "financed",
+        "down_payment_cad": 4186.46,
+        "financed_principal_cad": 37678.14,
+        "interest_rate_annual": 0.06,
+        "amortization_years": 25,
+        "loan_term_years": 5,
+        "monthly_debt_service_cad": 242.76,
         "assumption_status": "illustrative_dwelling_financing_scenario",
         "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
       },
@@ -13989,8 +14362,8 @@
         "model_diameter_m": 9.144,
         "legacy_gross_floor_area_m2": 65.6,
         "model_gross_floor_area_m2": 65.6693,
-        "model_completed_economic_capital_cad": 124947.43,
-        "delta_from_legacy_central_cad": 63947.43,
+        "model_completed_economic_capital_cad": 117585.26,
+        "delta_from_legacy_central_cad": 56585.26,
         "legacy_exact_integrated_total_cad": 61240,
         "legacy_public_rounded_total_cad": 61000,
         "historical_scope_components": [
@@ -14080,20 +14453,23 @@
         ],
         "bridge": {
           "former_model_economic_capital_cad": 108247.209692,
-          "corrected_economic_capital_cad": 124947.43463999999,
-          "direct_cash_delta_cad": 11729.169999999998,
-          "tax_delta_cad": 1654.7920999999988,
-          "contingency_delta_cad": 5445.032847999999,
-          "owner_labour_delta_cad": -2128.7699999999995,
-          "total_delta_cad": 16700.22494799999,
+          "corrected_economic_capital_cad": 117585.26263999999,
+          "direct_cash_delta_cad": 6140.419999999998,
+          "tax_delta_cad": 928.2545999999984,
+          "contingency_delta_cad": 4687.198347999998,
+          "owner_labour_delta_cad": -2417.8199999999997,
+          "total_delta_cad": 9338.052947999982,
           "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
         },
         "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
       },
       "accounting": {
         "component_sum_check": true,
-        "component_rows_plus_additional_cad": 122480.84,
-        "upfront_cash_required_cad": 122480.84,
+        "component_rows_plus_additional_cad": 115407.72,
+        "pricing_layer_sum_check": true,
+        "pricing_layer_economic_sum_check": true,
+        "pricing_layer_economic_residual_cad": -0.04,
+        "upfront_cash_required_cad": 115407.72,
         "resident_owned_dwelling_only": true,
         "excludes": [
           "land purchase",
@@ -14839,7 +15215,8 @@
         "tax_rate": 0.13,
         "contingency_rate": 0.12,
         "custom_quote": null,
-        "package_selection": "exact_published_or_selected_package"
+        "package_selection": "exact_published_or_selected_package",
+        "completion_stage": "yurt_package"
       }
     }
   },
@@ -14849,9 +15226,9 @@
       "label": "6.096 m / 20 ft",
       "diameter_m": 6.096,
       "usable_floor_area_m2": 28.0189,
-      "completed_dwelling_capital_cad": 75905.76,
-      "upfront_cash_required_cad": 74257.35,
-      "cost_per_usable_m2_cad": 2709.0913633297523,
+      "completed_dwelling_capital_cad": 69601.66,
+      "upfront_cash_required_cad": 68242.3,
+      "cost_per_usable_m2_cad": 2484.096806084465,
       "thresholds": []
     },
     {
@@ -14859,9 +15236,9 @@
       "label": "7.315 m / 24 ft",
       "diameter_m": 7.3152,
       "usable_floor_area_m2": 40.3472,
-      "completed_dwelling_capital_cad": 87107.39,
-      "upfront_cash_required_cad": 85161.79,
-      "cost_per_usable_m2_cad": 2158.94510647579,
+      "completed_dwelling_capital_cad": 80803.3,
+      "upfront_cash_required_cad": 79146.75,
+      "cost_per_usable_m2_cad": 2002.6990720545664,
       "thresholds": []
     },
     {
@@ -14869,9 +15246,9 @@
       "label": "9.144 m / 30 ft",
       "diameter_m": 9.144,
       "usable_floor_area_m2": 63.0425,
-      "completed_dwelling_capital_cad": 106112.29,
-      "upfront_cash_required_cad": 103645.7,
-      "cost_per_usable_m2_cad": 1683.1865804814213,
+      "completed_dwelling_capital_cad": 99808.2,
+      "upfront_cash_required_cad": 97630.66,
+      "cost_per_usable_m2_cad": 1583.189118451838,
       "thresholds": []
     },
     {
@@ -14879,9 +15256,9 @@
       "label": "10.668 m / 35 ft",
       "diameter_m": 10.668,
       "usable_floor_area_m2": 85.8079,
-      "completed_dwelling_capital_cad": 115822.83,
-      "upfront_cash_required_cad": 112814.28,
-      "cost_per_usable_m2_cad": 1349.7921520046523,
+      "completed_dwelling_capital_cad": 109518.73,
+      "upfront_cash_required_cad": 106799.23,
+      "cost_per_usable_m2_cad": 1276.3245575290853,
       "thresholds": [
         "large_diameter_9_144"
       ]
@@ -14891,9 +15268,9 @@
       "label": "12.192 m / 40 ft",
       "diameter_m": 12.192,
       "usable_floor_area_m2": 112.0756,
-      "completed_dwelling_capital_cad": 128877.73,
-      "upfront_cash_required_cad": 125272.47,
-      "cost_per_usable_m2_cad": 1149.9178233263976,
+      "completed_dwelling_capital_cad": 122573.64,
+      "upfront_cash_required_cad": 119257.43,
+      "cost_per_usable_m2_cad": 1093.6692732405627,
       "thresholds": [
         "large_diameter_9_144",
         "large_diameter_10_668"
@@ -14905,31 +15282,31 @@
       "layout": "single_storey",
       "label": "Single storey",
       "usable_floor_area_m2": 63.0425,
-      "completed_dwelling_capital_cad": 106112.29,
-      "upfront_cash_required_cad": 103645.7,
-      "cost_per_usable_m2_cad": 1683.1865804814213,
-      "owner_labour_hours": 100.27,
-      "paid_labour_hours": 182.94
+      "completed_dwelling_capital_cad": 99808.2,
+      "upfront_cash_required_cad": 97630.66,
+      "cost_per_usable_m2_cad": 1583.189118451838,
+      "owner_labour_hours": 88.52,
+      "paid_labour_hours": 171.19
     },
     {
       "layout": "partial_loft",
       "label": "Partial loft",
       "usable_floor_area_m2": 76.2211,
-      "completed_dwelling_capital_cad": 118058.15,
-      "upfront_cash_required_cad": 114718.76,
-      "cost_per_usable_m2_cad": 1548.8906615097392,
-      "owner_labour_hours": 135.75,
-      "paid_labour_hours": 220.01
+      "completed_dwelling_capital_cad": 111754.05,
+      "upfront_cash_required_cad": 108703.71,
+      "cost_per_usable_m2_cad": 1466.1825924842333,
+      "owner_labour_hours": 124,
+      "paid_labour_hours": 208.26
     },
     {
       "layout": "full_two_storeys",
       "label": "Full two storeys",
       "usable_floor_area_m2": 118.085,
-      "completed_dwelling_capital_cad": 131044.5,
-      "upfront_cash_required_cad": 126691.04,
-      "cost_per_usable_m2_cad": 1109.7472159884828,
-      "owner_labour_hours": 176.97,
-      "paid_labour_hours": 266.25
+      "completed_dwelling_capital_cad": 124740.41,
+      "upfront_cash_required_cad": 120676,
+      "cost_per_usable_m2_cad": 1056.3611805055682,
+      "owner_labour_hours": 165.22,
+      "paid_labour_hours": 254.5
     }
   ],
   "accounting_rules": [
