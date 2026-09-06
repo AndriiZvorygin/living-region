@@ -1,112 +1,207 @@
-# ARC House Cost Calculator
+# House Cost Calculator
 
-Generated from contract 2.0.0 on 2026-09-06. This is a planning model for a completed four-season yurt dwelling; land lease, shared infrastructure operating charges and household operating costs are separate.
+Generated from contract 3.0.0 on 2026-09-06. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
-## Central reference
+## Sourced yurt packages
 
-- Geometry: 9.144 m diameter (65.67 m² gross; 63.04 m² usable after explicit deductions)
-- Servicing: ARC household systems
-- Construction cash expenditure before tax/contingency: $80,172.73
-- Tax/HST allowance: $10,370.45
-- Contingency: $7,243.45
-- Total cash construction budget (the former “upfront cash required”): $97,786.64
-- Initial financing contribution: $9,778.66
-- Financed principal: $88,007.98
-- Owner labour economic value: $4,595.36
-- Completed dwelling economic cost: $102,382.00
-- Illustrative financing: $567.04/month at 6% interest, 25 year amortization, $9,778.66 down
+The package price is the starting input. The old ARC dwelling estimate is not used as a rate, residual or calibration target.
 
-The historical ARC reference is $61,240.00 before public rounding to $61,000.00. The audited model is $102,382.00 on its independently itemized scope. The former model result of $108,247.21 is reconciled below; no hidden discount is used.
+| Supplier | Diameter | Published / estimated price | Price basis | Evidence status |
+| --- | ---: | ---: | --- | --- |
+| Yurts Canada | 12 ft | $12,420.00 | installed | published_supplier_price |
+| Yurts Canada | 16 ft | $16,451.00 | installed | published_supplier_price |
+| Yurts Canada | 20 ft | $19,252.00 | installed | published_supplier_price |
+| Yurts Canada | 24 ft | $25,681.00 | installed | published_supplier_price |
+| Yurts Canada | 30 ft | $36,404.00 | installed | published_supplier_price |
+| The Out Factory | 20 ft | $32,958.00 | Canadian non-binding import estimate | non_binding_import_estimate |
+| The Out Factory | 24 ft | $37,699.00 | Canadian non-binding import estimate | non_binding_import_estimate |
+| The Out Factory | 32 ft | $57,852.00 | Canadian non-binding import estimate | non_binding_import_estimate |
+| Biome Canada | 20 ft | quote required | quote required | configurator_options_quote_required |
+| Biome Canada | 24 ft | quote required | quote required | configurator_options_quote_required |
+| Biome Canada | 30 ft | quote required | quote required | configurator_options_quote_required |
 
-## Historical ARC scope
+Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
 
-| Original scope | Original amount | Evidence status |
+## Central reference result
+
+- Supplier package: **Yurts Canada 30 ft**, $36,404.00 (exact_published_or_selected_package)
+- Geometry: 9.144 m diameter; 65.67 m² gross; 63.04 m² usable after explicit deductions
+- Direct cash before tax and contingency: **$84,927.65**
+- Taxes / HST allowance: $11,040.59
+- Contingency: $7,677.46
+- Completed dwelling cash construction budget: **$103,645.70**
+- Contributed owner-labour value: $2,466.59
+- Completed dwelling economic cost: **$106,112.29**
+- Initial financing contribution: $10,364.57; financed principal: $93,281.13
+- Illustrative financing: **$601.01/month** at 6% interest and 25-year amortization
+
+This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Platform and foundation BOM
+
+The platform is a preliminary circular deck-block concept, not an engineered foundation. Quantities include the stated waste factor and are driven by the reference geometry.
+
+| Item | Quantity | Unit rate | Material / non-labour | Labour | Cash |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Concrete deck blocks | 36 each | $10.51 | $378.36 | 19.8 h | $823.86 | [source](https://www.homedepot.ca/en/home/categories/building-materials/concrete-cement-and-masonry/f/bulk-pricing/g2c-xzs) |
+| Pressure-treated beams / rim framing | 9 16 ft piece | $46.21 | $415.89 | 5 h | $527.27 | [source](https://www.homedepot.ca/s/en/home/categories/building-materials/lumber-and-composites/dimensional-lumber-and-studs/2-x-8-x-16) |
+| SPF joists and blocking | 12 16 ft piece | $39.75 | $477.00 | 6.6 h | $625.50 | [source](https://www.homedepot.ca/s/en/home/categories/building-materials/lumber-and-composites/dimensional-lumber-and-studs/2-x-8-x-16) |
+| Tongue-and-groove floor deck | 25 sheet | $93.99 | $2,349.75 | 13.8 h | $2,659.13 | [source](https://www.homedepot.ca/en/home/categories/building-materials/lumber-and-composites/plywood/sheathing-plywood/f/tongue-and-groove/4-x-8/myp-1kki-3f3j) |
+| 2 in XPS floor insulation | 49 panel | $43.49 | $2,131.01 | 27 h | $2,737.39 | [source](https://www.rona.ca/en/product/dupont-rigid-insulation-panel-sm-r10-2-x-2-x-8-st248-2-0941038) |
+| 6 mil vapour/protective layer | 1 roll | $92.96 | $92.96 | 0.6 h | $105.34 | [source](https://www.homedepot.ca/product/everbilt-10-x-100-1000-sq-ft-ccmc-evaluated-6-mil-vapour-barrier/1000113373) |
+| Connectors, fasteners and anchors | 1 allowance | $650.00 | $650.00 | 4 h | $740.00 | allowance / quote required |
+
+## Household systems and amenities
+
+Each row below has one home in the dwelling. Included supplier items are not repriced. Qualified installation and fee rows are separated from materials.
+
+| Item | Quantity | Unit rate | Material / non-labour | Labour | Cash | Evidence |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Roof collection, first-flush and food-grade storage | 1 allowance | $650.00 | $650.00 | 0 h | $650.00 | provisional_quote_required |
+| Demand pump and pressure hardware | 1 allowance | $420.00 | $420.00 | 0 h | $420.00 | provisional_quote_required |
+| Sediment filtration and UV/RO treatment | 1 package | $548.00 | $548.00 | 0 h | $548.00 | published_retail_price |
+| Compact PEX, valves and fittings | 2 100 ft coil | $61.31 | $122.62 | 0 h | $122.62 | published_retail_price |
+| Sink and private shower fixtures | 1 allowance | $500.00 | $500.00 | 0 h | $500.00 | published_retail_price_synthesis |
+| Drainless composting toilet | 1 each | $1,854.00 | $1,854.00 | 0 h | $1,854.00 | published_manufacturer_price_reference |
+| Class 2 greywater components and excavation | 1 allowance | $850.00 | $850.00 | 0 h | $850.00 | provisional_quote_required |
+| Qualified plumbing installation and commissioning | 1 allowance | $0.00 | $0.00 | 26.7 h | $1,200.00 | planning_labour_allowance |
+| Water/plumbing permit allowance | 1 allowance | $0.00 | $0.00 | 0 h | $600.00 | site_specific_fee_required |
+| Summer solar-thermal collector | 1 quote allowance | $650.00 | $650.00 | 0 h | $650.00 | provisional_quote_required |
+| Storage tank, valves and controls | 1 allowance | $550.00 | $550.00 | 0 h | $550.00 | provisional_quote_required |
+| Winter heater thermosiphon plumbing | 1 allowance | $400.00 | $400.00 | 0 h | $400.00 | planning_design_allowance |
+| Hot-water integration labour | 1 allowance | $0.00 | $0.00 | 8.9 h | $400.00 | planning_labour_allowance |
+| 400 W PV array | 1 kit | $825.00 | $825.00 | 0 h | $825.00 | published_retail_price |
+| MPPT charge controller | 1 each | $196.00 | $196.00 | 0 h | $196.00 | published_retail_price |
+| 2.52 kWh nominal lead-acid storage | 1 allowance | $1,050.00 | $1,050.00 | 0 h | $1,050.00 | provisional_quote_required |
+| 1,000 W pure-sine inverter | 1 each | $485.00 | $485.00 | 0 h | $485.00 | published_retail_price |
+| Wiring, disconnects, fuses and enclosure | 1 allowance | $350.00 | $350.00 | 0 h | $350.00 | provisional_quote_required |
+| Electrical inspection allowance | 1 allowance | $0.00 | $0.00 | 0 h | $100.00 | site_specific_fee_required |
+
+## Complete component ledger
+
+| Component | Quantity | Unit | Unit rate | Material / non-labour | Labour | Cash | Evidence |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | --- |
+| Yurts Canada 30 ft Base Kit | 1 | CAD/package | $36,404.00 | $36,404.00 | 0 h | $36,404.00 | published_supplier_price |
+| Concrete deck blocks | 36 | each | $10.51 | $378.36 | 19.8 h | $823.86 | provisional_quantity |
+| Pressure-treated beams / rim framing | 9 | 16 ft piece | $46.21 | $415.89 | 5 h | $527.27 | provisional_quantity |
+| SPF joists and blocking | 12 | 16 ft piece | $39.75 | $477.00 | 6.6 h | $625.50 | provisional_quantity |
+| Tongue-and-groove floor deck | 25 | sheet | $93.99 | $2,349.75 | 13.8 h | $2,659.13 | provisional_quantity |
+| 2 in XPS floor insulation | 49 | panel | $43.49 | $2,131.01 | 27 h | $2,737.39 | provisional_quantity |
+| 6 mil vapour/protective layer | 1 | roll | $92.96 | $92.96 | 0.6 h | $105.34 | provisional_quantity |
+| Connectors, fasteners and anchors | 1 | allowance | $650.00 | $650.00 | 4 h | $740.00 | provisional_quote_required |
+| Additional insulated windows | 6 | CAD/window | $550.00 | $3,300.00 | 18 h | $3,705.00 | published_supplier_range_planning_rate |
+| Additional exterior/interior door | 1 | CAD/door | $1,100.00 | $1,100.00 | 5.5 h | $1,223.75 | published_supplier_range_planning_rate |
+| Interior floor finish and partitions | 63.043 | CAD/m2 | $45.00 | $2,836.91 | 50.4 h | $3,971.68 | provisional_material_and_labour_allowance |
+| Kitchen cabinetry, counter and basic appliances | 1 | CAD/dwelling | $2,750.00 | $2,750.00 | 26 h | $3,335.00 | provisional_itemized_fitout_allowance |
+| Bathroom non-plumbing fit-out | 1 | CAD/dwelling | $1,650.00 | $1,650.00 | 24 h | $2,190.00 | provisional_itemized_fitout_allowance |
+| Wood stove, chimney and fire-safe installation | 1 | CAD/dwelling | $5,200.00 | $5,200.00 | 24 h | $6,280.00 | published_product_plus_provisional_assembly |
+| Small dwelling ventilation | 63.043 | CAD/m2 | $16.00 | $1,008.68 | 7.6 h | $1,349.11 | provisional_design_allowance |
+| Supplier freight and local delivery | 1 | CAD/dwelling | $1,800.00 | $1,800.00 | 0 h | $1,800.00 | quotation_required |
+| Site, structural and servicing design | 1 | CAD/dwelling | $3,000.00 | $3,000.00 | 0 h | $3,000.00 | quotation_or_engineering_required |
+| Residual permits and approvals | 1 | CAD/dwelling | $1,000.00 | $1,000.00 | 0 h | $1,000.00 | site_specific_fee_required |
+| Roof collection, first-flush and food-grade storage | 1 | allowance | $650.00 | $650.00 | 0 h | $650.00 | provisional_quote_required |
+| Demand pump and pressure hardware | 1 | allowance | $420.00 | $420.00 | 0 h | $420.00 | provisional_quote_required |
+| Sediment filtration and UV/RO treatment | 1 | package | $548.00 | $548.00 | 0 h | $548.00 | published_retail_price |
+| Compact PEX, valves and fittings | 2 | 100 ft coil | $61.31 | $122.62 | 0 h | $122.62 | published_retail_price |
+| Sink and private shower fixtures | 1 | allowance | $500.00 | $500.00 | 0 h | $500.00 | published_retail_price_synthesis |
+| Drainless composting toilet | 1 | each | $1,854.00 | $1,854.00 | 0 h | $1,854.00 | published_manufacturer_price_reference |
+| Class 2 greywater components and excavation | 1 | allowance | $850.00 | $850.00 | 0 h | $850.00 | provisional_quote_required |
+| Qualified plumbing installation and commissioning | 1 | allowance | $0.00 | $0.00 | 26.7 h | $1,200.00 | planning_labour_allowance |
+| Water/plumbing permit allowance | 1 | allowance | $0.00 | $0.00 | 0 h | $600.00 | site_specific_fee_required |
+| Summer solar-thermal collector | 1 | quote allowance | $650.00 | $650.00 | 0 h | $650.00 | provisional_quote_required |
+| Storage tank, valves and controls | 1 | allowance | $550.00 | $550.00 | 0 h | $550.00 | provisional_quote_required |
+| Winter heater thermosiphon plumbing | 1 | allowance | $400.00 | $400.00 | 0 h | $400.00 | planning_design_allowance |
+| Hot-water integration labour | 1 | allowance | $0.00 | $0.00 | 8.9 h | $400.00 | planning_labour_allowance |
+| 400 W PV array | 1 | kit | $825.00 | $825.00 | 0 h | $825.00 | published_retail_price |
+| MPPT charge controller | 1 | each | $196.00 | $196.00 | 0 h | $196.00 | published_retail_price |
+| 2.52 kWh nominal lead-acid storage | 1 | allowance | $1,050.00 | $1,050.00 | 0 h | $1,050.00 | provisional_quote_required |
+| 1,000 W pure-sine inverter | 1 | each | $485.00 | $485.00 | 0 h | $485.00 | published_retail_price |
+| Wiring, disconnects, fuses and enclosure | 1 | allowance | $350.00 | $350.00 | 0 h | $350.00 | provisional_quote_required |
+| Qualified electrical installation | 1 | allowance | $0.00 | $0.00 | 15.6 h | $700.00 | planning_labour_allowance |
+| Electrical inspection allowance | 1 | allowance | $0.00 | $0.00 | 0 h | $100.00 | site_specific_fee_required |
+
+The visible component rows plus taxes and contingency equal the cash construction budget. Owner-builder work reduces cash expenditure but remains visible as hours and imputed economic value.
+
+## Procurement register
+
+| Material / product | Published unit price | Observed | Status | Source |
+| --- | ---: | --- | --- | --- |
+| Oldcastle 11 x 11 x 7 in concrete deck block | $10.51 / each | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/en/home/categories/building-materials/concrete-cement-and-masonry/f/bulk-pricing/g2c-xzs) |
+| Pressure-treated 2 x 8 x 16 ft premium wood | $46.21 / each | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/s/en/home/categories/building-materials/lumber-and-composites/dimensional-lumber-and-studs/2-x-8-x-16) |
+| SPF 2 x 8 x 16 ft premium dimensional lumber | $39.75 / each | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/s/en/home/categories/building-materials/lumber-and-composites/dimensional-lumber-and-studs/2-x-8-x-16) |
+| 3/4 in 4 x 8 ft standard spruce tongue-and-groove plywood | $93.99 / sheet | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/en/home/categories/building-materials/lumber-and-composites/plywood/sheathing-plywood/f/tongue-and-groove/4-x-8/myp-1kki-3f3j) |
+| DuPont SM R10 XPS 2 in x 2 ft x 8 ft panel | $43.49 / panel | 2026-09-05 | published_retail_price | [source](https://www.rona.ca/en/product/dupont-rigid-insulation-panel-sm-r10-2-x-2-x-8-st248-2-0941038) |
+| Everbilt CCMC-evaluated 6 mil vapour barrier, 1,000 ft² | $92.96 / roll | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/product/everbilt-10-x-100-1000-sq-ft-ccmc-evaluated-6-mil-vapour-barrier/1000113373) |
+| Apollo 1/2 in x 100 ft PEX-B pipe | $37.95 / coil | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/s/en/home/categories/building-materials/plumbing/pipe-and-fittings/pex-pipes-and-fittings/pex-1-2-ix1) |
+| Zurn 1/2 in x 100 ft PEX pipe | $61.31 / coil | 2026-07-29 | published_retail_price | [source](https://www.homedepot.ca/product/zurn-1-2-inch-x-100-ft-pex-pipe-in-white/1001512365) |
+| iSpring RCC7AK-UV 7-stage RO with UV | $548.00 / each | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/product/ispring-rcc7ak-uv-nsf-certified-75gpd-7-stage-reverse-osmosis-water-filter-system-alkaline-uv-filter/1001103065) |
+| Rheem 2.5 gallon point-of-use electric water heater | $331.00 / each | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/product/rheem-mini-tank-120-volt-2-5-gallon-compact-point-of-use-electric-water-heater/1001683414) |
+| Rocksolar 400 W 12 V rigid solar panel kit | $825.00 / kit | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/product/rocksolar-400w-12v-rigid-solar-panel-kit/1001828381) |
+| Rocksolar 40 A MPPT charge controller | $196.00 / each | 2026-08-24 | published_retail_price | [source](https://www.homedepot.ca/product/rocksolar-40a-mppt-solar-charge-controller/1001817765) |
+| PowerBright 1,000 W 12 V pure-sine inverter | $485.00 / each | 2026-09-05 | published_retail_price | [source](https://www.homedepot.ca/product/power-bright-1000-watt-12v-dc-to-120v-ac-pure-sine-wave-power-inverter/1001281881) |
+| Flooded lead-acid storage allowance for 2.52 kWh nominal | $1,050.00 / allowance | 2026-09-05 | provisional_quote_required | quote required |
+| Sun-Mar composting toilet allowance | $1,854.00 / each | 2026-09-05 | published_manufacturer_price_reference | [source](https://images.homedepot.ca/pdf/Instructions_1000158002.pdf) |
+
+## Historical ARC comparison only
+
+The former ARC figure remains a historical comparison, not a model input. Its exact integrated total was $61,240.00, publicly rounded to $61,000.00.
+
+| Historical scope | Amount | Status |
 | --- | ---: | --- |
 | Reinforced insulated structure, platform, masonry heater and chimney | $50,000.00 | historical_design_brief_amount |
 | Fixtures, toilet, excavation, compact plumbing, commissioning, CAD 1,200 qualified plumbing labour and CAD 600 permit allowance | $5,940.00 | historical_inclusive_package |
 | Winter thermosiphon and summer solar-thermal hot water, including CAD 400 integration labour | $2,000.00 | historical_inclusive_package |
 | Approximately 400 W PV, MPPT, 2.52 kWh nominal battery, 1,000 W inverter, CAD 700 qualified electrical labour and CAD 100 inspection allowance | $3,300.00 | historical_inclusive_package |
 
-The original structural itemization was not recovered. Its CAD 50,000 amount is retained as a historical design-brief figure. The utility packages are inclusive: their paid labour and fees are inside the stated package totals.
+The historical structural amount was a design-brief figure whose supporting takeoff was not recovered. The present result is not forced to match it; differences arise from the sourced yurt package, platform BOM, additional openings, fit-out, logistics, design, tax, contingency and explicit labour treatment.
 
-## Old-versus-audited package reconciliation
+## Former-model numerical reconciliation
 
-| Component | Original scope / amount | Former model cash row | Audited scope / amount | Delta from former | Evidence / reason |
+The former itemized model produced $108,247.21 economic cost. The audited first-principles result is $106,112.29, a change of -$2,134.92. This bridge keeps package scope, tax, contingency and contributed labour visible instead of applying a discount to reach the historical ARC benchmark.
+
+| Component | Original scope / amount | Former model cash | Audited scope / amount | Change from former | Evidence / reason |
 | --- | --- | ---: | --- | ---: | --- |
-| Water / plumbing / sanitation | Inclusive package ($5,940.00) | $8,685.00 | One inclusive package; included labour and fee decomposed, not added again ($5,940.00) | $-2,745.00 | Historical ARC design brief; original itemized quotation unrecovered. |
-| Hot water | Inclusive package including integration labour ($2,000.00) | $2,630.00 | One inclusive package; labour allowance is replaced only by a labour override ($2,000.00) | $-630.00 | Historical ARC design brief; original itemized quotation unrecovered. |
-| Household electrical | Inclusive off-grid package including qualified labour and inspection allowance ($3,300.00) | $4,200.00 | One inclusive package; labour and inspection allowance exposed inside package ($3,300.00) | $-900.00 | Historical ARC design brief; original itemized quotation unrecovered. |
-| General permits | The utility package includes CAD 600 permit allowance ($0.00) | $1,000.00 | Residual general permit allowance after CAD 600 package offset ($400.00) | $-600.00 | Historical ARC package detail plus current municipal-fee placeholder. |
+| Water / plumbing / sanitation | Inclusive package / $5,940.00 | $8,685.00 | One inclusive package; included labour and fee decomposed, not added again / $6,744.62 | -$1,940.38 | Historical ARC design brief; original itemized quotation unrecovered. |
+| Hot water | Inclusive package including integration labour / $2,000.00 | $2,630.00 | One inclusive package; labour allowance is replaced only by a labour override / $2,000.00 | -$630.00 | Historical ARC design brief; original itemized quotation unrecovered. |
+| Household electrical | Inclusive off-grid package including qualified labour and inspection allowance / $3,300.00 | $4,200.00 | One inclusive package; labour and inspection allowance exposed inside package / $3,706.00 | -$494.00 | Historical ARC design brief; original itemized quotation unrecovered. |
+| General permits | The utility package includes CAD 600 permit allowance / $0.00 | $1,000.00 | Residual general permit allowance after CAD 600 package offset / $1,000.00 | $0.00 | Historical ARC package detail plus current municipal-fee placeholder. |
 
-Bridge totals: direct cash $-4,875.00, tax $-555.75, contingency $-434.46, owner-labour value $0.00, total economic cost $-5,865.21. The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the lower cash base. Owner-labour valuation is unchanged. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.
-
-## Component audit
-
-| Component | Quantity | Unit | Unit rate | Materials / non-labour | Labour | Cash cost | Evidence status |
-| --- | ---: | --- | ---: | ---: | ---: | ---: | --- |
-| Platform / foundation | 65.67 | CAD/m2 | $130.00 | $8,537.01 | 27.6 h | $9,157.58 | planning_rate |
-| Yurt frame and tension structure | 28.73 | CAD/m | $225.00 | $6,463.51 | 51.7 h | $7,626.94 | planning_rate |
-| Roof structure and covering | 75.83 | CAD/m2 | $85.00 | $6,445.41 | 83.4 h | $8,322.17 | planning_rate |
-| Insulation | 144.77 | CAD/m2 | $30.00 | $4,343.18 | 55 h | $5,580.98 | planning_rate |
-| Weatherproofing and air control | 144.77 | CAD/m2 | $24.00 | $3,474.54 | 31.9 h | $4,191.16 | planning_rate |
-| Windows / dome glazing | 6 | CAD/window | $550.00 | $3,300.00 | 18 h | $3,705.00 | supplier_range_planning_rate |
-| Exterior and interior doors | 2 | CAD/door | $1,100.00 | $2,200.00 | 11 h | $2,447.50 | supplier_range_planning_rate |
-| Interior finishes and floor finish | 63.04 | CAD/m2 | $75.00 | $4,728.19 | 63 h | $6,146.64 | planning_rate |
-| Additional kitchen fit-out | 1 | CAD/dwelling | $3,500.00 | $3,500.00 | 32 h | $4,220.00 | unitemized_additional_fitout_allowance |
-| Additional bathroom fit-out | 1 | CAD/dwelling | $3,000.00 | $3,000.00 | 38 h | $4,710.00 | unitemized_additional_fitout_allowance |
-| Heating appliance and system | 1 | CAD/dwelling | $5,000.00 | $5,000.00 | 18 h | $5,810.00 | arc_planning_allocation |
-| Ventilation / air exchange | 63.04 | CAD/m2 | $20.00 | $1,260.85 | 10.1 h | $1,714.76 | planning_rate |
-| Household electrical equipment | 1 | CAD/dwelling | $3,300.00 | $2,600.00 | 15.6 h | $3,300.00 | inclusive household_electrical |
-| Water, plumbing and sanitation package | 1 | CAD/dwelling | $5,940.00 | $4,740.00 | 26.7 h | $5,940.00 | inclusive water_plumbing_sanitation |
-| Domestic hot water package | 1 | CAD/dwelling | $2,000.00 | $1,600.00 | 8.9 h | $2,000.00 | inclusive hot_water |
-| Household demand upgrade | 0 | CAD/person above 2 | $600.00 | $0.00 | 0 h | $0.00 | planning_assumption |
-| Delivery and logistics | 1 | CAD/dwelling | $1,200.00 | $1,200.00 | 6 h | $1,470.00 | site_specific_quote_required |
-| Equipment hire | 1 | CAD/dwelling | $750.00 | $750.00 | 4 h | $930.00 | site_specific_quote_required |
-| Design and engineering | 1 | CAD/dwelling | $2,500.00 | $2,500.00 | 0 h | $2,500.00 | quotation_or_engineering_required |
-| Permits and approvals | 1 | CAD/dwelling | $1,000.00 | $400.00 | 0 h | $400.00 | site_specific_fee_required |
-
-Package rows expose their inclusive total, included paid labour, included fee and non-labour portion in the generated JSON. A labour-rate override replaces the package’s included labour allowance; it is not added on top. The residual general permit row is $400.00 after the included $600.00 allowance.
+The total bridge is direct cash -$120.08, tax $114.39, contingency -$0.46 and owner-labour economic value -$2,128.77. The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.
 
 ## Labour modes
 
-| Mode | Total cash budget | Economic cost | Owner hours | Paid hours | Illustrative finance |
+| Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Owner-builder | $87,527.80 | $96,718.53 | 373.6 h | 127.2 h | $507.55/month |
-| Mixed labour | $97,786.64 | $102,382.00 | 186.8 h | 314 h | $567.04/month |
-| Contractor-built | $108,045.51 | $108,045.51 | 0 h | 500.8 h | $626.52/month |
+| Owner-builder | $98,139.21 | $103,072.35 | 200.5 h | 82.7 h | $569.08 / month |
+| Mixed labour | $103,645.70 | $106,112.29 | 100.3 h | 182.9 h | $601.01 / month |
+| Contractor-built | $109,152.14 | $109,152.14 | 0 h | 283.2 h | $632.94 / month |
 
-Owner-builder cash is lower because owner labour is contributed, not because that work disappears. Professional/design and approval work remains paid. Economic cost adds the imputed value of contributed owner labour to the total cash budget.
+## Size and layout sensitivity
 
-## Diameter sensitivity
+| Diameter | Usable m² | Cash budget | Economic cost | Economic / usable m² | Thresholds |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 6.096 m / 20 ft | 28.0 | $74,257.35 | $75,905.76 | $2,709.09 | none |
+| 7.315 m / 24 ft | 40.3 | $85,161.79 | $87,107.39 | $2,158.95 | none |
+| 9.144 m / 30 ft | 63.0 | $103,645.70 | $106,112.29 | $1,683.19 | none |
+| 10.668 m / 35 ft | 85.8 | $112,814.28 | $115,822.83 | $1,349.79 | large_diameter_9_144 |
+| 12.192 m / 40 ft | 112.1 | $125,272.47 | $128,877.73 | $1,149.92 | large_diameter_9_144, large_diameter_10_668 |
 
-| Diameter | Usable m² | Economic cost | Cost / usable m² | Applied thresholds |
-| --- | ---: | ---: | ---: | --- |
-| 6.096 m / 20 ft | 28.0 | $74,852.89 | $2,671.51 | none |
-| 7.315 m / 24 ft | 40.3 | $84,801.28 | $2,101.79 | none |
-| 9.144 m / 30 ft | 63.0 | $102,382.00 | $1,624.02 | none |
-| 10.668 m / 35 ft | 85.8 | $123,984.79 | $1,444.91 | large_diameter_9_144 |
-| 12.192 m / 40 ft | 112.1 | $151,586.02 | $1,352.53 | large_diameter_9_144, large_diameter_10_668 |
-
-## Layout comparison
-
-| Layout | Usable m² | Economic cost | Cost / usable m² | Owner hours | Paid hours |
+| Layout | Usable m² | Cash budget | Economic cost | Owner hours | Paid hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Single storey | 63.0 | $102,382.00 | $1,624.02 | 186.8 h | 314 h |
-| Partial loft | 76.2 | $115,008.43 | $1,508.88 | 223.6 h | 352.9 h |
-| Full two storeys | 118.1 | $136,344.94 | $1,154.63 | 289.7 h | 425.7 h |
+| Single storey | 63.0 | $103,645.70 | $106,112.29 | 100.3 h | 182.9 h |
+| Partial loft | 76.2 | $114,718.76 | $118,058.15 | 135.8 h | 220 h |
+| Full two storeys | 118.1 | $126,691.04 | $131,044.50 | 177 h | 266.3 h |
 
-## Accounting and evidence
+Interpolated sizes are labelled in the JSON contract. Thresholds for larger spans, roof pitch and upper floors are provisional planning rules, not structural approval. Snow, wind, foundations, connections, fire safety and final assemblies require qualified design.
 
-- Shell is the platform/foundation, frame, roof, insulation, weatherproofing, windows, doors and any upper-floor structure.
-- The platform/foundation row covers the structural base and floor structure; interior finishes cover finish flooring and surfaces. Frame and roof scopes are separated, and wall weatherproofing excludes the roof covering.
-- Insulated/heated structure adds interior finish, heating, ventilation, stairs and guards.
-- Completed dwelling adds additional kitchen/bathroom fit-out, distributed household systems, logistics, equipment, design, residual permits, tax and contingency.
-- The ARC household package is carried once: water/plumbing/sanitation $5,940.00, hot water $2,000.00, electrical $3,300.00. Generic well/septic/grid options remain alternatives.
-- Financing is calculated on the total cash construction budget, excluding contributed owner-labour value. Down payment/equity and financed principal are separate from that budget.
-- Centralized servicing removes household utility capital and reports unresolved shared-infrastructure quotation requirements; it is not silently added to this dwelling.
-- A custom quote overrides the financing headline while any unallocated difference remains visible.
+## Accounting boundaries and evidence gaps
 
-The strongest evidence supports geometry/specification boundaries and Ontario permit/servicing obligations. Component rates, structural thresholds, labour rates, HST treatment, kitchen/bath fit-out itemization and site logistics remain planning estimates or quotation-required inputs.
+- The purchased yurt package is a supplier-price input with its published inclusions and exclusions.
+- The platform is a quantity prototype using published retail material prices where available; structural grade, frost, soil, uplift, anchorage and spans require engineering.
+- Household water, sanitation, hot water and electrical systems are itemized once. Generic well/septic/grid and centralized services remain alternatives.
+- Financing uses the cash construction budget and excludes contributed owner-labour value. Down payment and financed principal are separate from the full cash budget.
+- Tax treatment, HST eligibility, municipal approvals, delivery, final supplier installation scope, battery pricing, kitchen/bath fit-out and structural design remain site-specific or quotation-required.
+- The dwelling is resident-owned. This does not convey ownership or guaranteed appreciation in the underlying land.
 
 ## Sources
 

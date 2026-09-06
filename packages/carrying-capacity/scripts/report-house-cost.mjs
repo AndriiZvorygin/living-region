@@ -7,101 +7,137 @@ const evidenceRoot = resolve('know/produce/house-cost');
 const generatedDate = new Date().toISOString().slice(0, 10);
 const contract = buildHouseCostPresentationContract();
 const central = contract.central;
-const cad = (value) => `$${Number(value ?? 0).toLocaleString('en-CA', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
 const money = (value) => `$${Number(value ?? 0).toLocaleString('en-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+const signedMoney = (value) => Number(value ?? 0) < 0 ? `-${money(Math.abs(Number(value)))}` : money(value);
 const hours = (value) => `${Number(value ?? 0).toLocaleString('en-CA', {maximumFractionDigits: 1})} h`;
-const modes = ['owner_builder', 'mixed_labour', 'contractor_built'].map((labourMode) => {
+const quantity = (value) => Number(value ?? 0).toLocaleString('en-CA', {maximumFractionDigits: 3});
+const packageRows = contract.market_evidence.yurt_packages.map((row) => {
+  const supplier = contract.market_evidence.suppliers.find((item) => item.id === row.supplier_id);
+  const price = row.price_cad == null ? 'quote required' : money(row.price_cad);
+  return `| ${supplier?.name ?? row.supplier_id} | ${row.diameter_label} | ${price} | ${row.price_basis} | ${row.evidence_status} |`;
+}).join('\n');
+const componentRows = central.components.map((row) => `| ${row.label} | ${quantity(row.quantity)} | ${row.unit} | ${money(row.unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
+const platformRows = central.components.filter((row) => row.id.startsWith('platform_')).map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.unit} | ${money(row.base_unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.source_url ? `[source](${row.source_url})` : 'allowance / quote required'} |`).join('\n');
+const utilityRows = central.components.filter((row) => row.id.startsWith('water_') || row.id.startsWith('compact_') || row.id.startsWith('sink_') || row.id.startsWith('composting_') || row.id.startsWith('class_') || row.id.startsWith('qualified_water') || row.id.startsWith('pv_') || row.id.startsWith('mppt_') || row.id.startsWith('lead_') || row.id.startsWith('pure_') || row.id.startsWith('dc_') || row.id.startsWith('electrical_') || row.id.startsWith('solar_') || row.id.startsWith('hot_water_') || row.id.startsWith('thermosiphon_')).map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.unit} | ${money(row.unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
+const materialRows = contract.market_evidence.material_catalog.map((row) => `| ${row.label} | ${money(row.unit_price_cad)} / ${row.purchase_unit} | ${row.price_date} | ${row.evidence_status} | ${row.source_url ? `[source](${row.source_url})` : 'quote required'} |`).join('\n');
+const sourceRows = contract.sources.map((source) => `- [${source.institution}: ${source.title}](${source.url}) - ${source.classification}. ${source.note}`).join('\n');
+const modeRows = ['owner_builder', 'mixed_labour', 'contractor_built'].map((labourMode) => {
   const result = calculateHouseCost({labourMode});
-  return {labourMode, label: result.labour.label, cash: result.totals.upfront_cash_required_cad, capital: result.totals.completed_dwelling_capital_cad, ownerHours: result.labour.owner_hours, paidHours: result.labour.paid_hours, financing: result.financing.monthly_debt_service_cad};
-});
-const componentRows = central.components.map((row) => `| ${row.label} | ${row.quantity.toLocaleString('en-CA', {maximumFractionDigits: 2})} | ${row.unit} | ${money(row.unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.package_id ? `inclusive ${row.package_id}` : row.status} |`).join('\n');
-const diameterRows = contract.diameter_sensitivity.map((row) => `| ${row.label} | ${row.usable_floor_area_m2.toFixed(1)} | ${money(row.completed_dwelling_capital_cad)} | ${money(row.cost_per_usable_m2_cad)} | ${row.thresholds.join(', ') || 'none'} |`).join('\n');
-const layoutRows = contract.layout_comparison.map((row) => `| ${row.label} | ${row.usable_floor_area_m2.toFixed(1)} | ${money(row.completed_dwelling_capital_cad)} | ${money(row.cost_per_usable_m2_cad)} | ${hours(row.owner_labour_hours)} | ${hours(row.paid_labour_hours)} |`).join('\n');
-const modeRows = modes.map((row) => `| ${row.label} | ${money(row.cash)} | ${money(row.capital)} | ${hours(row.ownerHours)} | ${hours(row.paidHours)} | ${money(row.financing)}/month |`).join('\n');
-const bridgeRows = central.legacy_reconciliation.bridge_rows.map((row) => `| ${row.component} | ${row.original_scope} (${money(row.original_amount_cad)}) | ${money(row.former_model_amount_cad)} | ${row.new_scope} (${money(row.new_amount_cad)}) | ${money(row.delta_from_former_model_cad)} | ${row.evidence} |`).join('\n');
+  return `| ${result.labour.label} | ${money(result.totals.upfront_cash_required_cad)} | ${money(result.totals.economic_cost_cad)} | ${hours(result.labour.owner_hours)} | ${hours(result.labour.paid_hours)} | ${money(result.financing.monthly_debt_service_cad)} / month |`;
+}).join('\n');
+const diameterRows = contract.diameter_sensitivity.map((row) => `| ${row.label} | ${row.usable_floor_area_m2.toFixed(1)} | ${money(row.upfront_cash_required_cad)} | ${money(row.completed_dwelling_capital_cad)} | ${money(row.cost_per_usable_m2_cad)} | ${row.thresholds.join(', ') || 'none'} |`).join('\n');
+const layoutRows = contract.layout_comparison.map((row) => `| ${row.label} | ${row.usable_floor_area_m2.toFixed(1)} | ${money(row.upfront_cash_required_cad)} | ${money(row.completed_dwelling_capital_cad)} | ${hours(row.owner_labour_hours)} | ${hours(row.paid_labour_hours)} |`).join('\n');
 const historicalRows = central.legacy_reconciliation.historical_scope_components.map((row) => `| ${row.scope} | ${money(row.amount_cad)} | ${row.status} |`).join('\n');
-const bridge = central.legacy_reconciliation.bridge;
-const packageRow = (id) => central.components.find((row) => row.id === id);
-const markdown = `# ARC House Cost Calculator
+const bridgeRows = central.legacy_reconciliation.bridge_rows.map((row) => `| ${row.component} | ${row.original_scope} / ${money(row.original_amount_cad)} | ${money(row.former_model_amount_cad)} | ${row.new_scope} / ${money(row.new_amount_cad)} | ${signedMoney(row.delta_from_former_model_cad)} | ${row.evidence} |`).join('\n');
+const markdown = `# House Cost Calculator
 
-Generated from contract ${HOUSE_COST_CONTRACT_VERSION} on ${generatedDate}. This is a planning model for a completed four-season yurt dwelling; land lease, shared infrastructure operating charges and household operating costs are separate.
+Generated from contract ${HOUSE_COST_CONTRACT_VERSION} on ${generatedDate}. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
-## Central reference
+## Sourced yurt packages
 
-- Geometry: ${central.geometry.inputs.diameter_m} m diameter (${central.geometry.gross_floor_area_m2.toFixed(2)} m² gross; ${central.geometry.usable_floor_area_m2.toFixed(2)} m² usable after explicit deductions)
-- Servicing: ${central.servicing.label}
-- Construction cash expenditure before tax/contingency: ${money(central.totals.construction_cash_expenditure_cad)}
-- Tax/HST allowance: ${money(central.totals.taxes_cad)}
+The package price is the starting input. The old ARC dwelling estimate is not used as a rate, residual or calibration target.
+
+| Supplier | Diameter | Published / estimated price | Price basis | Evidence status |
+| --- | ---: | ---: | --- | --- |
+${packageRows}
+
+Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+
+## Central reference result
+
+- Supplier package: **${central.supplier_package.source?.name ?? central.supplier_package.supplier_id} ${central.supplier_package.diameter_label}**, ${money(central.supplier_package.selected_price_cad)} (${central.supplier_package.selection_method})
+- Geometry: ${central.geometry.inputs.diameter_m} m diameter; ${central.geometry.gross_floor_area_m2.toFixed(2)} m² gross; ${central.geometry.usable_floor_area_m2.toFixed(2)} m² usable after explicit deductions
+- Direct cash before tax and contingency: **${money(central.totals.direct_cash_before_tax_cad)}**
+- Taxes / HST allowance: ${money(central.totals.taxes_cad)}
 - Contingency: ${money(central.totals.contingency_cad)}
-- Total cash construction budget (the former “upfront cash required”): ${money(central.totals.upfront_cash_required_cad)}
-- Initial financing contribution: ${money(central.totals.initial_cash_contribution_cad)}
-- Financed principal: ${money(central.totals.financed_principal_cad)}
-- Owner labour economic value: ${money(central.totals.owner_labour_imputed_cad)}
-- Completed dwelling economic cost: ${money(central.totals.economic_cost_cad)}
-- Illustrative financing: ${money(central.financing.monthly_debt_service_cad)}/month at ${central.financing.interest_rate_annual * 100}% interest, ${central.financing.amortization_years} year amortization, ${money(central.financing.down_payment_cad)} down
+- Completed dwelling cash construction budget: **${money(central.totals.upfront_cash_required_cad)}**
+- Contributed owner-labour value: ${money(central.totals.owner_labour_imputed_cad)}
+- Completed dwelling economic cost: **${money(central.totals.economic_cost_cad)}**
+- Initial financing contribution: ${money(central.totals.initial_cash_contribution_cad)}; financed principal: ${money(central.totals.financed_principal_cad)}
+- Illustrative financing: **${money(central.financing.monthly_debt_service_cad)}/month** at ${central.financing.interest_rate_annual * 100}% interest and ${central.financing.amortization_years}-year amortization
 
-The historical ARC reference is ${money(central.legacy_reconciliation.legacy_exact_integrated_total_cad)} before public rounding to ${money(central.legacy_reconciliation.legacy_public_rounded_total_cad)}. The audited model is ${money(central.totals.economic_cost_cad)} on its independently itemized scope. The former model result of ${money(bridge.former_model_economic_capital_cad)} is reconciled below; no hidden discount is used.
+This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
 
-## Historical ARC scope
+## Platform and foundation BOM
 
-| Original scope | Original amount | Evidence status |
-| --- | ---: | --- |
-${historicalRows}
+The platform is a preliminary circular deck-block concept, not an engineered foundation. Quantities include the stated waste factor and are driven by the reference geometry.
 
-The original structural itemization was not recovered. Its CAD 50,000 amount is retained as a historical design-brief figure. The utility packages are inclusive: their paid labour and fees are inside the stated package totals.
+| Item | Quantity | Unit rate | Material / non-labour | Labour | Cash |
+| --- | ---: | ---: | ---: | ---: | ---: |
+${platformRows}
 
-## Old-versus-audited package reconciliation
+## Household systems and amenities
 
-| Component | Original scope / amount | Former model cash row | Audited scope / amount | Delta from former | Evidence / reason |
-| --- | --- | ---: | --- | ---: | --- |
-${bridgeRows}
+Each row below has one home in the dwelling. Included supplier items are not repriced. Qualified installation and fee rows are separated from materials.
 
-Bridge totals: direct cash ${money(bridge.direct_cash_delta_cad)}, tax ${money(bridge.tax_delta_cad)}, contingency ${money(bridge.contingency_delta_cad)}, owner-labour value ${money(bridge.owner_labour_delta_cad)}, total economic cost ${money(bridge.total_delta_cad)}. ${bridge.explanation}
+| Item | Quantity | Unit rate | Material / non-labour | Labour | Cash | Evidence |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+${utilityRows}
 
-## Component audit
+## Complete component ledger
 
-| Component | Quantity | Unit | Unit rate | Materials / non-labour | Labour | Cash cost | Evidence status |
+| Component | Quantity | Unit | Unit rate | Material / non-labour | Labour | Cash | Evidence |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | --- |
 ${componentRows}
 
-Package rows expose their inclusive total, included paid labour, included fee and non-labour portion in the generated JSON. A labour-rate override replaces the package’s included labour allowance; it is not added on top. The residual general permit row is ${money(central.components.find((row) => row.id === 'permits')?.cash_cost_cad)} after the included ${money(central.components.find((row) => row.id === 'permits')?.package_fee_offset_cad)} allowance.
+The visible component rows plus taxes and contingency equal the cash construction budget. Owner-builder work reduces cash expenditure but remains visible as hours and imputed economic value.
+
+## Procurement register
+
+| Material / product | Published unit price | Observed | Status | Source |
+| --- | ---: | --- | --- | --- |
+${materialRows}
+
+## Historical ARC comparison only
+
+The former ARC figure remains a historical comparison, not a model input. Its exact integrated total was ${money(central.legacy_reconciliation.legacy_exact_integrated_total_cad)}, publicly rounded to ${money(central.legacy_reconciliation.legacy_public_rounded_total_cad)}.
+
+| Historical scope | Amount | Status |
+| --- | ---: | --- |
+${historicalRows}
+
+The historical structural amount was a design-brief figure whose supporting takeoff was not recovered. The present result is not forced to match it; differences arise from the sourced yurt package, platform BOM, additional openings, fit-out, logistics, design, tax, contingency and explicit labour treatment.
+
+## Former-model numerical reconciliation
+
+The former itemized model produced ${money(central.legacy_reconciliation.bridge.former_model_economic_capital_cad)} economic cost. The audited first-principles result is ${money(central.legacy_reconciliation.bridge.corrected_economic_capital_cad)}, a change of ${signedMoney(central.legacy_reconciliation.bridge.total_delta_cad)}. This bridge keeps package scope, tax, contingency and contributed labour visible instead of applying a discount to reach the historical ARC benchmark.
+
+| Component | Original scope / amount | Former model cash | Audited scope / amount | Change from former | Evidence / reason |
+| --- | --- | ---: | --- | ---: | --- |
+${bridgeRows}
+
+The total bridge is direct cash ${signedMoney(central.legacy_reconciliation.bridge.direct_cash_delta_cad)}, tax ${signedMoney(central.legacy_reconciliation.bridge.tax_delta_cad)}, contingency ${signedMoney(central.legacy_reconciliation.bridge.contingency_delta_cad)} and owner-labour economic value ${signedMoney(central.legacy_reconciliation.bridge.owner_labour_delta_cad)}. ${central.legacy_reconciliation.bridge.explanation}
 
 ## Labour modes
 
-| Mode | Total cash budget | Economic cost | Owner hours | Paid hours | Illustrative finance |
+| Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
 ${modeRows}
 
-Owner-builder cash is lower because owner labour is contributed, not because that work disappears. Professional/design and approval work remains paid. Economic cost adds the imputed value of contributed owner labour to the total cash budget.
+## Size and layout sensitivity
 
-## Diameter sensitivity
-
-| Diameter | Usable m² | Economic cost | Cost / usable m² | Applied thresholds |
-| --- | ---: | ---: | ---: | --- |
+| Diameter | Usable m² | Cash budget | Economic cost | Economic / usable m² | Thresholds |
+| --- | ---: | ---: | ---: | ---: | --- |
 ${diameterRows}
 
-## Layout comparison
-
-| Layout | Usable m² | Economic cost | Cost / usable m² | Owner hours | Paid hours |
+| Layout | Usable m² | Cash budget | Economic cost | Owner hours | Paid hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
 ${layoutRows}
 
-## Accounting and evidence
+Interpolated sizes are labelled in the JSON contract. Thresholds for larger spans, roof pitch and upper floors are provisional planning rules, not structural approval. Snow, wind, foundations, connections, fire safety and final assemblies require qualified design.
 
-- Shell is the platform/foundation, frame, roof, insulation, weatherproofing, windows, doors and any upper-floor structure.
-- The platform/foundation row covers the structural base and floor structure; interior finishes cover finish flooring and surfaces. Frame and roof scopes are separated, and wall weatherproofing excludes the roof covering.
-- Insulated/heated structure adds interior finish, heating, ventilation, stairs and guards.
-- Completed dwelling adds additional kitchen/bathroom fit-out, distributed household systems, logistics, equipment, design, residual permits, tax and contingency.
-- The ARC household package is carried once: water/plumbing/sanitation ${money(packageRow('water_plumbing_sanitation')?.package_total_cad)}, hot water ${money(packageRow('hot_water')?.package_total_cad)}, electrical ${money(packageRow('household_electrical')?.package_total_cad)}. Generic well/septic/grid options remain alternatives.
-- Financing is calculated on the total cash construction budget, excluding contributed owner-labour value. Down payment/equity and financed principal are separate from that budget.
-- Centralized servicing removes household utility capital and reports unresolved shared-infrastructure quotation requirements; it is not silently added to this dwelling.
-- A custom quote overrides the financing headline while any unallocated difference remains visible.
+## Accounting boundaries and evidence gaps
 
-The strongest evidence supports geometry/specification boundaries and Ontario permit/servicing obligations. Component rates, structural thresholds, labour rates, HST treatment, kitchen/bath fit-out itemization and site logistics remain planning estimates or quotation-required inputs.
+- The purchased yurt package is a supplier-price input with its published inclusions and exclusions.
+- The platform is a quantity prototype using published retail material prices where available; structural grade, frost, soil, uplift, anchorage and spans require engineering.
+- Household water, sanitation, hot water and electrical systems are itemized once. Generic well/septic/grid and centralized services remain alternatives.
+- Financing uses the cash construction budget and excludes contributed owner-labour value. Down payment and financed principal are separate from the full cash budget.
+- Tax treatment, HST eligibility, municipal approvals, delivery, final supplier installation scope, battery pricing, kitchen/bath fit-out and structural design remain site-specific or quotation-required.
+- The dwelling is resident-owned. This does not convey ownership or guaranteed appreciation in the underlying land.
 
 ## Sources
 
-${contract.sources.map((source) => `- [${source.institution}: ${source.title}](${source.url}) - ${source.classification}. ${source.note}`).join('\n')}
+${sourceRows}
 `;
 await mkdir(outputRoot, {recursive: true});
 await mkdir(dirname(resolve(evidenceRoot, 'cost-model.json')), {recursive: true});
@@ -109,4 +145,4 @@ await writeFile(resolve(outputRoot, 'cost-model.json'), JSON.stringify(contract,
 await writeFile(resolve(outputRoot, 'cost-model.md'), markdown);
 await writeFile(resolve(evidenceRoot, 'cost-model.json'), JSON.stringify(contract, null, 2) + '\n');
 await writeFile(resolve(evidenceRoot, 'cost-model.md'), markdown);
-console.log(`wrote ARC house cost model ${HOUSE_COST_CONTRACT_VERSION}`);
+console.log(`wrote House Cost first-principles model ${HOUSE_COST_CONTRACT_VERSION}`);

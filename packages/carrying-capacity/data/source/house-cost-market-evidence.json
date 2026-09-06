@@ -1,0 +1,162 @@
+{
+  "contract_version": "1.0.0",
+  "pricing_model_id": "first_principles_yurt_package_plus_quantity_bom",
+  "currency": "CAD",
+  "price_basis_date": "2026-09-05",
+  "planning_band_factors": {
+    "low": 0.9,
+    "central": 1,
+    "high": 1.15,
+    "status": "campaign_planning_sensitivity",
+    "note": "The central values are published prices where available. Low/high are explicit planning sensitivities, not supplier quotes."
+  },
+  "suppliers": [
+    {
+      "id": "yurts_canada",
+      "name": "Yurts Canada",
+      "country": "Canada",
+      "currency": "CAD",
+      "source_url": "https://www.yurts-canada.ca/pricing-faqs1",
+      "observed_date": "2026-09-05",
+      "price_status": "published_supplier_price",
+      "note": "Canadian-owned and operated; prices are listed as installed Base Kits. Delivery, platform/floor, extra openings and climate-control systems are excluded."
+    },
+    {
+      "id": "the_out_factory",
+      "name": "The Out Factory",
+      "country": "Canada delivery estimate",
+      "currency": "CAD",
+      "source_url": "https://www.theoutfactory.com/ca/yurts-pricing",
+      "observed_date": "2026-09-05",
+      "price_status": "non_binding_import_estimate",
+      "note": "Published Canadian estimates include ex-works kit, crating, insurance, estimated shipping, duties/fees and VAT. Door delivery and final quotation remain additional/variable."
+    },
+    {
+      "id": "biome_canada",
+      "name": "Biome Canada",
+      "country": "Canada",
+      "currency": "CAD",
+      "source_url": "https://biome-canada.ca/products/the-yurt/",
+      "observed_date": "2026-09-05",
+      "price_status": "configurator_options_quote_required",
+      "note": "The public product page publishes dimensions, package inclusions and selected option prices, but the base configurator total is not populated as a sale price."
+    }
+  ],
+  "yurt_packages": [
+    {"id": "yc_12_base_installed", "supplier_id": "yurts_canada", "diameter_m": 3.6576, "diameter_label": "12 ft", "price_cad": 12420, "area_ft2": 102, "price_basis": "installed", "included": ["lattice wall", "rafters/frame", "crown/dome", "tension structure", "all-season insulation", "weatherproof roof and wall covers", "interior moisture-wicking liner", "4 ft acrylic dome", "one 34 in standard exterior door", "mandatory supplier installation"], "excluded": ["platform/floor", "delivery", "additional windows or doors", "heating/cooling", "plumbing", "electrical", "interior partitions"], "evidence_status": "published_supplier_price"},
+    {"id": "yc_16_base_installed", "supplier_id": "yurts_canada", "diameter_m": 4.8768, "diameter_label": "16 ft", "price_cad": 16451, "area_ft2": 190, "price_basis": "installed", "included": ["lattice wall", "rafters/frame", "crown/dome", "tension structure", "all-season insulation", "weatherproof roof and wall covers", "interior moisture-wicking liner", "4 ft acrylic dome", "one 34 in standard exterior door", "mandatory supplier installation"], "excluded": ["platform/floor", "delivery", "additional windows or doors", "heating/cooling", "plumbing", "electrical", "interior partitions"], "evidence_status": "published_supplier_price"},
+    {"id": "yc_20_base_installed", "supplier_id": "yurts_canada", "diameter_m": 6.096, "diameter_label": "20 ft", "price_cad": 19252, "area_ft2": 296, "price_basis": "installed", "included": ["lattice wall", "rafters/frame", "crown/dome", "tension structure", "all-season insulation", "weatherproof roof and wall covers", "interior moisture-wicking liner", "4 ft acrylic dome", "one 34 in standard exterior door", "mandatory supplier installation"], "excluded": ["platform/floor", "delivery", "additional windows or doors", "heating/cooling", "plumbing", "electrical", "interior partitions"], "evidence_status": "published_supplier_price"},
+    {"id": "yc_24_base_installed", "supplier_id": "yurts_canada", "diameter_m": 7.3152, "diameter_label": "24 ft", "price_cad": 25681, "area_ft2": 434, "price_basis": "installed", "included": ["lattice wall", "rafters/frame", "crown/dome", "tension structure", "all-season insulation", "weatherproof roof and wall covers", "interior moisture-wicking liner", "4 ft acrylic dome", "one 34 in standard exterior door", "mandatory supplier installation"], "excluded": ["platform/floor", "delivery", "additional windows or doors", "heating/cooling", "plumbing", "electrical", "interior partitions"], "evidence_status": "published_supplier_price"},
+    {"id": "yc_30_base_installed", "supplier_id": "yurts_canada", "diameter_m": 9.144, "diameter_label": "30 ft", "price_cad": 36404, "area_ft2": 685, "price_basis": "installed", "included": ["lattice wall", "rafters/frame", "crown/dome", "tension structure", "all-season insulation", "weatherproof roof and wall covers", "interior moisture-wicking liner", "4 ft acrylic dome", "one 34 in standard exterior door", "mandatory supplier installation"], "excluded": ["platform/floor", "delivery", "additional windows or doors", "heating/cooling", "plumbing", "electrical", "interior partitions"], "evidence_status": "published_supplier_price"},
+    {"id": "tof_20_import_estimate", "supplier_id": "the_out_factory", "diameter_m": 6.096, "diameter_label": "20 ft", "price_cad": 32958, "area_ft2": 314, "price_basis": "Canadian non-binding import estimate", "included": ["crown and dome", "rafters", "lattice", "door frame and door", "two window frames and uPVC windows", "insulation", "outer and inner fabric", "hardware", "estimated crating", "estimated shipping", "estimated duties/fees", "estimated VAT"], "excluded": ["platform/base", "flooring", "electrical", "plumbing", "toilet fixtures", "interior partitions", "door delivery to site"], "evidence_status": "non_binding_import_estimate"},
+    {"id": "tof_24_import_estimate", "supplier_id": "the_out_factory", "diameter_m": 7.3152, "diameter_label": "24 ft", "price_cad": 37699, "area_ft2": 452, "price_basis": "Canadian non-binding import estimate", "included": ["crown and dome", "rafters", "lattice", "door frame and door", "two window frames and uPVC windows", "insulation", "outer and inner fabric", "hardware", "estimated crating", "estimated shipping", "estimated duties/fees", "estimated VAT"], "excluded": ["platform/base", "flooring", "electrical", "plumbing", "toilet fixtures", "interior partitions", "door delivery to site"], "evidence_status": "non_binding_import_estimate"},
+    {"id": "tof_32_import_estimate", "supplier_id": "the_out_factory", "diameter_m": 9.7536, "diameter_label": "32 ft", "price_cad": 57852, "area_ft2": 804, "price_basis": "Canadian non-binding import estimate", "included": ["crown and dome", "rafters", "lattice", "door frame and door", "four window frames and uPVC windows", "insulation", "outer and inner fabric", "hardware", "estimated crating", "estimated shipping", "estimated duties/fees", "estimated VAT"], "excluded": ["platform/base", "flooring", "electrical", "plumbing", "toilet fixtures", "interior partitions", "door delivery to site"], "evidence_status": "non_binding_import_estimate"},
+    {"id": "biome_20_configurator", "supplier_id": "biome_canada", "diameter_m": 6.096, "diameter_label": "20 ft", "price_cad": null, "price_basis": "quote required", "included": ["lattices", "rafters", "dome rings", "dome", "exterior wall fabric", "exterior roof fabric", "one standard door", "jambs", "support cable", "hardware"], "excluded": ["base/floor", "utilities", "interior partitions", "installation", "transport", "taxes"], "option_prices_cad": {"wall_insulation": 217.35, "roof_insulation": 270.32, "non_insulated_floor": 3148.14, "floor_insulation": 1103.52, "rafter_supports": 1478.08, "wood_stove": 3501.42}, "evidence_status": "configurator_options_quote_required"},
+    {"id": "biome_24_configurator", "supplier_id": "biome_canada", "diameter_m": 7.3152, "diameter_label": "24 ft", "price_cad": null, "price_basis": "quote required", "included": ["lattices", "rafters", "dome rings", "dome", "exterior wall fabric", "exterior roof fabric", "one standard door", "jambs", "support cable", "hardware"], "excluded": ["base/floor", "utilities", "interior partitions", "installation", "transport", "taxes"], "option_prices_cad": {"wall_insulation": 306.62, "roof_insulation": 464.07, "non_insulated_floor": 3700.35, "floor_insulation": 1424.58, "rafter_supports": 2138.58, "wood_stove": 3501.42}, "evidence_status": "configurator_options_quote_required"},
+    {"id": "biome_30_configurator", "supplier_id": "biome_canada", "diameter_m": 9.144, "diameter_label": "30 ft", "price_cad": null, "price_basis": "quote required", "included": ["lattices", "rafters", "dome rings", "dome", "exterior wall fabric", "exterior roof fabric", "one standard door", "jambs", "support cable", "hardware"], "excluded": ["base/floor", "utilities", "interior partitions", "installation", "transport", "taxes"], "option_prices_cad": {"wall_insulation": 338.16, "roof_insulation": 595.07, "non_insulated_floor": 5009.35, "floor_insulation": 2049.88, "rafter_supports_yellow_poplar": 2567.31, "rafter_supports_spf": 931.46, "wood_stove": 3501.42}, "evidence_status": "configurator_options_quote_required"}
+  ],
+  "package_inclusion_matrix": {
+    "columns": ["lattice", "rafters", "ring_or_dome", "tension_cable", "roof_covering", "wall_covering", "insulation", "windows", "doors", "installation", "platform", "delivery", "utilities"],
+    "rows": [
+      {"package_id": "yc_30_base_installed", "lattice": "included", "rafters": "included", "ring_or_dome": "included", "tension_cable": "included", "roof_covering": "included", "wall_covering": "included", "insulation": "included", "windows": "none by default", "doors": "one standard", "installation": "included", "platform": "excluded", "delivery": "excluded", "utilities": "excluded"},
+      {"package_id": "tof_32_import_estimate", "lattice": "included", "rafters": "included", "ring_or_dome": "included", "tension_cable": "included", "roof_covering": "included", "wall_covering": "included", "insulation": "included", "windows": "four uPVC", "doors": "one", "installation": "not separately priced", "platform": "excluded", "delivery": "door delivery extra", "utilities": "excluded"},
+      {"package_id": "biome_30_configurator", "lattice": "included", "rafters": "included", "ring_or_dome": "included", "tension_cable": "included", "roof_covering": "included", "wall_covering": "included", "insulation": "optional priced add-on", "windows": "option priced", "doors": "one standard", "installation": "excluded", "platform": "excluded", "delivery": "excluded", "utilities": "excluded"}
+    ]
+  },
+  "material_catalog": [
+    {"id": "oldcastle_deck_block", "label": "Oldcastle 11 x 11 x 7 in concrete deck block", "category": "platform", "purchase_unit": "each", "unit_price_cad": 10.51, "coverage": null, "source_url": "https://www.homedepot.ca/en/home/categories/building-materials/concrete-cement-and-masonry/f/bulk-pricing/g2c-xzs", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Preliminary above-ground support concept only; final foundation and frost/soil design require engineering."},
+    {"id": "pt_2x8x16", "label": "Pressure-treated 2 x 8 x 16 ft premium wood", "category": "platform", "purchase_unit": "each", "unit_price_cad": 46.21, "coverage": 4.8768, "source_url": "https://www.homedepot.ca/s/en/home/categories/building-materials/lumber-and-composites/dimensional-lumber-and-studs/2-x-8-x-16", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Above-ground-use listing; structural grade, treatment and span must be confirmed for the final platform."},
+    {"id": "spf_2x8x16", "label": "SPF 2 x 8 x 16 ft premium dimensional lumber", "category": "platform", "purchase_unit": "each", "unit_price_cad": 39.75, "coverage": 4.8768, "source_url": "https://www.homedepot.ca/s/en/home/categories/building-materials/lumber-and-composites/dimensional-lumber-and-studs/2-x-8-x-16", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Retail framing price; final grade and load path require engineering."},
+    {"id": "spruce_tg_plywood_3_4", "label": "3/4 in 4 x 8 ft standard spruce tongue-and-groove plywood", "category": "platform", "purchase_unit": "sheet", "unit_price_cad": 93.99, "coverage": 2.9729, "source_url": "https://www.homedepot.ca/en/home/categories/building-materials/lumber-and-composites/plywood/sheathing-plywood/f/tongue-and-groove/4-x-8/myp-1kki-3f3j", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "4 x 8 ft sheet; selected as a preliminary floor deck."},
+    {"id": "dupont_xps_r10_2in", "label": "DuPont SM R10 XPS 2 in x 2 ft x 8 ft panel", "category": "platform_insulation", "purchase_unit": "panel", "unit_price_cad": 43.49, "coverage": 1.4864, "source_url": "https://www.rona.ca/en/product/dupont-rigid-insulation-panel-sm-r10-2-x-2-x-8-st248-2-0941038", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "R10 panel listed for outdoor/foundation use; final thermal assembly is a design question."},
+    {"id": "ccmc_vapour_barrier_1000sf", "label": "Everbilt CCMC-evaluated 6 mil vapour barrier, 1,000 ft²", "category": "platform_protection", "purchase_unit": "roll", "unit_price_cad": 92.96, "coverage": 92.903, "source_url": "https://www.homedepot.ca/product/everbilt-10-x-100-1000-sq-ft-ccmc-evaluated-6-mil-vapour-barrier/1000113373", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Wall/ceiling vapour barrier product; platform use is a preliminary protective-layer assumption."},
+    {"id": "apollo_pex_100ft", "label": "Apollo 1/2 in x 100 ft PEX-B pipe", "category": "water_plumbing", "purchase_unit": "coil", "unit_price_cad": 37.95, "coverage": 30.48, "source_url": "https://www.homedepot.ca/s/en/home/categories/building-materials/plumbing/pipe-and-fittings/pex-pipes-and-fittings/pex-1-2-ix1", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Potable-water PEX price; fittings and approval remain separate."},
+    {"id": "zurn_pex_100ft", "label": "Zurn 1/2 in x 100 ft PEX pipe", "category": "water_plumbing", "purchase_unit": "coil", "unit_price_cad": 61.31, "coverage": 30.48, "source_url": "https://www.homedepot.ca/product/zurn-1-2-inch-x-100-ft-pex-pipe-in-white/1001512365", "price_date": "2026-07-29", "evidence_status": "published_retail_price", "note": "Alternative current listed price used for conservative plumbing material sensitivity."},
+    {"id": "ispring_ro_uv", "label": "iSpring RCC7AK-UV 7-stage RO with UV", "category": "water_treatment", "purchase_unit": "each", "unit_price_cad": 548, "coverage": null, "source_url": "https://www.homedepot.ca/product/ispring-rcc7ak-uv-nsf-certified-75gpd-7-stage-reverse-osmosis-water-filter-system-alkaline-uv-filter/1001103065", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Under-sink system; source water, whole-house treatment and maintenance remain site-specific."},
+    {"id": "rheem_mini_tank_2_5gal", "label": "Rheem 2.5 gallon point-of-use electric water heater", "category": "hot_water", "purchase_unit": "each", "unit_price_cad": 331, "coverage": null, "source_url": "https://www.homedepot.ca/product/rheem-mini-tank-120-volt-2-5-gallon-compact-point-of-use-electric-water-heater/1001683414", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Alternative equipment reference; the low-input solar-thermal/masonry-heater design remains a quote/design item."},
+    {"id": "rocksolar_400w_kit", "label": "Rocksolar 400 W 12 V rigid solar panel kit", "category": "electrical", "purchase_unit": "kit", "unit_price_cad": 825, "coverage": 400, "source_url": "https://www.homedepot.ca/product/rocksolar-400w-12v-rigid-solar-panel-kit/1001828381", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "Two 200 W panels; wiring, battery, inverter and installation are separate."},
+    {"id": "rocksolar_40a_mppt", "label": "Rocksolar 40 A MPPT charge controller", "category": "electrical", "purchase_unit": "each", "unit_price_cad": 196, "coverage": 40, "source_url": "https://www.homedepot.ca/product/rocksolar-40a-mppt-solar-charge-controller/1001817765", "price_date": "2026-08-24", "evidence_status": "published_retail_price", "note": "12/24 V controller; final battery and array compatibility must be checked."},
+    {"id": "powerbright_1000w_inverter", "label": "PowerBright 1,000 W 12 V pure-sine inverter", "category": "electrical", "purchase_unit": "each", "unit_price_cad": 485, "coverage": 1000, "source_url": "https://www.homedepot.ca/product/power-bright-1000-watt-12v-dc-to-120v-ac-pure-sine-wave-power-inverter/1001281881", "price_date": "2026-09-05", "evidence_status": "published_retail_price", "note": "1,000 W continuous / 2,000 W peak listing."},
+    {"id": "lead_acid_storage_allowance", "label": "Flooded lead-acid storage allowance for 2.52 kWh nominal", "category": "electrical", "purchase_unit": "allowance", "unit_price_cad": 1050, "coverage": 2.52, "source_url": null, "price_date": "2026-09-05", "evidence_status": "provisional_quote_required", "note": "The previous ARC capacity is retained as a sizing requirement, not as a price. Current battery chemistry, bank voltage, enclosure and cold-weather installation require a quote."},
+    {"id": "sunmar_composting_toilet_allowance", "label": "Sun-Mar composting toilet allowance", "category": "sanitation", "purchase_unit": "each", "unit_price_cad": 1854, "coverage": null, "source_url": "https://images.homedepot.ca/pdf/Instructions_1000158002.pdf", "price_date": "2026-09-05", "evidence_status": "published_manufacturer_price_reference", "note": "Manufacturer instruction sheet references a price for a Centrex unit; exact model and suitability require approval."}
+  ],
+  "platform_design": {
+    "id": "preliminary_round_deck_block_platform",
+    "status": "provisional_preliminary_takeoff",
+    "support_arrangement": "36 above-ground deck blocks on a circular support grid; 2x8 pressure-treated perimeter/radial beams and SPF joists; 3/4 in tongue-and-groove deck; 2 in XPS below deck; vapour/protective layer.",
+    "engineering_note": "This is a quantity prototype, not a foundation design. Soil, frost, uplift, snow, anchorage, treated-lumber exposure and local approval require qualified design.",
+    "waste_factor": 0.1,
+    "rows": [
+      {"id": "platform_support_blocks", "label": "Concrete deck blocks", "material_id": "oldcastle_deck_block", "quantity_formula": "ceil(36 × area / reference_area)", "unit": "each", "driver": "platform_area", "scope": "support", "evidence_status": "provisional_quantity"},
+      {"id": "platform_pt_beams", "label": "Pressure-treated beams / rim framing", "material_id": "pt_2x8x16", "quantity_formula": "ceil((perimeter × 1.35 / 4.8768) × (1 + waste))", "unit": "16 ft piece", "driver": "perimeter", "scope": "support and rim", "evidence_status": "provisional_quantity"},
+      {"id": "platform_joists", "label": "SPF joists and blocking", "material_id": "spf_2x8x16", "quantity_formula": "ceil((area × 0.75 / 4.8768) × (1 + waste))", "unit": "16 ft piece", "driver": "platform_area", "scope": "floor structure", "evidence_status": "provisional_quantity"},
+      {"id": "platform_decking", "label": "Tongue-and-groove floor deck", "material_id": "spruce_tg_plywood_3_4", "quantity_formula": "ceil(area × (1 + waste) / coverage)", "unit": "sheet", "driver": "platform_area", "scope": "floor deck", "evidence_status": "provisional_quantity"},
+      {"id": "platform_floor_insulation", "label": "2 in XPS floor insulation", "material_id": "dupont_xps_r10_2in", "quantity_formula": "ceil(area × (1 + waste) / coverage)", "unit": "panel", "driver": "platform_area", "scope": "floor thermal layer", "evidence_status": "provisional_quantity"},
+      {"id": "platform_vapour_layer", "label": "6 mil vapour/protective layer", "material_id": "ccmc_vapour_barrier_1000sf", "quantity_formula": "ceil(area × (1 + waste) / coverage)", "unit": "roll", "driver": "platform_area", "scope": "moisture protection", "evidence_status": "provisional_quantity"},
+      {"id": "platform_connectors", "label": "Connectors, fasteners and anchors", "material_id": null, "quantity_formula": "1", "unit": "allowance", "driver": "fixed", "unit_price_cad": 650, "scope": "connections and yurt anchorage", "evidence_status": "provisional_quote_required"}
+    ]
+  },
+  "utility_packages": {
+    "arc_household_systems": {
+      "label": "ARC distributed household systems, itemized planning package",
+      "status": "mixed_published_prices_and_provisional_items",
+      "rows": [
+        {"id": "water_collection_storage_first_flush", "label": "Roof collection, first-flush and food-grade storage", "category": "water", "quantity": 1, "unit": "allowance", "unit_price_cad": 650, "evidence_status": "provisional_quote_required", "note": "The yurt supplier excludes platform/drainage; tank sizing, gutters and frost protection need a site-specific takeoff."},
+        {"id": "water_demand_pump", "label": "Demand pump and pressure hardware", "category": "water", "quantity": 1, "unit": "allowance", "unit_price_cad": 420, "evidence_status": "provisional_quote_required"},
+        {"id": "water_sediment_and_uv", "label": "Sediment filtration and UV/RO treatment", "category": "water", "quantity": 1, "unit": "package", "unit_price_cad": 548, "material_id": "ispring_ro_uv", "evidence_status": "published_retail_price"},
+        {"id": "compact_pex_and_fittings", "label": "Compact PEX, valves and fittings", "category": "plumbing", "quantity": 2, "unit": "100 ft coil", "unit_price_cad": 61.31, "material_id": "zurn_pex_100ft", "evidence_status": "published_retail_price"},
+        {"id": "sink_and_shower_fixtures", "label": "Sink and private shower fixtures", "category": "plumbing", "quantity": 1, "unit": "allowance", "unit_price_cad": 500, "evidence_status": "published_retail_price_synthesis", "note": "Representative current faucet/shower listings; final fixture selection and accessibility require confirmation."},
+        {"id": "composting_toilet", "label": "Drainless composting toilet", "category": "sanitation", "quantity": 1, "unit": "each", "unit_price_cad": 1854, "material_id": "sunmar_composting_toilet_allowance", "evidence_status": "published_manufacturer_price_reference"},
+        {"id": "class_2_greywater", "label": "Class 2 greywater components and excavation", "category": "sanitation", "quantity": 1, "unit": "allowance", "unit_price_cad": 850, "evidence_status": "provisional_quote_required"},
+        {"id": "qualified_water_installation", "label": "Qualified plumbing installation and commissioning", "category": "paid_labour", "quantity": 1, "unit": "allowance", "unit_price_cad": 1200, "evidence_status": "planning_labour_allowance"},
+        {"id": "water_permit_allowance", "label": "Water/plumbing permit allowance", "category": "fees", "quantity": 1, "unit": "allowance", "unit_price_cad": 600, "evidence_status": "site_specific_fee_required"}
+      ]
+    },
+    "hot_water": {
+      "label": "Seasonal hot-water package",
+      "status": "mixed_published_price_and_design_allowance",
+      "rows": [
+        {"id": "solar_thermal_collector", "label": "Summer solar-thermal collector", "category": "hot_water", "quantity": 1, "unit": "quote allowance", "unit_price_cad": 650, "evidence_status": "provisional_quote_required"},
+        {"id": "hot_water_storage_and_controls", "label": "Storage tank, valves and controls", "category": "hot_water", "quantity": 1, "unit": "allowance", "unit_price_cad": 550, "evidence_status": "provisional_quote_required"},
+        {"id": "thermosiphon_integration", "label": "Winter heater thermosiphon plumbing", "category": "hot_water", "quantity": 1, "unit": "allowance", "unit_price_cad": 400, "evidence_status": "planning_design_allowance"},
+        {"id": "hot_water_integration_labour", "label": "Hot-water integration labour", "category": "paid_labour", "quantity": 1, "unit": "allowance", "unit_price_cad": 400, "evidence_status": "planning_labour_allowance"}
+      ],
+      "alternative_reference": {"material_id": "rheem_mini_tank_2_5gal", "note": "Electric point-of-use heater is a priced alternative, not an addition to the seasonal package."}
+    },
+    "household_electrical": {
+      "label": "400 Wh/day off-grid electrical package",
+      "status": "published_retail_components_plus_storage_allowance",
+      "rows": [
+        {"id": "pv_400w", "label": "400 W PV array", "category": "electrical", "quantity": 1, "unit": "kit", "unit_price_cad": 825, "material_id": "rocksolar_400w_kit", "evidence_status": "published_retail_price"},
+        {"id": "mppt_controller", "label": "MPPT charge controller", "category": "electrical", "quantity": 1, "unit": "each", "unit_price_cad": 196, "material_id": "rocksolar_40a_mppt", "evidence_status": "published_retail_price"},
+        {"id": "lead_acid_bank", "label": "2.52 kWh nominal lead-acid storage", "category": "electrical", "quantity": 1, "unit": "allowance", "unit_price_cad": 1050, "material_id": "lead_acid_storage_allowance", "evidence_status": "provisional_quote_required"},
+        {"id": "pure_sine_inverter", "label": "1,000 W pure-sine inverter", "category": "electrical", "quantity": 1, "unit": "each", "unit_price_cad": 485, "material_id": "powerbright_1000w_inverter", "evidence_status": "published_retail_price"},
+        {"id": "dc_ac_wiring_protection", "label": "Wiring, disconnects, fuses and enclosure", "category": "electrical", "quantity": 1, "unit": "allowance", "unit_price_cad": 350, "evidence_status": "provisional_quote_required"},
+        {"id": "qualified_electrical_labour", "label": "Qualified electrical installation", "category": "paid_labour", "quantity": 1, "unit": "allowance", "unit_price_cad": 700, "evidence_status": "planning_labour_allowance"},
+        {"id": "electrical_inspection", "label": "Electrical inspection allowance", "category": "fees", "quantity": 1, "unit": "allowance", "unit_price_cad": 100, "evidence_status": "site_specific_fee_required"}
+      ]
+    }
+  },
+  "additional_assemblies": [
+    {"id": "additional_interior_liner_and_furring", "label": "Interior lining/furring and vapour detailing", "stage": "insulated_heated", "driver": "envelope_area_m2", "unit": "CAD/m2", "central_rate_cad": 12, "labour_hours_per_m2": 0.18, "evidence_status": "provisional_material_and_labour_allowance", "note": "Yurts Canada includes an interior moisture-wicking liner; this row is limited to additional service cavity, furring and sealed details needed for the selected interior."},
+    {"id": "additional_windows", "label": "Additional insulated windows", "stage": "shell", "driver": "window_count", "unit": "CAD/window", "central_rate_cad": 550, "labour_hours_per_unit": 3, "included_default_windows": 0, "evidence_status": "published_supplier_range_planning_rate", "note": "Yurts Canada says no windows are included by default; standard window options and thermal installation need quotation."},
+    {"id": "additional_doors", "label": "Additional exterior/interior door", "stage": "shell", "driver": "door_count", "unit": "CAD/door", "central_rate_cad": 1100, "included_default_doors": 1, "labour_hours_per_unit": 5.5, "evidence_status": "published_supplier_range_planning_rate"},
+    {"id": "interior_finish_materials", "label": "Interior floor finish and partitions", "stage": "insulated_heated", "driver": "usable_floor_area_m2", "unit": "CAD/m2", "central_rate_cad": 45, "labour_hours_per_m2": 0.8, "evidence_status": "provisional_material_and_labour_allowance", "note": "Excludes structural platform and utility fixtures."},
+    {"id": "upper_floor_structure", "label": "Upper-floor structure and load path", "stage": "shell", "driver": "upper_floor_area_m2", "unit": "CAD/m2", "central_rate_cad": 130, "labour_hours_per_m2": 1.3, "layout_condition": "not_single_storey", "evidence_status": "provisional_engineering_allowance", "note": "Separate upper-floor quantity and load-path allowance; spans, supports, connections and foundations require engineering."},
+    {"id": "stairs", "label": "Stairs and access opening", "stage": "insulated_heated", "driver": "stair_count", "unit": "CAD/stair", "central_rate_cad": 1800, "labour_hours_per_unit": 18, "layout_condition": "not_single_storey", "evidence_status": "provisional_code_and_layout_allowance", "note": "Separate stairs and opening allowance; guards and code review remain required."},
+    {"id": "guards", "label": "Loft guards and edge protection", "stage": "insulated_heated", "driver": "guard_length_m", "unit": "CAD/m", "central_rate_cad": 120, "labour_hours_per_unit": 0.5, "layout_condition": "not_single_storey", "evidence_status": "provisional_code_and_layout_allowance", "note": "Guard length follows selected layout; final geometry and code compliance require confirmation."},
+    {"id": "kitchen_fitout_materials", "label": "Kitchen cabinetry, counter and basic appliances", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "central_rate_cad": 2750, "labour_hours": 26, "evidence_status": "provisional_itemized_fitout_allowance"},
+    {"id": "bathroom_fitout_materials", "label": "Bathroom non-plumbing fit-out", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "central_rate_cad": 1650, "labour_hours": 24, "evidence_status": "provisional_itemized_fitout_allowance"},
+    {"id": "wood_stove_and_chimney", "label": "Wood stove, chimney and fire-safe installation", "stage": "insulated_heated", "driver": "fixed", "unit": "CAD/dwelling", "central_rate_cad": 5200, "labour_hours": 24, "evidence_status": "published_product_plus_provisional_assembly", "note": "Biome publishes a wood-stove option at CAD 3,501.42 and chimney support at CAD 395; chimney length, hearth and installation remain design/quote items."},
+    {"id": "balanced_ventilation", "label": "Small dwelling ventilation", "stage": "insulated_heated", "driver": "usable_floor_area_m2", "unit": "CAD/m2", "central_rate_cad": 16, "labour_hours_per_m2": 0.12, "evidence_status": "provisional_design_allowance"},
+    {"id": "delivery_logistics", "label": "Supplier freight and local delivery", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "central_rate_cad": 1800, "evidence_status": "quotation_required", "note": "Yurts Canada explicitly excludes delivery; amount is a planning allowance pending location and freight quote."},
+    {"id": "design_engineering", "label": "Site, structural and servicing design", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "central_rate_cad": 3000, "evidence_status": "quotation_or_engineering_required"},
+    {"id": "permits", "label": "Residual permits and approvals", "stage": "completed", "driver": "fixed", "unit": "CAD/dwelling", "central_rate_cad": 1000, "evidence_status": "site_specific_fee_required", "note": "Water package includes its own CAD 600 allowance; this is a separate residual allowance only."}
+  ],
+  "inclusion_rules": [
+    "The selected yurt supplier package is one purchased package; its included installation is visible but never added as another labour row.",
+    "The supplier package excludes the platform, utilities, delivery and climate-control systems; those are separately itemized.",
+    "A material catalog row may be used once per BOM line. Package-included lattice, rafters, ring, cable, covers and insulation are never priced again by additional assemblies.",
+    "The historical ARC 61,000 figure is comparison-only and cannot calibrate or supply a current component rate."
+  ]
+}

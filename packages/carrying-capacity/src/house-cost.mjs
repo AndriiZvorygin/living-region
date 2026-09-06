@@ -1,7 +1,8 @@
 import evidence from '../data/source/house-cost-evidence.json' with {type: 'json'};
+import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {financeCapital} from './site-lease-browser.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = evidence.contract_version;
+export const HOUSE_COST_CONTRACT_VERSION = '3.0.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 
@@ -188,8 +189,11 @@ function normalizeOptions(options = {}) {
     servicingMode,
     labourMode,
     design: normalizeDesign(options.design),
+    yurtSupplierId: typeof options.yurtSupplierId === 'string' ? options.yurtSupplierId : 'yurts_canada',
+    yurtPackageId: typeof options.yurtPackageId === 'string' ? options.yurtPackageId : null,
     unitRateOverrides: options.unitRateOverrides ?? {},
     quantityOverrides: options.quantityOverrides ?? {},
+    materialPriceOverrides: {...(options.unitRateOverrides ?? {}), ...(options.materialPriceOverrides ?? {})},
     taxRate: clamp(options.taxRate ?? evidence.tax_and_contingency.tax_rate[band], 0, .3),
     contingencyRate: clamp(options.contingencyRate ?? evidence.tax_and_contingency.contingency_rate[band], 0, .3),
     labourRateCadPerHour: Math.max(0, finite(options.labourRateCadPerHour, evidence.defaults.labour_rate_cad_per_hour)),
@@ -205,7 +209,7 @@ function normalizeOptions(options = {}) {
   };
 }
 
-export function calculateHouseCost(options = {}) {
+function calculateLegacyRateHouseCost(options = {}) {
   const input = normalizeOptions(options);
   const geometry = calculateYurtGeometry(input.design);
   const thresholds = thresholdEffects({geometry, band: input.band});
@@ -421,6 +425,304 @@ export function calculateHouseCost(options = {}) {
   return result;
 }
 
+const MARKET_BAND_FACTORS = marketEvidence.planning_band_factors;
+const MARKET_REFERENCE_AREA_M2 = Math.PI * (9.144 / 2) ** 2;
+
+function marketPrice(value, band) {
+  return nonNegative(value) * finite(MARKET_BAND_FACTORS[band], 1);
+}
+
+function packageForOptions(input) {
+  const priced = marketEvidence.yurt_packages.filter((row) => finite(row.price_cad, 0) > 0);
+  const requested = input.yurtPackageId ? marketEvidence.yurt_packages.find((row) => row.id === input.yurtPackageId) : null;
+  const supplierId = input.yurtSupplierId ?? 'yurts_canada';
+  const supplierPriced = priced.filter((row) => row.supplier_id === supplierId);
+  const candidates = supplierPriced.length ? supplierPriced : priced.filter((row) => row.supplier_id === 'yurts_canada');
+  const exact = requested?.price_cad ? requested : candidates.find((row) => Math.abs(row.diameter_m - input.design.diameter_m) < 0.0001);
+  if (exact) return {...exact, selection_method: 'exact_published_or_selected_package', source: marketEvidence.suppliers.find((row) => row.id === exact.supplier_id)};
+  const ordered = [...candidates].sort((a, b) => a.diameter_m - b.diameter_m);
+  const lower = [...ordered].reverse().find((row) => row.diameter_m <= input.design.diameter_m) ?? ordered[0];
+  const upper = ordered.find((row) => row.diameter_m >= input.design.diameter_m) ?? ordered.at(-1);
+  const denominator = upper.diameter_m - lower.diameter_m;
+  const proportion = denominator ? (input.design.diameter_m - lower.diameter_m) / denominator : 0;
+  const price = lower.price_cad + (upper.price_cad - lower.price_cad) * proportion;
+  const extrapolated = input.design.diameter_m < ordered[0].diameter_m || input.design.diameter_m > ordered.at(-1).diameter_m;
+  return {
+    ...upper,
+    id: `${supplierId}_interpolated_${input.design.diameter_m.toFixed(3)}`,
+    diameter_m: input.design.diameter_m,
+    diameter_label: `${input.design.diameter_m.toFixed(3)} m custom`,
+    price_cad: price,
+    selection_method: extrapolated ? 'extrapolated_from_nearest_published_sizes' : 'linear_interpolation_between_published_sizes',
+    interpolation: {lower_package_id: lower.id, upper_package_id: upper.id, proportion, extrapolated},
+    source: marketEvidence.suppliers.find((row) => row.id === upper.supplier_id)
+  };
+}
+
+function marketThresholdEffects(geometry, band) {
+  const applied = [];
+  const additions = new Map();
+  // Store threshold additions at their base value. The row renderer applies the
+  // selected planning band exactly once, just like every other material rate.
+  const add = (id, amount) => additions.set(id, (additions.get(id) ?? 0) + finite(amount));
+  if (geometry.inputs.diameter_m > 9.144) {
+    applied.push({id: 'large_diameter_9_144', label: 'Diameter above 9.144 m', trigger: 'diameter_m > 9.144', confidence: 'provisional', source: 'Yurt package and platform load-path changes above the priced 30 ft reference require supplier and engineer confirmation.', additions: [{component_id: 'purchased_yurt_package', amount_cad: marketPrice(1400, band)}, {component_id: 'platform_bom', amount_cad: marketPrice(1000, band)}, {component_id: 'design_engineering', amount_cad: marketPrice(500, band)}]});
+    add('purchased_yurt_package', 1400);
+    add('platform_bom', 1000);
+    add('design_engineering', 500);
+  }
+  if (geometry.inputs.diameter_m > 10.668) {
+    applied.push({id: 'large_diameter_10_668', label: 'Diameter above 10.668 m', trigger: 'diameter_m > 10.668', confidence: 'provisional', source: 'Larger span and snow/wind load path require quotation and engineering.', additions: [{component_id: 'purchased_yurt_package', amount_cad: marketPrice(2400, band)}, {component_id: 'platform_bom', amount_cad: marketPrice(1800, band)}, {component_id: 'design_engineering', amount_cad: marketPrice(1000, band)}]});
+    add('purchased_yurt_package', 2400);
+    add('platform_bom', 1800);
+    add('design_engineering', 1000);
+  }
+  if (geometry.inputs.roof_pitch_degrees > 35) {
+    applied.push({id: 'roof_pitch_above_35', label: 'Roof pitch above 35 degrees', trigger: 'roof_pitch_degrees > 35', confidence: 'provisional', source: 'Planning allowance for changed roof geometry and connections; not a code threshold.', rate_multipliers: [{component_id: 'purchased_yurt_package', multiplier: 1.15}]});
+  }
+  return {applied, additions};
+}
+
+function quantityForPlatformRow(row, geometry, overrides) {
+  if (overrides[row.id] != null) return nonNegative(overrides[row.id]);
+  const area = geometry.footprint_m2;
+  const perimeter = geometry.perimeter_m;
+  const waste = finite(marketEvidence.platform_design.waste_factor, 0.1);
+  const material = marketEvidence.material_catalog.find((item) => item.id === row.material_id);
+  if (row.id === 'platform_support_blocks') return Math.max(1, Math.ceil((36 * area / MARKET_REFERENCE_AREA_M2) - 1e-5));
+  if (row.id === 'platform_pt_beams') return Math.ceil((perimeter * 1.35 / finite(material?.coverage, 4.8768)) * (1 + waste));
+  if (row.id === 'platform_joists') return Math.ceil((area * 0.75 / finite(material?.coverage, 4.8768)) * (1 + waste));
+  if (row.id === 'platform_decking' || row.id === 'platform_floor_insulation' || row.id === 'platform_vapour_layer') return Math.ceil(area * (1 + waste) / finite(material?.coverage, area));
+  return 1;
+}
+
+function labourShares(mode, eligible) {
+  if (!eligible) return {paid: 1, owner: 0};
+  const definition = evidence.labour_modes[mode];
+  return {paid: finite(definition?.paid_labour_share, 1), owner: finite(definition?.owner_labour_share, 0)};
+}
+
+function pricedMarketRow({id, label, stage, quantity, unit, rate, labourHours = 0, labourIncludedCash = 0, fee = 0, ownerEligible = true, status, sourceNote, sourceUrl, priceDate, evidenceStatus, driver, scope = [], packageId = null, sourcePackageId = null, packageScope = [], thresholdAddition = 0, materialId = null, input, quantityOverride = false}) {
+  const shares = labourShares(input.labourMode, ownerEligible);
+  const overrideKey = materialId && input.materialPriceOverrides[materialId] != null ? materialId : id;
+  const selectedRate = input.materialPriceOverrides[overrideKey] == null ? rate : nonNegative(input.materialPriceOverrides[overrideKey]);
+  const selectedLabourIncludedCash = input.materialPriceOverrides[id] != null && labourIncludedCash > 0 ? nonNegative(input.materialPriceOverrides[id]) : labourIncludedCash;
+  const materialCost = marketPrice(selectedRate * quantity, input.band) + marketPrice(thresholdAddition, input.band);
+  const includedLabour = marketPrice(selectedLabourIncludedCash * quantity, input.band);
+  const paidCash = includedLabour || labourHours > 0 ? includedLabour + labourHours * shares.paid * input.labourRateCadPerHour : 0;
+  const ownerHours = labourHours * shares.owner;
+  const ownerImputed = ownerHours * input.ownerLabourValueRateCadPerHour;
+  const feeCost = marketPrice(fee * quantity, input.band);
+  const cash = materialCost + paidCash + feeCost;
+  return {
+    id, label, stage, driver, unit,
+    quantity: round(quantity, 4),
+    base_unit_rate_cad: round(selectedRate, 2),
+    unit_rate_cad: round(marketPrice(selectedRate, input.band), 2),
+    base_material_cost_cad: round(selectedRate * quantity),
+    threshold_addition_cad: round(thresholdAddition),
+    material_cost_cad: round(materialCost),
+    package_id: packageId,
+    source_package_id: sourcePackageId,
+    package_total_cad: packageId ? round(materialCost + includedLabour + feeCost) : null,
+    package_included_paid_labour_cad: packageId && labourIncludedCash ? round(includedLabour) : null,
+    package_included_fee_cad: packageId && fee ? round(feeCost) : null,
+    package_non_labour_cost_cad: packageId ? round(materialCost + feeCost) : null,
+    package_included_installation: packageScope.includes('mandatory supplier installation'),
+    package_labour_override_delta_cad: 0,
+    package_scope: packageScope,
+    package_source_note: packageId ? sourceNote : null,
+    labour_hours_total: round(labourHours + (includedLabour / Math.max(0.01, input.labourRateCadPerHour)), 3),
+    paid_labour_hours: round((includedLabour / Math.max(0.01, input.labourRateCadPerHour)) + labourHours * shares.paid, 3),
+    owner_labour_hours: round(ownerHours, 3),
+    paid_labour_cash_cad: round(paidCash),
+    owner_labour_imputed_cad: round(ownerImputed),
+    cash_cost_cad: round(cash),
+    economic_capital_cad: round(cash + ownerImputed),
+    owner_eligible: ownerEligible,
+    active: true,
+    taxable: true,
+    status: status ?? evidenceStatus ?? 'provisional',
+    evidence_status: evidenceStatus ?? status ?? 'provisional',
+    source_note: sourceNote ?? null,
+    source_url: sourceUrl ?? null,
+    price_date: priceDate ?? marketEvidence.price_basis_date,
+    source_service_rate: false,
+    scope_ids: scope,
+    excludes_scope_ids: [],
+    material_id: materialId,
+    quantity_override_used: quantityOverride,
+    material_price_override_used: input.materialPriceOverrides[overrideKey] != null
+  };
+}
+
+function utilityPackageBundle(servicingMode) {
+  const ids = servicingMode === 'arc_household_systems'
+    ? ['arc_household_systems', 'hot_water', 'household_electrical']
+    : [servicingMode];
+  const records = ids.map((id) => marketEvidence.utility_packages[id] ? {id, ...marketEvidence.utility_packages[id]} : null).filter(Boolean);
+  if (!records.length) return null;
+  return {
+    id: `utility_${servicingMode}`,
+    label: records.map((record) => record.label).join(' + '),
+    status: records.map((record) => record.status).join('; '),
+    rows: records.flatMap((record) => record.rows.map((row) => ({...row, source_package_id: record.id, source_package_label: record.label})))
+  };
+}
+
+function firstPrinciplesUtilityRows(input) {
+  const mode = utilityPackageBundle(input.servicingMode);
+  if (mode) {
+    return mode.rows.map((row) => pricedMarketRow({
+      id: row.id,
+      label: row.label,
+      stage: 'completed',
+      quantity: input.quantityOverrides[row.id] == null ? finite(row.quantity, 1) : nonNegative(input.quantityOverrides[row.id]),
+      unit: row.unit,
+      rate: row.category === 'paid_labour' || row.category === 'fees' ? 0 : finite(row.unit_price_cad),
+      labourIncludedCash: row.category === 'paid_labour' ? finite(row.unit_price_cad) : 0,
+      fee: row.category === 'fees' ? finite(row.unit_price_cad) : 0,
+      labourHours: 0,
+      ownerEligible: false,
+      status: row.evidence_status,
+      evidenceStatus: row.evidence_status,
+      sourceNote: row.note ?? mode.label,
+      sourceUrl: row.material_id ? marketEvidence.material_catalog.find((material) => material.id === row.material_id)?.source_url : null,
+      materialId: row.material_id ?? null,
+      input,
+      packageId: mode.id,
+      // Keep the original utility-package boundary on every priced row. The
+      // fallback protects hand-authored/older source records that predate the
+      // normalized source_package_id field.
+      sourcePackageId: row.source_package_id ?? mode.id,
+      packageScope: [row.source_package_label ?? mode.label]
+    }));
+  }
+  const legacyMode = evidence.servicing_modes[input.servicingMode] ?? evidence.servicing_modes.arc_household_systems;
+  const genericMap = {water_plumbing_sanitation: 'water_plumbing_sanitation', household_electrical: 'household_electrical', hot_water: 'hot_water'};
+  return Object.entries(legacyMode.components).map(([id, amount]) => pricedMarketRow({id: `alternative_${id}`, label: `${legacyMode.label}: ${id}`, stage: 'completed', quantity: 1, unit: 'CAD/dwelling', rate: finite(amount), ownerEligible: false, status: 'alternative_package_placeholder', sourceNote: legacyMode.description, input, packageId: `alternative_${input.servicingMode}`, packageScope: [genericMap[id] ?? id]}));
+}
+
+function calculateFirstPrinciplesHouseCost(options = {}) {
+  const input = normalizeOptions(options);
+  const geometry = calculateYurtGeometry(input.design);
+  const yurtPackage = packageForOptions(input);
+  const threshold = marketThresholdEffects(geometry, input.band);
+  const rows = [];
+  rows.push(pricedMarketRow({
+    id: 'purchased_yurt_package',
+    label: `${yurtPackage.source?.name ?? 'Yurt supplier'} ${yurtPackage.diameter_label} Base Kit`,
+    stage: 'shell',
+    quantity: 1,
+    unit: 'CAD/package',
+    rate: finite(yurtPackage.price_cad) * (threshold.applied.some((row) => row.id === 'roof_pitch_above_35') ? 1.15 : 1),
+    thresholdAddition: finite(threshold.additions.get('purchased_yurt_package')),
+    labourHours: 0,
+    ownerEligible: false,
+    status: yurtPackage.evidence_status,
+    evidenceStatus: yurtPackage.evidence_status,
+    sourceNote: `${yurtPackage.source?.note ?? ''} Published package inclusions: ${(yurtPackage.included ?? []).join('; ')}. Exclusions: ${(yurtPackage.excluded ?? []).join('; ')}. Selection: ${yurtPackage.selection_method}.`,
+    sourceUrl: yurtPackage.source?.source_url,
+    priceDate: yurtPackage.source?.observed_date,
+    input,
+    packageId: yurtPackage.id,
+    packageScope: yurtPackage.included ?? []
+  }));
+  const platformRows = marketEvidence.platform_design.rows.map((spec) => {
+    const material = marketEvidence.material_catalog.find((item) => item.id === spec.material_id);
+    const quantity = quantityForPlatformRow(spec, geometry, input.quantityOverrides);
+    return pricedMarketRow({id: spec.id, label: spec.label, stage: 'shell', quantity, unit: spec.unit, rate: finite(spec.unit_price_cad ?? material?.unit_price_cad), labourHours: quantity * (spec.id === 'platform_connectors' ? 4 : 0.55), ownerEligible: true, status: spec.evidence_status, evidenceStatus: spec.evidence_status, sourceNote: `${spec.quantity_formula}; ${spec.scope}. ${marketEvidence.platform_design.engineering_note}`, sourceUrl: material?.source_url, materialId: spec.material_id, driver: spec.driver, scope: [spec.scope], thresholdAddition: spec.id === 'platform_connectors' ? 0 : finite(threshold.additions.get('platform_bom'), 0) * (spec.id === 'platform_joists' ? 1 : 0), input, quantityOverride: input.quantityOverrides[spec.id] != null});
+  });
+  rows.push(...platformRows);
+  const addRows = marketEvidence.additional_assemblies.map((spec) => {
+    let quantity = componentQuantity({driver: spec.driver}, geometry, input.quantityOverrides);
+    if (spec.id === 'additional_interior_liner_and_furring') quantity = 0;
+    if (spec.id === 'additional_windows') quantity = Math.max(0, geometry.inputs.window_count - finite(spec.included_default_windows, 0));
+    if (spec.id === 'additional_doors') quantity = Math.max(0, geometry.inputs.door_count - finite(spec.included_default_doors, 1));
+    const unitRate = finite(spec.central_rate_cad);
+    const hours = finite(spec.labour_hours, spec.labour_hours_per_unit ?? spec.labour_hours_per_m2 ?? 0) * quantity;
+    return pricedMarketRow({id: spec.id, label: spec.label, stage: spec.stage, quantity, unit: spec.unit, rate: unitRate, labourHours: hours, ownerEligible: !['wood_stove_and_chimney', 'balanced_ventilation', 'delivery_logistics', 'design_engineering', 'permits'].includes(spec.id), status: spec.evidence_status, evidenceStatus: spec.evidence_status, sourceNote: spec.note, sourceUrl: null, driver: spec.driver, thresholdAddition: finite(threshold.additions.get(spec.id)), input, quantityOverride: input.quantityOverrides[spec.id] != null});
+  });
+  rows.push(...addRows);
+  if (input.servicingMode === 'centralized_shared_services') {
+    rows.push(...firstPrinciplesUtilityRows(input));
+  } else {
+    rows.push(...firstPrinciplesUtilityRows(input));
+  }
+  const activeRows = rows.filter((row) => row.active && row.quantity > 0);
+  const itemizedPackage = utilityPackageBundle(input.servicingMode);
+  const serviceComponents = itemizedPackage
+    ? Object.fromEntries([...new Set(itemizedPackage.rows.map((row) => row.source_package_id))].map((packageId) => [packageId, round(sum(activeRows.filter((row) => row.source_package_id === packageId), 'cash_cost_cad'))]))
+    : Object.fromEntries(activeRows.filter((row) => row.package_id === `alternative_${input.servicingMode}`).map((row) => [row.id, round(row.cash_cost_cad)]));
+  const directCashBeforeTax = sum(activeRows, 'cash_cost_cad');
+  const taxableCash = activeRows.filter((row) => row.taxable).reduce((total, row) => total + finite(row.cash_cost_cad), 0);
+  const taxes = taxableCash * input.taxRate;
+  const contingency = (directCashBeforeTax + taxes) * input.contingencyRate;
+  const additionalRows = [
+    {id: 'taxes', label: 'Taxes / HST allowance', driver: 'taxable cash cost', unit: 'CAD', quantity: input.taxRate, unit_rate_cad: taxableCash, cash_cost_cad: taxes, status: 'provisional_tax_treatment', source_note: 'Tax treatment and any new-housing rebate require project-specific review.'},
+    {id: 'contingency', label: 'Contingency', driver: 'pre-contingency cash', unit: 'CAD', quantity: input.contingencyRate, unit_rate_cad: directCashBeforeTax + taxes, cash_cost_cad: contingency, status: 'campaign_planning_assumption', source_note: 'Explicit planning allowance; not a hidden calibration adjustment.'}
+  ];
+  const upfrontCash = directCashBeforeTax + taxes + contingency;
+  const ownerImputed = sum(activeRows, 'owner_labour_imputed_cad');
+  const economicCapital = upfrontCash + ownerImputed;
+  const customQuote = input.customCompletedQuoteCad != null;
+  const headlineCapital = customQuote ? input.customCompletedQuoteCad : upfrontCash;
+  const financing = financeCapital({value: headlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, interestRateAnnual: input.financing.interestRateAnnual, amortizationYears: input.financing.amortizationYears, loanTermYears: input.financing.loanTermYears});
+  const stageRows = (stage) => activeRows.filter((row) => stage === 'shell' ? row.stage === 'shell' : stage === 'insulated_heated' ? ['shell', 'insulated_heated'].includes(row.stage) : true);
+  const stageTotal = (stage) => sum(stageRows(stage), 'cash_cost_cad');
+  const sourceList = [...evidence.sources, ...marketEvidence.suppliers.map((supplier) => ({id: supplier.id, institution: supplier.name, title: 'Yurt package and price evidence', url: supplier.source_url, classification: supplier.price_status, note: supplier.note})), ...marketEvidence.material_catalog.filter((row) => row.source_url).map((row) => ({id: row.id, institution: row.label.split(' ')[0], title: row.label, url: row.source_url, classification: row.evidence_status, note: `Observed ${row.price_date}; ${row.note ?? ''}`}))];
+  const legacy = evidence.legacy_arc_benchmark;
+  const formerModel = evidence.former_model_reference;
+  const currentPackageCash = (packageId) => round(sum(activeRows.filter((row) => row.source_package_id === packageId), 'cash_cost_cad'));
+  const currentComponentCash = (rowId) => round(sum(activeRows.filter((row) => row.id === rowId), 'cash_cost_cad'));
+  const bridgeRows = [
+    {component: 'Water / plumbing / sanitation', original_scope: 'Inclusive package', original_amount_cad: 5940, former_model_amount_cad: formerModel.component_cash_costs.water_plumbing + formerModel.component_cash_costs.sanitation_greywater, new_scope: 'One inclusive package; included labour and fee decomposed, not added again', new_amount_cad: currentPackageCash('arc_household_systems'), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
+    {component: 'Hot water', original_scope: 'Inclusive package including integration labour', original_amount_cad: 2000, former_model_amount_cad: formerModel.component_cash_costs.hot_water, new_scope: 'One inclusive package; labour allowance is replaced only by a labour override', new_amount_cad: currentPackageCash('hot_water'), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
+    {component: 'Household electrical', original_scope: 'Inclusive off-grid package including qualified labour and inspection allowance', original_amount_cad: 3300, former_model_amount_cad: formerModel.component_cash_costs.household_electrical, new_scope: 'One inclusive package; labour and inspection allowance exposed inside package', new_amount_cad: currentPackageCash('household_electrical'), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
+    {component: 'General permits', original_scope: 'The utility package includes CAD 600 permit allowance', original_amount_cad: 0, former_model_amount_cad: formerModel.component_cash_costs.permits, new_scope: 'Residual general permit allowance after CAD 600 package offset', new_amount_cad: currentComponentCash('permits'), evidence: 'Historical ARC package detail plus current municipal-fee placeholder.'}
+  ].map((row) => ({...row, delta_from_former_model_cad: roundSigned(row.new_amount_cad - row.former_model_amount_cad)}));
+  const formerModelBridge = {
+    former_model_economic_capital_cad: formerModel.economic_capital_cad,
+    corrected_economic_capital_cad: economicCapital,
+    direct_cash_delta_cad: directCashBeforeTax - formerModel.direct_cash_before_tax_cad,
+    tax_delta_cad: taxes - formerModel.taxes_cad,
+    contingency_delta_cad: contingency - formerModel.contingency_cad,
+    owner_labour_delta_cad: ownerImputed - formerModel.owner_labour_imputed_cad,
+    total_delta_cad: economicCapital - formerModel.economic_capital_cad,
+    explanation: 'The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.'
+  };
+  return {
+    contract_version: HOUSE_COST_CONTRACT_VERSION,
+    model_id: HOUSE_COST_MODEL_ID,
+    package_label: 'First-principles yurt package plus quantity-based completion model',
+    price_basis_date: marketEvidence.price_basis_date,
+    pricing_model: marketEvidence.pricing_model_id,
+    band: input.band,
+    design: geometry.inputs,
+    geometry,
+    supplier_package: {...yurtPackage, selected_price_cad: round(marketPrice(yurtPackage.price_cad, input.band)), published_price_cad: yurtPackage.price_cad, price_currency: 'CAD', source_url: yurtPackage.source?.source_url, inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null},
+    servicing: {mode: input.servicingMode, label: evidence.servicing_modes[input.servicingMode]?.label, description: evidence.servicing_modes[input.servicingMode]?.description, status: itemizedPackage?.status ?? 'alternative_package_placeholder', components: serviceComponents, historical_reference_components: evidence.servicing_modes[input.servicingMode]?.components ?? null, shared_infrastructure_additions: evidence.servicing_modes[input.servicingMode]?.shared_infrastructure_additions ?? {}, itemized_package: itemizedPackage},
+    labour: {mode: input.labourMode, ...evidence.labour_modes[input.labourMode], labour_rate_cad_per_hour: input.labourRateCadPerHour, owner_labour_value_rate_cad_per_hour: input.ownerLabourValueRateCadPerHour, paid_hours: round(sum(activeRows, 'paid_labour_hours'), 2), owner_hours: round(sum(activeRows, 'owner_labour_hours'), 2), paid_labour_cash_cad: round(sum(activeRows, 'paid_labour_cash_cad')), owner_labour_imputed_cad: round(ownerImputed), total_labour_hours: round(sum(activeRows, 'labour_hours_total'), 2)},
+    components: activeRows,
+    inactive_components: [...rows.filter((row) => !row.active), ...marketEvidence.additional_assemblies.filter((row) => row.id === 'additional_interior_liner_and_furring').map((row) => ({id: row.id, label: row.label, active: false, status: 'included_by_supplier_package', source_note: row.note}))],
+    additional_costs: additionalRows,
+    thresholds: {applied: threshold.applied, all_rules: [...evidence.threshold_rules, ...threshold.applied.filter((row) => !evidence.threshold_rules.some((rule) => rule.id === row.id))]},
+    stages: {shell: {cash_cost_cad: round(stageTotal('shell')), includes: ['purchased_yurt_package', 'platform BOM', 'additional openings']}, insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'interior finish', 'heating', 'ventilation']}, completed_before_tax_and_contingency: {cash_cost_cad: round(directCashBeforeTax), includes: activeRows.map((row) => row.id)}, completed_dwelling: {cash_cost_cad: round(upfrontCash), economic_capital_cad: round(economicCapital), includes: [...activeRows.map((row) => row.id), 'taxes', 'contingency']}},
+    totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},
+    financing: {...financing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
+    legacy_reconciliation: {legacy_range_cad: legacy.range_cad, legacy_central_cad: legacy.range_cad.central, legacy_diameter_m_rounded: legacy.diameter_m_rounded, model_diameter_m: geometry.inputs.diameter_m, legacy_gross_floor_area_m2: legacy.gross_floor_area_m2, model_gross_floor_area_m2: geometry.gross_floor_area_m2, model_completed_economic_capital_cad: round(economicCapital), delta_from_legacy_central_cad: roundSigned(economicCapital - legacy.range_cad.central), legacy_exact_integrated_total_cad: legacy.legacy_exact_integrated_total_cad, legacy_public_rounded_total_cad: legacy.legacy_public_rounded_total_cad, historical_scope_components: legacy.legacy_scope_components, former_model_reference: formerModel, bridge_rows: bridgeRows, bridge: formerModelBridge, explanation: 'The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model.'},
+    accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
+    input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
+    evidence: sourceList,
+    market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors},
+    assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method}
+  };
+}
+
+export function calculateHouseCost(options = {}) {
+  return calculateFirstPrinciplesHouseCost(options);
+}
+
 export function buildHouseCostPresentationContract(options = {}) {
   const bands = Object.fromEntries(['low', 'central', 'high'].map((band) => [band, calculateHouseCost({...options, band})]));
   const diameterSensitivity = evidence.diameter_presets.map((preset) => {
@@ -443,6 +745,8 @@ export function buildHouseCostPresentationContract(options = {}) {
     service_package_accounting: evidence.service_package_accounting,
     tax_and_contingency: evidence.tax_and_contingency,
     component_evidence: evidence.components,
+    pricing_model: marketEvidence.pricing_model_id,
+    market_evidence: marketEvidence,
     threshold_rules: evidence.threshold_rules,
     legacy_arc_benchmark: evidence.legacy_arc_benchmark,
     central: bands.central,
