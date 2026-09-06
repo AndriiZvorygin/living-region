@@ -26,14 +26,20 @@ test('usable floor area shows stair, partition and headroom deductions', () => {
 
 test('reference utility package is included once in resident dwelling capital', () => {
   const result = calculateHouseCost({labourMode: 'owner_builder', band: 'central', servicingMode: 'arc_household_systems'});
-  const water = result.components.find((row) => row.id === 'water_plumbing');
-  const sanitation = result.components.find((row) => row.id === 'sanitation_greywater');
+  const water = result.components.find((row) => row.id === 'water_plumbing_sanitation');
   const hotWater = result.components.find((row) => row.id === 'hot_water');
   const electric = result.components.find((row) => row.id === 'household_electrical');
-  assert.equal(water.material_cost_cad, 3940);
-  assert.equal(sanitation.material_cost_cad, 2000);
-  assert.equal(hotWater.material_cost_cad, 2000);
-  assert.equal(electric.material_cost_cad, 3300);
+  const permits = result.components.find((row) => row.id === 'permits');
+  assert.equal(water.cash_cost_cad, 5940);
+  assert.equal(water.package_included_paid_labour_cad, 1200);
+  assert.equal(water.package_included_fee_cad, 600);
+  assert.equal(hotWater.material_cost_cad, 1600);
+  assert.equal(hotWater.package_included_paid_labour_cad, 400);
+  assert.equal(electric.material_cost_cad, 2600);
+  assert.equal(electric.package_included_paid_labour_cad, 700);
+  assert.equal(electric.package_included_fee_cad, 100);
+  assert.equal(permits.cash_cost_cad, 400);
+  assert.equal(permits.package_fee_offset_cad, 600);
   assert.equal(result.accounting.utility_single_home, true);
 });
 
@@ -42,8 +48,7 @@ test('servicing alternatives change the correct dwelling components only', () =>
   const generic = calculateHouseCost({servicingMode: 'generic_well_septic_grid'});
   const centralized = calculateHouseCost({servicingMode: 'centralized_shared_services'});
   assert.ok(generic.totals.completed_dwelling_capital_cad > arc.totals.completed_dwelling_capital_cad);
-  assert.equal(centralized.components.find((row) => row.id === 'water_plumbing').material_cost_cad, 0);
-  assert.equal(centralized.components.find((row) => row.id === 'sanitation_greywater').material_cost_cad, 0);
+  assert.equal(centralized.components.find((row) => row.id === 'water_plumbing_sanitation').material_cost_cad, 0);
   assert.equal(centralized.components.find((row) => row.id === 'household_electrical').material_cost_cad, 0);
   assert.equal(centralized.servicing.shared_infrastructure_additions.centralized_water, 'quote required');
 });
@@ -73,6 +78,35 @@ test('zero-interest dwelling financing is principal divided by payment months', 
   assert.ok(Math.abs(result.financing.monthly_debt_service_cad - expected) < 0.02);
 });
 
+test('inclusive package labour overrides replace the included allowance rather than stacking', () => {
+  const baseline = calculateHouseCost({labourMode: 'contractor_built', labourRateCadPerHour: 45});
+  const override = calculateHouseCost({labourMode: 'contractor_built', labourRateCadPerHour: 60});
+  const packageRows = baseline.components.filter((row) => row.package_id);
+  assert.equal(packageRows.reduce((sum, row) => sum + row.cash_cost_cad, 0), 11240);
+  assert.ok(Math.abs(packageRows.reduce((sum, row) => sum + row.labour_hours_total, 0) - 51.112) < .0001);
+  const packageDelta = override.components.filter((row) => row.package_id).reduce((sum, row) => sum + row.cash_cost_cad, 0)
+    - packageRows.reduce((sum, row) => sum + row.cash_cost_cad, 0);
+  assert.ok(packageDelta > 760 && packageDelta < 770);
+  assert.ok(override.components.find((row) => row.id === 'water_plumbing_sanitation').package_labour_override_delta_cad > 0);
+});
+
+test('cash, owner value and financing contribution have distinct accounting boundaries', () => {
+  const result = calculateHouseCost({labourMode: 'mixed_labour'});
+  assert.equal(result.totals.cash_plus_owner_labour_equals_economic, true);
+  assert.equal(result.totals.construction_cash_expenditure_cad, result.totals.direct_cash_before_tax_cad);
+  assert.equal(result.totals.initial_cash_contribution_cad, Math.round(result.totals.upfront_cash_required_cad * .1 * 100) / 100);
+  assert.equal(result.totals.financed_principal_cad, result.financing.financed_principal_cad);
+  assert.equal(result.totals.completed_dwelling_capital_cad, 102382);
+});
+
+test('legacy bridge exposes the correction from the former 108247.21 economic result', () => {
+  const result = calculateHouseCost({labourMode: 'mixed_labour'});
+  const bridge = result.legacy_reconciliation.bridge;
+  assert.equal(bridge.former_model_economic_capital_cad, 108247.209692);
+  assert.ok(Math.abs(bridge.total_delta_cad + 5865.209692) < .01);
+  assert.equal(result.legacy_reconciliation.bridge_rows.length, 4);
+});
+
 test('signed quote and benchmark deltas remain signed and thresholded overrides are not multiplied twice', () => {
   const quote = calculateHouseCost({customCompletedQuoteCad: 61000});
   assert.ok(quote.totals.quote_delta_unallocated_cad < 0);
@@ -96,6 +130,16 @@ test('diameter thresholds are discrete and layout costs are explicit', () => {
   assert.ok(twoStorey.components.find((row) => row.id === 'stairs').material_cost_cad > 0);
 });
 
+test('reference diameter has no threshold and storey envelopes/headroom follow geometry', () => {
+  const single = calculateHouseCost({design: {diameter_m: 9.144, layout: 'single_storey'}});
+  const full = calculateHouseCost({design: {diameter_m: 9.144, layout: 'full_two_storeys'}});
+  assert.equal(single.thresholds.applied.some((row) => row.id === 'large_diameter_9_144'), false);
+  assert.equal(single.geometry.total_wall_height_m, 2.4);
+  assert.equal(full.geometry.total_wall_height_m, 4.8);
+  assert.equal(full.geometry.upper_floor_elevation_m, 2.4);
+  assert.equal(full.geometry.area_deductions_m2.restricted_headroom, 0);
+});
+
 test('custom completed quote overrides only the financing headline and stays auditable', () => {
   const result = calculateHouseCost({customCompletedQuoteCad: 61000});
   assert.equal(result.totals.custom_quote_applied, true);
@@ -114,7 +158,9 @@ test('ARC integration keeps dwelling finance separate from land and infrastructu
 
 test('presentation contract includes diameter and layout sensitivity', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '1.0.0');
+  assert.equal(contract.contract_version, '2.0.0');
+  assert.ok(contract.service_package_accounting.arc_household_systems.water_plumbing_sanitation);
+  assert.ok(contract.central.legacy_reconciliation.bridge);
   assert.ok(contract.diameter_sensitivity.length >= 5);
   assert.equal(contract.layout_comparison.length, 3);
   assert.ok(contract.sources.length >= 5);

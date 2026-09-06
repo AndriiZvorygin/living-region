@@ -21,6 +21,8 @@ function layoutRule(layout) {
 function normalizeDesign(design = {}) {
   const layout = evidence.layout_rules[design.layout] ? design.layout : evidence.defaults.layout;
   const rule = layoutRule(layout);
+  const restrictedHeadroomOverride = design.restricted_headroom_override_used === true
+    || (design.restricted_headroom_override_used !== false && design.restricted_headroom_fraction != null);
   return {
     diameter_m: clamp(design.diameter_m ?? evidence.defaults.diameter_m, 3, 20),
     wall_height_m: clamp(design.wall_height_m ?? evidence.defaults.wall_height_m, 1.8, 4),
@@ -31,7 +33,10 @@ function normalizeDesign(design = {}) {
     door_count: Math.max(1, Math.round(finite(design.door_count, evidence.defaults.door_count))),
     partition_loss_fraction: clamp(design.partition_loss_fraction ?? evidence.defaults.partition_loss_fraction, 0, .25),
     stair_opening_m2: Math.max(0, finite(design.stair_opening_m2, rule.stair_opening_m2)),
-    restricted_headroom_fraction: clamp(design.restricted_headroom_fraction ?? rule.restricted_headroom_fraction, 0, .75),
+    restricted_headroom_override_used: restrictedHeadroomOverride,
+    restricted_headroom_fraction: !restrictedHeadroomOverride
+      ? rule.restricted_headroom_fraction
+      : clamp(design.restricted_headroom_fraction, 0, .75),
     guard_length_m: Math.max(0, finite(design.guard_length_m, rule.guard_length_m))
   };
 }
@@ -44,12 +49,31 @@ export function calculateYurtGeometry(design = {}) {
   const roofRise = radius * Math.tan(input.roof_pitch_degrees * Math.PI / 180);
   const roofSlope = Math.sqrt(radius ** 2 + roofRise ** 2);
   const roofArea = Math.PI * radius * roofSlope;
-  const wallArea = perimeter * input.wall_height_m;
-  const upperFloor = footprint * layoutRule(input.layout).upper_floor_fraction;
+  const rule = layoutRule(input.layout);
+  const totalWallHeight = input.wall_height_m * finite(rule.wall_height_multiplier, 1);
+  const upperFloor = footprint * finite(rule.upper_floor_fraction);
+  const upperFloorElevation = input.wall_height_m * finite(rule.upper_floor_elevation_factor);
   const grossFloor = footprint + upperFloor;
   const stairOpening = input.layout === 'single_storey' ? 0 : Math.min(input.stair_opening_m2, upperFloor);
   const partitionLoss = grossFloor * input.partition_loss_fraction;
-  const restrictedHeadroom = upperFloor * input.restricted_headroom_fraction;
+  const minimumHeadroom = finite(rule.minimum_headroom_m, 1.98);
+  const roofBaseHeight = totalWallHeight;
+  const requiredRoofHeight = upperFloorElevation + minimumHeadroom;
+  const headroomRatio = roofRise > 0 ? (requiredRoofHeight - roofBaseHeight) / roofRise : 1;
+  const upperFloorRadius = upperFloor > 0 ? radius * Math.sqrt(Math.min(1, upperFloor / footprint)) : 0;
+  const unrestrictedRadius = headroomRatio <= 0
+    ? upperFloorRadius
+    : headroomRatio >= 1
+      ? 0
+      : radius * (1 - headroomRatio);
+  const derivedRestrictedFraction = upperFloorRadius > 0
+    ? 1 - Math.min(upperFloorRadius, Math.max(0, unrestrictedRadius)) ** 2 / upperFloorRadius ** 2
+    : 0;
+  const restrictedHeadroomFraction = input.restricted_headroom_fraction == null
+    ? clamp(derivedRestrictedFraction, 0, 1)
+    : input.restricted_headroom_fraction;
+  const restrictedHeadroom = upperFloor * restrictedHeadroomFraction;
+  const wallArea = perimeter * totalWallHeight;
   const usableFloor = Math.max(0, grossFloor - stairOpening - partitionLoss - restrictedHeadroom);
   return {
     inputs: input,
@@ -57,6 +81,8 @@ export function calculateYurtGeometry(design = {}) {
     footprint_m2: round(footprint, 4),
     perimeter_m: round(perimeter, 4),
     exterior_wall_area_m2: round(wallArea, 4),
+    total_wall_height_m: round(totalWallHeight, 4),
+    upper_floor_elevation_m: round(upperFloorElevation, 4),
     roof_rise_m: round(roofRise, 4),
     roof_sloping_area_m2: round(roofArea, 4),
     lower_floor_area_m2: round(footprint, 4),
@@ -67,9 +93,17 @@ export function calculateYurtGeometry(design = {}) {
       stair_opening: round(stairOpening, 4),
       interior_partitions: round(partitionLoss, 4),
       restricted_headroom: round(restrictedHeadroom, 4),
+      restricted_headroom_fraction: round(restrictedHeadroomFraction, 4),
       total: round(stairOpening + partitionLoss + restrictedHeadroom, 4)
     },
     envelope_area_m2: round(wallArea + roofArea, 4),
+    headroom: {
+      minimum_headroom_m: minimumHeadroom,
+      roof_base_height_m: round(roofBaseHeight, 4),
+      derived_restricted_fraction: round(derivedRestrictedFraction, 4),
+      input_override_used: input.restricted_headroom_override_used,
+      method: 'Radial pitched-roof clearance above configured upper-floor elevation; full two-storey layouts receive a second wall-height envelope.'
+    },
     dimensional_checks: {
       footprint_from_radius_m2: round(Math.PI * radius ** 2, 4),
       roof_uses_sloping_area: true,
@@ -103,6 +137,24 @@ function serviceRate(componentId, band, servicingMode) {
   if (!Object.prototype.hasOwnProperty.call(mode.components, componentId)) return null;
   const value = finite(mode.components[componentId], 0);
   return componentId === 'hot_water' ? value : value * (band === 'low' ? .95 : band === 'high' ? 1.15 : 1);
+}
+
+function servicePackage(componentId, band, servicingMode, baseRate) {
+  const component = evidence.components.find((row) => row.id === componentId);
+  const packageId = component?.service_package_id;
+  const packageRecord = packageId ? evidence.service_package_accounting?.[servicingMode]?.[packageId] : null;
+  if (!packageRecord) return null;
+  const sourceTotal = finite(evidence.servicing_modes[servicingMode]?.components?.[componentId], packageRecord.inclusive_total_cad);
+  const bandFactor = sourceTotal ? baseRate / sourceTotal : 1;
+  return {
+    id: packageId,
+    inclusiveTotal: finite(baseRate),
+    includedPaidLabour: Math.min(finite(baseRate), finite(packageRecord.included_paid_labour_cad) * bandFactor),
+    includedFee: Math.min(finite(baseRate), finite(packageRecord.included_fee_cad) * bandFactor),
+    labourRateBasis: Math.max(.01, finite(packageRecord.labour_rate_basis_cad_per_hour, 45)),
+    scope: packageRecord.scope ?? [],
+    sourceNote: packageRecord.source_note
+  };
 }
 
 function thresholdEffects({geometry, band}) {
@@ -168,9 +220,16 @@ export function calculateHouseCost(options = {}) {
     const unitRate = baseRate * multiplierForComponent(thresholds.applied, component.id);
     const baseMaterial = quantity * unitRate;
     const thresholdAddition = quantity > 0 ? finite(thresholds.effects.get(component.id), 0) : 0;
-    const materialCost = baseMaterial + thresholdAddition;
-    const fullHours = quantity * finite(component.labour_hours_per_unit?.[input.band], 0);
-    const ownerEligible = component.owner_eligible !== false;
+    const packageInfo = active ? servicePackage(component.id, input.band, input.servicingMode, unitRate) : null;
+    const packageTotal = packageInfo ? quantity * packageInfo.inclusiveTotal : 0;
+    const packageIncludedPaidLabour = packageInfo ? quantity * packageInfo.includedPaidLabour : 0;
+    const packageIncludedFee = packageInfo ? quantity * packageInfo.includedFee : 0;
+    const packageNonLabour = packageInfo ? Math.max(0, packageTotal - packageIncludedPaidLabour) : 0;
+    const materialCost = packageInfo ? packageNonLabour : baseMaterial + thresholdAddition;
+    const fullHours = packageInfo
+      ? packageIncludedPaidLabour / packageInfo.labourRateBasis
+      : quantity * finite(component.labour_hours_per_unit?.[input.band], 0);
+    const ownerEligible = packageInfo ? false : component.owner_eligible !== false;
     const paidShare = ownerEligible ? finite(labourMode.paid_labour_share) : 1;
     const ownerShare = ownerEligible ? finite(labourMode.owner_labour_share) : 0;
     const paidHours = fullHours * paidShare;
@@ -186,9 +245,17 @@ export function calculateHouseCost(options = {}) {
       quantity: round(quantity, 4),
       base_unit_rate_cad: round(baseRate, 2),
       unit_rate_cad: round(unitRate, 2),
-      base_material_cost_cad: round(baseMaterial),
-      threshold_addition_cad: round(thresholdAddition),
+      base_material_cost_cad: round(packageInfo ? packageNonLabour : baseMaterial),
+      threshold_addition_cad: round(packageInfo ? 0 : thresholdAddition),
       material_cost_cad: round(materialCost),
+      package_id: packageInfo?.id ?? null,
+      package_total_cad: packageInfo ? round(packageTotal) : null,
+      package_included_paid_labour_cad: packageInfo ? round(packageIncludedPaidLabour) : null,
+      package_included_fee_cad: packageInfo ? round(packageIncludedFee) : null,
+      package_non_labour_cost_cad: packageInfo ? round(packageNonLabour) : null,
+      package_labour_override_delta_cad: packageInfo ? roundSigned(paidCash - packageIncludedPaidLabour) : 0,
+      package_scope: packageInfo?.scope ?? [],
+      package_source_note: packageInfo?.sourceNote ?? null,
       labour_hours_total: round(fullHours, 3),
       paid_labour_hours: round(paidHours, 3),
       owner_labour_hours: round(ownerHours, 3),
@@ -202,10 +269,25 @@ export function calculateHouseCost(options = {}) {
       status: component.status,
       source_note: component.source_note,
       source_service_rate: sourceServiceRate != null,
+      scope_ids: component.scope_ids ?? [],
+      excludes_scope_ids: component.excludes_scope_ids ?? [],
       servicing_mode: input.servicingMode
     };
   });
   const activeRows = rows.filter((row) => row.active);
+  const packagePermitAllowance = input.servicingMode === 'arc_household_systems'
+    ? finite(evidence.service_package_accounting?.arc_household_systems?.water_plumbing_sanitation?.included_fee_cad)
+    : 0;
+  const permitRow = activeRows.find((row) => row.id === 'permits');
+  if (permitRow && packagePermitAllowance > 0) {
+    const offset = Math.min(permitRow.cash_cost_cad, packagePermitAllowance);
+    permitRow.cash_cost_cad = round(Math.max(0, permitRow.cash_cost_cad - offset));
+    permitRow.material_cost_cad = permitRow.cash_cost_cad;
+    permitRow.base_material_cost_cad = permitRow.cash_cost_cad;
+    permitRow.economic_capital_cad = permitRow.cash_cost_cad;
+    permitRow.package_fee_offset_cad = round(offset);
+    permitRow.package_fee_offset_note = 'The ARC water/plumbing/sanitation package already includes this permit allowance; only the residual general permit allowance is charged here.';
+  }
   const directCashBeforeTax = sum(activeRows, 'cash_cost_cad');
   const taxableCash = activeRows.filter((row) => row.taxable).reduce((total, row) => total + row.cash_cost_cad, 0);
   const taxes = taxableCash * input.taxRate;
@@ -262,8 +344,13 @@ export function calculateHouseCost(options = {}) {
       taxes_cad: round(taxes),
       contingency_cad: round(contingency),
       upfront_cash_required_cad: round(upfrontCash),
+      construction_cash_expenditure_cad: round(directCashBeforeTax),
+      initial_cash_contribution_cad: round(financing.down_payment_cad),
+      financed_principal_cad: round(financing.financed_principal_cad),
       owner_labour_imputed_cad: round(ownerImputed),
       completed_dwelling_capital_cad: round(economicCapital),
+      economic_cost_cad: round(economicCapital),
+      cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - (upfrontCash + ownerImputed)) < .005,
       headline_financed_value_cad: round(headlineCapital),
       custom_quote_applied: customQuote,
       quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0,
@@ -285,7 +372,27 @@ export function calculateHouseCost(options = {}) {
       model_core_capital_before_soft_tax_contingency_cad: round(coreCapital),
       model_completed_economic_capital_cad: round(economicCapital),
       delta_from_legacy_central_cad: roundSigned(economicCapital - legacy.range_cad.central),
-      explanation: 'The legacy CAD 61,000 was an integrated planning benchmark with unrecovered source detail. This model carries forward its utility package, then exposes component drivers, layout/diameter thresholds, delivery, equipment hire, design, permits, tax and contingency separately.'
+      legacy_exact_integrated_total_cad: legacy.legacy_exact_integrated_total_cad,
+      legacy_public_rounded_total_cad: legacy.legacy_public_rounded_total_cad,
+      historical_scope_components: legacy.legacy_scope_components,
+      former_model_reference: evidence.former_model_reference,
+      bridge_rows: [
+        {component: 'Water / plumbing / sanitation', original_scope: 'Inclusive package', original_amount_cad: 5940, former_model_amount_cad: evidence.former_model_reference.component_cash_costs.water_plumbing + evidence.former_model_reference.component_cash_costs.sanitation_greywater, new_scope: 'One inclusive package; included labour and fee decomposed, not added again', new_amount_cad: activeRows.find((row) => row.id === 'water_plumbing_sanitation')?.cash_cost_cad ?? 0, delta_from_former_model_cad: roundSigned((activeRows.find((row) => row.id === 'water_plumbing_sanitation')?.cash_cost_cad ?? 0) - (evidence.former_model_reference.component_cash_costs.water_plumbing + evidence.former_model_reference.component_cash_costs.sanitation_greywater)), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
+        {component: 'Hot water', original_scope: 'Inclusive package including integration labour', original_amount_cad: 2000, former_model_amount_cad: evidence.former_model_reference.component_cash_costs.hot_water, new_scope: 'One inclusive package; labour allowance is replaced only by a labour override', new_amount_cad: activeRows.find((row) => row.id === 'hot_water')?.cash_cost_cad ?? 0, delta_from_former_model_cad: roundSigned((activeRows.find((row) => row.id === 'hot_water')?.cash_cost_cad ?? 0) - evidence.former_model_reference.component_cash_costs.hot_water), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
+        {component: 'Household electrical', original_scope: 'Inclusive off-grid package including qualified labour and inspection allowance', original_amount_cad: 3300, former_model_amount_cad: evidence.former_model_reference.component_cash_costs.household_electrical, new_scope: 'One inclusive package; labour and inspection allowance exposed inside package', new_amount_cad: activeRows.find((row) => row.id === 'household_electrical')?.cash_cost_cad ?? 0, delta_from_former_model_cad: roundSigned((activeRows.find((row) => row.id === 'household_electrical')?.cash_cost_cad ?? 0) - evidence.former_model_reference.component_cash_costs.household_electrical), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
+        {component: 'General permits', original_scope: 'The utility package includes CAD 600 permit allowance', original_amount_cad: 0, former_model_amount_cad: evidence.former_model_reference.component_cash_costs.permits, new_scope: 'Residual general permit allowance after CAD 600 package offset', new_amount_cad: activeRows.find((row) => row.id === 'permits')?.cash_cost_cad ?? 0, delta_from_former_model_cad: roundSigned((activeRows.find((row) => row.id === 'permits')?.cash_cost_cad ?? 0) - evidence.former_model_reference.component_cash_costs.permits), evidence: 'Historical ARC package detail plus current municipal-fee placeholder.'}
+      ],
+      bridge: {
+        former_model_economic_capital_cad: evidence.former_model_reference.economic_capital_cad,
+        corrected_economic_capital_cad: economicCapital,
+        direct_cash_delta_cad: directCashBeforeTax - evidence.former_model_reference.direct_cash_before_tax_cad,
+        tax_delta_cad: taxes - evidence.former_model_reference.taxes_cad,
+        contingency_delta_cad: contingency - evidence.former_model_reference.contingency_cad,
+        owner_labour_delta_cad: ownerImputed - evidence.former_model_reference.owner_labour_imputed_cad,
+        total_delta_cad: economicCapital - evidence.former_model_reference.economic_capital_cad,
+        explanation: 'The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the lower cash base. Owner-labour valuation is unchanged. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.'
+      },
+      explanation: 'The legacy CAD 61,000 was an integrated planning benchmark with a historical exact sum of CAD 61,240. This model keeps that reference beside an independently itemized scope, corrects bundled utility labour and permit overlap, and distinguishes cash construction budget, owner-labour economic value, taxes, contingency and financing.'
     },
     accounting: {
       component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash),
@@ -333,6 +440,7 @@ export function buildHouseCostPresentationContract(options = {}) {
     layout_rules: evidence.layout_rules,
     labour_modes: evidence.labour_modes,
     servicing_modes: evidence.servicing_modes,
+    service_package_accounting: evidence.service_package_accounting,
     tax_and_contingency: evidence.tax_and_contingency,
     component_evidence: evidence.components,
     threshold_rules: evidence.threshold_rules,
