@@ -46,7 +46,6 @@ function renderFoodProductionLabourSection(result: any) {
 }
 
 let houseSupplierOptions: Array<[string, string]> = [];
-let houseSupplierDiameterOptions: Record<string, string[]> = {};
 
 function renderFirstPrinciplesHouseCostPage() {
   const result = houseCostResult();
@@ -79,7 +78,6 @@ function renderFirstPrinciplesHouseCostPage() {
   const services = Object.entries(HOUSE_COST_EVIDENCE.servicing_modes).map(([id, mode]: [string, any]) => [id, mode.label] as [string, string]);
   const labourModes = Object.entries(HOUSE_COST_EVIDENCE.labour_modes).map(([id, mode]: [string, any]) => [id, mode.label] as [string, string]);
   houseSupplierOptions = ([...new Set(market.yurt_packages.filter((row: any) => row.price_cad != null).map((row: any) => row.supplier_id))] as string[]).map((id) => [id, market.suppliers.find((row: any) => row.id === id)?.name ?? id]);
-  houseSupplierDiameterOptions = Object.fromEntries(houseSupplierOptions.map(([id]) => [id, market.yurt_packages.filter((row: any) => row.price_cad != null && row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M && row.supplier_id === id).sort((a: any, b: any) => a.diameter_m - b.diameter_m).map((row: any) => String(row.diameter_m))]));
   const houseBandOptions: Array<[string, string]> = [['low', 'Low planning band'], ['central', 'Central planning band'], ['high', 'High planning band']];
   const layoutOptions: Array<[string, string]> = Object.entries(HOUSE_COST_EVIDENCE.layout_rules).map(([id, rule]: [string, any]) => [id, rule.label]);
   const ownershipOptions: Array<[string, string]> = [['financed', 'Financed dwelling'], ['owned_out_right', 'Owned outright']];
@@ -918,10 +916,6 @@ document.addEventListener('click', (event) => {
 });
 
 function houseSelect(id: string, label: string, options: Array<[string, string]>, value: string, field: string) {
-  if (id === 'house-diameter-preset') {
-    const allowed = houseSupplierDiameterOptions[houseCostState.supplierId];
-    if (allowed?.length) options = options.filter(([key]) => key === 'custom' || allowed.includes(key));
-  }
   const control = `<label class="control"><span>${esc(label)}</span><select id="${esc(id)}" data-house-field="${esc(field)}">${options.map(([key, text]) => `<option value="${esc(key)}" ${key === value ? 'selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
   if (id !== 'house-band' || !houseSupplierOptions.length) return control;
   return `${control}<label class="control"><span>Yurt supplier</span><select id="house-supplier" data-house-field="supplierId">${houseSupplierOptions.map(([key, text]) => `<option value="${esc(key)}" ${key === houseCostState.supplierId ? 'selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
