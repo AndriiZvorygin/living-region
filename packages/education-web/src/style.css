@@ -364,6 +364,8 @@ main { max-width: 1180px; }
 .house-layer-running span { color: var(--muted); font-size: .82rem; }
 .house-layer-running strong { margin-right: 16px; color: var(--teal); }
 .house-layer-table { min-width: 900px; }
+#answer .house-layer .evidence-table thead th,
+#cost-stack .evidence-table thead th { position: static; }
 @media (max-width: 900px) { .house-answer-stack, .house-control-grid, .house-evidence-grid { grid-template-columns: 1fr; } }
 @media (max-width: 900px) { .house-stage-controls { grid-template-columns: 1fr; } }
 @media (max-width: 430px) { .house-bar-row { grid-template-columns: 1fr auto; } .house-bar-row span { grid-column: 1 / -1; } .house-bar-row strong { min-width: 0; } .house-highlight strong { font-size: 2.15rem; } .house-layer-heading { grid-template-columns: auto minmax(0, 1fr); } .house-layer-price { grid-column: 2; } }
