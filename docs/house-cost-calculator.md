@@ -27,7 +27,7 @@ At the 30 ft reference diameter, the central cash layers are:
 | Basic household amenities | `$12,735.47` | `$66,374.59` |
 | Delivery, design, permits, tax and contingency | `$21,707.28` | `$88,081.87` |
 
-The full cash total includes the published supplier package, platform, only the selected minimal completion rows, utility package, project costs, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
+The full cash total includes the published supplier package, platform, only the selected minimal completion rows, utility package, project costs, tax and contingency. The default selected stage is the Basic completed ARC dwelling, while the package-only stage remains available for inspecting the opening supplier price and outstanding requirements. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
 
 ## Residential shell boundary and occupancy review
 

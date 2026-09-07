@@ -56,10 +56,10 @@ These rows are **larger imported shell** evidence, not installed Canadian dwelli
 - Completed dwelling cash construction budget: **$88,081.87**
 - Contributed owner-labour value: $1,303.18
 - Completed dwelling economic cost: **$89,385.05**
-- Selected-stage mortgage basis: **$36,404.00 cash**, excluding contributed owner labour.
-- Selected-stage contract payment: **$159.41/month** at 4.35% fixed; source: [Bank of Canada funds advanced, uninsured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
-- Initial contribution: $7,280.80; base financed principal: $29,123.20; mortgage-insurance premium: $0.00; total financed principal: $29,123.20.
-- Stress-test payment: **$193.92/month** at 6.35%; term: 5 years; amortization: 25 years; balance at term end: $25,522.17.
+- Selected-stage mortgage basis: **$88,081.87 cash**, excluding contributed owner labour.
+- Selected-stage contract payment: **$385.69/month** at 4.35% fixed; source: [Bank of Canada funds advanced, uninsured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
+- Initial contribution: $17,616.37; base financed principal: $70,465.50; mortgage-insurance premium: $0.00; total financed principal: $70,465.50.
+- Stress-test payment: **$469.20/month** at 6.35%; term: 5 years; amortization: 25 years; balance at term end: $61,752.56.
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
 
@@ -92,10 +92,10 @@ The dwelling is labelled **Full-time, year-round residential dwelling based on a
 
 | Scenario | Initial contribution | Base principal | Insurance premium | Total principal | Contract rate | Contract payment | Stress payment |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Legal minimum down payment | $1,820.20 | $34,583.80 | $1,383.35 | $35,967.15 | 4.01% | $190.05 | $231.96 |
-| 10% down | $3,640.40 | $32,763.60 | $1,015.67 | $33,779.27 | 4.01% | $178.49 | $217.85 |
-| 20% down · uninsured reference | $7,280.80 | $29,123.20 | $0.00 | $29,123.20 | 4.35% | $159.41 | $193.92 |
-| 25% down | $9,101.00 | $27,303.00 | $0.00 | $27,303.00 | 4.35% | $149.44 | $181.80 |
+| Legal minimum down payment | $4,404.09 | $83,677.78 | $3,347.11 | $87,024.89 | 4.01% | $459.83 | $561.23 |
+| 10% down | $8,808.19 | $79,273.68 | $2,457.48 | $81,731.16 | 4.01% | $431.86 | $527.09 |
+| 20% down · uninsured reference | $17,616.37 | $70,465.50 | $0.00 | $70,465.50 | 4.35% | $385.69 | $469.20 |
+| 25% down | $22,020.47 | $66,061.40 | $0.00 | $66,061.40 | 4.35% | $361.59 | $439.88 |
 
 20% down is the conventional uninsured reference scenario, not the legal minimum. The legal-minimum row follows current Canada.ca down-payment rules. Insurance is shown separately and added to principal where the CMHC standard schedule applies. The qualifying rate is separate from the ordinary contract rate: the model uses the greater of contract rate + 2 percentage points or 5.25%.
 
@@ -132,8 +132,8 @@ The public starting view is the selected supplier package. It is distinct from t
 | Basic household amenities | $12,735.47 | $66,374.59 | basic_counter, water_collection_storage_first_flush, water_demand_pump, water_sediment_and_uv, compact_pex_and_fittings, sink_and_shower_fixtures, composting_toilet, class_2_greywater, qualified_water_installation, water_permit_allowance, solar_thermal_collector, hot_water_storage_and_controls, thermosiphon_integration, hot_water_integration_labour, pv_400w, mppt_controller, lead_acid_bank, pure_sine_inverter, dc_ac_wiring_protection, qualified_electrical_labour, electrical_inspection |
 | Delivery, design, permits, tax and contingency | $21,707.28 | $88,081.87 | delivery_logistics, design_engineering, permits, taxes, contingency |
 
-- Selected public stage: **Yurt package**, $36,404.00 cash and $36,404.00 economic cost.
-- Selected-stage financing payment: **$159.41/month**.
+- Selected public stage: **Basic completed ARC dwelling**, $88,081.87 cash and $89,385.01 economic cost.
+- Selected-stage financing payment: **$385.69/month**.
 - Layer reconciliation: passed; economic layer reconciliation: passed.
 
 ## Cash waterfall
@@ -331,9 +331,9 @@ The total bridge is direct cash -$12,873.14, tax -$1,543.51, contingency -$1,153
 
 | Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $159.41 / month |
-| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $159.41 / month |
-| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $159.41 / month |
+| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $372.96 / month |
+| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $385.69 / month |
+| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $398.43 / month |
 
 ## Size and layout sensitivity
 

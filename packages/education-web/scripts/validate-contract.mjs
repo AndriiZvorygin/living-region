@@ -63,7 +63,7 @@ if (!Array.isArray(house.pricing_layers) || house.pricing_layers.length !== 5) t
 if (house.pricing_layers.at(-1)?.label !== 'Delivery, design, permits, tax and contingency') throw new Error('house-cost final layer label is stale');
 if (house.central?.water_package_reconciliation?.difference_cad !== 804.62) throw new Error('house-cost water-package reconciliation is missing or changed');
 if (house.procurement_routes?.local_fabrication_owner_built?.status !== 'unmodeled') throw new Error('house-cost local fabrication route must remain explicitly unmodeled');
-if (house.defaults?.completion_stage !== 'yurt_package') throw new Error('house-cost defaults must open at the yurt package layer');
+if (house.defaults?.completion_stage !== 'basic_completed_arc') throw new Error('house-cost defaults must open at the basic completed ARC dwelling stage');
 if (house.central?.accounting?.pricing_layer_sum_check !== true) throw new Error('house-cost central pricing layers must reconcile');
 if (house.central?.cost_waterfall?.basic_dwelling_subtotal_cad !== 66374.59 || house.central?.cost_waterfall?.project_costs_before_tax_cad !== 5800 || house.central?.cost_waterfall?.total_before_tax_and_contingency_cad !== 72174.59) throw new Error('house-cost cash waterfall does not expose the expected central boundary');
 if (house.central?.cost_waterfall?.checks?.project_costs_sum_check !== true || house.central?.cost_waterfall?.checks?.subtotal_plus_project_costs_check !== true) throw new Error('house-cost cash waterfall reconciliation failed');

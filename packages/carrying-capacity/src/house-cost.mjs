@@ -25,7 +25,7 @@ export const HOUSE_COST_PRICING_LAYERS = [
   {id: 'project_costs', label: 'Delivery, design, permits, tax and contingency', stage: 'basic_completed_arc', description: 'Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected.'}
 ];
 
-const COMPLETION_STAGE_IDS = new Set(HOUSE_COST_PRICING_LAYERS.map((layer) => layer.stage));
+const COMPLETION_STAGE_IDS = new Set([...HOUSE_COST_PRICING_LAYERS.map((layer) => layer.id), ...HOUSE_COST_PRICING_LAYERS.map((layer) => layer.stage)]);
 const COMPLETION_STAGE_ALIASES = {package: 'yurt_package', bare_package: 'yurt_package', platform_shell: 'platform_supported_shell', four_season: 'four_season_structure', completed: 'basic_completed_arc'};
 const COMPLETION_STAGE_LAYER_COUNTS = {yurt_package: 1, platform_supported_shell: 2, four_season_structure: 3, basic_completed_arc: HOUSE_COST_PRICING_LAYERS.length};
 const COMPLETION_STAGE_PRESENTATION = {

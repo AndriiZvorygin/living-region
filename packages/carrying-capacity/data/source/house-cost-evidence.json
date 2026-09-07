@@ -12,7 +12,7 @@
     "layout": "single_storey",
     "window_count": 0,
     "door_count": 1,
-    "completion_stage": "yurt_package",
+    "completion_stage": "basic_completed_arc",
     "completion_selections": {
       "heating": true,
       "ventilation": true,

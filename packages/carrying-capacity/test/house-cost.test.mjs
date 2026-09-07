@@ -37,9 +37,9 @@ test('published supplier package is the first pricing input', () => {
   assert.equal(result.supplier_package.inclusion_matrix.platform, 'excluded');
   assert.equal(result.supplier_package.inclusion_matrix.utilities, 'excluded');
   assert.equal(result.accounting.no_historical_input_used, true);
-  assert.equal(result.completion_stage, 'yurt_package');
-  assert.equal(result.selected_stage.label, 'Yurt package');
-  assert.match(result.selected_stage.description, /not a platform-supported or habitable dwelling/);
+  assert.equal(result.completion_stage, 'basic_completed_arc');
+  assert.equal(result.selected_stage.label, 'Basic completed ARC dwelling');
+  assert.match(result.selected_stage.description, /modest ARC completion/);
   assert.equal(result.components.find((row) => row.id === 'additional_windows'), undefined);
   assert.equal(result.components.find((row) => row.id === 'additional_doors'), undefined);
 });
@@ -183,7 +183,7 @@ test('ARC integration keeps dwelling finance separate from land and infrastructu
 });
 
 test('layered pricing starts with the supplier package and reconciles every layer', () => {
-  const bare = calculateHouseCost();
+  const bare = calculateHouseCost({completionStage: 'yurt_package'});
   const complete = calculateHouseCost({completionStage: 'basic_completed_arc'});
   assert.equal(bare.pricing_layers.length, 5);
   assert.equal(bare.pricing_layers[0].incremental_cash_cost_cad, bare.supplier_package.selected_price_cad);
@@ -237,7 +237,7 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.equal(contract.layout_comparison.length, 3);
   assert.ok(contract.central.supplier_package.source_url);
   assert.equal(contract.pricing_layers.length, 5);
-  assert.equal(contract.defaults.completion_stage, 'yurt_package');
+  assert.equal(contract.defaults.completion_stage, 'basic_completed_arc');
   assert.equal(contract.pricing_layers.at(-1).label, 'Delivery, design, permits, tax and contingency');
   assert.ok(contract.procurement_routes.yurts_canada_purchased_package);
   assert.equal(contract.procurement_routes.local_fabrication_owner_built.status, 'unmodeled');
