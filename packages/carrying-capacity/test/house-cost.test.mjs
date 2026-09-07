@@ -27,7 +27,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.0.0');
+  assert.equal(result.contract_version, '4.1.0');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -201,7 +201,7 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.0.0');
+  assert.equal(contract.contract_version, '4.1.0');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));
@@ -212,4 +212,52 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.ok(contract.central.supplier_package.source_url);
   assert.equal(contract.pricing_layers.length, 5);
   assert.equal(contract.defaults.completion_stage, 'yurt_package');
+});
+
+test('basic completed preset selects only itemized minimal completion components', () => {
+  const result = calculateHouseCost({completionStage: 'basic_completed_arc'});
+  const selected = new Set(result.components.filter((row) => row.selection_id).map((row) => row.selection_id));
+  const unselected = new Set(result.inactive_components.filter((row) => row.selection_id).map((row) => row.selection_id));
+  assert.deepEqual(selected, new Set(['heating', 'ventilation', 'privacy_partition', 'protective_floor_surface', 'basic_counter']));
+  assert.deepEqual(unselected, new Set(['interior_surface_finish', 'kitchen_cabinetry', 'kitchen_appliances', 'bathroom_fittings']));
+  const privacy = result.components.find((row) => row.id === 'privacy_partition');
+  const floor = result.components.find((row) => row.id === 'protective_floor_surface');
+  const counter = result.components.find((row) => row.id === 'basic_counter');
+  assert.equal(privacy.quantity, 7.2);
+  assert.equal(privacy.quantity_unit, 'm²');
+  assert.equal(floor.quantity, result.geometry.usable_floor_area_m2);
+  assert.equal(floor.quantity_unit, 'm²');
+  assert.equal(counter.quantity, 1.08);
+  assert.equal(counter.quantity_unit, 'm²');
+  assert.equal(privacy.cash_cost_cad, 473.4);
+  assert.equal(floor.cash_cost_cad, 914.12);
+  assert.equal(counter.cash_cost_cad, 284.85);
+  assert.equal(result.components.find((row) => row.id === 'interior_finish_materials'), undefined);
+  assert.equal(result.components.find((row) => row.id === 'kitchen_fitout_materials'), undefined);
+  assert.equal(result.components.find((row) => row.id === 'bathroom_fitout_materials'), undefined);
+});
+
+test('completion controls are independent and utility fixtures remain in one package', () => {
+  const noHeating = calculateHouseCost({completionStage: 'basic_completed_arc', completionSelections: {heating: false}});
+  assert.equal(noHeating.components.find((row) => row.id === 'wood_stove_and_chimney'), undefined);
+  assert.ok(noHeating.components.find((row) => row.id === 'balanced_ventilation'));
+  assert.ok(noHeating.components.find((row) => row.id === 'privacy_partition'));
+  const allOptional = calculateHouseCost({completionStage: 'basic_completed_arc', completionSelections: {
+    heating: true,
+    ventilation: true,
+    privacy_partition: true,
+    protective_floor_surface: true,
+    interior_surface_finish: true,
+    basic_counter: true,
+    kitchen_cabinetry: true,
+    kitchen_appliances: true,
+    bathroom_fittings: true
+  }});
+  assert.ok(allOptional.components.find((row) => row.id === 'kitchen_cabinetry'));
+  assert.ok(allOptional.components.find((row) => row.id === 'bathroom_fittings'));
+  const utilityIds = allOptional.components.filter((row) => String(row.package_id).startsWith('utility_')).map((row) => row.id);
+  assert.equal(utilityIds.filter((id) => id === 'sink_and_shower_fixtures').length, 1);
+  assert.equal(utilityIds.filter((id) => id === 'composting_toilet').length, 1);
+  assert.equal(utilityIds.filter((id) => id === 'qualified_water_installation').length, 1);
+  assert.equal(allOptional.accounting.utility_single_home, true);
 });

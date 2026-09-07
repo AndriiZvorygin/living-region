@@ -300,6 +300,11 @@ main { max-width: 1180px; }
 .house-control-grid .controls-row { margin-bottom: 12px; }
 .house-quote-control { max-width: 430px; margin-top: 15px; }
 .house-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 22px; }
+.house-completion-controls { margin-top: 24px; padding: 19px; border-top: 3px solid var(--amber); background: #fff; }
+.house-completion-controls h3 { margin-top: 0; }
+.house-completion-controls .controls-row { margin-bottom: 10px; }
+.house-selection-control { min-width: 230px; }
+.house-selection-audit { margin: 18px 0 24px; }
 .house-cost-table { min-width: 1120px; }
 .house-cost-table input { width: 96px; min-height: 36px; padding: 6px 7px; }
 .house-cost-table td:nth-child(4) { white-space: nowrap; }

@@ -7,6 +7,7 @@ const evidenceRoot = resolve('know/produce/house-cost');
 const generatedDate = new Date().toISOString().slice(0, 10);
 const contract = buildHouseCostPresentationContract();
 const central = contract.central;
+const minimal = calculateHouseCost({completionStage: 'basic_completed_arc'});
 const money = (value) => `$${Number(value ?? 0).toLocaleString('en-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 const signedMoney = (value) => Number(value ?? 0) < 0 ? `-${money(Math.abs(Number(value)))}` : money(value);
 const hours = (value) => `${Number(value ?? 0).toLocaleString('en-CA', {maximumFractionDigits: 1})} h`;
@@ -30,6 +31,8 @@ const layoutRows = contract.layout_comparison.map((row) => `| ${row.label} | ${r
 const historicalRows = central.legacy_reconciliation.historical_scope_components.map((row) => `| ${row.scope} | ${money(row.amount_cad)} | ${row.status} |`).join('\n');
 const bridgeRows = central.legacy_reconciliation.bridge_rows.map((row) => `| ${row.component} | ${row.original_scope} / ${money(row.original_amount_cad)} | ${money(row.former_model_amount_cad)} | ${row.new_scope} / ${money(row.new_amount_cad)} | ${signedMoney(row.delta_from_former_model_cad)} | ${row.evidence} |`).join('\n');
 const layerRows = central.pricing_layers.map((layer) => `| ${layer.label} | ${money(layer.incremental_cash_cost_cad)} | ${money(layer.cumulative_cash_cost_cad)} | ${layer.component_ids.join(', ') || 'none'} |`).join('\n');
+const minimalSelectedRows = minimal.components.filter((row) => row.selection_id).map((row) => `| ${row.label} | selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
+const minimalUnselectedRows = minimal.inactive_components.filter((row) => row.selection_id).map((row) => `| ${row.label} | not selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const markdown = `# House Cost Calculator
 
 Generated from contract ${HOUSE_COST_CONTRACT_VERSION} on ${generatedDate}. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
@@ -70,6 +73,20 @@ ${layerRows}
 - Selected public stage: **${central.selected_stage.label}**, ${money(central.selected_stage.cash_cost_cad)} cash and ${money(central.selected_stage.economic_cost_cad)} economic cost.
 - Selected-stage financing payment: **${money(central.selected_financing.monthly_debt_service_cad)}/month**.
 - Layer reconciliation: ${central.accounting.pricing_layer_sum_check ? 'passed' : 'failed'}; economic layer reconciliation: ${central.accounting.pricing_layer_economic_sum_check ? 'passed' : 'failed'}.
+
+## Basic completed ARC selection
+
+The completed preset selects only the documented minimal additions. Utility-package fixtures and installation remain in their existing package exactly once. Elective finishes, cabinetry, appliances and bathroom storage/trim are priced but off by default.
+
+| Component | State | Quantity | Materials | Labour | Cash if selected | Evidence |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+${minimalSelectedRows}
+
+| Component | State | Quantity | Materials if selected | Labour if selected | Cash if selected | Evidence |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+${minimalUnselectedRows}
+
+Unresolved or provisional allowances remain visible in the component ledger: supplier freight/local delivery, structural/site/servicing design, residual permits, tax/HST treatment, contingency, the preliminary platform/foundation design, heating/chimney assembly, ventilation design, protective floor product compatibility, privacy partition detailing and basic counter detailing. These are not hidden calibration amounts.
 
 ## Platform and foundation BOM
 

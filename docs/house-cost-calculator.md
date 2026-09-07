@@ -9,7 +9,7 @@ The authoritative engine is `packages/carrying-capacity/src/house-cost.mjs`. The
 ```text
 published yurt package
   + quantity-based platform and foundation prototype
-  + additional openings, finishes, kitchen, bath, heating and ventilation
+  + individually selected privacy, protective-floor, heating, ventilation and basic-counter components
   + itemized water, sanitation, hot-water and electrical systems
   + paid labour, delivery, design, approvals, tax and contingency
   = dwelling cash construction budget
@@ -23,11 +23,13 @@ At the 30 ft reference diameter, the central cash layers are:
 | --- | ---: | ---: |
 | Yurt package | `$36,404.00` | `$36,404.00` |
 | Platform and foundation | `$8,218.49` | `$44,622.49` |
-| Four-season completion | `$11,600.79` | `$56,223.28` |
-| Basic household amenities | `$17,975.62` | `$74,198.90` |
-| Project costs and optional upgrades | `$23,431.76` | `$97,630.66` |
+| Four-season completion | `$9,016.63` | `$53,639.12` |
+| Basic household amenities | `$12,735.47` | `$66,374.59` |
+| Project costs and optional upgrades | `$21,707.28` | `$88,081.87` |
 
-The full cash total includes all five layers, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
+The full cash total includes the published supplier package, platform, only the selected minimal completion rows, utility package, project costs, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
+
+The **Basic completed ARC dwelling** preset selects: heating (`1 dwelling`, `$5,200` rate, `$6,280` central cash including paid installation); ventilation (`63.0425 m²`, `$16/m²`, `$1,349.11`); a privacy partition (`7.2 m²`, `$32/m²`, `$473.40`); protective floor surface (`63.0425 m²`, `$10/m²`, `$914.12`); and a basic counter (`1.08 m²`, `$140/m²`, `$284.85`). Interior decorative finish, kitchen cabinetry, kitchen appliances and bathroom storage/trim are individually priced but off by default. Their current central cash amounts if selected are `$1,194.66`, `$1,170.00`, `$890.00` and `$390.00`, respectively.
 
 The household owns the dwelling and can build equity in it. Land purchase, site lease, shared infrastructure and household operating costs remain outside this calculator.
 
@@ -53,6 +55,6 @@ Owner-builder, mixed-labour and contractor-built modes show paid hours, owner ho
 
 ## Evidence and uncertainty
 
-Published supplier and retailer prices are dated evidence. Battery storage, solar thermal, greywater, composting-toilet suitability, kitchen/bath allowances, delivery, tax/HST treatment, permits and engineering remain provisional or quotation-required where indicated. Interpolated diameters are labelled; extrapolated sizes are flagged. Larger spans, roof pitch and upper-floor structures use editable planning thresholds and are not approvals.
+Published supplier and retailer prices are dated evidence. Battery storage, solar thermal, greywater, composting-toilet suitability, the optional finish/cabinet/appliance/bathroom rows, delivery, tax/HST treatment, permits and engineering remain provisional or quotation-required where indicated. Interpolated diameters are labelled; extrapolated sizes are flagged. Larger spans, roof pitch and upper-floor structures use editable planning thresholds and are not approvals.
 
 The display keeps the detailed component ledger, package inclusion matrix, platform BOM, procurement register, geometry audit, layout comparison, diameter sensitivity, labour modes and historical comparison expandable so the result can be independently reproduced.

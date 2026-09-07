@@ -2,7 +2,7 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {financeCapital} from './site-lease-browser.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.0.0';
+export const HOUSE_COST_CONTRACT_VERSION = '4.1.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 
@@ -41,8 +41,8 @@ function normalizeCompletionStage(value) {
 function pricingLayerForRow(row) {
   if (row.id === 'purchased_yurt_package') return 'yurt_package';
   if (row.id.startsWith('platform_')) return 'platform_foundation';
-  if (['additional_windows', 'additional_doors', 'additional_interior_liner_and_furring', 'interior_finish_materials', 'upper_floor_structure', 'stairs', 'guards', 'wood_stove_and_chimney', 'balanced_ventilation'].includes(row.id)) return 'four_season_completion';
-  if (['kitchen_fitout_materials', 'bathroom_fitout_materials'].includes(row.id) || String(row.package_id ?? '').startsWith('utility_') || String(row.package_id ?? '').startsWith('alternative_')) return 'basic_household_amenities';
+  if (['additional_windows', 'additional_doors', 'additional_interior_liner_and_furring', 'privacy_partition', 'protective_floor_surface', 'interior_surface_finish', 'upper_floor_structure', 'stairs', 'guards', 'wood_stove_and_chimney', 'balanced_ventilation'].includes(row.id)) return 'four_season_completion';
+  if (['basic_counter', 'kitchen_cabinetry', 'kitchen_appliances', 'bathroom_fittings'].includes(row.id) || String(row.package_id ?? '').startsWith('utility_') || String(row.package_id ?? '').startsWith('alternative_')) return 'basic_household_amenities';
   if (['delivery_logistics', 'design_engineering', 'permits'].includes(row.id)) return 'project_costs';
   return row.stage === 'shell' ? 'four_season_completion' : 'basic_household_amenities';
 }
@@ -159,6 +159,9 @@ function componentQuantity(component, geometry, overrides = {}) {
     stair_count: geometry.inputs.layout === 'single_storey' ? 0 : 1,
     guard_length_m: geometry.inputs.layout === 'single_storey' ? 0 : geometry.inputs.guard_length_m,
     people_above_two: Math.max(0, geometry.inputs.household_size - 2),
+    privacy_partition_area_m2: 7.2,
+    protective_floor_area_m2: geometry.usable_floor_area_m2,
+    counter_area_m2: 1.08,
     fixed: 1,
     servicing_mode: 1
   };
@@ -222,6 +225,7 @@ function normalizeOptions(options = {}) {
     servicingMode,
     labourMode,
     design: normalizeDesign(options.design),
+    completionSelections: {...(evidence.defaults.completion_selections ?? {}), ...(options.completionSelections ?? {})},
     yurtSupplierId: typeof options.yurtSupplierId === 'string' ? options.yurtSupplierId : 'yurts_canada',
     yurtPackageId: typeof options.yurtPackageId === 'string' ? options.yurtPackageId : null,
     unitRateOverrides: options.unitRateOverrides ?? {},
@@ -353,6 +357,7 @@ function calculateLegacyRateHouseCost(options = {}) {
     price_basis_date: evidence.price_basis_date,
     band: input.band,
     completion_stage: input.completionStage,
+    completion_selections: input.completionSelections,
     design: geometry.inputs,
     geometry,
     servicing: {mode: input.servicingMode, ...evidence.servicing_modes[input.servicingMode], shared_infrastructure_additions: sharedServices},
@@ -373,7 +378,7 @@ function calculateLegacyRateHouseCost(options = {}) {
     thresholds: {applied: thresholds.applied, all_rules: evidence.threshold_rules},
     stages: {
       shell: {cash_cost_cad: round(stageTotal('shell')), includes: ['platform_foundation', 'frame', 'roof', 'insulation', 'weatherproofing', 'windows', 'doors', 'upper_floor_structure']},
-      insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'interior_finishes', 'heating', 'ventilation', 'stairs', 'guards']},
+      insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'selected four-season components', 'heating', 'ventilation', 'stairs', 'guards']},
       completed_before_tax_and_contingency: {cash_cost_cad: round(directCashBeforeTax), includes: activeRows.map((row) => row.id)},
       completed_dwelling: {cash_cost_cad: round(upfrontCash), economic_capital_cad: round(economicCapital), includes: [...activeRows.map((row) => row.id), 'taxes', 'contingency']}
     },
@@ -536,7 +541,7 @@ function labourShares(mode, eligible) {
   return {paid: finite(definition?.paid_labour_share, 1), owner: finite(definition?.owner_labour_share, 0)};
 }
 
-function pricedMarketRow({id, label, stage, quantity, unit, rate, labourHours = 0, labourIncludedCash = 0, fee = 0, ownerEligible = true, status, sourceNote, sourceUrl, priceDate, evidenceStatus, driver, scope = [], packageId = null, sourcePackageId = null, packageScope = [], thresholdAddition = 0, materialId = null, input, quantityOverride = false}) {
+function pricedMarketRow({id, label, stage, quantity, quantityUnit = null, unit, rate, labourHours = 0, labourIncludedCash = 0, fee = 0, ownerEligible = true, status, sourceNote, sourceUrl, priceDate, evidenceStatus, driver, scope = [], packageId = null, sourcePackageId = null, packageScope = [], thresholdAddition = 0, materialId = null, input, quantityOverride = false, active = true, selectionId = null, selectedByDefault = null}) {
   const shares = labourShares(input.labourMode, ownerEligible);
   const overrideKey = materialId && input.materialPriceOverrides[materialId] != null ? materialId : id;
   const selectedRate = input.materialPriceOverrides[overrideKey] == null ? rate : nonNegative(input.materialPriceOverrides[overrideKey]);
@@ -549,7 +554,7 @@ function pricedMarketRow({id, label, stage, quantity, unit, rate, labourHours = 
   const feeCost = marketPrice(fee * quantity, input.band);
   const cash = materialCost + paidCash + feeCost;
   return {
-    id, label, stage, driver, unit,
+    id, label, stage, driver, unit, quantity_unit: quantityUnit,
     quantity: round(quantity, 4),
     base_unit_rate_cad: round(selectedRate, 2),
     unit_rate_cad: round(marketPrice(selectedRate, input.band), 2),
@@ -574,7 +579,9 @@ function pricedMarketRow({id, label, stage, quantity, unit, rate, labourHours = 
     cash_cost_cad: round(cash),
     economic_capital_cad: round(cash + ownerImputed),
     owner_eligible: ownerEligible,
-    active: true,
+    active: Boolean(active),
+    selection_id: selectionId,
+    selected_by_default: selectedByDefault,
     taxable: true,
     status: status ?? evidenceStatus ?? 'provisional',
     evidence_status: evidenceStatus ?? status ?? 'provisional',
@@ -675,7 +682,9 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     if (spec.id === 'additional_doors') quantity = Math.max(0, geometry.inputs.door_count - finite(spec.included_default_doors, 1));
     const unitRate = finite(spec.central_rate_cad);
     const hours = finite(spec.labour_hours, spec.labour_hours_per_unit ?? spec.labour_hours_per_m2 ?? 0) * quantity;
-    return pricedMarketRow({id: spec.id, label: spec.label, stage: spec.stage, quantity, unit: spec.unit, rate: unitRate, labourHours: hours, ownerEligible: !['wood_stove_and_chimney', 'balanced_ventilation', 'delivery_logistics', 'design_engineering', 'permits'].includes(spec.id), status: spec.evidence_status, evidenceStatus: spec.evidence_status, sourceNote: spec.note, sourceUrl: null, driver: spec.driver, thresholdAddition: finite(threshold.additions.get(spec.id)), input, quantityOverride: input.quantityOverrides[spec.id] != null});
+    const selectionId = spec.selection_id ?? null;
+    const selected = selectionId == null ? true : input.completionSelections[selectionId] !== false;
+    return pricedMarketRow({id: spec.id, label: spec.label, stage: spec.stage, quantity, quantityUnit: spec.quantity_unit ?? null, unit: spec.unit, rate: unitRate, labourHours: hours, ownerEligible: !['wood_stove_and_chimney', 'balanced_ventilation', 'delivery_logistics', 'design_engineering', 'permits'].includes(spec.id), status: spec.evidence_status, evidenceStatus: spec.evidence_status, sourceNote: spec.note, sourceUrl: null, driver: spec.driver, thresholdAddition: finite(threshold.additions.get(spec.id)), input, quantityOverride: input.quantityOverrides[spec.id] != null, active: selected && quantity > 0, selectionId, selectedByDefault: spec.selected_by_default ?? null});
   });
   rows.push(...addRows);
   if (input.servicingMode === 'centralized_shared_services') {
@@ -684,6 +693,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     rows.push(...firstPrinciplesUtilityRows(input));
   }
   const activeRows = rows.filter((row) => row.active && row.quantity > 0).map((row) => ({...row, pricing_layer: pricingLayerForRow(row)}));
+  const inactiveRows = rows.filter((row) => !row.active).map((row) => ({...row, pricing_layer: pricingLayerForRow(row)}));
   const itemizedPackage = utilityPackageBundle(input.servicingMode);
   const serviceComponents = itemizedPackage
     ? Object.fromEntries([...new Set(itemizedPackage.rows.map((row) => row.source_package_id))].map((packageId) => [packageId, round(sum(activeRows.filter((row) => row.source_package_id === packageId), 'cash_cost_cad'))]))
@@ -752,18 +762,19 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     pricing_model: marketEvidence.pricing_model_id,
     band: input.band,
     completion_stage: input.completionStage,
+    completion_selections: input.completionSelections,
     design: geometry.inputs,
     geometry,
     supplier_package: {...yurtPackage, selected_price_cad: round(marketPrice(yurtPackage.price_cad, input.band)), published_price_cad: yurtPackage.price_cad, price_currency: 'CAD', source_url: yurtPackage.source?.source_url, inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null},
     servicing: {mode: input.servicingMode, label: evidence.servicing_modes[input.servicingMode]?.label, description: evidence.servicing_modes[input.servicingMode]?.description, status: itemizedPackage?.status ?? 'alternative_package_placeholder', components: serviceComponents, historical_reference_components: evidence.servicing_modes[input.servicingMode]?.components ?? null, shared_infrastructure_additions: evidence.servicing_modes[input.servicingMode]?.shared_infrastructure_additions ?? {}, itemized_package: itemizedPackage},
     labour: {mode: input.labourMode, ...evidence.labour_modes[input.labourMode], labour_rate_cad_per_hour: input.labourRateCadPerHour, owner_labour_value_rate_cad_per_hour: input.ownerLabourValueRateCadPerHour, paid_hours: round(sum(activeRows, 'paid_labour_hours'), 2), owner_hours: round(sum(activeRows, 'owner_labour_hours'), 2), paid_labour_cash_cad: round(sum(activeRows, 'paid_labour_cash_cad')), owner_labour_imputed_cad: round(ownerImputed), total_labour_hours: round(sum(activeRows, 'labour_hours_total'), 2)},
     components: activeRows,
-    inactive_components: [...rows.filter((row) => !row.active), ...marketEvidence.additional_assemblies.filter((row) => row.id === 'additional_interior_liner_and_furring').map((row) => ({id: row.id, label: row.label, active: false, status: 'included_by_supplier_package', source_note: row.note}))],
+    inactive_components: [...inactiveRows, ...marketEvidence.additional_assemblies.filter((row) => row.id === 'additional_interior_liner_and_furring').map((row) => ({id: row.id, label: row.label, active: false, selection_id: null, pricing_layer: pricingLayerForRow(row), status: 'included_by_supplier_package', source_note: row.note}))],
     additional_costs: additionalRows,
     thresholds: {applied: threshold.applied, all_rules: [...evidence.threshold_rules, ...threshold.applied.filter((row) => !evidence.threshold_rules.some((rule) => rule.id === row.id))]},
     pricing_layers: pricingLayers,
     selected_stage: {id: input.completionStage, label: COMPLETION_STAGE_PRESENTATION[input.completionStage].label, description: COMPLETION_STAGE_PRESENTATION[input.completionStage].description, layer_ids: pricingLayers.slice(0, selectedLayerIndex + 1).map((layer) => layer.id), cash_cost_cad: round(selectedCash), economic_cost_cad: round(selectedEconomic), financing_value_cad: round(selectedHeadlineCapital), initial_cash_contribution_cad: round(selectedFinancing.down_payment_cad), financed_principal_cad: round(selectedFinancing.financed_principal_cad), remaining_layer_ids: pricingLayers.slice(selectedLayerIndex + 1).map((layer) => layer.id)},
-    stages: {shell: {cash_cost_cad: round(stageTotal('shell')), includes: ['purchased_yurt_package', 'platform BOM', 'additional openings']}, insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'interior finish', 'heating', 'ventilation']}, completed_before_tax_and_contingency: {cash_cost_cad: round(directCashBeforeTax), includes: activeRows.map((row) => row.id)}, completed_dwelling: {cash_cost_cad: round(upfrontCash), economic_capital_cad: round(economicCapital), includes: [...activeRows.map((row) => row.id), 'taxes', 'contingency']}},
+    stages: {shell: {cash_cost_cad: round(stageTotal('shell')), includes: ['purchased_yurt_package', 'platform BOM', 'additional openings']}, insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'selected interior completion rows', 'heating', 'ventilation']}, completed_before_tax_and_contingency: {cash_cost_cad: round(directCashBeforeTax), includes: activeRows.map((row) => row.id)}, completed_dwelling: {cash_cost_cad: round(upfrontCash), economic_capital_cad: round(economicCapital), includes: [...activeRows.map((row) => row.id), 'taxes', 'contingency']}},
     totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), selected_stage_cash_cost_cad: round(selectedCash), selected_stage_economic_cost_cad: round(selectedEconomic), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},
     financing: {...financing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
     selected_financing: {...selectedFinancing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
@@ -772,7 +783,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
     evidence: sourceList,
     market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors},
-    assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method, completion_stage: input.completionStage}
+    assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method, completion_stage: input.completionStage, completion_selections: input.completionSelections}
   };
 }
 

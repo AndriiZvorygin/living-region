@@ -40,7 +40,7 @@ const house = JSON.parse(fs.readFileSync(housePath, 'utf8'));
 if (!house.contract_version || house.model_id !== 'arc_yurt_house_cost' || !house.central || !house.bands || !house.central.geometry) throw new Error('house-cost contract is incomplete');
 if (!house.central.accounting?.utility_single_home) throw new Error('house-cost contract must enforce one household utility package');
 if (house.central.geometry.roof_sloping_area_m2 <= house.central.geometry.footprint_m2) throw new Error('house-cost contract must use sloping roof area');
-if (house.contract_version !== '4.0.0') throw new Error('house-cost contract must expose the layered first-principles v4 accounting');
+if (house.contract_version !== '4.1.0') throw new Error('house-cost contract must expose the layered first-principles v4.1 accounting');
 if (!house.market_evidence?.pricing_model_id || !house.market_evidence?.yurt_packages?.length) throw new Error('house-cost contract is missing sourced yurt package evidence');
 if (!house.central.supplier_package?.selected_price_cad || !house.central.supplier_package?.source_url) throw new Error('house-cost contract is missing the selected supplier package');
 if (!house.central.market_evidence?.platform_design?.rows?.length) throw new Error('house-cost contract is missing the platform quantity design');
