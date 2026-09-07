@@ -29,6 +29,21 @@ At the 30 ft reference diameter, the central cash layers are:
 
 The full cash total includes the published supplier package, platform, only the selected minimal completion rows, utility package, project costs, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
 
+## Cash waterfall
+
+The basic dwelling subtotal ends after the Basic household amenities layer. Delivery, design and permits are external project costs added after that subtotal; they are not an unexplained construction-cost increase.
+
+| Accounting step | Central cash amount |
+| --- | ---: |
+| Basic dwelling subtotal | `$66,374.59` |
+| Project costs before tax | `$5,800.00` |
+| Total before tax and contingency | `$72,174.59` |
+| Tax/HST allowance | `$9,382.70` |
+| Contingency | `$6,524.58` |
+| Final cash construction budget | `$88,081.87` |
+
+The `$5,800.00` project-cost bridge is exactly `$1,800.00` supplier freight and local delivery + `$3,000.00` site, structural and servicing design + `$1,000.00` residual permits and approvals. The first four layer totals therefore reconcile to the Basic dwelling subtotal, and the subtotal plus this project-cost bridge reconciles to the Total before tax and contingency. Tax/HST and contingency remain separate rows and are not included in the project-cost bridge.
+
 The **Basic completed ARC dwelling** preset selects: heating (`1 dwelling`, `$5,200` rate, `$6,280` central cash including paid installation); ventilation (`63.0425 m²`, `$16/m²`, `$1,349.11`); a privacy partition (`7.2 m²`, `$32/m²`, `$473.40`); protective floor surface (`63.0425 m²`, `$10/m²`, `$914.12`); and a basic counter (`1.08 m²`, `$140/m²`, `$284.85`). Interior decorative finish, kitchen cabinetry, kitchen appliances and bathroom storage/trim are individually priced but off by default. Their current central cash amounts if selected are `$1,194.66`, `$1,170.00`, `$890.00` and `$390.00`, respectively.
 
 The household owns the dwelling and can build equity in it. Land purchase, site lease, shared infrastructure and household operating costs remain outside this calculator.

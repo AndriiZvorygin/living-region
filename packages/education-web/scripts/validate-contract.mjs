@@ -40,7 +40,7 @@ const house = JSON.parse(fs.readFileSync(housePath, 'utf8'));
 if (!house.contract_version || house.model_id !== 'arc_yurt_house_cost' || !house.central || !house.bands || !house.central.geometry) throw new Error('house-cost contract is incomplete');
 if (!house.central.accounting?.utility_single_home) throw new Error('house-cost contract must enforce one household utility package');
 if (house.central.geometry.roof_sloping_area_m2 <= house.central.geometry.footprint_m2) throw new Error('house-cost contract must use sloping roof area');
-if (house.contract_version !== '4.1.1') throw new Error('house-cost contract must expose the layered first-principles v4.1.1 accounting');
+if (house.contract_version !== '4.1.2') throw new Error('house-cost contract must expose the layered first-principles v4.1.2 accounting');
 if (!house.market_evidence?.pricing_model_id || !house.market_evidence?.yurt_packages?.length) throw new Error('house-cost contract is missing sourced yurt package evidence');
 if (!house.central.supplier_package?.selected_price_cad || !house.central.supplier_package?.source_url) throw new Error('house-cost contract is missing the selected supplier package');
 if (!house.central.market_evidence?.platform_design?.rows?.length) throw new Error('house-cost contract is missing the platform quantity design');
@@ -54,4 +54,6 @@ if (house.central?.water_package_reconciliation?.difference_cad !== 804.62) thro
 if (house.procurement_routes?.local_fabrication_owner_built?.status !== 'unmodeled') throw new Error('house-cost local fabrication route must remain explicitly unmodeled');
 if (house.defaults?.completion_stage !== 'yurt_package') throw new Error('house-cost defaults must open at the yurt package layer');
 if (house.central?.accounting?.pricing_layer_sum_check !== true) throw new Error('house-cost central pricing layers must reconcile');
+if (house.central?.cost_waterfall?.basic_dwelling_subtotal_cad !== 66374.59 || house.central?.cost_waterfall?.project_costs_before_tax_cad !== 5800 || house.central?.cost_waterfall?.total_before_tax_and_contingency_cad !== 72174.59) throw new Error('house-cost cash waterfall does not expose the expected central boundary');
+if (house.central?.cost_waterfall?.checks?.project_costs_sum_check !== true || house.central?.cost_waterfall?.checks?.subtotal_plus_project_costs_check !== true) throw new Error('house-cost cash waterfall reconciliation failed');
 console.log(`validated house-cost contract ${house.contract_version} (${house.central.geometry.usable_floor_area_m2} m2 usable reference)`);

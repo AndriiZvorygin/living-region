@@ -289,6 +289,14 @@ main { max-width: 1180px; }
 .house-cost-list dt { color: var(--muted); }
 .house-cost-list dd { margin: 0; font-weight: 800; }
 .house-cost-list .total { border-top: 3px solid var(--teal); border-bottom: 0; padding-top: 16px; color: var(--teal); font-size: 1.12rem; }
+.house-waterfall { margin-top: 24px; padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--teal); background: #f8fbf8; }
+.house-waterfall h3 { margin: 0 0 7px; }
+.house-waterfall > p:not(.eyebrow) { max-width: 72ch; }
+.house-waterfall-breakdown { display: grid; gap: 5px; margin: 0 0 14px; padding: 0; list-style: none; }
+.house-waterfall-breakdown li { display: flex; justify-content: space-between; gap: 18px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.house-waterfall-breakdown li span { display: grid; gap: 2px; }
+.house-waterfall-breakdown small { color: var(--muted); font-size: .78rem; }
+.house-waterfall-breakdown strong { color: var(--teal); }
 .house-highlight { padding: 23px; border-top: 4px solid var(--amber); background: var(--ink); color: #fff; }
 .house-highlight p { color: #e8eee8; }
 .house-highlight strong { display: block; margin: 10px 0; color: #f6d67b; font: 700 2.5rem/1 Georgia, serif; }

@@ -31,6 +31,8 @@ const layoutRows = contract.layout_comparison.map((row) => `| ${row.label} | ${r
 const historicalRows = central.legacy_reconciliation.historical_scope_components.map((row) => `| ${row.scope} | ${money(row.amount_cad)} | ${row.status} |`).join('\n');
 const bridgeRows = central.legacy_reconciliation.bridge_rows.map((row) => `| ${row.component} | ${row.original_scope} / ${money(row.original_amount_cad)} | ${money(row.former_model_amount_cad)} | ${row.new_scope} / ${money(row.new_amount_cad)} | ${signedMoney(row.delta_from_former_model_cad)} | ${row.evidence} |`).join('\n');
 const layerRows = central.pricing_layers.map((layer) => `| ${layer.label} | ${money(layer.incremental_cash_cost_cad)} | ${money(layer.cumulative_cash_cost_cad)} | ${layer.component_ids.join(', ') || 'none'} |`).join('\n');
+const waterfall = central.cost_waterfall;
+const waterfallProjectRows = waterfall.project_cost_rows.map((row) => `| ${row.label} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const waterReconciliation = central.water_package_reconciliation;
 const waterRows = waterReconciliation.current_itemized_rows.map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.quantity_unit} | ${money(row.material_cost_cad)} | ${money(row.included_paid_labour_cad)} | ${money(row.included_fee_cad)} | ${money(row.cash_cost_cad)} | ${row.evidence_status} |`).join('\n');
 const minimalSelectedRows = minimal.components.filter((row) => row.selection_id).map((row) => `| ${row.label} | selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
@@ -58,8 +60,8 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 
 - Supplier package: **${central.supplier_package.source?.name ?? central.supplier_package.supplier_id} ${central.supplier_package.diameter_label}**, ${money(central.supplier_package.selected_price_cad)} (${central.supplier_package.selection_method})
 - Geometry: ${central.geometry.inputs.diameter_m} m diameter; ${central.geometry.gross_floor_area_m2.toFixed(2)} m² gross; ${central.geometry.usable_floor_area_m2.toFixed(2)} m² usable after explicit deductions
-- Direct cash before tax and contingency: **${money(central.totals.direct_cash_before_tax_cad)}**
-- Taxes / HST allowance: ${money(central.totals.taxes_cad)}
+- Total before tax and contingency: **${money(central.totals.direct_cash_before_tax_cad)}**
+- Tax/HST allowance: ${money(central.totals.taxes_cad)}
 - Contingency: ${money(central.totals.contingency_cad)}
 - Completed dwelling cash construction budget: **${money(central.totals.upfront_cash_required_cad)}**
 - Contributed owner-labour value: ${money(central.totals.owner_labour_imputed_cad)}
@@ -80,6 +82,27 @@ ${layerRows}
 - Selected public stage: **${central.selected_stage.label}**, ${money(central.selected_stage.cash_cost_cad)} cash and ${money(central.selected_stage.economic_cost_cad)} economic cost.
 - Selected-stage financing payment: **${money(central.selected_financing.monthly_debt_service_cad)}/month**.
 - Layer reconciliation: ${central.accounting.pricing_layer_sum_check ? 'passed' : 'failed'}; economic layer reconciliation: ${central.accounting.pricing_layer_economic_sum_check ? 'passed' : 'failed'}.
+
+## Cash waterfall
+
+The layer table shows the full price stack. This waterfall makes the boundary between the basic dwelling and external project costs explicit: the first subtotal ends with basic household amenities, then delivery, design and permits are added before tax and contingency.
+
+| Accounting step | Amount |
+| --- | ---: |
+| Basic dwelling subtotal | **${money(waterfall.basic_dwelling_subtotal_cad)}** |
+| Project costs before tax | **${money(waterfall.project_costs_before_tax_cad)}** |
+| Total before tax and contingency | **${money(waterfall.total_before_tax_and_contingency_cad)}** |
+| Tax/HST allowance | **${money(waterfall.tax_hst_allowance_cad)}** |
+| Contingency | **${money(waterfall.contingency_cad)}** |
+| Final cash construction budget | **${money(waterfall.final_cash_construction_budget_cad)}** |
+
+Project costs before tax are the following required or provisional external project rows:
+
+| Project cost | Amount | Evidence status |
+| --- | ---: | --- |
+${waterfallProjectRows}
+
+The project-cost bridge is exactly ${money(waterfall.project_costs_before_tax_cad)} = ${waterfall.project_cost_rows.map((row) => money(row.cash_cost_cad)).join(' + ')}. The subtotal check is ${waterfall.checks.subtotal_plus_project_costs_check ? 'passed' : 'failed'}: basic dwelling subtotal plus project costs before tax equals the total before tax and contingency.
 
 ## Basic completed ARC selection
 

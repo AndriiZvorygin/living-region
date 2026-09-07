@@ -2,7 +2,7 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {financeCapital} from './site-lease-browser.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.1.1';
+export const HOUSE_COST_CONTRACT_VERSION = '4.1.2';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 
@@ -725,6 +725,23 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     cumulativeLayerEconomic += incrementalEconomic;
     return {...definition, incremental_cash_cost_cad: round(incrementalCash), incremental_economic_cost_cad: round(incrementalEconomic), cumulative_cash_cost_cad: round(cumulativeLayerCash), cumulative_economic_cost_cad: round(cumulativeLayerEconomic), component_ids: layerRows.map((row) => row.id)};
   });
+  const basicDwellingLayerIds = new Set(HOUSE_COST_PRICING_LAYERS.slice(0, 4).map((layer) => layer.id));
+  const projectCostRows = activeRows.filter((row) => ['delivery_logistics', 'design_engineering', 'permits'].includes(row.id));
+  const projectCostsBeforeTax = sum(projectCostRows, 'cash_cost_cad');
+  const basicDwellingSubtotal = sum(allLayerRows.filter((row) => basicDwellingLayerIds.has(row.pricing_layer)), 'cash_cost_cad');
+  const costWaterfall = {
+    basic_dwelling_subtotal_cad: round(basicDwellingSubtotal),
+    project_costs_before_tax_cad: round(projectCostsBeforeTax),
+    project_cost_rows: projectCostRows.map((row) => ({id: row.id, label: row.label, cash_cost_cad: round(row.cash_cost_cad), status: row.status, source_note: row.source_note, source_url: row.source_url})),
+    total_before_tax_and_contingency_cad: round(directCashBeforeTax),
+    tax_hst_allowance_cad: round(taxes),
+    contingency_cad: round(contingency),
+    final_cash_construction_budget_cad: round(upfrontCash),
+    checks: {
+      project_costs_sum_check: Math.abs(projectCostsBeforeTax - sum(projectCostRows, 'cash_cost_cad')) < .005,
+      subtotal_plus_project_costs_check: Math.abs(basicDwellingSubtotal + projectCostsBeforeTax - directCashBeforeTax) < .005
+    }
+  };
   const selectedLayerIndex = Math.max(0, (COMPLETION_STAGE_LAYER_COUNTS[input.completionStage] ?? 1) - 1);
   const selectedLayer = pricingLayers[selectedLayerIndex] ?? pricingLayers[0];
   const selectedLayerIds = new Set(pricingLayers.slice(0, selectedLayerIndex + 1).map((layer) => layer.id));
@@ -809,6 +826,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     additional_costs: additionalRows,
     thresholds: {applied: threshold.applied, all_rules: [...evidence.threshold_rules, ...threshold.applied.filter((row) => !evidence.threshold_rules.some((rule) => rule.id === row.id))]},
     pricing_layers: pricingLayers,
+    cost_waterfall: costWaterfall,
     selected_stage: {id: input.completionStage, label: COMPLETION_STAGE_PRESENTATION[input.completionStage].label, description: COMPLETION_STAGE_PRESENTATION[input.completionStage].description, layer_ids: pricingLayers.slice(0, selectedLayerIndex + 1).map((layer) => layer.id), cash_cost_cad: round(selectedCash), economic_cost_cad: round(selectedEconomic), financing_value_cad: round(selectedHeadlineCapital), initial_cash_contribution_cad: round(selectedFinancing.down_payment_cad), financed_principal_cad: round(selectedFinancing.financed_principal_cad), remaining_layer_ids: pricingLayers.slice(selectedLayerIndex + 1).map((layer) => layer.id)},
     stages: {shell: {cash_cost_cad: round(stageTotal('shell')), includes: ['purchased_yurt_package', 'platform BOM', 'additional openings']}, insulated_heated_structure: {cash_cost_cad: round(stageTotal('insulated_heated')), includes: ['shell', 'selected interior completion rows', 'heating', 'ventilation']}, completed_before_tax_and_contingency: {cash_cost_cad: round(directCashBeforeTax), includes: activeRows.map((row) => row.id)}, completed_dwelling: {cash_cost_cad: round(upfrontCash), economic_capital_cad: round(economicCapital), includes: [...activeRows.map((row) => row.id), 'taxes', 'contingency']}},
     totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), selected_stage_cash_cost_cad: round(selectedCash), selected_stage_economic_cost_cad: round(selectedEconomic), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},

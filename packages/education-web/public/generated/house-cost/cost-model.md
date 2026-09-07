@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.1.1 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.1.2 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -31,8 +31,8 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 
 - Supplier package: **Yurts Canada 30 ft**, $36,404.00 (exact_published_or_selected_package)
 - Geometry: 9.144 m diameter; 65.67 m² gross; 63.04 m² usable after explicit deductions
-- Direct cash before tax and contingency: **$72,174.59**
-- Taxes / HST allowance: $9,382.70
+- Total before tax and contingency: **$72,174.59**
+- Tax/HST allowance: $9,382.70
 - Contingency: $6,524.58
 - Completed dwelling cash construction budget: **$88,081.87**
 - Contributed owner-labour value: $1,303.18
@@ -57,6 +57,29 @@ The public starting view is the selected supplier package. It is distinct from t
 - Selected public stage: **Yurt package**, $36,404.00 cash and $36,404.00 economic cost.
 - Selected-stage financing payment: **$211.10/month**.
 - Layer reconciliation: passed; economic layer reconciliation: passed.
+
+## Cash waterfall
+
+The layer table shows the full price stack. This waterfall makes the boundary between the basic dwelling and external project costs explicit: the first subtotal ends with basic household amenities, then delivery, design and permits are added before tax and contingency.
+
+| Accounting step | Amount |
+| --- | ---: |
+| Basic dwelling subtotal | **$66,374.59** |
+| Project costs before tax | **$5,800.00** |
+| Total before tax and contingency | **$72,174.59** |
+| Tax/HST allowance | **$9,382.70** |
+| Contingency | **$6,524.58** |
+| Final cash construction budget | **$88,081.87** |
+
+Project costs before tax are the following required or provisional external project rows:
+
+| Project cost | Amount | Evidence status |
+| --- | ---: | --- |
+| Supplier freight and local delivery | $1,800.00 | quotation_required |
+| Site, structural and servicing design | $3,000.00 | quotation_or_engineering_required |
+| Residual permits and approvals | $1,000.00 | site_specific_fee_required |
+
+The project-cost bridge is exactly $5,800.00 = $1,800.00 + $3,000.00 + $1,000.00. The subtotal check is passed: basic dwelling subtotal plus project costs before tax equals the total before tax and contingency.
 
 ## Basic completed ARC selection
 

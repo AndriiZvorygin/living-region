@@ -1,5 +1,5 @@
 {
-  "contract_version": "4.1.1",
+  "contract_version": "4.1.2",
   "model_id": "arc_yurt_house_cost",
   "title": "ARC four-season yurt house cost model",
   "defaults": {
@@ -2280,7 +2280,7 @@
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
   "central": {
-    "contract_version": "4.1.1",
+    "contract_version": "4.1.2",
     "model_id": "arc_yurt_house_cost",
     "package_label": "First-principles yurt package plus quantity-based completion model",
     "price_basis_date": "2026-09-05",
@@ -5313,6 +5313,44 @@
         ]
       }
     ],
+    "cost_waterfall": {
+      "basic_dwelling_subtotal_cad": 66374.59,
+      "project_costs_before_tax_cad": 5800,
+      "project_cost_rows": [
+        {
+          "id": "delivery_logistics",
+          "label": "Supplier freight and local delivery",
+          "cash_cost_cad": 1800,
+          "status": "quotation_required",
+          "source_note": "Yurts Canada explicitly excludes delivery; amount is a planning allowance pending location and freight quote.",
+          "source_url": null
+        },
+        {
+          "id": "design_engineering",
+          "label": "Site, structural and servicing design",
+          "cash_cost_cad": 3000,
+          "status": "quotation_or_engineering_required",
+          "source_note": null,
+          "source_url": null
+        },
+        {
+          "id": "permits",
+          "label": "Residual permits and approvals",
+          "cash_cost_cad": 1000,
+          "status": "site_specific_fee_required",
+          "source_note": "Water package includes its own CAD 600 allowance; this is a separate residual allowance only.",
+          "source_url": null
+        }
+      ],
+      "total_before_tax_and_contingency_cad": 72174.59,
+      "tax_hst_allowance_cad": 9382.7,
+      "contingency_cad": 6524.58,
+      "final_cash_construction_budget_cad": 88081.87,
+      "checks": {
+        "project_costs_sum_check": true,
+        "subtotal_plus_project_costs_check": true
+      }
+    },
     "selected_stage": {
       "id": "yurt_package",
       "label": "Yurt package",
@@ -6447,7 +6485,7 @@
   },
   "bands": {
     "low": {
-      "contract_version": "4.1.1",
+      "contract_version": "4.1.2",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -9480,6 +9518,44 @@
           ]
         }
       ],
+      "cost_waterfall": {
+        "basic_dwelling_subtotal_cad": 60117.53,
+        "project_costs_before_tax_cad": 5220,
+        "project_cost_rows": [
+          {
+            "id": "delivery_logistics",
+            "label": "Supplier freight and local delivery",
+            "cash_cost_cad": 1620,
+            "status": "quotation_required",
+            "source_note": "Yurts Canada explicitly excludes delivery; amount is a planning allowance pending location and freight quote.",
+            "source_url": null
+          },
+          {
+            "id": "design_engineering",
+            "label": "Site, structural and servicing design",
+            "cash_cost_cad": 2700,
+            "status": "quotation_or_engineering_required",
+            "source_note": null,
+            "source_url": null
+          },
+          {
+            "id": "permits",
+            "label": "Residual permits and approvals",
+            "cash_cost_cad": 900,
+            "status": "site_specific_fee_required",
+            "source_note": "Water package includes its own CAD 600 allowance; this is a separate residual allowance only.",
+            "source_url": null
+          }
+        ],
+        "total_before_tax_and_contingency_cad": 65337.53,
+        "tax_hst_allowance_cad": 3266.88,
+        "contingency_cad": 3430.22,
+        "final_cash_construction_budget_cad": 72034.63,
+        "checks": {
+          "project_costs_sum_check": true,
+          "subtotal_plus_project_costs_check": true
+        }
+      },
       "selected_stage": {
         "id": "yurt_package",
         "label": "Yurt package",
@@ -10613,7 +10689,7 @@
       }
     },
     "central": {
-      "contract_version": "4.1.1",
+      "contract_version": "4.1.2",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -13646,6 +13722,44 @@
           ]
         }
       ],
+      "cost_waterfall": {
+        "basic_dwelling_subtotal_cad": 66374.59,
+        "project_costs_before_tax_cad": 5800,
+        "project_cost_rows": [
+          {
+            "id": "delivery_logistics",
+            "label": "Supplier freight and local delivery",
+            "cash_cost_cad": 1800,
+            "status": "quotation_required",
+            "source_note": "Yurts Canada explicitly excludes delivery; amount is a planning allowance pending location and freight quote.",
+            "source_url": null
+          },
+          {
+            "id": "design_engineering",
+            "label": "Site, structural and servicing design",
+            "cash_cost_cad": 3000,
+            "status": "quotation_or_engineering_required",
+            "source_note": null,
+            "source_url": null
+          },
+          {
+            "id": "permits",
+            "label": "Residual permits and approvals",
+            "cash_cost_cad": 1000,
+            "status": "site_specific_fee_required",
+            "source_note": "Water package includes its own CAD 600 allowance; this is a separate residual allowance only.",
+            "source_url": null
+          }
+        ],
+        "total_before_tax_and_contingency_cad": 72174.59,
+        "tax_hst_allowance_cad": 9382.7,
+        "contingency_cad": 6524.58,
+        "final_cash_construction_budget_cad": 88081.87,
+        "checks": {
+          "project_costs_sum_check": true,
+          "subtotal_plus_project_costs_check": true
+        }
+      },
       "selected_stage": {
         "id": "yurt_package",
         "label": "Yurt package",
@@ -14779,7 +14893,7 @@
       }
     },
     "high": {
-      "contract_version": "4.1.1",
+      "contract_version": "4.1.2",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -17812,6 +17926,44 @@
           ]
         }
       ],
+      "cost_waterfall": {
+        "basic_dwelling_subtotal_cad": 75760.11,
+        "project_costs_before_tax_cad": 6670,
+        "project_cost_rows": [
+          {
+            "id": "delivery_logistics",
+            "label": "Supplier freight and local delivery",
+            "cash_cost_cad": 2070,
+            "status": "quotation_required",
+            "source_note": "Yurts Canada explicitly excludes delivery; amount is a planning allowance pending location and freight quote.",
+            "source_url": null
+          },
+          {
+            "id": "design_engineering",
+            "label": "Site, structural and servicing design",
+            "cash_cost_cad": 3450,
+            "status": "quotation_or_engineering_required",
+            "source_note": null,
+            "source_url": null
+          },
+          {
+            "id": "permits",
+            "label": "Residual permits and approvals",
+            "cash_cost_cad": 1150,
+            "status": "site_specific_fee_required",
+            "source_note": "Water package includes its own CAD 600 allowance; this is a separate residual allowance only.",
+            "source_url": null
+          }
+        ],
+        "total_before_tax_and_contingency_cad": 82430.11,
+        "tax_hst_allowance_cad": 10715.91,
+        "contingency_cad": 11177.52,
+        "final_cash_construction_budget_cad": 104323.55,
+        "checks": {
+          "project_costs_sum_check": true,
+          "subtotal_plus_project_costs_check": true
+        }
+      },
       "selected_stage": {
         "id": "yurt_package",
         "label": "Yurt package",

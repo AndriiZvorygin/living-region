@@ -27,7 +27,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.1.1');
+  assert.equal(result.contract_version, '4.1.2');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -193,6 +193,24 @@ test('layered pricing starts with the supplier package and reconciles every laye
   assert.ok(complete.pricing_layers.every((layer) => layer.component_ids.every((id) => id)));
 });
 
+test('cash waterfall separates the basic dwelling subtotal from project costs', () => {
+  const result = calculateHouseCost({completionStage: 'basic_completed_arc'});
+  const waterfall = result.cost_waterfall;
+  assert.equal(waterfall.basic_dwelling_subtotal_cad, 66374.59);
+  assert.equal(waterfall.project_costs_before_tax_cad, 5800);
+  assert.deepEqual(waterfall.project_cost_rows.map((row) => [row.id, row.cash_cost_cad]), [
+    ['delivery_logistics', 1800],
+    ['design_engineering', 3000],
+    ['permits', 1000]
+  ]);
+  assert.equal(waterfall.total_before_tax_and_contingency_cad, 72174.59);
+  assert.equal(waterfall.tax_hst_allowance_cad, 9382.70);
+  assert.equal(waterfall.contingency_cad, 6524.58);
+  assert.equal(waterfall.final_cash_construction_budget_cad, 88081.87);
+  assert.equal(waterfall.checks.project_costs_sum_check, true);
+  assert.equal(waterfall.checks.subtotal_plus_project_costs_check, true);
+});
+
 test('completion stages expose outstanding work and stage-specific financing', () => {
   const packageStage = calculateHouseCost({completionStage: 'yurt_package'});
   const platformStage = calculateHouseCost({completionStage: 'platform_supported_shell'});
@@ -207,7 +225,7 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.1.1');
+  assert.equal(contract.contract_version, '4.1.2');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));
@@ -222,6 +240,9 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.ok(contract.procurement_routes.yurts_canada_purchased_package);
   assert.equal(contract.procurement_routes.local_fabrication_owner_built.status, 'unmodeled');
   assert.equal(contract.central.water_package_reconciliation.difference_cad, 804.62);
+  assert.equal(contract.central.cost_waterfall.project_costs_before_tax_cad, 5800);
+  assert.equal(contract.central.cost_waterfall.basic_dwelling_subtotal_cad, 66374.59);
+  assert.equal(contract.central.cost_waterfall.checks.subtotal_plus_project_costs_check, true);
 });
 
 test('basic completed preset selects only itemized minimal completion components', () => {
