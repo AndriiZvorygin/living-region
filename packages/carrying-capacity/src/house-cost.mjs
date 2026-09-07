@@ -2,7 +2,7 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {calculateMortgage, calculateMortgageScenarios, HOUSE_MORTGAGE_CONTRACT_VERSION, HOUSE_MORTGAGE_RATE_EVIDENCE} from './mortgage.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.3.0';
+export const HOUSE_COST_CONTRACT_VERSION = '4.4.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 export const MIN_RESIDENTIAL_DIAMETER_M = 6.096;
@@ -558,6 +558,17 @@ function marketPrice(value, band) {
   return nonNegative(value) * finite(MARKET_BAND_FACTORS[band], 1);
 }
 
+function annotateResidentialPackage(row) {
+  const ordinary = row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M;
+  return {
+    ...row,
+    ordinary_residential_eligible: ordinary,
+    residential_use: ordinary
+      ? (row.residential_use ?? 'ordinary_full_time_year_round_candidate')
+      : 'shell_only_seasonal_experimental_or_special_engineering'
+  };
+}
+
 function packageForOptions(input) {
   const priced = marketEvidence.yurt_packages.filter((row) => finite(row.price_cad, 0) > 0);
   const residentialPriced = priced.filter((row) => row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M);
@@ -566,7 +577,7 @@ function packageForOptions(input) {
   const supplierPriced = residentialPriced.filter((row) => row.supplier_id === supplierId);
   const candidates = supplierPriced.length ? supplierPriced : residentialPriced.filter((row) => row.supplier_id === 'yurts_canada');
   const exact = requested?.price_cad ? requested : candidates.find((row) => Math.abs(row.diameter_m - input.design.diameter_m) < 0.0001);
-  if (exact) return {...exact, ordinary_residential_eligible: true, residential_use: 'ordinary_full_time_year_round_candidate', selection_method: 'exact_published_or_selected_package', source: marketEvidence.suppliers.find((row) => row.id === exact.supplier_id)};
+  if (exact) return {...annotateResidentialPackage(exact), selection_method: 'exact_published_or_selected_package', source: marketEvidence.suppliers.find((row) => row.id === exact.supplier_id)};
   const ordered = [...candidates].sort((a, b) => a.diameter_m - b.diameter_m);
   const lower = [...ordered].reverse().find((row) => row.diameter_m <= input.design.diameter_m) ?? ordered[0];
   const upper = ordered.find((row) => row.diameter_m >= input.design.diameter_m) ?? ordered.at(-1);
@@ -583,7 +594,7 @@ function packageForOptions(input) {
     selection_method: extrapolated ? 'extrapolated_from_nearest_published_sizes' : 'linear_interpolation_between_published_sizes',
     interpolation: {lower_package_id: lower.id, upper_package_id: upper.id, proportion, extrapolated},
     ordinary_residential_eligible: true,
-    residential_use: 'ordinary_full_time_year_round_candidate',
+    residential_use: upper.residential_use ?? 'ordinary_full_time_year_round_candidate',
     source: marketEvidence.suppliers.find((row) => row.id === upper.supplier_id)
   };
 }
@@ -907,7 +918,17 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     completion_selections: input.completionSelections,
     design: geometry.inputs,
     geometry,
-    supplier_package: {...yurtPackage, selected_price_cad: round(marketPrice(yurtPackage.price_cad, input.band)), published_price_cad: yurtPackage.price_cad, price_currency: 'CAD', source_url: yurtPackage.source?.source_url, inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null},
+    supplier_package: {
+      ...yurtPackage,
+      selected_price_cad: round(marketPrice(yurtPackage.price_cad, input.band)),
+      published_price_cad: yurtPackage.price_currency === 'USD' ? null : yurtPackage.price_cad,
+      published_price_usd: yurtPackage.price_currency === 'USD' ? yurtPackage.price_usd : null,
+      estimated_price_cad: yurtPackage.price_currency === 'USD' ? round(yurtPackage.estimated_price_cad ?? yurtPackage.price_cad) : null,
+      price_conversion: yurtPackage.price_currency === 'USD' ? marketEvidence.currency_conversion : null,
+      price_currency: yurtPackage.price_currency ?? 'CAD',
+      source_url: yurtPackage.source?.source_url,
+      inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null
+    },
     servicing: {mode: input.servicingMode, label: evidence.servicing_modes[input.servicingMode]?.label, description: evidence.servicing_modes[input.servicingMode]?.description, status: itemizedPackage?.status ?? 'alternative_package_placeholder', components: serviceComponents, historical_reference_components: evidence.servicing_modes[input.servicingMode]?.components ?? null, shared_infrastructure_additions: evidence.servicing_modes[input.servicingMode]?.shared_infrastructure_additions ?? {}, itemized_package: itemizedPackage},
     procurement_routes: evidence.procurement_routes,
     water_package_reconciliation: waterPackageReconciliation,
@@ -929,7 +950,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), pricing_layer_sum_check: round(cumulativeLayerCash) === round(upfrontCash), pricing_layer_economic_sum_check: Math.abs(cumulativeLayerEconomic - economicCapital) < .05, pricing_layer_economic_residual_cad: roundSigned(cumulativeLayerEconomic - economicCapital, 4), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
     input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
     evidence: sourceList,
-    market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors, yurt_packages: marketEvidence.yurt_packages.map((row) => ({...row, ordinary_residential_eligible: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M, residential_use: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M ? 'ordinary_full_time_year_round_candidate' : 'shell_only_seasonal_experimental_or_special_engineering'}))},
+    market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, currency_conversion: marketEvidence.currency_conversion, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors, yurt_packages: marketEvidence.yurt_packages.map(annotateResidentialPackage)},
     occupancy_compliance: calculateOccupancyCompliance(geometry, input.design.occupancy),
     residential_shell_policy: evidence.residential_shell_policy,
     assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method, completion_stage: input.completionStage, completion_selections: input.completionSelections}
@@ -965,7 +986,7 @@ export function buildHouseCostPresentationContract(options = {}) {
     procurement_routes: evidence.procurement_routes,
     component_evidence: evidence.components,
     pricing_model: marketEvidence.pricing_model_id,
-    market_evidence: {...marketEvidence, yurt_packages: marketEvidence.yurt_packages.map((row) => ({...row, ordinary_residential_eligible: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M, residential_use: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M ? 'ordinary_full_time_year_round_candidate' : 'shell_only_seasonal_experimental_or_special_engineering'}))},
+    market_evidence: {...marketEvidence, yurt_packages: marketEvidence.yurt_packages.map(annotateResidentialPackage)},
     threshold_rules: evidence.threshold_rules,
     legacy_arc_benchmark: evidence.legacy_arc_benchmark,
     central: bands.central,
@@ -973,7 +994,7 @@ export function buildHouseCostPresentationContract(options = {}) {
     diameter_sensitivity: diameterSensitivity,
     residential_shell_policy: evidence.residential_shell_policy,
     occupancy_code_model: evidence.occupancy_code_model,
-    supplier_diameter_options: Object.fromEntries([...new Set(marketEvidence.yurt_packages.map((row) => row.supplier_id))].map((supplierId) => [supplierId, marketEvidence.yurt_packages.filter((row) => finite(row.price_cad, 0) > 0 && row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M && row.supplier_id === supplierId).map((row) => ({id: row.id, label: row.diameter_label, diameter_m: row.diameter_m, evidence_status: row.evidence_status}))])),
+    supplier_diameter_options: Object.fromEntries([...new Set(marketEvidence.yurt_packages.map((row) => row.supplier_id))].map((supplierId) => [supplierId, marketEvidence.yurt_packages.filter((row) => finite(row.price_cad, 0) > 0 && row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M && row.supplier_id === supplierId).sort((a, b) => a.diameter_m - b.diameter_m).map((row) => ({id: row.id, label: row.diameter_label, diameter_m: row.diameter_m, price_currency: row.price_currency ?? 'CAD', price_usd: row.price_usd ?? null, estimated_price_cad: row.price_currency === 'USD' ? row.estimated_price_cad ?? row.price_cad : null, evidence_status: row.evidence_status, residential_use: row.residential_use ?? 'ordinary_full_time_year_round_candidate'}))])),
     layout_comparison: comparison,
     accounting_rules: evidence.accounting_rules,
     sources: evidence.sources,

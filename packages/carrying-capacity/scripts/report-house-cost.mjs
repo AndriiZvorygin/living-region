@@ -14,10 +14,13 @@ const hours = (value) => `${Number(value ?? 0).toLocaleString('en-CA', {maximumF
 const quantity = (value) => Number(value ?? 0).toLocaleString('en-CA', {maximumFractionDigits: 3});
 const packageRows = contract.market_evidence.yurt_packages.map((row) => {
   const supplier = contract.market_evidence.suppliers.find((item) => item.id === row.supplier_id);
-  const price = row.price_cad == null ? 'quote required' : money(row.price_cad);
-  const residentialUse = row.ordinary_residential_eligible ? 'ordinary residential candidate' : 'evidence only: shell-only / seasonal / experimental / special engineering';
+  const price = row.price_currency === 'USD'
+    ? `${money(row.price_usd).replace('$', 'US$')} USD base; ~${money(row.estimated_price_cad ?? row.price_cad)} CAD at ${Number(contract.market_evidence.currency_conversion?.rate ?? 0).toFixed(4)} USD/CAD`
+    : row.price_cad == null ? 'quote required' : `${money(row.price_cad)} CAD`;
+  const residentialUse = row.ordinary_residential_eligible ? (row.residential_use === 'larger_imported_shell' ? 'larger imported shell' : 'ordinary residential candidate') : 'evidence only: shell-only / seasonal / experimental / special engineering';
   return `| ${supplier?.name ?? row.supplier_id} | ${row.diameter_label} | ${price} | ${row.price_basis} | ${row.evidence_status} · ${residentialUse} |`;
 }).join('\n');
+const importedPackageRows = contract.market_evidence.yurt_packages.filter((row) => row.price_currency === 'USD').map((row) => `| ${row.diameter_label} | ${money(row.price_usd).replace('$', 'US$')} | ${money(row.estimated_price_cad ?? row.price_cad)} | ${(row.quote_required_items ?? []).join('; ')} | ${(row.structural_review_flags ?? []).join('; ')} |`).join('\n');
 const componentRows = central.components.map((row) => `| ${row.label} | ${quantity(row.quantity)} | ${row.unit} | ${money(row.unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const platformRows = central.components.filter((row) => row.id.startsWith('platform_')).map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.unit} | ${money(row.base_unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.source_url ? `[source](${row.source_url})` : 'allowance / quote required'} |`).join('\n');
 const utilityRows = central.components.filter((row) => row.id.startsWith('water_') || row.id.startsWith('compact_') || row.id.startsWith('sink_') || row.id.startsWith('composting_') || row.id.startsWith('class_') || row.id.startsWith('qualified_water') || row.id.startsWith('pv_') || row.id.startsWith('mppt_') || row.id.startsWith('lead_') || row.id.startsWith('pure_') || row.id.startsWith('dc_') || row.id.startsWith('electrical_') || row.id.startsWith('solar_') || row.id.startsWith('hot_water_') || row.id.startsWith('thermosiphon_')).map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.unit} | ${money(row.unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
@@ -56,7 +59,15 @@ The package price is the starting input. The old ARC dwelling estimate is not us
 | --- | ---: | ---: | --- | --- |
 ${packageRows}
 
-Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Shelter Designs Big Sky rows are published USD base prices for imported shell packages; their CAD equivalents use the recorded Bank of Canada conversion only and do not include Canadian delivery, customs, brokerage, installation, engineering or approvals. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+
+### Shelter Designs Big Sky imported-shell review
+
+These rows are **larger imported shell** evidence, not installed Canadian dwelling prices. The recorded conversion is ${Number(contract.market_evidence.currency_conversion?.rate ?? 0).toFixed(4)} USD/CAD on ${contract.market_evidence.currency_conversion?.rate_date}; international delivery, customs, brokerage, local installation, Canadian engineering, taxes and approvals remain separate.
+
+| Diameter | Published base | Estimated CAD equivalent | Quote-required additions | Structural / approval flags |
+| --- | ---: | ---: | --- | --- |
+${importedPackageRows}
 
 ## Procurement routes
 
@@ -84,7 +95,7 @@ This result is independently calculated from a published supplier package, quant
 
 - Ordinary residential selector minimum: **${contract.residential_shell_policy.minimum_diameter_label}** (${contract.residential_shell_policy.minimum_diameter_m} m); existing default: **${contract.defaults.diameter_m} m / 30 ft**.
 - 12 ft and 16 ft records remain supplier evidence only and are excluded from ordinary residential, completed-dwelling and mortgage calculations.
-- Exact larger supplier evidence is supplier-specific: the 32 ft Out Factory estimate is available under that supplier; custom sizes outside exact rows are labelled interpolated or extrapolated.
+- Exact larger supplier evidence is supplier-specific: the 27 ft, 35 ft and 40 ft Shelter Designs Big Sky base prices are available as larger imported-shell evidence, alongside the 32 ft Out Factory estimate; custom sizes outside exact rows are labelled interpolated or extrapolated.
 - The Ontario guidance reference is **${contract.occupancy_code_model.open_concept.total_minimum_finished_floor_area_m2} m²** for an open-concept tiny-home example. This is a reference screen, not automatic approval.
 
 | Occupancy/code check | Result | Detail |

@@ -45,14 +45,18 @@
     {"id": "20ft", "label": "6.096 m / 20 ft", "diameter_m": 6.096},
     {"id": "24ft", "label": "7.315 m / 24 ft", "diameter_m": 7.3152},
     {"id": "30ft", "label": "9.144 m / 30 ft", "diameter_m": 9.144},
-    {"id": "32ft_out_factory", "label": "9.754 m / 32 ft · Out Factory estimate", "diameter_m": 9.7536, "supplier_id": "the_out_factory"}
+    {"id": "27ft_shelter_designs", "label": "8.230 m / 27 ft · Shelter Designs Big Sky base", "diameter_m": 8.2296, "supplier_id": "shelter_designs"},
+    {"id": "32ft_out_factory", "label": "9.754 m / 32 ft · Out Factory estimate", "diameter_m": 9.7536, "supplier_id": "the_out_factory"},
+    {"id": "35ft_shelter_designs", "label": "10.668 m / 35 ft · Shelter Designs Big Sky base", "diameter_m": 10.668, "supplier_id": "shelter_designs"},
+    {"id": "40ft_shelter_designs", "label": "12.192 m / 40 ft · Shelter Designs Big Sky base", "diameter_m": 12.192, "supplier_id": "shelter_designs"}
   ],
   "residential_shell_policy": {
     "minimum_diameter_m": 6.096,
     "minimum_diameter_label": "20 ft",
     "ordinary_scope": "full_time_year_round_residential_dwelling",
     "default_diameter_m": 9.144,
-    "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+    "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Exact 27 ft, 35 ft and 40 ft Shelter Designs Big Sky base prices are shown as larger imported shells; freight, customs, brokerage, installation, tax and Canadian engineering remain quote-required.",
+    "larger_imported_shell_note": "Shelter Designs Big Sky publishes USD base prices for larger shells. The CAD figures shown by Living Region are indicative conversions only and are not installed Canadian dwelling prices.",
     "excluded_from_ordinary_calculations": ["12 ft", "16 ft"],
     "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
     "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
@@ -227,6 +231,8 @@
     {"id": "arc_legacy", "institution": "Living Region", "title": "ARC dwelling cost evidence", "url": "https://github.com/AndriiZvorygin/living-region/blob/main/packages/carrying-capacity/data/source/arc-dwelling-costs.json", "classification": "derived from existing Living Region evidence", "note": "Existing integrated ARC package and utility components; original underlying quote remains unrecovered."},
     {"id": "biome_yurt", "institution": "Biome Canada", "title": "The Yurt", "url": "https://biome-canada.ca/products/the-yurt/", "classification": "supplier specification", "note": "Canadian diameter options and included structural/envelope elements support geometry and component boundaries; price is not adopted as a local installed quote."},
     {"id": "yurts_canada", "institution": "Yurts Canada", "title": "Pricing and FAQs", "url": "https://www.yurts-canada.ca/pricing-faqs1", "classification": "supplier specification", "note": "Canadian four-season package and installation/specification context; current quote required for a project."},
+    {"id": "shelter_designs_big_sky", "institution": "Shelter Designs", "title": "Big Sky yurt kits for sale", "url": "https://www.shelterdesigns.net/custom-yurt-kits-for-sale/big-sky-yurt/", "classification": "published imported supplier USD base price", "note": "Published Big Sky base prices for 27 ft, 35 ft and 40 ft are imported shell evidence. Shipping/customs, final delivery, installation, Canadian engineering and local approvals are not included in the base price."},
+    {"id": "bank_of_canada_usd_cad", "institution": "Bank of Canada", "title": "Daily exchange rates", "url": "https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates-lookup/", "classification": "official indicative exchange rate", "note": "USD/CAD conversion used only to display an estimated Canadian equivalent; observed 2026-09-04. Supplier pricing remains published in USD."},
     {"id": "ontario_tiny_code", "institution": "Government of Ontario", "title": "Build or buy a tiny home: Building Code requirements", "url": "https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-requirements", "classification": "official requirement guidance", "note": "Year-round homes require Building Code compliance, plumbing, energy efficiency, foundations/anchorage and site-specific water/sewage review."},
     {"id": "ontario_tiny_permits", "institution": "Government of Ontario", "title": "Build or buy a tiny home: permits and inspections", "url": "https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-permits-and-inspections", "classification": "official requirement guidance", "note": "Building permits and inspections apply to on-site and factory-built tiny homes."},
     {"id": "grey_development_charges", "institution": "Grey County", "title": "Development charges", "url": "https://www.grey.ca/government/development-charges", "classification": "official fee schedule", "note": "Development charges are payable when a building permit is issued; actual applicability and current fee require municipal confirmation."},

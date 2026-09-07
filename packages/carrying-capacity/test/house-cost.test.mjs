@@ -29,7 +29,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.3.0');
+  assert.equal(result.contract_version, '4.4.0');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -227,7 +227,7 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.3.0');
+  assert.equal(contract.contract_version, '4.4.0');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));
@@ -272,6 +272,45 @@ test('32 ft exact evidence is supplier-specific while 12 ft and 16 ft remain evi
   assert.equal(contract.central.market_evidence.yurt_packages.find((row) => row.diameter_label === '16 ft').ordinary_residential_eligible, false);
   const outFactory = calculateHouseCost({yurtSupplierId: 'the_out_factory', design: {diameter_m: 9.7536}});
   assert.equal(outFactory.supplier_package.id, 'tof_32_import_estimate');
+});
+
+test('Shelter Designs 35 ft and 40 ft are larger imported shells with separate CAD estimates and review requirements', () => {
+  const contract = buildHouseCostPresentationContract();
+  const shelterOptions = contract.supplier_diameter_options.shelter_designs;
+  assert.deepEqual(shelterOptions.map((row) => row.label), ['20 ft', '24 ft', '27 ft', '30 ft', '35 ft', '40 ft']);
+  const shell35Evidence = contract.market_evidence.yurt_packages.find((row) => row.id === 'sd_35_big_sky_base');
+  const shell40Evidence = contract.market_evidence.yurt_packages.find((row) => row.id === 'sd_40_big_sky_base');
+  assert.equal(shell35Evidence.price_usd, 29780);
+  assert.equal(shell40Evidence.price_usd, 39100);
+  assert.equal(shell35Evidence.estimated_price_cad, 41215.52);
+  assert.equal(shell40Evidence.estimated_price_cad, 54114.4);
+  assert.equal(shell35Evidence.residential_use, 'larger_imported_shell');
+  assert.equal(shell40Evidence.residential_use, 'larger_imported_shell');
+  assert.equal(shell35Evidence.installation_status, 'not_included');
+  assert.ok(shell35Evidence.quote_required_items.includes('customs and import charges'));
+  assert.ok(shell35Evidence.quote_required_items.includes('Canadian engineering'));
+  assert.ok(shell35Evidence.structural_review_flags.includes('snow and wind loads'));
+  assert.ok(shell35Evidence.structural_review_flags.includes('foundation and frost conditions'));
+  assert.equal(contract.market_evidence.currency_conversion.rate, 1.384);
+  assert.equal(contract.market_evidence.currency_conversion.rate_date, '2026-09-04');
+
+  const shell35 = calculateHouseCost({yurtSupplierId: 'shelter_designs', design: {diameter_m: 10.668}});
+  const shell40 = calculateHouseCost({yurtSupplierId: 'shelter_designs', design: {diameter_m: 12.192}});
+  const reference = calculateHouseCost({design: {diameter_m: 9.144}});
+  assert.equal(shell35.supplier_package.id, 'sd_35_big_sky_base');
+  assert.equal(shell40.supplier_package.id, 'sd_40_big_sky_base');
+  assert.equal(shell35.supplier_package.published_price_usd, 29780);
+  assert.equal(shell40.supplier_package.published_price_usd, 39100);
+  assert.equal(shell35.supplier_package.price_currency, 'USD');
+  assert.equal(shell35.supplier_package.installation_status, 'not_included');
+  assert.ok(shell35.geometry.footprint_m2 > reference.geometry.footprint_m2);
+  assert.ok(shell40.geometry.footprint_m2 > shell35.geometry.footprint_m2);
+  assert.ok(shell35.components.find((row) => row.id === 'platform_decking').quantity > reference.components.find((row) => row.id === 'platform_decking').quantity);
+  assert.ok(shell40.components.find((row) => row.id === 'platform_decking').quantity > shell35.components.find((row) => row.id === 'platform_decking').quantity);
+  assert.notEqual(shell35.supplier_package.selected_price_cad, reference.supplier_package.selected_price_cad);
+  assert.notEqual(shell40.supplier_package.selected_price_cad, reference.supplier_package.selected_price_cad);
+  assert.ok(shell35.thresholds.applied.some((row) => row.id === 'large_diameter_9_144'));
+  assert.ok(shell40.thresholds.applied.some((row) => row.id === 'large_diameter_10_668'));
 });
 
 test('occupancy screen uses Ontario open-concept reference and evaluates code-sensitive requirements', () => {

@@ -40,7 +40,7 @@ const house = JSON.parse(fs.readFileSync(housePath, 'utf8'));
 if (!house.contract_version || house.model_id !== 'arc_yurt_house_cost' || !house.central || !house.bands || !house.central.geometry) throw new Error('house-cost contract is incomplete');
 if (!house.central.accounting?.utility_single_home) throw new Error('house-cost contract must enforce one household utility package');
 if (house.central.geometry.roof_sloping_area_m2 <= house.central.geometry.footprint_m2) throw new Error('house-cost contract must use sloping roof area');
-if (house.contract_version !== '4.3.0') throw new Error('house-cost contract must expose the residential shell and occupancy v4.3.0 accounting');
+if (house.contract_version !== '4.4.0') throw new Error('house-cost contract must expose the larger imported residential shells v4.4.0 accounting');
 if (!house.market_evidence?.pricing_model_id || !house.market_evidence?.yurt_packages?.length) throw new Error('house-cost contract is missing sourced yurt package evidence');
 if (!house.central.supplier_package?.selected_price_cad || !house.central.supplier_package?.source_url) throw new Error('house-cost contract is missing the selected supplier package');
 if (!house.central.market_evidence?.platform_design?.rows?.length) throw new Error('house-cost contract is missing the platform quantity design');
@@ -53,6 +53,12 @@ if (house.defaults?.financing?.down_payment_rate !== 0.2) throw new Error('house
 if (!house.residential_shell_policy || house.residential_shell_policy.minimum_diameter_m !== 6.096) throw new Error('house-cost contract is missing the 20 ft residential shell boundary');
 if (!house.occupancy_code_model?.source?.url || house.occupancy_code_model.open_concept?.total_minimum_finished_floor_area_m2 !== 17.5) throw new Error('house-cost contract is missing the Ontario occupancy reference');
 if (house.supplier_diameter_options?.yurts_canada?.some((row) => row.diameter_m < 6.096)) throw new Error('ordinary Yurts Canada options must exclude 12 ft and 16 ft shells');
+if (!house.supplier_diameter_options?.shelter_designs?.some((row) => row.diameter_m === 10.668) || !house.supplier_diameter_options?.shelter_designs?.some((row) => row.diameter_m === 12.192)) throw new Error('Shelter Designs 35 ft and 40 ft residential options are missing');
+if (house.market_evidence?.currency_conversion?.rate !== 1.384 || house.market_evidence.currency_conversion.rate_date !== '2026-09-04') throw new Error('house-cost contract is missing the dated USD/CAD conversion evidence');
+for (const diameter of [10.668, 12.192]) {
+  const row = house.market_evidence.yurt_packages.find((item) => item.supplier_id === 'shelter_designs' && item.diameter_m === diameter);
+  if (!row || row.price_currency !== 'USD' || row.price_usd == null || row.estimated_price_cad == null || row.residential_use !== 'larger_imported_shell' || row.installation_status !== 'not_included' || row.quote_required_items?.length < 5 || row.structural_review_flags?.length < 5) throw new Error(`Shelter Designs ${diameter} ft evidence boundary is incomplete`);
+}
 if (!Array.isArray(house.pricing_layers) || house.pricing_layers.length !== 5) throw new Error('house-cost contract must expose five pricing layers');
 if (house.pricing_layers.at(-1)?.label !== 'Delivery, design, permits, tax and contingency') throw new Error('house-cost final layer label is stale');
 if (house.central?.water_package_reconciliation?.difference_cad !== 804.62) throw new Error('house-cost water-package reconciliation is missing or changed');

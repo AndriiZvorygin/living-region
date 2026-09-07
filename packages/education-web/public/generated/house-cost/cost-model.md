@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.3.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.4.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -8,19 +8,38 @@ The package price is the starting input. The old ARC dwelling estimate is not us
 
 | Supplier | Diameter | Published / estimated price | Price basis | Evidence status |
 | --- | ---: | ---: | --- | --- |
-| Yurts Canada | 12 ft | $12,420.00 | installed | published_supplier_price · evidence only: shell-only / seasonal / experimental / special engineering |
-| Yurts Canada | 16 ft | $16,451.00 | installed | published_supplier_price · evidence only: shell-only / seasonal / experimental / special engineering |
-| Yurts Canada | 20 ft | $19,252.00 | installed | published_supplier_price · ordinary residential candidate |
-| Yurts Canada | 24 ft | $25,681.00 | installed | published_supplier_price · ordinary residential candidate |
-| Yurts Canada | 30 ft | $36,404.00 | installed | published_supplier_price · ordinary residential candidate |
-| The Out Factory | 20 ft | $32,958.00 | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
-| The Out Factory | 24 ft | $37,699.00 | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
-| The Out Factory | 32 ft | $57,852.00 | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| Yurts Canada | 12 ft | $12,420.00 CAD | installed | published_supplier_price · evidence only: shell-only / seasonal / experimental / special engineering |
+| Yurts Canada | 16 ft | $16,451.00 CAD | installed | published_supplier_price · evidence only: shell-only / seasonal / experimental / special engineering |
+| Yurts Canada | 20 ft | $19,252.00 CAD | installed | published_supplier_price · ordinary residential candidate |
+| Yurts Canada | 24 ft | $25,681.00 CAD | installed | published_supplier_price · ordinary residential candidate |
+| Yurts Canada | 30 ft | $36,404.00 CAD | installed | published_supplier_price · ordinary residential candidate |
+| The Out Factory | 20 ft | $32,958.00 CAD | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| The Out Factory | 24 ft | $37,699.00 CAD | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| The Out Factory | 32 ft | $57,852.00 CAD | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| Shelter Designs | 27 ft | US$17,950.00 USD base; ~$24,842.80 CAD at 1.3840 USD/CAD | published USD Big Sky base; CAD conversion estimate | published_usd_base_imported_shell · larger imported shell |
+| Shelter Designs | 20 ft | US$13,850.00 USD base; ~$19,168.40 CAD at 1.3840 USD/CAD | published USD Big Sky base; CAD conversion estimate | published_usd_base_imported_shell · ordinary residential candidate |
+| Shelter Designs | 24 ft | US$15,850.00 USD base; ~$21,936.40 CAD at 1.3840 USD/CAD | published USD Big Sky base; CAD conversion estimate | published_usd_base_imported_shell · ordinary residential candidate |
+| Shelter Designs | 30 ft | US$19,990.00 USD base; ~$27,666.16 CAD at 1.3840 USD/CAD | published USD Big Sky base; CAD conversion estimate | published_usd_base_imported_shell · ordinary residential candidate |
+| Shelter Designs | 35 ft | US$29,780.00 USD base; ~$41,215.52 CAD at 1.3840 USD/CAD | published USD Big Sky base; CAD conversion estimate | published_usd_base_imported_shell · larger imported shell |
+| Shelter Designs | 40 ft | US$39,100.00 USD base; ~$54,114.40 CAD at 1.3840 USD/CAD | published USD Big Sky base; CAD conversion estimate | published_usd_base_imported_shell · larger imported shell |
 | Biome Canada | 20 ft | quote required | quote required | configurator_options_quote_required · ordinary residential candidate |
 | Biome Canada | 24 ft | quote required | quote required | configurator_options_quote_required · ordinary residential candidate |
 | Biome Canada | 30 ft | quote required | quote required | configurator_options_quote_required · ordinary residential candidate |
 
-Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Shelter Designs Big Sky rows are published USD base prices for imported shell packages; their CAD equivalents use the recorded Bank of Canada conversion only and do not include Canadian delivery, customs, brokerage, installation, engineering or approvals. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+
+### Shelter Designs Big Sky imported-shell review
+
+These rows are **larger imported shell** evidence, not installed Canadian dwelling prices. The recorded conversion is 1.3840 USD/CAD on 2026-09-04; international delivery, customs, brokerage, local installation, Canadian engineering, taxes and approvals remain separate.
+
+| Diameter | Published base | Estimated CAD equivalent | Quote-required additions | Structural / approval flags |
+| --- | ---: | ---: | --- | --- |
+| 27 ft | US$17,950.00 | $24,842.80 | international freight and final Ontario delivery; customs and import charges; Canadian brokerage; local installation; Canadian engineering; taxes and approvals | snow and wind loads; reinforced rafters and connections; platform design; transport and unloading; foundation and frost conditions; anchorage and uplift; local building-code and occupancy approval |
+| 20 ft | US$13,850.00 | $19,168.40 | international freight and final Ontario delivery; customs and import charges; Canadian brokerage; local installation; Canadian engineering; taxes and approvals | snow and wind loads; reinforced rafters and connections; platform design; transport and unloading; foundation and frost conditions; anchorage and uplift; local building-code and occupancy approval |
+| 24 ft | US$15,850.00 | $21,936.40 | international freight and final Ontario delivery; customs and import charges; Canadian brokerage; local installation; Canadian engineering; taxes and approvals | snow and wind loads; reinforced rafters and connections; platform design; transport and unloading; foundation and frost conditions; anchorage and uplift; local building-code and occupancy approval |
+| 30 ft | US$19,990.00 | $27,666.16 | international freight and final Ontario delivery; customs and import charges; Canadian brokerage; local installation; Canadian engineering; taxes and approvals | snow and wind loads; reinforced rafters and connections; platform design; transport and unloading; foundation and frost conditions; anchorage and uplift; local building-code and occupancy approval |
+| 35 ft | US$29,780.00 | $41,215.52 | international freight and final Ontario delivery; customs and import charges; Canadian brokerage; local installation; Canadian engineering; taxes and approvals | snow and wind loads; reinforced rafters and connections; platform design; transport and unloading; foundation and frost conditions; anchorage and uplift; local building-code and occupancy approval |
+| 40 ft | US$39,100.00 | $54,114.40 | international freight and final Ontario delivery; customs and import charges; Canadian brokerage; local installation; Canadian engineering; taxes and approvals | snow and wind loads; reinforced rafters and connections; platform design; transport and unloading; foundation and frost conditions; anchorage and uplift; local building-code and occupancy approval |
 
 ## Procurement routes
 
@@ -48,7 +67,7 @@ This result is independently calculated from a published supplier package, quant
 
 - Ordinary residential selector minimum: **20 ft** (6.096 m); existing default: **9.144 m / 30 ft**.
 - 12 ft and 16 ft records remain supplier evidence only and are excluded from ordinary residential, completed-dwelling and mortgage calculations.
-- Exact larger supplier evidence is supplier-specific: the 32 ft Out Factory estimate is available under that supplier; custom sizes outside exact rows are labelled interpolated or extrapolated.
+- Exact larger supplier evidence is supplier-specific: the 27 ft, 35 ft and 40 ft Shelter Designs Big Sky base prices are available as larger imported-shell evidence, alongside the 32 ft Out Factory estimate; custom sizes outside exact rows are labelled interpolated or extrapolated.
 - The Ontario guidance reference is **17.5 m²** for an open-concept tiny-home example. This is a reference screen, not automatic approval.
 
 | Occupancy/code check | Result | Detail |
@@ -323,7 +342,10 @@ The total bridge is direct cash -$12,873.14, tax -$1,543.51, contingency -$1,153
 | 6.096 m / 20 ft | 28.0 | $60,766.54 | $61,510.02 | $2,195.30 | none |
 | 7.315 m / 24 ft | 40.3 | $70,941.28 | $71,890.96 | $1,781.81 | none |
 | 9.144 m / 30 ft | 63.0 | $88,081.87 | $89,385.05 | $1,417.85 | none |
+| 8.230 m / 27 ft · Shelter Designs Big Sky base | 51.1 | $71,755.22 | $72,866.57 | $1,426.95 | none |
 | 9.754 m / 32 ft · Out Factory estimate | 71.7 | $119,318.13 | $120,757.68 | $1,683.54 | large_diameter_9_144 |
+| 10.668 m / 35 ft · Shelter Designs Big Sky base | 85.8 | $101,774.94 | $103,452.08 | $1,205.62 | large_diameter_9_144 |
+| 12.192 m / 40 ft · Shelter Designs Big Sky base | 112.1 | $128,420.18 | $130,500.18 | $1,164.39 | large_diameter_9_144, large_diameter_10_668 |
 
 | Layout | Usable m² | Cash budget | Economic cost | Owner hours | Paid hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -347,6 +369,8 @@ Interpolated sizes are labelled in the JSON contract. Thresholds for larger span
 - [Living Region: ARC dwelling cost evidence](https://github.com/AndriiZvorygin/living-region/blob/main/packages/carrying-capacity/data/source/arc-dwelling-costs.json) - derived from existing Living Region evidence. Existing integrated ARC package and utility components; original underlying quote remains unrecovered.
 - [Biome Canada: The Yurt](https://biome-canada.ca/products/the-yurt/) - supplier specification. Canadian diameter options and included structural/envelope elements support geometry and component boundaries; price is not adopted as a local installed quote.
 - [Yurts Canada: Pricing and FAQs](https://www.yurts-canada.ca/pricing-faqs1) - supplier specification. Canadian four-season package and installation/specification context; current quote required for a project.
+- [Shelter Designs: Big Sky yurt kits for sale](https://www.shelterdesigns.net/custom-yurt-kits-for-sale/big-sky-yurt/) - published imported supplier USD base price. Published Big Sky base prices for 27 ft, 35 ft and 40 ft are imported shell evidence. Shipping/customs, final delivery, installation, Canadian engineering and local approvals are not included in the base price.
+- [Bank of Canada: Daily exchange rates](https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates-lookup/) - official indicative exchange rate. USD/CAD conversion used only to display an estimated Canadian equivalent; observed 2026-09-04. Supplier pricing remains published in USD.
 - [Government of Ontario: Build or buy a tiny home: Building Code requirements](https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-requirements) - official requirement guidance. Year-round homes require Building Code compliance, plumbing, energy efficiency, foundations/anchorage and site-specific water/sewage review.
 - [Government of Ontario: Build or buy a tiny home: permits and inspections](https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-permits-and-inspections) - official requirement guidance. Building permits and inspections apply to on-site and factory-built tiny homes.
 - [Grey County: Development charges](https://www.grey.ca/government/development-charges) - official fee schedule. Development charges are payable when a building permit is issued; actual applicability and current fee require municipal confirmation.
