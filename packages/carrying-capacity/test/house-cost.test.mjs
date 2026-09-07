@@ -27,7 +27,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.1.0');
+  assert.equal(result.contract_version, '4.1.1');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -80,6 +80,12 @@ test('former-model reconciliation sums current itemized utility packages', () =>
   assert.equal(rows['Hot water'].new_amount_cad, 2000);
   assert.equal(rows['Household electrical'].new_amount_cad, 3706);
   assert.equal(rows['General permits'].new_amount_cad, 1000);
+  assert.equal(result.water_package_reconciliation.historical_inclusive_total_cad, 5940);
+  assert.equal(result.water_package_reconciliation.current_itemized_total_cad, 6744.62);
+  assert.equal(result.water_package_reconciliation.difference_cad, 804.62);
+  assert.equal(Math.round(result.water_package_reconciliation.current_itemized_rows.reduce((total, row) => total + row.cash_cost_cad, 0) * 100) / 100, 6744.62);
+  assert.equal(result.water_package_reconciliation.difference_classification.changed_equipment.status, 'not_established');
+  assert.equal(result.water_package_reconciliation.difference_classification.changed_scope.status, 'not_established');
   assert.ok(Math.abs(result.legacy_reconciliation.bridge.corrected_economic_capital_cad - result.totals.economic_cost_cad) < 0.005);
   assert.ok(result.legacy_reconciliation.bridge.total_delta_cad < 0);
 });
@@ -201,7 +207,7 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.1.0');
+  assert.equal(contract.contract_version, '4.1.1');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));
@@ -212,6 +218,10 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.ok(contract.central.supplier_package.source_url);
   assert.equal(contract.pricing_layers.length, 5);
   assert.equal(contract.defaults.completion_stage, 'yurt_package');
+  assert.equal(contract.pricing_layers.at(-1).label, 'Delivery, design, permits, tax and contingency');
+  assert.ok(contract.procurement_routes.yurts_canada_purchased_package);
+  assert.equal(contract.procurement_routes.local_fabrication_owner_built.status, 'unmodeled');
+  assert.equal(contract.central.water_package_reconciliation.difference_cad, 804.62);
 });
 
 test('basic completed preset selects only itemized minimal completion components', () => {

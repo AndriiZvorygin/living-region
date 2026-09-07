@@ -31,6 +31,8 @@ const layoutRows = contract.layout_comparison.map((row) => `| ${row.label} | ${r
 const historicalRows = central.legacy_reconciliation.historical_scope_components.map((row) => `| ${row.scope} | ${money(row.amount_cad)} | ${row.status} |`).join('\n');
 const bridgeRows = central.legacy_reconciliation.bridge_rows.map((row) => `| ${row.component} | ${row.original_scope} / ${money(row.original_amount_cad)} | ${money(row.former_model_amount_cad)} | ${row.new_scope} / ${money(row.new_amount_cad)} | ${signedMoney(row.delta_from_former_model_cad)} | ${row.evidence} |`).join('\n');
 const layerRows = central.pricing_layers.map((layer) => `| ${layer.label} | ${money(layer.incremental_cash_cost_cad)} | ${money(layer.cumulative_cash_cost_cad)} | ${layer.component_ids.join(', ') || 'none'} |`).join('\n');
+const waterReconciliation = central.water_package_reconciliation;
+const waterRows = waterReconciliation.current_itemized_rows.map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.quantity_unit} | ${money(row.material_cost_cad)} | ${money(row.included_paid_labour_cad)} | ${money(row.included_fee_cad)} | ${money(row.cash_cost_cad)} | ${row.evidence_status} |`).join('\n');
 const minimalSelectedRows = minimal.components.filter((row) => row.selection_id).map((row) => `| ${row.label} | selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const minimalUnselectedRows = minimal.inactive_components.filter((row) => row.selection_id).map((row) => `| ${row.label} | not selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const markdown = `# House Cost Calculator
@@ -46,6 +48,11 @@ The package price is the starting input. The old ARC dwelling estimate is not us
 ${packageRows}
 
 Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+
+## Procurement routes
+
+- **Yurts Canada purchased-package route:** ${contract.procurement_routes.yurts_canada_purchased_package.basis}; the selected 30 ft Base Kit is ${money(central.supplier_package.selected_price_cad)} before platform, household systems, heating, delivery, design, tax and contingency.
+- **Local fabrication or owner-built route:** **not modeled**. ${contract.procurement_routes.local_fabrication_owner_built.basis} The historical ARC approximately CAD 61,000 figure is not a local-fabrication price and is not used to infer one.
 
 ## Central reference result
 
@@ -87,6 +94,16 @@ ${minimalSelectedRows}
 ${minimalUnselectedRows}
 
 Unresolved or provisional allowances remain visible in the component ledger: supplier freight/local delivery, structural/site/servicing design, residual permits, tax/HST treatment, contingency, the preliminary platform/foundation design, heating/chimney assembly, ventilation design, protective floor product compatibility, privacy partition detailing and basic counter detailing. These are not hidden calibration amounts.
+
+## Water package reconciliation
+
+The earlier ARC water/plumbing/sanitation package was an inclusive **${money(waterReconciliation.historical_inclusive_total_cad)}**. The current itemized package is **${money(waterReconciliation.current_itemized_total_cad)}**, a difference of **${signedMoney(waterReconciliation.difference_cad)}** at the central planning band.
+
+| Current itemized row | Quantity | Materials | Included labour | Included fee | Current cash | Evidence |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+${waterRows}
+
+The current rows preserve the historical broad design intent and include the qualified plumbing allowance and water/plumbing permit allowance once. Current product prices and planning allowances are possible contributors, but the original historical line-item quotation was not recovered. A changed equipment set is **not established**, and a changed scope is **not established**. The ${money(waterReconciliation.difference_cad)} attribution therefore remains unresolved rather than being assigned to an invented price or scope change. ${waterReconciliation.note}
 
 ## Platform and foundation BOM
 

@@ -1,5 +1,5 @@
 {
-  "contract_version": "4.1.0",
+  "contract_version": "4.1.1",
   "model_id": "arc_yurt_house_cost",
   "title": "ARC four-season yurt house cost model",
   "defaults": {
@@ -123,9 +123,9 @@
     },
     {
       "id": "project_costs",
-      "label": "Project costs and optional upgrades",
+      "label": "Delivery, design, permits, tax and contingency",
       "stage": "basic_completed_arc",
-      "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances."
+      "description": "Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected."
     }
   ],
   "labour_modes": {
@@ -243,6 +243,24 @@
       "central": 0.08,
       "high": 0.12,
       "status": "campaign_planning_assumption"
+    }
+  },
+  "procurement_routes": {
+    "yurts_canada_purchased_package": {
+      "label": "Yurts Canada purchased-package route",
+      "supplier_id": "yurts_canada",
+      "selected_default_package_id": "yc_30_base_installed",
+      "basis": "Published supplier package price",
+      "scope_note": "The 30 ft Base Kit is a supplier package with published inclusions and exclusions. Platform, household systems, heating, delivery, design, tax and contingency are separate model layers.",
+      "status": "published_supplier_route"
+    },
+    "local_fabrication_owner_built": {
+      "label": "Local fabrication or owner-built route",
+      "basis": "No independently supported bill of materials is currently available in the evidence set.",
+      "status": "unmodeled",
+      "cost_cad": null,
+      "historical_arc_benchmark_not_reusable": true,
+      "note": "The historical ARC approximately CAD 61,000 benchmark is not a local-fabrication price and must not be inferred as one. A local route requires its own documented materials, labour, design and approval basis."
     }
   },
   "component_evidence": [
@@ -2262,7 +2280,7 @@
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
   "central": {
-    "contract_version": "4.1.0",
+    "contract_version": "4.1.1",
     "model_id": "arc_yurt_house_cost",
     "package_label": "First-principles yurt package plus quantity-based completion model",
     "price_basis_date": "2026-09-05",
@@ -2656,6 +2674,170 @@
           }
         ]
       }
+    },
+    "procurement_routes": {
+      "yurts_canada_purchased_package": {
+        "label": "Yurts Canada purchased-package route",
+        "supplier_id": "yurts_canada",
+        "selected_default_package_id": "yc_30_base_installed",
+        "basis": "Published supplier package price",
+        "scope_note": "The 30 ft Base Kit is a supplier package with published inclusions and exclusions. Platform, household systems, heating, delivery, design, tax and contingency are separate model layers.",
+        "status": "published_supplier_route"
+      },
+      "local_fabrication_owner_built": {
+        "label": "Local fabrication or owner-built route",
+        "basis": "No independently supported bill of materials is currently available in the evidence set.",
+        "status": "unmodeled",
+        "cost_cad": null,
+        "historical_arc_benchmark_not_reusable": true,
+        "note": "The historical ARC approximately CAD 61,000 benchmark is not a local-fabrication price and must not be inferred as one. A local route requires its own documented materials, labour, design and approval basis."
+      }
+    },
+    "water_package_reconciliation": {
+      "applicable": true,
+      "historical_inclusive_total_cad": 5940,
+      "current_itemized_total_cad": 6744.62,
+      "difference_cad": 804.62,
+      "historical_scope": "Roof rainwater collection, first flush, indoor storage, pump, treatment, compact plumbing, private fixtures, drainless composting sanitation, greywater, included qualified plumbing labour and a permit allowance.",
+      "current_itemized_rows": [
+        {
+          "id": "water_collection_storage_first_flush",
+          "label": "Roof collection, first-flush and food-grade storage",
+          "quantity": 1,
+          "quantity_unit": "allowance",
+          "material_cost_cad": 650,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 650,
+          "evidence_status": "provisional_quote_required",
+          "source_note": "The yurt supplier excludes platform/drainage; tank sizing, gutters and frost protection need a site-specific takeoff.",
+          "source_url": null
+        },
+        {
+          "id": "water_demand_pump",
+          "label": "Demand pump and pressure hardware",
+          "quantity": 1,
+          "quantity_unit": "allowance",
+          "material_cost_cad": 420,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 420,
+          "evidence_status": "provisional_quote_required",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": null
+        },
+        {
+          "id": "water_sediment_and_uv",
+          "label": "Sediment filtration and UV/RO treatment",
+          "quantity": 1,
+          "quantity_unit": "package",
+          "material_cost_cad": 548,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 548,
+          "evidence_status": "published_retail_price",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": "https://www.homedepot.ca/product/ispring-rcc7ak-uv-nsf-certified-75gpd-7-stage-reverse-osmosis-water-filter-system-alkaline-uv-filter/1001103065"
+        },
+        {
+          "id": "compact_pex_and_fittings",
+          "label": "Compact PEX, valves and fittings",
+          "quantity": 2,
+          "quantity_unit": "100 ft coil",
+          "material_cost_cad": 122.62,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 122.62,
+          "evidence_status": "published_retail_price",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": "https://www.homedepot.ca/product/zurn-1-2-inch-x-100-ft-pex-pipe-in-white/1001512365"
+        },
+        {
+          "id": "sink_and_shower_fixtures",
+          "label": "Sink and private shower fixtures",
+          "quantity": 1,
+          "quantity_unit": "allowance",
+          "material_cost_cad": 500,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 500,
+          "evidence_status": "published_retail_price_synthesis",
+          "source_note": "Representative current faucet/shower listings; final fixture selection and accessibility require confirmation.",
+          "source_url": null
+        },
+        {
+          "id": "composting_toilet",
+          "label": "Drainless composting toilet",
+          "quantity": 1,
+          "quantity_unit": "each",
+          "material_cost_cad": 1854,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 1854,
+          "evidence_status": "published_manufacturer_price_reference",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": "https://images.homedepot.ca/pdf/Instructions_1000158002.pdf"
+        },
+        {
+          "id": "class_2_greywater",
+          "label": "Class 2 greywater components and excavation",
+          "quantity": 1,
+          "quantity_unit": "allowance",
+          "material_cost_cad": 850,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 850,
+          "evidence_status": "provisional_quote_required",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": null
+        },
+        {
+          "id": "qualified_water_installation",
+          "label": "Qualified plumbing installation and commissioning",
+          "quantity": 1,
+          "quantity_unit": "allowance",
+          "material_cost_cad": 0,
+          "included_paid_labour_cad": 1200,
+          "included_fee_cad": 0,
+          "cash_cost_cad": 1200,
+          "evidence_status": "planning_labour_allowance",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": null
+        },
+        {
+          "id": "water_permit_allowance",
+          "label": "Water/plumbing permit allowance",
+          "quantity": 1,
+          "quantity_unit": "allowance",
+          "material_cost_cad": 0,
+          "included_paid_labour_cad": 0,
+          "included_fee_cad": 600,
+          "cash_cost_cad": 600,
+          "evidence_status": "site_specific_fee_required",
+          "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+          "source_url": null
+        }
+      ],
+      "difference_classification": {
+        "current_product_prices": {
+          "status": "possible_contributor_not_quantified",
+          "explanation": "The current itemized package uses current published retail prices and explicit planning allowances. The historical line-item prices were not recovered, so this contribution cannot be isolated."
+        },
+        "changed_equipment": {
+          "status": "not_established",
+          "explanation": "No evidence establishes that the current design uses a different required equipment set from the historical ARC package."
+        },
+        "changed_scope": {
+          "status": "not_established",
+          "explanation": "The broad service intent is comparable, but the historical package was inclusive and its original line items are unavailable for row-by-row comparison."
+        },
+        "unresolved_attribution": {
+          "status": "unresolved",
+          "amount_cad": 804.62,
+          "explanation": "The full difference remains unallocated until the original inclusive package quotation or detailed procurement record is recovered."
+        }
+      },
+      "note": "The current central planning-band package is CAD 804.62 above the historical inclusive CAD 5940.00 package. This is a reconciliation difference, not a hidden discount or calibration adjustment."
     },
     "labour": {
       "mode": "mixed_labour",
@@ -5115,9 +5297,9 @@
       },
       {
         "id": "project_costs",
-        "label": "Project costs and optional upgrades",
+        "label": "Delivery, design, permits, tax and contingency",
         "stage": "basic_completed_arc",
-        "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+        "description": "Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected.",
         "incremental_cash_cost_cad": 21707.28,
         "incremental_economic_cost_cad": 21707.28,
         "cumulative_cash_cost_cad": 88081.87,
@@ -5407,7 +5589,7 @@
         "total_delta_cad": -18862.160056000008,
         "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
       },
-      "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
+      "explanation": "The historical approximately CAD 61,000 ARC figure represents a different planning/procurement route. It is retained for comparison only, not as an input, rate, discount, calibration target or implied Yurts Canada price."
     },
     "accounting": {
       "component_sum_check": true,
@@ -6265,7 +6447,7 @@
   },
   "bands": {
     "low": {
-      "contract_version": "4.1.0",
+      "contract_version": "4.1.1",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -6659,6 +6841,170 @@
             }
           ]
         }
+      },
+      "procurement_routes": {
+        "yurts_canada_purchased_package": {
+          "label": "Yurts Canada purchased-package route",
+          "supplier_id": "yurts_canada",
+          "selected_default_package_id": "yc_30_base_installed",
+          "basis": "Published supplier package price",
+          "scope_note": "The 30 ft Base Kit is a supplier package with published inclusions and exclusions. Platform, household systems, heating, delivery, design, tax and contingency are separate model layers.",
+          "status": "published_supplier_route"
+        },
+        "local_fabrication_owner_built": {
+          "label": "Local fabrication or owner-built route",
+          "basis": "No independently supported bill of materials is currently available in the evidence set.",
+          "status": "unmodeled",
+          "cost_cad": null,
+          "historical_arc_benchmark_not_reusable": true,
+          "note": "The historical ARC approximately CAD 61,000 benchmark is not a local-fabrication price and must not be inferred as one. A local route requires its own documented materials, labour, design and approval basis."
+        }
+      },
+      "water_package_reconciliation": {
+        "applicable": true,
+        "historical_inclusive_total_cad": 5940,
+        "current_itemized_total_cad": 6070.16,
+        "difference_cad": 130.16,
+        "historical_scope": "Roof rainwater collection, first flush, indoor storage, pump, treatment, compact plumbing, private fixtures, drainless composting sanitation, greywater, included qualified plumbing labour and a permit allowance.",
+        "current_itemized_rows": [
+          {
+            "id": "water_collection_storage_first_flush",
+            "label": "Roof collection, first-flush and food-grade storage",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 585,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 585,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "The yurt supplier excludes platform/drainage; tank sizing, gutters and frost protection need a site-specific takeoff.",
+            "source_url": null
+          },
+          {
+            "id": "water_demand_pump",
+            "label": "Demand pump and pressure hardware",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 378,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 378,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "water_sediment_and_uv",
+            "label": "Sediment filtration and UV/RO treatment",
+            "quantity": 1,
+            "quantity_unit": "package",
+            "material_cost_cad": 493.2,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 493.2,
+            "evidence_status": "published_retail_price",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://www.homedepot.ca/product/ispring-rcc7ak-uv-nsf-certified-75gpd-7-stage-reverse-osmosis-water-filter-system-alkaline-uv-filter/1001103065"
+          },
+          {
+            "id": "compact_pex_and_fittings",
+            "label": "Compact PEX, valves and fittings",
+            "quantity": 2,
+            "quantity_unit": "100 ft coil",
+            "material_cost_cad": 110.36,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 110.36,
+            "evidence_status": "published_retail_price",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://www.homedepot.ca/product/zurn-1-2-inch-x-100-ft-pex-pipe-in-white/1001512365"
+          },
+          {
+            "id": "sink_and_shower_fixtures",
+            "label": "Sink and private shower fixtures",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 450,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 450,
+            "evidence_status": "published_retail_price_synthesis",
+            "source_note": "Representative current faucet/shower listings; final fixture selection and accessibility require confirmation.",
+            "source_url": null
+          },
+          {
+            "id": "composting_toilet",
+            "label": "Drainless composting toilet",
+            "quantity": 1,
+            "quantity_unit": "each",
+            "material_cost_cad": 1668.6,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 1668.6,
+            "evidence_status": "published_manufacturer_price_reference",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://images.homedepot.ca/pdf/Instructions_1000158002.pdf"
+          },
+          {
+            "id": "class_2_greywater",
+            "label": "Class 2 greywater components and excavation",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 765,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 765,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "qualified_water_installation",
+            "label": "Qualified plumbing installation and commissioning",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 0,
+            "included_paid_labour_cad": 1080,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 1080,
+            "evidence_status": "planning_labour_allowance",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "water_permit_allowance",
+            "label": "Water/plumbing permit allowance",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 0,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 540,
+            "cash_cost_cad": 540,
+            "evidence_status": "site_specific_fee_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          }
+        ],
+        "difference_classification": {
+          "current_product_prices": {
+            "status": "possible_contributor_not_quantified",
+            "explanation": "The current itemized package uses current published retail prices and explicit planning allowances. The historical line-item prices were not recovered, so this contribution cannot be isolated."
+          },
+          "changed_equipment": {
+            "status": "not_established",
+            "explanation": "No evidence establishes that the current design uses a different required equipment set from the historical ARC package."
+          },
+          "changed_scope": {
+            "status": "not_established",
+            "explanation": "The broad service intent is comparable, but the historical package was inclusive and its original line items are unavailable for row-by-row comparison."
+          },
+          "unresolved_attribution": {
+            "status": "unresolved",
+            "amount_cad": 130.16,
+            "explanation": "The full difference remains unallocated until the original inclusive package quotation or detailed procurement record is recovered."
+          }
+        },
+        "note": "The current low planning-band package is CAD 130.16 above the historical inclusive CAD 5940.00 package. This is a reconciliation difference, not a hidden discount or calibration adjustment."
       },
       "labour": {
         "mode": "mixed_labour",
@@ -9118,9 +9464,9 @@
         },
         {
           "id": "project_costs",
-          "label": "Project costs and optional upgrades",
+          "label": "Delivery, design, permits, tax and contingency",
           "stage": "basic_completed_arc",
-          "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+          "description": "Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected.",
           "incremental_cash_cost_cad": 11917.1,
           "incremental_economic_cost_cad": 11917.1,
           "cumulative_cash_cost_cad": 72034.63,
@@ -9410,7 +9756,7 @@
           "total_delta_cad": -34909.40286700001,
           "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
         },
-        "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
+        "explanation": "The historical approximately CAD 61,000 ARC figure represents a different planning/procurement route. It is retained for comparison only, not as an input, rate, discount, calibration target or implied Yurts Canada price."
       },
       "accounting": {
         "component_sum_check": true,
@@ -10267,7 +10613,7 @@
       }
     },
     "central": {
-      "contract_version": "4.1.0",
+      "contract_version": "4.1.1",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -10661,6 +11007,170 @@
             }
           ]
         }
+      },
+      "procurement_routes": {
+        "yurts_canada_purchased_package": {
+          "label": "Yurts Canada purchased-package route",
+          "supplier_id": "yurts_canada",
+          "selected_default_package_id": "yc_30_base_installed",
+          "basis": "Published supplier package price",
+          "scope_note": "The 30 ft Base Kit is a supplier package with published inclusions and exclusions. Platform, household systems, heating, delivery, design, tax and contingency are separate model layers.",
+          "status": "published_supplier_route"
+        },
+        "local_fabrication_owner_built": {
+          "label": "Local fabrication or owner-built route",
+          "basis": "No independently supported bill of materials is currently available in the evidence set.",
+          "status": "unmodeled",
+          "cost_cad": null,
+          "historical_arc_benchmark_not_reusable": true,
+          "note": "The historical ARC approximately CAD 61,000 benchmark is not a local-fabrication price and must not be inferred as one. A local route requires its own documented materials, labour, design and approval basis."
+        }
+      },
+      "water_package_reconciliation": {
+        "applicable": true,
+        "historical_inclusive_total_cad": 5940,
+        "current_itemized_total_cad": 6744.62,
+        "difference_cad": 804.62,
+        "historical_scope": "Roof rainwater collection, first flush, indoor storage, pump, treatment, compact plumbing, private fixtures, drainless composting sanitation, greywater, included qualified plumbing labour and a permit allowance.",
+        "current_itemized_rows": [
+          {
+            "id": "water_collection_storage_first_flush",
+            "label": "Roof collection, first-flush and food-grade storage",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 650,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 650,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "The yurt supplier excludes platform/drainage; tank sizing, gutters and frost protection need a site-specific takeoff.",
+            "source_url": null
+          },
+          {
+            "id": "water_demand_pump",
+            "label": "Demand pump and pressure hardware",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 420,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 420,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "water_sediment_and_uv",
+            "label": "Sediment filtration and UV/RO treatment",
+            "quantity": 1,
+            "quantity_unit": "package",
+            "material_cost_cad": 548,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 548,
+            "evidence_status": "published_retail_price",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://www.homedepot.ca/product/ispring-rcc7ak-uv-nsf-certified-75gpd-7-stage-reverse-osmosis-water-filter-system-alkaline-uv-filter/1001103065"
+          },
+          {
+            "id": "compact_pex_and_fittings",
+            "label": "Compact PEX, valves and fittings",
+            "quantity": 2,
+            "quantity_unit": "100 ft coil",
+            "material_cost_cad": 122.62,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 122.62,
+            "evidence_status": "published_retail_price",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://www.homedepot.ca/product/zurn-1-2-inch-x-100-ft-pex-pipe-in-white/1001512365"
+          },
+          {
+            "id": "sink_and_shower_fixtures",
+            "label": "Sink and private shower fixtures",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 500,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 500,
+            "evidence_status": "published_retail_price_synthesis",
+            "source_note": "Representative current faucet/shower listings; final fixture selection and accessibility require confirmation.",
+            "source_url": null
+          },
+          {
+            "id": "composting_toilet",
+            "label": "Drainless composting toilet",
+            "quantity": 1,
+            "quantity_unit": "each",
+            "material_cost_cad": 1854,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 1854,
+            "evidence_status": "published_manufacturer_price_reference",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://images.homedepot.ca/pdf/Instructions_1000158002.pdf"
+          },
+          {
+            "id": "class_2_greywater",
+            "label": "Class 2 greywater components and excavation",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 850,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 850,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "qualified_water_installation",
+            "label": "Qualified plumbing installation and commissioning",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 0,
+            "included_paid_labour_cad": 1200,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 1200,
+            "evidence_status": "planning_labour_allowance",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "water_permit_allowance",
+            "label": "Water/plumbing permit allowance",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 0,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 600,
+            "cash_cost_cad": 600,
+            "evidence_status": "site_specific_fee_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          }
+        ],
+        "difference_classification": {
+          "current_product_prices": {
+            "status": "possible_contributor_not_quantified",
+            "explanation": "The current itemized package uses current published retail prices and explicit planning allowances. The historical line-item prices were not recovered, so this contribution cannot be isolated."
+          },
+          "changed_equipment": {
+            "status": "not_established",
+            "explanation": "No evidence establishes that the current design uses a different required equipment set from the historical ARC package."
+          },
+          "changed_scope": {
+            "status": "not_established",
+            "explanation": "The broad service intent is comparable, but the historical package was inclusive and its original line items are unavailable for row-by-row comparison."
+          },
+          "unresolved_attribution": {
+            "status": "unresolved",
+            "amount_cad": 804.62,
+            "explanation": "The full difference remains unallocated until the original inclusive package quotation or detailed procurement record is recovered."
+          }
+        },
+        "note": "The current central planning-band package is CAD 804.62 above the historical inclusive CAD 5940.00 package. This is a reconciliation difference, not a hidden discount or calibration adjustment."
       },
       "labour": {
         "mode": "mixed_labour",
@@ -13120,9 +13630,9 @@
         },
         {
           "id": "project_costs",
-          "label": "Project costs and optional upgrades",
+          "label": "Delivery, design, permits, tax and contingency",
           "stage": "basic_completed_arc",
-          "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+          "description": "Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected.",
           "incremental_cash_cost_cad": 21707.28,
           "incremental_economic_cost_cad": 21707.28,
           "cumulative_cash_cost_cad": 88081.87,
@@ -13412,7 +13922,7 @@
           "total_delta_cad": -18862.160056000008,
           "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
         },
-        "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
+        "explanation": "The historical approximately CAD 61,000 ARC figure represents a different planning/procurement route. It is retained for comparison only, not as an input, rate, discount, calibration target or implied Yurts Canada price."
       },
       "accounting": {
         "component_sum_check": true,
@@ -14269,7 +14779,7 @@
       }
     },
     "high": {
-      "contract_version": "4.1.0",
+      "contract_version": "4.1.1",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -14663,6 +15173,170 @@
             }
           ]
         }
+      },
+      "procurement_routes": {
+        "yurts_canada_purchased_package": {
+          "label": "Yurts Canada purchased-package route",
+          "supplier_id": "yurts_canada",
+          "selected_default_package_id": "yc_30_base_installed",
+          "basis": "Published supplier package price",
+          "scope_note": "The 30 ft Base Kit is a supplier package with published inclusions and exclusions. Platform, household systems, heating, delivery, design, tax and contingency are separate model layers.",
+          "status": "published_supplier_route"
+        },
+        "local_fabrication_owner_built": {
+          "label": "Local fabrication or owner-built route",
+          "basis": "No independently supported bill of materials is currently available in the evidence set.",
+          "status": "unmodeled",
+          "cost_cad": null,
+          "historical_arc_benchmark_not_reusable": true,
+          "note": "The historical ARC approximately CAD 61,000 benchmark is not a local-fabrication price and must not be inferred as one. A local route requires its own documented materials, labour, design and approval basis."
+        }
+      },
+      "water_package_reconciliation": {
+        "applicable": true,
+        "historical_inclusive_total_cad": 5940,
+        "current_itemized_total_cad": 7756.31,
+        "difference_cad": 1816.31,
+        "historical_scope": "Roof rainwater collection, first flush, indoor storage, pump, treatment, compact plumbing, private fixtures, drainless composting sanitation, greywater, included qualified plumbing labour and a permit allowance.",
+        "current_itemized_rows": [
+          {
+            "id": "water_collection_storage_first_flush",
+            "label": "Roof collection, first-flush and food-grade storage",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 747.5,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 747.5,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "The yurt supplier excludes platform/drainage; tank sizing, gutters and frost protection need a site-specific takeoff.",
+            "source_url": null
+          },
+          {
+            "id": "water_demand_pump",
+            "label": "Demand pump and pressure hardware",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 483,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 483,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "water_sediment_and_uv",
+            "label": "Sediment filtration and UV/RO treatment",
+            "quantity": 1,
+            "quantity_unit": "package",
+            "material_cost_cad": 630.2,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 630.2,
+            "evidence_status": "published_retail_price",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://www.homedepot.ca/product/ispring-rcc7ak-uv-nsf-certified-75gpd-7-stage-reverse-osmosis-water-filter-system-alkaline-uv-filter/1001103065"
+          },
+          {
+            "id": "compact_pex_and_fittings",
+            "label": "Compact PEX, valves and fittings",
+            "quantity": 2,
+            "quantity_unit": "100 ft coil",
+            "material_cost_cad": 141.01,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 141.01,
+            "evidence_status": "published_retail_price",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://www.homedepot.ca/product/zurn-1-2-inch-x-100-ft-pex-pipe-in-white/1001512365"
+          },
+          {
+            "id": "sink_and_shower_fixtures",
+            "label": "Sink and private shower fixtures",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 575,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 575,
+            "evidence_status": "published_retail_price_synthesis",
+            "source_note": "Representative current faucet/shower listings; final fixture selection and accessibility require confirmation.",
+            "source_url": null
+          },
+          {
+            "id": "composting_toilet",
+            "label": "Drainless composting toilet",
+            "quantity": 1,
+            "quantity_unit": "each",
+            "material_cost_cad": 2132.1,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 2132.1,
+            "evidence_status": "published_manufacturer_price_reference",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": "https://images.homedepot.ca/pdf/Instructions_1000158002.pdf"
+          },
+          {
+            "id": "class_2_greywater",
+            "label": "Class 2 greywater components and excavation",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 977.5,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 977.5,
+            "evidence_status": "provisional_quote_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "qualified_water_installation",
+            "label": "Qualified plumbing installation and commissioning",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 0,
+            "included_paid_labour_cad": 1380,
+            "included_fee_cad": 0,
+            "cash_cost_cad": 1380,
+            "evidence_status": "planning_labour_allowance",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          },
+          {
+            "id": "water_permit_allowance",
+            "label": "Water/plumbing permit allowance",
+            "quantity": 1,
+            "quantity_unit": "allowance",
+            "material_cost_cad": 0,
+            "included_paid_labour_cad": 0,
+            "included_fee_cad": 690,
+            "cash_cost_cad": 690,
+            "evidence_status": "site_specific_fee_required",
+            "source_note": "ARC distributed household systems, itemized planning package + Seasonal hot-water package + 400 Wh/day off-grid electrical package",
+            "source_url": null
+          }
+        ],
+        "difference_classification": {
+          "current_product_prices": {
+            "status": "possible_contributor_not_quantified",
+            "explanation": "The current itemized package uses current published retail prices and explicit planning allowances. The historical line-item prices were not recovered, so this contribution cannot be isolated."
+          },
+          "changed_equipment": {
+            "status": "not_established",
+            "explanation": "No evidence establishes that the current design uses a different required equipment set from the historical ARC package."
+          },
+          "changed_scope": {
+            "status": "not_established",
+            "explanation": "The broad service intent is comparable, but the historical package was inclusive and its original line items are unavailable for row-by-row comparison."
+          },
+          "unresolved_attribution": {
+            "status": "unresolved",
+            "amount_cad": 1816.31,
+            "explanation": "The full difference remains unallocated until the original inclusive package quotation or detailed procurement record is recovered."
+          }
+        },
+        "note": "The current high planning-band package is CAD 1816.31 above the historical inclusive CAD 5940.00 package. This is a reconciliation difference, not a hidden discount or calibration adjustment."
       },
       "labour": {
         "mode": "mixed_labour",
@@ -17122,9 +17796,9 @@
         },
         {
           "id": "project_costs",
-          "label": "Project costs and optional upgrades",
+          "label": "Delivery, design, permits, tax and contingency",
           "stage": "basic_completed_arc",
-          "description": "Delivery, design, permits, taxes, contingency and explicitly selected project allowances.",
+          "description": "Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected.",
           "incremental_cash_cost_cad": 28563.44,
           "incremental_economic_cost_cad": 28563.44,
           "cumulative_cash_cost_cad": 104323.55,
@@ -17414,7 +18088,7 @@
           "total_delta_cad": -2620.4824760000192,
           "explanation": "The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets."
         },
-        "explanation": "The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model."
+        "explanation": "The historical approximately CAD 61,000 ARC figure represents a different planning/procurement route. It is retained for comparison only, not as an input, rate, discount, calibration target or implied Yurts Canada price."
       },
       "accounting": {
         "component_sum_check": true,

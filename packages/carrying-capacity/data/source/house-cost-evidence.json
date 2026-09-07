@@ -138,6 +138,24 @@
     ],
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
+  "procurement_routes": {
+    "yurts_canada_purchased_package": {
+      "label": "Yurts Canada purchased-package route",
+      "supplier_id": "yurts_canada",
+      "selected_default_package_id": "yc_30_base_installed",
+      "basis": "Published supplier package price",
+      "scope_note": "The 30 ft Base Kit is a supplier package with published inclusions and exclusions. Platform, household systems, heating, delivery, design, tax and contingency are separate model layers.",
+      "status": "published_supplier_route"
+    },
+    "local_fabrication_owner_built": {
+      "label": "Local fabrication or owner-built route",
+      "basis": "No independently supported bill of materials is currently available in the evidence set.",
+      "status": "unmodeled",
+      "cost_cad": null,
+      "historical_arc_benchmark_not_reusable": true,
+      "note": "The historical ARC approximately CAD 61,000 benchmark is not a local-fabrication price and must not be inferred as one. A local route requires its own documented materials, labour, design and approval basis."
+    }
+  },
   "former_model_reference": {
     "source_commit": "81a4aed772cbbe3d098c96bcc9dcdf3157efba62",
     "basis": "Default 9.144 m single-storey ARC household systems, central rates, mixed labour, 13% tax, 8% contingency; generated immediately before package-boundary correction.",

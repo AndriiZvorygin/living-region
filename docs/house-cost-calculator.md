@@ -25,7 +25,7 @@ At the 30 ft reference diameter, the central cash layers are:
 | Platform and foundation | `$8,218.49` | `$44,622.49` |
 | Four-season completion | `$9,016.63` | `$53,639.12` |
 | Basic household amenities | `$12,735.47` | `$66,374.59` |
-| Project costs and optional upgrades | `$21,707.28` | `$88,081.87` |
+| Delivery, design, permits, tax and contingency | `$21,707.28` | `$88,081.87` |
 
 The full cash total includes the published supplier package, platform, only the selected minimal completion rows, utility package, project costs, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
 
@@ -39,13 +39,17 @@ The source contract is `packages/carrying-capacity/data/source/house-cost-market
 
 The central reference uses the published Yurts Canada 30 ft installed all-season Base Kit. The package includes the yurt frame, lattice, dome/ring, covers, insulation, liner, one standard door and mandatory supplier installation. It excludes the platform/floor, delivery, additional openings, utilities and climate control. The Out Factory Canadian rows are non-binding import estimates; Biome Canada publishes configurator options but requires a base quote.
 
-The historical ARC `$51,000–$74,000`, central approximately `$61,000`, is preserved only as a historical comparison. It is not a calculation input, component rate or calibration target. Its exact historical integrated sum was `$61,240`: `$50,000` structural design-brief amount, `$5,940` water/plumbing/sanitation, `$2,000` hot water and `$3,300` electrical.
+The historical ARC `$51,000–$74,000`, central approximately `$61,000`, is preserved only as a historical comparison. It represents a different planning/procurement route, not a Yurts Canada price. It is not a calculation input, component rate, discount, calibration target or implied local-fabrication price. Its exact historical integrated sum was `$61,240`: `$50,000` structural design-brief amount, `$5,940` water/plumbing/sanitation, `$2,000` hot water and `$3,300` electrical.
+
+The two procurement routes remain separate: the Yurts Canada 30 ft purchased-package route starts with its published `$36,404` installed Base Kit; a local fabrication or owner-built route is currently unmodeled because no independently supported bill of materials is available. The historical ARC benchmark must not be used to fill that gap.
 
 ## Quantity accounting
 
 The platform is explicitly labelled a preliminary circular deck-block concept, not an engineered foundation. It exposes blocks, pressure-treated beams, joists/blocking, tongue-and-groove deck, floor XPS, vapour/protective layer and connectors/anchors. Quantities are calculated from footprint or perimeter, purchase units and a stated waste factor. Soil, frost, uplift, snow, wind, anchorage, structural grade and municipal approval require qualified confirmation.
 
 Each utility package row has one accounting home. Included supplier items are not repriced. Qualified installation and permit rows are separate. The ARC distributed package retains the earlier design intent: roof collection, first flush, storage, pump, filtration/UV/RO, compact PEX, private fixtures, composting sanitation, Class 2 greywater, seasonal hot water and a 400 Wh/day off-grid electrical system. Generic well/septic/grid and centralized servicing remain alternatives.
+
+The historical inclusive water/plumbing/sanitation package was `$5,940`. The current central itemized package is `$6,744.62`, or `$804.62` higher. The current ledger shows each material, included qualified plumbing labour and included permit fee. Current product prices and planning allowances may contribute, but the original historical line items are unrecovered; changed equipment and changed scope are not established. The difference remains explicitly unresolved rather than being hidden or calibrated away.
 
 ## Labour and financing
 

@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.1.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.1.1 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -21,6 +21,11 @@ The package price is the starting input. The old ARC dwelling estimate is not us
 | Biome Canada | 30 ft | quote required | quote required | configurator_options_quote_required |
 
 Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
+
+## Procurement routes
+
+- **Yurts Canada purchased-package route:** Published supplier package price; the selected 30 ft Base Kit is $36,404.00 before platform, household systems, heating, delivery, design, tax and contingency.
+- **Local fabrication or owner-built route:** **not modeled**. No independently supported bill of materials is currently available in the evidence set. The historical ARC approximately CAD 61,000 figure is not a local-fabrication price and is not used to infer one.
 
 ## Central reference result
 
@@ -47,7 +52,7 @@ The public starting view is the selected supplier package. It is distinct from t
 | Platform and foundation | $8,218.49 | $44,622.49 | platform_support_blocks, platform_pt_beams, platform_joists, platform_decking, platform_floor_insulation, platform_vapour_layer, platform_connectors |
 | Four-season completion | $9,016.63 | $53,639.12 | privacy_partition, protective_floor_surface, wood_stove_and_chimney, balanced_ventilation |
 | Basic household amenities | $12,735.47 | $66,374.59 | basic_counter, water_collection_storage_first_flush, water_demand_pump, water_sediment_and_uv, compact_pex_and_fittings, sink_and_shower_fixtures, composting_toilet, class_2_greywater, qualified_water_installation, water_permit_allowance, solar_thermal_collector, hot_water_storage_and_controls, thermosiphon_integration, hot_water_integration_labour, pv_400w, mppt_controller, lead_acid_bank, pure_sine_inverter, dc_ac_wiring_protection, qualified_electrical_labour, electrical_inspection |
-| Project costs and optional upgrades | $21,707.28 | $88,081.87 | delivery_logistics, design_engineering, permits, taxes, contingency |
+| Delivery, design, permits, tax and contingency | $21,707.28 | $88,081.87 | delivery_logistics, design_engineering, permits, taxes, contingency |
 
 - Selected public stage: **Yurt package**, $36,404.00 cash and $36,404.00 economic cost.
 - Selected-stage financing payment: **$211.10/month**.
@@ -73,6 +78,24 @@ The completed preset selects only the documented minimal additions. Utility-pack
 | Optional bathroom storage and trim | not selected | 1 dwelling | $300.00 | 4 h | $390.00 | optional_itemized_planning_rate |
 
 Unresolved or provisional allowances remain visible in the component ledger: supplier freight/local delivery, structural/site/servicing design, residual permits, tax/HST treatment, contingency, the preliminary platform/foundation design, heating/chimney assembly, ventilation design, protective floor product compatibility, privacy partition detailing and basic counter detailing. These are not hidden calibration amounts.
+
+## Water package reconciliation
+
+The earlier ARC water/plumbing/sanitation package was an inclusive **$5,940.00**. The current itemized package is **$6,744.62**, a difference of **$804.62** at the central planning band.
+
+| Current itemized row | Quantity | Materials | Included labour | Included fee | Current cash | Evidence |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Roof collection, first-flush and food-grade storage | 1 allowance | $650.00 | $0.00 | $0.00 | $650.00 | provisional_quote_required |
+| Demand pump and pressure hardware | 1 allowance | $420.00 | $0.00 | $0.00 | $420.00 | provisional_quote_required |
+| Sediment filtration and UV/RO treatment | 1 package | $548.00 | $0.00 | $0.00 | $548.00 | published_retail_price |
+| Compact PEX, valves and fittings | 2 100 ft coil | $122.62 | $0.00 | $0.00 | $122.62 | published_retail_price |
+| Sink and private shower fixtures | 1 allowance | $500.00 | $0.00 | $0.00 | $500.00 | published_retail_price_synthesis |
+| Drainless composting toilet | 1 each | $1,854.00 | $0.00 | $0.00 | $1,854.00 | published_manufacturer_price_reference |
+| Class 2 greywater components and excavation | 1 allowance | $850.00 | $0.00 | $0.00 | $850.00 | provisional_quote_required |
+| Qualified plumbing installation and commissioning | 1 allowance | $0.00 | $1,200.00 | $0.00 | $1,200.00 | planning_labour_allowance |
+| Water/plumbing permit allowance | 1 allowance | $0.00 | $0.00 | $600.00 | $600.00 | site_specific_fee_required |
+
+The current rows preserve the historical broad design intent and include the qualified plumbing allowance and water/plumbing permit allowance once. Current product prices and planning allowances are possible contributors, but the original historical line-item quotation was not recovered. A changed equipment set is **not established**, and a changed scope is **not established**. The $804.62 attribution therefore remains unresolved rather than being assigned to an invented price or scope change. The current central planning-band package is CAD 804.62 above the historical inclusive CAD 5940.00 package. This is a reconciliation difference, not a hidden discount or calibration adjustment.
 
 ## Platform and foundation BOM
 

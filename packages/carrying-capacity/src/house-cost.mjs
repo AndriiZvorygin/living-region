@@ -2,7 +2,7 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {financeCapital} from './site-lease-browser.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.1.0';
+export const HOUSE_COST_CONTRACT_VERSION = '4.1.1';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 
@@ -20,7 +20,7 @@ export const HOUSE_COST_PRICING_LAYERS = [
   {id: 'platform_foundation', label: 'Platform and foundation', stage: 'platform_supported_shell', description: 'The preliminary platform/foundation BOM, supports, fasteners and assembly.'},
   {id: 'four_season_completion', label: 'Four-season completion', stage: 'four_season_structure', description: 'Additional openings, envelope work, heating, chimney, ventilation and layout structure.'},
   {id: 'basic_household_amenities', label: 'Basic household amenities', stage: 'basic_completed_arc', description: 'Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.'},
-  {id: 'project_costs', label: 'Project costs and optional upgrades', stage: 'basic_completed_arc', description: 'Delivery, design, permits, taxes, contingency and explicitly selected project allowances.'}
+  {id: 'project_costs', label: 'Delivery, design, permits, tax and contingency', stage: 'basic_completed_arc', description: 'Supplier freight/local delivery, design, residual permits, applicable tax and explicit contingency. Elective upgrades remain separate and unselected.'}
 ];
 
 const COMPLETION_STAGE_IDS = new Set(HOUSE_COST_PRICING_LAYERS.map((layer) => layer.stage));
@@ -738,6 +738,40 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   const formerModel = evidence.former_model_reference;
   const currentPackageCash = (packageId) => round(sum(activeRows.filter((row) => row.source_package_id === packageId), 'cash_cost_cad'));
   const currentComponentCash = (rowId) => round(sum(activeRows.filter((row) => row.id === rowId), 'cash_cost_cad'));
+  const historicalWaterPackage = finite(legacy.legacy_scope_components.find((row) => row.id === 'water_plumbing_sanitation')?.amount_cad, 5940);
+  const waterPackageApplicable = input.servicingMode === 'arc_household_systems';
+  const waterPackageRows = waterPackageApplicable ? activeRows.filter((row) => row.source_package_id === 'arc_household_systems') : [];
+  const currentWaterPackage = waterPackageApplicable ? currentPackageCash('arc_household_systems') : null;
+  const waterPackageDifference = currentWaterPackage == null ? null : roundSigned(currentWaterPackage - historicalWaterPackage);
+  const waterPackageReconciliation = {
+    applicable: waterPackageApplicable,
+    historical_inclusive_total_cad: round(historicalWaterPackage),
+    current_itemized_total_cad: currentWaterPackage,
+    difference_cad: waterPackageDifference,
+    historical_scope: 'Roof rainwater collection, first flush, indoor storage, pump, treatment, compact plumbing, private fixtures, drainless composting sanitation, greywater, included qualified plumbing labour and a permit allowance.',
+    current_itemized_rows: waterPackageRows.map((row) => ({
+      id: row.id,
+      label: row.label,
+      quantity: row.quantity,
+      quantity_unit: row.quantity_unit ?? row.unit,
+      material_cost_cad: row.material_cost_cad,
+      included_paid_labour_cad: row.paid_labour_cash_cad,
+      included_fee_cad: row.package_included_fee_cad ?? 0,
+      cash_cost_cad: row.cash_cost_cad,
+      evidence_status: row.evidence_status ?? row.status,
+      source_note: row.source_note,
+      source_url: row.source_url
+    })),
+    difference_classification: {
+      current_product_prices: {status: 'possible_contributor_not_quantified', explanation: 'The current itemized package uses current published retail prices and explicit planning allowances. The historical line-item prices were not recovered, so this contribution cannot be isolated.'},
+      changed_equipment: {status: 'not_established', explanation: 'No evidence establishes that the current design uses a different required equipment set from the historical ARC package.'},
+      changed_scope: {status: 'not_established', explanation: 'The broad service intent is comparable, but the historical package was inclusive and its original line items are unavailable for row-by-row comparison.'},
+      unresolved_attribution: {status: waterPackageApplicable ? 'unresolved' : 'not_applicable', amount_cad: waterPackageDifference, explanation: waterPackageApplicable ? 'The full difference remains unallocated until the original inclusive package quotation or detailed procurement record is recovered.' : 'The historical ARC comparison does not apply to the selected alternative servicing package.'}
+    },
+    note: waterPackageApplicable
+      ? `The current ${input.band} planning-band package is CAD ${waterPackageDifference.toFixed(2)} above the historical inclusive CAD ${historicalWaterPackage.toFixed(2)} package. This is a reconciliation difference, not a hidden discount or calibration adjustment.`
+      : 'The ARC water-package reconciliation is not applicable to the selected alternative servicing package; its alternative scope remains separately priced.'
+  };
   const bridgeRows = [
     {component: 'Water / plumbing / sanitation', original_scope: 'Inclusive package', original_amount_cad: 5940, former_model_amount_cad: formerModel.component_cash_costs.water_plumbing + formerModel.component_cash_costs.sanitation_greywater, new_scope: 'One inclusive package; included labour and fee decomposed, not added again', new_amount_cad: currentPackageCash('arc_household_systems'), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
     {component: 'Hot water', original_scope: 'Inclusive package including integration labour', original_amount_cad: 2000, former_model_amount_cad: formerModel.component_cash_costs.hot_water, new_scope: 'One inclusive package; labour allowance is replaced only by a labour override', new_amount_cad: currentPackageCash('hot_water'), evidence: 'Historical ARC design brief; original itemized quotation unrecovered.'},
@@ -767,6 +801,8 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     geometry,
     supplier_package: {...yurtPackage, selected_price_cad: round(marketPrice(yurtPackage.price_cad, input.band)), published_price_cad: yurtPackage.price_cad, price_currency: 'CAD', source_url: yurtPackage.source?.source_url, inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null},
     servicing: {mode: input.servicingMode, label: evidence.servicing_modes[input.servicingMode]?.label, description: evidence.servicing_modes[input.servicingMode]?.description, status: itemizedPackage?.status ?? 'alternative_package_placeholder', components: serviceComponents, historical_reference_components: evidence.servicing_modes[input.servicingMode]?.components ?? null, shared_infrastructure_additions: evidence.servicing_modes[input.servicingMode]?.shared_infrastructure_additions ?? {}, itemized_package: itemizedPackage},
+    procurement_routes: evidence.procurement_routes,
+    water_package_reconciliation: waterPackageReconciliation,
     labour: {mode: input.labourMode, ...evidence.labour_modes[input.labourMode], labour_rate_cad_per_hour: input.labourRateCadPerHour, owner_labour_value_rate_cad_per_hour: input.ownerLabourValueRateCadPerHour, paid_hours: round(sum(activeRows, 'paid_labour_hours'), 2), owner_hours: round(sum(activeRows, 'owner_labour_hours'), 2), paid_labour_cash_cad: round(sum(activeRows, 'paid_labour_cash_cad')), owner_labour_imputed_cad: round(ownerImputed), total_labour_hours: round(sum(activeRows, 'labour_hours_total'), 2)},
     components: activeRows,
     inactive_components: [...inactiveRows, ...marketEvidence.additional_assemblies.filter((row) => row.id === 'additional_interior_liner_and_furring').map((row) => ({id: row.id, label: row.label, active: false, selection_id: null, pricing_layer: pricingLayerForRow(row), status: 'included_by_supplier_package', source_note: row.note}))],
@@ -778,7 +814,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), selected_stage_cash_cost_cad: round(selectedCash), selected_stage_economic_cost_cad: round(selectedEconomic), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},
     financing: {...financing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
     selected_financing: {...selectedFinancing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
-    legacy_reconciliation: {legacy_range_cad: legacy.range_cad, legacy_central_cad: legacy.range_cad.central, legacy_diameter_m_rounded: legacy.diameter_m_rounded, model_diameter_m: geometry.inputs.diameter_m, legacy_gross_floor_area_m2: legacy.gross_floor_area_m2, model_gross_floor_area_m2: geometry.gross_floor_area_m2, model_completed_economic_capital_cad: round(economicCapital), delta_from_legacy_central_cad: roundSigned(economicCapital - legacy.range_cad.central), legacy_exact_integrated_total_cad: legacy.legacy_exact_integrated_total_cad, legacy_public_rounded_total_cad: legacy.legacy_public_rounded_total_cad, historical_scope_components: legacy.legacy_scope_components, former_model_reference: formerModel, bridge_rows: bridgeRows, bridge: formerModelBridge, explanation: 'The historical CAD 61,000 is retained for comparison only. It is not an input, rate, calibration target or residual in this first-principles model.'},
+    legacy_reconciliation: {legacy_range_cad: legacy.range_cad, legacy_central_cad: legacy.range_cad.central, legacy_diameter_m_rounded: legacy.diameter_m_rounded, model_diameter_m: geometry.inputs.diameter_m, legacy_gross_floor_area_m2: legacy.gross_floor_area_m2, model_gross_floor_area_m2: geometry.gross_floor_area_m2, model_completed_economic_capital_cad: round(economicCapital), delta_from_legacy_central_cad: roundSigned(economicCapital - legacy.range_cad.central), legacy_exact_integrated_total_cad: legacy.legacy_exact_integrated_total_cad, legacy_public_rounded_total_cad: legacy.legacy_public_rounded_total_cad, historical_scope_components: legacy.legacy_scope_components, former_model_reference: formerModel, bridge_rows: bridgeRows, bridge: formerModelBridge, explanation: 'The historical approximately CAD 61,000 ARC figure represents a different planning/procurement route. It is retained for comparison only, not as an input, rate, discount, calibration target or implied Yurts Canada price.'},
     accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), pricing_layer_sum_check: round(cumulativeLayerCash) === round(upfrontCash), pricing_layer_economic_sum_check: Math.abs(cumulativeLayerEconomic - economicCapital) < .05, pricing_layer_economic_residual_cad: roundSigned(cumulativeLayerEconomic - economicCapital, 4), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
     input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
     evidence: sourceList,
@@ -813,6 +849,7 @@ export function buildHouseCostPresentationContract(options = {}) {
     servicing_modes: evidence.servicing_modes,
     service_package_accounting: evidence.service_package_accounting,
     tax_and_contingency: evidence.tax_and_contingency,
+    procurement_routes: evidence.procurement_routes,
     component_evidence: evidence.components,
     pricing_model: marketEvidence.pricing_model_id,
     market_evidence: marketEvidence,
