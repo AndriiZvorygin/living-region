@@ -2,9 +2,11 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {calculateMortgage, calculateMortgageScenarios, HOUSE_MORTGAGE_CONTRACT_VERSION, HOUSE_MORTGAGE_RATE_EVIDENCE} from './mortgage.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.2.0';
+export const HOUSE_COST_CONTRACT_VERSION = '4.3.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
+export const MIN_RESIDENTIAL_DIAMETER_M = 6.096;
+export const MAX_RESIDENTIAL_DIAMETER_M = 20;
 
 const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const nonNegative = (value, fallback = 0) => Math.max(0, finite(value, fallback));
@@ -54,13 +56,26 @@ function layoutRule(layout) {
 function normalizeDesign(design = {}) {
   const layout = evidence.layout_rules[design.layout] ? design.layout : evidence.defaults.layout;
   const rule = layoutRule(layout);
+  const requestedDiameter = finite(design.residential_shell?.requested_diameter_m ?? design.diameter_m ?? evidence.defaults.diameter_m, evidence.defaults.diameter_m);
   const restrictedHeadroomOverride = design.restricted_headroom_override_used === true
     || (design.restricted_headroom_override_used !== false && design.restricted_headroom_fraction != null);
   return {
-    diameter_m: clamp(design.diameter_m ?? evidence.defaults.diameter_m, 3, 20),
+    diameter_m: clamp(requestedDiameter, MIN_RESIDENTIAL_DIAMETER_M, MAX_RESIDENTIAL_DIAMETER_M),
     wall_height_m: clamp(design.wall_height_m ?? evidence.defaults.wall_height_m, 1.8, 4),
     roof_pitch_degrees: clamp(design.roof_pitch_degrees ?? evidence.defaults.roof_pitch_degrees, 10, 60),
     household_size: Math.max(1, Math.round(finite(design.household_size, evidence.defaults.household_size))),
+    occupancy: {
+      layout: design.occupancy?.layout === 'separated_rooms' ? 'separated_rooms' : 'open_concept',
+      occupants: Math.max(1, Math.round(finite(design.occupancy?.occupants, finite(design.household_size, evidence.defaults.household_size)))),
+      bedroom_count: Math.max(0, Math.round(finite(design.occupancy?.bedroom_count, design.occupancy?.layout === 'separated_rooms' ? 1 : 0))),
+      sleeping_area_m2: design.occupancy?.sleeping_area_m2 == null ? null : Math.max(0, finite(design.occupancy.sleeping_area_m2)),
+      bathroom_area_m2: design.occupancy?.bathroom_area_m2 == null ? null : Math.max(0, finite(design.occupancy.bathroom_area_m2)),
+      kitchen_area_m2: design.occupancy?.kitchen_area_m2 == null ? null : Math.max(0, finite(design.occupancy.kitchen_area_m2)),
+      living_dining_kitchen_area_m2: design.occupancy?.living_dining_kitchen_area_m2 == null ? null : Math.max(0, finite(design.occupancy.living_dining_kitchen_area_m2)),
+      window_area_m2: design.occupancy?.window_area_m2 == null ? null : Math.max(0, finite(design.occupancy.window_area_m2)),
+      heating_confirmed: design.occupancy?.heating_confirmed === true,
+      ventilation_confirmed: design.occupancy?.ventilation_confirmed === true
+    },
     layout,
     window_count: Math.max(0, Math.round(finite(design.window_count, evidence.defaults.window_count))),
     door_count: Math.max(1, Math.round(finite(design.door_count, evidence.defaults.door_count))),
@@ -70,7 +85,15 @@ function normalizeDesign(design = {}) {
     restricted_headroom_fraction: !restrictedHeadroomOverride
       ? rule.restricted_headroom_fraction
       : clamp(design.restricted_headroom_fraction, 0, .75),
-    guard_length_m: Math.max(0, finite(design.guard_length_m, rule.guard_length_m))
+    guard_length_m: Math.max(0, finite(design.guard_length_m, rule.guard_length_m)),
+    residential_shell: {
+      minimum_diameter_m: MIN_RESIDENTIAL_DIAMETER_M,
+      minimum_diameter_label: '20 ft',
+      requested_diameter_m: requestedDiameter,
+      requested_below_minimum: requestedDiameter < MIN_RESIDENTIAL_DIAMETER_M,
+      applied_diameter_m: clamp(requestedDiameter, MIN_RESIDENTIAL_DIAMETER_M, MAX_RESIDENTIAL_DIAMETER_M),
+      ordinary_residential_scope: 'full_time_year_round_residential_dwelling'
+    }
   };
 }
 
@@ -142,6 +165,59 @@ export function calculateYurtGeometry(design = {}) {
       roof_uses_sloping_area: true,
       usable_not_greater_than_gross: usableFloor <= grossFloor + 1e-9
     }
+  };
+}
+
+export function calculateOccupancyCompliance(geometry, occupancy = {}) {
+  const code = evidence.occupancy_code_model;
+  const optionalNumber = (key, fallback) => occupancy[key] == null ? fallback : finite(occupancy[key], fallback);
+  const openConcept = occupancy.layout !== 'separated_rooms';
+  const occupants = Math.max(1, Math.round(finite(occupancy.occupants, geometry.inputs.household_size)));
+  const bedroomCount = Math.max(0, Math.round(finite(occupancy.bedroom_count, openConcept ? 0 : 1)));
+  const bathroomArea = Math.max(0, optionalNumber('bathroom_area_m2', code.open_concept.bathroom_reference_area_m2));
+  const kitchenArea = Math.max(0, optionalNumber('kitchen_area_m2', code.separated_rooms.kitchen_area_m2));
+  const livingDiningKitchenArea = Math.max(0, optionalNumber('living_dining_kitchen_area_m2', geometry.usable_floor_area_m2 - bathroomArea));
+  const sleepingArea = Math.max(0, optionalNumber('sleeping_area_m2', openConcept ? livingDiningKitchenArea : geometry.usable_floor_area_m2 - bathroomArea - kitchenArea));
+  const requiredArea = openConcept
+    ? code.open_concept.total_minimum_finished_floor_area_m2
+    : code.separated_rooms.minimum_one_bedroom_area_m2;
+  const requiredSleepingArea = openConcept ? code.open_concept.combined_living_sleeping_dining_kitchen_area_m2 : (bedroomCount > 1 ? code.separated_rooms.master_bedroom_area_m2 + (bedroomCount - 1) * code.separated_rooms.other_bedroom_area_m2 : code.separated_rooms.master_bedroom_area_m2);
+  const providedWindowArea = occupancy.window_area_m2 == null ? null : Math.max(0, finite(occupancy.window_area_m2));
+  const requiredWindowArea = openConcept
+    ? sleepingArea * code.windows.living_dining_glazing_fraction
+    : livingDiningKitchenArea * code.windows.living_dining_glazing_fraction + sleepingArea * code.windows.bedroom_glazing_fraction;
+  const review = (id, label, status, detail, evidenceStatus = 'official_guidance_reference') => ({id, label, status, detail, evidence_status: evidenceStatus});
+  const checks = [
+    review('finished_floor_area', 'Finished floor area', geometry.usable_floor_area_m2 >= requiredArea ? 'passes_reference_minimum' : 'below_reference_minimum', `${geometry.usable_floor_area_m2.toFixed(2)} m² usable against ${requiredArea.toFixed(2)} m² for the ${openConcept ? 'open-concept' : 'one-bedroom separated-room'} reference.`),
+    review('layout_and_sleeping', openConcept ? 'Open-concept living / sleeping / dining / kitchen' : 'Separated rooms and sleeping areas', sleepingArea >= requiredSleepingArea ? 'passes_reference_allocation' : 'below_reference_allocation', `${sleepingArea.toFixed(2)} m² available against ${requiredSleepingArea.toFixed(2)} m² reference sleeping/living allocation.`),
+    review('occupants_and_bedrooms', 'Occupants and bedrooms', openConcept ? 'review_required' : (bedroomCount > 0 ? 'review_required' : 'below_reference_allocation'), `${occupants} occupant${occupants === 1 ? '' : 's'} and ${bedroomCount} bedroom${bedroomCount === 1 ? '' : 's'} supplied. Ontario guidance does not create a universal occupancy-per-m² rule; room use and municipal review remain required.`),
+    review('bathroom', 'Bathroom', bathroomArea >= code.open_concept.bathroom_reference_area_m2 ? 'passes_reference_area' : 'below_reference_area', `${bathroomArea.toFixed(2)} m² planning allocation; fixtures still require compliant layout and servicing.`),
+    review('kitchen', 'Kitchen', openConcept ? 'included_in_open_concept_reference' : (kitchenArea >= code.separated_rooms.kitchen_area_m2 ? 'passes_reference_area' : 'below_reference_area'), `${kitchenArea.toFixed(2)} m² planning allocation; the open-concept reference combines kitchen with living/sleeping/dining.`),
+    review('egress_windows', 'Windows and egress', providedWindowArea == null ? 'review_required' : (providedWindowArea >= requiredWindowArea ? 'passes_area_reference' : 'below_area_reference'), providedWindowArea == null ? `At least ${requiredWindowArea.toFixed(2)} m² of qualifying glazing is required by the reference; provide an opening schedule.` : `${providedWindowArea.toFixed(2)} m² provided against ${requiredWindowArea.toFixed(2)} m² reference glazing.`, providedWindowArea == null ? 'quotation_or_design_review_required' : 'official_guidance_reference'),
+    review('ventilation_heating', 'Ventilation and heating', occupancy.heating_confirmed && occupancy.ventilation_confirmed ? 'user_confirmed_review_required' : 'review_required', 'Year-round occupancy needs code-compliant heating and ventilation; the model does not infer approval from a yurt package.'),
+    review('ceiling_heights', 'Ceiling heights', 'review_required', `${geometry.inputs.wall_height_m.toFixed(2)} m wall height is not proof that all required floor area meets the applicable ceiling-height rules.`),
+    review('stairs_guards', 'Stairs and guards', geometry.inputs.layout === 'single_storey' ? 'not_applicable_single_storey' : 'review_required', geometry.inputs.layout === 'single_storey' ? 'No upper floor selected.' : 'Upper-floor access, guards, handrails and headroom require a code review.'),
+    review('foundation_anchorage', 'Foundation and anchorage', 'review_required', 'Footings, foundation, frost protection and anchorage require site-specific structural design.', 'engineering_review_required'),
+    review('zoning_occupancy', 'Zoning and occupancy approval', 'review_required', 'Municipal zoning, minimum dwelling area, permits and occupancy approval are site-specific.', 'municipal_review_required')
+  ];
+  return {
+    contract_version: '1.0.0',
+    source: code.source,
+    scope: 'planning_screen_not_building_approval',
+    reference_open_concept_minimum_finished_floor_area_m2: code.open_concept.total_minimum_finished_floor_area_m2,
+    layout: openConcept ? 'open_concept' : 'separated_rooms',
+    occupants,
+    bedroom_count: bedroomCount,
+    finished_floor_area_m2: geometry.usable_floor_area_m2,
+    required_reference_area_m2: requiredArea,
+    sleeping_area_m2: sleepingArea,
+    bathroom_area_m2: bathroomArea,
+    kitchen_area_m2: kitchenArea,
+    required_window_area_m2: round(requiredWindowArea, 3),
+    provided_window_area_m2: providedWindowArea,
+    checks,
+    overall_status: checks.some((check) => ['below_reference_minimum', 'below_reference_allocation', 'below_reference_area'].includes(check.status)) ? 'does_not_pass_reference_screen' : 'passes_reference_screen_subject_to_review',
+    note: code.note
   };
 }
 
@@ -219,6 +295,10 @@ function normalizeOptions(options = {}) {
   const band = ['low', 'central', 'high'].includes(options.band) ? options.band : 'central';
   const servicingMode = evidence.servicing_modes[options.servicingMode] ? options.servicingMode : evidence.defaults.servicing_mode;
   const labourMode = evidence.labour_modes[options.labourMode] ? options.labourMode : evidence.defaults.labour_mode;
+  const requestedDiameter = finite(options.design?.diameter_m ?? evidence.defaults.diameter_m, evidence.defaults.diameter_m);
+  const design = normalizeDesign(options.design);
+  design.residential_shell.requested_diameter_m = requestedDiameter;
+  design.residential_shell.requested_below_minimum = requestedDiameter < MIN_RESIDENTIAL_DIAMETER_M;
   const explicitRateType = options.financing?.rateType;
   const legacyRateOverride = explicitRateType == null && options.financing?.customRateAnnual == null && options.financing?.interestRateAnnual != null;
   const rateType = ['fixed', 'variable', 'custom'].includes(explicitRateType) ? explicitRateType : (legacyRateOverride ? 'custom' : (evidence.defaults.financing.rate_type ?? 'fixed'));
@@ -227,7 +307,7 @@ function normalizeOptions(options = {}) {
     completionStage: normalizeCompletionStage(options.completionStage),
     servicingMode,
     labourMode,
-    design: normalizeDesign(options.design),
+    design,
     completionSelections: {...(evidence.defaults.completion_selections ?? {}), ...(options.completionSelections ?? {})},
     yurtSupplierId: typeof options.yurtSupplierId === 'string' ? options.yurtSupplierId : 'yurts_canada',
     yurtPackageId: typeof options.yurtPackageId === 'string' ? options.yurtPackageId : null,
@@ -480,12 +560,13 @@ function marketPrice(value, band) {
 
 function packageForOptions(input) {
   const priced = marketEvidence.yurt_packages.filter((row) => finite(row.price_cad, 0) > 0);
-  const requested = input.yurtPackageId ? marketEvidence.yurt_packages.find((row) => row.id === input.yurtPackageId) : null;
+  const residentialPriced = priced.filter((row) => row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M);
+  const requested = input.yurtPackageId ? residentialPriced.find((row) => row.id === input.yurtPackageId) : null;
   const supplierId = input.yurtSupplierId ?? 'yurts_canada';
-  const supplierPriced = priced.filter((row) => row.supplier_id === supplierId);
-  const candidates = supplierPriced.length ? supplierPriced : priced.filter((row) => row.supplier_id === 'yurts_canada');
+  const supplierPriced = residentialPriced.filter((row) => row.supplier_id === supplierId);
+  const candidates = supplierPriced.length ? supplierPriced : residentialPriced.filter((row) => row.supplier_id === 'yurts_canada');
   const exact = requested?.price_cad ? requested : candidates.find((row) => Math.abs(row.diameter_m - input.design.diameter_m) < 0.0001);
-  if (exact) return {...exact, selection_method: 'exact_published_or_selected_package', source: marketEvidence.suppliers.find((row) => row.id === exact.supplier_id)};
+  if (exact) return {...exact, ordinary_residential_eligible: true, residential_use: 'ordinary_full_time_year_round_candidate', selection_method: 'exact_published_or_selected_package', source: marketEvidence.suppliers.find((row) => row.id === exact.supplier_id)};
   const ordered = [...candidates].sort((a, b) => a.diameter_m - b.diameter_m);
   const lower = [...ordered].reverse().find((row) => row.diameter_m <= input.design.diameter_m) ?? ordered[0];
   const upper = ordered.find((row) => row.diameter_m >= input.design.diameter_m) ?? ordered.at(-1);
@@ -501,6 +582,8 @@ function packageForOptions(input) {
     price_cad: price,
     selection_method: extrapolated ? 'extrapolated_from_nearest_published_sizes' : 'linear_interpolation_between_published_sizes',
     interpolation: {lower_package_id: lower.id, upper_package_id: upper.id, proportion, extrapolated},
+    ordinary_residential_eligible: true,
+    residential_use: 'ordinary_full_time_year_round_candidate',
     source: marketEvidence.suppliers.find((row) => row.id === upper.supplier_id)
   };
 }
@@ -846,7 +929,9 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), pricing_layer_sum_check: round(cumulativeLayerCash) === round(upfrontCash), pricing_layer_economic_sum_check: Math.abs(cumulativeLayerEconomic - economicCapital) < .05, pricing_layer_economic_residual_cad: roundSigned(cumulativeLayerEconomic - economicCapital, 4), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
     input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
     evidence: sourceList,
-    market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors},
+    market_evidence: {contract_version: marketEvidence.contract_version, pricing_model_id: marketEvidence.pricing_model_id, supplier_count: marketEvidence.suppliers.length, package_count: marketEvidence.yurt_packages.length, material_count: marketEvidence.material_catalog.length, package_inclusion_matrix: marketEvidence.package_inclusion_matrix, platform_design: marketEvidence.platform_design, utility_packages: marketEvidence.utility_packages, additional_assemblies: marketEvidence.additional_assemblies, planning_band_factors: marketEvidence.planning_band_factors, yurt_packages: marketEvidence.yurt_packages.map((row) => ({...row, ordinary_residential_eligible: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M, residential_use: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M ? 'ordinary_full_time_year_round_candidate' : 'shell_only_seasonal_experimental_or_special_engineering'}))},
+    occupancy_compliance: calculateOccupancyCompliance(geometry, input.design.occupancy),
+    residential_shell_policy: evidence.residential_shell_policy,
     assumptions: {tax_rate: input.taxRate, contingency_rate: input.contingencyRate, custom_quote: input.customCompletedQuoteCad, package_selection: yurtPackage.selection_method, completion_stage: input.completionStage, completion_selections: input.completionSelections}
   };
 }
@@ -858,8 +943,8 @@ export function calculateHouseCost(options = {}) {
 export function buildHouseCostPresentationContract(options = {}) {
   const bands = Object.fromEntries(['low', 'central', 'high'].map((band) => [band, calculateHouseCost({...options, band})]));
   const diameterSensitivity = evidence.diameter_presets.map((preset) => {
-    const result = calculateHouseCost({...options, design: {...options.design, diameter_m: preset.diameter_m}});
-    return {id: preset.id, label: preset.label, diameter_m: result.geometry.inputs.diameter_m, usable_floor_area_m2: result.geometry.usable_floor_area_m2, completed_dwelling_capital_cad: result.totals.completed_dwelling_capital_cad, upfront_cash_required_cad: result.totals.upfront_cash_required_cad, cost_per_usable_m2_cad: result.geometry.usable_floor_area_m2 ? result.totals.completed_dwelling_capital_cad / result.geometry.usable_floor_area_m2 : null, thresholds: result.thresholds.applied.map((row) => row.id)};
+    const result = calculateHouseCost({...options, ...(preset.supplier_id ? {yurtSupplierId: preset.supplier_id} : {}), design: {...options.design, diameter_m: preset.diameter_m}});
+    return {id: preset.id, label: preset.label, diameter_m: result.geometry.inputs.diameter_m, supplier_id: result.supplier_package.supplier_id, usable_floor_area_m2: result.geometry.usable_floor_area_m2, completed_dwelling_capital_cad: result.totals.completed_dwelling_capital_cad, upfront_cash_required_cad: result.totals.upfront_cash_required_cad, cost_per_usable_m2_cad: result.geometry.usable_floor_area_m2 ? result.totals.completed_dwelling_capital_cad / result.geometry.usable_floor_area_m2 : null, thresholds: result.thresholds.applied.map((row) => row.id)};
   });
   const comparison = ['single_storey', 'partial_loft', 'full_two_storeys'].map((layout) => {
     const result = calculateHouseCost({...options, design: {...options.design, layout}});
@@ -880,12 +965,15 @@ export function buildHouseCostPresentationContract(options = {}) {
     procurement_routes: evidence.procurement_routes,
     component_evidence: evidence.components,
     pricing_model: marketEvidence.pricing_model_id,
-    market_evidence: marketEvidence,
+    market_evidence: {...marketEvidence, yurt_packages: marketEvidence.yurt_packages.map((row) => ({...row, ordinary_residential_eligible: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M, residential_use: row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M ? 'ordinary_full_time_year_round_candidate' : 'shell_only_seasonal_experimental_or_special_engineering'}))},
     threshold_rules: evidence.threshold_rules,
     legacy_arc_benchmark: evidence.legacy_arc_benchmark,
     central: bands.central,
     bands,
     diameter_sensitivity: diameterSensitivity,
+    residential_shell_policy: evidence.residential_shell_policy,
+    occupancy_code_model: evidence.occupancy_code_model,
+    supplier_diameter_options: Object.fromEntries([...new Set(marketEvidence.yurt_packages.map((row) => row.supplier_id))].map((supplierId) => [supplierId, marketEvidence.yurt_packages.filter((row) => finite(row.price_cad, 0) > 0 && row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M && row.supplier_id === supplierId).map((row) => ({id: row.id, label: row.diameter_label, diameter_m: row.diameter_m, evidence_status: row.evidence_status}))])),
     layout_comparison: comparison,
     accounting_rules: evidence.accounting_rules,
     sources: evidence.sources,

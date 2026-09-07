@@ -15,7 +15,8 @@ const quantity = (value) => Number(value ?? 0).toLocaleString('en-CA', {maximumF
 const packageRows = contract.market_evidence.yurt_packages.map((row) => {
   const supplier = contract.market_evidence.suppliers.find((item) => item.id === row.supplier_id);
   const price = row.price_cad == null ? 'quote required' : money(row.price_cad);
-  return `| ${supplier?.name ?? row.supplier_id} | ${row.diameter_label} | ${price} | ${row.price_basis} | ${row.evidence_status} |`;
+  const residentialUse = row.ordinary_residential_eligible ? 'ordinary residential candidate' : 'evidence only: shell-only / seasonal / experimental / special engineering';
+  return `| ${supplier?.name ?? row.supplier_id} | ${row.diameter_label} | ${price} | ${row.price_basis} | ${row.evidence_status} · ${residentialUse} |`;
 }).join('\n');
 const componentRows = central.components.map((row) => `| ${row.label} | ${quantity(row.quantity)} | ${row.unit} | ${money(row.unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const platformRows = central.components.filter((row) => row.id.startsWith('platform_')).map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.unit} | ${money(row.base_unit_rate_cad)} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.source_url ? `[source](${row.source_url})` : 'allowance / quote required'} |`).join('\n');
@@ -78,6 +79,19 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 - Stress-test payment: **${money(selectedMortgage.stress_test_payment_cad)}/month** at ${(selectedMortgage.stress_test_rate_annual * 100).toFixed(2)}%; term: ${selectedMortgage.term_years} years; amortization: ${selectedMortgage.amortization_years} years; balance at term end: ${money(selectedMortgage.term_end_balance_cad)}.
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Residential shell and occupancy screen
+
+- Ordinary residential selector minimum: **${contract.residential_shell_policy.minimum_diameter_label}** (${contract.residential_shell_policy.minimum_diameter_m} m); existing default: **${contract.defaults.diameter_m} m / 30 ft**.
+- 12 ft and 16 ft records remain supplier evidence only and are excluded from ordinary residential, completed-dwelling and mortgage calculations.
+- Exact larger supplier evidence is supplier-specific: the 32 ft Out Factory estimate is available under that supplier; custom sizes outside exact rows are labelled interpolated or extrapolated.
+- The Ontario guidance reference is **${contract.occupancy_code_model.open_concept.total_minimum_finished_floor_area_m2} m²** for an open-concept tiny-home example. This is a reference screen, not automatic approval.
+
+| Occupancy/code check | Result | Detail |
+| --- | --- | --- |
+${central.occupancy_compliance.checks.map((row) => `| ${row.label} | ${row.status} | ${row.detail} |`).join('\n')}
+
+Source: [Ontario tiny-home guidance](${contract.occupancy_code_model.source.url}). Municipal zoning, Building Code review, servicing, foundation/anchorage, occupancy approval, appraisal, insurance and lender acceptance remain unresolved until reviewed for the actual design and site.
 
 ## Mortgage evidence and down-payment scenarios
 

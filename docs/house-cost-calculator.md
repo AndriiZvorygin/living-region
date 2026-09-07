@@ -29,6 +29,12 @@ At the 30 ft reference diameter, the central cash layers are:
 
 The full cash total includes the published supplier package, platform, only the selected minimal completion rows, utility package, project costs, tax and contingency. The default selected stage is the first layer, so its financing and outstanding requirements are shown separately. The supplier package is Yurts Canada's published installed all-season Base Kit; there is no unsupported claim that this evidence is a bare-material kit price.
 
+## Residential shell boundary and occupancy review
+
+The ordinary residential selector starts at **20 ft**. The existing **30 ft** default is preserved; 24 ft is also available, and the exact 32 ft Out Factory estimate appears when that supplier is selected. 12 ft and 16 ft products remain visible in the market evidence table only as shell-only, seasonal, experimental or special-engineering records. They cannot enter ordinary residential, completed-dwelling or mortgage calculations. A custom diameter below 20 ft is clamped to 20 ft and records that correction in the contract.
+
+20 ft is a practical modelling threshold, not automatic legal approval. The occupancy screen evaluates finished usable floor area, open-concept or separated-room layout, occupants and bedrooms, sleeping/living/kitchen allocation, bathroom area, windows and egress, ventilation and heating, ceiling heights, stairs and guards, foundation/anchorage, zoning and occupancy approval. Ontario's tiny-home guidance gives **17.5 m²** as an open-concept reference, but municipal zoning and the final Building Code review may require more. The screen is therefore a design review aid, not a permit or lender approval.
+
 ## Cash waterfall
 
 The basic dwelling subtotal ends after the Basic household amenities layer. Delivery, design and permits are external project costs added after that subtotal; they are not an unexplained construction-cost increase.
@@ -72,7 +78,7 @@ Owner-builder, mixed-labour and contractor-built modes show paid hours, owner ho
 
 `upfront_cash_required_cad` is the complete cash construction budget including tax and contingency. It is not the household's down payment. Financing exposes the initial contribution and financed principal separately and documents the distinction between loan term/renewal and amortization.
 
-The mortgage section uses the dated evidence snapshot at `packages/carrying-capacity/data/derived/house-mortgage-rates.json`, refreshed by `npm run update:house-mortgage-rates`. The default fixed reference is the Bank of Canada's latest visible insured fixed-rate market average for terms of five years and over: **4.01%**, observed **2026-06-30** and checked **2026-09-07**. The snapshot also records Bank of Canada insured/uninsured variable and fixed averages, current RBC high-ratio and conventional special-rate observations, and a source-dated Scotiabank comparison. Lender promotions are not treated as universal offers; the UI shows source, observation date and freshness, and retains the last valid snapshot if a refresh is unavailable.
+The mortgage section uses the dated evidence snapshot at `packages/carrying-capacity/data/derived/house-mortgage-rates.json`, refreshed by `npm run update:house-mortgage-rates`. The default fixed reference is the Bank of Canada's latest visible **uninsured** fixed-rate market average for terms of five years and over: **4.35%**, observed **2026-06-30** and checked **2026-09-07**. The snapshot also records insured fixed and variable averages, current RBC high-ratio and conventional special-rate observations, and a source-dated Scotiabank comparison. Lender promotions are not treated as universal offers; the UI shows source, observation date and freshness, and retains the last valid snapshot if a refresh is unavailable.
 
 The four comparison rows are legal-minimum down payment, 10%, 20% and 25%. Canada.ca minimum-down-payment rules determine the first row. Below 20% down, the standard CMHC premium schedule is calculated separately and added to the financed principal when the property is eligible; 20% down is the conventional uninsured reference, not the legal minimum. The selected mortgage mode can use fixed, variable, custom or no-premium sensitivity, while the published comparison rows retain the automatic CMHC treatment.
 

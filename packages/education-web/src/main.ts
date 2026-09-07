@@ -18,6 +18,8 @@ import {calculatePhase1BoardingSensitivity, calculateTransitCostModel, DEFAULT_T
 import {calculateLocalRepresentationCostModel, DEFAULT_EXISTING_RESIDENT_LEVY_CAD, DEFAULT_LOCAL_AREAS_PER_WARD, DEFAULT_LOCAL_REPRESENTATION_AVOIDED_COSTS, DEFAULT_LOCAL_REPRESENTATION_CUSTOM_INPUTS, DEFAULT_LOCAL_REPRESENTATION_FUNDING, DEFAULT_LOCAL_REPRESENTATION_HOUSEHOLD_EQUIVALENTS, DEFAULT_LOCAL_REPRESENTATION_PROGRAM_COSTS, DEFAULT_LOCAL_REPRESENTATIVE_LIVING_WAGE_CAD, LOCAL_REPRESENTATION_SCENARIO_PRESETS, LOCAL_REPRESENTATION_SOURCES, LOCAL_REPRESENTATION_TIME_FIELD_LABELS, type ActiveLocalAreaCounts, type LocalRepresentationAvoidedCosts, type LocalRepresentationCustomInputs, type LocalRepresentationFunding, type LocalRepresentationOverheadPreset, type LocalRepresentationProgramCosts, type LocalRepresentationTimeAssumptions, type LocalRepresentationTimeScenarioId} from '../../transit-planner/src/local-representation-cost-model';
 import './style.css';
 
+const MIN_RESIDENTIAL_DIAMETER_M = HOUSE_COST_EVIDENCE.residential_shell_policy.minimum_diameter_m;
+
 function renderSectionNavNew() { const links: Array<[string, string]> = [['scenario', '01 Scenario'], ['land-requirement', '02 Land requirement'], ['establishment', '03 Establishment timeline'], ['food', '04 Food requirement'], ['food-labour', 'Food-production labour'], ['agroecosystem', 'Agroecosystem planner'], ['food-protein', 'Food & protein'], ['heating', '05 Heating'], ['annual-crops', '06 Annual crops'], ['perennial-crops', '07 Perennial crops'], ['method', '08 Method & sources']]; return `<nav class="section-nav" aria-label="Land and carrying-capacity sections"><span>On this page</span>${links.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('')}</nav>`; }
 function renderScenarioSummaryNew(result: any) { const site = state.contract.site_classes[state.site]; const local = site.local_environment ?? {}; const buildingCount = state.buildings.length; const totalFloor = state.buildings.reduce((sum: number, building: Building) => sum + Number(building.floor_area_m2 || 0), 0); return `<div class="scenario-summary"><div class="metric"><span>Household</span><strong>${state.members.length} ${state.members.length === 1 ? 'person' : 'people'}</strong><small>${esc(state.members.map((member) => member.label).join(' · '))}</small></div><div class="metric"><span>Site condition</span><strong>${esc(site.label)}</strong><small>${esc(local.cli_capability_class_band ?? 'Scenario capability band')}</small></div><div class="metric"><span>Heated buildings</span><strong>${buildingCount} · ${fmt(totalFloor, 1)} m²</strong><small>${esc(state.buildings.map((building) => building.label).join(' · '))}</small></div><div class="metric"><span>Local context</span><strong>${fmt(state.contract.environment.climate.growing_degree_days.value_degree_days, 0)} °C·day</strong><small>${fmt(state.contract.environment.climate.frost_free_period.average_length_days, 0)} frost-free days · ${fmt(state.contract.environment.climate.heating_degree_days.value_degree_days, 0)} heating degree days</small></div></div>`; }
 function renderScenarioSectionNew(result: any) { const siteOptions: Array<[string, string]> = [['wetter_productive', 'Favourable / productive'], ['ordinary_mesic', 'Ordinary / mesic'], ['dry', 'Dry / moisture-limited'], ['shallow_rocky_marginal', 'Marginal / shallow / rocky']]; const presetOptions: Array<[string, string]> = [['reference_adult_man', 'Reference adult man · editable starting case'], ...state.contract.household_presets.map((row: any) => [row.id, row.label]), ['custom', 'Custom household']]; return `<section class="section" id="scenario"><div class="section-heading"><p class="eyebrow">01 · scenario</p><h2>Choose the household and place</h2><p>Set the people, site condition and heated building load. The result below updates immediately from this scenario.</p></div>${renderScenarioSummaryNew(result)}<div class="controls-row scenario-controls">${selectControl('preset', 'Household', presetOptions, state.preset)}${selectControl('site', 'Site condition', siteOptions, state.site)}</div><p class="small-note">Site bands are transparent scenario capability ranges informed by Owen Sound / Grey County climate and the Ontario soil-capability framework; they are not parcel-level soil classifications.</p></section>`; }
@@ -44,6 +46,7 @@ function renderFoodProductionLabourSection(result: any) {
 }
 
 let houseSupplierOptions: Array<[string, string]> = [];
+let houseSupplierDiameterOptions: Record<string, string[]> = {};
 
 function renderFirstPrinciplesHouseCostPage() {
   const result = houseCostResult();
@@ -56,7 +59,8 @@ function renderFirstPrinciplesHouseCostPage() {
   const packageRows = market.yurt_packages.map((row: any) => {
     const supplier = market.suppliers.find((item: any) => item.id === row.supplier_id);
     const price = row.price_cad == null ? 'Quote required' : cad(row.price_cad);
-    return `<tr><th scope="row">${esc(supplier?.name ?? row.supplier_id)}</th><td>${esc(row.diameter_label)}</td><td>${price}</td><td>${esc(row.price_basis)}</td><td>${esc(row.evidence_status)}</td><td>${supplier?.source_url ? `<a href="${esc(supplier.source_url)}" target="_blank" rel="noreferrer">source</a>` : '—'}</td></tr>`;
+    const residentialUse = row.ordinary_residential_eligible ? 'ordinary residential candidate' : 'evidence only: shell-only / seasonal / experimental / special engineering';
+    return `<tr><th scope="row">${esc(supplier?.name ?? row.supplier_id)}</th><td>${esc(row.diameter_label)}</td><td>${price}</td><td>${esc(row.price_basis)}</td><td>${esc(row.evidence_status)} · ${residentialUse}</td><td>${supplier?.source_url ? `<a href="${esc(supplier.source_url)}" target="_blank" rel="noreferrer">source</a>` : '—'}</td></tr>`;
   }).join('');
   const rateRows = result.components.map((row: any) => {
     const source = row.source_url ? `<a href="${esc(row.source_url)}" target="_blank" rel="noreferrer">source</a>` : 'Quote or planning allowance';
@@ -73,6 +77,7 @@ function renderFirstPrinciplesHouseCostPage() {
   const services = Object.entries(HOUSE_COST_EVIDENCE.servicing_modes).map(([id, mode]: [string, any]) => [id, mode.label] as [string, string]);
   const labourModes = Object.entries(HOUSE_COST_EVIDENCE.labour_modes).map(([id, mode]: [string, any]) => [id, mode.label] as [string, string]);
   houseSupplierOptions = ([...new Set(market.yurt_packages.filter((row: any) => row.price_cad != null).map((row: any) => row.supplier_id))] as string[]).map((id) => [id, market.suppliers.find((row: any) => row.id === id)?.name ?? id]);
+  houseSupplierDiameterOptions = Object.fromEntries(houseSupplierOptions.map(([id]) => [id, market.yurt_packages.filter((row: any) => row.price_cad != null && row.diameter_m >= MIN_RESIDENTIAL_DIAMETER_M && row.supplier_id === id).map((row: any) => String(row.diameter_m))]));
   const houseBandOptions: Array<[string, string]> = [['low', 'Low planning band'], ['central', 'Central planning band'], ['high', 'High planning band']];
   const layoutOptions: Array<[string, string]> = Object.entries(HOUSE_COST_EVIDENCE.layout_rules).map(([id, rule]: [string, any]) => [id, rule.label]);
   const ownershipOptions: Array<[string, string]> = [['financed', 'Financed dwelling'], ['owned_out_right', 'Owned outright']];
@@ -295,7 +300,7 @@ const houseCostState: HouseCostUiState = {
 const sharedQuery = new URLSearchParams(window.location.search);
 const houseQueryNumber = (key: string, fallback: number) => { const value = Number(sharedQuery.get(key)); return sharedQuery.has(key) && Number.isFinite(value) ? value : fallback; };
 if (sharedQuery.has('houseBand') && ['low', 'central', 'high'].includes(sharedQuery.get('houseBand') ?? '')) houseCostState.band = sharedQuery.get('houseBand') as HouseCostUiState['band'];
-houseCostState.diameter_m = houseQueryNumber('houseDiameter', houseCostState.diameter_m);
+houseCostState.diameter_m = Math.max(MIN_RESIDENTIAL_DIAMETER_M, houseQueryNumber('houseDiameter', houseCostState.diameter_m));
 houseCostState.wall_height_m = houseQueryNumber('houseWallHeight', houseCostState.wall_height_m);
 houseCostState.roof_pitch_degrees = houseQueryNumber('houseRoofPitch', houseCostState.roof_pitch_degrees);
 houseCostState.household_size = houseQueryNumber('householdSize', houseCostState.household_size);
@@ -757,7 +762,7 @@ function bind() {
       const element = node as HTMLInputElement | HTMLSelectElement;
       const field = element.dataset.houseField;
       const value = Number(element.value);
-      if (field === 'diameterPreset') { if (element.value !== 'custom') houseCostState.diameter_m = Number(element.value); }
+      if (field === 'diameterPreset') { if (element.value !== 'custom') { houseCostState.diameter_m = Math.max(MIN_RESIDENTIAL_DIAMETER_M, Number(element.value)); const preset = HOUSE_COST_EVIDENCE.diameter_presets.find((row: any) => Math.abs(row.diameter_m - houseCostState.diameter_m) < .0001); if (preset?.supplier_id) houseCostState.supplierId = preset.supplier_id; } }
       else if (field === 'band') houseCostState.band = element.value as HouseCostUiState['band'];
       else if (field === 'supplierId') houseCostState.supplierId = element.value;
       else if (field === 'completionStage') houseCostState.completionStage = element.value;
@@ -776,6 +781,7 @@ function bind() {
       else if (field === 'insuranceMode') houseCostState.insuranceMode = element.value;
       else if (field === 'interestRate') { houseCostState.interestRate = Math.max(0, value / 100); houseCostState.customRateAnnual = houseCostState.interestRate; houseCostState.rateType = 'custom'; }
       else if (field === 'partition_loss_percent') houseCostState.partition_loss_fraction = Math.max(0, value / 100);
+      else if (field === 'diameter_m') houseCostState.diameter_m = Math.max(MIN_RESIDENTIAL_DIAMETER_M, value);
       else if (field && field in houseCostState) (houseCostState as unknown as Record<string, number>)[field] = value;
       render();
     }));
@@ -881,6 +887,10 @@ document.addEventListener('click', (event) => {
 });
 
 function houseSelect(id: string, label: string, options: Array<[string, string]>, value: string, field: string) {
+  if (id === 'house-diameter-preset') {
+    const allowed = houseSupplierDiameterOptions[houseCostState.supplierId];
+    if (allowed?.length) options = options.filter(([key]) => key === 'custom' || allowed.includes(key));
+  }
   const control = `<label class="control"><span>${esc(label)}</span><select id="${esc(id)}" data-house-field="${esc(field)}">${options.map(([key, text]) => `<option value="${esc(key)}" ${key === value ? 'selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
   if (id !== 'house-band' || !houseSupplierOptions.length) return control;
   return `${control}<label class="control"><span>Yurt supplier</span><select id="house-supplier" data-house-field="supplierId">${houseSupplierOptions.map(([key, text]) => `<option value="${esc(key)}" ${key === houseCostState.supplierId ? 'selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
@@ -894,6 +904,7 @@ function houseInput(id: string, label: string, value: unknown, unit: string, fie
     const additionalDoors = Math.max(0, Math.round(Number(value ?? 1)) - 1);
     return `<label class="control"><span>Additional doors</span><input id="${esc(id)}" data-house-field="additionalDoorCount" type="number" min="0" step="1" value="${esc(String(additionalDoors))}"><em>count; one standard supplier door is included</em></label>`;
   }
+  if (id === 'house-diameter' && field === 'diameter_m') min = String(MIN_RESIDENTIAL_DIAMETER_M);
   const shown = value == null ? '' : String(value);
   return `<label class="control"><span>${esc(label)}</span><input id="${esc(id)}" data-house-field="${esc(field)}" type="number" min="${esc(min)}" step="${esc(step)}" value="${esc(shown)}"><em>${esc(unit)}</em></label>`;
 }
@@ -950,6 +961,17 @@ function renderHouseMortgageRateEvidence(result: any) {
   return `<details class="method house-rate-evidence" data-house-rate-evidence><summary>Reference-rate range and lender observations</summary><p>The default calculation uses a Bank of Canada market average. The recorded lender rows show the range of available evidence and conditions; promotional or lender-specific rates are not universal offers.</p><div class="table-scroll"><table class="evidence-table"><caption>Bank of Canada reference rates</caption><thead><tr><th>Rate</th><th>Annual</th><th>Institution</th><th>Observed</th><th>Type</th><th>Source</th></tr></thead><tbody>${referenceRows.join('')}</tbody></table></div><div class="table-scroll"><table class="evidence-table"><caption>Canadian lender observations</caption><thead><tr><th>Lender</th><th>Product</th><th>Annual</th><th>Insurance status</th><th>Observed</th><th>Classification</th><th>Source</th></tr></thead><tbody>${lenderRows.join('')}</tbody></table></div><p class="small-note">The snapshot is ${esc(evidence.freshness?.status ?? 'status unavailable')} as of ${esc(evidence.snapshot_date ?? '—')}; a source-dated observation may remain visible as stale comparison evidence.</p></details>`;
 }
 
+function renderHouseOccupancyCompliance(result: any) {
+  const review = result.occupancy_compliance;
+  if (!review) return '';
+  const statusLabel = review.overall_status === 'passes_reference_screen_subject_to_review' ? 'Reference area screen passes; approvals remain required' : 'Reference screen has an area or layout issue';
+  const rows = (review.checks ?? []).map((check: any) => {
+    const pass = String(check.status).startsWith('passes_') || String(check.status).startsWith('included_') || String(check.status).startsWith('not_applicable');
+    return `<tr><th scope="row">${esc(check.label)}</th><td><span class="status ${pass ? 'selected' : check.status === 'review_required' ? 'reference' : 'unresolved'}">${esc(check.status.replaceAll('_', ' '))}</span></td><td>${esc(check.detail)}</td><td>${esc(check.evidence_status ?? 'planning review')}</td></tr>`;
+  }).join('');
+  return `<section class="section house-occupancy-review" data-house-occupancy-review><div class="section-heading"><p class="eyebrow">Occupancy and code review</p><h3>Does the selected shell have a plausible residential layout?</h3><p><strong>20 ft is a practical modelling threshold, not automatic legal approval.</strong> The review uses Ontario's open-concept ${fmt(review.reference_open_concept_minimum_finished_floor_area_m2, 1)} m² reference and checks the selected geometry, layout and known design inputs.</p></div><div class="metric-grid four">${metric('Finished floor area', `${fmt(review.finished_floor_area_m2, 1)} m²`, `reference ${fmt(review.required_reference_area_m2, 1)} m²`)}${metric('Occupants / bedrooms', `${fmt(review.occupants, 0)} / ${fmt(review.bedroom_count, 0)}`, review.layout.replaceAll('_', ' '))}${metric('Sleeping / living allocation', `${fmt(review.sleeping_area_m2, 1)} m²`, 'reference area check')}${metric('Required glazing', `${fmt(review.required_window_area_m2, 2)} m²`, review.provided_window_area_m2 == null ? 'opening schedule required' : `${fmt(review.provided_window_area_m2, 2)} m² provided`)}</div><p><span class="status ${review.overall_status === 'passes_reference_screen_subject_to_review' ? 'selected' : 'unresolved'}">${esc(statusLabel)}</span></p><div class="table-scroll"><table class="evidence-table"><caption>Selected design checks; a pass is not an occupancy permit</caption><thead><tr><th>Check</th><th>Status</th><th>Finding</th><th>Evidence status</th></tr></thead><tbody>${rows}</tbody></table></div><details class="method"><summary>Ontario reference and unresolved approvals</summary><p>${esc(review.note)}</p><p>The model also requires review of municipal zoning and minimum dwelling area, final Building Code compliance, finished area after wall thickness, qualifying egress windows, ventilation and heating, ceiling heights, stairs and guards for lofts, foundation and anchorage, water/sewage/electrical servicing, occupancy approval, appraisal, insurance and lender acceptance.</p><p><a href="${esc(review.source?.url ?? 'https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf')}" target="_blank" rel="noreferrer">Ontario tiny-home guidance</a></p></details></section>`;
+}
+
 function enhanceHouseCostSelectionUi() {
   const answer = document.querySelector('#answer');
   if (answer && !document.querySelector('[data-house-cost-waterfall]')) {
@@ -962,7 +984,14 @@ function enhanceHouseCostSelectionUi() {
   if (mortgageElement && !mortgageElement.querySelector('[data-house-rate-evidence]')) {
     mortgageElement.insertAdjacentHTML('beforeend', renderHouseMortgageRateEvidence(houseCostResult()));
   }
+  if (answer && !document.querySelector('[data-house-occupancy-review]')) {
+    const anchor = answer.querySelector('[data-house-mortgage]') ?? answer.querySelector('.house-layer-list');
+    anchor?.insertAdjacentHTML('afterend', renderHouseOccupancyCompliance(houseCostResult()));
+  }
   const designActions = document.querySelector('#design .house-actions');
+  if (designActions && !document.querySelector('[data-house-shell-policy]')) {
+    designActions.insertAdjacentHTML('beforebegin', `<div class="house-shell-policy" data-house-shell-policy><strong>Residential shell boundary:</strong> ordinary full-time, year-round modelling starts at 20 ft. The 30 ft default is preserved. 12 ft and 16 ft supplier records remain evidence-only shell options and cannot enter ordinary residential, completed-dwelling or mortgage calculations. This is a practical threshold, not legal approval.</div>`);
+  }
   if (designActions && !document.querySelector('[data-house-completion-controls]')) {
     designActions.insertAdjacentHTML('beforebegin', `<div class="house-completion-controls" data-house-completion-controls><h3>Completion selections</h3><p>These controls are independent. The household water, sanitation, hot-water and electrical fixtures remain in the selected utility package exactly once.</p><div class="controls-row">${houseCompletionSelectionControl('heating', 'Heating appliance and chimney', 'required for the four-season reference')}</div><div class="controls-row">${houseCompletionSelectionControl('ventilation', 'Ventilation', 'separate air-exchange system')}${houseCompletionSelectionControl('privacy_partition', 'Privacy partition', '3.0 m × 2.4 m = 7.2 m²')}${houseCompletionSelectionControl('protective_floor_surface', 'Protective floor surface', 'usable floor area')}</div><div class="controls-row">${houseCompletionSelectionControl('basic_counter', 'Basic kitchen counter', '1.8 m × 0.6 m = 1.08 m²')}${houseCompletionSelectionControl('interior_surface_finish', 'Decorative interior finish', 'optional; off by default')}${houseCompletionSelectionControl('kitchen_cabinetry', 'Kitchen cabinetry', 'optional; off by default')}</div><div class="controls-row">${houseCompletionSelectionControl('kitchen_appliances', 'Kitchen appliances', 'optional; off by default')}${houseCompletionSelectionControl('bathroom_fittings', 'Bathroom storage and trim', 'optional; off by default')}</div><p class="small-note">The Basic completed ARC dwelling preset selects only the reference heating, ventilation, privacy, protective-floor and counter rows. Unselected options stay visible as unresolved elective work.</p></div>`);
   }

@@ -4,7 +4,9 @@ import {
   buildArcDwellingAffordabilityIntegration,
   buildHouseCostPresentationContract,
   calculateHouseCost,
-  calculateYurtGeometry
+  calculateYurtGeometry,
+  MIN_RESIDENTIAL_DIAMETER_M,
+  calculateOccupancyCompliance
 } from '../src/index.mjs';
 
 test('reference yurt uses full precision geometry and sloping roof area', () => {
@@ -27,7 +29,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.2.0');
+  assert.equal(result.contract_version, '4.3.0');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -225,13 +227,13 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.2.0');
+  assert.equal(contract.contract_version, '4.3.0');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));
   assert.ok(contract.central.components.some((row) => row.id === 'pv_400w'));
   assert.ok(contract.sources.length >= 5);
-  assert.ok(contract.diameter_sensitivity.length >= 5);
+  assert.ok(contract.diameter_sensitivity.length >= 4);
   assert.equal(contract.layout_comparison.length, 3);
   assert.ok(contract.central.supplier_package.source_url);
   assert.equal(contract.pricing_layers.length, 5);
@@ -243,6 +245,46 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.equal(contract.central.cost_waterfall.project_costs_before_tax_cad, 5800);
   assert.equal(contract.central.cost_waterfall.basic_dwelling_subtotal_cad, 66374.59);
   assert.equal(contract.central.cost_waterfall.checks.subtotal_plus_project_costs_check, true);
+});
+
+test('ordinary residential shell options start at 20 ft and keep smaller evidence out of calculations', () => {
+  const below20 = calculateHouseCost({design: {diameter_m: 4.8768}, completionStage: 'basic_completed_arc'});
+  const twenty = calculateHouseCost({design: {diameter_m: 6.096}, completionStage: 'basic_completed_arc'});
+  const twentyFour = calculateHouseCost({design: {diameter_m: 7.3152}, completionStage: 'basic_completed_arc'});
+  const thirty = calculateHouseCost({design: {diameter_m: 9.144}, completionStage: 'basic_completed_arc'});
+  assert.equal(MIN_RESIDENTIAL_DIAMETER_M, 6.096);
+  assert.equal(below20.geometry.inputs.diameter_m, MIN_RESIDENTIAL_DIAMETER_M);
+  assert.equal(below20.supplier_package.id, 'yc_20_base_installed');
+  assert.equal(twenty.supplier_package.id, 'yc_20_base_installed');
+  assert.equal(twentyFour.supplier_package.id, 'yc_24_base_installed');
+  assert.equal(thirty.supplier_package.id, 'yc_30_base_installed');
+  assert.equal(below20.geometry.inputs.residential_shell.requested_below_minimum, true);
+  assert.ok(below20.mortgage.selected_stage_cash_basis_cad > 0);
+});
+
+test('32 ft exact evidence is supplier-specific while 12 ft and 16 ft remain evidence-only', () => {
+  const contract = buildHouseCostPresentationContract();
+  const defaultOptions = contract.supplier_diameter_options.yurts_canada.map((row) => row.label);
+  const outFactoryOptions = contract.supplier_diameter_options.the_out_factory.map((row) => row.label);
+  assert.deepEqual(defaultOptions, ['20 ft', '24 ft', '30 ft']);
+  assert.ok(outFactoryOptions.some((label) => label.includes('32 ft')));
+  assert.equal(contract.central.market_evidence.yurt_packages.find((row) => row.diameter_label === '12 ft').ordinary_residential_eligible, false);
+  assert.equal(contract.central.market_evidence.yurt_packages.find((row) => row.diameter_label === '16 ft').ordinary_residential_eligible, false);
+  const outFactory = calculateHouseCost({yurtSupplierId: 'the_out_factory', design: {diameter_m: 9.7536}});
+  assert.equal(outFactory.supplier_package.id, 'tof_32_import_estimate');
+});
+
+test('occupancy screen uses Ontario open-concept reference and evaluates code-sensitive requirements', () => {
+  const twenty = calculateHouseCost({design: {diameter_m: 6.096, household_size: 1}});
+  const review = twenty.occupancy_compliance;
+  assert.equal(review.reference_open_concept_minimum_finished_floor_area_m2, 17.5);
+  assert.equal(review.occupants, 1);
+  assert.equal(review.checks.find((row) => row.id === 'finished_floor_area').status, 'passes_reference_minimum');
+  assert.equal(review.checks.find((row) => row.id === 'egress_windows').status, 'review_required');
+  assert.equal(review.checks.find((row) => row.id === 'zoning_occupancy').status, 'review_required');
+  const separated = calculateOccupancyCompliance(twenty.geometry, {layout: 'separated_rooms', occupants: 2, bedroom_count: 1, bathroom_area_m2: 3, kitchen_area_m2: 4.2});
+  assert.equal(separated.layout, 'separated_rooms');
+  assert.equal(separated.required_reference_area_m2, 23.8);
 });
 
 test('basic completed preset selects only itemized minimal completion components', () => {

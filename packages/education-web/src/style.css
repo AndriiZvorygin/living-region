@@ -343,6 +343,11 @@ main { max-width: 1180px; }
 .house-eligibility-warning { margin-top: 18px; padding: 15px 17px; border-left: 4px solid var(--amber); background: #fff8df; }
 .house-eligibility-warning strong { color: var(--ink); }
 .house-eligibility-warning p { margin: 6px 0 0; }
+.house-shell-policy { margin: 18px 0 0; padding: 14px 16px; border-left: 4px solid var(--amber); background: #fff8df; }
+.house-occupancy-review { margin-top: 24px; padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--sage); background: #f8fbf8; }
+.house-occupancy-review .section-heading h3 { margin: 0 0 8px; font-size: 1.45rem; }
+.house-occupancy-review .metric-grid { margin: 18px 0; }
+.house-occupancy-review .table-scroll { margin-top: 16px; }
 .status.warning { display: block; margin: 10px 0; padding: 9px 11px; color: #6a4300; background: #fff1bf; border: 1px solid #d5ad46; }
 @media (max-width: 700px) { .house-mortgage-controls { grid-template-columns: 1fr; } .house-mortgage { padding: 16px; } }
 .house-layer-list { display: grid; gap: 12px; margin: 25px 0; }

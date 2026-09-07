@@ -1,5 +1,5 @@
 {
-  "contract_version": "4.2.0",
+  "contract_version": "4.3.0",
   "model_id": "arc_yurt_house_cost",
   "title": "ARC four-season yurt house cost model",
   "defaults": {
@@ -31,10 +31,10 @@
     "owner_labour_value_rate_cad_per_hour": 24.6,
     "financing": {
       "ownership": "financed",
-      "down_payment_rate": 0.1,
+      "down_payment_rate": 0.2,
       "rate_type": "fixed",
       "insurance_mode": "automatic",
-      "interest_rate_annual": 0.0401,
+      "interest_rate_annual": 0.0435,
       "amortization_years": 25,
       "loan_term_years": 5
     }
@@ -56,14 +56,10 @@
       "diameter_m": 9.144
     },
     {
-      "id": "35ft",
-      "label": "10.668 m / 35 ft",
-      "diameter_m": 10.668
-    },
-    {
-      "id": "40ft",
-      "label": "12.192 m / 40 ft",
-      "diameter_m": 12.192
+      "id": "32ft_out_factory",
+      "label": "9.754 m / 32 ft · Out Factory estimate",
+      "diameter_m": 9.7536,
+      "supplier_id": "the_out_factory"
     }
   ],
   "layout_rules": {
@@ -1051,7 +1047,9 @@
           "electrical",
           "interior partitions"
         ],
-        "evidence_status": "published_supplier_price"
+        "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": false,
+        "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
       },
       {
         "id": "yc_16_base_installed",
@@ -1082,7 +1080,9 @@
           "electrical",
           "interior partitions"
         ],
-        "evidence_status": "published_supplier_price"
+        "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": false,
+        "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
       },
       {
         "id": "yc_20_base_installed",
@@ -1113,7 +1113,9 @@
           "electrical",
           "interior partitions"
         ],
-        "evidence_status": "published_supplier_price"
+        "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "yc_24_base_installed",
@@ -1144,7 +1146,9 @@
           "electrical",
           "interior partitions"
         ],
-        "evidence_status": "published_supplier_price"
+        "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "yc_30_base_installed",
@@ -1175,7 +1179,9 @@
           "electrical",
           "interior partitions"
         ],
-        "evidence_status": "published_supplier_price"
+        "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "tof_20_import_estimate",
@@ -1208,7 +1214,9 @@
           "interior partitions",
           "door delivery to site"
         ],
-        "evidence_status": "non_binding_import_estimate"
+        "evidence_status": "non_binding_import_estimate",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "tof_24_import_estimate",
@@ -1241,7 +1249,9 @@
           "interior partitions",
           "door delivery to site"
         ],
-        "evidence_status": "non_binding_import_estimate"
+        "evidence_status": "non_binding_import_estimate",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "tof_32_import_estimate",
@@ -1274,7 +1284,9 @@
           "interior partitions",
           "door delivery to site"
         ],
-        "evidence_status": "non_binding_import_estimate"
+        "evidence_status": "non_binding_import_estimate",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "biome_20_configurator",
@@ -1311,7 +1323,9 @@
           "rafter_supports": 1478.08,
           "wood_stove": 3501.42
         },
-        "evidence_status": "configurator_options_quote_required"
+        "evidence_status": "configurator_options_quote_required",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "biome_24_configurator",
@@ -1348,7 +1362,9 @@
           "rafter_supports": 2138.58,
           "wood_stove": 3501.42
         },
-        "evidence_status": "configurator_options_quote_required"
+        "evidence_status": "configurator_options_quote_required",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       },
       {
         "id": "biome_30_configurator",
@@ -1386,7 +1402,9 @@
           "rafter_supports_spf": 931.46,
           "wood_stove": 3501.42
         },
-        "evidence_status": "configurator_options_quote_required"
+        "evidence_status": "configurator_options_quote_required",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate"
       }
     ],
     "package_inclusion_matrix": {
@@ -2282,7 +2300,7 @@
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
   "central": {
-    "contract_version": "4.2.0",
+    "contract_version": "4.3.0",
     "model_id": "arc_yurt_house_cost",
     "package_label": "First-principles yurt package plus quantity-based completion model",
     "price_basis_date": "2026-09-05",
@@ -2305,6 +2323,18 @@
       "wall_height_m": 2.4,
       "roof_pitch_degrees": 30,
       "household_size": 2,
+      "occupancy": {
+        "layout": "open_concept",
+        "occupants": 2,
+        "bedroom_count": 0,
+        "sleeping_area_m2": null,
+        "bathroom_area_m2": null,
+        "kitchen_area_m2": null,
+        "living_dining_kitchen_area_m2": null,
+        "window_area_m2": null,
+        "heating_confirmed": false,
+        "ventilation_confirmed": false
+      },
       "layout": "single_storey",
       "window_count": 0,
       "door_count": 1,
@@ -2312,7 +2342,15 @@
       "stair_opening_m2": 0,
       "restricted_headroom_override_used": false,
       "restricted_headroom_fraction": 0,
-      "guard_length_m": 0
+      "guard_length_m": 0,
+      "residential_shell": {
+        "minimum_diameter_m": 6.096,
+        "minimum_diameter_label": "20 ft",
+        "requested_diameter_m": 9.144,
+        "requested_below_minimum": false,
+        "applied_diameter_m": 9.144,
+        "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+      }
     },
     "geometry": {
       "inputs": {
@@ -2320,6 +2358,18 @@
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
+        "occupancy": {
+          "layout": "open_concept",
+          "occupants": 2,
+          "bedroom_count": 0,
+          "sleeping_area_m2": null,
+          "bathroom_area_m2": null,
+          "kitchen_area_m2": null,
+          "living_dining_kitchen_area_m2": null,
+          "window_area_m2": null,
+          "heating_confirmed": false,
+          "ventilation_confirmed": false
+        },
         "layout": "single_storey",
         "window_count": 0,
         "door_count": 1,
@@ -2327,7 +2377,15 @@
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
         "restricted_headroom_fraction": 0,
-        "guard_length_m": 0
+        "guard_length_m": 0,
+        "residential_shell": {
+          "minimum_diameter_m": 6.096,
+          "minimum_diameter_label": "20 ft",
+          "requested_diameter_m": 9.144,
+          "requested_below_minimum": false,
+          "applied_diameter_m": 9.144,
+          "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+        }
       },
       "radius_m": 4.572,
       "footprint_m2": 65.6693,
@@ -2392,6 +2450,8 @@
         "interior partitions"
       ],
       "evidence_status": "published_supplier_price",
+      "ordinary_residential_eligible": true,
+      "residential_use": "ordinary_full_time_year_round_candidate",
       "selection_method": "exact_published_or_selected_package",
       "source": {
         "id": "yurts_canada",
@@ -5363,8 +5423,8 @@
       "cash_cost_cad": 36404,
       "economic_cost_cad": 36404,
       "financing_value_cad": 36404,
-      "initial_cash_contribution_cad": 3640.4,
-      "financed_principal_cad": 33779.27,
+      "initial_cash_contribution_cad": 7280.8,
+      "financed_principal_cad": 29123.2,
       "remaining_layer_ids": [
         "platform_foundation",
         "four_season_completion",
@@ -5482,8 +5542,8 @@
       "contingency_cad": 6524.58,
       "upfront_cash_required_cad": 88081.87,
       "construction_cash_expenditure_cad": 72174.59,
-      "initial_cash_contribution_cad": 3640.4,
-      "financed_principal_cad": 33779.27,
+      "initial_cash_contribution_cad": 7280.8,
+      "financed_principal_cad": 29123.2,
       "owner_labour_imputed_cad": 1303.18,
       "completed_dwelling_capital_cad": 89385.05,
       "economic_cost_cad": 89385.05,
@@ -5501,30 +5561,30 @@
       "cash_construction_budget_cad": 36404,
       "property_value_cad": 36404,
       "ownership": "financed",
-      "initial_contribution_cad": 3640.4,
-      "down_payment_cad": 3640.4,
-      "down_payment_rate": 0.1,
-      "requested_initial_contribution_cad": 3640.4,
+      "initial_contribution_cad": 7280.8,
+      "down_payment_cad": 7280.8,
+      "down_payment_rate": 0.2,
+      "requested_initial_contribution_cad": 7280.8,
       "contribution_raised_to_minimum": false,
       "minimum_down_payment_cad": 1820.2,
-      "base_financed_principal_cad": 32763.6,
-      "mortgage_insurance_premium_cad": 1015.67,
+      "base_financed_principal_cad": 29123.2,
+      "mortgage_insurance_premium_cad": 0,
       "mortgage_insurance": {
-        "required": true,
-        "eligible": true,
-        "ltv": 0.8999999999999999,
-        "premium_rate": 0.031,
-        "premium_cad": 1015.67,
-        "status": "cmhc_standard_schedule"
+        "required": false,
+        "eligible": false,
+        "ltv": 0.8,
+        "premium_rate": 0,
+        "premium_cad": 0,
+        "status": "not_required_or_not_eligible"
       },
-      "total_financed_principal_cad": 33779.27,
-      "financed_principal_cad": 33779.27,
+      "total_financed_principal_cad": 29123.2,
+      "financed_principal_cad": 29123.2,
       "rate_type": "fixed",
-      "contract_rate_annual": 0.0401,
-      "interest_rate_annual": 0.0401,
+      "contract_rate_annual": 0.0435,
+      "interest_rate_annual": 0.0435,
       "rate": {
         "type": "fixed",
-        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
         "source_id": "boc_new_lending",
         "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
         "observed_date": "2026-06-30",
@@ -5535,15 +5595,15 @@
       "term_years": 5,
       "loan_term_years": 5,
       "amortization_years": 25,
-      "monthly_payment_cad": 178.49,
-      "monthly_debt_service_cad": 178.49,
-      "total_interest_over_amortization_cad": 19766.53,
-      "term_end_balance_cad": 29428.5,
-      "stress_test_rate_annual": 0.0601,
-      "stress_test_payment_cad": 217.85,
+      "monthly_payment_cad": 159.41,
+      "monthly_debt_service_cad": 159.41,
+      "total_interest_over_amortization_cad": 18698.8,
+      "term_end_balance_cad": 25522.17,
+      "stress_test_rate_annual": 0.0635,
+      "stress_test_payment_cad": 193.92,
       "qualification": {
-        "rate_annual": 0.0601,
-        "payment_cad": 217.85,
+        "rate_annual": 0.0635,
+        "payment_cad": 193.92,
         "rule": "greater of contract rate + 2 percentage points or 5.25%"
       },
       "eligibility": {
@@ -5568,30 +5628,30 @@
       "cash_construction_budget_cad": 36404,
       "property_value_cad": 36404,
       "ownership": "financed",
-      "initial_contribution_cad": 3640.4,
-      "down_payment_cad": 3640.4,
-      "down_payment_rate": 0.1,
-      "requested_initial_contribution_cad": 3640.4,
+      "initial_contribution_cad": 7280.8,
+      "down_payment_cad": 7280.8,
+      "down_payment_rate": 0.2,
+      "requested_initial_contribution_cad": 7280.8,
       "contribution_raised_to_minimum": false,
       "minimum_down_payment_cad": 1820.2,
-      "base_financed_principal_cad": 32763.6,
-      "mortgage_insurance_premium_cad": 1015.67,
+      "base_financed_principal_cad": 29123.2,
+      "mortgage_insurance_premium_cad": 0,
       "mortgage_insurance": {
-        "required": true,
-        "eligible": true,
-        "ltv": 0.8999999999999999,
-        "premium_rate": 0.031,
-        "premium_cad": 1015.67,
-        "status": "cmhc_standard_schedule"
+        "required": false,
+        "eligible": false,
+        "ltv": 0.8,
+        "premium_rate": 0,
+        "premium_cad": 0,
+        "status": "not_required_or_not_eligible"
       },
-      "total_financed_principal_cad": 33779.27,
-      "financed_principal_cad": 33779.27,
+      "total_financed_principal_cad": 29123.2,
+      "financed_principal_cad": 29123.2,
       "rate_type": "fixed",
-      "contract_rate_annual": 0.0401,
-      "interest_rate_annual": 0.0401,
+      "contract_rate_annual": 0.0435,
+      "interest_rate_annual": 0.0435,
       "rate": {
         "type": "fixed",
-        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
         "source_id": "boc_new_lending",
         "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
         "observed_date": "2026-06-30",
@@ -5602,15 +5662,15 @@
       "term_years": 5,
       "loan_term_years": 5,
       "amortization_years": 25,
-      "monthly_payment_cad": 178.49,
-      "monthly_debt_service_cad": 178.49,
-      "total_interest_over_amortization_cad": 19766.53,
-      "term_end_balance_cad": 29428.5,
-      "stress_test_rate_annual": 0.0601,
-      "stress_test_payment_cad": 217.85,
+      "monthly_payment_cad": 159.41,
+      "monthly_debt_service_cad": 159.41,
+      "total_interest_over_amortization_cad": 18698.8,
+      "term_end_balance_cad": 25522.17,
+      "stress_test_rate_annual": 0.0635,
+      "stress_test_payment_cad": 193.92,
       "qualification": {
-        "rate_annual": 0.0601,
-        "payment_cad": 217.85,
+        "rate_annual": 0.0635,
+        "payment_cad": 193.92,
         "rule": "greater of contract rate + 2 percentage points or 5.25%"
       },
       "eligibility": {
@@ -5635,30 +5695,30 @@
       "cash_construction_budget_cad": 88081.87,
       "property_value_cad": 88081.87,
       "ownership": "financed",
-      "initial_contribution_cad": 8808.19,
-      "down_payment_cad": 8808.19,
-      "down_payment_rate": 0.1,
-      "requested_initial_contribution_cad": 8808.19,
+      "initial_contribution_cad": 17616.37,
+      "down_payment_cad": 17616.37,
+      "down_payment_rate": 0.2,
+      "requested_initial_contribution_cad": 17616.37,
       "contribution_raised_to_minimum": false,
       "minimum_down_payment_cad": 4404.09,
-      "base_financed_principal_cad": 79273.68,
-      "mortgage_insurance_premium_cad": 2457.48,
+      "base_financed_principal_cad": 70465.5,
+      "mortgage_insurance_premium_cad": 0,
       "mortgage_insurance": {
-        "required": true,
-        "eligible": true,
-        "ltv": 0.8999999999999999,
-        "premium_rate": 0.031,
-        "premium_cad": 2457.48,
-        "status": "cmhc_standard_schedule"
+        "required": false,
+        "eligible": false,
+        "ltv": 0.8,
+        "premium_rate": 0,
+        "premium_cad": 0,
+        "status": "not_required_or_not_eligible"
       },
-      "total_financed_principal_cad": 81731.16,
-      "financed_principal_cad": 81731.16,
+      "total_financed_principal_cad": 70465.5,
+      "financed_principal_cad": 70465.5,
       "rate_type": "fixed",
-      "contract_rate_annual": 0.0401,
-      "interest_rate_annual": 0.0401,
+      "contract_rate_annual": 0.0435,
+      "interest_rate_annual": 0.0435,
       "rate": {
         "type": "fixed",
-        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
         "source_id": "boc_new_lending",
         "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
         "observed_date": "2026-06-30",
@@ -5669,15 +5729,15 @@
       "term_years": 5,
       "loan_term_years": 5,
       "amortization_years": 25,
-      "monthly_payment_cad": 431.86,
-      "monthly_debt_service_cad": 431.86,
-      "total_interest_over_amortization_cad": 47826.42,
-      "term_end_balance_cad": 71204.18,
-      "stress_test_rate_annual": 0.0601,
-      "stress_test_payment_cad": 527.09,
+      "monthly_payment_cad": 385.69,
+      "monthly_debt_service_cad": 385.69,
+      "total_interest_over_amortization_cad": 45242.97,
+      "term_end_balance_cad": 61752.56,
+      "stress_test_rate_annual": 0.0635,
+      "stress_test_payment_cad": 469.2,
       "qualification": {
-        "rate_annual": 0.0601,
-        "payment_cad": 527.09,
+        "rate_annual": 0.0635,
+        "payment_cad": 469.2,
         "rule": "greater of contract rate + 2 percentage points or 5.25%"
       },
       "eligibility": {
@@ -7176,7 +7236,512 @@
         "high": 1.15,
         "status": "campaign_planning_sensitivity",
         "note": "The central values are published prices where available. Low/high are explicit planning sensitivities, not supplier quotes."
-      }
+      },
+      "yurt_packages": [
+        {
+          "id": "yc_12_base_installed",
+          "supplier_id": "yurts_canada",
+          "diameter_m": 3.6576,
+          "diameter_label": "12 ft",
+          "price_cad": 12420,
+          "area_ft2": 102,
+          "price_basis": "installed",
+          "included": [
+            "lattice wall",
+            "rafters/frame",
+            "crown/dome",
+            "tension structure",
+            "all-season insulation",
+            "weatherproof roof and wall covers",
+            "interior moisture-wicking liner",
+            "4 ft acrylic dome",
+            "one 34 in standard exterior door",
+            "mandatory supplier installation"
+          ],
+          "excluded": [
+            "platform/floor",
+            "delivery",
+            "additional windows or doors",
+            "heating/cooling",
+            "plumbing",
+            "electrical",
+            "interior partitions"
+          ],
+          "evidence_status": "published_supplier_price",
+          "ordinary_residential_eligible": false,
+          "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+        },
+        {
+          "id": "yc_16_base_installed",
+          "supplier_id": "yurts_canada",
+          "diameter_m": 4.8768,
+          "diameter_label": "16 ft",
+          "price_cad": 16451,
+          "area_ft2": 190,
+          "price_basis": "installed",
+          "included": [
+            "lattice wall",
+            "rafters/frame",
+            "crown/dome",
+            "tension structure",
+            "all-season insulation",
+            "weatherproof roof and wall covers",
+            "interior moisture-wicking liner",
+            "4 ft acrylic dome",
+            "one 34 in standard exterior door",
+            "mandatory supplier installation"
+          ],
+          "excluded": [
+            "platform/floor",
+            "delivery",
+            "additional windows or doors",
+            "heating/cooling",
+            "plumbing",
+            "electrical",
+            "interior partitions"
+          ],
+          "evidence_status": "published_supplier_price",
+          "ordinary_residential_eligible": false,
+          "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+        },
+        {
+          "id": "yc_20_base_installed",
+          "supplier_id": "yurts_canada",
+          "diameter_m": 6.096,
+          "diameter_label": "20 ft",
+          "price_cad": 19252,
+          "area_ft2": 296,
+          "price_basis": "installed",
+          "included": [
+            "lattice wall",
+            "rafters/frame",
+            "crown/dome",
+            "tension structure",
+            "all-season insulation",
+            "weatherproof roof and wall covers",
+            "interior moisture-wicking liner",
+            "4 ft acrylic dome",
+            "one 34 in standard exterior door",
+            "mandatory supplier installation"
+          ],
+          "excluded": [
+            "platform/floor",
+            "delivery",
+            "additional windows or doors",
+            "heating/cooling",
+            "plumbing",
+            "electrical",
+            "interior partitions"
+          ],
+          "evidence_status": "published_supplier_price",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "yc_24_base_installed",
+          "supplier_id": "yurts_canada",
+          "diameter_m": 7.3152,
+          "diameter_label": "24 ft",
+          "price_cad": 25681,
+          "area_ft2": 434,
+          "price_basis": "installed",
+          "included": [
+            "lattice wall",
+            "rafters/frame",
+            "crown/dome",
+            "tension structure",
+            "all-season insulation",
+            "weatherproof roof and wall covers",
+            "interior moisture-wicking liner",
+            "4 ft acrylic dome",
+            "one 34 in standard exterior door",
+            "mandatory supplier installation"
+          ],
+          "excluded": [
+            "platform/floor",
+            "delivery",
+            "additional windows or doors",
+            "heating/cooling",
+            "plumbing",
+            "electrical",
+            "interior partitions"
+          ],
+          "evidence_status": "published_supplier_price",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "yc_30_base_installed",
+          "supplier_id": "yurts_canada",
+          "diameter_m": 9.144,
+          "diameter_label": "30 ft",
+          "price_cad": 36404,
+          "area_ft2": 685,
+          "price_basis": "installed",
+          "included": [
+            "lattice wall",
+            "rafters/frame",
+            "crown/dome",
+            "tension structure",
+            "all-season insulation",
+            "weatherproof roof and wall covers",
+            "interior moisture-wicking liner",
+            "4 ft acrylic dome",
+            "one 34 in standard exterior door",
+            "mandatory supplier installation"
+          ],
+          "excluded": [
+            "platform/floor",
+            "delivery",
+            "additional windows or doors",
+            "heating/cooling",
+            "plumbing",
+            "electrical",
+            "interior partitions"
+          ],
+          "evidence_status": "published_supplier_price",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "tof_20_import_estimate",
+          "supplier_id": "the_out_factory",
+          "diameter_m": 6.096,
+          "diameter_label": "20 ft",
+          "price_cad": 32958,
+          "area_ft2": 314,
+          "price_basis": "Canadian non-binding import estimate",
+          "included": [
+            "crown and dome",
+            "rafters",
+            "lattice",
+            "door frame and door",
+            "two window frames and uPVC windows",
+            "insulation",
+            "outer and inner fabric",
+            "hardware",
+            "estimated crating",
+            "estimated shipping",
+            "estimated duties/fees",
+            "estimated VAT"
+          ],
+          "excluded": [
+            "platform/base",
+            "flooring",
+            "electrical",
+            "plumbing",
+            "toilet fixtures",
+            "interior partitions",
+            "door delivery to site"
+          ],
+          "evidence_status": "non_binding_import_estimate",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "tof_24_import_estimate",
+          "supplier_id": "the_out_factory",
+          "diameter_m": 7.3152,
+          "diameter_label": "24 ft",
+          "price_cad": 37699,
+          "area_ft2": 452,
+          "price_basis": "Canadian non-binding import estimate",
+          "included": [
+            "crown and dome",
+            "rafters",
+            "lattice",
+            "door frame and door",
+            "two window frames and uPVC windows",
+            "insulation",
+            "outer and inner fabric",
+            "hardware",
+            "estimated crating",
+            "estimated shipping",
+            "estimated duties/fees",
+            "estimated VAT"
+          ],
+          "excluded": [
+            "platform/base",
+            "flooring",
+            "electrical",
+            "plumbing",
+            "toilet fixtures",
+            "interior partitions",
+            "door delivery to site"
+          ],
+          "evidence_status": "non_binding_import_estimate",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "tof_32_import_estimate",
+          "supplier_id": "the_out_factory",
+          "diameter_m": 9.7536,
+          "diameter_label": "32 ft",
+          "price_cad": 57852,
+          "area_ft2": 804,
+          "price_basis": "Canadian non-binding import estimate",
+          "included": [
+            "crown and dome",
+            "rafters",
+            "lattice",
+            "door frame and door",
+            "four window frames and uPVC windows",
+            "insulation",
+            "outer and inner fabric",
+            "hardware",
+            "estimated crating",
+            "estimated shipping",
+            "estimated duties/fees",
+            "estimated VAT"
+          ],
+          "excluded": [
+            "platform/base",
+            "flooring",
+            "electrical",
+            "plumbing",
+            "toilet fixtures",
+            "interior partitions",
+            "door delivery to site"
+          ],
+          "evidence_status": "non_binding_import_estimate",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "biome_20_configurator",
+          "supplier_id": "biome_canada",
+          "diameter_m": 6.096,
+          "diameter_label": "20 ft",
+          "price_cad": null,
+          "price_basis": "quote required",
+          "included": [
+            "lattices",
+            "rafters",
+            "dome rings",
+            "dome",
+            "exterior wall fabric",
+            "exterior roof fabric",
+            "one standard door",
+            "jambs",
+            "support cable",
+            "hardware"
+          ],
+          "excluded": [
+            "base/floor",
+            "utilities",
+            "interior partitions",
+            "installation",
+            "transport",
+            "taxes"
+          ],
+          "option_prices_cad": {
+            "wall_insulation": 217.35,
+            "roof_insulation": 270.32,
+            "non_insulated_floor": 3148.14,
+            "floor_insulation": 1103.52,
+            "rafter_supports": 1478.08,
+            "wood_stove": 3501.42
+          },
+          "evidence_status": "configurator_options_quote_required",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "biome_24_configurator",
+          "supplier_id": "biome_canada",
+          "diameter_m": 7.3152,
+          "diameter_label": "24 ft",
+          "price_cad": null,
+          "price_basis": "quote required",
+          "included": [
+            "lattices",
+            "rafters",
+            "dome rings",
+            "dome",
+            "exterior wall fabric",
+            "exterior roof fabric",
+            "one standard door",
+            "jambs",
+            "support cable",
+            "hardware"
+          ],
+          "excluded": [
+            "base/floor",
+            "utilities",
+            "interior partitions",
+            "installation",
+            "transport",
+            "taxes"
+          ],
+          "option_prices_cad": {
+            "wall_insulation": 306.62,
+            "roof_insulation": 464.07,
+            "non_insulated_floor": 3700.35,
+            "floor_insulation": 1424.58,
+            "rafter_supports": 2138.58,
+            "wood_stove": 3501.42
+          },
+          "evidence_status": "configurator_options_quote_required",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        },
+        {
+          "id": "biome_30_configurator",
+          "supplier_id": "biome_canada",
+          "diameter_m": 9.144,
+          "diameter_label": "30 ft",
+          "price_cad": null,
+          "price_basis": "quote required",
+          "included": [
+            "lattices",
+            "rafters",
+            "dome rings",
+            "dome",
+            "exterior wall fabric",
+            "exterior roof fabric",
+            "one standard door",
+            "jambs",
+            "support cable",
+            "hardware"
+          ],
+          "excluded": [
+            "base/floor",
+            "utilities",
+            "interior partitions",
+            "installation",
+            "transport",
+            "taxes"
+          ],
+          "option_prices_cad": {
+            "wall_insulation": 338.16,
+            "roof_insulation": 595.07,
+            "non_insulated_floor": 5009.35,
+            "floor_insulation": 2049.88,
+            "rafter_supports_yellow_poplar": 2567.31,
+            "rafter_supports_spf": 931.46,
+            "wood_stove": 3501.42
+          },
+          "evidence_status": "configurator_options_quote_required",
+          "ordinary_residential_eligible": true,
+          "residential_use": "ordinary_full_time_year_round_candidate"
+        }
+      ]
+    },
+    "occupancy_compliance": {
+      "contract_version": "1.0.0",
+      "source": {
+        "title": "Build or buy a tiny home",
+        "url": "https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf",
+        "classification": "official_guidance_reference",
+        "observed_date": "2022-05-12"
+      },
+      "scope": "planning_screen_not_building_approval",
+      "reference_open_concept_minimum_finished_floor_area_m2": 17.5,
+      "layout": "open_concept",
+      "occupants": 2,
+      "bedroom_count": 0,
+      "finished_floor_area_m2": 63.0425,
+      "required_reference_area_m2": 17.5,
+      "sleeping_area_m2": 60.0425,
+      "bathroom_area_m2": 3,
+      "kitchen_area_m2": 4.2,
+      "required_window_area_m2": 6.004,
+      "provided_window_area_m2": null,
+      "checks": [
+        {
+          "id": "finished_floor_area",
+          "label": "Finished floor area",
+          "status": "passes_reference_minimum",
+          "detail": "63.04 m² usable against 17.50 m² for the open-concept reference.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "layout_and_sleeping",
+          "label": "Open-concept living / sleeping / dining / kitchen",
+          "status": "passes_reference_allocation",
+          "detail": "60.04 m² available against 13.50 m² reference sleeping/living allocation.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "occupants_and_bedrooms",
+          "label": "Occupants and bedrooms",
+          "status": "review_required",
+          "detail": "2 occupants and 0 bedrooms supplied. Ontario guidance does not create a universal occupancy-per-m² rule; room use and municipal review remain required.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "bathroom",
+          "label": "Bathroom",
+          "status": "passes_reference_area",
+          "detail": "3.00 m² planning allocation; fixtures still require compliant layout and servicing.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "kitchen",
+          "label": "Kitchen",
+          "status": "included_in_open_concept_reference",
+          "detail": "4.20 m² planning allocation; the open-concept reference combines kitchen with living/sleeping/dining.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "egress_windows",
+          "label": "Windows and egress",
+          "status": "review_required",
+          "detail": "At least 6.00 m² of qualifying glazing is required by the reference; provide an opening schedule.",
+          "evidence_status": "quotation_or_design_review_required"
+        },
+        {
+          "id": "ventilation_heating",
+          "label": "Ventilation and heating",
+          "status": "review_required",
+          "detail": "Year-round occupancy needs code-compliant heating and ventilation; the model does not infer approval from a yurt package.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "ceiling_heights",
+          "label": "Ceiling heights",
+          "status": "review_required",
+          "detail": "2.40 m wall height is not proof that all required floor area meets the applicable ceiling-height rules.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "stairs_guards",
+          "label": "Stairs and guards",
+          "status": "not_applicable_single_storey",
+          "detail": "No upper floor selected.",
+          "evidence_status": "official_guidance_reference"
+        },
+        {
+          "id": "foundation_anchorage",
+          "label": "Foundation and anchorage",
+          "status": "review_required",
+          "detail": "Footings, foundation, frost protection and anchorage require site-specific structural design.",
+          "evidence_status": "engineering_review_required"
+        },
+        {
+          "id": "zoning_occupancy",
+          "label": "Zoning and occupancy approval",
+          "status": "review_required",
+          "detail": "Municipal zoning, minimum dwelling area, permits and occupancy approval are site-specific.",
+          "evidence_status": "municipal_review_required"
+        }
+      ],
+      "overall_status": "passes_reference_screen_subject_to_review",
+      "note": "The 17.5 m² figure is an open-concept Building Code reference from Ontario guidance, not a universal occupancy rule or approval. Municipal zoning, Building Code review, servicing and occupancy approval may require more."
+    },
+    "residential_shell_policy": {
+      "minimum_diameter_m": 6.096,
+      "minimum_diameter_label": "20 ft",
+      "ordinary_scope": "full_time_year_round_residential_dwelling",
+      "default_diameter_m": 9.144,
+      "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+      "excluded_from_ordinary_calculations": [
+        "12 ft",
+        "16 ft"
+      ],
+      "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
+      "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
     },
     "assumptions": {
       "tax_rate": 0.13,
@@ -7199,7 +7764,7 @@
   },
   "bands": {
     "low": {
-      "contract_version": "4.2.0",
+      "contract_version": "4.3.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -7222,6 +7787,18 @@
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
+        "occupancy": {
+          "layout": "open_concept",
+          "occupants": 2,
+          "bedroom_count": 0,
+          "sleeping_area_m2": null,
+          "bathroom_area_m2": null,
+          "kitchen_area_m2": null,
+          "living_dining_kitchen_area_m2": null,
+          "window_area_m2": null,
+          "heating_confirmed": false,
+          "ventilation_confirmed": false
+        },
         "layout": "single_storey",
         "window_count": 0,
         "door_count": 1,
@@ -7229,7 +7806,15 @@
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
         "restricted_headroom_fraction": 0,
-        "guard_length_m": 0
+        "guard_length_m": 0,
+        "residential_shell": {
+          "minimum_diameter_m": 6.096,
+          "minimum_diameter_label": "20 ft",
+          "requested_diameter_m": 9.144,
+          "requested_below_minimum": false,
+          "applied_diameter_m": 9.144,
+          "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+        }
       },
       "geometry": {
         "inputs": {
@@ -7237,6 +7822,18 @@
           "wall_height_m": 2.4,
           "roof_pitch_degrees": 30,
           "household_size": 2,
+          "occupancy": {
+            "layout": "open_concept",
+            "occupants": 2,
+            "bedroom_count": 0,
+            "sleeping_area_m2": null,
+            "bathroom_area_m2": null,
+            "kitchen_area_m2": null,
+            "living_dining_kitchen_area_m2": null,
+            "window_area_m2": null,
+            "heating_confirmed": false,
+            "ventilation_confirmed": false
+          },
           "layout": "single_storey",
           "window_count": 0,
           "door_count": 1,
@@ -7244,7 +7841,15 @@
           "stair_opening_m2": 0,
           "restricted_headroom_override_used": false,
           "restricted_headroom_fraction": 0,
-          "guard_length_m": 0
+          "guard_length_m": 0,
+          "residential_shell": {
+            "minimum_diameter_m": 6.096,
+            "minimum_diameter_label": "20 ft",
+            "requested_diameter_m": 9.144,
+            "requested_below_minimum": false,
+            "applied_diameter_m": 9.144,
+            "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+          }
         },
         "radius_m": 4.572,
         "footprint_m2": 65.6693,
@@ -7309,6 +7914,8 @@
           "interior partitions"
         ],
         "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate",
         "selection_method": "exact_published_or_selected_package",
         "source": {
           "id": "yurts_canada",
@@ -10280,8 +10887,8 @@
         "cash_cost_cad": 32763.6,
         "economic_cost_cad": 32763.6,
         "financing_value_cad": 32763.6,
-        "initial_cash_contribution_cad": 3276.36,
-        "financed_principal_cad": 30401.34,
+        "initial_cash_contribution_cad": 6552.72,
+        "financed_principal_cad": 26210.88,
         "remaining_layer_ids": [
           "platform_foundation",
           "four_season_completion",
@@ -10399,8 +11006,8 @@
         "contingency_cad": 3430.22,
         "upfront_cash_required_cad": 72034.63,
         "construction_cash_expenditure_cad": 65337.53,
-        "initial_cash_contribution_cad": 3276.36,
-        "financed_principal_cad": 30401.34,
+        "initial_cash_contribution_cad": 6552.72,
+        "financed_principal_cad": 26210.88,
         "owner_labour_imputed_cad": 1303.18,
         "completed_dwelling_capital_cad": 73337.81,
         "economic_cost_cad": 73337.81,
@@ -10418,30 +11025,30 @@
         "cash_construction_budget_cad": 32763.6,
         "property_value_cad": 32763.6,
         "ownership": "financed",
-        "initial_contribution_cad": 3276.36,
-        "down_payment_cad": 3276.36,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 3276.36,
+        "initial_contribution_cad": 6552.72,
+        "down_payment_cad": 6552.72,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 6552.72,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 1638.18,
-        "base_financed_principal_cad": 29487.24,
-        "mortgage_insurance_premium_cad": 914.1,
+        "base_financed_principal_cad": 26210.88,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.9,
-          "premium_rate": 0.031,
-          "premium_cad": 914.1,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.7999999999999999,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 30401.34,
-        "financed_principal_cad": 30401.34,
+        "total_financed_principal_cad": 26210.88,
+        "financed_principal_cad": 26210.88,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -10452,15 +11059,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 160.64,
-        "monthly_debt_service_cad": 160.64,
-        "total_interest_over_amortization_cad": 17789.87,
-        "term_end_balance_cad": 26485.64,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 196.06,
+        "monthly_payment_cad": 143.47,
+        "monthly_debt_service_cad": 143.47,
+        "total_interest_over_amortization_cad": 16828.92,
+        "term_end_balance_cad": 22969.95,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 174.53,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 196.06,
+          "rate_annual": 0.0635,
+          "payment_cad": 174.53,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -10485,30 +11092,30 @@
         "cash_construction_budget_cad": 32763.6,
         "property_value_cad": 32763.6,
         "ownership": "financed",
-        "initial_contribution_cad": 3276.36,
-        "down_payment_cad": 3276.36,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 3276.36,
+        "initial_contribution_cad": 6552.72,
+        "down_payment_cad": 6552.72,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 6552.72,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 1638.18,
-        "base_financed_principal_cad": 29487.24,
-        "mortgage_insurance_premium_cad": 914.1,
+        "base_financed_principal_cad": 26210.88,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.9,
-          "premium_rate": 0.031,
-          "premium_cad": 914.1,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.7999999999999999,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 30401.34,
-        "financed_principal_cad": 30401.34,
+        "total_financed_principal_cad": 26210.88,
+        "financed_principal_cad": 26210.88,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -10519,15 +11126,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 160.64,
-        "monthly_debt_service_cad": 160.64,
-        "total_interest_over_amortization_cad": 17789.87,
-        "term_end_balance_cad": 26485.64,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 196.06,
+        "monthly_payment_cad": 143.47,
+        "monthly_debt_service_cad": 143.47,
+        "total_interest_over_amortization_cad": 16828.92,
+        "term_end_balance_cad": 22969.95,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 174.53,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 196.06,
+          "rate_annual": 0.0635,
+          "payment_cad": 174.53,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -10552,30 +11159,30 @@
         "cash_construction_budget_cad": 72034.63,
         "property_value_cad": 72034.63,
         "ownership": "financed",
-        "initial_contribution_cad": 7203.46,
-        "down_payment_cad": 7203.46,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 7203.46,
+        "initial_contribution_cad": 14406.93,
+        "down_payment_cad": 14406.93,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 14406.93,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 3601.73,
-        "base_financed_principal_cad": 64831.16,
-        "mortgage_insurance_premium_cad": 2009.77,
+        "base_financed_principal_cad": 57627.7,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.9,
-          "premium_rate": 0.031,
-          "premium_cad": 2009.77,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.7999999999999999,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 66840.93,
-        "financed_principal_cad": 66840.93,
+        "total_financed_principal_cad": 57627.7,
+        "financed_principal_cad": 57627.7,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -10586,15 +11193,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 353.18,
-        "monthly_debt_service_cad": 353.18,
-        "total_interest_over_amortization_cad": 39113.14,
-        "term_end_balance_cad": 58231.81,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 431.07,
+        "monthly_payment_cad": 315.43,
+        "monthly_debt_service_cad": 315.43,
+        "total_interest_over_amortization_cad": 37000.35,
+        "term_end_balance_cad": 50502.14,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 383.72,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 431.07,
+          "rate_annual": 0.0635,
+          "payment_cad": 383.72,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -12093,7 +12700,512 @@
           "high": 1.15,
           "status": "campaign_planning_sensitivity",
           "note": "The central values are published prices where available. Low/high are explicit planning sensitivities, not supplier quotes."
-        }
+        },
+        "yurt_packages": [
+          {
+            "id": "yc_12_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 3.6576,
+            "diameter_label": "12 ft",
+            "price_cad": 12420,
+            "area_ft2": 102,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": false,
+            "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+          },
+          {
+            "id": "yc_16_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 4.8768,
+            "diameter_label": "16 ft",
+            "price_cad": 16451,
+            "area_ft2": 190,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": false,
+            "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+          },
+          {
+            "id": "yc_20_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": 19252,
+            "area_ft2": 296,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "yc_24_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": 25681,
+            "area_ft2": 434,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "yc_30_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 9.144,
+            "diameter_label": "30 ft",
+            "price_cad": 36404,
+            "area_ft2": 685,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_20_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": 32958,
+            "area_ft2": 314,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "two window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_24_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": 37699,
+            "area_ft2": 452,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "two window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_32_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 9.7536,
+            "diameter_label": "32 ft",
+            "price_cad": 57852,
+            "area_ft2": 804,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "four window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_20_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 217.35,
+              "roof_insulation": 270.32,
+              "non_insulated_floor": 3148.14,
+              "floor_insulation": 1103.52,
+              "rafter_supports": 1478.08,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_24_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 306.62,
+              "roof_insulation": 464.07,
+              "non_insulated_floor": 3700.35,
+              "floor_insulation": 1424.58,
+              "rafter_supports": 2138.58,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_30_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 9.144,
+            "diameter_label": "30 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 338.16,
+              "roof_insulation": 595.07,
+              "non_insulated_floor": 5009.35,
+              "floor_insulation": 2049.88,
+              "rafter_supports_yellow_poplar": 2567.31,
+              "rafter_supports_spf": 931.46,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          }
+        ]
+      },
+      "occupancy_compliance": {
+        "contract_version": "1.0.0",
+        "source": {
+          "title": "Build or buy a tiny home",
+          "url": "https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf",
+          "classification": "official_guidance_reference",
+          "observed_date": "2022-05-12"
+        },
+        "scope": "planning_screen_not_building_approval",
+        "reference_open_concept_minimum_finished_floor_area_m2": 17.5,
+        "layout": "open_concept",
+        "occupants": 2,
+        "bedroom_count": 0,
+        "finished_floor_area_m2": 63.0425,
+        "required_reference_area_m2": 17.5,
+        "sleeping_area_m2": 60.0425,
+        "bathroom_area_m2": 3,
+        "kitchen_area_m2": 4.2,
+        "required_window_area_m2": 6.004,
+        "provided_window_area_m2": null,
+        "checks": [
+          {
+            "id": "finished_floor_area",
+            "label": "Finished floor area",
+            "status": "passes_reference_minimum",
+            "detail": "63.04 m² usable against 17.50 m² for the open-concept reference.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "layout_and_sleeping",
+            "label": "Open-concept living / sleeping / dining / kitchen",
+            "status": "passes_reference_allocation",
+            "detail": "60.04 m² available against 13.50 m² reference sleeping/living allocation.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "occupants_and_bedrooms",
+            "label": "Occupants and bedrooms",
+            "status": "review_required",
+            "detail": "2 occupants and 0 bedrooms supplied. Ontario guidance does not create a universal occupancy-per-m² rule; room use and municipal review remain required.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "bathroom",
+            "label": "Bathroom",
+            "status": "passes_reference_area",
+            "detail": "3.00 m² planning allocation; fixtures still require compliant layout and servicing.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "kitchen",
+            "label": "Kitchen",
+            "status": "included_in_open_concept_reference",
+            "detail": "4.20 m² planning allocation; the open-concept reference combines kitchen with living/sleeping/dining.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "egress_windows",
+            "label": "Windows and egress",
+            "status": "review_required",
+            "detail": "At least 6.00 m² of qualifying glazing is required by the reference; provide an opening schedule.",
+            "evidence_status": "quotation_or_design_review_required"
+          },
+          {
+            "id": "ventilation_heating",
+            "label": "Ventilation and heating",
+            "status": "review_required",
+            "detail": "Year-round occupancy needs code-compliant heating and ventilation; the model does not infer approval from a yurt package.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "ceiling_heights",
+            "label": "Ceiling heights",
+            "status": "review_required",
+            "detail": "2.40 m wall height is not proof that all required floor area meets the applicable ceiling-height rules.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "stairs_guards",
+            "label": "Stairs and guards",
+            "status": "not_applicable_single_storey",
+            "detail": "No upper floor selected.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "foundation_anchorage",
+            "label": "Foundation and anchorage",
+            "status": "review_required",
+            "detail": "Footings, foundation, frost protection and anchorage require site-specific structural design.",
+            "evidence_status": "engineering_review_required"
+          },
+          {
+            "id": "zoning_occupancy",
+            "label": "Zoning and occupancy approval",
+            "status": "review_required",
+            "detail": "Municipal zoning, minimum dwelling area, permits and occupancy approval are site-specific.",
+            "evidence_status": "municipal_review_required"
+          }
+        ],
+        "overall_status": "passes_reference_screen_subject_to_review",
+        "note": "The 17.5 m² figure is an open-concept Building Code reference from Ontario guidance, not a universal occupancy rule or approval. Municipal zoning, Building Code review, servicing and occupancy approval may require more."
+      },
+      "residential_shell_policy": {
+        "minimum_diameter_m": 6.096,
+        "minimum_diameter_label": "20 ft",
+        "ordinary_scope": "full_time_year_round_residential_dwelling",
+        "default_diameter_m": 9.144,
+        "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+        "excluded_from_ordinary_calculations": [
+          "12 ft",
+          "16 ft"
+        ],
+        "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
+        "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
       },
       "assumptions": {
         "tax_rate": 0.05,
@@ -12115,7 +13227,7 @@
       }
     },
     "central": {
-      "contract_version": "4.2.0",
+      "contract_version": "4.3.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -12138,6 +13250,18 @@
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
+        "occupancy": {
+          "layout": "open_concept",
+          "occupants": 2,
+          "bedroom_count": 0,
+          "sleeping_area_m2": null,
+          "bathroom_area_m2": null,
+          "kitchen_area_m2": null,
+          "living_dining_kitchen_area_m2": null,
+          "window_area_m2": null,
+          "heating_confirmed": false,
+          "ventilation_confirmed": false
+        },
         "layout": "single_storey",
         "window_count": 0,
         "door_count": 1,
@@ -12145,7 +13269,15 @@
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
         "restricted_headroom_fraction": 0,
-        "guard_length_m": 0
+        "guard_length_m": 0,
+        "residential_shell": {
+          "minimum_diameter_m": 6.096,
+          "minimum_diameter_label": "20 ft",
+          "requested_diameter_m": 9.144,
+          "requested_below_minimum": false,
+          "applied_diameter_m": 9.144,
+          "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+        }
       },
       "geometry": {
         "inputs": {
@@ -12153,6 +13285,18 @@
           "wall_height_m": 2.4,
           "roof_pitch_degrees": 30,
           "household_size": 2,
+          "occupancy": {
+            "layout": "open_concept",
+            "occupants": 2,
+            "bedroom_count": 0,
+            "sleeping_area_m2": null,
+            "bathroom_area_m2": null,
+            "kitchen_area_m2": null,
+            "living_dining_kitchen_area_m2": null,
+            "window_area_m2": null,
+            "heating_confirmed": false,
+            "ventilation_confirmed": false
+          },
           "layout": "single_storey",
           "window_count": 0,
           "door_count": 1,
@@ -12160,7 +13304,15 @@
           "stair_opening_m2": 0,
           "restricted_headroom_override_used": false,
           "restricted_headroom_fraction": 0,
-          "guard_length_m": 0
+          "guard_length_m": 0,
+          "residential_shell": {
+            "minimum_diameter_m": 6.096,
+            "minimum_diameter_label": "20 ft",
+            "requested_diameter_m": 9.144,
+            "requested_below_minimum": false,
+            "applied_diameter_m": 9.144,
+            "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+          }
         },
         "radius_m": 4.572,
         "footprint_m2": 65.6693,
@@ -12225,6 +13377,8 @@
           "interior partitions"
         ],
         "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate",
         "selection_method": "exact_published_or_selected_package",
         "source": {
           "id": "yurts_canada",
@@ -15196,8 +16350,8 @@
         "cash_cost_cad": 36404,
         "economic_cost_cad": 36404,
         "financing_value_cad": 36404,
-        "initial_cash_contribution_cad": 3640.4,
-        "financed_principal_cad": 33779.27,
+        "initial_cash_contribution_cad": 7280.8,
+        "financed_principal_cad": 29123.2,
         "remaining_layer_ids": [
           "platform_foundation",
           "four_season_completion",
@@ -15315,8 +16469,8 @@
         "contingency_cad": 6524.58,
         "upfront_cash_required_cad": 88081.87,
         "construction_cash_expenditure_cad": 72174.59,
-        "initial_cash_contribution_cad": 3640.4,
-        "financed_principal_cad": 33779.27,
+        "initial_cash_contribution_cad": 7280.8,
+        "financed_principal_cad": 29123.2,
         "owner_labour_imputed_cad": 1303.18,
         "completed_dwelling_capital_cad": 89385.05,
         "economic_cost_cad": 89385.05,
@@ -15334,30 +16488,30 @@
         "cash_construction_budget_cad": 36404,
         "property_value_cad": 36404,
         "ownership": "financed",
-        "initial_contribution_cad": 3640.4,
-        "down_payment_cad": 3640.4,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 3640.4,
+        "initial_contribution_cad": 7280.8,
+        "down_payment_cad": 7280.8,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 7280.8,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 1820.2,
-        "base_financed_principal_cad": 32763.6,
-        "mortgage_insurance_premium_cad": 1015.67,
+        "base_financed_principal_cad": 29123.2,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.8999999999999999,
-          "premium_rate": 0.031,
-          "premium_cad": 1015.67,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.8,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 33779.27,
-        "financed_principal_cad": 33779.27,
+        "total_financed_principal_cad": 29123.2,
+        "financed_principal_cad": 29123.2,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -15368,15 +16522,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 178.49,
-        "monthly_debt_service_cad": 178.49,
-        "total_interest_over_amortization_cad": 19766.53,
-        "term_end_balance_cad": 29428.5,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 217.85,
+        "monthly_payment_cad": 159.41,
+        "monthly_debt_service_cad": 159.41,
+        "total_interest_over_amortization_cad": 18698.8,
+        "term_end_balance_cad": 25522.17,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 193.92,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 217.85,
+          "rate_annual": 0.0635,
+          "payment_cad": 193.92,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -15401,30 +16555,30 @@
         "cash_construction_budget_cad": 36404,
         "property_value_cad": 36404,
         "ownership": "financed",
-        "initial_contribution_cad": 3640.4,
-        "down_payment_cad": 3640.4,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 3640.4,
+        "initial_contribution_cad": 7280.8,
+        "down_payment_cad": 7280.8,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 7280.8,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 1820.2,
-        "base_financed_principal_cad": 32763.6,
-        "mortgage_insurance_premium_cad": 1015.67,
+        "base_financed_principal_cad": 29123.2,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.8999999999999999,
-          "premium_rate": 0.031,
-          "premium_cad": 1015.67,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.8,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 33779.27,
-        "financed_principal_cad": 33779.27,
+        "total_financed_principal_cad": 29123.2,
+        "financed_principal_cad": 29123.2,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -15435,15 +16589,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 178.49,
-        "monthly_debt_service_cad": 178.49,
-        "total_interest_over_amortization_cad": 19766.53,
-        "term_end_balance_cad": 29428.5,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 217.85,
+        "monthly_payment_cad": 159.41,
+        "monthly_debt_service_cad": 159.41,
+        "total_interest_over_amortization_cad": 18698.8,
+        "term_end_balance_cad": 25522.17,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 193.92,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 217.85,
+          "rate_annual": 0.0635,
+          "payment_cad": 193.92,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -15468,30 +16622,30 @@
         "cash_construction_budget_cad": 88081.87,
         "property_value_cad": 88081.87,
         "ownership": "financed",
-        "initial_contribution_cad": 8808.19,
-        "down_payment_cad": 8808.19,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 8808.19,
+        "initial_contribution_cad": 17616.37,
+        "down_payment_cad": 17616.37,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 17616.37,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 4404.09,
-        "base_financed_principal_cad": 79273.68,
-        "mortgage_insurance_premium_cad": 2457.48,
+        "base_financed_principal_cad": 70465.5,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.8999999999999999,
-          "premium_rate": 0.031,
-          "premium_cad": 2457.48,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.8,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 81731.16,
-        "financed_principal_cad": 81731.16,
+        "total_financed_principal_cad": 70465.5,
+        "financed_principal_cad": 70465.5,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -15502,15 +16656,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 431.86,
-        "monthly_debt_service_cad": 431.86,
-        "total_interest_over_amortization_cad": 47826.42,
-        "term_end_balance_cad": 71204.18,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 527.09,
+        "monthly_payment_cad": 385.69,
+        "monthly_debt_service_cad": 385.69,
+        "total_interest_over_amortization_cad": 45242.97,
+        "term_end_balance_cad": 61752.56,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 469.2,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 527.09,
+          "rate_annual": 0.0635,
+          "payment_cad": 469.2,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -17009,7 +18163,512 @@
           "high": 1.15,
           "status": "campaign_planning_sensitivity",
           "note": "The central values are published prices where available. Low/high are explicit planning sensitivities, not supplier quotes."
-        }
+        },
+        "yurt_packages": [
+          {
+            "id": "yc_12_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 3.6576,
+            "diameter_label": "12 ft",
+            "price_cad": 12420,
+            "area_ft2": 102,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": false,
+            "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+          },
+          {
+            "id": "yc_16_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 4.8768,
+            "diameter_label": "16 ft",
+            "price_cad": 16451,
+            "area_ft2": 190,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": false,
+            "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+          },
+          {
+            "id": "yc_20_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": 19252,
+            "area_ft2": 296,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "yc_24_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": 25681,
+            "area_ft2": 434,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "yc_30_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 9.144,
+            "diameter_label": "30 ft",
+            "price_cad": 36404,
+            "area_ft2": 685,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_20_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": 32958,
+            "area_ft2": 314,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "two window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_24_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": 37699,
+            "area_ft2": 452,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "two window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_32_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 9.7536,
+            "diameter_label": "32 ft",
+            "price_cad": 57852,
+            "area_ft2": 804,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "four window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_20_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 217.35,
+              "roof_insulation": 270.32,
+              "non_insulated_floor": 3148.14,
+              "floor_insulation": 1103.52,
+              "rafter_supports": 1478.08,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_24_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 306.62,
+              "roof_insulation": 464.07,
+              "non_insulated_floor": 3700.35,
+              "floor_insulation": 1424.58,
+              "rafter_supports": 2138.58,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_30_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 9.144,
+            "diameter_label": "30 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 338.16,
+              "roof_insulation": 595.07,
+              "non_insulated_floor": 5009.35,
+              "floor_insulation": 2049.88,
+              "rafter_supports_yellow_poplar": 2567.31,
+              "rafter_supports_spf": 931.46,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          }
+        ]
+      },
+      "occupancy_compliance": {
+        "contract_version": "1.0.0",
+        "source": {
+          "title": "Build or buy a tiny home",
+          "url": "https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf",
+          "classification": "official_guidance_reference",
+          "observed_date": "2022-05-12"
+        },
+        "scope": "planning_screen_not_building_approval",
+        "reference_open_concept_minimum_finished_floor_area_m2": 17.5,
+        "layout": "open_concept",
+        "occupants": 2,
+        "bedroom_count": 0,
+        "finished_floor_area_m2": 63.0425,
+        "required_reference_area_m2": 17.5,
+        "sleeping_area_m2": 60.0425,
+        "bathroom_area_m2": 3,
+        "kitchen_area_m2": 4.2,
+        "required_window_area_m2": 6.004,
+        "provided_window_area_m2": null,
+        "checks": [
+          {
+            "id": "finished_floor_area",
+            "label": "Finished floor area",
+            "status": "passes_reference_minimum",
+            "detail": "63.04 m² usable against 17.50 m² for the open-concept reference.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "layout_and_sleeping",
+            "label": "Open-concept living / sleeping / dining / kitchen",
+            "status": "passes_reference_allocation",
+            "detail": "60.04 m² available against 13.50 m² reference sleeping/living allocation.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "occupants_and_bedrooms",
+            "label": "Occupants and bedrooms",
+            "status": "review_required",
+            "detail": "2 occupants and 0 bedrooms supplied. Ontario guidance does not create a universal occupancy-per-m² rule; room use and municipal review remain required.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "bathroom",
+            "label": "Bathroom",
+            "status": "passes_reference_area",
+            "detail": "3.00 m² planning allocation; fixtures still require compliant layout and servicing.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "kitchen",
+            "label": "Kitchen",
+            "status": "included_in_open_concept_reference",
+            "detail": "4.20 m² planning allocation; the open-concept reference combines kitchen with living/sleeping/dining.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "egress_windows",
+            "label": "Windows and egress",
+            "status": "review_required",
+            "detail": "At least 6.00 m² of qualifying glazing is required by the reference; provide an opening schedule.",
+            "evidence_status": "quotation_or_design_review_required"
+          },
+          {
+            "id": "ventilation_heating",
+            "label": "Ventilation and heating",
+            "status": "review_required",
+            "detail": "Year-round occupancy needs code-compliant heating and ventilation; the model does not infer approval from a yurt package.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "ceiling_heights",
+            "label": "Ceiling heights",
+            "status": "review_required",
+            "detail": "2.40 m wall height is not proof that all required floor area meets the applicable ceiling-height rules.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "stairs_guards",
+            "label": "Stairs and guards",
+            "status": "not_applicable_single_storey",
+            "detail": "No upper floor selected.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "foundation_anchorage",
+            "label": "Foundation and anchorage",
+            "status": "review_required",
+            "detail": "Footings, foundation, frost protection and anchorage require site-specific structural design.",
+            "evidence_status": "engineering_review_required"
+          },
+          {
+            "id": "zoning_occupancy",
+            "label": "Zoning and occupancy approval",
+            "status": "review_required",
+            "detail": "Municipal zoning, minimum dwelling area, permits and occupancy approval are site-specific.",
+            "evidence_status": "municipal_review_required"
+          }
+        ],
+        "overall_status": "passes_reference_screen_subject_to_review",
+        "note": "The 17.5 m² figure is an open-concept Building Code reference from Ontario guidance, not a universal occupancy rule or approval. Municipal zoning, Building Code review, servicing and occupancy approval may require more."
+      },
+      "residential_shell_policy": {
+        "minimum_diameter_m": 6.096,
+        "minimum_diameter_label": "20 ft",
+        "ordinary_scope": "full_time_year_round_residential_dwelling",
+        "default_diameter_m": 9.144,
+        "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+        "excluded_from_ordinary_calculations": [
+          "12 ft",
+          "16 ft"
+        ],
+        "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
+        "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
       },
       "assumptions": {
         "tax_rate": 0.13,
@@ -17031,7 +18690,7 @@
       }
     },
     "high": {
-      "contract_version": "4.2.0",
+      "contract_version": "4.3.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -17054,6 +18713,18 @@
         "wall_height_m": 2.4,
         "roof_pitch_degrees": 30,
         "household_size": 2,
+        "occupancy": {
+          "layout": "open_concept",
+          "occupants": 2,
+          "bedroom_count": 0,
+          "sleeping_area_m2": null,
+          "bathroom_area_m2": null,
+          "kitchen_area_m2": null,
+          "living_dining_kitchen_area_m2": null,
+          "window_area_m2": null,
+          "heating_confirmed": false,
+          "ventilation_confirmed": false
+        },
         "layout": "single_storey",
         "window_count": 0,
         "door_count": 1,
@@ -17061,7 +18732,15 @@
         "stair_opening_m2": 0,
         "restricted_headroom_override_used": false,
         "restricted_headroom_fraction": 0,
-        "guard_length_m": 0
+        "guard_length_m": 0,
+        "residential_shell": {
+          "minimum_diameter_m": 6.096,
+          "minimum_diameter_label": "20 ft",
+          "requested_diameter_m": 9.144,
+          "requested_below_minimum": false,
+          "applied_diameter_m": 9.144,
+          "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+        }
       },
       "geometry": {
         "inputs": {
@@ -17069,6 +18748,18 @@
           "wall_height_m": 2.4,
           "roof_pitch_degrees": 30,
           "household_size": 2,
+          "occupancy": {
+            "layout": "open_concept",
+            "occupants": 2,
+            "bedroom_count": 0,
+            "sleeping_area_m2": null,
+            "bathroom_area_m2": null,
+            "kitchen_area_m2": null,
+            "living_dining_kitchen_area_m2": null,
+            "window_area_m2": null,
+            "heating_confirmed": false,
+            "ventilation_confirmed": false
+          },
           "layout": "single_storey",
           "window_count": 0,
           "door_count": 1,
@@ -17076,7 +18767,15 @@
           "stair_opening_m2": 0,
           "restricted_headroom_override_used": false,
           "restricted_headroom_fraction": 0,
-          "guard_length_m": 0
+          "guard_length_m": 0,
+          "residential_shell": {
+            "minimum_diameter_m": 6.096,
+            "minimum_diameter_label": "20 ft",
+            "requested_diameter_m": 9.144,
+            "requested_below_minimum": false,
+            "applied_diameter_m": 9.144,
+            "ordinary_residential_scope": "full_time_year_round_residential_dwelling"
+          }
         },
         "radius_m": 4.572,
         "footprint_m2": 65.6693,
@@ -17141,6 +18840,8 @@
           "interior partitions"
         ],
         "evidence_status": "published_supplier_price",
+        "ordinary_residential_eligible": true,
+        "residential_use": "ordinary_full_time_year_round_candidate",
         "selection_method": "exact_published_or_selected_package",
         "source": {
           "id": "yurts_canada",
@@ -20112,8 +21813,8 @@
         "cash_cost_cad": 41864.6,
         "economic_cost_cad": 41864.6,
         "financing_value_cad": 41864.6,
-        "initial_cash_contribution_cad": 4186.46,
-        "financed_principal_cad": 38846.16,
+        "initial_cash_contribution_cad": 8372.92,
+        "financed_principal_cad": 33491.68,
         "remaining_layer_ids": [
           "platform_foundation",
           "four_season_completion",
@@ -20231,8 +21932,8 @@
         "contingency_cad": 11177.52,
         "upfront_cash_required_cad": 104323.55,
         "construction_cash_expenditure_cad": 82430.11,
-        "initial_cash_contribution_cad": 4186.46,
-        "financed_principal_cad": 38846.16,
+        "initial_cash_contribution_cad": 8372.92,
+        "financed_principal_cad": 33491.68,
         "owner_labour_imputed_cad": 1303.18,
         "completed_dwelling_capital_cad": 105626.73,
         "economic_cost_cad": 105626.73,
@@ -20250,30 +21951,30 @@
         "cash_construction_budget_cad": 41864.6,
         "property_value_cad": 41864.6,
         "ownership": "financed",
-        "initial_contribution_cad": 4186.46,
-        "down_payment_cad": 4186.46,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 4186.46,
+        "initial_contribution_cad": 8372.92,
+        "down_payment_cad": 8372.92,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 8372.92,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 2093.23,
-        "base_financed_principal_cad": 37678.14,
-        "mortgage_insurance_premium_cad": 1168.02,
+        "base_financed_principal_cad": 33491.68,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.9,
-          "premium_rate": 0.031,
-          "premium_cad": 1168.02,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.8,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 38846.16,
-        "financed_principal_cad": 38846.16,
+        "total_financed_principal_cad": 33491.68,
+        "financed_principal_cad": 33491.68,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -20284,15 +21985,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 205.26,
-        "monthly_debt_service_cad": 205.26,
-        "total_interest_over_amortization_cad": 22731.51,
-        "term_end_balance_cad": 33842.77,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 250.52,
+        "monthly_payment_cad": 183.32,
+        "monthly_debt_service_cad": 183.32,
+        "total_interest_over_amortization_cad": 21503.62,
+        "term_end_balance_cad": 29350.49,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 223.01,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 250.52,
+          "rate_annual": 0.0635,
+          "payment_cad": 223.01,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -20317,30 +22018,30 @@
         "cash_construction_budget_cad": 41864.6,
         "property_value_cad": 41864.6,
         "ownership": "financed",
-        "initial_contribution_cad": 4186.46,
-        "down_payment_cad": 4186.46,
-        "down_payment_rate": 0.1,
-        "requested_initial_contribution_cad": 4186.46,
+        "initial_contribution_cad": 8372.92,
+        "down_payment_cad": 8372.92,
+        "down_payment_rate": 0.2,
+        "requested_initial_contribution_cad": 8372.92,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 2093.23,
-        "base_financed_principal_cad": 37678.14,
-        "mortgage_insurance_premium_cad": 1168.02,
+        "base_financed_principal_cad": 33491.68,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.9,
-          "premium_rate": 0.031,
-          "premium_cad": 1168.02,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.8,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 38846.16,
-        "financed_principal_cad": 38846.16,
+        "total_financed_principal_cad": 33491.68,
+        "financed_principal_cad": 33491.68,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -20351,15 +22052,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 205.26,
-        "monthly_debt_service_cad": 205.26,
-        "total_interest_over_amortization_cad": 22731.51,
-        "term_end_balance_cad": 33842.77,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 250.52,
+        "monthly_payment_cad": 183.32,
+        "monthly_debt_service_cad": 183.32,
+        "total_interest_over_amortization_cad": 21503.62,
+        "term_end_balance_cad": 29350.49,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 223.01,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 250.52,
+          "rate_annual": 0.0635,
+          "payment_cad": 223.01,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -20384,30 +22085,30 @@
         "cash_construction_budget_cad": 104323.55,
         "property_value_cad": 104323.55,
         "ownership": "financed",
-        "initial_contribution_cad": 10432.35,
-        "down_payment_cad": 10432.35,
-        "down_payment_rate": 0.10000000000000002,
-        "requested_initial_contribution_cad": 10432.35,
+        "initial_contribution_cad": 20864.71,
+        "down_payment_cad": 20864.71,
+        "down_payment_rate": 0.20000000000000004,
+        "requested_initial_contribution_cad": 20864.71,
         "contribution_raised_to_minimum": false,
         "minimum_down_payment_cad": 5216.18,
-        "base_financed_principal_cad": 93891.19,
-        "mortgage_insurance_premium_cad": 2910.63,
+        "base_financed_principal_cad": 83458.84,
+        "mortgage_insurance_premium_cad": 0,
         "mortgage_insurance": {
-          "required": true,
-          "eligible": true,
-          "ltv": 0.9,
-          "premium_rate": 0.031,
-          "premium_cad": 2910.63,
-          "status": "cmhc_standard_schedule"
+          "required": false,
+          "eligible": false,
+          "ltv": 0.7999999999999999,
+          "premium_rate": 0,
+          "premium_cad": 0,
+          "status": "not_required_or_not_eligible"
         },
-        "total_financed_principal_cad": 96801.82,
-        "financed_principal_cad": 96801.82,
+        "total_financed_principal_cad": 83458.84,
+        "financed_principal_cad": 83458.84,
         "rate_type": "fixed",
-        "contract_rate_annual": 0.0401,
-        "interest_rate_annual": 0.0401,
+        "contract_rate_annual": 0.0435,
+        "interest_rate_annual": 0.0435,
         "rate": {
           "type": "fixed",
-          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
           "source_id": "boc_new_lending",
           "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
           "observed_date": "2026-06-30",
@@ -20418,15 +22119,15 @@
         "term_years": 5,
         "loan_term_years": 5,
         "amortization_years": 25,
-        "monthly_payment_cad": 511.49,
-        "monthly_debt_service_cad": 511.49,
-        "total_interest_over_amortization_cad": 56645.28,
-        "term_end_balance_cad": 84333.73,
-        "stress_test_rate_annual": 0.0601,
-        "stress_test_payment_cad": 624.29,
+        "monthly_payment_cad": 456.81,
+        "monthly_debt_service_cad": 456.81,
+        "total_interest_over_amortization_cad": 53585.45,
+        "term_end_balance_cad": 73139.3,
+        "stress_test_rate_annual": 0.0635,
+        "stress_test_payment_cad": 555.72,
         "qualification": {
-          "rate_annual": 0.0601,
-          "payment_cad": 624.29,
+          "rate_annual": 0.0635,
+          "payment_cad": 555.72,
           "rule": "greater of contract rate + 2 percentage points or 5.25%"
         },
         "eligibility": {
@@ -21925,7 +23626,512 @@
           "high": 1.15,
           "status": "campaign_planning_sensitivity",
           "note": "The central values are published prices where available. Low/high are explicit planning sensitivities, not supplier quotes."
-        }
+        },
+        "yurt_packages": [
+          {
+            "id": "yc_12_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 3.6576,
+            "diameter_label": "12 ft",
+            "price_cad": 12420,
+            "area_ft2": 102,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": false,
+            "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+          },
+          {
+            "id": "yc_16_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 4.8768,
+            "diameter_label": "16 ft",
+            "price_cad": 16451,
+            "area_ft2": 190,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": false,
+            "residential_use": "shell_only_seasonal_experimental_or_special_engineering"
+          },
+          {
+            "id": "yc_20_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": 19252,
+            "area_ft2": 296,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "yc_24_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": 25681,
+            "area_ft2": 434,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "yc_30_base_installed",
+            "supplier_id": "yurts_canada",
+            "diameter_m": 9.144,
+            "diameter_label": "30 ft",
+            "price_cad": 36404,
+            "area_ft2": 685,
+            "price_basis": "installed",
+            "included": [
+              "lattice wall",
+              "rafters/frame",
+              "crown/dome",
+              "tension structure",
+              "all-season insulation",
+              "weatherproof roof and wall covers",
+              "interior moisture-wicking liner",
+              "4 ft acrylic dome",
+              "one 34 in standard exterior door",
+              "mandatory supplier installation"
+            ],
+            "excluded": [
+              "platform/floor",
+              "delivery",
+              "additional windows or doors",
+              "heating/cooling",
+              "plumbing",
+              "electrical",
+              "interior partitions"
+            ],
+            "evidence_status": "published_supplier_price",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_20_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": 32958,
+            "area_ft2": 314,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "two window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_24_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": 37699,
+            "area_ft2": 452,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "two window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "tof_32_import_estimate",
+            "supplier_id": "the_out_factory",
+            "diameter_m": 9.7536,
+            "diameter_label": "32 ft",
+            "price_cad": 57852,
+            "area_ft2": 804,
+            "price_basis": "Canadian non-binding import estimate",
+            "included": [
+              "crown and dome",
+              "rafters",
+              "lattice",
+              "door frame and door",
+              "four window frames and uPVC windows",
+              "insulation",
+              "outer and inner fabric",
+              "hardware",
+              "estimated crating",
+              "estimated shipping",
+              "estimated duties/fees",
+              "estimated VAT"
+            ],
+            "excluded": [
+              "platform/base",
+              "flooring",
+              "electrical",
+              "plumbing",
+              "toilet fixtures",
+              "interior partitions",
+              "door delivery to site"
+            ],
+            "evidence_status": "non_binding_import_estimate",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_20_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 6.096,
+            "diameter_label": "20 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 217.35,
+              "roof_insulation": 270.32,
+              "non_insulated_floor": 3148.14,
+              "floor_insulation": 1103.52,
+              "rafter_supports": 1478.08,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_24_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 7.3152,
+            "diameter_label": "24 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 306.62,
+              "roof_insulation": 464.07,
+              "non_insulated_floor": 3700.35,
+              "floor_insulation": 1424.58,
+              "rafter_supports": 2138.58,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          },
+          {
+            "id": "biome_30_configurator",
+            "supplier_id": "biome_canada",
+            "diameter_m": 9.144,
+            "diameter_label": "30 ft",
+            "price_cad": null,
+            "price_basis": "quote required",
+            "included": [
+              "lattices",
+              "rafters",
+              "dome rings",
+              "dome",
+              "exterior wall fabric",
+              "exterior roof fabric",
+              "one standard door",
+              "jambs",
+              "support cable",
+              "hardware"
+            ],
+            "excluded": [
+              "base/floor",
+              "utilities",
+              "interior partitions",
+              "installation",
+              "transport",
+              "taxes"
+            ],
+            "option_prices_cad": {
+              "wall_insulation": 338.16,
+              "roof_insulation": 595.07,
+              "non_insulated_floor": 5009.35,
+              "floor_insulation": 2049.88,
+              "rafter_supports_yellow_poplar": 2567.31,
+              "rafter_supports_spf": 931.46,
+              "wood_stove": 3501.42
+            },
+            "evidence_status": "configurator_options_quote_required",
+            "ordinary_residential_eligible": true,
+            "residential_use": "ordinary_full_time_year_round_candidate"
+          }
+        ]
+      },
+      "occupancy_compliance": {
+        "contract_version": "1.0.0",
+        "source": {
+          "title": "Build or buy a tiny home",
+          "url": "https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf",
+          "classification": "official_guidance_reference",
+          "observed_date": "2022-05-12"
+        },
+        "scope": "planning_screen_not_building_approval",
+        "reference_open_concept_minimum_finished_floor_area_m2": 17.5,
+        "layout": "open_concept",
+        "occupants": 2,
+        "bedroom_count": 0,
+        "finished_floor_area_m2": 63.0425,
+        "required_reference_area_m2": 17.5,
+        "sleeping_area_m2": 60.0425,
+        "bathroom_area_m2": 3,
+        "kitchen_area_m2": 4.2,
+        "required_window_area_m2": 6.004,
+        "provided_window_area_m2": null,
+        "checks": [
+          {
+            "id": "finished_floor_area",
+            "label": "Finished floor area",
+            "status": "passes_reference_minimum",
+            "detail": "63.04 m² usable against 17.50 m² for the open-concept reference.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "layout_and_sleeping",
+            "label": "Open-concept living / sleeping / dining / kitchen",
+            "status": "passes_reference_allocation",
+            "detail": "60.04 m² available against 13.50 m² reference sleeping/living allocation.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "occupants_and_bedrooms",
+            "label": "Occupants and bedrooms",
+            "status": "review_required",
+            "detail": "2 occupants and 0 bedrooms supplied. Ontario guidance does not create a universal occupancy-per-m² rule; room use and municipal review remain required.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "bathroom",
+            "label": "Bathroom",
+            "status": "passes_reference_area",
+            "detail": "3.00 m² planning allocation; fixtures still require compliant layout and servicing.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "kitchen",
+            "label": "Kitchen",
+            "status": "included_in_open_concept_reference",
+            "detail": "4.20 m² planning allocation; the open-concept reference combines kitchen with living/sleeping/dining.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "egress_windows",
+            "label": "Windows and egress",
+            "status": "review_required",
+            "detail": "At least 6.00 m² of qualifying glazing is required by the reference; provide an opening schedule.",
+            "evidence_status": "quotation_or_design_review_required"
+          },
+          {
+            "id": "ventilation_heating",
+            "label": "Ventilation and heating",
+            "status": "review_required",
+            "detail": "Year-round occupancy needs code-compliant heating and ventilation; the model does not infer approval from a yurt package.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "ceiling_heights",
+            "label": "Ceiling heights",
+            "status": "review_required",
+            "detail": "2.40 m wall height is not proof that all required floor area meets the applicable ceiling-height rules.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "stairs_guards",
+            "label": "Stairs and guards",
+            "status": "not_applicable_single_storey",
+            "detail": "No upper floor selected.",
+            "evidence_status": "official_guidance_reference"
+          },
+          {
+            "id": "foundation_anchorage",
+            "label": "Foundation and anchorage",
+            "status": "review_required",
+            "detail": "Footings, foundation, frost protection and anchorage require site-specific structural design.",
+            "evidence_status": "engineering_review_required"
+          },
+          {
+            "id": "zoning_occupancy",
+            "label": "Zoning and occupancy approval",
+            "status": "review_required",
+            "detail": "Municipal zoning, minimum dwelling area, permits and occupancy approval are site-specific.",
+            "evidence_status": "municipal_review_required"
+          }
+        ],
+        "overall_status": "passes_reference_screen_subject_to_review",
+        "note": "The 17.5 m² figure is an open-concept Building Code reference from Ontario guidance, not a universal occupancy rule or approval. Municipal zoning, Building Code review, servicing and occupancy approval may require more."
+      },
+      "residential_shell_policy": {
+        "minimum_diameter_m": 6.096,
+        "minimum_diameter_label": "20 ft",
+        "ordinary_scope": "full_time_year_round_residential_dwelling",
+        "default_diameter_m": 9.144,
+        "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+        "excluded_from_ordinary_calculations": [
+          "12 ft",
+          "16 ft"
+        ],
+        "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
+        "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
       },
       "assumptions": {
         "tax_rate": 0.13,
@@ -21952,6 +24158,7 @@
       "id": "20ft",
       "label": "6.096 m / 20 ft",
       "diameter_m": 6.096,
+      "supplier_id": "yurts_canada",
       "usable_floor_area_m2": 28.0189,
       "completed_dwelling_capital_cad": 61510.02,
       "upfront_cash_required_cad": 60766.54,
@@ -21962,6 +24169,7 @@
       "id": "24ft",
       "label": "7.315 m / 24 ft",
       "diameter_m": 7.3152,
+      "supplier_id": "yurts_canada",
       "usable_floor_area_m2": 40.3472,
       "completed_dwelling_capital_cad": 71890.96,
       "upfront_cash_required_cad": 70941.28,
@@ -21972,6 +24180,7 @@
       "id": "30ft",
       "label": "9.144 m / 30 ft",
       "diameter_m": 9.144,
+      "supplier_id": "yurts_canada",
       "usable_floor_area_m2": 63.0425,
       "completed_dwelling_capital_cad": 89385.05,
       "upfront_cash_required_cad": 88081.87,
@@ -21979,31 +24188,128 @@
       "thresholds": []
     },
     {
-      "id": "35ft",
-      "label": "10.668 m / 35 ft",
-      "diameter_m": 10.668,
-      "usable_floor_area_m2": 85.8079,
-      "completed_dwelling_capital_cad": 97580.1,
-      "upfront_cash_required_cad": 95902.96,
-      "cost_per_usable_m2_cad": 1137.1924962619992,
+      "id": "32ft_out_factory",
+      "label": "9.754 m / 32 ft · Out Factory estimate",
+      "diameter_m": 9.7536,
+      "supplier_id": "the_out_factory",
+      "usable_floor_area_m2": 71.7284,
+      "completed_dwelling_capital_cad": 120757.68,
+      "upfront_cash_required_cad": 119318.13,
+      "cost_per_usable_m2_cad": 1683.5406896013294,
       "thresholds": [
         "large_diameter_9_144"
       ]
-    },
-    {
-      "id": "40ft",
-      "label": "12.192 m / 40 ft",
-      "diameter_m": 12.192,
-      "usable_floor_area_m2": 112.0756,
-      "completed_dwelling_capital_cad": 108886.41,
-      "upfront_cash_required_cad": 106806.41,
-      "cost_per_usable_m2_cad": 971.5442968853167,
-      "thresholds": [
-        "large_diameter_9_144",
-        "large_diameter_10_668"
-      ]
     }
   ],
+  "residential_shell_policy": {
+    "minimum_diameter_m": 6.096,
+    "minimum_diameter_label": "20 ft",
+    "ordinary_scope": "full_time_year_round_residential_dwelling",
+    "default_diameter_m": 9.144,
+    "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+    "excluded_from_ordinary_calculations": [
+      "12 ft",
+      "16 ft"
+    ],
+    "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
+    "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
+  },
+  "occupancy_code_model": {
+    "contract_version": "1.0.0",
+    "source": {
+      "title": "Build or buy a tiny home",
+      "url": "https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf",
+      "classification": "official_guidance_reference",
+      "observed_date": "2022-05-12"
+    },
+    "note": "The 17.5 m² figure is an open-concept Building Code reference from Ontario guidance, not a universal occupancy rule or approval. Municipal zoning, Building Code review, servicing and occupancy approval may require more.",
+    "open_concept": {
+      "total_minimum_finished_floor_area_m2": 17.5,
+      "combined_living_sleeping_dining_kitchen_area_m2": 13.5,
+      "bathroom_reference_area_m2": 3,
+      "laundry_reference_area_m2": 1
+    },
+    "separated_rooms": {
+      "minimum_one_bedroom_area_m2": 23.8,
+      "living_area_m2": 13.5,
+      "dining_area_m2": 7,
+      "kitchen_area_m2": 4.2,
+      "combined_living_dining_kitchen_one_bedroom_area_m2": 11,
+      "master_bedroom_area_m2": 9.8,
+      "other_bedroom_area_m2": 7
+    },
+    "windows": {
+      "living_dining_glazing_fraction": 0.1,
+      "bedroom_glazing_fraction": 0.05,
+      "upper_sleeping_exit_clear_opening_m2": 0.35,
+      "minimum_clear_dimension_m": 0.38,
+      "maximum_sill_height_m": 1
+    },
+    "ceiling_heights": {
+      "living_dining_kitchen_m": 2.3,
+      "living_dining_kitchen_minimum_any_point_m": 2.1,
+      "bedroom_m": 2.3,
+      "bathroom_standing_area_m": 2.1,
+      "restricted_below_1400mm_not_counted": true
+    },
+    "mezzanine": {
+      "open_to_below_max_fraction": 0.4,
+      "enclosed_max_fraction": 0.1,
+      "stairs_guards_handrails_required": true
+    },
+    "year_round_systems": [
+      "code_compliant_heating",
+      "ventilation",
+      "heat_recovery_ventilation",
+      "potable_water",
+      "sewage",
+      "electrical",
+      "foundation_and_anchorage"
+    ]
+  },
+  "supplier_diameter_options": {
+    "yurts_canada": [
+      {
+        "id": "yc_20_base_installed",
+        "label": "20 ft",
+        "diameter_m": 6.096,
+        "evidence_status": "published_supplier_price"
+      },
+      {
+        "id": "yc_24_base_installed",
+        "label": "24 ft",
+        "diameter_m": 7.3152,
+        "evidence_status": "published_supplier_price"
+      },
+      {
+        "id": "yc_30_base_installed",
+        "label": "30 ft",
+        "diameter_m": 9.144,
+        "evidence_status": "published_supplier_price"
+      }
+    ],
+    "the_out_factory": [
+      {
+        "id": "tof_20_import_estimate",
+        "label": "20 ft",
+        "diameter_m": 6.096,
+        "evidence_status": "non_binding_import_estimate"
+      },
+      {
+        "id": "tof_24_import_estimate",
+        "label": "24 ft",
+        "diameter_m": 7.3152,
+        "evidence_status": "non_binding_import_estimate"
+      },
+      {
+        "id": "tof_32_import_estimate",
+        "label": "32 ft",
+        "diameter_m": 9.7536,
+        "evidence_status": "non_binding_import_estimate"
+      }
+    ],
+    "biome_canada": []
+  },
   "layout_comparison": [
     {
       "layout": "single_storey",

@@ -33,10 +33,10 @@
     "owner_labour_value_rate_cad_per_hour": 24.6,
     "financing": {
       "ownership": "financed",
-      "down_payment_rate": 0.1,
+      "down_payment_rate": 0.2,
       "rate_type": "fixed",
       "insurance_mode": "automatic",
-      "interest_rate_annual": 0.0401,
+      "interest_rate_annual": 0.0435,
       "amortization_years": 25,
       "loan_term_years": 5
     }
@@ -45,9 +45,63 @@
     {"id": "20ft", "label": "6.096 m / 20 ft", "diameter_m": 6.096},
     {"id": "24ft", "label": "7.315 m / 24 ft", "diameter_m": 7.3152},
     {"id": "30ft", "label": "9.144 m / 30 ft", "diameter_m": 9.144},
-    {"id": "35ft", "label": "10.668 m / 35 ft", "diameter_m": 10.668},
-    {"id": "40ft", "label": "12.192 m / 40 ft", "diameter_m": 12.192}
+    {"id": "32ft_out_factory", "label": "9.754 m / 32 ft · Out Factory estimate", "diameter_m": 9.7536, "supplier_id": "the_out_factory"}
   ],
+  "residential_shell_policy": {
+    "minimum_diameter_m": 6.096,
+    "minimum_diameter_label": "20 ft",
+    "ordinary_scope": "full_time_year_round_residential_dwelling",
+    "default_diameter_m": 9.144,
+    "ordinary_options_note": "20 ft is the smallest ordinary residential modelling option. The existing 30 ft default is preserved. Larger options require exact supplier evidence or are explicitly marked as custom/extrapolated.",
+    "excluded_from_ordinary_calculations": ["12 ft", "16 ft"],
+    "excluded_options_note": "12 ft and 16 ft supplier records remain evidence only: shell-only, seasonal, experimental or special-engineering options, not ordinary mortgage-eligible homes.",
+    "source": "Ontario Ministry of Municipal Affairs and Housing tiny-home guidance"
+  },
+  "occupancy_code_model": {
+    "contract_version": "1.0.0",
+    "source": {
+      "title": "Build or buy a tiny home",
+      "url": "https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf",
+      "classification": "official_guidance_reference",
+      "observed_date": "2022-05-12"
+    },
+    "note": "The 17.5 m² figure is an open-concept Building Code reference from Ontario guidance, not a universal occupancy rule or approval. Municipal zoning, Building Code review, servicing and occupancy approval may require more.",
+    "open_concept": {
+      "total_minimum_finished_floor_area_m2": 17.5,
+      "combined_living_sleeping_dining_kitchen_area_m2": 13.5,
+      "bathroom_reference_area_m2": 3,
+      "laundry_reference_area_m2": 1
+    },
+    "separated_rooms": {
+      "minimum_one_bedroom_area_m2": 23.8,
+      "living_area_m2": 13.5,
+      "dining_area_m2": 7,
+      "kitchen_area_m2": 4.2,
+      "combined_living_dining_kitchen_one_bedroom_area_m2": 11,
+      "master_bedroom_area_m2": 9.8,
+      "other_bedroom_area_m2": 7
+    },
+    "windows": {
+      "living_dining_glazing_fraction": 0.1,
+      "bedroom_glazing_fraction": 0.05,
+      "upper_sleeping_exit_clear_opening_m2": 0.35,
+      "minimum_clear_dimension_m": 0.38,
+      "maximum_sill_height_m": 1
+    },
+    "ceiling_heights": {
+      "living_dining_kitchen_m": 2.3,
+      "living_dining_kitchen_minimum_any_point_m": 2.1,
+      "bedroom_m": 2.3,
+      "bathroom_standing_area_m": 2.1,
+      "restricted_below_1400mm_not_counted": true
+    },
+    "mezzanine": {
+      "open_to_below_max_fraction": 0.4,
+      "enclosed_max_fraction": 0.1,
+      "stairs_guards_handrails_required": true
+    },
+    "year_round_systems": ["code_compliant_heating", "ventilation", "heat_recovery_ventilation", "potable_water", "sewage", "electrical", "foundation_and_anchorage"]
+  },
   "layout_rules": {
     "single_storey": {"label": "Single storey", "upper_floor_fraction": 0, "stair_opening_m2": 0, "restricted_headroom_fraction": 0, "guard_length_m": 0, "wall_height_multiplier": 1, "upper_floor_elevation_factor": 0, "minimum_headroom_m": 1.98},
     "partial_loft": {"label": "Partial loft", "upper_floor_fraction": 0.45, "stair_opening_m2": 5.5, "restricted_headroom_fraction": null, "guard_length_m": 8, "wall_height_multiplier": 1, "upper_floor_elevation_factor": 0.67, "minimum_headroom_m": 1.98},

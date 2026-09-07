@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.2.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.3.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -8,17 +8,17 @@ The package price is the starting input. The old ARC dwelling estimate is not us
 
 | Supplier | Diameter | Published / estimated price | Price basis | Evidence status |
 | --- | ---: | ---: | --- | --- |
-| Yurts Canada | 12 ft | $12,420.00 | installed | published_supplier_price |
-| Yurts Canada | 16 ft | $16,451.00 | installed | published_supplier_price |
-| Yurts Canada | 20 ft | $19,252.00 | installed | published_supplier_price |
-| Yurts Canada | 24 ft | $25,681.00 | installed | published_supplier_price |
-| Yurts Canada | 30 ft | $36,404.00 | installed | published_supplier_price |
-| The Out Factory | 20 ft | $32,958.00 | Canadian non-binding import estimate | non_binding_import_estimate |
-| The Out Factory | 24 ft | $37,699.00 | Canadian non-binding import estimate | non_binding_import_estimate |
-| The Out Factory | 32 ft | $57,852.00 | Canadian non-binding import estimate | non_binding_import_estimate |
-| Biome Canada | 20 ft | quote required | quote required | configurator_options_quote_required |
-| Biome Canada | 24 ft | quote required | quote required | configurator_options_quote_required |
-| Biome Canada | 30 ft | quote required | quote required | configurator_options_quote_required |
+| Yurts Canada | 12 ft | $12,420.00 | installed | published_supplier_price · evidence only: shell-only / seasonal / experimental / special engineering |
+| Yurts Canada | 16 ft | $16,451.00 | installed | published_supplier_price · evidence only: shell-only / seasonal / experimental / special engineering |
+| Yurts Canada | 20 ft | $19,252.00 | installed | published_supplier_price · ordinary residential candidate |
+| Yurts Canada | 24 ft | $25,681.00 | installed | published_supplier_price · ordinary residential candidate |
+| Yurts Canada | 30 ft | $36,404.00 | installed | published_supplier_price · ordinary residential candidate |
+| The Out Factory | 20 ft | $32,958.00 | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| The Out Factory | 24 ft | $37,699.00 | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| The Out Factory | 32 ft | $57,852.00 | Canadian non-binding import estimate | non_binding_import_estimate · ordinary residential candidate |
+| Biome Canada | 20 ft | quote required | quote required | configurator_options_quote_required · ordinary residential candidate |
+| Biome Canada | 24 ft | quote required | quote required | configurator_options_quote_required · ordinary residential candidate |
+| Biome Canada | 30 ft | quote required | quote required | configurator_options_quote_required · ordinary residential candidate |
 
 Yurts Canada is the central reference because its public price is a Canadian installed all-season Base Kit. The Out Factory rows are non-binding Canadian import estimates. Biome Canada publishes a configurable package and options but requires a quote for the base total. Package inclusions and exclusions are preserved in the JSON contract.
 
@@ -38,11 +38,34 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 - Contributed owner-labour value: $1,303.18
 - Completed dwelling economic cost: **$89,385.05**
 - Selected-stage mortgage basis: **$36,404.00 cash**, excluding contributed owner labour.
-- Selected-stage contract payment: **$178.49/month** at 4.01% fixed; source: [Bank of Canada funds advanced, insured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
-- Initial contribution: $3,640.40; base financed principal: $32,763.60; mortgage-insurance premium: $1,015.67; total financed principal: $33,779.27.
-- Stress-test payment: **$217.85/month** at 6.01%; term: 5 years; amortization: 25 years; balance at term end: $29,428.50.
+- Selected-stage contract payment: **$159.41/month** at 4.35% fixed; source: [Bank of Canada funds advanced, uninsured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
+- Initial contribution: $7,280.80; base financed principal: $29,123.20; mortgage-insurance premium: $0.00; total financed principal: $29,123.20.
+- Stress-test payment: **$193.92/month** at 6.35%; term: 5 years; amortization: 25 years; balance at term end: $25,522.17.
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Residential shell and occupancy screen
+
+- Ordinary residential selector minimum: **20 ft** (6.096 m); existing default: **9.144 m / 30 ft**.
+- 12 ft and 16 ft records remain supplier evidence only and are excluded from ordinary residential, completed-dwelling and mortgage calculations.
+- Exact larger supplier evidence is supplier-specific: the 32 ft Out Factory estimate is available under that supplier; custom sizes outside exact rows are labelled interpolated or extrapolated.
+- The Ontario guidance reference is **17.5 m²** for an open-concept tiny-home example. This is a reference screen, not automatic approval.
+
+| Occupancy/code check | Result | Detail |
+| --- | --- | --- |
+| Finished floor area | passes_reference_minimum | 63.04 m² usable against 17.50 m² for the open-concept reference. |
+| Open-concept living / sleeping / dining / kitchen | passes_reference_allocation | 60.04 m² available against 13.50 m² reference sleeping/living allocation. |
+| Occupants and bedrooms | review_required | 2 occupants and 0 bedrooms supplied. Ontario guidance does not create a universal occupancy-per-m² rule; room use and municipal review remain required. |
+| Bathroom | passes_reference_area | 3.00 m² planning allocation; fixtures still require compliant layout and servicing. |
+| Kitchen | included_in_open_concept_reference | 4.20 m² planning allocation; the open-concept reference combines kitchen with living/sleeping/dining. |
+| Windows and egress | review_required | At least 6.00 m² of qualifying glazing is required by the reference; provide an opening schedule. |
+| Ventilation and heating | review_required | Year-round occupancy needs code-compliant heating and ventilation; the model does not infer approval from a yurt package. |
+| Ceiling heights | review_required | 2.40 m wall height is not proof that all required floor area meets the applicable ceiling-height rules. |
+| Stairs and guards | not_applicable_single_storey | No upper floor selected. |
+| Foundation and anchorage | review_required | Footings, foundation, frost protection and anchorage require site-specific structural design. |
+| Zoning and occupancy approval | review_required | Municipal zoning, minimum dwelling area, permits and occupancy approval are site-specific. |
+
+Source: [Ontario tiny-home guidance](https://files.ontario.ca/pdf1/mmah-build-or-buy-a-tiny-home-en-2022-05-12.pdf). Municipal zoning, Building Code review, servicing, foundation/anchorage, occupancy approval, appraisal, insurance and lender acceptance remain unresolved until reviewed for the actual design and site.
 
 ## Mortgage evidence and down-payment scenarios
 
@@ -91,7 +114,7 @@ The public starting view is the selected supplier package. It is distinct from t
 | Delivery, design, permits, tax and contingency | $21,707.28 | $88,081.87 | delivery_logistics, design_engineering, permits, taxes, contingency |
 
 - Selected public stage: **Yurt package**, $36,404.00 cash and $36,404.00 economic cost.
-- Selected-stage financing payment: **$178.49/month**.
+- Selected-stage financing payment: **$159.41/month**.
 - Layer reconciliation: passed; economic layer reconciliation: passed.
 
 ## Cash waterfall
@@ -289,9 +312,9 @@ The total bridge is direct cash -$12,873.14, tax -$1,543.51, contingency -$1,153
 
 | Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $178.49 / month |
-| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $178.49 / month |
-| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $178.49 / month |
+| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $159.41 / month |
+| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $159.41 / month |
+| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $159.41 / month |
 
 ## Size and layout sensitivity
 
@@ -300,8 +323,7 @@ The total bridge is direct cash -$12,873.14, tax -$1,543.51, contingency -$1,153
 | 6.096 m / 20 ft | 28.0 | $60,766.54 | $61,510.02 | $2,195.30 | none |
 | 7.315 m / 24 ft | 40.3 | $70,941.28 | $71,890.96 | $1,781.81 | none |
 | 9.144 m / 30 ft | 63.0 | $88,081.87 | $89,385.05 | $1,417.85 | none |
-| 10.668 m / 35 ft | 85.8 | $95,902.96 | $97,580.10 | $1,137.19 | large_diameter_9_144 |
-| 12.192 m / 40 ft | 112.1 | $106,806.41 | $108,886.41 | $971.54 | large_diameter_9_144, large_diameter_10_668 |
+| 9.754 m / 32 ft · Out Factory estimate | 71.7 | $119,318.13 | $120,757.68 | $1,683.54 | large_diameter_9_144 |
 
 | Layout | Usable m² | Cash budget | Economic cost | Owner hours | Paid hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
