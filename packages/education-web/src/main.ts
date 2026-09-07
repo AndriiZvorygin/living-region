@@ -131,9 +131,23 @@ function enhanceImportedShellPage(page: string) {
   return page.replace(oldSummary, importedSummary).replace('</main>', `${audit}</main>`);
 }
 
+function orderHouseCostChoices(page: string) {
+  const answerStart = page.indexOf('<section class="section house-answer" id="answer">');
+  const designStart = page.indexOf('<section class="section tinted" id="design">');
+  const marketStart = page.indexOf('<section class="section" id="market">');
+  if (answerStart < 0 || designStart < 0 || marketStart < 0 || answerStart > designStart) return page;
+  const before = page.slice(0, answerStart);
+  const answer = page.slice(answerStart, designStart);
+  const design = page.slice(designStart, marketStart);
+  const after = page.slice(marketStart);
+  return `${before}${design}${answer}${after}`
+    .replace('<a href="#answer">01 Price layers</a><a href="#design">02 Design</a>', '<a href="#design">01 Design</a><a href="#answer">02 Price layers</a>');
+}
+
 function renderHouseCostPage() {
   let page = renderFirstPrinciplesHouseCostPage();
   page = page.replace('Published or supplier-estimated packages in Canadian dollars', 'Published prices and indicative CAD equivalents');
+  page = orderHouseCostChoices(page);
   return enhanceImportedShellPage(page);
   const result = houseCostResult();
   const presentation = buildHouseCostPresentationContract({...houseCostOptions(), taxRate: undefined, contingencyRate: undefined});
