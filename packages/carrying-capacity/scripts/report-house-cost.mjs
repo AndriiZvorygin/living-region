@@ -35,6 +35,12 @@ const waterfall = central.cost_waterfall;
 const waterfallProjectRows = waterfall.project_cost_rows.map((row) => `| ${row.label} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const waterReconciliation = central.water_package_reconciliation;
 const waterRows = waterReconciliation.current_itemized_rows.map((row) => `| ${row.label} | ${quantity(row.quantity)} ${row.quantity_unit} | ${money(row.material_cost_cad)} | ${money(row.included_paid_labour_cad)} | ${money(row.included_fee_cad)} | ${money(row.cash_cost_cad)} | ${row.evidence_status} |`).join('\n');
+const selectedMortgage = central.selected_financing ?? central.financing;
+const mortgageScenarioRows = (central.mortgage?.scenarios ?? []).map((scenario) => { const row = scenario.result; return `| ${scenario.label} | ${money(row.initial_contribution_cad)} | ${money(row.base_financed_principal_cad)} | ${money(row.mortgage_insurance_premium_cad)} | ${money(row.total_financed_principal_cad)} | ${(row.contract_rate_annual * 100).toFixed(2)}% | ${money(row.monthly_payment_cad)} | ${money(row.stress_test_payment_cad)} |`; }).join('\n');
+const mortgageRateEvidence = central.mortgage?.rate_evidence ?? {};
+const mortgageSources = new Map((mortgageRateEvidence.sources ?? []).map((source) => [source.id, source]));
+const mortgageReferenceRows = Object.entries(mortgageRateEvidence.reference_rates ?? {}).flatMap(([rateType, groups]) => Object.entries(groups ?? {}).map(([insuredStatus, row]) => { const source = mortgageSources.get(row.source_id); return `| ${row.label ?? `${rateType} · ${insuredStatus}`} | ${(Number(row.annual_rate) * 100).toFixed(2)}% | ${source?.institution ?? 'Recorded source'} | ${source?.observed_date ?? '—'} | ${row.market_average ? 'market average' : 'reference'} | ${source?.url ? `[source](${source.url})` : '—'} |`; })).join('\n');
+const mortgageLenderRows = (mortgageRateEvidence.lender_observations ?? []).map((row) => { const source = mortgageSources.get(row.source_id); return `| ${row.lender ?? row.id} | ${row.rate_type} · ${row.term_years} years | ${(Number(row.annual_rate) * 100).toFixed(2)}% | ${row.insured_status ?? '—'} | ${row.observed_date ?? '—'} | ${row.rate_classification ?? '—'}${row.freshness === 'stale' ? ' · stale' : ''} | ${source?.url ? `[source](${source.url})` : '—'} |`; }).join('\n');
 const minimalSelectedRows = minimal.components.filter((row) => row.selection_id).map((row) => `| ${row.label} | selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const minimalUnselectedRows = minimal.inactive_components.filter((row) => row.selection_id).map((row) => `| ${row.label} | not selected | ${quantity(row.quantity)} ${row.quantity_unit ?? ''} | ${money(row.material_cost_cad)} | ${hours(row.labour_hours_total)} | ${money(row.cash_cost_cad)} | ${row.status} |`).join('\n');
 const markdown = `# House Cost Calculator
@@ -66,10 +72,36 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 - Completed dwelling cash construction budget: **${money(central.totals.upfront_cash_required_cad)}**
 - Contributed owner-labour value: ${money(central.totals.owner_labour_imputed_cad)}
 - Completed dwelling economic cost: **${money(central.totals.economic_cost_cad)}**
-- Initial financing contribution: ${money(central.totals.initial_cash_contribution_cad)}; financed principal: ${money(central.totals.financed_principal_cad)}
-- Illustrative financing: **${money(central.financing.monthly_debt_service_cad)}/month** at ${central.financing.interest_rate_annual * 100}% interest and ${central.financing.amortization_years}-year amortization
+- Selected-stage mortgage basis: **${money(central.mortgage?.selected_stage_cash_basis_cad)} cash**, excluding contributed owner labour.
+- Selected-stage contract payment: **${money(selectedMortgage.monthly_payment_cad)}/month** at ${(selectedMortgage.contract_rate_annual * 100).toFixed(2)}% ${selectedMortgage.rate_type}; source: [${selectedMortgage.rate?.label ?? selectedMortgage.rate?.source_id}](${selectedMortgage.rate?.source_url}) observed ${selectedMortgage.rate?.observed_date}; snapshot ${selectedMortgage.rate_snapshot?.snapshot_date} (${selectedMortgage.rate?.status}).
+- Initial contribution: ${money(selectedMortgage.initial_contribution_cad)}; base financed principal: ${money(selectedMortgage.base_financed_principal_cad)}; mortgage-insurance premium: ${money(selectedMortgage.mortgage_insurance_premium_cad)}; total financed principal: ${money(selectedMortgage.total_financed_principal_cad)}.
+- Stress-test payment: **${money(selectedMortgage.stress_test_payment_cad)}/month** at ${(selectedMortgage.stress_test_rate_annual * 100).toFixed(2)}%; term: ${selectedMortgage.term_years} years; amortization: ${selectedMortgage.amortization_years} years; balance at term end: ${money(selectedMortgage.term_end_balance_cad)}.
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Mortgage evidence and down-payment scenarios
+
+The dwelling is labelled **Full-time, year-round residential dwelling based on a yurt form.** Financing is a planning calculation, not a commitment. CMHC/lender eligibility depends on permanent foundation and structural compliance, year-round occupancy approval, insurability, appraisal, title/security registration, municipal approvals and acceptance of the yurt construction system.
+
+| Scenario | Initial contribution | Base principal | Insurance premium | Total principal | Contract rate | Contract payment | Stress payment |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+${mortgageScenarioRows}
+
+20% down is the conventional uninsured reference scenario, not the legal minimum. The legal-minimum row follows current Canada.ca down-payment rules. Insurance is shown separately and added to principal where the CMHC standard schedule applies. The qualifying rate is separate from the ordinary contract rate: the model uses the greater of contract rate + 2 percentage points or 5.25%.
+
+### Recorded rate evidence
+
+The default is a Bank of Canada market average, not a guaranteed lender offer. Lender observations remain separate because special rates have product, credit, insurance and property conditions.
+
+| Reference rate | Annual | Institution | Observed | Type | Source |
+| --- | ---: | --- | --- | --- | --- |
+${mortgageReferenceRows}
+
+| Lender | Product | Annual | Insurance status | Observed | Classification | Source |
+| --- | --- | ---: | --- | --- | --- |
+${mortgageLenderRows}
+
+The snapshot was checked on ${mortgageRateEvidence.snapshot_date}; stale source-dated observations are retained as comparison evidence rather than silently substituted into the default.
 
 ## Layered price from package to dwelling
 

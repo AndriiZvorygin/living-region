@@ -333,6 +333,18 @@ main { max-width: 1180px; }
 .house-stage-controls .control { max-width: 440px; }
 .house-stage-controls .button { margin-top: 14px; }
 .house-stage-title { display: block; margin: 8px 0; color: var(--teal); font: 700 1.55rem/1.12 Georgia, serif; }
+.house-mortgage { margin-top: 24px; padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--amber); background: #fff; }
+.house-mortgage .section-heading { margin-bottom: 18px; }
+.house-mortgage .section-heading h3 { margin: 0 0 8px; font-size: 1.45rem; }
+.house-mortgage-controls { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); gap: 24px; margin-bottom: 20px; }
+.house-mortgage-controls > div { min-width: 0; padding: 16px; border-top: 3px solid var(--sage); background: #f8fbf8; }
+.house-mortgage-controls h4 { margin: 0 0 10px; }
+.house-mortgage-table { min-width: 900px; }
+.house-eligibility-warning { margin-top: 18px; padding: 15px 17px; border-left: 4px solid var(--amber); background: #fff8df; }
+.house-eligibility-warning strong { color: var(--ink); }
+.house-eligibility-warning p { margin: 6px 0 0; }
+.status.warning { display: block; margin: 10px 0; padding: 9px 11px; color: #6a4300; background: #fff1bf; border: 1px solid #d5ad46; }
+@media (max-width: 700px) { .house-mortgage-controls { grid-template-columns: 1fr; } .house-mortgage { padding: 16px; } }
 .house-layer-list { display: grid; gap: 12px; margin: 25px 0; }
 .house-layer { min-width: 0; padding: 16px; border: 1px solid var(--line); border-left: 4px solid var(--muted); background: #fff; }
 .house-layer.selected { border-left-color: var(--teal); }

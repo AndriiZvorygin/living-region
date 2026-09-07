@@ -34,7 +34,9 @@
     "financing": {
       "ownership": "financed",
       "down_payment_rate": 0.1,
-      "interest_rate_annual": 0.06,
+      "rate_type": "fixed",
+      "insurance_mode": "automatic",
+      "interest_rate_annual": 0.0401,
       "amortization_years": 25,
       "loan_term_years": 5
     }

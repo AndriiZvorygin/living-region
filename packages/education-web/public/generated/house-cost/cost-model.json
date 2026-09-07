@@ -1,5 +1,5 @@
 {
-  "contract_version": "4.1.2",
+  "contract_version": "4.2.0",
   "model_id": "arc_yurt_house_cost",
   "title": "ARC four-season yurt house cost model",
   "defaults": {
@@ -32,7 +32,9 @@
     "financing": {
       "ownership": "financed",
       "down_payment_rate": 0.1,
-      "interest_rate_annual": 0.06,
+      "rate_type": "fixed",
+      "insurance_mode": "automatic",
+      "interest_rate_annual": 0.0401,
       "amortization_years": 25,
       "loan_term_years": 5
     }
@@ -2280,7 +2282,7 @@
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
   "central": {
-    "contract_version": "4.1.2",
+    "contract_version": "4.2.0",
     "model_id": "arc_yurt_house_cost",
     "package_label": "First-principles yurt package plus quantity-based completion model",
     "price_basis_date": "2026-09-05",
@@ -5362,7 +5364,7 @@
       "economic_cost_cad": 36404,
       "financing_value_cad": 36404,
       "initial_cash_contribution_cad": 3640.4,
-      "financed_principal_cad": 32763.6,
+      "financed_principal_cad": 33779.27,
       "remaining_layer_ids": [
         "platform_foundation",
         "four_season_completion",
@@ -5480,8 +5482,8 @@
       "contingency_cad": 6524.58,
       "upfront_cash_required_cad": 88081.87,
       "construction_cash_expenditure_cad": 72174.59,
-      "initial_cash_contribution_cad": 8808.19,
-      "financed_principal_cad": 79273.68,
+      "initial_cash_contribution_cad": 3640.4,
+      "financed_principal_cad": 33779.27,
       "owner_labour_imputed_cad": 1303.18,
       "completed_dwelling_capital_cad": 89385.05,
       "economic_cost_cad": 89385.05,
@@ -5494,28 +5496,740 @@
       "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
     },
     "financing": {
-      "capital_value_cad": 88081.87,
+      "contract_version": "1.0.0",
+      "capital_value_cad": 36404,
+      "cash_construction_budget_cad": 36404,
+      "property_value_cad": 36404,
       "ownership": "financed",
-      "down_payment_cad": 8808.19,
-      "financed_principal_cad": 79273.68,
-      "interest_rate_annual": 0.06,
-      "amortization_years": 25,
+      "initial_contribution_cad": 3640.4,
+      "down_payment_cad": 3640.4,
+      "down_payment_rate": 0.1,
+      "requested_initial_contribution_cad": 3640.4,
+      "contribution_raised_to_minimum": false,
+      "minimum_down_payment_cad": 1820.2,
+      "base_financed_principal_cad": 32763.6,
+      "mortgage_insurance_premium_cad": 1015.67,
+      "mortgage_insurance": {
+        "required": true,
+        "eligible": true,
+        "ltv": 0.8999999999999999,
+        "premium_rate": 0.031,
+        "premium_cad": 1015.67,
+        "status": "cmhc_standard_schedule"
+      },
+      "total_financed_principal_cad": 33779.27,
+      "financed_principal_cad": 33779.27,
+      "rate_type": "fixed",
+      "contract_rate_annual": 0.0401,
+      "interest_rate_annual": 0.0401,
+      "rate": {
+        "type": "fixed",
+        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "source_id": "boc_new_lending",
+        "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+        "observed_date": "2026-06-30",
+        "retrieved_date": "2026-09-07",
+        "status": "fresh",
+        "market_average": true
+      },
+      "term_years": 5,
       "loan_term_years": 5,
-      "monthly_debt_service_cad": 510.76,
-      "assumption_status": "illustrative_dwelling_financing_scenario",
-      "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+      "amortization_years": 25,
+      "monthly_payment_cad": 178.49,
+      "monthly_debt_service_cad": 178.49,
+      "total_interest_over_amortization_cad": 19766.53,
+      "term_end_balance_cad": 29428.5,
+      "stress_test_rate_annual": 0.0601,
+      "stress_test_payment_cad": 217.85,
+      "qualification": {
+        "rate_annual": 0.0601,
+        "payment_cad": 217.85,
+        "rule": "greater of contract rate + 2 percentage points or 5.25%"
+      },
+      "eligibility": {
+        "status": "planning_eligibility_only",
+        "issues": [],
+        "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+      },
+      "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+      "rate_snapshot": {
+        "snapshot_id": "house-mortgage-rates-2026-09-07",
+        "snapshot_date": "2026-09-07",
+        "as_of": "2026-09-07",
+        "stale": false
+      },
+      "monthly_compounding": true,
+      "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+      "assumption_status": "illustrative_dwelling_financing_scenario"
     },
     "selected_financing": {
+      "contract_version": "1.0.0",
       "capital_value_cad": 36404,
+      "cash_construction_budget_cad": 36404,
+      "property_value_cad": 36404,
       "ownership": "financed",
+      "initial_contribution_cad": 3640.4,
       "down_payment_cad": 3640.4,
-      "financed_principal_cad": 32763.6,
-      "interest_rate_annual": 0.06,
-      "amortization_years": 25,
+      "down_payment_rate": 0.1,
+      "requested_initial_contribution_cad": 3640.4,
+      "contribution_raised_to_minimum": false,
+      "minimum_down_payment_cad": 1820.2,
+      "base_financed_principal_cad": 32763.6,
+      "mortgage_insurance_premium_cad": 1015.67,
+      "mortgage_insurance": {
+        "required": true,
+        "eligible": true,
+        "ltv": 0.8999999999999999,
+        "premium_rate": 0.031,
+        "premium_cad": 1015.67,
+        "status": "cmhc_standard_schedule"
+      },
+      "total_financed_principal_cad": 33779.27,
+      "financed_principal_cad": 33779.27,
+      "rate_type": "fixed",
+      "contract_rate_annual": 0.0401,
+      "interest_rate_annual": 0.0401,
+      "rate": {
+        "type": "fixed",
+        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "source_id": "boc_new_lending",
+        "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+        "observed_date": "2026-06-30",
+        "retrieved_date": "2026-09-07",
+        "status": "fresh",
+        "market_average": true
+      },
+      "term_years": 5,
       "loan_term_years": 5,
-      "monthly_debt_service_cad": 211.1,
-      "assumption_status": "illustrative_dwelling_financing_scenario",
-      "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+      "amortization_years": 25,
+      "monthly_payment_cad": 178.49,
+      "monthly_debt_service_cad": 178.49,
+      "total_interest_over_amortization_cad": 19766.53,
+      "term_end_balance_cad": 29428.5,
+      "stress_test_rate_annual": 0.0601,
+      "stress_test_payment_cad": 217.85,
+      "qualification": {
+        "rate_annual": 0.0601,
+        "payment_cad": 217.85,
+        "rule": "greater of contract rate + 2 percentage points or 5.25%"
+      },
+      "eligibility": {
+        "status": "planning_eligibility_only",
+        "issues": [],
+        "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+      },
+      "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+      "rate_snapshot": {
+        "snapshot_id": "house-mortgage-rates-2026-09-07",
+        "snapshot_date": "2026-09-07",
+        "as_of": "2026-09-07",
+        "stale": false
+      },
+      "monthly_compounding": true,
+      "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+      "assumption_status": "illustrative_dwelling_financing_scenario"
+    },
+    "completed_financing": {
+      "contract_version": "1.0.0",
+      "capital_value_cad": 88081.87,
+      "cash_construction_budget_cad": 88081.87,
+      "property_value_cad": 88081.87,
+      "ownership": "financed",
+      "initial_contribution_cad": 8808.19,
+      "down_payment_cad": 8808.19,
+      "down_payment_rate": 0.1,
+      "requested_initial_contribution_cad": 8808.19,
+      "contribution_raised_to_minimum": false,
+      "minimum_down_payment_cad": 4404.09,
+      "base_financed_principal_cad": 79273.68,
+      "mortgage_insurance_premium_cad": 2457.48,
+      "mortgage_insurance": {
+        "required": true,
+        "eligible": true,
+        "ltv": 0.8999999999999999,
+        "premium_rate": 0.031,
+        "premium_cad": 2457.48,
+        "status": "cmhc_standard_schedule"
+      },
+      "total_financed_principal_cad": 81731.16,
+      "financed_principal_cad": 81731.16,
+      "rate_type": "fixed",
+      "contract_rate_annual": 0.0401,
+      "interest_rate_annual": 0.0401,
+      "rate": {
+        "type": "fixed",
+        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "source_id": "boc_new_lending",
+        "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+        "observed_date": "2026-06-30",
+        "retrieved_date": "2026-09-07",
+        "status": "fresh",
+        "market_average": true
+      },
+      "term_years": 5,
+      "loan_term_years": 5,
+      "amortization_years": 25,
+      "monthly_payment_cad": 431.86,
+      "monthly_debt_service_cad": 431.86,
+      "total_interest_over_amortization_cad": 47826.42,
+      "term_end_balance_cad": 71204.18,
+      "stress_test_rate_annual": 0.0601,
+      "stress_test_payment_cad": 527.09,
+      "qualification": {
+        "rate_annual": 0.0601,
+        "payment_cad": 527.09,
+        "rule": "greater of contract rate + 2 percentage points or 5.25%"
+      },
+      "eligibility": {
+        "status": "planning_eligibility_only",
+        "issues": [],
+        "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+      },
+      "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+      "rate_snapshot": {
+        "snapshot_id": "house-mortgage-rates-2026-09-07",
+        "snapshot_date": "2026-09-07",
+        "as_of": "2026-09-07",
+        "stale": false
+      },
+      "monthly_compounding": true,
+      "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+      "assumption_status": "illustrative_full_completed_cash_budget_comparison"
+    },
+    "mortgage": {
+      "contract_version": "1.0.0",
+      "property_label": "Full-time, year-round residential dwelling based on a yurt form.",
+      "selected_stage_cash_basis_cad": 36404,
+      "rate_evidence": {
+        "contract_version": "1.0.0",
+        "snapshot_id": "house-mortgage-rates-2026-09-07",
+        "snapshot_date": "2026-09-07",
+        "currency": "CAD",
+        "freshness": {
+          "stale_after_days": 120,
+          "status": "fresh",
+          "basis": "The snapshot date is the date the public source pages and latest visible monthly Bank of Canada table were checked.",
+          "checked_as_of": "2026-09-07",
+          "age_days": 0
+        },
+        "reference_rates": {
+          "fixed": {
+            "insured": {
+              "annual_rate": 0.0401,
+              "source_id": "boc_new_lending",
+              "series": "V122667780",
+              "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+              "market_average": true
+            },
+            "uninsured": {
+              "annual_rate": 0.0435,
+              "source_id": "boc_new_lending",
+              "series": "V122667792",
+              "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+              "market_average": true
+            }
+          },
+          "variable": {
+            "insured": {
+              "annual_rate": 0.0379,
+              "source_id": "boc_new_lending",
+              "series": "V122667776",
+              "label": "Bank of Canada funds advanced, insured, variable",
+              "market_average": true
+            },
+            "uninsured": {
+              "annual_rate": 0.039,
+              "source_id": "boc_new_lending",
+              "series": "V122667782",
+              "label": "Bank of Canada funds advanced, uninsured, variable",
+              "market_average": true
+            }
+          }
+        },
+        "lender_observations": [
+          {
+            "id": "rbc_5yr_fixed_uninsured_special",
+            "lender": "RBC Royal Bank",
+            "rate_type": "fixed",
+            "term_years": 5,
+            "insured_status": "uninsured / 20%+ down",
+            "annual_rate": 0.0489,
+            "apr": 0.0492,
+            "source_id": "rbc_rates",
+            "observed_date": "2026-09-07",
+            "rate_classification": "promotional rate",
+            "eligibility_conditions": "Purchase or switch special rate; credit approval, property and product conditions apply."
+          },
+          {
+            "id": "rbc_5yr_fixed_high_ratio_special",
+            "lender": "RBC Royal Bank",
+            "rate_type": "fixed",
+            "term_years": 5,
+            "insured_status": "insured / under 20% down",
+            "annual_rate": 0.0459,
+            "apr": 0.0462,
+            "source_id": "rbc_rates",
+            "observed_date": "2026-09-07",
+            "rate_classification": "promotional rate",
+            "eligibility_conditions": "High-ratio special rate; high-ratio eligibility, credit approval, property and product conditions apply."
+          },
+          {
+            "id": "rbc_5yr_variable_uninsured_special",
+            "lender": "RBC Royal Bank",
+            "rate_type": "variable",
+            "term_years": 5,
+            "insured_status": "uninsured / 20%+ down",
+            "annual_rate": 0.0395,
+            "apr": 0.0398,
+            "source_id": "rbc_rates",
+            "observed_date": "2026-09-07",
+            "rate_classification": "promotional rate",
+            "eligibility_conditions": "Prime minus 0.500%; credit approval, property and product conditions apply."
+          },
+          {
+            "id": "rbc_5yr_variable_high_ratio_special",
+            "lender": "RBC Royal Bank",
+            "rate_type": "variable",
+            "term_years": 5,
+            "insured_status": "insured / under 20% down",
+            "annual_rate": 0.0365,
+            "apr": 0.0368,
+            "source_id": "rbc_rates",
+            "observed_date": "2026-09-07",
+            "rate_classification": "promotional rate",
+            "eligibility_conditions": "Prime minus 0.800%; high-ratio eligibility, credit approval, property and product conditions apply."
+          },
+          {
+            "id": "scotiabank_5yr_variable_closed",
+            "lender": "Scotiabank",
+            "rate_type": "variable",
+            "term_years": 5,
+            "insured_status": "conventional or insured",
+            "annual_rate": 0.049,
+            "apr": 0.0491,
+            "source_id": "scotiabank_rates",
+            "observed_date": "2025-10-30",
+            "retrieved_date": "2026-09-07",
+            "rate_classification": "special rate; source-dated",
+            "eligibility_conditions": "Closed Flex-Value product; rate and approval conditions are set by Scotiabank and the numeric page footnote is dated October 30, 2025.",
+            "freshness": "stale"
+          }
+        ],
+        "insurance_schedule": [
+          {
+            "max_ltv": 0.65,
+            "premium_rate": 0.006
+          },
+          {
+            "max_ltv": 0.75,
+            "premium_rate": 0.017
+          },
+          {
+            "max_ltv": 0.8,
+            "premium_rate": 0.024
+          },
+          {
+            "max_ltv": 0.85,
+            "premium_rate": 0.028
+          },
+          {
+            "max_ltv": 0.9,
+            "premium_rate": 0.031
+          },
+          {
+            "max_ltv": 0.95,
+            "premium_rate": 0.04
+          }
+        ],
+        "rules": {
+          "minimum_down_payment": {
+            "up_to_500000_cad_rate": 0.05,
+            "between_500000_and_1500000_first_cad": 500000,
+            "between_500000_and_1500000_first_rate": 0.05,
+            "between_500000_and_1500000_remainder_rate": 0.1,
+            "over_1500000_cad_rate": 0.2
+          },
+          "max_insured_home_price_cad": 1500000,
+          "insurance_required_below_down_payment": 0.2,
+          "stress_test_floor": 0.0525,
+          "stress_test_buffer": 0.02,
+          "max_standard_insured_amortization_years": 25
+        },
+        "sources": [
+          {
+            "id": "boc_new_lending",
+            "institution": "Bank of Canada",
+            "title": "Interest rates charged for new and existing lending by chartered banks",
+            "url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+            "source_class": "official figure",
+            "observed_date": "2026-06-30",
+            "retrieved_date": "2026-09-07",
+            "note": "Latest visible monthly observations in the snapshot. The Bank says this table is typically published within the third week of the month."
+          },
+          {
+            "id": "canada_down_payment",
+            "institution": "Government of Canada",
+            "title": "How much you need for a down payment",
+            "url": "https://www.canada.ca/en/financial-consumer-agency/services/mortgages/down-payment.html",
+            "source_class": "official requirement",
+            "observed_date": "2026-09-07",
+            "retrieved_date": "2026-09-07",
+            "note": "5% up to $500,000; 5% of the first $500,000 plus 10% of the remainder up to $1.5 million; 20% at $1.5 million or more."
+          },
+          {
+            "id": "cmhc_insurance",
+            "institution": "Canada Mortgage and Housing Corporation",
+            "title": "CMHC Mortgage Loan Insurance Explained",
+            "url": "https://www.cmhc-schl.gc.ca/observer/2025/cmhc-mortgage-loan-insurance-explained",
+            "source_class": "official requirement and premium schedule",
+            "observed_date": "2026-09-07",
+            "retrieved_date": "2026-09-07",
+            "note": "Mortgage insurance is generally required below 20% down for an eligible home priced below $1.5 million. The standard homeowner schedule is recorded separately in this snapshot."
+          },
+          {
+            "id": "cmhc_premium_schedule",
+            "institution": "Canada Mortgage and Housing Corporation",
+            "title": "CMHC Purchase premium information",
+            "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/purchase",
+            "source_class": "official premium schedule",
+            "observed_date": "2026-09-07",
+            "retrieved_date": "2026-09-07",
+            "note": "Owner-occupied 1-to-4-unit standard premium schedule; non-traditional down-payment surcharges and exact lender underwriting remain outside this planning calculation."
+          },
+          {
+            "id": "cmhc_prefab_plus",
+            "institution": "Canada Mortgage and Housing Corporation",
+            "title": "Prefab Plus",
+            "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/prefab-plus",
+            "source_class": "official eligibility guidance",
+            "observed_date": "2026-09-07",
+            "retrieved_date": "2026-09-07",
+            "note": "Prefab eligibility depends on full-time year-round suitability, permanent foundation/attachment for a traditional mortgage, approvals and lender/insurer acceptance."
+          },
+          {
+            "id": "osfi_mqr",
+            "institution": "Office of the Superintendent of Financial Institutions",
+            "title": "Minimum qualifying rate for uninsured mortgages",
+            "url": "https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages",
+            "source_class": "official qualification rule",
+            "observed_date": "2026-09-07",
+            "retrieved_date": "2026-09-07",
+            "note": "Qualifying rate is the greater of the contract rate plus 2 percentage points or 5.25%; this model displays it separately from the contract payment."
+          },
+          {
+            "id": "rbc_rates",
+            "institution": "RBC Royal Bank",
+            "title": "Mortgage rates",
+            "url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+            "source_class": "lender promotional and posted rate page",
+            "observed_date": "2026-09-07",
+            "retrieved_date": "2026-09-07",
+            "note": "Current page displayed 5-year fixed and variable special-rate rows, including high-ratio rows. These are lender-specific promotional rates, not universal offers."
+          },
+          {
+            "id": "scotiabank_rates",
+            "institution": "Scotiabank",
+            "title": "5-year closed variable mortgage",
+            "url": "https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html",
+            "source_class": "lender product page",
+            "observed_date": "2025-10-30",
+            "retrieved_date": "2026-09-07",
+            "note": "The accessible product page exposes a source-dated October 30, 2025 rate footnote; it is retained as a stale comparison and is not used as the default."
+          }
+        ],
+        "generated_at": "2026-09-07",
+        "source_snapshot_path": "packages/carrying-capacity/data/source/house-mortgage-rates.json"
+      },
+      "scenarios": [
+        {
+          "id": "legal_minimum",
+          "label": "Legal minimum down payment",
+          "downPayment": "minimum",
+          "result": {
+            "contract_version": "1.0.0",
+            "capital_value_cad": 36404,
+            "cash_construction_budget_cad": 36404,
+            "property_value_cad": 36404,
+            "ownership": "financed",
+            "initial_contribution_cad": 1820.2,
+            "down_payment_cad": 1820.2,
+            "down_payment_rate": 0.05,
+            "requested_initial_contribution_cad": 1820.2,
+            "contribution_raised_to_minimum": false,
+            "minimum_down_payment_cad": 1820.2,
+            "base_financed_principal_cad": 34583.8,
+            "mortgage_insurance_premium_cad": 1383.35,
+            "mortgage_insurance": {
+              "required": true,
+              "eligible": true,
+              "ltv": 0.9500000000000001,
+              "premium_rate": 0.04,
+              "premium_cad": 1383.35,
+              "status": "cmhc_standard_schedule"
+            },
+            "total_financed_principal_cad": 35967.15,
+            "financed_principal_cad": 35967.15,
+            "rate_type": "fixed",
+            "contract_rate_annual": 0.0401,
+            "interest_rate_annual": 0.0401,
+            "rate": {
+              "type": "fixed",
+              "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+              "source_id": "boc_new_lending",
+              "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "status": "fresh",
+              "market_average": true
+            },
+            "term_years": 5,
+            "loan_term_years": 5,
+            "amortization_years": 25,
+            "monthly_payment_cad": 190.05,
+            "monthly_debt_service_cad": 190.05,
+            "total_interest_over_amortization_cad": 21046.81,
+            "term_end_balance_cad": 31334.58,
+            "stress_test_rate_annual": 0.0601,
+            "stress_test_payment_cad": 231.96,
+            "qualification": {
+              "rate_annual": 0.0601,
+              "payment_cad": 231.96,
+              "rule": "greater of contract rate + 2 percentage points or 5.25%"
+            },
+            "eligibility": {
+              "status": "planning_eligibility_only",
+              "issues": [],
+              "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+            },
+            "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+            "rate_snapshot": {
+              "snapshot_id": "house-mortgage-rates-2026-09-07",
+              "snapshot_date": "2026-09-07",
+              "as_of": "2026-09-07",
+              "stale": false
+            },
+            "monthly_compounding": true,
+            "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+            "assumption_status": "down_payment_sensitivity"
+          }
+        },
+        {
+          "id": "ten_percent",
+          "label": "10% down",
+          "downPayment": 0.1,
+          "result": {
+            "contract_version": "1.0.0",
+            "capital_value_cad": 36404,
+            "cash_construction_budget_cad": 36404,
+            "property_value_cad": 36404,
+            "ownership": "financed",
+            "initial_contribution_cad": 3640.4,
+            "down_payment_cad": 3640.4,
+            "down_payment_rate": 0.1,
+            "requested_initial_contribution_cad": 3640.4,
+            "contribution_raised_to_minimum": false,
+            "minimum_down_payment_cad": 1820.2,
+            "base_financed_principal_cad": 32763.6,
+            "mortgage_insurance_premium_cad": 1015.67,
+            "mortgage_insurance": {
+              "required": true,
+              "eligible": true,
+              "ltv": 0.8999999999999999,
+              "premium_rate": 0.031,
+              "premium_cad": 1015.67,
+              "status": "cmhc_standard_schedule"
+            },
+            "total_financed_principal_cad": 33779.27,
+            "financed_principal_cad": 33779.27,
+            "rate_type": "fixed",
+            "contract_rate_annual": 0.0401,
+            "interest_rate_annual": 0.0401,
+            "rate": {
+              "type": "fixed",
+              "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+              "source_id": "boc_new_lending",
+              "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "status": "fresh",
+              "market_average": true
+            },
+            "term_years": 5,
+            "loan_term_years": 5,
+            "amortization_years": 25,
+            "monthly_payment_cad": 178.49,
+            "monthly_debt_service_cad": 178.49,
+            "total_interest_over_amortization_cad": 19766.53,
+            "term_end_balance_cad": 29428.5,
+            "stress_test_rate_annual": 0.0601,
+            "stress_test_payment_cad": 217.85,
+            "qualification": {
+              "rate_annual": 0.0601,
+              "payment_cad": 217.85,
+              "rule": "greater of contract rate + 2 percentage points or 5.25%"
+            },
+            "eligibility": {
+              "status": "planning_eligibility_only",
+              "issues": [],
+              "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+            },
+            "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+            "rate_snapshot": {
+              "snapshot_id": "house-mortgage-rates-2026-09-07",
+              "snapshot_date": "2026-09-07",
+              "as_of": "2026-09-07",
+              "stale": false
+            },
+            "monthly_compounding": true,
+            "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+            "assumption_status": "down_payment_sensitivity"
+          }
+        },
+        {
+          "id": "twenty_percent",
+          "label": "20% down · uninsured reference",
+          "downPayment": 0.2,
+          "result": {
+            "contract_version": "1.0.0",
+            "capital_value_cad": 36404,
+            "cash_construction_budget_cad": 36404,
+            "property_value_cad": 36404,
+            "ownership": "financed",
+            "initial_contribution_cad": 7280.8,
+            "down_payment_cad": 7280.8,
+            "down_payment_rate": 0.2,
+            "requested_initial_contribution_cad": 7280.8,
+            "contribution_raised_to_minimum": false,
+            "minimum_down_payment_cad": 1820.2,
+            "base_financed_principal_cad": 29123.2,
+            "mortgage_insurance_premium_cad": 0,
+            "mortgage_insurance": {
+              "required": false,
+              "eligible": false,
+              "ltv": 0.8,
+              "premium_rate": 0,
+              "premium_cad": 0,
+              "status": "not_required_or_not_eligible"
+            },
+            "total_financed_principal_cad": 29123.2,
+            "financed_principal_cad": 29123.2,
+            "rate_type": "fixed",
+            "contract_rate_annual": 0.0435,
+            "interest_rate_annual": 0.0435,
+            "rate": {
+              "type": "fixed",
+              "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+              "source_id": "boc_new_lending",
+              "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "status": "fresh",
+              "market_average": true
+            },
+            "term_years": 5,
+            "loan_term_years": 5,
+            "amortization_years": 25,
+            "monthly_payment_cad": 159.41,
+            "monthly_debt_service_cad": 159.41,
+            "total_interest_over_amortization_cad": 18698.8,
+            "term_end_balance_cad": 25522.17,
+            "stress_test_rate_annual": 0.0635,
+            "stress_test_payment_cad": 193.92,
+            "qualification": {
+              "rate_annual": 0.0635,
+              "payment_cad": 193.92,
+              "rule": "greater of contract rate + 2 percentage points or 5.25%"
+            },
+            "eligibility": {
+              "status": "planning_eligibility_only",
+              "issues": [],
+              "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+            },
+            "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+            "rate_snapshot": {
+              "snapshot_id": "house-mortgage-rates-2026-09-07",
+              "snapshot_date": "2026-09-07",
+              "as_of": "2026-09-07",
+              "stale": false
+            },
+            "monthly_compounding": true,
+            "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+            "assumption_status": "uninsured_reference_scenario"
+          }
+        },
+        {
+          "id": "twenty_five_percent",
+          "label": "25% down",
+          "downPayment": 0.25,
+          "result": {
+            "contract_version": "1.0.0",
+            "capital_value_cad": 36404,
+            "cash_construction_budget_cad": 36404,
+            "property_value_cad": 36404,
+            "ownership": "financed",
+            "initial_contribution_cad": 9101,
+            "down_payment_cad": 9101,
+            "down_payment_rate": 0.25,
+            "requested_initial_contribution_cad": 9101,
+            "contribution_raised_to_minimum": false,
+            "minimum_down_payment_cad": 1820.2,
+            "base_financed_principal_cad": 27303,
+            "mortgage_insurance_premium_cad": 0,
+            "mortgage_insurance": {
+              "required": false,
+              "eligible": false,
+              "ltv": 0.75,
+              "premium_rate": 0,
+              "premium_cad": 0,
+              "status": "not_required_or_not_eligible"
+            },
+            "total_financed_principal_cad": 27303,
+            "financed_principal_cad": 27303,
+            "rate_type": "fixed",
+            "contract_rate_annual": 0.0435,
+            "interest_rate_annual": 0.0435,
+            "rate": {
+              "type": "fixed",
+              "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+              "source_id": "boc_new_lending",
+              "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "status": "fresh",
+              "market_average": true
+            },
+            "term_years": 5,
+            "loan_term_years": 5,
+            "amortization_years": 25,
+            "monthly_payment_cad": 149.44,
+            "monthly_debt_service_cad": 149.44,
+            "total_interest_over_amortization_cad": 17530.12,
+            "term_end_balance_cad": 23927.03,
+            "stress_test_rate_annual": 0.0635,
+            "stress_test_payment_cad": 181.8,
+            "qualification": {
+              "rate_annual": 0.0635,
+              "payment_cad": 181.8,
+              "rule": "greater of contract rate + 2 percentage points or 5.25%"
+            },
+            "eligibility": {
+              "status": "planning_eligibility_only",
+              "issues": [],
+              "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+            },
+            "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+            "rate_snapshot": {
+              "snapshot_id": "house-mortgage-rates-2026-09-07",
+              "snapshot_date": "2026-09-07",
+              "as_of": "2026-09-07",
+              "stale": false
+            },
+            "monthly_compounding": true,
+            "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+            "assumption_status": "down_payment_sensitivity"
+          }
+        }
+      ]
     },
     "legacy_reconciliation": {
       "legacy_range_cad": {
@@ -6485,7 +7199,7 @@
   },
   "bands": {
     "low": {
-      "contract_version": "4.1.2",
+      "contract_version": "4.2.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -9567,7 +10281,7 @@
         "economic_cost_cad": 32763.6,
         "financing_value_cad": 32763.6,
         "initial_cash_contribution_cad": 3276.36,
-        "financed_principal_cad": 29487.24,
+        "financed_principal_cad": 30401.34,
         "remaining_layer_ids": [
           "platform_foundation",
           "four_season_completion",
@@ -9685,8 +10399,8 @@
         "contingency_cad": 3430.22,
         "upfront_cash_required_cad": 72034.63,
         "construction_cash_expenditure_cad": 65337.53,
-        "initial_cash_contribution_cad": 7203.46,
-        "financed_principal_cad": 64831.16,
+        "initial_cash_contribution_cad": 3276.36,
+        "financed_principal_cad": 30401.34,
         "owner_labour_imputed_cad": 1303.18,
         "completed_dwelling_capital_cad": 73337.81,
         "economic_cost_cad": 73337.81,
@@ -9699,28 +10413,740 @@
         "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
       },
       "financing": {
-        "capital_value_cad": 72034.63,
+        "contract_version": "1.0.0",
+        "capital_value_cad": 32763.6,
+        "cash_construction_budget_cad": 32763.6,
+        "property_value_cad": 32763.6,
         "ownership": "financed",
-        "down_payment_cad": 7203.46,
-        "financed_principal_cad": 64831.16,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25,
+        "initial_contribution_cad": 3276.36,
+        "down_payment_cad": 3276.36,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 3276.36,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 1638.18,
+        "base_financed_principal_cad": 29487.24,
+        "mortgage_insurance_premium_cad": 914.1,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.9,
+          "premium_rate": 0.031,
+          "premium_cad": 914.1,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 30401.34,
+        "financed_principal_cad": 30401.34,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 417.71,
-        "assumption_status": "illustrative_dwelling_financing_scenario",
-        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+        "amortization_years": 25,
+        "monthly_payment_cad": 160.64,
+        "monthly_debt_service_cad": 160.64,
+        "total_interest_over_amortization_cad": 17789.87,
+        "term_end_balance_cad": 26485.64,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 196.06,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 196.06,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+        "assumption_status": "illustrative_dwelling_financing_scenario"
       },
       "selected_financing": {
+        "contract_version": "1.0.0",
         "capital_value_cad": 32763.6,
+        "cash_construction_budget_cad": 32763.6,
+        "property_value_cad": 32763.6,
         "ownership": "financed",
+        "initial_contribution_cad": 3276.36,
         "down_payment_cad": 3276.36,
-        "financed_principal_cad": 29487.24,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 3276.36,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 1638.18,
+        "base_financed_principal_cad": 29487.24,
+        "mortgage_insurance_premium_cad": 914.1,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.9,
+          "premium_rate": 0.031,
+          "premium_cad": 914.1,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 30401.34,
+        "financed_principal_cad": 30401.34,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 189.99,
-        "assumption_status": "illustrative_dwelling_financing_scenario",
-        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+        "amortization_years": 25,
+        "monthly_payment_cad": 160.64,
+        "monthly_debt_service_cad": 160.64,
+        "total_interest_over_amortization_cad": 17789.87,
+        "term_end_balance_cad": 26485.64,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 196.06,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 196.06,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+        "assumption_status": "illustrative_dwelling_financing_scenario"
+      },
+      "completed_financing": {
+        "contract_version": "1.0.0",
+        "capital_value_cad": 72034.63,
+        "cash_construction_budget_cad": 72034.63,
+        "property_value_cad": 72034.63,
+        "ownership": "financed",
+        "initial_contribution_cad": 7203.46,
+        "down_payment_cad": 7203.46,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 7203.46,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 3601.73,
+        "base_financed_principal_cad": 64831.16,
+        "mortgage_insurance_premium_cad": 2009.77,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.9,
+          "premium_rate": 0.031,
+          "premium_cad": 2009.77,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 66840.93,
+        "financed_principal_cad": 66840.93,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
+        "loan_term_years": 5,
+        "amortization_years": 25,
+        "monthly_payment_cad": 353.18,
+        "monthly_debt_service_cad": 353.18,
+        "total_interest_over_amortization_cad": 39113.14,
+        "term_end_balance_cad": 58231.81,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 431.07,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 431.07,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+        "assumption_status": "illustrative_full_completed_cash_budget_comparison"
+      },
+      "mortgage": {
+        "contract_version": "1.0.0",
+        "property_label": "Full-time, year-round residential dwelling based on a yurt form.",
+        "selected_stage_cash_basis_cad": 32763.6,
+        "rate_evidence": {
+          "contract_version": "1.0.0",
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "currency": "CAD",
+          "freshness": {
+            "stale_after_days": 120,
+            "status": "fresh",
+            "basis": "The snapshot date is the date the public source pages and latest visible monthly Bank of Canada table were checked.",
+            "checked_as_of": "2026-09-07",
+            "age_days": 0
+          },
+          "reference_rates": {
+            "fixed": {
+              "insured": {
+                "annual_rate": 0.0401,
+                "source_id": "boc_new_lending",
+                "series": "V122667780",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "market_average": true
+              },
+              "uninsured": {
+                "annual_rate": 0.0435,
+                "source_id": "boc_new_lending",
+                "series": "V122667792",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "market_average": true
+              }
+            },
+            "variable": {
+              "insured": {
+                "annual_rate": 0.0379,
+                "source_id": "boc_new_lending",
+                "series": "V122667776",
+                "label": "Bank of Canada funds advanced, insured, variable",
+                "market_average": true
+              },
+              "uninsured": {
+                "annual_rate": 0.039,
+                "source_id": "boc_new_lending",
+                "series": "V122667782",
+                "label": "Bank of Canada funds advanced, uninsured, variable",
+                "market_average": true
+              }
+            }
+          },
+          "lender_observations": [
+            {
+              "id": "rbc_5yr_fixed_uninsured_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "fixed",
+              "term_years": 5,
+              "insured_status": "uninsured / 20%+ down",
+              "annual_rate": 0.0489,
+              "apr": 0.0492,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Purchase or switch special rate; credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_fixed_high_ratio_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "fixed",
+              "term_years": 5,
+              "insured_status": "insured / under 20% down",
+              "annual_rate": 0.0459,
+              "apr": 0.0462,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "High-ratio special rate; high-ratio eligibility, credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_variable_uninsured_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "uninsured / 20%+ down",
+              "annual_rate": 0.0395,
+              "apr": 0.0398,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Prime minus 0.500%; credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_variable_high_ratio_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "insured / under 20% down",
+              "annual_rate": 0.0365,
+              "apr": 0.0368,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Prime minus 0.800%; high-ratio eligibility, credit approval, property and product conditions apply."
+            },
+            {
+              "id": "scotiabank_5yr_variable_closed",
+              "lender": "Scotiabank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "conventional or insured",
+              "annual_rate": 0.049,
+              "apr": 0.0491,
+              "source_id": "scotiabank_rates",
+              "observed_date": "2025-10-30",
+              "retrieved_date": "2026-09-07",
+              "rate_classification": "special rate; source-dated",
+              "eligibility_conditions": "Closed Flex-Value product; rate and approval conditions are set by Scotiabank and the numeric page footnote is dated October 30, 2025.",
+              "freshness": "stale"
+            }
+          ],
+          "insurance_schedule": [
+            {
+              "max_ltv": 0.65,
+              "premium_rate": 0.006
+            },
+            {
+              "max_ltv": 0.75,
+              "premium_rate": 0.017
+            },
+            {
+              "max_ltv": 0.8,
+              "premium_rate": 0.024
+            },
+            {
+              "max_ltv": 0.85,
+              "premium_rate": 0.028
+            },
+            {
+              "max_ltv": 0.9,
+              "premium_rate": 0.031
+            },
+            {
+              "max_ltv": 0.95,
+              "premium_rate": 0.04
+            }
+          ],
+          "rules": {
+            "minimum_down_payment": {
+              "up_to_500000_cad_rate": 0.05,
+              "between_500000_and_1500000_first_cad": 500000,
+              "between_500000_and_1500000_first_rate": 0.05,
+              "between_500000_and_1500000_remainder_rate": 0.1,
+              "over_1500000_cad_rate": 0.2
+            },
+            "max_insured_home_price_cad": 1500000,
+            "insurance_required_below_down_payment": 0.2,
+            "stress_test_floor": 0.0525,
+            "stress_test_buffer": 0.02,
+            "max_standard_insured_amortization_years": 25
+          },
+          "sources": [
+            {
+              "id": "boc_new_lending",
+              "institution": "Bank of Canada",
+              "title": "Interest rates charged for new and existing lending by chartered banks",
+              "url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "source_class": "official figure",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "note": "Latest visible monthly observations in the snapshot. The Bank says this table is typically published within the third week of the month."
+            },
+            {
+              "id": "canada_down_payment",
+              "institution": "Government of Canada",
+              "title": "How much you need for a down payment",
+              "url": "https://www.canada.ca/en/financial-consumer-agency/services/mortgages/down-payment.html",
+              "source_class": "official requirement",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "5% up to $500,000; 5% of the first $500,000 plus 10% of the remainder up to $1.5 million; 20% at $1.5 million or more."
+            },
+            {
+              "id": "cmhc_insurance",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "CMHC Mortgage Loan Insurance Explained",
+              "url": "https://www.cmhc-schl.gc.ca/observer/2025/cmhc-mortgage-loan-insurance-explained",
+              "source_class": "official requirement and premium schedule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Mortgage insurance is generally required below 20% down for an eligible home priced below $1.5 million. The standard homeowner schedule is recorded separately in this snapshot."
+            },
+            {
+              "id": "cmhc_premium_schedule",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "CMHC Purchase premium information",
+              "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/purchase",
+              "source_class": "official premium schedule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Owner-occupied 1-to-4-unit standard premium schedule; non-traditional down-payment surcharges and exact lender underwriting remain outside this planning calculation."
+            },
+            {
+              "id": "cmhc_prefab_plus",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "Prefab Plus",
+              "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/prefab-plus",
+              "source_class": "official eligibility guidance",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Prefab eligibility depends on full-time year-round suitability, permanent foundation/attachment for a traditional mortgage, approvals and lender/insurer acceptance."
+            },
+            {
+              "id": "osfi_mqr",
+              "institution": "Office of the Superintendent of Financial Institutions",
+              "title": "Minimum qualifying rate for uninsured mortgages",
+              "url": "https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages",
+              "source_class": "official qualification rule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Qualifying rate is the greater of the contract rate plus 2 percentage points or 5.25%; this model displays it separately from the contract payment."
+            },
+            {
+              "id": "rbc_rates",
+              "institution": "RBC Royal Bank",
+              "title": "Mortgage rates",
+              "url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+              "source_class": "lender promotional and posted rate page",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Current page displayed 5-year fixed and variable special-rate rows, including high-ratio rows. These are lender-specific promotional rates, not universal offers."
+            },
+            {
+              "id": "scotiabank_rates",
+              "institution": "Scotiabank",
+              "title": "5-year closed variable mortgage",
+              "url": "https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html",
+              "source_class": "lender product page",
+              "observed_date": "2025-10-30",
+              "retrieved_date": "2026-09-07",
+              "note": "The accessible product page exposes a source-dated October 30, 2025 rate footnote; it is retained as a stale comparison and is not used as the default."
+            }
+          ],
+          "generated_at": "2026-09-07",
+          "source_snapshot_path": "packages/carrying-capacity/data/source/house-mortgage-rates.json"
+        },
+        "scenarios": [
+          {
+            "id": "legal_minimum",
+            "label": "Legal minimum down payment",
+            "downPayment": "minimum",
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 32763.6,
+              "cash_construction_budget_cad": 32763.6,
+              "property_value_cad": 32763.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 1638.18,
+              "down_payment_cad": 1638.18,
+              "down_payment_rate": 0.05,
+              "requested_initial_contribution_cad": 1638.18,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1638.18,
+              "base_financed_principal_cad": 31125.42,
+              "mortgage_insurance_premium_cad": 1245.02,
+              "mortgage_insurance": {
+                "required": true,
+                "eligible": true,
+                "ltv": 0.95,
+                "premium_rate": 0.04,
+                "premium_cad": 1245.02,
+                "status": "cmhc_standard_schedule"
+              },
+              "total_financed_principal_cad": 32370.44,
+              "financed_principal_cad": 32370.44,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0401,
+              "interest_rate_annual": 0.0401,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 171.04,
+              "monthly_debt_service_cad": 171.04,
+              "total_interest_over_amortization_cad": 18942.13,
+              "term_end_balance_cad": 28201.12,
+              "stress_test_rate_annual": 0.0601,
+              "stress_test_payment_cad": 208.76,
+              "qualification": {
+                "rate_annual": 0.0601,
+                "payment_cad": 208.76,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          },
+          {
+            "id": "ten_percent",
+            "label": "10% down",
+            "downPayment": 0.1,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 32763.6,
+              "cash_construction_budget_cad": 32763.6,
+              "property_value_cad": 32763.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 3276.36,
+              "down_payment_cad": 3276.36,
+              "down_payment_rate": 0.1,
+              "requested_initial_contribution_cad": 3276.36,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1638.18,
+              "base_financed_principal_cad": 29487.24,
+              "mortgage_insurance_premium_cad": 914.1,
+              "mortgage_insurance": {
+                "required": true,
+                "eligible": true,
+                "ltv": 0.9,
+                "premium_rate": 0.031,
+                "premium_cad": 914.1,
+                "status": "cmhc_standard_schedule"
+              },
+              "total_financed_principal_cad": 30401.34,
+              "financed_principal_cad": 30401.34,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0401,
+              "interest_rate_annual": 0.0401,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 160.64,
+              "monthly_debt_service_cad": 160.64,
+              "total_interest_over_amortization_cad": 17789.87,
+              "term_end_balance_cad": 26485.64,
+              "stress_test_rate_annual": 0.0601,
+              "stress_test_payment_cad": 196.06,
+              "qualification": {
+                "rate_annual": 0.0601,
+                "payment_cad": 196.06,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          },
+          {
+            "id": "twenty_percent",
+            "label": "20% down · uninsured reference",
+            "downPayment": 0.2,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 32763.6,
+              "cash_construction_budget_cad": 32763.6,
+              "property_value_cad": 32763.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 6552.72,
+              "down_payment_cad": 6552.72,
+              "down_payment_rate": 0.2,
+              "requested_initial_contribution_cad": 6552.72,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1638.18,
+              "base_financed_principal_cad": 26210.88,
+              "mortgage_insurance_premium_cad": 0,
+              "mortgage_insurance": {
+                "required": false,
+                "eligible": false,
+                "ltv": 0.7999999999999999,
+                "premium_rate": 0,
+                "premium_cad": 0,
+                "status": "not_required_or_not_eligible"
+              },
+              "total_financed_principal_cad": 26210.88,
+              "financed_principal_cad": 26210.88,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0435,
+              "interest_rate_annual": 0.0435,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 143.47,
+              "monthly_debt_service_cad": 143.47,
+              "total_interest_over_amortization_cad": 16828.92,
+              "term_end_balance_cad": 22969.95,
+              "stress_test_rate_annual": 0.0635,
+              "stress_test_payment_cad": 174.53,
+              "qualification": {
+                "rate_annual": 0.0635,
+                "payment_cad": 174.53,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "uninsured_reference_scenario"
+            }
+          },
+          {
+            "id": "twenty_five_percent",
+            "label": "25% down",
+            "downPayment": 0.25,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 32763.6,
+              "cash_construction_budget_cad": 32763.6,
+              "property_value_cad": 32763.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 8190.9,
+              "down_payment_cad": 8190.9,
+              "down_payment_rate": 0.25,
+              "requested_initial_contribution_cad": 8190.9,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1638.18,
+              "base_financed_principal_cad": 24572.7,
+              "mortgage_insurance_premium_cad": 0,
+              "mortgage_insurance": {
+                "required": false,
+                "eligible": false,
+                "ltv": 0.7499999999999999,
+                "premium_rate": 0,
+                "premium_cad": 0,
+                "status": "not_required_or_not_eligible"
+              },
+              "total_financed_principal_cad": 24572.7,
+              "financed_principal_cad": 24572.7,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0435,
+              "interest_rate_annual": 0.0435,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 134.5,
+              "monthly_debt_service_cad": 134.5,
+              "total_interest_over_amortization_cad": 15777.11,
+              "term_end_balance_cad": 21534.33,
+              "stress_test_rate_annual": 0.0635,
+              "stress_test_payment_cad": 163.62,
+              "qualification": {
+                "rate_annual": 0.0635,
+                "payment_cad": 163.62,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          }
+        ]
       },
       "legacy_reconciliation": {
         "legacy_range_cad": {
@@ -10689,7 +12115,7 @@
       }
     },
     "central": {
-      "contract_version": "4.1.2",
+      "contract_version": "4.2.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -13771,7 +15197,7 @@
         "economic_cost_cad": 36404,
         "financing_value_cad": 36404,
         "initial_cash_contribution_cad": 3640.4,
-        "financed_principal_cad": 32763.6,
+        "financed_principal_cad": 33779.27,
         "remaining_layer_ids": [
           "platform_foundation",
           "four_season_completion",
@@ -13889,8 +15315,8 @@
         "contingency_cad": 6524.58,
         "upfront_cash_required_cad": 88081.87,
         "construction_cash_expenditure_cad": 72174.59,
-        "initial_cash_contribution_cad": 8808.19,
-        "financed_principal_cad": 79273.68,
+        "initial_cash_contribution_cad": 3640.4,
+        "financed_principal_cad": 33779.27,
         "owner_labour_imputed_cad": 1303.18,
         "completed_dwelling_capital_cad": 89385.05,
         "economic_cost_cad": 89385.05,
@@ -13903,28 +15329,740 @@
         "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
       },
       "financing": {
-        "capital_value_cad": 88081.87,
+        "contract_version": "1.0.0",
+        "capital_value_cad": 36404,
+        "cash_construction_budget_cad": 36404,
+        "property_value_cad": 36404,
         "ownership": "financed",
-        "down_payment_cad": 8808.19,
-        "financed_principal_cad": 79273.68,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25,
+        "initial_contribution_cad": 3640.4,
+        "down_payment_cad": 3640.4,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 3640.4,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 1820.2,
+        "base_financed_principal_cad": 32763.6,
+        "mortgage_insurance_premium_cad": 1015.67,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.8999999999999999,
+          "premium_rate": 0.031,
+          "premium_cad": 1015.67,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 33779.27,
+        "financed_principal_cad": 33779.27,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 510.76,
-        "assumption_status": "illustrative_dwelling_financing_scenario",
-        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+        "amortization_years": 25,
+        "monthly_payment_cad": 178.49,
+        "monthly_debt_service_cad": 178.49,
+        "total_interest_over_amortization_cad": 19766.53,
+        "term_end_balance_cad": 29428.5,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 217.85,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 217.85,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+        "assumption_status": "illustrative_dwelling_financing_scenario"
       },
       "selected_financing": {
+        "contract_version": "1.0.0",
         "capital_value_cad": 36404,
+        "cash_construction_budget_cad": 36404,
+        "property_value_cad": 36404,
         "ownership": "financed",
+        "initial_contribution_cad": 3640.4,
         "down_payment_cad": 3640.4,
-        "financed_principal_cad": 32763.6,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 3640.4,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 1820.2,
+        "base_financed_principal_cad": 32763.6,
+        "mortgage_insurance_premium_cad": 1015.67,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.8999999999999999,
+          "premium_rate": 0.031,
+          "premium_cad": 1015.67,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 33779.27,
+        "financed_principal_cad": 33779.27,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 211.1,
-        "assumption_status": "illustrative_dwelling_financing_scenario",
-        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+        "amortization_years": 25,
+        "monthly_payment_cad": 178.49,
+        "monthly_debt_service_cad": 178.49,
+        "total_interest_over_amortization_cad": 19766.53,
+        "term_end_balance_cad": 29428.5,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 217.85,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 217.85,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+        "assumption_status": "illustrative_dwelling_financing_scenario"
+      },
+      "completed_financing": {
+        "contract_version": "1.0.0",
+        "capital_value_cad": 88081.87,
+        "cash_construction_budget_cad": 88081.87,
+        "property_value_cad": 88081.87,
+        "ownership": "financed",
+        "initial_contribution_cad": 8808.19,
+        "down_payment_cad": 8808.19,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 8808.19,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 4404.09,
+        "base_financed_principal_cad": 79273.68,
+        "mortgage_insurance_premium_cad": 2457.48,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.8999999999999999,
+          "premium_rate": 0.031,
+          "premium_cad": 2457.48,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 81731.16,
+        "financed_principal_cad": 81731.16,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
+        "loan_term_years": 5,
+        "amortization_years": 25,
+        "monthly_payment_cad": 431.86,
+        "monthly_debt_service_cad": 431.86,
+        "total_interest_over_amortization_cad": 47826.42,
+        "term_end_balance_cad": 71204.18,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 527.09,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 527.09,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+        "assumption_status": "illustrative_full_completed_cash_budget_comparison"
+      },
+      "mortgage": {
+        "contract_version": "1.0.0",
+        "property_label": "Full-time, year-round residential dwelling based on a yurt form.",
+        "selected_stage_cash_basis_cad": 36404,
+        "rate_evidence": {
+          "contract_version": "1.0.0",
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "currency": "CAD",
+          "freshness": {
+            "stale_after_days": 120,
+            "status": "fresh",
+            "basis": "The snapshot date is the date the public source pages and latest visible monthly Bank of Canada table were checked.",
+            "checked_as_of": "2026-09-07",
+            "age_days": 0
+          },
+          "reference_rates": {
+            "fixed": {
+              "insured": {
+                "annual_rate": 0.0401,
+                "source_id": "boc_new_lending",
+                "series": "V122667780",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "market_average": true
+              },
+              "uninsured": {
+                "annual_rate": 0.0435,
+                "source_id": "boc_new_lending",
+                "series": "V122667792",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "market_average": true
+              }
+            },
+            "variable": {
+              "insured": {
+                "annual_rate": 0.0379,
+                "source_id": "boc_new_lending",
+                "series": "V122667776",
+                "label": "Bank of Canada funds advanced, insured, variable",
+                "market_average": true
+              },
+              "uninsured": {
+                "annual_rate": 0.039,
+                "source_id": "boc_new_lending",
+                "series": "V122667782",
+                "label": "Bank of Canada funds advanced, uninsured, variable",
+                "market_average": true
+              }
+            }
+          },
+          "lender_observations": [
+            {
+              "id": "rbc_5yr_fixed_uninsured_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "fixed",
+              "term_years": 5,
+              "insured_status": "uninsured / 20%+ down",
+              "annual_rate": 0.0489,
+              "apr": 0.0492,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Purchase or switch special rate; credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_fixed_high_ratio_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "fixed",
+              "term_years": 5,
+              "insured_status": "insured / under 20% down",
+              "annual_rate": 0.0459,
+              "apr": 0.0462,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "High-ratio special rate; high-ratio eligibility, credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_variable_uninsured_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "uninsured / 20%+ down",
+              "annual_rate": 0.0395,
+              "apr": 0.0398,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Prime minus 0.500%; credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_variable_high_ratio_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "insured / under 20% down",
+              "annual_rate": 0.0365,
+              "apr": 0.0368,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Prime minus 0.800%; high-ratio eligibility, credit approval, property and product conditions apply."
+            },
+            {
+              "id": "scotiabank_5yr_variable_closed",
+              "lender": "Scotiabank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "conventional or insured",
+              "annual_rate": 0.049,
+              "apr": 0.0491,
+              "source_id": "scotiabank_rates",
+              "observed_date": "2025-10-30",
+              "retrieved_date": "2026-09-07",
+              "rate_classification": "special rate; source-dated",
+              "eligibility_conditions": "Closed Flex-Value product; rate and approval conditions are set by Scotiabank and the numeric page footnote is dated October 30, 2025.",
+              "freshness": "stale"
+            }
+          ],
+          "insurance_schedule": [
+            {
+              "max_ltv": 0.65,
+              "premium_rate": 0.006
+            },
+            {
+              "max_ltv": 0.75,
+              "premium_rate": 0.017
+            },
+            {
+              "max_ltv": 0.8,
+              "premium_rate": 0.024
+            },
+            {
+              "max_ltv": 0.85,
+              "premium_rate": 0.028
+            },
+            {
+              "max_ltv": 0.9,
+              "premium_rate": 0.031
+            },
+            {
+              "max_ltv": 0.95,
+              "premium_rate": 0.04
+            }
+          ],
+          "rules": {
+            "minimum_down_payment": {
+              "up_to_500000_cad_rate": 0.05,
+              "between_500000_and_1500000_first_cad": 500000,
+              "between_500000_and_1500000_first_rate": 0.05,
+              "between_500000_and_1500000_remainder_rate": 0.1,
+              "over_1500000_cad_rate": 0.2
+            },
+            "max_insured_home_price_cad": 1500000,
+            "insurance_required_below_down_payment": 0.2,
+            "stress_test_floor": 0.0525,
+            "stress_test_buffer": 0.02,
+            "max_standard_insured_amortization_years": 25
+          },
+          "sources": [
+            {
+              "id": "boc_new_lending",
+              "institution": "Bank of Canada",
+              "title": "Interest rates charged for new and existing lending by chartered banks",
+              "url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "source_class": "official figure",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "note": "Latest visible monthly observations in the snapshot. The Bank says this table is typically published within the third week of the month."
+            },
+            {
+              "id": "canada_down_payment",
+              "institution": "Government of Canada",
+              "title": "How much you need for a down payment",
+              "url": "https://www.canada.ca/en/financial-consumer-agency/services/mortgages/down-payment.html",
+              "source_class": "official requirement",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "5% up to $500,000; 5% of the first $500,000 plus 10% of the remainder up to $1.5 million; 20% at $1.5 million or more."
+            },
+            {
+              "id": "cmhc_insurance",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "CMHC Mortgage Loan Insurance Explained",
+              "url": "https://www.cmhc-schl.gc.ca/observer/2025/cmhc-mortgage-loan-insurance-explained",
+              "source_class": "official requirement and premium schedule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Mortgage insurance is generally required below 20% down for an eligible home priced below $1.5 million. The standard homeowner schedule is recorded separately in this snapshot."
+            },
+            {
+              "id": "cmhc_premium_schedule",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "CMHC Purchase premium information",
+              "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/purchase",
+              "source_class": "official premium schedule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Owner-occupied 1-to-4-unit standard premium schedule; non-traditional down-payment surcharges and exact lender underwriting remain outside this planning calculation."
+            },
+            {
+              "id": "cmhc_prefab_plus",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "Prefab Plus",
+              "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/prefab-plus",
+              "source_class": "official eligibility guidance",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Prefab eligibility depends on full-time year-round suitability, permanent foundation/attachment for a traditional mortgage, approvals and lender/insurer acceptance."
+            },
+            {
+              "id": "osfi_mqr",
+              "institution": "Office of the Superintendent of Financial Institutions",
+              "title": "Minimum qualifying rate for uninsured mortgages",
+              "url": "https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages",
+              "source_class": "official qualification rule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Qualifying rate is the greater of the contract rate plus 2 percentage points or 5.25%; this model displays it separately from the contract payment."
+            },
+            {
+              "id": "rbc_rates",
+              "institution": "RBC Royal Bank",
+              "title": "Mortgage rates",
+              "url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+              "source_class": "lender promotional and posted rate page",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Current page displayed 5-year fixed and variable special-rate rows, including high-ratio rows. These are lender-specific promotional rates, not universal offers."
+            },
+            {
+              "id": "scotiabank_rates",
+              "institution": "Scotiabank",
+              "title": "5-year closed variable mortgage",
+              "url": "https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html",
+              "source_class": "lender product page",
+              "observed_date": "2025-10-30",
+              "retrieved_date": "2026-09-07",
+              "note": "The accessible product page exposes a source-dated October 30, 2025 rate footnote; it is retained as a stale comparison and is not used as the default."
+            }
+          ],
+          "generated_at": "2026-09-07",
+          "source_snapshot_path": "packages/carrying-capacity/data/source/house-mortgage-rates.json"
+        },
+        "scenarios": [
+          {
+            "id": "legal_minimum",
+            "label": "Legal minimum down payment",
+            "downPayment": "minimum",
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 36404,
+              "cash_construction_budget_cad": 36404,
+              "property_value_cad": 36404,
+              "ownership": "financed",
+              "initial_contribution_cad": 1820.2,
+              "down_payment_cad": 1820.2,
+              "down_payment_rate": 0.05,
+              "requested_initial_contribution_cad": 1820.2,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1820.2,
+              "base_financed_principal_cad": 34583.8,
+              "mortgage_insurance_premium_cad": 1383.35,
+              "mortgage_insurance": {
+                "required": true,
+                "eligible": true,
+                "ltv": 0.9500000000000001,
+                "premium_rate": 0.04,
+                "premium_cad": 1383.35,
+                "status": "cmhc_standard_schedule"
+              },
+              "total_financed_principal_cad": 35967.15,
+              "financed_principal_cad": 35967.15,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0401,
+              "interest_rate_annual": 0.0401,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 190.05,
+              "monthly_debt_service_cad": 190.05,
+              "total_interest_over_amortization_cad": 21046.81,
+              "term_end_balance_cad": 31334.58,
+              "stress_test_rate_annual": 0.0601,
+              "stress_test_payment_cad": 231.96,
+              "qualification": {
+                "rate_annual": 0.0601,
+                "payment_cad": 231.96,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          },
+          {
+            "id": "ten_percent",
+            "label": "10% down",
+            "downPayment": 0.1,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 36404,
+              "cash_construction_budget_cad": 36404,
+              "property_value_cad": 36404,
+              "ownership": "financed",
+              "initial_contribution_cad": 3640.4,
+              "down_payment_cad": 3640.4,
+              "down_payment_rate": 0.1,
+              "requested_initial_contribution_cad": 3640.4,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1820.2,
+              "base_financed_principal_cad": 32763.6,
+              "mortgage_insurance_premium_cad": 1015.67,
+              "mortgage_insurance": {
+                "required": true,
+                "eligible": true,
+                "ltv": 0.8999999999999999,
+                "premium_rate": 0.031,
+                "premium_cad": 1015.67,
+                "status": "cmhc_standard_schedule"
+              },
+              "total_financed_principal_cad": 33779.27,
+              "financed_principal_cad": 33779.27,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0401,
+              "interest_rate_annual": 0.0401,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 178.49,
+              "monthly_debt_service_cad": 178.49,
+              "total_interest_over_amortization_cad": 19766.53,
+              "term_end_balance_cad": 29428.5,
+              "stress_test_rate_annual": 0.0601,
+              "stress_test_payment_cad": 217.85,
+              "qualification": {
+                "rate_annual": 0.0601,
+                "payment_cad": 217.85,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          },
+          {
+            "id": "twenty_percent",
+            "label": "20% down · uninsured reference",
+            "downPayment": 0.2,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 36404,
+              "cash_construction_budget_cad": 36404,
+              "property_value_cad": 36404,
+              "ownership": "financed",
+              "initial_contribution_cad": 7280.8,
+              "down_payment_cad": 7280.8,
+              "down_payment_rate": 0.2,
+              "requested_initial_contribution_cad": 7280.8,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1820.2,
+              "base_financed_principal_cad": 29123.2,
+              "mortgage_insurance_premium_cad": 0,
+              "mortgage_insurance": {
+                "required": false,
+                "eligible": false,
+                "ltv": 0.8,
+                "premium_rate": 0,
+                "premium_cad": 0,
+                "status": "not_required_or_not_eligible"
+              },
+              "total_financed_principal_cad": 29123.2,
+              "financed_principal_cad": 29123.2,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0435,
+              "interest_rate_annual": 0.0435,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 159.41,
+              "monthly_debt_service_cad": 159.41,
+              "total_interest_over_amortization_cad": 18698.8,
+              "term_end_balance_cad": 25522.17,
+              "stress_test_rate_annual": 0.0635,
+              "stress_test_payment_cad": 193.92,
+              "qualification": {
+                "rate_annual": 0.0635,
+                "payment_cad": 193.92,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "uninsured_reference_scenario"
+            }
+          },
+          {
+            "id": "twenty_five_percent",
+            "label": "25% down",
+            "downPayment": 0.25,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 36404,
+              "cash_construction_budget_cad": 36404,
+              "property_value_cad": 36404,
+              "ownership": "financed",
+              "initial_contribution_cad": 9101,
+              "down_payment_cad": 9101,
+              "down_payment_rate": 0.25,
+              "requested_initial_contribution_cad": 9101,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 1820.2,
+              "base_financed_principal_cad": 27303,
+              "mortgage_insurance_premium_cad": 0,
+              "mortgage_insurance": {
+                "required": false,
+                "eligible": false,
+                "ltv": 0.75,
+                "premium_rate": 0,
+                "premium_cad": 0,
+                "status": "not_required_or_not_eligible"
+              },
+              "total_financed_principal_cad": 27303,
+              "financed_principal_cad": 27303,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0435,
+              "interest_rate_annual": 0.0435,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 149.44,
+              "monthly_debt_service_cad": 149.44,
+              "total_interest_over_amortization_cad": 17530.12,
+              "term_end_balance_cad": 23927.03,
+              "stress_test_rate_annual": 0.0635,
+              "stress_test_payment_cad": 181.8,
+              "qualification": {
+                "rate_annual": 0.0635,
+                "payment_cad": 181.8,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          }
+        ]
       },
       "legacy_reconciliation": {
         "legacy_range_cad": {
@@ -14893,7 +17031,7 @@
       }
     },
     "high": {
-      "contract_version": "4.1.2",
+      "contract_version": "4.2.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-05",
@@ -17975,7 +20113,7 @@
         "economic_cost_cad": 41864.6,
         "financing_value_cad": 41864.6,
         "initial_cash_contribution_cad": 4186.46,
-        "financed_principal_cad": 37678.14,
+        "financed_principal_cad": 38846.16,
         "remaining_layer_ids": [
           "platform_foundation",
           "four_season_completion",
@@ -18093,8 +20231,8 @@
         "contingency_cad": 11177.52,
         "upfront_cash_required_cad": 104323.55,
         "construction_cash_expenditure_cad": 82430.11,
-        "initial_cash_contribution_cad": 10432.35,
-        "financed_principal_cad": 93891.19,
+        "initial_cash_contribution_cad": 4186.46,
+        "financed_principal_cad": 38846.16,
         "owner_labour_imputed_cad": 1303.18,
         "completed_dwelling_capital_cad": 105626.73,
         "economic_cost_cad": 105626.73,
@@ -18107,28 +20245,740 @@
         "financing_basis": "upfront_cash_excluding_contributed_owner_labour"
       },
       "financing": {
-        "capital_value_cad": 104323.55,
+        "contract_version": "1.0.0",
+        "capital_value_cad": 41864.6,
+        "cash_construction_budget_cad": 41864.6,
+        "property_value_cad": 41864.6,
         "ownership": "financed",
-        "down_payment_cad": 10432.35,
-        "financed_principal_cad": 93891.19,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25,
+        "initial_contribution_cad": 4186.46,
+        "down_payment_cad": 4186.46,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 4186.46,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 2093.23,
+        "base_financed_principal_cad": 37678.14,
+        "mortgage_insurance_premium_cad": 1168.02,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.9,
+          "premium_rate": 0.031,
+          "premium_cad": 1168.02,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 38846.16,
+        "financed_principal_cad": 38846.16,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 604.94,
-        "assumption_status": "illustrative_dwelling_financing_scenario",
-        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+        "amortization_years": 25,
+        "monthly_payment_cad": 205.26,
+        "monthly_debt_service_cad": 205.26,
+        "total_interest_over_amortization_cad": 22731.51,
+        "term_end_balance_cad": 33842.77,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 250.52,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 250.52,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+        "assumption_status": "illustrative_dwelling_financing_scenario"
       },
       "selected_financing": {
+        "contract_version": "1.0.0",
         "capital_value_cad": 41864.6,
+        "cash_construction_budget_cad": 41864.6,
+        "property_value_cad": 41864.6,
         "ownership": "financed",
+        "initial_contribution_cad": 4186.46,
         "down_payment_cad": 4186.46,
-        "financed_principal_cad": 37678.14,
-        "interest_rate_annual": 0.06,
-        "amortization_years": 25,
+        "down_payment_rate": 0.1,
+        "requested_initial_contribution_cad": 4186.46,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 2093.23,
+        "base_financed_principal_cad": 37678.14,
+        "mortgage_insurance_premium_cad": 1168.02,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.9,
+          "premium_rate": 0.031,
+          "premium_cad": 1168.02,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 38846.16,
+        "financed_principal_cad": 38846.16,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
         "loan_term_years": 5,
-        "monthly_debt_service_cad": 242.76,
-        "assumption_status": "illustrative_dwelling_financing_scenario",
-        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment."
+        "amortization_years": 25,
+        "monthly_payment_cad": 205.26,
+        "monthly_debt_service_cad": 205.26,
+        "total_interest_over_amortization_cad": 22731.51,
+        "term_end_balance_cad": 33842.77,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 250.52,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 250.52,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Loan term/renewal is separate from the amortization period used to calculate scheduled payment.",
+        "assumption_status": "illustrative_dwelling_financing_scenario"
+      },
+      "completed_financing": {
+        "contract_version": "1.0.0",
+        "capital_value_cad": 104323.55,
+        "cash_construction_budget_cad": 104323.55,
+        "property_value_cad": 104323.55,
+        "ownership": "financed",
+        "initial_contribution_cad": 10432.35,
+        "down_payment_cad": 10432.35,
+        "down_payment_rate": 0.10000000000000002,
+        "requested_initial_contribution_cad": 10432.35,
+        "contribution_raised_to_minimum": false,
+        "minimum_down_payment_cad": 5216.18,
+        "base_financed_principal_cad": 93891.19,
+        "mortgage_insurance_premium_cad": 2910.63,
+        "mortgage_insurance": {
+          "required": true,
+          "eligible": true,
+          "ltv": 0.9,
+          "premium_rate": 0.031,
+          "premium_cad": 2910.63,
+          "status": "cmhc_standard_schedule"
+        },
+        "total_financed_principal_cad": 96801.82,
+        "financed_principal_cad": 96801.82,
+        "rate_type": "fixed",
+        "contract_rate_annual": 0.0401,
+        "interest_rate_annual": 0.0401,
+        "rate": {
+          "type": "fixed",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "source_id": "boc_new_lending",
+          "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+          "observed_date": "2026-06-30",
+          "retrieved_date": "2026-09-07",
+          "status": "fresh",
+          "market_average": true
+        },
+        "term_years": 5,
+        "loan_term_years": 5,
+        "amortization_years": 25,
+        "monthly_payment_cad": 511.49,
+        "monthly_debt_service_cad": 511.49,
+        "total_interest_over_amortization_cad": 56645.28,
+        "term_end_balance_cad": 84333.73,
+        "stress_test_rate_annual": 0.0601,
+        "stress_test_payment_cad": 624.29,
+        "qualification": {
+          "rate_annual": 0.0601,
+          "payment_cad": 624.29,
+          "rule": "greater of contract rate + 2 percentage points or 5.25%"
+        },
+        "eligibility": {
+          "status": "planning_eligibility_only",
+          "issues": [],
+          "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+        },
+        "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+        "rate_snapshot": {
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "as_of": "2026-09-07",
+          "stale": false
+        },
+        "monthly_compounding": true,
+        "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+        "assumption_status": "illustrative_full_completed_cash_budget_comparison"
+      },
+      "mortgage": {
+        "contract_version": "1.0.0",
+        "property_label": "Full-time, year-round residential dwelling based on a yurt form.",
+        "selected_stage_cash_basis_cad": 41864.6,
+        "rate_evidence": {
+          "contract_version": "1.0.0",
+          "snapshot_id": "house-mortgage-rates-2026-09-07",
+          "snapshot_date": "2026-09-07",
+          "currency": "CAD",
+          "freshness": {
+            "stale_after_days": 120,
+            "status": "fresh",
+            "basis": "The snapshot date is the date the public source pages and latest visible monthly Bank of Canada table were checked.",
+            "checked_as_of": "2026-09-07",
+            "age_days": 0
+          },
+          "reference_rates": {
+            "fixed": {
+              "insured": {
+                "annual_rate": 0.0401,
+                "source_id": "boc_new_lending",
+                "series": "V122667780",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "market_average": true
+              },
+              "uninsured": {
+                "annual_rate": 0.0435,
+                "source_id": "boc_new_lending",
+                "series": "V122667792",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "market_average": true
+              }
+            },
+            "variable": {
+              "insured": {
+                "annual_rate": 0.0379,
+                "source_id": "boc_new_lending",
+                "series": "V122667776",
+                "label": "Bank of Canada funds advanced, insured, variable",
+                "market_average": true
+              },
+              "uninsured": {
+                "annual_rate": 0.039,
+                "source_id": "boc_new_lending",
+                "series": "V122667782",
+                "label": "Bank of Canada funds advanced, uninsured, variable",
+                "market_average": true
+              }
+            }
+          },
+          "lender_observations": [
+            {
+              "id": "rbc_5yr_fixed_uninsured_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "fixed",
+              "term_years": 5,
+              "insured_status": "uninsured / 20%+ down",
+              "annual_rate": 0.0489,
+              "apr": 0.0492,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Purchase or switch special rate; credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_fixed_high_ratio_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "fixed",
+              "term_years": 5,
+              "insured_status": "insured / under 20% down",
+              "annual_rate": 0.0459,
+              "apr": 0.0462,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "High-ratio special rate; high-ratio eligibility, credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_variable_uninsured_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "uninsured / 20%+ down",
+              "annual_rate": 0.0395,
+              "apr": 0.0398,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Prime minus 0.500%; credit approval, property and product conditions apply."
+            },
+            {
+              "id": "rbc_5yr_variable_high_ratio_special",
+              "lender": "RBC Royal Bank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "insured / under 20% down",
+              "annual_rate": 0.0365,
+              "apr": 0.0368,
+              "source_id": "rbc_rates",
+              "observed_date": "2026-09-07",
+              "rate_classification": "promotional rate",
+              "eligibility_conditions": "Prime minus 0.800%; high-ratio eligibility, credit approval, property and product conditions apply."
+            },
+            {
+              "id": "scotiabank_5yr_variable_closed",
+              "lender": "Scotiabank",
+              "rate_type": "variable",
+              "term_years": 5,
+              "insured_status": "conventional or insured",
+              "annual_rate": 0.049,
+              "apr": 0.0491,
+              "source_id": "scotiabank_rates",
+              "observed_date": "2025-10-30",
+              "retrieved_date": "2026-09-07",
+              "rate_classification": "special rate; source-dated",
+              "eligibility_conditions": "Closed Flex-Value product; rate and approval conditions are set by Scotiabank and the numeric page footnote is dated October 30, 2025.",
+              "freshness": "stale"
+            }
+          ],
+          "insurance_schedule": [
+            {
+              "max_ltv": 0.65,
+              "premium_rate": 0.006
+            },
+            {
+              "max_ltv": 0.75,
+              "premium_rate": 0.017
+            },
+            {
+              "max_ltv": 0.8,
+              "premium_rate": 0.024
+            },
+            {
+              "max_ltv": 0.85,
+              "premium_rate": 0.028
+            },
+            {
+              "max_ltv": 0.9,
+              "premium_rate": 0.031
+            },
+            {
+              "max_ltv": 0.95,
+              "premium_rate": 0.04
+            }
+          ],
+          "rules": {
+            "minimum_down_payment": {
+              "up_to_500000_cad_rate": 0.05,
+              "between_500000_and_1500000_first_cad": 500000,
+              "between_500000_and_1500000_first_rate": 0.05,
+              "between_500000_and_1500000_remainder_rate": 0.1,
+              "over_1500000_cad_rate": 0.2
+            },
+            "max_insured_home_price_cad": 1500000,
+            "insurance_required_below_down_payment": 0.2,
+            "stress_test_floor": 0.0525,
+            "stress_test_buffer": 0.02,
+            "max_standard_insured_amortization_years": 25
+          },
+          "sources": [
+            {
+              "id": "boc_new_lending",
+              "institution": "Bank of Canada",
+              "title": "Interest rates charged for new and existing lending by chartered banks",
+              "url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+              "source_class": "official figure",
+              "observed_date": "2026-06-30",
+              "retrieved_date": "2026-09-07",
+              "note": "Latest visible monthly observations in the snapshot. The Bank says this table is typically published within the third week of the month."
+            },
+            {
+              "id": "canada_down_payment",
+              "institution": "Government of Canada",
+              "title": "How much you need for a down payment",
+              "url": "https://www.canada.ca/en/financial-consumer-agency/services/mortgages/down-payment.html",
+              "source_class": "official requirement",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "5% up to $500,000; 5% of the first $500,000 plus 10% of the remainder up to $1.5 million; 20% at $1.5 million or more."
+            },
+            {
+              "id": "cmhc_insurance",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "CMHC Mortgage Loan Insurance Explained",
+              "url": "https://www.cmhc-schl.gc.ca/observer/2025/cmhc-mortgage-loan-insurance-explained",
+              "source_class": "official requirement and premium schedule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Mortgage insurance is generally required below 20% down for an eligible home priced below $1.5 million. The standard homeowner schedule is recorded separately in this snapshot."
+            },
+            {
+              "id": "cmhc_premium_schedule",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "CMHC Purchase premium information",
+              "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/purchase",
+              "source_class": "official premium schedule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Owner-occupied 1-to-4-unit standard premium schedule; non-traditional down-payment surcharges and exact lender underwriting remain outside this planning calculation."
+            },
+            {
+              "id": "cmhc_prefab_plus",
+              "institution": "Canada Mortgage and Housing Corporation",
+              "title": "Prefab Plus",
+              "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/prefab-plus",
+              "source_class": "official eligibility guidance",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Prefab eligibility depends on full-time year-round suitability, permanent foundation/attachment for a traditional mortgage, approvals and lender/insurer acceptance."
+            },
+            {
+              "id": "osfi_mqr",
+              "institution": "Office of the Superintendent of Financial Institutions",
+              "title": "Minimum qualifying rate for uninsured mortgages",
+              "url": "https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages",
+              "source_class": "official qualification rule",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Qualifying rate is the greater of the contract rate plus 2 percentage points or 5.25%; this model displays it separately from the contract payment."
+            },
+            {
+              "id": "rbc_rates",
+              "institution": "RBC Royal Bank",
+              "title": "Mortgage rates",
+              "url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+              "source_class": "lender promotional and posted rate page",
+              "observed_date": "2026-09-07",
+              "retrieved_date": "2026-09-07",
+              "note": "Current page displayed 5-year fixed and variable special-rate rows, including high-ratio rows. These are lender-specific promotional rates, not universal offers."
+            },
+            {
+              "id": "scotiabank_rates",
+              "institution": "Scotiabank",
+              "title": "5-year closed variable mortgage",
+              "url": "https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html",
+              "source_class": "lender product page",
+              "observed_date": "2025-10-30",
+              "retrieved_date": "2026-09-07",
+              "note": "The accessible product page exposes a source-dated October 30, 2025 rate footnote; it is retained as a stale comparison and is not used as the default."
+            }
+          ],
+          "generated_at": "2026-09-07",
+          "source_snapshot_path": "packages/carrying-capacity/data/source/house-mortgage-rates.json"
+        },
+        "scenarios": [
+          {
+            "id": "legal_minimum",
+            "label": "Legal minimum down payment",
+            "downPayment": "minimum",
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 41864.6,
+              "cash_construction_budget_cad": 41864.6,
+              "property_value_cad": 41864.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 2093.23,
+              "down_payment_cad": 2093.23,
+              "down_payment_rate": 0.05,
+              "requested_initial_contribution_cad": 2093.23,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 2093.23,
+              "base_financed_principal_cad": 39771.37,
+              "mortgage_insurance_premium_cad": 1590.85,
+              "mortgage_insurance": {
+                "required": true,
+                "eligible": true,
+                "ltv": 0.95,
+                "premium_rate": 0.04,
+                "premium_cad": 1590.85,
+                "status": "cmhc_standard_schedule"
+              },
+              "total_financed_principal_cad": 41362.22,
+              "financed_principal_cad": 41362.22,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0401,
+              "interest_rate_annual": 0.0401,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 218.55,
+              "monthly_debt_service_cad": 218.55,
+              "total_interest_over_amortization_cad": 24203.82,
+              "term_end_balance_cad": 36034.76,
+              "stress_test_rate_annual": 0.0601,
+              "stress_test_payment_cad": 266.75,
+              "qualification": {
+                "rate_annual": 0.0601,
+                "payment_cad": 266.75,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          },
+          {
+            "id": "ten_percent",
+            "label": "10% down",
+            "downPayment": 0.1,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 41864.6,
+              "cash_construction_budget_cad": 41864.6,
+              "property_value_cad": 41864.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 4186.46,
+              "down_payment_cad": 4186.46,
+              "down_payment_rate": 0.1,
+              "requested_initial_contribution_cad": 4186.46,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 2093.23,
+              "base_financed_principal_cad": 37678.14,
+              "mortgage_insurance_premium_cad": 1168.02,
+              "mortgage_insurance": {
+                "required": true,
+                "eligible": true,
+                "ltv": 0.9,
+                "premium_rate": 0.031,
+                "premium_cad": 1168.02,
+                "status": "cmhc_standard_schedule"
+              },
+              "total_financed_principal_cad": 38846.16,
+              "financed_principal_cad": 38846.16,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0401,
+              "interest_rate_annual": 0.0401,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 205.26,
+              "monthly_debt_service_cad": 205.26,
+              "total_interest_over_amortization_cad": 22731.51,
+              "term_end_balance_cad": 33842.77,
+              "stress_test_rate_annual": 0.0601,
+              "stress_test_payment_cad": 250.52,
+              "qualification": {
+                "rate_annual": 0.0601,
+                "payment_cad": 250.52,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          },
+          {
+            "id": "twenty_percent",
+            "label": "20% down · uninsured reference",
+            "downPayment": 0.2,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 41864.6,
+              "cash_construction_budget_cad": 41864.6,
+              "property_value_cad": 41864.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 8372.92,
+              "down_payment_cad": 8372.92,
+              "down_payment_rate": 0.2,
+              "requested_initial_contribution_cad": 8372.92,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 2093.23,
+              "base_financed_principal_cad": 33491.68,
+              "mortgage_insurance_premium_cad": 0,
+              "mortgage_insurance": {
+                "required": false,
+                "eligible": false,
+                "ltv": 0.8,
+                "premium_rate": 0,
+                "premium_cad": 0,
+                "status": "not_required_or_not_eligible"
+              },
+              "total_financed_principal_cad": 33491.68,
+              "financed_principal_cad": 33491.68,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0435,
+              "interest_rate_annual": 0.0435,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 183.32,
+              "monthly_debt_service_cad": 183.32,
+              "total_interest_over_amortization_cad": 21503.62,
+              "term_end_balance_cad": 29350.49,
+              "stress_test_rate_annual": 0.0635,
+              "stress_test_payment_cad": 223.01,
+              "qualification": {
+                "rate_annual": 0.0635,
+                "payment_cad": 223.01,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "uninsured_reference_scenario"
+            }
+          },
+          {
+            "id": "twenty_five_percent",
+            "label": "25% down",
+            "downPayment": 0.25,
+            "result": {
+              "contract_version": "1.0.0",
+              "capital_value_cad": 41864.6,
+              "cash_construction_budget_cad": 41864.6,
+              "property_value_cad": 41864.6,
+              "ownership": "financed",
+              "initial_contribution_cad": 10466.15,
+              "down_payment_cad": 10466.15,
+              "down_payment_rate": 0.25,
+              "requested_initial_contribution_cad": 10466.15,
+              "contribution_raised_to_minimum": false,
+              "minimum_down_payment_cad": 2093.23,
+              "base_financed_principal_cad": 31398.45,
+              "mortgage_insurance_premium_cad": 0,
+              "mortgage_insurance": {
+                "required": false,
+                "eligible": false,
+                "ltv": 0.75,
+                "premium_rate": 0,
+                "premium_cad": 0,
+                "status": "not_required_or_not_eligible"
+              },
+              "total_financed_principal_cad": 31398.45,
+              "financed_principal_cad": 31398.45,
+              "rate_type": "fixed",
+              "contract_rate_annual": 0.0435,
+              "interest_rate_annual": 0.0435,
+              "rate": {
+                "type": "fixed",
+                "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+                "source_id": "boc_new_lending",
+                "source_url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+                "observed_date": "2026-06-30",
+                "retrieved_date": "2026-09-07",
+                "status": "fresh",
+                "market_average": true
+              },
+              "term_years": 5,
+              "loan_term_years": 5,
+              "amortization_years": 25,
+              "monthly_payment_cad": 171.86,
+              "monthly_debt_service_cad": 171.86,
+              "total_interest_over_amortization_cad": 20159.64,
+              "term_end_balance_cad": 27516.09,
+              "stress_test_rate_annual": 0.0635,
+              "stress_test_payment_cad": 209.07,
+              "qualification": {
+                "rate_annual": 0.0635,
+                "payment_cad": 209.07,
+                "rule": "greater of contract rate + 2 percentage points or 5.25%"
+              },
+              "eligibility": {
+                "status": "planning_eligibility_only",
+                "issues": [],
+                "warning": "Full-time, year-round yurt-form residential financing depends on permanent foundation and structural compliance, occupancy approval, insurability, appraisal, legal title/security registration, municipal approvals and lender acceptance of the construction system."
+              },
+              "basis": "selected_dwelling_stage_cash_cost_excluding_contributed_owner_labour",
+              "rate_snapshot": {
+                "snapshot_id": "house-mortgage-rates-2026-09-07",
+                "snapshot_date": "2026-09-07",
+                "as_of": "2026-09-07",
+                "stale": false
+              },
+              "monthly_compounding": true,
+              "loan_term_vs_amortization": "Term is the renewal period; amortization is the scheduled payment period.",
+              "assumption_status": "down_payment_sensitivity"
+            }
+          }
+        ]
       },
       "legacy_reconciliation": {
         "legacy_range_cad": {
@@ -19252,5 +22102,246 @@
       "note": "Tax treatment and any rebate depend on owner-builder/builder facts, timing and eligibility; the calculator keeps HST as an editable planning assumption."
     }
   ],
-  "generated_at": "2026-09-05"
+  "mortgage_rate_evidence": {
+    "contract_version": "1.0.0",
+    "snapshot_id": "house-mortgage-rates-2026-09-07",
+    "snapshot_date": "2026-09-07",
+    "currency": "CAD",
+    "freshness": {
+      "stale_after_days": 120,
+      "status": "fresh",
+      "basis": "The snapshot date is the date the public source pages and latest visible monthly Bank of Canada table were checked.",
+      "checked_as_of": "2026-09-07",
+      "age_days": 0
+    },
+    "reference_rates": {
+      "fixed": {
+        "insured": {
+          "annual_rate": 0.0401,
+          "source_id": "boc_new_lending",
+          "series": "V122667780",
+          "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+          "market_average": true
+        },
+        "uninsured": {
+          "annual_rate": 0.0435,
+          "source_id": "boc_new_lending",
+          "series": "V122667792",
+          "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+          "market_average": true
+        }
+      },
+      "variable": {
+        "insured": {
+          "annual_rate": 0.0379,
+          "source_id": "boc_new_lending",
+          "series": "V122667776",
+          "label": "Bank of Canada funds advanced, insured, variable",
+          "market_average": true
+        },
+        "uninsured": {
+          "annual_rate": 0.039,
+          "source_id": "boc_new_lending",
+          "series": "V122667782",
+          "label": "Bank of Canada funds advanced, uninsured, variable",
+          "market_average": true
+        }
+      }
+    },
+    "lender_observations": [
+      {
+        "id": "rbc_5yr_fixed_uninsured_special",
+        "lender": "RBC Royal Bank",
+        "rate_type": "fixed",
+        "term_years": 5,
+        "insured_status": "uninsured / 20%+ down",
+        "annual_rate": 0.0489,
+        "apr": 0.0492,
+        "source_id": "rbc_rates",
+        "observed_date": "2026-09-07",
+        "rate_classification": "promotional rate",
+        "eligibility_conditions": "Purchase or switch special rate; credit approval, property and product conditions apply."
+      },
+      {
+        "id": "rbc_5yr_fixed_high_ratio_special",
+        "lender": "RBC Royal Bank",
+        "rate_type": "fixed",
+        "term_years": 5,
+        "insured_status": "insured / under 20% down",
+        "annual_rate": 0.0459,
+        "apr": 0.0462,
+        "source_id": "rbc_rates",
+        "observed_date": "2026-09-07",
+        "rate_classification": "promotional rate",
+        "eligibility_conditions": "High-ratio special rate; high-ratio eligibility, credit approval, property and product conditions apply."
+      },
+      {
+        "id": "rbc_5yr_variable_uninsured_special",
+        "lender": "RBC Royal Bank",
+        "rate_type": "variable",
+        "term_years": 5,
+        "insured_status": "uninsured / 20%+ down",
+        "annual_rate": 0.0395,
+        "apr": 0.0398,
+        "source_id": "rbc_rates",
+        "observed_date": "2026-09-07",
+        "rate_classification": "promotional rate",
+        "eligibility_conditions": "Prime minus 0.500%; credit approval, property and product conditions apply."
+      },
+      {
+        "id": "rbc_5yr_variable_high_ratio_special",
+        "lender": "RBC Royal Bank",
+        "rate_type": "variable",
+        "term_years": 5,
+        "insured_status": "insured / under 20% down",
+        "annual_rate": 0.0365,
+        "apr": 0.0368,
+        "source_id": "rbc_rates",
+        "observed_date": "2026-09-07",
+        "rate_classification": "promotional rate",
+        "eligibility_conditions": "Prime minus 0.800%; high-ratio eligibility, credit approval, property and product conditions apply."
+      },
+      {
+        "id": "scotiabank_5yr_variable_closed",
+        "lender": "Scotiabank",
+        "rate_type": "variable",
+        "term_years": 5,
+        "insured_status": "conventional or insured",
+        "annual_rate": 0.049,
+        "apr": 0.0491,
+        "source_id": "scotiabank_rates",
+        "observed_date": "2025-10-30",
+        "retrieved_date": "2026-09-07",
+        "rate_classification": "special rate; source-dated",
+        "eligibility_conditions": "Closed Flex-Value product; rate and approval conditions are set by Scotiabank and the numeric page footnote is dated October 30, 2025.",
+        "freshness": "stale"
+      }
+    ],
+    "insurance_schedule": [
+      {
+        "max_ltv": 0.65,
+        "premium_rate": 0.006
+      },
+      {
+        "max_ltv": 0.75,
+        "premium_rate": 0.017
+      },
+      {
+        "max_ltv": 0.8,
+        "premium_rate": 0.024
+      },
+      {
+        "max_ltv": 0.85,
+        "premium_rate": 0.028
+      },
+      {
+        "max_ltv": 0.9,
+        "premium_rate": 0.031
+      },
+      {
+        "max_ltv": 0.95,
+        "premium_rate": 0.04
+      }
+    ],
+    "rules": {
+      "minimum_down_payment": {
+        "up_to_500000_cad_rate": 0.05,
+        "between_500000_and_1500000_first_cad": 500000,
+        "between_500000_and_1500000_first_rate": 0.05,
+        "between_500000_and_1500000_remainder_rate": 0.1,
+        "over_1500000_cad_rate": 0.2
+      },
+      "max_insured_home_price_cad": 1500000,
+      "insurance_required_below_down_payment": 0.2,
+      "stress_test_floor": 0.0525,
+      "stress_test_buffer": 0.02,
+      "max_standard_insured_amortization_years": 25
+    },
+    "sources": [
+      {
+        "id": "boc_new_lending",
+        "institution": "Bank of Canada",
+        "title": "Interest rates charged for new and existing lending by chartered banks",
+        "url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+        "source_class": "official figure",
+        "observed_date": "2026-06-30",
+        "retrieved_date": "2026-09-07",
+        "note": "Latest visible monthly observations in the snapshot. The Bank says this table is typically published within the third week of the month."
+      },
+      {
+        "id": "canada_down_payment",
+        "institution": "Government of Canada",
+        "title": "How much you need for a down payment",
+        "url": "https://www.canada.ca/en/financial-consumer-agency/services/mortgages/down-payment.html",
+        "source_class": "official requirement",
+        "observed_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+        "note": "5% up to $500,000; 5% of the first $500,000 plus 10% of the remainder up to $1.5 million; 20% at $1.5 million or more."
+      },
+      {
+        "id": "cmhc_insurance",
+        "institution": "Canada Mortgage and Housing Corporation",
+        "title": "CMHC Mortgage Loan Insurance Explained",
+        "url": "https://www.cmhc-schl.gc.ca/observer/2025/cmhc-mortgage-loan-insurance-explained",
+        "source_class": "official requirement and premium schedule",
+        "observed_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+        "note": "Mortgage insurance is generally required below 20% down for an eligible home priced below $1.5 million. The standard homeowner schedule is recorded separately in this snapshot."
+      },
+      {
+        "id": "cmhc_premium_schedule",
+        "institution": "Canada Mortgage and Housing Corporation",
+        "title": "CMHC Purchase premium information",
+        "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/purchase",
+        "source_class": "official premium schedule",
+        "observed_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+        "note": "Owner-occupied 1-to-4-unit standard premium schedule; non-traditional down-payment surcharges and exact lender underwriting remain outside this planning calculation."
+      },
+      {
+        "id": "cmhc_prefab_plus",
+        "institution": "Canada Mortgage and Housing Corporation",
+        "title": "Prefab Plus",
+        "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/prefab-plus",
+        "source_class": "official eligibility guidance",
+        "observed_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+        "note": "Prefab eligibility depends on full-time year-round suitability, permanent foundation/attachment for a traditional mortgage, approvals and lender/insurer acceptance."
+      },
+      {
+        "id": "osfi_mqr",
+        "institution": "Office of the Superintendent of Financial Institutions",
+        "title": "Minimum qualifying rate for uninsured mortgages",
+        "url": "https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages",
+        "source_class": "official qualification rule",
+        "observed_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+        "note": "Qualifying rate is the greater of the contract rate plus 2 percentage points or 5.25%; this model displays it separately from the contract payment."
+      },
+      {
+        "id": "rbc_rates",
+        "institution": "RBC Royal Bank",
+        "title": "Mortgage rates",
+        "url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+        "source_class": "lender promotional and posted rate page",
+        "observed_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+        "note": "Current page displayed 5-year fixed and variable special-rate rows, including high-ratio rows. These are lender-specific promotional rates, not universal offers."
+      },
+      {
+        "id": "scotiabank_rates",
+        "institution": "Scotiabank",
+        "title": "5-year closed variable mortgage",
+        "url": "https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html",
+        "source_class": "lender product page",
+        "observed_date": "2025-10-30",
+        "retrieved_date": "2026-09-07",
+        "note": "The accessible product page exposes a source-dated October 30, 2025 rate footnote; it is retained as a stale comparison and is not used as the default."
+      }
+    ],
+    "generated_at": "2026-09-07",
+    "source_snapshot_path": "packages/carrying-capacity/data/source/house-mortgage-rates.json"
+  },
+  "mortgage_contract_version": "1.0.0",
+  "generated_at": "2026-09-07"
 }

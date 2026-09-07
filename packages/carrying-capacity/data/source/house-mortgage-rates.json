@@ -1,0 +1,218 @@
+{
+  "contract_version": "1.0.0",
+  "snapshot_id": "house-mortgage-rates-2026-09-07",
+  "snapshot_date": "2026-09-07",
+  "currency": "CAD",
+  "freshness": {
+    "stale_after_days": 120,
+    "status": "fresh",
+    "basis": "The snapshot date is the date the public source pages and latest visible monthly Bank of Canada table were checked."
+  },
+  "reference_rates": {
+    "fixed": {
+      "insured": {
+        "annual_rate": 0.0401,
+        "source_id": "boc_new_lending",
+        "series": "V122667780",
+        "label": "Bank of Canada funds advanced, insured, fixed 5 years and over",
+        "market_average": true
+      },
+      "uninsured": {
+        "annual_rate": 0.0435,
+        "source_id": "boc_new_lending",
+        "series": "V122667792",
+        "label": "Bank of Canada funds advanced, uninsured, fixed 5 years and over",
+        "market_average": true
+      }
+    },
+    "variable": {
+      "insured": {
+        "annual_rate": 0.0379,
+        "source_id": "boc_new_lending",
+        "series": "V122667776",
+        "label": "Bank of Canada funds advanced, insured, variable",
+        "market_average": true
+      },
+      "uninsured": {
+        "annual_rate": 0.039,
+        "source_id": "boc_new_lending",
+        "series": "V122667782",
+        "label": "Bank of Canada funds advanced, uninsured, variable",
+        "market_average": true
+      }
+    }
+  },
+  "lender_observations": [
+    {
+      "id": "rbc_5yr_fixed_uninsured_special",
+      "lender": "RBC Royal Bank",
+      "rate_type": "fixed",
+      "term_years": 5,
+      "insured_status": "uninsured / 20%+ down",
+      "annual_rate": 0.0489,
+      "apr": 0.0492,
+      "source_id": "rbc_rates",
+      "observed_date": "2026-09-07",
+      "rate_classification": "promotional rate",
+      "eligibility_conditions": "Purchase or switch special rate; credit approval, property and product conditions apply."
+    },
+    {
+      "id": "rbc_5yr_fixed_high_ratio_special",
+      "lender": "RBC Royal Bank",
+      "rate_type": "fixed",
+      "term_years": 5,
+      "insured_status": "insured / under 20% down",
+      "annual_rate": 0.0459,
+      "apr": 0.0462,
+      "source_id": "rbc_rates",
+      "observed_date": "2026-09-07",
+      "rate_classification": "promotional rate",
+      "eligibility_conditions": "High-ratio special rate; high-ratio eligibility, credit approval, property and product conditions apply."
+    },
+    {
+      "id": "rbc_5yr_variable_uninsured_special",
+      "lender": "RBC Royal Bank",
+      "rate_type": "variable",
+      "term_years": 5,
+      "insured_status": "uninsured / 20%+ down",
+      "annual_rate": 0.0395,
+      "apr": 0.0398,
+      "source_id": "rbc_rates",
+      "observed_date": "2026-09-07",
+      "rate_classification": "promotional rate",
+      "eligibility_conditions": "Prime minus 0.500%; credit approval, property and product conditions apply."
+    },
+    {
+      "id": "rbc_5yr_variable_high_ratio_special",
+      "lender": "RBC Royal Bank",
+      "rate_type": "variable",
+      "term_years": 5,
+      "insured_status": "insured / under 20% down",
+      "annual_rate": 0.0365,
+      "apr": 0.0368,
+      "source_id": "rbc_rates",
+      "observed_date": "2026-09-07",
+      "rate_classification": "promotional rate",
+      "eligibility_conditions": "Prime minus 0.800%; high-ratio eligibility, credit approval, property and product conditions apply."
+    },
+    {
+      "id": "scotiabank_5yr_variable_closed",
+      "lender": "Scotiabank",
+      "rate_type": "variable",
+      "term_years": 5,
+      "insured_status": "conventional or insured",
+      "annual_rate": 0.049,
+      "apr": 0.0491,
+      "source_id": "scotiabank_rates",
+      "observed_date": "2025-10-30",
+      "retrieved_date": "2026-09-07",
+      "rate_classification": "special rate; source-dated",
+      "eligibility_conditions": "Closed Flex-Value product; rate and approval conditions are set by Scotiabank and the numeric page footnote is dated October 30, 2025.",
+      "freshness": "stale"
+    }
+  ],
+  "insurance_schedule": [
+    {"max_ltv": 0.65, "premium_rate": 0.006},
+    {"max_ltv": 0.75, "premium_rate": 0.017},
+    {"max_ltv": 0.8, "premium_rate": 0.024},
+    {"max_ltv": 0.85, "premium_rate": 0.028},
+    {"max_ltv": 0.9, "premium_rate": 0.031},
+    {"max_ltv": 0.95, "premium_rate": 0.04}
+  ],
+  "rules": {
+    "minimum_down_payment": {
+      "up_to_500000_cad_rate": 0.05,
+      "between_500000_and_1500000_first_cad": 500000,
+      "between_500000_and_1500000_first_rate": 0.05,
+      "between_500000_and_1500000_remainder_rate": 0.1,
+      "over_1500000_cad_rate": 0.2
+    },
+    "max_insured_home_price_cad": 1500000,
+    "insurance_required_below_down_payment": 0.2,
+    "stress_test_floor": 0.0525,
+    "stress_test_buffer": 0.02,
+    "max_standard_insured_amortization_years": 25
+  },
+  "sources": [
+    {
+      "id": "boc_new_lending",
+      "institution": "Bank of Canada",
+      "title": "Interest rates charged for new and existing lending by chartered banks",
+      "url": "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/",
+      "source_class": "official figure",
+      "observed_date": "2026-06-30",
+      "retrieved_date": "2026-09-07",
+      "note": "Latest visible monthly observations in the snapshot. The Bank says this table is typically published within the third week of the month."
+    },
+    {
+      "id": "canada_down_payment",
+      "institution": "Government of Canada",
+      "title": "How much you need for a down payment",
+      "url": "https://www.canada.ca/en/financial-consumer-agency/services/mortgages/down-payment.html",
+      "source_class": "official requirement",
+      "observed_date": "2026-09-07",
+      "retrieved_date": "2026-09-07",
+      "note": "5% up to $500,000; 5% of the first $500,000 plus 10% of the remainder up to $1.5 million; 20% at $1.5 million or more."
+    },
+    {
+      "id": "cmhc_insurance",
+      "institution": "Canada Mortgage and Housing Corporation",
+      "title": "CMHC Mortgage Loan Insurance Explained",
+      "url": "https://www.cmhc-schl.gc.ca/observer/2025/cmhc-mortgage-loan-insurance-explained",
+      "source_class": "official requirement and premium schedule",
+      "observed_date": "2026-09-07",
+      "retrieved_date": "2026-09-07",
+      "note": "Mortgage insurance is generally required below 20% down for an eligible home priced below $1.5 million. The standard homeowner schedule is recorded separately in this snapshot."
+    },
+    {
+      "id": "cmhc_premium_schedule",
+      "institution": "Canada Mortgage and Housing Corporation",
+      "title": "CMHC Purchase premium information",
+      "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/purchase",
+      "source_class": "official premium schedule",
+      "observed_date": "2026-09-07",
+      "retrieved_date": "2026-09-07",
+      "note": "Owner-occupied 1-to-4-unit standard premium schedule; non-traditional down-payment surcharges and exact lender underwriting remain outside this planning calculation."
+    },
+    {
+      "id": "cmhc_prefab_plus",
+      "institution": "Canada Mortgage and Housing Corporation",
+      "title": "Prefab Plus",
+      "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/mortgage-loan-insurance/mortgage-loan-insurance-homeownership-programs/prefab-plus",
+      "source_class": "official eligibility guidance",
+      "observed_date": "2026-09-07",
+      "retrieved_date": "2026-09-07",
+      "note": "Prefab eligibility depends on full-time year-round suitability, permanent foundation/attachment for a traditional mortgage, approvals and lender/insurer acceptance."
+    },
+    {
+      "id": "osfi_mqr",
+      "institution": "Office of the Superintendent of Financial Institutions",
+      "title": "Minimum qualifying rate for uninsured mortgages",
+      "url": "https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages",
+      "source_class": "official qualification rule",
+      "observed_date": "2026-09-07",
+      "retrieved_date": "2026-09-07",
+      "note": "Qualifying rate is the greater of the contract rate plus 2 percentage points or 5.25%; this model displays it separately from the contract payment."
+    },
+    {
+      "id": "rbc_rates",
+      "institution": "RBC Royal Bank",
+      "title": "Mortgage rates",
+      "url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+      "source_class": "lender promotional and posted rate page",
+      "observed_date": "2026-09-07",
+      "retrieved_date": "2026-09-07",
+      "note": "Current page displayed 5-year fixed and variable special-rate rows, including high-ratio rows. These are lender-specific promotional rates, not universal offers."
+    },
+    {
+      "id": "scotiabank_rates",
+      "institution": "Scotiabank",
+      "title": "5-year closed variable mortgage",
+      "url": "https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html",
+      "source_class": "lender product page",
+      "observed_date": "2025-10-30",
+      "retrieved_date": "2026-09-07",
+      "note": "The accessible product page exposes a source-dated October 30, 2025 rate footnote; it is retained as a stale comparison and is not used as the default."
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 import evidence from '../data/source/house-cost-evidence.json' with {type: 'json'};
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
-import {financeCapital} from './site-lease-browser.mjs';
+import {calculateMortgage, calculateMortgageScenarios, HOUSE_MORTGAGE_CONTRACT_VERSION, HOUSE_MORTGAGE_RATE_EVIDENCE} from './mortgage.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.1.2';
+export const HOUSE_COST_CONTRACT_VERSION = '4.2.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 
@@ -219,6 +219,9 @@ function normalizeOptions(options = {}) {
   const band = ['low', 'central', 'high'].includes(options.band) ? options.band : 'central';
   const servicingMode = evidence.servicing_modes[options.servicingMode] ? options.servicingMode : evidence.defaults.servicing_mode;
   const labourMode = evidence.labour_modes[options.labourMode] ? options.labourMode : evidence.defaults.labour_mode;
+  const explicitRateType = options.financing?.rateType;
+  const legacyRateOverride = explicitRateType == null && options.financing?.customRateAnnual == null && options.financing?.interestRateAnnual != null;
+  const rateType = ['fixed', 'variable', 'custom'].includes(explicitRateType) ? explicitRateType : (legacyRateOverride ? 'custom' : (evidence.defaults.financing.rate_type ?? 'fixed'));
   return {
     band,
     completionStage: normalizeCompletionStage(options.completionStage),
@@ -238,7 +241,11 @@ function normalizeOptions(options = {}) {
     financing: {
       ownership: options.financing?.ownership === 'owned_out_right' ? 'owned_out_right' : 'financed',
       downPaymentRate: clamp(options.financing?.downPaymentRate ?? evidence.defaults.financing.down_payment_rate, 0, 1),
-      interestRateAnnual: clamp(options.financing?.interestRateAnnual ?? evidence.defaults.financing.interest_rate_annual, 0, 1),
+      downPaymentCad: options.financing?.downPaymentCad == null ? null : Math.max(0, finite(options.financing.downPaymentCad)),
+      rateType,
+      customRateAnnual: options.financing?.customRateAnnual == null ? (legacyRateOverride ? clamp(options.financing.interestRateAnnual, 0, 1) : null) : clamp(options.financing.customRateAnnual, 0, 1),
+      interestRateAnnual: clamp(options.financing?.interestRateAnnual ?? evidence.defaults.financing.interest_rate_annual ?? HOUSE_MORTGAGE_RATE_EVIDENCE.reference_rates.fixed.insured.annual_rate, 0, 1),
+      insuranceMode: ['automatic', 'cmhc', 'none'].includes(options.financing?.insuranceMode) ? options.financing.insuranceMode : (evidence.defaults.financing.insurance_mode ?? 'automatic'),
       amortizationYears: Math.max(1, finite(options.financing?.amortizationYears, evidence.defaults.financing.amortization_years)),
       loanTermYears: options.financing?.loanTermYears == null ? evidence.defaults.financing.loan_term_years : Math.max(1, finite(options.financing.loanTermYears))
     },
@@ -343,7 +350,7 @@ function calculateLegacyRateHouseCost(options = {}) {
   const economicCapital = upfrontCash + ownerImputed;
   const customQuote = input.customCompletedQuoteCad != null;
   const headlineCapital = customQuote ? input.customCompletedQuoteCad : upfrontCash;
-  const financing = financeCapital({value: headlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, interestRateAnnual: input.financing.interestRateAnnual, amortizationYears: input.financing.amortizationYears, loanTermYears: input.financing.loanTermYears});
+  const completedFinancing = calculateMortgage({cashCostCad: headlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, downPaymentCad: input.financing.downPaymentCad, rateType: input.financing.rateType, customRateAnnual: input.financing.customRateAnnual ?? input.financing.interestRateAnnual, insuranceMode: input.financing.insuranceMode, amortizationYears: input.financing.amortizationYears, termYears: input.financing.loanTermYears});
   const stageRows = (stage) => activeRows.filter((row) => stage === 'shell' ? row.stage === 'shell' : stage === 'insulated_heated' ? ['shell', 'insulated_heated'].includes(row.stage) : true);
   const stageTotal = (stage) => sum(stageRows(stage), 'cash_cost_cad');
   const coreRows = activeRows.filter((row) => !SOFT_COMPONENTS.has(row.id));
@@ -711,7 +718,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   const economicCapital = upfrontCash + ownerImputed;
   const customQuote = input.customCompletedQuoteCad != null;
   const headlineCapital = customQuote ? input.customCompletedQuoteCad : upfrontCash;
-  const financing = financeCapital({value: headlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, interestRateAnnual: input.financing.interestRateAnnual, amortizationYears: input.financing.amortizationYears, loanTermYears: input.financing.loanTermYears});
+  const completedFinancing = calculateMortgage({cashCostCad: headlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, downPaymentCad: input.financing.downPaymentCad, rateType: input.financing.rateType, customRateAnnual: input.financing.customRateAnnual ?? input.financing.interestRateAnnual, insuranceMode: input.financing.insuranceMode, amortizationYears: input.financing.amortizationYears, termYears: input.financing.loanTermYears});
   const stageRows = (stage) => activeRows.filter((row) => stage === 'shell' ? row.stage === 'shell' : stage === 'insulated_heated' ? ['shell', 'insulated_heated'].includes(row.stage) : true);
   const stageTotal = (stage) => sum(stageRows(stage), 'cash_cost_cad');
   const allLayerRows = [...activeRows, ...additionalRows];
@@ -749,7 +756,8 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   const selectedCash = sum(selectedRows, 'cash_cost_cad');
   const selectedEconomic = sum(selectedRows, 'economic_capital_cad');
   const selectedHeadlineCapital = customQuote && input.completionStage === 'basic_completed_arc' ? input.customCompletedQuoteCad : selectedCash;
-  const selectedFinancing = financeCapital({value: selectedHeadlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, interestRateAnnual: input.financing.interestRateAnnual, amortizationYears: input.financing.amortizationYears, loanTermYears: input.financing.loanTermYears});
+  const selectedFinancing = calculateMortgage({cashCostCad: selectedHeadlineCapital, ownership: input.financing.ownership, downPaymentRate: input.financing.downPaymentRate, downPaymentCad: input.financing.downPaymentCad, rateType: input.financing.rateType, customRateAnnual: input.financing.customRateAnnual ?? input.financing.interestRateAnnual, insuranceMode: input.financing.insuranceMode, amortizationYears: input.financing.amortizationYears, termYears: input.financing.loanTermYears});
+  const financing = selectedFinancing;
   const sourceList = [...evidence.sources, ...marketEvidence.suppliers.map((supplier) => ({id: supplier.id, institution: supplier.name, title: 'Yurt package and price evidence', url: supplier.source_url, classification: supplier.price_status, note: supplier.note})), ...marketEvidence.material_catalog.filter((row) => row.source_url).map((row) => ({id: row.id, institution: row.label.split(' ')[0], title: row.label, url: row.source_url, classification: row.evidence_status, note: `Observed ${row.price_date}; ${row.note ?? ''}`}))];
   const legacy = evidence.legacy_arc_benchmark;
   const formerModel = evidence.former_model_reference;
@@ -832,6 +840,8 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
     totals: {direct_cash_before_tax_cad: round(directCashBeforeTax), taxes_cad: round(taxes), contingency_cad: round(contingency), upfront_cash_required_cad: round(upfrontCash), construction_cash_expenditure_cad: round(directCashBeforeTax), initial_cash_contribution_cad: round(financing.down_payment_cad), financed_principal_cad: round(financing.financed_principal_cad), owner_labour_imputed_cad: round(ownerImputed), completed_dwelling_capital_cad: round(economicCapital), economic_cost_cad: round(economicCapital), selected_stage_cash_cost_cad: round(selectedCash), selected_stage_economic_cost_cad: round(selectedEconomic), cash_plus_owner_labour_equals_economic: Math.abs(economicCapital - upfrontCash - ownerImputed) < .005, headline_financed_value_cad: round(headlineCapital), custom_quote_applied: customQuote, quote_delta_unallocated_cad: customQuote ? roundSigned(input.customCompletedQuoteCad - economicCapital) : 0, financing_basis: customQuote ? 'custom_completed_quote' : 'upfront_cash_excluding_contributed_owner_labour'},
     financing: {...financing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
     selected_financing: {...selectedFinancing, assumption_status: 'illustrative_dwelling_financing_scenario', loan_term_vs_amortization: 'Loan term/renewal is separate from the amortization period used to calculate scheduled payment.'},
+    completed_financing: {...completedFinancing, assumption_status: 'illustrative_full_completed_cash_budget_comparison', loan_term_vs_amortization: 'Term is the renewal period; amortization is the scheduled payment period.'},
+    mortgage: {contract_version: HOUSE_MORTGAGE_CONTRACT_VERSION, property_label: 'Full-time, year-round residential dwelling based on a yurt form.', selected_stage_cash_basis_cad: round(selectedHeadlineCapital), rate_evidence: HOUSE_MORTGAGE_RATE_EVIDENCE, scenarios: calculateMortgageScenarios({cashCostCad: selectedHeadlineCapital, ownership: input.financing.ownership, rateType: input.financing.rateType, customRateAnnual: input.financing.customRateAnnual ?? input.financing.interestRateAnnual, insuranceMode: input.financing.insuranceMode, amortizationYears: input.financing.amortizationYears, termYears: input.financing.loanTermYears}).map((row) => ({...row, result: {...row.result, assumption_status: row.id === 'twenty_percent' ? 'uninsured_reference_scenario' : 'down_payment_sensitivity'}}))},
     legacy_reconciliation: {legacy_range_cad: legacy.range_cad, legacy_central_cad: legacy.range_cad.central, legacy_diameter_m_rounded: legacy.diameter_m_rounded, model_diameter_m: geometry.inputs.diameter_m, legacy_gross_floor_area_m2: legacy.gross_floor_area_m2, model_gross_floor_area_m2: geometry.gross_floor_area_m2, model_completed_economic_capital_cad: round(economicCapital), delta_from_legacy_central_cad: roundSigned(economicCapital - legacy.range_cad.central), legacy_exact_integrated_total_cad: legacy.legacy_exact_integrated_total_cad, legacy_public_rounded_total_cad: legacy.legacy_public_rounded_total_cad, historical_scope_components: legacy.legacy_scope_components, former_model_reference: formerModel, bridge_rows: bridgeRows, bridge: formerModelBridge, explanation: 'The historical approximately CAD 61,000 ARC figure represents a different planning/procurement route. It is retained for comparison only, not as an input, rate, discount, calibration target or implied Yurts Canada price.'},
     accounting: {component_sum_check: round(activeRows.reduce((total, row) => total + row.cash_cost_cad, 0) + taxes + contingency) === round(upfrontCash), component_rows_plus_additional_cad: round(sum(activeRows, 'cash_cost_cad') + sum(additionalRows, 'cash_cost_cad')), pricing_layer_sum_check: round(cumulativeLayerCash) === round(upfrontCash), pricing_layer_economic_sum_check: Math.abs(cumulativeLayerEconomic - economicCapital) < .05, pricing_layer_economic_residual_cad: roundSigned(cumulativeLayerEconomic - economicCapital, 4), upfront_cash_required_cad: round(upfrontCash), resident_owned_dwelling_only: true, excludes: ['land purchase', 'site lease', 'shared infrastructure operating charges', 'household operating expenses'], utility_single_home: input.servicingMode !== 'centralized_shared_services', no_historical_input_used: true, package_included_items_not_repriced: true},
     input_status: {dimensions: 'derived_from_geometry_and_user_input', supplier_package_price: yurtPackage.evidence_status, material_prices: 'published_retail_price_or_explicit_provisional_allowance', thresholds: 'provisional_until_engineered', labour_rates: 'planning_labour_allowance_or_quote_required', taxes: 'site_specific_tax_review_required', financing: 'illustrative_financing_scenario'},
@@ -879,7 +889,9 @@ export function buildHouseCostPresentationContract(options = {}) {
     layout_comparison: comparison,
     accounting_rules: evidence.accounting_rules,
     sources: evidence.sources,
-    generated_at: '2026-09-05'
+    mortgage_rate_evidence: HOUSE_MORTGAGE_RATE_EVIDENCE,
+    mortgage_contract_version: HOUSE_MORTGAGE_CONTRACT_VERSION,
+    generated_at: HOUSE_MORTGAGE_RATE_EVIDENCE.snapshot_date
   };
 }
 

@@ -27,7 +27,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.1.2');
+  assert.equal(result.contract_version, '4.2.0');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -124,7 +124,7 @@ test('owner-builder, mixed and contractor labour remain separately visible', () 
 
 test('zero-interest financing uses principal divided by payment months', () => {
   const result = calculateHouseCost({financing: {ownership: 'financed', downPaymentRate: 0.2, interestRateAnnual: 0, amortizationYears: 25}});
-  const expected = result.totals.upfront_cash_required_cad * 0.8 / 300;
+  const expected = result.selected_stage.cash_cost_cad * 0.8 / 300;
   assert.ok(Math.abs(result.financing.monthly_debt_service_cad - expected) < 0.02);
   assert.equal(result.totals.initial_cash_contribution_cad, result.financing.down_payment_cad);
   assert.equal(result.totals.financed_principal_cad, result.financing.financed_principal_cad);
@@ -163,8 +163,8 @@ test('reference package has no diameter threshold and geometry remains physicall
   assert.equal(full.geometry.upper_floor_elevation_m, 2.4);
 });
 
-test('custom quote overrides only the financing headline and stays auditable', () => {
-  const result = calculateHouseCost({customCompletedQuoteCad: 61000});
+test('custom quote overrides the selected completed-stage financing basis and stays auditable', () => {
+  const result = calculateHouseCost({completionStage: 'basic_completed_arc', customCompletedQuoteCad: 61000});
   assert.equal(result.totals.custom_quote_applied, true);
   assert.equal(result.financing.capital_value_cad, 61000);
   assert.notEqual(result.totals.upfront_cash_required_cad, 61000);
@@ -225,7 +225,7 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.1.2');
+  assert.equal(contract.contract_version, '4.2.0');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));

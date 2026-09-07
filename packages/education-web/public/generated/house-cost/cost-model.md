@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.1.2 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.2.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -37,10 +37,46 @@ Yurts Canada is the central reference because its public price is a Canadian ins
 - Completed dwelling cash construction budget: **$88,081.87**
 - Contributed owner-labour value: $1,303.18
 - Completed dwelling economic cost: **$89,385.05**
-- Initial financing contribution: $8,808.19; financed principal: $79,273.68
-- Illustrative financing: **$510.76/month** at 6% interest and 25-year amortization
+- Selected-stage mortgage basis: **$36,404.00 cash**, excluding contributed owner labour.
+- Selected-stage contract payment: **$178.49/month** at 4.01% fixed; source: [Bank of Canada funds advanced, insured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
+- Initial contribution: $3,640.40; base financed principal: $32,763.60; mortgage-insurance premium: $1,015.67; total financed principal: $33,779.27.
+- Stress-test payment: **$217.85/month** at 6.01%; term: 5 years; amortization: 25 years; balance at term end: $29,428.50.
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
+
+## Mortgage evidence and down-payment scenarios
+
+The dwelling is labelled **Full-time, year-round residential dwelling based on a yurt form.** Financing is a planning calculation, not a commitment. CMHC/lender eligibility depends on permanent foundation and structural compliance, year-round occupancy approval, insurability, appraisal, title/security registration, municipal approvals and acceptance of the yurt construction system.
+
+| Scenario | Initial contribution | Base principal | Insurance premium | Total principal | Contract rate | Contract payment | Stress payment |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Legal minimum down payment | $1,820.20 | $34,583.80 | $1,383.35 | $35,967.15 | 4.01% | $190.05 | $231.96 |
+| 10% down | $3,640.40 | $32,763.60 | $1,015.67 | $33,779.27 | 4.01% | $178.49 | $217.85 |
+| 20% down · uninsured reference | $7,280.80 | $29,123.20 | $0.00 | $29,123.20 | 4.35% | $159.41 | $193.92 |
+| 25% down | $9,101.00 | $27,303.00 | $0.00 | $27,303.00 | 4.35% | $149.44 | $181.80 |
+
+20% down is the conventional uninsured reference scenario, not the legal minimum. The legal-minimum row follows current Canada.ca down-payment rules. Insurance is shown separately and added to principal where the CMHC standard schedule applies. The qualifying rate is separate from the ordinary contract rate: the model uses the greater of contract rate + 2 percentage points or 5.25%.
+
+### Recorded rate evidence
+
+The default is a Bank of Canada market average, not a guaranteed lender offer. Lender observations remain separate because special rates have product, credit, insurance and property conditions.
+
+| Reference rate | Annual | Institution | Observed | Type | Source |
+| --- | ---: | --- | --- | --- | --- |
+| Bank of Canada funds advanced, insured, fixed 5 years and over | 4.01% | Bank of Canada | 2026-06-30 | market average | [source](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) |
+| Bank of Canada funds advanced, uninsured, fixed 5 years and over | 4.35% | Bank of Canada | 2026-06-30 | market average | [source](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) |
+| Bank of Canada funds advanced, insured, variable | 3.79% | Bank of Canada | 2026-06-30 | market average | [source](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) |
+| Bank of Canada funds advanced, uninsured, variable | 3.90% | Bank of Canada | 2026-06-30 | market average | [source](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) |
+
+| Lender | Product | Annual | Insurance status | Observed | Classification | Source |
+| --- | --- | ---: | --- | --- | --- |
+| RBC Royal Bank | fixed · 5 years | 4.89% | uninsured / 20%+ down | 2026-09-07 | promotional rate | [source](https://www.rbcroyalbank.com/mortgages/mortgage-rates.html) |
+| RBC Royal Bank | fixed · 5 years | 4.59% | insured / under 20% down | 2026-09-07 | promotional rate | [source](https://www.rbcroyalbank.com/mortgages/mortgage-rates.html) |
+| RBC Royal Bank | variable · 5 years | 3.95% | uninsured / 20%+ down | 2026-09-07 | promotional rate | [source](https://www.rbcroyalbank.com/mortgages/mortgage-rates.html) |
+| RBC Royal Bank | variable · 5 years | 3.65% | insured / under 20% down | 2026-09-07 | promotional rate | [source](https://www.rbcroyalbank.com/mortgages/mortgage-rates.html) |
+| Scotiabank | variable · 5 years | 4.90% | conventional or insured | 2025-10-30 | special rate; source-dated · stale | [source](https://www.scotiabank.com/ca/en/personal/mortgages/variable-rate/flex-value-closed-term.html) |
+
+The snapshot was checked on 2026-09-07; stale source-dated observations are retained as comparison evidence rather than silently substituted into the default.
 
 ## Layered price from package to dwelling
 
@@ -55,7 +91,7 @@ The public starting view is the selected supplier package. It is distinct from t
 | Delivery, design, permits, tax and contingency | $21,707.28 | $88,081.87 | delivery_logistics, design_engineering, permits, taxes, contingency |
 
 - Selected public stage: **Yurt package**, $36,404.00 cash and $36,404.00 economic cost.
-- Selected-stage financing payment: **$211.10/month**.
+- Selected-stage financing payment: **$178.49/month**.
 - Layer reconciliation: passed; economic layer reconciliation: passed.
 
 ## Cash waterfall
@@ -253,9 +289,9 @@ The total bridge is direct cash -$12,873.14, tax -$1,543.51, contingency -$1,153
 
 | Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $493.89 / month |
-| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $510.76 / month |
-| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $527.63 / month |
+| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $178.49 / month |
+| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $178.49 / month |
+| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $178.49 / month |
 
 ## Size and layout sensitivity
 

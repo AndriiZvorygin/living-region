@@ -40,7 +40,7 @@ const house = JSON.parse(fs.readFileSync(housePath, 'utf8'));
 if (!house.contract_version || house.model_id !== 'arc_yurt_house_cost' || !house.central || !house.bands || !house.central.geometry) throw new Error('house-cost contract is incomplete');
 if (!house.central.accounting?.utility_single_home) throw new Error('house-cost contract must enforce one household utility package');
 if (house.central.geometry.roof_sloping_area_m2 <= house.central.geometry.footprint_m2) throw new Error('house-cost contract must use sloping roof area');
-if (house.contract_version !== '4.1.2') throw new Error('house-cost contract must expose the layered first-principles v4.1.2 accounting');
+if (house.contract_version !== '4.2.0') throw new Error('house-cost contract must expose the layered first-principles v4.2.0 accounting');
 if (!house.market_evidence?.pricing_model_id || !house.market_evidence?.yurt_packages?.length) throw new Error('house-cost contract is missing sourced yurt package evidence');
 if (!house.central.supplier_package?.selected_price_cad || !house.central.supplier_package?.source_url) throw new Error('house-cost contract is missing the selected supplier package');
 if (!house.central.market_evidence?.platform_design?.rows?.length) throw new Error('house-cost contract is missing the platform quantity design');
@@ -56,4 +56,7 @@ if (house.defaults?.completion_stage !== 'yurt_package') throw new Error('house-
 if (house.central?.accounting?.pricing_layer_sum_check !== true) throw new Error('house-cost central pricing layers must reconcile');
 if (house.central?.cost_waterfall?.basic_dwelling_subtotal_cad !== 66374.59 || house.central?.cost_waterfall?.project_costs_before_tax_cad !== 5800 || house.central?.cost_waterfall?.total_before_tax_and_contingency_cad !== 72174.59) throw new Error('house-cost cash waterfall does not expose the expected central boundary');
 if (house.central?.cost_waterfall?.checks?.project_costs_sum_check !== true || house.central?.cost_waterfall?.checks?.subtotal_plus_project_costs_check !== true) throw new Error('house-cost cash waterfall reconciliation failed');
+if (house.mortgage_contract_version !== '1.0.0' || !house.mortgage_rate_evidence?.reference_rates || !house.central?.mortgage?.scenarios?.length) throw new Error('house-cost mortgage contract is incomplete');
+if (house.central?.mortgage?.property_label !== 'Full-time, year-round residential dwelling based on a yurt form.') throw new Error('house-cost mortgage property label is missing');
+if (!house.central?.selected_financing?.rate?.source_url || !house.central?.selected_financing?.rate_snapshot || house.central?.selected_financing?.stress_test_payment_cad == null) throw new Error('house-cost mortgage output is missing source, freshness or stress-test fields');
 console.log(`validated house-cost contract ${house.contract_version} (${house.central.geometry.usable_floor_area_m2} m2 usable reference)`);
