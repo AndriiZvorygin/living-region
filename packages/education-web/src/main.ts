@@ -142,11 +142,18 @@ function orderHouseCostChoices(page: string) {
     .replace('<a href="#answer">01 Price layers</a><a href="#design">02 Design</a>', '<a href="#design">01 Design</a><a href="#answer">02 Price layers</a>');
 }
 
+function renderHouseCostIntroduction() {
+  return `<section class="section tinted house-cost-introduction" id="introduction"><div class="section-heading"><p class="eyebrow">Start here</p><h2>How this dwelling estimate works</h2><p>This calculator provides a transparent planning estimate for creating a modest, full-time, year-round dwelling based on a yurt shell.</p><p>It begins with a real supplier package and builds the dwelling layer by layer:</p><ol><li>Yurt package</li><li>Platform and foundation</li><li>Four-season completion</li><li>Basic household amenities</li><li>Delivery, design, permits, tax and contingency</li></ol><p>Each layer shows its incremental cost and cumulative running total. Optional windows, doors, finishes, cabinetry, appliances and other upgrades begin at zero and can be added individually.</p><p>Choose the shell diameter, layout, labour assumptions and completion stage to explore different dwelling possibilities. You can price the supplier shell, a partially completed dwelling or the modest Basic completed ARC dwelling specification.</p><p>This page covers the dwelling structure and household systems. Land, shared site infrastructure, agricultural development and community costs are modelled separately in the ARC affordability calculator.</p><p>All figures are Canadian-dollar planning estimates based on the displayed sources, assumptions and date. Final costs depend on supplier quotations, site conditions, engineering, municipal approvals, financing and construction decisions.</p></div><div class="house-cost-intro-grid"><div class="house-cost-howto"><h3>How to use this page</h3><ul><li>Select a shell size.</li><li>Choose the completion stage.</li><li>Review each price layer.</li><li>Add optional components individually.</li><li>Check the evidence and quote-required items.</li><li>Compare the cash total and financing estimate.</li></ul></div></div></section>`;
+}
+
 function renderHouseCostPage() {
   let page = renderFirstPrinciplesHouseCostPage();
   page = page.replace('Published or supplier-estimated packages in Canadian dollars', 'Published prices and indicative CAD equivalents');
   page = orderHouseCostChoices(page);
-  return enhanceImportedShellPage(page);
+  page = enhanceImportedShellPage(page);
+  return page
+    .replace("Start with the supplier's yurt package, then add only the platform, four-season completion, household amenities and project costs you choose.", 'Transparent planning for a modest, full-time, year-round dwelling based on a yurt shell.')
+    .replace('</section><nav class="section-nav house-cost-nav"', `</section>${renderHouseCostIntroduction()}<nav class="section-nav house-cost-nav"`);
   const result = houseCostResult();
   const presentation = buildHouseCostPresentationContract({...houseCostOptions(), taxRate: undefined, contingencyRate: undefined});
   const geometry = result.geometry;
