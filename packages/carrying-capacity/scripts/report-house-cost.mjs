@@ -163,7 +163,7 @@ The project-cost bridge is exactly ${money(waterfall.project_costs_before_tax_ca
 
 ## Basic completed ARC selection
 
-The completed preset selects only the documented minimal additions. Utility-package fixtures and installation remain in their existing package exactly once. Elective finishes, cabinetry, appliances and bathroom storage/trim are priced but off by default.
+The completed preset selects the documented minimal additions, including an interior surface finish, basic kitchen cabinetry and bathroom storage/trim. Utility-package fixtures and installation remain in their existing package exactly once. Kitchen appliances and other elective upgrades remain individually priced and off by default.
 
 | Component | State | Quantity | Materials | Labour | Cash if selected | Evidence |
 | --- | --- | ---: | ---: | ---: | ---: | --- |

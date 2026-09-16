@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.4.0 on 2026-09-07. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.4.0 on 2026-09-16. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -50,16 +50,16 @@ These rows are **larger imported shell** evidence, not installed Canadian dwelli
 
 - Supplier package: **Yurts Canada 30 ft**, $36,404.00 (exact_published_or_selected_package)
 - Geometry: 9.144 m diameter; 65.67 m² gross; 63.04 m² usable after explicit deductions
-- Total before tax and contingency: **$72,174.59**
-- Tax/HST allowance: $9,382.70
-- Contingency: $6,524.58
-- Completed dwelling cash construction budget: **$88,081.87**
-- Contributed owner-labour value: $1,303.18
-- Completed dwelling economic cost: **$89,385.05**
-- Selected-stage mortgage basis: **$88,081.87 cash**, excluding contributed owner labour.
-- Selected-stage contract payment: **$385.69/month** at 4.35% fixed; source: [Bank of Canada funds advanced, uninsured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
-- Initial contribution: $17,616.37; base financed principal: $70,465.50; mortgage-insurance premium: $0.00; total financed principal: $70,465.50.
-- Stress-test payment: **$469.20/month** at 6.35%; term: 5 years; amortization: 25 years; balance at term end: $61,752.56.
+- Total before tax and contingency: **$74,929.25**
+- Tax/HST allowance: $9,740.80
+- Contingency: $6,773.60
+- Completed dwelling cash construction budget: **$91,443.66**
+- Contributed owner-labour value: $1,670.57
+- Completed dwelling economic cost: **$93,114.23**
+- Selected-stage mortgage basis: **$91,443.66 cash**, excluding contributed owner labour.
+- Selected-stage contract payment: **$400.42/month** at 4.35% fixed; source: [Bank of Canada funds advanced, uninsured, fixed 5 years and over](https://www.bankofcanada.ca/rates/banking-and-financial-statistics/interest-rates-for-new-and-existing-lending-by-chartered-banks/) observed 2026-06-30; snapshot 2026-09-07 (fresh).
+- Initial contribution: $18,288.73; base financed principal: $73,154.93; mortgage-insurance premium: $0.00; total financed principal: $73,154.93.
+- Stress-test payment: **$487.11/month** at 6.35%; term: 5 years; amortization: 25 years; balance at term end: $64,109.44.
 
 This result is independently calculated from a published supplier package, quantity-based platform takeoff, itemized household systems, additional assemblies, labour, tax and contingency.
 
@@ -92,10 +92,10 @@ The dwelling is labelled **Full-time, year-round residential dwelling based on a
 
 | Scenario | Initial contribution | Base principal | Insurance premium | Total principal | Contract rate | Contract payment | Stress payment |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Legal minimum down payment | $4,404.09 | $83,677.78 | $3,347.11 | $87,024.89 | 4.01% | $459.83 | $561.23 |
-| 10% down | $8,808.19 | $79,273.68 | $2,457.48 | $81,731.16 | 4.01% | $431.86 | $527.09 |
-| 20% down · uninsured reference | $17,616.37 | $70,465.50 | $0.00 | $70,465.50 | 4.35% | $385.69 | $469.20 |
-| 25% down | $22,020.47 | $66,061.40 | $0.00 | $66,061.40 | 4.35% | $361.59 | $439.88 |
+| Legal minimum down payment | $4,572.18 | $86,871.47 | $3,474.86 | $90,346.33 | 4.01% | $477.38 | $582.66 |
+| 10% down | $9,144.37 | $82,299.29 | $2,551.28 | $84,850.57 | 4.01% | $448.34 | $547.21 |
+| 20% down · uninsured reference | $18,288.73 | $73,154.93 | $0.00 | $73,154.93 | 4.35% | $400.42 | $487.11 |
+| 25% down | $22,860.91 | $68,582.74 | $0.00 | $68,582.74 | 4.35% | $375.39 | $456.67 |
 
 20% down is the conventional uninsured reference scenario, not the legal minimum. The legal-minimum row follows current Canada.ca down-payment rules. Insurance is shown separately and added to principal where the CMHC standard schedule applies. The qualifying rate is separate from the ordinary contract rate: the model uses the greater of contract rate + 2 percentage points or 5.25%.
 
@@ -128,12 +128,12 @@ The public starting view is the selected supplier package. It is distinct from t
 | --- | ---: | ---: | --- |
 | Yurt package | $36,404.00 | $36,404.00 | purchased_yurt_package |
 | Platform and foundation | $8,218.49 | $44,622.49 | platform_support_blocks, platform_pt_beams, platform_joists, platform_decking, platform_floor_insulation, platform_vapour_layer, platform_connectors |
-| Four-season completion | $9,016.63 | $53,639.12 | privacy_partition, protective_floor_surface, wood_stove_and_chimney, balanced_ventilation |
-| Basic household amenities | $12,735.47 | $66,374.59 | basic_counter, water_collection_storage_first_flush, water_demand_pump, water_sediment_and_uv, compact_pex_and_fittings, sink_and_shower_fixtures, composting_toilet, class_2_greywater, qualified_water_installation, water_permit_allowance, solar_thermal_collector, hot_water_storage_and_controls, thermosiphon_integration, hot_water_integration_labour, pv_400w, mppt_controller, lead_acid_bank, pure_sine_inverter, dc_ac_wiring_protection, qualified_electrical_labour, electrical_inspection |
-| Delivery, design, permits, tax and contingency | $21,707.28 | $88,081.87 | delivery_logistics, design_engineering, permits, taxes, contingency |
+| Four-season completion | $10,211.29 | $54,833.78 | privacy_partition, protective_floor_surface, interior_surface_finish, wood_stove_and_chimney, balanced_ventilation |
+| Basic household amenities | $14,295.47 | $69,129.25 | basic_counter, kitchen_cabinetry, bathroom_fittings, water_collection_storage_first_flush, water_demand_pump, water_sediment_and_uv, compact_pex_and_fittings, sink_and_shower_fixtures, composting_toilet, class_2_greywater, qualified_water_installation, water_permit_allowance, solar_thermal_collector, hot_water_storage_and_controls, thermosiphon_integration, hot_water_integration_labour, pv_400w, mppt_controller, lead_acid_bank, pure_sine_inverter, dc_ac_wiring_protection, qualified_electrical_labour, electrical_inspection |
+| Delivery, design, permits, tax and contingency | $22,314.41 | $91,443.66 | delivery_logistics, design_engineering, permits, taxes, contingency |
 
-- Selected public stage: **Basic completed ARC dwelling**, $88,081.87 cash and $89,385.01 economic cost.
-- Selected-stage financing payment: **$385.69/month**.
+- Selected public stage: **Basic completed ARC dwelling**, $91,443.66 cash and $93,114.19 economic cost.
+- Selected-stage financing payment: **$400.42/month**.
 - Layer reconciliation: passed; economic layer reconciliation: passed.
 
 ## Cash waterfall
@@ -142,12 +142,12 @@ The layer table shows the full price stack. This waterfall makes the boundary be
 
 | Accounting step | Amount |
 | --- | ---: |
-| Basic dwelling subtotal | **$66,374.59** |
+| Basic dwelling subtotal | **$69,129.25** |
 | Project costs before tax | **$5,800.00** |
-| Total before tax and contingency | **$72,174.59** |
-| Tax/HST allowance | **$9,382.70** |
-| Contingency | **$6,524.58** |
-| Final cash construction budget | **$88,081.87** |
+| Total before tax and contingency | **$74,929.25** |
+| Tax/HST allowance | **$9,740.80** |
+| Contingency | **$6,773.60** |
+| Final cash construction budget | **$91,443.66** |
 
 Project costs before tax are the following required or provisional external project rows:
 
@@ -161,22 +161,22 @@ The project-cost bridge is exactly $5,800.00 = $1,800.00 + $3,000.00 + $1,000.00
 
 ## Basic completed ARC selection
 
-The completed preset selects only the documented minimal additions. Utility-package fixtures and installation remain in their existing package exactly once. Elective finishes, cabinetry, appliances and bathroom storage/trim are priced but off by default.
+The completed preset selects the documented minimal additions, including an interior surface finish, basic kitchen cabinetry and bathroom storage/trim. Utility-package fixtures and installation remain in their existing package exactly once. Kitchen appliances and other elective upgrades remain individually priced and off by default.
 
 | Component | State | Quantity | Materials | Labour | Cash if selected | Evidence |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | Basic privacy partition | selected | 7.2 m² | $230.40 | 10.8 h | $473.40 | provisional_itemized_quantity |
 | Protective floor surface | selected | 63.043 m² | $630.42 | 12.6 h | $914.12 | provisional_itemized_quantity |
+| Interior surface finish | selected | 63.043 m² | $882.59 | 13.9 h | $1,194.66 | minimal_itemized_planning_rate |
 | Basic kitchen counter | selected | 1.08 m² | $151.20 | 5.9 h | $284.85 | provisional_itemized_quantity |
+| Kitchen base cabinetry | selected | 1 dwelling | $900.00 | 12 h | $1,170.00 | minimal_itemized_planning_rate |
+| Basic bathroom storage and trim | selected | 1 dwelling | $300.00 | 4 h | $390.00 | minimal_itemized_planning_rate |
 | Wood stove, chimney and fire-safe installation | selected | 1 dwelling | $5,200.00 | 24 h | $6,280.00 | published_product_plus_provisional_assembly |
 | Small dwelling ventilation | selected | 63.043 m² | $1,008.68 | 7.6 h | $1,349.11 | provisional_design_allowance |
 
 | Component | State | Quantity | Materials if selected | Labour if selected | Cash if selected | Evidence |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| Interior decorative surface finish | not selected | 63.043 m² | $882.59 | 13.9 h | $1,194.66 | optional_itemized_planning_rate |
-| Kitchen base cabinetry | not selected | 1 dwelling | $900.00 | 12 h | $1,170.00 | optional_itemized_planning_rate |
 | Basic kitchen appliances | not selected | 1 dwelling | $800.00 | 4 h | $890.00 | optional_itemized_planning_rate |
-| Optional bathroom storage and trim | not selected | 1 dwelling | $300.00 | 4 h | $390.00 | optional_itemized_planning_rate |
 
 Unresolved or provisional allowances remain visible in the component ledger: supplier freight/local delivery, structural/site/servicing design, residual permits, tax/HST treatment, contingency, the preliminary platform/foundation design, heating/chimney assembly, ventilation design, protective floor product compatibility, privacy partition detailing and basic counter detailing. These are not hidden calibration amounts.
 
@@ -252,7 +252,10 @@ Each row below has one home in the dwelling. Included supplier items are not rep
 | Connectors, fasteners and anchors | 1 | allowance | $650.00 | $650.00 | 4 h | $740.00 | provisional_quote_required |
 | Basic privacy partition | 7.2 | CAD/m2 | $32.00 | $230.40 | 10.8 h | $473.40 | provisional_itemized_quantity |
 | Protective floor surface | 63.043 | CAD/m2 | $10.00 | $630.42 | 12.6 h | $914.12 | provisional_itemized_quantity |
+| Interior surface finish | 63.043 | CAD/m2 | $14.00 | $882.59 | 13.9 h | $1,194.66 | minimal_itemized_planning_rate |
 | Basic kitchen counter | 1.08 | CAD/m2 | $140.00 | $151.20 | 5.9 h | $284.85 | provisional_itemized_quantity |
+| Kitchen base cabinetry | 1 | CAD/dwelling | $900.00 | $900.00 | 12 h | $1,170.00 | minimal_itemized_planning_rate |
+| Basic bathroom storage and trim | 1 | CAD/dwelling | $300.00 | $300.00 | 4 h | $390.00 | minimal_itemized_planning_rate |
 | Wood stove, chimney and fire-safe installation | 1 | CAD/dwelling | $5,200.00 | $5,200.00 | 24 h | $6,280.00 | published_product_plus_provisional_assembly |
 | Small dwelling ventilation | 63.043 | CAD/m2 | $16.00 | $1,008.68 | 7.6 h | $1,349.11 | provisional_design_allowance |
 | Supplier freight and local delivery | 1 | CAD/dwelling | $1,800.00 | $1,800.00 | 0 h | $1,800.00 | quotation_required |
@@ -316,7 +319,7 @@ The historical structural amount was a design-brief figure whose supporting take
 
 ## Former-model numerical reconciliation
 
-The former itemized model produced $108,247.21 economic cost. The audited first-principles result is $89,385.05, a change of -$18,862.16. This bridge keeps package scope, tax, contingency and contributed labour visible instead of applying a discount to reach the historical ARC benchmark.
+The former itemized model produced $108,247.21 economic cost. The audited first-principles result is $93,114.23, a change of -$15,132.98. This bridge keeps package scope, tax, contingency and contributed labour visible instead of applying a discount to reach the historical ARC benchmark.
 
 | Component | Original scope / amount | Former model cash | Audited scope / amount | Change from former | Evidence / reason |
 | --- | --- | ---: | --- | ---: | --- |
@@ -325,33 +328,33 @@ The former itemized model produced $108,247.21 economic cost. The audited first-
 | Household electrical | Inclusive off-grid package including qualified labour and inspection allowance / $3,300.00 | $4,200.00 | One inclusive package; labour and inspection allowance exposed inside package / $3,706.00 | -$494.00 | Historical ARC design brief; original itemized quotation unrecovered. |
 | General permits | The utility package includes CAD 600 permit allowance / $0.00 | $1,000.00 | Residual general permit allowance after CAD 600 package offset / $1,000.00 | $0.00 | Historical ARC package detail plus current municipal-fee placeholder. |
 
-The total bridge is direct cash -$12,873.14, tax -$1,543.51, contingency -$1,153.33 and owner-labour economic value -$3,292.18. The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.
+The total bridge is direct cash -$10,118.48, tax -$1,185.40, contingency -$904.31 and owner-labour economic value -$2,924.79. The bridge isolates corrected bundled-package/permit overlap, then recomputes tax and contingency on the changed cash base. Contributed owner-labour value is shown separately; its delta reflects the changed task scope and labour basis. Structure, kitchen/bath fit-out and other planning-rate differences remain visible as unresolved scope/pricing differences rather than hidden offsets.
 
 ## Labour modes
 
 | Mode | Cash budget | Economic cost | Owner hours | Paid hours | Illustrative financing |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Owner-builder | $85,172.59 | $87,778.92 | 106 h | 82.7 h | $372.96 / month |
-| Mixed labour | $88,081.87 | $89,385.05 | 53 h | 135.7 h | $385.69 / month |
-| Contractor-built | $90,991.08 | $90,991.08 | 0 h | 188.6 h | $398.43 / month |
+| Owner-builder | $87,714.19 | $91,055.31 | 135.8 h | 82.7 h | $384.08 / month |
+| Mixed labour | $91,443.66 | $93,114.23 | 67.9 h | 150.6 h | $400.42 / month |
+| Contractor-built | $95,173.05 | $95,173.05 | 0 h | 218.5 h | $416.75 / month |
 
 ## Size and layout sensitivity
 
 | Diameter | Usable m² | Cash budget | Economic cost | Economic / usable m² | Thresholds |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 6.096 m / 20 ft | 28.0 | $60,766.54 | $61,510.02 | $2,195.30 | none |
-| 7.315 m / 24 ft | 40.3 | $70,941.28 | $71,890.96 | $1,781.81 | none |
-| 9.144 m / 30 ft | 63.0 | $88,081.87 | $89,385.05 | $1,417.85 | none |
-| 8.230 m / 27 ft · Shelter Designs Big Sky base | 51.1 | $71,755.22 | $72,866.57 | $1,426.95 | none |
-| 9.754 m / 32 ft · Out Factory estimate | 71.7 | $119,318.13 | $120,757.68 | $1,683.54 | large_diameter_9_144 |
-| 10.668 m / 35 ft · Shelter Designs Big Sky base | 85.8 | $101,774.94 | $103,452.08 | $1,205.62 | large_diameter_9_144 |
-| 12.192 m / 40 ft · Shelter Designs Big Sky base | 112.1 | $128,420.18 | $130,500.18 | $1,164.39 | large_diameter_9_144, large_diameter_10_668 |
+| 6.096 m / 20 ft | 28.0 | $63,318.34 | $64,334.44 | $2,296.11 | none |
+| 7.315 m / 24 ft | 40.3 | $73,778.20 | $75,033.86 | $1,859.70 | none |
+| 9.144 m / 30 ft | 63.0 | $91,443.66 | $93,114.23 | $1,477.01 | none |
+| 8.230 m / 27 ft · Shelter Designs Big Sky base | 51.1 | $74,839.99 | $76,286.32 | $1,493.92 | none |
+| 9.754 m / 32 ft · Out Factory estimate | 71.7 | $122,880.78 | $124,711.23 | $1,738.66 | large_diameter_9_144 |
+| 10.668 m / 35 ft · Shelter Designs Big Sky base | 85.8 | $105,663.21 | $107,769.35 | $1,255.94 | large_diameter_9_144 |
+| 12.192 m / 40 ft · Shelter Designs Big Sky base | 112.1 | $132,915.92 | $135,496.00 | $1,208.97 | large_diameter_9_144, large_diameter_10_668 |
 
 | Layout | Usable m² | Cash budget | Economic cost | Owner hours | Paid hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Single storey | 63.0 | $88,081.87 | $89,385.05 | 53 h | 135.7 h |
-| Partial loft | 76.2 | $98,374.89 | $100,453.61 | 84.5 h | 168.8 h |
-| Full two storeys | 118.1 | $107,869.26 | $110,653.10 | 113.2 h | 202.5 h |
+| Single storey | 63.0 | $91,443.66 | $93,114.23 | 67.9 h | 150.6 h |
+| Partial loft | 76.2 | $102,041.45 | $104,523.22 | 100.9 h | 185.1 h |
+| Full two storeys | 118.1 | $112,503.99 | $115,804.17 | 134.2 h | 223.4 h |
 
 Interpolated sizes are labelled in the JSON contract. Thresholds for larger spans, roof pitch and upper floors are provisional planning rules, not structural approval. Snow, wind, foundations, connections, fire safety and final assemblies require qualified design.
 

@@ -198,17 +198,17 @@ test('layered pricing starts with the supplier package and reconciles every laye
 test('cash waterfall separates the basic dwelling subtotal from project costs', () => {
   const result = calculateHouseCost({completionStage: 'basic_completed_arc'});
   const waterfall = result.cost_waterfall;
-  assert.equal(waterfall.basic_dwelling_subtotal_cad, 66374.59);
+  assert.equal(waterfall.basic_dwelling_subtotal_cad, 69129.25);
   assert.equal(waterfall.project_costs_before_tax_cad, 5800);
   assert.deepEqual(waterfall.project_cost_rows.map((row) => [row.id, row.cash_cost_cad]), [
     ['delivery_logistics', 1800],
     ['design_engineering', 3000],
     ['permits', 1000]
   ]);
-  assert.equal(waterfall.total_before_tax_and_contingency_cad, 72174.59);
-  assert.equal(waterfall.tax_hst_allowance_cad, 9382.70);
-  assert.equal(waterfall.contingency_cad, 6524.58);
-  assert.equal(waterfall.final_cash_construction_budget_cad, 88081.87);
+  assert.equal(waterfall.total_before_tax_and_contingency_cad, 74929.25);
+  assert.equal(waterfall.tax_hst_allowance_cad, 9740.80);
+  assert.equal(waterfall.contingency_cad, 6773.60);
+  assert.equal(waterfall.final_cash_construction_budget_cad, 91443.66);
   assert.equal(waterfall.checks.project_costs_sum_check, true);
   assert.equal(waterfall.checks.subtotal_plus_project_costs_check, true);
 });
@@ -243,7 +243,7 @@ test('presentation contract exposes market evidence, BOM and source-linked rows'
   assert.equal(contract.procurement_routes.local_fabrication_owner_built.status, 'unmodeled');
   assert.equal(contract.central.water_package_reconciliation.difference_cad, 804.62);
   assert.equal(contract.central.cost_waterfall.project_costs_before_tax_cad, 5800);
-  assert.equal(contract.central.cost_waterfall.basic_dwelling_subtotal_cad, 66374.59);
+  assert.equal(contract.central.cost_waterfall.basic_dwelling_subtotal_cad, 69129.25);
   assert.equal(contract.central.cost_waterfall.checks.subtotal_plus_project_costs_check, true);
 });
 
@@ -330,8 +330,8 @@ test('basic completed preset selects only itemized minimal completion components
   const result = calculateHouseCost({completionStage: 'basic_completed_arc'});
   const selected = new Set(result.components.filter((row) => row.selection_id).map((row) => row.selection_id));
   const unselected = new Set(result.inactive_components.filter((row) => row.selection_id).map((row) => row.selection_id));
-  assert.deepEqual(selected, new Set(['heating', 'ventilation', 'privacy_partition', 'protective_floor_surface', 'basic_counter']));
-  assert.deepEqual(unselected, new Set(['interior_surface_finish', 'kitchen_cabinetry', 'kitchen_appliances', 'bathroom_fittings']));
+  assert.deepEqual(selected, new Set(['heating', 'ventilation', 'privacy_partition', 'protective_floor_surface', 'interior_surface_finish', 'basic_counter', 'kitchen_cabinetry', 'bathroom_fittings']));
+  assert.deepEqual(unselected, new Set(['kitchen_appliances']));
   const privacy = result.components.find((row) => row.id === 'privacy_partition');
   const floor = result.components.find((row) => row.id === 'protective_floor_surface');
   const counter = result.components.find((row) => row.id === 'basic_counter');
@@ -344,6 +344,8 @@ test('basic completed preset selects only itemized minimal completion components
   assert.equal(privacy.cash_cost_cad, 473.4);
   assert.equal(floor.cash_cost_cad, 914.12);
   assert.equal(counter.cash_cost_cad, 284.85);
+  assert.equal(result.totals.upfront_cash_required_cad, 91443.66);
+  assert.equal(result.financing.monthly_payment_cad, 400.42);
   assert.equal(result.components.find((row) => row.id === 'interior_finish_materials'), undefined);
   assert.equal(result.components.find((row) => row.id === 'kitchen_fitout_materials'), undefined);
   assert.equal(result.components.find((row) => row.id === 'bathroom_fitout_materials'), undefined);
