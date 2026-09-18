@@ -6,16 +6,16 @@ Generated from contract 1.0.0 on 2026-09-04. The default report case is the mixe
 
 20 active Local Areas and 20 Local Representatives serve 3,000 participating households.
 
-- Paid representative time: 1,786 h (34.3 h average per week)
+- Paid representative time: 1,436 h (27.6 h average per week)
 - Volunteer time entered by scenario: 520 h
-- Wages: $43,936
-- Employer overhead: $14,499
+- Wages: $35,326
+- Employer overhead: $11,657
 - Materials and training: $4,375
 - Program administration: $2,000
-- Gross recurring annual cost: $64,809
-- Net municipal requirement after entered funding/savings: $64,809
-- Equivalent cost per Owen Sound household: $6
-- Share of existing resident levy: 0.1700%
+- Gross recurring annual cost: $53,358
+- Net municipal requirement after entered funding/savings: $53,358
+- Equivalent cost per Owen Sound household: $5
+- Share of existing resident levy: 0.1399%
 - Startup cost, shown separately: $13,000
 
 ## Tier accounting
@@ -23,32 +23,32 @@ Generated from contract 1.0.0 on 2026-09-04. The default report case is the mixe
 | Tier | Active areas | Paid representative hours | Volunteer hours | Wages | Employer overhead | Materials/training | Gross annual cost |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | tier0 | 0 | 0 h | 0 h | $0 | $0 | $0 | $0 |
-| tier1 | 10 | 570 h | 0 h | $14,022 | $4,627 | $750 | $19,399 |
-| tier2 | 7 | 763 h | 280 h | $18,770 | $6,194 | $1,750 | $26,714 |
-| tier3 | 3 | 453 h | 240 h | $11,144 | $3,677 | $1,875 | $16,696 |
+| tier1 | 10 | 395 h | 0 h | $9,717 | $3,207 | $750 | $13,674 |
+| tier2 | 7 | 640.5 h | 280 h | $15,756 | $5,200 | $1,750 | $22,706 |
+| tier3 | 3 | 400.5 h | 240 h | $9,852 | $3,251 | $1,875 | $14,979 |
 | tier4 | 0 | 0 h | 0 h | $0 | $0 | $0 | $0 |
 
 ## Participation scale
 
 | Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Equivalent/household |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| One-area demonstration | 1 | 150 | 57 h | $3,940 | $3,940 | $0 |
-| One basic area per ward · 7 areas | 7 | 1,050 | 399 h | $15,579 | $15,579 | $2 |
-| Ten-area resident-demand pilot | 10 | 1,500 | 570 h | $21,399 | $21,399 | $2 |
-| Mixed twenty-area rollout | 20 | 3,000 | 1,786 h | $64,809 | $64,809 | $6 |
-| City-wide Tier 1 · 70 areas | 70 | 10,500 | 3,990 h | $137,795 | $137,795 | $14 |
+| One-area demonstration | 1 | 150 | 39.5 h | $3,367 | $3,367 | $0 |
+| One basic area per ward · 7 areas | 7 | 1,050 | 276.5 h | $11,572 | $11,572 | $1 |
+| Ten-area resident-demand pilot | 10 | 1,500 | 395 h | $15,674 | $15,674 | $2 |
+| Mixed twenty-area rollout | 20 | 3,000 | 1,436 h | $53,358 | $53,358 | $5 |
+| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,765 h | $97,715 | $97,715 | $10 |
 
 ## Time-assumption sensitivity
 
 | Time scenario | Paid hours/year | Gross recurring cost | Net municipal requirement |
 | --- | ---: | ---: | ---: |
-| low | 1,244 h | $45,156 | $45,156 |
-| central | 1,786 h | $64,809 | $64,809 |
-| high | 2,690 h | $97,961 | $97,961 |
+| low | 994 h | $36,977 | $36,977 |
+| central | 1,436 h | $53,358 | $53,358 |
+| high | 2,290 h | $84,874 | $84,874 |
 
 ## Worked formula
 
-For each active Tier 1 area, central assumptions calculate 150 households × 12 minutes ÷ 60 = 30 invitation hours. The annual gathering, twelve one-hour Ward Councillor meetings and basic issue administration are then added. Tier 2 and Tier 3 add their own coordination and stewardship tasks; Tier 4 adds user-entered custom work. Wages are paid hours × living wage; employer cost is wages × the selected overhead percentage.
+For each active Tier 1 area, central assumptions calculate 150 households × 5 minutes ÷ 60 = 12.5 door-to-door invitation hours. This is one pass to each household, including walking, a brief doorstep issue check and a flyer handoff when nobody answers. The annual gathering, twelve one-hour Ward Councillor meetings and basic issue administration are then added. Tier 2 and Tier 3 add their own coordination and stewardship tasks; Tier 4 adds user-entered custom work. Wages are paid hours × living wage; employer cost is wages × the selected overhead percentage.
 
 Ward Councillor time is reported separately: 84 elected-representative hours/year in this case, with $0 incremental cost by default. Councillors continue to be elected at large and each has primary responsibility for one ward.
 

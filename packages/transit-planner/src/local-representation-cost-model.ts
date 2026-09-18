@@ -110,7 +110,7 @@ export type LocalRepresentationOptions = {
 
 export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresentationTimeScenarioId, LocalRepresentationTimeAssumptions> = {
   low: {
-    invitation_minutes_per_household: 8,
+    invitation_minutes_per_household: 3,
     gathering_preparation_hours: 3,
     gathering_attendance_hours: 2,
     post_gathering_follow_up_hours: 1,
@@ -137,7 +137,7 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
     tier3_project_materials_cad_per_area: 50
   },
   central: {
-    invitation_minutes_per_household: 12,
+    invitation_minutes_per_household: 5,
     gathering_preparation_hours: 4,
     gathering_attendance_hours: 3,
     post_gathering_follow_up_hours: 2,
@@ -164,7 +164,7 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
     tier3_project_materials_cad_per_area: 100
   },
   high: {
-    invitation_minutes_per_household: 16,
+    invitation_minutes_per_household: 8,
     gathering_preparation_hours: 6,
     gathering_attendance_hours: 4,
     post_gathering_follow_up_hours: 4,
@@ -251,7 +251,7 @@ export const LOCAL_REPRESENTATION_OVERHEAD_PRESETS: Record<LocalRepresentationOv
 };
 
 export const LOCAL_REPRESENTATION_TIME_FIELD_LABELS: Record<keyof LocalRepresentationTimeAssumptions, string> = {
-  invitation_minutes_per_household: "Invitation minutes per household",
+  invitation_minutes_per_household: "Door-to-door invitation time per household",
   gathering_preparation_hours: "Gathering preparation hours",
   gathering_attendance_hours: "Gathering attendance hours",
   post_gathering_follow_up_hours: "Post-gathering follow-up hours",

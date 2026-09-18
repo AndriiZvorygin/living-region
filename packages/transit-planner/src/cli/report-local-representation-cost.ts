@@ -75,7 +75,7 @@ ${sensitivityRows}
 
 ## Worked formula
 
-For each active Tier 1 area, central assumptions calculate ${model.assumptions.households_per_local_area} households × ${model.assumptions.time_values.invitation_minutes_per_household} minutes ÷ 60 = ${tier1.paid_hour_components.invitation_hours / Math.max(1, tier1.active_local_areas)} invitation hours. The annual gathering, twelve one-hour Ward Councillor meetings and basic issue administration are then added. Tier 2 and Tier 3 add their own coordination and stewardship tasks; Tier 4 adds user-entered custom work. Wages are paid hours × living wage; employer cost is wages × the selected overhead percentage.
+For each active Tier 1 area, central assumptions calculate ${model.assumptions.households_per_local_area} households × ${model.assumptions.time_values.invitation_minutes_per_household} minutes ÷ 60 = ${tier1.paid_hour_components.invitation_hours / Math.max(1, tier1.active_local_areas)} door-to-door invitation hours. This is one pass to each household, including walking, a brief doorstep issue check and a flyer handoff when nobody answers. The annual gathering, twelve one-hour Ward Councillor meetings and basic issue administration are then added. Tier 2 and Tier 3 add their own coordination and stewardship tasks; Tier 4 adds user-entered custom work. Wages are paid hours × living wage; employer cost is wages × the selected overhead percentage.
 
 Ward Councillor time is reported separately: ${model.ward_councillor_time.elected_representative_hours_year} elected-representative hours/year in this case, with ${cad(model.ward_councillor_time.incremental_cost_cad)} incremental cost by default. Councillors continue to be elected at large and each has primary responsibility for one ward.
 
