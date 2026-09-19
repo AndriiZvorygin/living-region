@@ -27,6 +27,14 @@
       "note": "The budget reports a 33% full-time employee overhead comparison and an existing resident levy base of CAD 38,133,221."
     },
     {
+      "id": "cra_elected_officials_payroll",
+      "institution": "Canada Revenue Agency",
+      "title": "Elected or appointed officials payroll deductions",
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/special-payments/elected-appointed-officials.html",
+      "classification": "Official figure",
+      "note": "CRA states that EI premiums are generally not deducted from remuneration paid to mayors and municipal councillors. The Local Representative baseline therefore uses direct wages only; final treatment depends on the legal office and payroll structure adopted."
+    },
+    {
       "id": "city_2026_household_projection",
       "institution": "City of Owen Sound",
       "title": "Planning justification report household projection",

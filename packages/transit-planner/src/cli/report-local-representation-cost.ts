@@ -37,7 +37,7 @@ const output = {
 };
 const markdown = `# Owen Sound Local Representation Cost Calculator
 
-Generated from contract ${OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION} on 2026-09-04. The default report case is the mixed twenty-area rollout with central time assumptions, CAD 24.60/hour living wage and 33% employer-overhead comparison.
+Generated from contract ${OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION} on 2026-09-04. The default report case is the mixed twenty-area rollout with central time assumptions, CAD 24.60/hour living wage and direct wages only (0% employer overhead); 15%, 20%, 33% and custom overhead remain comparison sensitivities.
 
 ## Default result: mixed twenty-area rollout
 

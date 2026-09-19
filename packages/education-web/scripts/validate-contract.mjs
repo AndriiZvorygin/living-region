@@ -33,6 +33,7 @@ if (local.tiers.find((row) => row.tier_id === 'tier0')?.gross_annual_cost_cad !=
 if (local.summary.net_municipal_requirement_cad < 0) throw new Error('local-representation net requirement cannot be negative');
 if (local.assumptions.household_equivalent_denominator !== 11000) throw new Error('local-representation contract must use the approximately 11,000-household citywide planning denominator by default');
 if (local.summary.cost_per_participating_household_monthly_cad == null || local.summary.equivalent_cost_per_owen_sound_household_monthly_cad == null) throw new Error('local-representation contract must expose monthly household comparison fields');
+if (local.assumptions.employer_overhead_preset !== 'direct' || local.assumptions.employer_overhead_percent !== 0 || local.summary.employer_overhead_cad !== 0) throw new Error('local-representation contract must use direct wages only as the published baseline');
 console.log(`validated local-representation cost contract ${local.contract_version} (${local.summary.active_local_areas} active areas)`);
 
 const houseRoot = path.resolve('packages/education-web/public/generated/house-cost');

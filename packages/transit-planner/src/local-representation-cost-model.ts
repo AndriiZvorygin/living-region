@@ -321,7 +321,7 @@ function resolveCounts(options: LocalRepresentationOptions) {
 }
 
 function resolveOverhead(options: LocalRepresentationOptions): {preset: LocalRepresentationOverheadPreset; percent: number} {
-  const preset = options.employer_overhead_preset ?? "plus_33";
+  const preset = options.employer_overhead_preset ?? "direct";
   const configured = LOCAL_REPRESENTATION_OVERHEAD_PRESETS[preset];
   return {preset, percent: Math.max(0, configured == null ? numeric(options.employer_overhead_percent, 0) : configured)};
 }
@@ -534,6 +534,9 @@ function calculateCore(options: LocalRepresentationOptions) {
       living_wage_cad: livingWage,
       employer_overhead_preset: overhead.preset,
       employer_overhead_percent: overhead.percent,
+      employer_overhead_basis: overhead.percent === 0
+        ? "Direct wages only; the elected-office baseline excludes EI and does not assume other employer overhead without a confirmed payroll structure."
+        : "Editable comparison sensitivity; confirm the legal and payroll structure before applying this overhead rate.",
       household_equivalent_denominator: denominator,
       existing_resident_levy_cad: levyBase,
       time_scenario: time.id,
