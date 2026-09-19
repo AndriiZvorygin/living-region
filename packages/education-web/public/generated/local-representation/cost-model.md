@@ -11,12 +11,12 @@ Generated from contract 1.0.1 on 2026-09-04. The default report case is the mixe
 - Wages: $35,326
 - Employer overhead: $0
 - Materials and training: $4,375
-- Program administration: $2,000
-- Gross recurring annual cost: $41,701
-- Net municipal requirement after entered funding/savings: $41,701
-- Citywide household-equivalent comparison: $3.79/year ($0.32/month ÷ 11,000 citywide household equivalents)
-- Cost per participating household: $13.90/year ($1.16/month across 3,000 households in active Local Areas)
-- Share of existing resident levy: 0.1094%
+- Program administration: $0
+- Gross recurring annual cost: $39,701
+- Net municipal requirement after entered funding/savings: $39,701
+- Citywide household-equivalent comparison: $3.61/year ($0.30/month ÷ 11,000 citywide household equivalents)
+- Cost per participating household: $13.23/year ($1.10/month across 3,000 households in active Local Areas)
+- Share of existing resident levy: 0.1041%
 - Startup cost, shown separately: $13,000
 
 ## Tier accounting
@@ -33,19 +33,19 @@ Generated from contract 1.0.1 on 2026-09-04. The default report case is the mixe
 
 | Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Citywide household equivalent/year |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| One-area demonstration | 1 | 150 | 39.5 h | $3,047 | $3,047 | $0 |
-| One basic area per ward · 7 areas | 7 | 1,050 | 276.5 h | $9,327 | $9,327 | $1 |
-| Ten-area resident-demand pilot | 10 | 1,500 | 395 h | $12,467 | $12,467 | $1 |
-| Mixed twenty-area rollout | 20 | 3,000 | 1,436 h | $41,701 | $41,701 | $4 |
-| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,765 h | $75,269 | $75,269 | $7 |
+| One-area demonstration | 1 | 150 | 39.5 h | $1,047 | $1,047 | $0 |
+| One basic area per ward · 7 areas | 7 | 1,050 | 276.5 h | $7,327 | $7,327 | $1 |
+| Ten-area resident-demand pilot | 10 | 1,500 | 395 h | $10,467 | $10,467 | $1 |
+| Mixed twenty-area rollout | 20 | 3,000 | 1,436 h | $39,701 | $39,701 | $4 |
+| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,765 h | $73,269 | $73,269 | $7 |
 
 ## Time-assumption sensitivity
 
 | Time scenario | Paid hours/year | Gross recurring cost | Net municipal requirement |
 | --- | ---: | ---: | ---: |
-| low | 994 h | $28,907 | $28,907 |
-| central | 1,436 h | $41,701 | $41,701 |
-| high | 2,290 h | $66,284 | $66,284 |
+| low | 994 h | $26,907 | $26,907 |
+| central | 1,436 h | $39,701 | $39,701 |
+| high | 2,290 h | $64,284 | $64,284 |
 
 ## Worked formula
 

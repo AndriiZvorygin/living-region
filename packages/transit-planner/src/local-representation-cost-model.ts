@@ -211,7 +211,7 @@ export const DEFAULT_LOCAL_REPRESENTATION_PROGRAM_COSTS: LocalRepresentationProg
   insurance_legal_review_cad: 0,
   background_checks_cad: 0,
   annual_city_administration_cad: 0,
-  public_reporting_cad: 2_000,
+  public_reporting_cad: 0,
   contingency_percent: 0
 };
 

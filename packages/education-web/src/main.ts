@@ -883,6 +883,13 @@ function clarifyLocalRepresentationHouseholdMetrics() {
   if (scaleHeader) scaleHeader.textContent = 'Citywide household equivalent/year';
   const controlsExplanation = document.querySelector<HTMLElement>('#controls .section-heading h2 + p');
   if (controlsExplanation) controlsExplanation.textContent = 'The published baseline uses direct representative wages only and applies 0% employer overhead. CRA generally excludes EI deductions for mayors and municipal councillors; the 15%, 20%, 33% and custom settings remain comparison sensitivities pending confirmation of the Local Representative legal and payroll structure.';
+  const costStack = document.querySelector<HTMLElement>('.local-rep-cost-stack');
+  if (costStack) {
+    const note = document.createElement('p');
+    note.className = 'small-note';
+    note.textContent = 'Program administration is $0 in the baseline. Local Representatives report through the Ward Councillor structure, whose established salary has no incremental charge here. Public reporting remains an optional editable line and also starts at $0.';
+    costStack.insertAdjacentElement('afterend', note);
+  }
 }
 
 const defaultRender = render;
