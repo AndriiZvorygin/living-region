@@ -51,7 +51,8 @@ ${summary.active_local_areas} active Local Areas and ${summary.active_local_repr
 - Program administration: ${cad(summary.program_administration_cad)}
 - Gross recurring annual cost: ${cad(summary.gross_recurring_annual_cost_cad)}
 - Net municipal requirement after entered funding/savings: ${cad(summary.net_municipal_requirement_cad)}
-- Equivalent cost per Owen Sound household: ${cad(summary.equivalent_cost_per_owen_sound_household_cad)}
+- Citywide household-equivalent comparison: ${summary.equivalent_cost_per_owen_sound_household_cad.toLocaleString("en-CA", {style: "currency", currency: "CAD", minimumFractionDigits: 2, maximumFractionDigits: 2})}/year (${summary.equivalent_cost_per_owen_sound_household_monthly_cad.toLocaleString("en-CA", {style: "currency", currency: "CAD", minimumFractionDigits: 2, maximumFractionDigits: 2})}/month ÷ ${model.assumptions.household_equivalent_denominator.toLocaleString("en-CA")} citywide household equivalents)
+- Cost per participating household: ${summary.cost_per_participating_household_cad.toLocaleString("en-CA", {style: "currency", currency: "CAD", minimumFractionDigits: 2, maximumFractionDigits: 2})}/year (${summary.cost_per_participating_household_monthly_cad.toLocaleString("en-CA", {style: "currency", currency: "CAD", minimumFractionDigits: 2, maximumFractionDigits: 2})}/month across ${summary.participating_households.toLocaleString("en-CA")} households in active Local Areas)
 - Share of existing resident levy: ${summary.percentage_of_existing_resident_levy.toFixed(4)}%
 - Startup cost, shown separately: ${cad(summary.startup_cost_cad)}
 
@@ -63,7 +64,7 @@ ${tierRows}
 
 ## Participation scale
 
-| Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Equivalent/household |
+| Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Citywide household equivalent/year |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 ${presetRows}
 

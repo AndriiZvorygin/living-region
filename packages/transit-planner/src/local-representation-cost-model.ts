@@ -1,12 +1,12 @@
 import evidence from "../data/source/owen-sound-local-representation-evidence.json";
 
-export const OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION = "1.0.0";
+export const OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION = "1.0.1";
 export const LOCAL_REPRESENTATION_MAX_AREAS = 70;
 export const DEFAULT_LOCAL_REPRESENTATION_WARDS = 7;
 export const DEFAULT_LOCAL_AREAS_PER_WARD = 10;
 export const DEFAULT_HOUSEHOLDS_PER_LOCAL_AREA = 150;
 export const DEFAULT_LOCAL_REPRESENTATIVE_LIVING_WAGE_CAD = 24.60;
-export const DEFAULT_LOCAL_REPRESENTATION_HOUSEHOLD_EQUIVALENTS = 10_000;
+export const DEFAULT_LOCAL_REPRESENTATION_HOUSEHOLD_EQUIVALENTS = 11_000;
 export const DEFAULT_EXISTING_RESIDENT_LEVY_CAD = 38_133_221;
 export const LOCAL_REPRESENTATION_WEEKS_PER_YEAR = 52;
 export const LOCAL_REPRESENTATION_HOURS_PER_FTE_YEAR = 2_080;
@@ -495,6 +495,9 @@ function calculateCore(options: LocalRepresentationOptions) {
     cost_per_active_local_area_cad: rounded(activeAreas ? netRequirement / activeAreas : 0),
     cost_per_participating_household_cad: rounded(participatingHouseholds ? netRequirement / participatingHouseholds : 0),
     equivalent_cost_per_owen_sound_household_cad: rounded(netRequirement / denominator),
+    cost_per_active_local_area_monthly_cad: rounded(activeAreas ? netRequirement / activeAreas / 12 : 0),
+    cost_per_participating_household_monthly_cad: rounded(participatingHouseholds ? netRequirement / participatingHouseholds / 12 : 0),
+    equivalent_cost_per_owen_sound_household_monthly_cad: rounded(netRequirement / denominator / 12),
     percentage_of_existing_resident_levy: rounded(netRequirement / levyBase * 100),
     savings_required_to_break_even_cad: rounded(Math.max(0, grossRecurring - recurringFunding)),
     savings_required_per_active_area_cad: rounded(activeAreas ? Math.max(0, grossRecurring - recurringFunding) / activeAreas : 0),

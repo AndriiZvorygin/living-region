@@ -1,6 +1,6 @@
 # Owen Sound Local Representation Cost Calculator
 
-Generated from contract 1.0.0 on 2026-09-04. The default report case is the mixed twenty-area rollout with central time assumptions, CAD 24.60/hour living wage and 33% employer-overhead comparison.
+Generated from contract 1.0.1 on 2026-09-04. The default report case is the mixed twenty-area rollout with central time assumptions, CAD 24.60/hour living wage and 33% employer-overhead comparison.
 
 ## Default result: mixed twenty-area rollout
 
@@ -14,7 +14,8 @@ Generated from contract 1.0.0 on 2026-09-04. The default report case is the mixe
 - Program administration: $2,000
 - Gross recurring annual cost: $53,358
 - Net municipal requirement after entered funding/savings: $53,358
-- Equivalent cost per Owen Sound household: $5
+- Citywide household-equivalent comparison: $4.85/year ($0.40/month ÷ 11,000 citywide household equivalents)
+- Cost per participating household: $17.79/year ($1.48/month across 3,000 households in active Local Areas)
 - Share of existing resident levy: 0.1399%
 - Startup cost, shown separately: $13,000
 
@@ -30,13 +31,13 @@ Generated from contract 1.0.0 on 2026-09-04. The default report case is the mixe
 
 ## Participation scale
 
-| Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Equivalent/household |
+| Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Citywide household equivalent/year |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | One-area demonstration | 1 | 150 | 39.5 h | $3,367 | $3,367 | $0 |
 | One basic area per ward · 7 areas | 7 | 1,050 | 276.5 h | $11,572 | $11,572 | $1 |
-| Ten-area resident-demand pilot | 10 | 1,500 | 395 h | $15,674 | $15,674 | $2 |
+| Ten-area resident-demand pilot | 10 | 1,500 | 395 h | $15,674 | $15,674 | $1 |
 | Mixed twenty-area rollout | 20 | 3,000 | 1,436 h | $53,358 | $53,358 | $5 |
-| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,765 h | $97,715 | $97,715 | $10 |
+| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,765 h | $97,715 | $97,715 | $9 |
 
 ## Time-assumption sensitivity
 
@@ -65,6 +66,7 @@ Local Representation can begin in a few interested areas. Each Local Area can ch
 | HelpOS | [Neighbourhoods and Local Representation policy](https://helpos.ca/mayor/neighbourhoods) | Campaign planning assumption | Policy context for demand-led Local Areas, representatives and ward relationships; this calculator does not determine legal authority or employment classification. |
 | Ontario Living Wage Network | [Updated 2025 living-wage rates](https://www.ontariolivingwage.ca/updated_2025_rates) | Official figure | The Bruce Grey Huron Perth Simcoe 2025 planning rate used here is CAD 24.60/hour. Rates are normally updated annually in November. |
 | City of Owen Sound | [2026 Mayor's Budget](https://www.owensound.ca/media/lujd1fw3/2026-mayor-s-budget.pdf) | Official figure | The budget reports a 33% full-time employee overhead comparison and an existing resident levy base of CAD 38,133,221. |
-| Living Region | [Owen Sound transit household-equivalent convention](https://andriizvorygin.github.io/living-region/owen-sound-transit) | Campaign planning assumption | 10,000 is an editable comparison denominator reused from the transit cost model. It is not presented as an official household count. |
+| City of Owen Sound | [Planning justification report household projection](https://www.owensound.ca/media/g41nl2qa/planning-justification-report.pdf) | Official figure | The City planning document projects approximately 11,000 households to 2026. Living Region uses this as an editable citywide comparison denominator, not as a claim that every current household has been enumerated. |
+| Living Region | [Owen Sound household-equivalent calculation convention](https://andriizvorygin.github.io/living-region/owen-sound-transit) | Campaign planning assumption | The citywide denominator is editable and is kept separate from the participating households served by active Local Areas. |
 
 The calculator is a transparent planning model. Local-area demand, time requirements, employment structure, City support, avoided costs and partner funding require local operating data before budget approval.

@@ -866,6 +866,23 @@ function addLocalRepresentationNavLink() {
   nav.querySelector('[data-local-representation-link]')?.addEventListener('click', (event) => { event.preventDefault(); navigate('/owen-sound-local-representation'); });
 }
 
+function clarifyLocalRepresentationHouseholdMetrics() {
+  const model: any = localRepresentationModel();
+  const summary = model.summary;
+  const citywideCard = document.querySelector<HTMLElement>('.local-rep-total.secondary');
+  const citywideLabel = citywideCard?.querySelector('span');
+  const citywideDetail = citywideCard?.querySelector('small');
+  if (citywideLabel) citywideLabel.textContent = 'Citywide household-equivalent comparison';
+  if (citywideDetail) citywideDetail.textContent = `${cad(summary.equivalent_cost_per_owen_sound_household_cad)}/year ÷ ${fmt(model.assumptions.household_equivalent_denominator, 0)} citywide household equivalents`;
+  const note = document.querySelector<HTMLElement>('.household-equivalent-note');
+  if (note) note.innerHTML = `<strong>Two household views</strong>: the citywide comparison divides the net municipal funding requirement by approximately ${fmt(model.assumptions.household_equivalent_denominator, 0)} Owen Sound households. The participating-household figure divides it across ${fmt(summary.participating_households, 0)} households in active Local Areas. Actual property-tax bills vary according to assessed value, property class and final funding source; both figures are planning comparisons, not equal bills sent to households.`;
+  document.querySelectorAll<HTMLElement>('.local-rep-control-grid .control span').forEach((label) => {
+    if (label.textContent === 'Household-equivalent denominator') label.textContent = 'Citywide household comparison denominator';
+  });
+  const scaleHeader = document.querySelector<HTMLElement>('.local-rep-scale-table thead th:last-child');
+  if (scaleHeader) scaleHeader.textContent = 'Citywide household equivalent/year';
+}
+
 const defaultRender = render;
 render = function() {
   if (state.page !== '/owen-sound-local-representation') { defaultRender(); addLocalRepresentationNavLink(); return; }
@@ -875,6 +892,7 @@ render = function() {
   history.replaceState({}, '', `${appUrl(state.page)}${query ? `?${query}` : ''}${window.location.hash}`);
   updateLocalRepresentationMetadata();
   app.innerHTML = renderLocalRepresentationPage();
+  clarifyLocalRepresentationHouseholdMetrics();
   document.querySelectorAll<HTMLInputElement>('[id^="local-rep-tier"]').forEach((input, index) => { if (index >= 4) input.remove(); });
   bind();
   addLocalRepresentationNavLink();

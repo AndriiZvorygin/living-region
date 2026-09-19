@@ -27,12 +27,20 @@
       "note": "The budget reports a 33% full-time employee overhead comparison and an existing resident levy base of CAD 38,133,221."
     },
     {
+      "id": "city_2026_household_projection",
+      "institution": "City of Owen Sound",
+      "title": "Planning justification report household projection",
+      "url": "https://www.owensound.ca/media/g41nl2qa/planning-justification-report.pdf",
+      "classification": "Official figure",
+      "note": "The City planning document projects approximately 11,000 households to 2026. Living Region uses this as an editable citywide comparison denominator, not as a claim that every current household has been enumerated."
+    },
+    {
       "id": "household_equivalent_convention",
       "institution": "Living Region",
-      "title": "Owen Sound transit household-equivalent convention",
+      "title": "Owen Sound household-equivalent calculation convention",
       "url": "https://andriizvorygin.github.io/living-region/owen-sound-transit",
       "classification": "Campaign planning assumption",
-      "note": "10,000 is an editable comparison denominator reused from the transit cost model. It is not presented as an official household count."
+      "note": "The citywide denominator is editable and is kept separate from the participating households served by active Local Areas."
     }
   ],
   "input_status": {
@@ -42,6 +50,7 @@
     "program_costs": "Campaign planning assumption",
     "local_area_counts": "Campaign planning assumption",
     "participating_households": "Campaign planning assumption",
+    "household_equivalent_denominator": "Official figure",
     "avoided_costs": "Quotation or operating data required",
     "city_support_costs": "Quotation or operating data required"
   }
