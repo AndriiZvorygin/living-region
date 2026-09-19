@@ -111,9 +111,9 @@ export type LocalRepresentationOptions = {
 export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresentationTimeScenarioId, LocalRepresentationTimeAssumptions> = {
   low: {
     invitation_minutes_per_household: 3,
-    gathering_preparation_hours: 3,
+    gathering_preparation_hours: 0,
     gathering_attendance_hours: 2,
-    post_gathering_follow_up_hours: 1,
+    post_gathering_follow_up_hours: 0,
     meetings_per_year: 12,
     meeting_duration_hours: 1,
     basic_administration_hours: 4,
@@ -138,9 +138,9 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
   },
   central: {
     invitation_minutes_per_household: 5,
-    gathering_preparation_hours: 4,
+    gathering_preparation_hours: 0,
     gathering_attendance_hours: 3,
-    post_gathering_follow_up_hours: 2,
+    post_gathering_follow_up_hours: 0,
     meetings_per_year: 12,
     meeting_duration_hours: 1,
     basic_administration_hours: 6,
@@ -165,9 +165,9 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
   },
   high: {
     invitation_minutes_per_household: 8,
-    gathering_preparation_hours: 6,
+    gathering_preparation_hours: 0,
     gathering_attendance_hours: 4,
-    post_gathering_follow_up_hours: 4,
+    post_gathering_follow_up_hours: 0,
     meetings_per_year: 12,
     meeting_duration_hours: 1,
     basic_administration_hours: 12,

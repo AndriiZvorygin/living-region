@@ -6,17 +6,17 @@ Generated from contract 1.0.1 on 2026-09-04. The default report case is the mixe
 
 20 active Local Areas and 20 Local Representatives serve 3,000 participating households.
 
-- Paid representative time: 1,436 h (27.6 h average per week)
+- Paid representative time: 1,316 h (25.3 h average per week)
 - Volunteer time entered by scenario: 520 h
-- Wages: $35,326
+- Wages: $32,374
 - Employer overhead: $0
 - Materials and training: $4,375
 - Program administration: $0
-- Gross recurring annual cost: $39,701
-- Net municipal requirement after entered funding/savings: $39,701
-- Citywide household-equivalent comparison: $3.61/year ($0.30/month ÷ 11,000 citywide household equivalents)
-- Cost per participating household: $13.23/year ($1.10/month across 3,000 households in active Local Areas)
-- Share of existing resident levy: 0.1041%
+- Gross recurring annual cost: $36,749
+- Net municipal requirement after entered funding/savings: $36,749
+- Citywide household-equivalent comparison: $3.34/year ($0.28/month ÷ 11,000 citywide household equivalents)
+- Cost per participating household: $12.25/year ($1.02/month across 3,000 households in active Local Areas)
+- Share of existing resident levy: 0.0964%
 - Startup cost, shown separately: $13,000
 
 ## Tier accounting
@@ -24,28 +24,28 @@ Generated from contract 1.0.1 on 2026-09-04. The default report case is the mixe
 | Tier | Active areas | Paid representative hours | Volunteer hours | Wages | Employer overhead | Materials/training | Gross annual cost |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | tier0 | 0 | 0 h | 0 h | $0 | $0 | $0 | $0 |
-| tier1 | 10 | 395 h | 0 h | $9,717 | $0 | $750 | $10,467 |
-| tier2 | 7 | 640.5 h | 280 h | $15,756 | $0 | $1,750 | $17,506 |
-| tier3 | 3 | 400.5 h | 240 h | $9,852 | $0 | $1,875 | $11,727 |
+| tier1 | 10 | 335 h | 0 h | $8,241 | $0 | $750 | $8,991 |
+| tier2 | 7 | 598.5 h | 280 h | $14,723 | $0 | $1,750 | $16,473 |
+| tier3 | 3 | 382.5 h | 240 h | $9,410 | $0 | $1,875 | $11,285 |
 | tier4 | 0 | 0 h | 0 h | $0 | $0 | $0 | $0 |
 
 ## Participation scale
 
 | Scenario | Active areas | Participating households | Paid hours/year | Gross recurring cost | Net municipal requirement | Citywide household equivalent/year |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| One-area demonstration | 1 | 150 | 39.5 h | $1,047 | $1,047 | $0 |
-| One basic area per ward · 7 areas | 7 | 1,050 | 276.5 h | $7,327 | $7,327 | $1 |
-| Ten-area resident-demand pilot | 10 | 1,500 | 395 h | $10,467 | $10,467 | $1 |
-| Mixed twenty-area rollout | 20 | 3,000 | 1,436 h | $39,701 | $39,701 | $4 |
-| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,765 h | $73,269 | $73,269 | $7 |
+| One-area demonstration | 1 | 150 | 33.5 h | $899 | $899 | $0 |
+| One basic area per ward · 7 areas | 7 | 1,050 | 234.5 h | $6,294 | $6,294 | $1 |
+| Ten-area resident-demand pilot | 10 | 1,500 | 335 h | $8,991 | $8,991 | $1 |
+| Mixed twenty-area rollout | 20 | 3,000 | 1,316 h | $36,749 | $36,749 | $3 |
+| City-wide Tier 1 · 70 areas | 70 | 10,500 | 2,345 h | $62,937 | $62,937 | $6 |
 
 ## Time-assumption sensitivity
 
 | Time scenario | Paid hours/year | Gross recurring cost | Net municipal requirement |
 | --- | ---: | ---: | ---: |
-| low | 994 h | $26,907 | $26,907 |
-| central | 1,436 h | $39,701 | $39,701 |
-| high | 2,290 h | $64,284 | $64,284 |
+| low | 914 h | $24,939 | $24,939 |
+| central | 1,316 h | $36,749 | $36,749 |
+| high | 2,090 h | $59,364 | $59,364 |
 
 ## Worked formula
 

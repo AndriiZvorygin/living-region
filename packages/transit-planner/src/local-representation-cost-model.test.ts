@@ -11,11 +11,17 @@ describe('Owen Sound Local Representation household comparisons', () => {
     expect(model.summary.employer_overhead_cad).toBe(0);
     expect(model.summary.program_administration_cad).toBe(0);
     expect(model.summary.participating_households).toBe(3_000);
-    expect(model.summary.net_municipal_requirement_cad).toBeCloseTo(39700.6, 6);
-    expect(model.summary.cost_per_participating_household_cad).toBeCloseTo(13.233533, 6);
-    expect(model.summary.cost_per_participating_household_monthly_cad).toBeCloseTo(1.102794, 6);
-    expect(model.summary.equivalent_cost_per_owen_sound_household_cad).toBeCloseTo(3.609145, 6);
-    expect(model.summary.equivalent_cost_per_owen_sound_household_monthly_cad).toBeCloseTo(0.300762, 6);
+    expect(model.summary.net_municipal_requirement_cad).toBeCloseTo(36748.6, 6);
+    expect(model.summary.cost_per_participating_household_cad).toBeCloseTo(12.249533, 6);
+    expect(model.summary.cost_per_participating_household_monthly_cad).toBeCloseTo(1.020794, 6);
+    expect(model.summary.equivalent_cost_per_owen_sound_household_cad).toBeCloseTo(3.340782, 6);
+    expect(model.summary.equivalent_cost_per_owen_sound_household_monthly_cad).toBeCloseTo(0.278398, 6);
+    expect(model.tiers.find((tier) => tier.tier_id === 'tier1')?.paid_hour_components).toMatchObject({
+      gathering_preparation_hours: 0,
+      post_gathering_follow_up_hours: 0,
+      gathering_attendance_hours: 30,
+      ward_councillor_meeting_hours: 120
+    });
   });
 
   it('allows the citywide denominator to remain an editable scenario input', () => {
@@ -25,8 +31,8 @@ describe('Owen Sound Local Representation household comparisons', () => {
     });
 
     expect(model.assumptions.household_equivalent_denominator).toBe(10_000);
-    expect(model.summary.equivalent_cost_per_owen_sound_household_cad).toBeCloseTo(3.97006, 6);
-    expect(model.summary.cost_per_participating_household_cad).toBeCloseTo(13.233533, 6);
+    expect(model.summary.equivalent_cost_per_owen_sound_household_cad).toBeCloseTo(3.67486, 6);
+    expect(model.summary.cost_per_participating_household_cad).toBeCloseTo(12.249533, 6);
   });
 
   it('keeps employer overhead presets as explicit sensitivities', () => {
@@ -36,7 +42,7 @@ describe('Owen Sound Local Representation household comparisons', () => {
     });
 
     expect(model.assumptions.employer_overhead_percent).toBe(33);
-    expect(model.summary.employer_overhead_cad).toBeCloseTo(11657.448, 6);
-    expect(model.summary.net_municipal_requirement_cad).toBeCloseTo(51358.048, 6);
+    expect(model.summary.employer_overhead_cad).toBeCloseTo(10683.288, 6);
+    expect(model.summary.net_municipal_requirement_cad).toBeCloseTo(47431.888, 6);
   });
 });
