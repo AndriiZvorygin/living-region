@@ -1,7 +1,8 @@
 import evidence from "../data/source/owen-sound-local-representation-evidence.json";
 
-export const OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION = "1.0.1";
+export const OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION = "1.0.2";
 export const LOCAL_REPRESENTATION_MAX_AREAS = 70;
+export const DEFAULT_LOCAL_REPRESENTATION_SCENARIO_ID = "citywide_tier1";
 export const DEFAULT_LOCAL_REPRESENTATION_WARDS = 7;
 export const DEFAULT_LOCAL_AREAS_PER_WARD = 10;
 export const DEFAULT_HOUSEHOLDS_PER_LOCAL_AREA = 150;
@@ -116,7 +117,7 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
     post_gathering_follow_up_hours: 0,
     meetings_per_year: 12,
     meeting_duration_hours: 1,
-    basic_administration_hours: 4,
+    basic_administration_hours: 0,
     regular_resident_communication_hours: 10,
     volunteer_organizing_hours: 8,
     mailing_list_administration_hours: 3,
@@ -143,7 +144,7 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
     post_gathering_follow_up_hours: 0,
     meetings_per_year: 12,
     meeting_duration_hours: 1,
-    basic_administration_hours: 6,
+    basic_administration_hours: 0,
     regular_resident_communication_hours: 18,
     volunteer_organizing_hours: 12,
     mailing_list_administration_hours: 6,
@@ -170,7 +171,7 @@ export const DEFAULT_LOCAL_REPRESENTATION_TIME_SCENARIOS: Record<LocalRepresenta
     post_gathering_follow_up_hours: 0,
     meetings_per_year: 12,
     meeting_duration_hours: 1,
-    basic_administration_hours: 12,
+    basic_administration_hours: 0,
     regular_resident_communication_hours: 30,
     volunteer_organizing_hours: 24,
     mailing_list_administration_hours: 10,
@@ -234,11 +235,11 @@ export const DEFAULT_LOCAL_REPRESENTATION_AVOIDED_COSTS: LocalRepresentationAvoi
 };
 
 export const LOCAL_REPRESENTATION_SCENARIO_PRESETS = [
+  {id: "citywide_tier1", label: "City-wide Tier 1 · 70 areas", active_area_counts: {tier1: 70, tier2: 0, tier3: 0, tier4: 0}, active_wards: 7},
   {id: "one_area", label: "One-area demonstration", active_area_counts: {tier1: 1, tier2: 0, tier3: 0, tier4: 0}, active_wards: 1},
   {id: "one_per_ward", label: "One basic area per ward · 7 areas", active_area_counts: {tier1: 7, tier2: 0, tier3: 0, tier4: 0}, active_wards: 7},
   {id: "ten_area_pilot", label: "Ten-area resident-demand pilot", active_area_counts: {tier1: 10, tier2: 0, tier3: 0, tier4: 0}, active_wards: 7},
   {id: "mixed_twenty_area", label: "Mixed twenty-area rollout", active_area_counts: {tier1: 10, tier2: 7, tier3: 3, tier4: 0}, active_wards: 7},
-  {id: "citywide_tier1", label: "City-wide Tier 1 · 70 areas", active_area_counts: {tier1: 70, tier2: 0, tier3: 0, tier4: 0}, active_wards: 7},
   {id: "custom", label: "Custom scenario", active_area_counts: {tier1: 0, tier2: 0, tier3: 0, tier4: 0}, active_wards: 0}
 ] as const;
 
@@ -286,7 +287,7 @@ const rounded = (value: number): number => Number(value.toFixed(6));
 const tierIds: Array<Exclude<LocalRepresentationTierId, "tier0">> = ["tier1", "tier2", "tier3", "tier4"];
 
 function selectedPreset(id: string | undefined) {
-  return LOCAL_REPRESENTATION_SCENARIO_PRESETS.find((preset) => preset.id === id) ?? LOCAL_REPRESENTATION_SCENARIO_PRESETS[3];
+  return LOCAL_REPRESENTATION_SCENARIO_PRESETS.find((preset) => preset.id === id) ?? LOCAL_REPRESENTATION_SCENARIO_PRESETS.find((preset) => preset.id === DEFAULT_LOCAL_REPRESENTATION_SCENARIO_ID)!;
 }
 
 function resolveTime(options: LocalRepresentationOptions): {id: LocalRepresentationTimeScenarioId; values: LocalRepresentationTimeAssumptions} {

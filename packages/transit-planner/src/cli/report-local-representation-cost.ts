@@ -3,6 +3,7 @@ import {dirname, resolve} from "node:path";
 import {
   calculateLocalRepresentationCostModel,
   DEFAULT_EXISTING_RESIDENT_LEVY_CAD,
+  DEFAULT_LOCAL_REPRESENTATION_SCENARIO_ID,
   DEFAULT_LOCAL_REPRESENTATIVE_LIVING_WAGE_CAD,
   LOCAL_REPRESENTATION_SCENARIO_PRESETS,
   LOCAL_REPRESENTATION_SOURCES,
@@ -11,7 +12,7 @@ import {
 
 const outputRoot = resolve("packages/education-web/public/generated/local-representation");
 const evidenceRoot = resolve("know/produce/owen-sound-local-representation");
-const model: any = calculateLocalRepresentationCostModel({scenario_preset_id: "mixed_twenty_area"});
+const model: any = calculateLocalRepresentationCostModel({scenario_preset_id: DEFAULT_LOCAL_REPRESENTATION_SCENARIO_ID});
 const tier1: any = model.tiers.find((row: any) => row.tier_id === "tier1");
 const cad = (value: number) => `$${Math.round(value).toLocaleString("en-CA")}`;
 const hours = (value: number) => `${Number(value).toLocaleString("en-CA", {maximumFractionDigits: 1})} h`;
@@ -37,9 +38,9 @@ const output = {
 };
 const markdown = `# Owen Sound Local Representation Cost Calculator
 
-Generated from contract ${OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION} on 2026-09-04. The default report case is the mixed twenty-area rollout with central time assumptions, CAD 24.60/hour living wage and direct wages only (0% employer overhead); 15%, 20%, 33% and custom overhead remain comparison sensitivities.
+Generated from contract ${OWEN_SOUND_LOCAL_REPRESENTATION_CONTRACT_VERSION} on 2026-09-21. The default report case is the city-wide Tier 1 baseline covering all 70 Local Areas, with central time assumptions, CAD 24.60/hour living wage and direct wages only (0% employer overhead); 15%, 20%, 33% and custom overhead remain comparison sensitivities.
 
-## Default result: mixed twenty-area rollout
+## Default result: city-wide Tier 1 · 70 areas
 
 ${summary.active_local_areas} active Local Areas and ${summary.active_local_representatives} Local Representatives serve ${summary.participating_households.toLocaleString("en-CA")} participating households.
 
@@ -76,7 +77,7 @@ ${sensitivityRows}
 
 ## Worked formula
 
-For each active Tier 1 area, central assumptions calculate ${model.assumptions.households_per_local_area} households × ${model.assumptions.time_values.invitation_minutes_per_household} minutes ÷ 60 = ${tier1.paid_hour_components.invitation_hours / Math.max(1, tier1.active_local_areas)} door-to-door invitation hours. This is one pass to each household, including walking, a brief doorstep issue check and a flyer handoff when nobody answers. The annual gathering, twelve one-hour Ward Councillor meetings and basic issue administration are then added. Tier 2 and Tier 3 add their own coordination and stewardship tasks; Tier 4 adds user-entered custom work. Wages are paid hours × living wage; employer cost is wages × the selected overhead percentage.
+For each active Tier 1 area, central assumptions calculate ${model.assumptions.households_per_local_area} households × ${model.assumptions.time_values.invitation_minutes_per_household} minutes ÷ 60 = ${tier1.paid_hour_components.invitation_hours / Math.max(1, tier1.active_local_areas)} door-to-door invitation hours. This is one pass to each household, including walking, a brief doorstep issue check and a flyer handoff when nobody answers. The annual gathering and twelve one-hour Ward Councillor meetings are then added. The published baseline adds no preparation, follow-up or basic administration time; those fields remain explicit editable sensitivities. Tier 2 and Tier 3 add their own coordination and stewardship tasks; Tier 4 adds user-entered custom work. Wages are paid hours × living wage; employer cost is wages × the selected overhead percentage.
 
 Ward Councillor time is reported separately: ${model.ward_councillor_time.elected_representative_hours_year} elected-representative hours/year in this case, with ${cad(model.ward_councillor_time.incremental_cost_cad)} incremental cost by default. Councillors continue to be elected at large and each has primary responsibility for one ward.
 
