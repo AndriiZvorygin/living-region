@@ -8,6 +8,8 @@ import { WalkingRoadGraph, metresBetween } from "./canvassing-routing";
 import {
   isCoverageCovered,
   isCoverageEligible,
+  isCanvassableBuildingType,
+  inferNonCanvassableHouseholdIds,
   type CoverageLocation,
   type NextUnderflyeredArea,
 } from "./canvassing-coverage";
@@ -702,6 +704,9 @@ export async function canvassingMain() {
       ]),
     ),
     structureIdsByHousehold = new Map<string, Set<string>>();
+  const inferredNonCanvassableHouseholdIds = inferNonCanvassableHouseholdIds(
+    state.households,
+  );
   for (const feature of structures.features) {
     const structureId = String(feature.properties.structure_id);
     for (const home of homesForStructure(feature)) {
@@ -787,28 +792,14 @@ export async function canvassingMain() {
       ].filter(Boolean)),
     ];
   }
-  const knownNonResidentialBuildingTypes = new Set([
-    "commercial",
-    "industrial",
-    "retail",
-    "office",
-    "school",
-    "hospital",
-    "college",
-    "warehouse",
-    "church",
-    "civic",
-    "public",
-    "garage",
-    "shed",
-    "barn",
-  ]);
   const isKnownNonResidential = (home: Household) => {
     const structure = home.structure_id
       ? structureFeatureById.get(home.structure_id)
       : undefined;
-    return knownNonResidentialBuildingTypes.has(
-      String(structure?.properties?.building_type ?? "").toLowerCase(),
+    return (
+      structure?.properties?.canvassable === false ||
+      !isCanvassableBuildingType(structure?.properties?.building_type) ||
+      inferredNonCanvassableHouseholdIds.has(home.household_id)
     );
   };
   const applyAddressCoverageProperties = () => {

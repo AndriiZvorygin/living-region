@@ -11,6 +11,8 @@ import {
   type CoverageLocation,
   type HouseholdAdjacencyGraph,
   infernoCoverageColor,
+  inferNonCanvassableHouseholdIds,
+  isCanvassableBuildingType,
   selectNextUnderflyeredArea,
 } from "./canvassing-coverage";
 
@@ -93,6 +95,35 @@ const linearCandidates = (
 };
 
 describe("flyer coverage", () => {
+  it("excludes apartment and estimated multi-unit buildings from next-area candidates", () => {
+    expect(isCanvassableBuildingType("apartment")).toBe(false);
+    expect(isCanvassableBuildingType("multi_unit_estimated")).toBe(false);
+    expect(isCanvassableBuildingType("residential")).toBe(true);
+    expect(isCanvassableBuildingType("townhouse_unit_estimated")).toBe(true);
+
+    const locations = [
+      location("apartment-stop", false, -80.94, 44.56, {
+        eligible: isCanvassableBuildingType("apartment"),
+      }),
+      location("detached-stop", false, -80.941, 44.56),
+    ];
+    const result = selectNextUnderflyeredArea(locations, graphFor(locations, []));
+    expect(result?.center_household_id).toBe("detached-stop");
+  });
+
+  it("infers an apartment building when unit records have no structure link", () => {
+    const apartment = [
+      { household_id: "unit-101", civic_number: "1389", street: "16th Avenue East", unit: "101" },
+      { household_id: "unit-102", civic_number: "1389", street: "16th Avenue East", unit: "102" },
+      { household_id: "unit-103", civic_number: "1389", street: "16th Avenue East", unit: "103" },
+    ];
+    const excluded = inferNonCanvassableHouseholdIds(apartment);
+    expect([...excluded].sort()).toEqual(["unit-101", "unit-102", "unit-103"]);
+    expect(inferNonCanvassableHouseholdIds([
+      { household_id: "house", civic_number: "1389", street: "16th Avenue East", unit: "" },
+    ]).size).toBe(0);
+  });
+
   it("reports untouched, partial, and fully covered clusters", () => {
     expect(calculateCoverage([household("a", "untouched")])).toEqual({
       covered: 0,

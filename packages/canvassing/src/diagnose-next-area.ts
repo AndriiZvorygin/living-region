@@ -3,6 +3,8 @@ import { DatabaseSync } from "node:sqlite";
 import { dirname, resolve } from "node:path";
 import {
   buildHouseholdAdjacencyGraph,
+  inferNonCanvassableHouseholdIds,
+  isCanvassableBuildingType,
   isCoverageCovered,
   isCoverageEligible,
   rankNextUnderflyeredAreas,
@@ -19,6 +21,7 @@ type StateHousehold = {
   address_id: string;
   civic_number: string;
   street: string;
+  unit?: string;
   status: string;
   lon: number;
   lat: number;
@@ -35,24 +38,6 @@ type DiagnosticOptions = {
   geojsonPath: string;
   recentDays: number;
 };
-
-const nonResidentialBuildingTypes = new Set([
-  "commercial",
-  "industrial",
-  "retail",
-  "office",
-  "school",
-  "university",
-  "hospital",
-  "clinic",
-  "warehouse",
-  "church",
-  "civic",
-  "public",
-  "garage",
-  "shed",
-  "barn",
-]);
 
 function options(): DiagnosticOptions {
   const statePath = process.env.CANVASS_DIAGNOSTIC_STATE;
@@ -273,6 +258,9 @@ async function main() {
         .all() as Array<{ id: string; building_type: string }>
     ).map((row) => [row.id, String(row.building_type ?? "").toLowerCase()]),
   );
+  const inferredNonCanvassableHouseholdIds = inferNonCanvassableHouseholdIds(
+    state.households,
+  );
   const hasRecommendationHolds = Boolean(
     (
       db
@@ -300,9 +288,10 @@ async function main() {
   db.close();
 
   const locations: CoverageLocation[] = state.households.map((home) => {
-    const nonResidential = nonResidentialBuildingTypes.has(
-      buildingTypes.get(String(home.structure_id ?? "")) ?? "",
-    );
+    const nonResidential =
+      !isCanvassableBuildingType(
+        buildingTypes.get(String(home.structure_id ?? "")) ?? "",
+      ) || inferredNonCanvassableHouseholdIds.has(home.household_id);
     const eligible =
       !nonResidential &&
       isCoverageEligible({ household_id: home.household_id, status: home.status });

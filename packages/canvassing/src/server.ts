@@ -32,8 +32,10 @@ import {
 import {
   buildHouseholdAdjacencyGraph,
   calculateNestedCoverageArea,
+  isCanvassableBuildingType,
   isCoverageCovered,
   isCoverageEligible,
+  inferNonCanvassableHouseholdIds,
   selectNextUnderflyeredArea,
   type CoverageLocation,
   type HouseholdAdjacencyGraph,
@@ -1994,23 +1996,6 @@ function state(role = "candidate") {
   };
 }
 
-const knownNonResidentialBuildingTypes = new Set([
-  "commercial",
-  "industrial",
-  "retail",
-  "office",
-  "school",
-  "hospital",
-  "college",
-  "warehouse",
-  "church",
-  "civic",
-  "public",
-  "garage",
-  "shed",
-  "barn",
-]);
-
 type ServerCoverageSnapshot = {
   locations: CoverageLocation[];
   graph: HouseholdAdjacencyGraph;
@@ -2034,6 +2019,7 @@ function serverCoverageSnapshot(
   excludedHouseholdIds: ReadonlySet<string> = new Set(),
 ): ServerCoverageSnapshot {
   const current = state("candidate").households as Array<any>;
+  const inferredNonCanvassableHouseholdIds = inferNonCanvassableHouseholdIds(current);
   const buildingTypes = new Map(
     (
       db
@@ -2044,9 +2030,10 @@ function serverCoverageSnapshot(
     ).map((row) => [row.id, String(row.building_type ?? "").toLowerCase()]),
   );
   const locations = current.map((home) => {
-    const nonResidential = knownNonResidentialBuildingTypes.has(
-      buildingTypes.get(String(home.structure_id ?? "")) ?? "",
-    );
+    const nonResidential =
+      !isCanvassableBuildingType(
+        buildingTypes.get(String(home.structure_id ?? "")) ?? "",
+      ) || inferredNonCanvassableHouseholdIds.has(home.household_id);
     const eligible =
       !nonResidential &&
       isCoverageEligible({

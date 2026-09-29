@@ -26,6 +26,77 @@ export const EXCLUDED_STATUSES = [
 const coveredStatuses = new Set<string>(COVERED_STATUSES);
 const excludedStatuses = new Set<string>(EXCLUDED_STATUSES);
 
+/** Building records that do not represent canvassable door-to-door stops. */
+export const NON_CANVASSABLE_BUILDING_TYPES: ReadonlySet<string> = new Set([
+  "commercial",
+  "industrial",
+  "retail",
+  "office",
+  "school",
+  "university",
+  "hospital",
+  "clinic",
+  "college",
+  "warehouse",
+  "church",
+  "civic",
+  "public",
+  "garage",
+  "shed",
+  "barn",
+  "apartment",
+  "apartments",
+  "apartment_building",
+  "multi_unit",
+  "multi_unit_estimated",
+]);
+
+export function isCanvassableBuildingType(value: unknown): boolean {
+  return !NON_CANVASSABLE_BUILDING_TYPES.has(
+    String(value ?? "").trim().toLowerCase(),
+  );
+}
+
+type HouseholdAddressRecord = {
+  household_id: string;
+  civic_number?: unknown;
+  street?: unknown;
+  unit?: unknown;
+};
+
+const addressKeyPart = (value: unknown) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
+/**
+ * Address records can lose their structure link during multi-source joins.
+ * A civic address with several distinct unit labels is still an apartment
+ * building, so exclude it before the selector builds its coverage graph.
+ */
+export function inferNonCanvassableHouseholdIds(
+  households: ReadonlyArray<HouseholdAddressRecord>,
+): ReadonlySet<string> {
+  const groups = new Map<string, HouseholdAddressRecord[]>();
+  for (const household of households) {
+    const key = `${addressKeyPart(household.civic_number)}|${addressKeyPart(household.street)}`;
+    if (key === "|") continue;
+    groups.set(key, [...(groups.get(key) ?? []), household]);
+  }
+  const excluded = new Set<string>();
+  for (const group of groups.values()) {
+    const unitLabels = new Set(
+      group
+        .map((household) => addressKeyPart(household.unit))
+        .filter(Boolean),
+    );
+    if (unitLabels.size < 3) continue;
+    for (const household of group) excluded.add(household.household_id);
+  }
+  return excluded;
+}
+
 export function isCoverageEligible(household: CoverageHousehold): boolean {
   return household.eligible !== false && !excludedStatuses.has(household.status);
 }
