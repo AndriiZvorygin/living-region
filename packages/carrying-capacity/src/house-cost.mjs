@@ -2,7 +2,7 @@ import evidence from '../data/source/house-cost-evidence.json' with {type: 'json
 import marketEvidence from '../data/source/house-cost-market-evidence.json' with {type: 'json'};
 import {calculateMortgage, calculateMortgageScenarios, HOUSE_MORTGAGE_CONTRACT_VERSION, HOUSE_MORTGAGE_RATE_EVIDENCE} from './mortgage.mjs';
 
-export const HOUSE_COST_CONTRACT_VERSION = '4.4.0';
+export const HOUSE_COST_CONTRACT_VERSION = '4.5.0';
 export const HOUSE_COST_EVIDENCE = evidence;
 export const HOUSE_COST_MODEL_ID = evidence.model_id;
 export const MIN_RESIDENTIAL_DIAMETER_M = 6.096;
@@ -701,7 +701,9 @@ function pricedMarketRow({id, label, stage, quantity, quantityUnit = null, unit,
 function utilityPackageBundle(servicingMode) {
   const ids = servicingMode === 'arc_household_systems'
     ? ['arc_household_systems', 'hot_water', 'household_electrical']
-    : [servicingMode];
+    : servicingMode === 'grid_electricity'
+      ? ['arc_household_systems', 'hot_water', 'grid_electricity']
+      : [servicingMode];
   const records = ids.map((id) => marketEvidence.utility_packages[id] ? {id, ...marketEvidence.utility_packages[id]} : null).filter(Boolean);
   if (!records.length) return null;
   return {
@@ -858,7 +860,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   const currentPackageCash = (packageId) => round(sum(activeRows.filter((row) => row.source_package_id === packageId), 'cash_cost_cad'));
   const currentComponentCash = (rowId) => round(sum(activeRows.filter((row) => row.id === rowId), 'cash_cost_cad'));
   const historicalWaterPackage = finite(legacy.legacy_scope_components.find((row) => row.id === 'water_plumbing_sanitation')?.amount_cad, 5940);
-  const waterPackageApplicable = input.servicingMode === 'arc_household_systems';
+  const waterPackageApplicable = ['arc_household_systems', 'grid_electricity'].includes(input.servicingMode);
   const waterPackageRows = waterPackageApplicable ? activeRows.filter((row) => row.source_package_id === 'arc_household_systems') : [];
   const currentWaterPackage = waterPackageApplicable ? currentPackageCash('arc_household_systems') : null;
   const waterPackageDifference = currentWaterPackage == null ? null : roundSigned(currentWaterPackage - historicalWaterPackage);
@@ -929,7 +931,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
       source_url: yurtPackage.source?.source_url,
       inclusion_matrix: marketEvidence.package_inclusion_matrix.rows.find((row) => row.package_id === yurtPackage.id) ?? null
     },
-    servicing: {mode: input.servicingMode, label: evidence.servicing_modes[input.servicingMode]?.label, description: evidence.servicing_modes[input.servicingMode]?.description, status: itemizedPackage?.status ?? 'alternative_package_placeholder', components: serviceComponents, historical_reference_components: evidence.servicing_modes[input.servicingMode]?.components ?? null, shared_infrastructure_additions: evidence.servicing_modes[input.servicingMode]?.shared_infrastructure_additions ?? {}, itemized_package: itemizedPackage},
+    servicing: {mode: input.servicingMode, label: evidence.servicing_modes[input.servicingMode]?.label, description: evidence.servicing_modes[input.servicingMode]?.description, status: itemizedPackage?.status ?? 'alternative_package_placeholder', components: serviceComponents, historical_reference_components: evidence.servicing_modes[input.servicingMode]?.components ?? null, grid_connection: evidence.servicing_modes[input.servicingMode]?.grid_connection ?? null, shared_infrastructure_additions: evidence.servicing_modes[input.servicingMode]?.shared_infrastructure_additions ?? {}, itemized_package: itemizedPackage},
     procurement_routes: evidence.procurement_routes,
     water_package_reconciliation: waterPackageReconciliation,
     labour: {mode: input.labourMode, ...evidence.labour_modes[input.labourMode], labour_rate_cad_per_hour: input.labourRateCadPerHour, owner_labour_value_rate_cad_per_hour: input.ownerLabourValueRateCadPerHour, paid_hours: round(sum(activeRows, 'paid_labour_hours'), 2), owner_hours: round(sum(activeRows, 'owner_labour_hours'), 2), paid_labour_cash_cad: round(sum(activeRows, 'paid_labour_cash_cad')), owner_labour_imputed_cad: round(ownerImputed), total_labour_hours: round(sum(activeRows, 'labour_hours_total'), 2)},

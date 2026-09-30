@@ -1,6 +1,6 @@
 # House Cost Calculator
 
-Generated from contract 4.4.0 on 2026-09-16. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
+Generated from contract 4.5.0 on 2026-09-30. This is a first-principles planning model for a resident-owned, four-season yurt dwelling. Land purchase, site lease, shared infrastructure and household operating costs are separate.
 
 ## Sourced yurt packages
 
@@ -372,6 +372,9 @@ Interpolated sizes are labelled in the JSON contract. Thresholds for larger span
 - [Living Region: ARC dwelling cost evidence](https://github.com/AndriiZvorygin/living-region/blob/main/packages/carrying-capacity/data/source/arc-dwelling-costs.json) - derived from existing Living Region evidence. Existing integrated ARC package and utility components; original underlying quote remains unrecovered.
 - [Biome Canada: The Yurt](https://biome-canada.ca/products/the-yurt/) - supplier specification. Canadian diameter options and included structural/envelope elements support geometry and component boundaries; price is not adopted as a local installed quote.
 - [Yurts Canada: Pricing and FAQs](https://www.yurts-canada.ca/pricing-faqs1) - supplier specification. Canadian four-season package and installation/specification context; current quote required for a project.
+- [Hydro One: Conditions of Service](https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf) - official utility conditions. Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required.
+- [Hydro One: Distribution connection process](https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx) - official utility process. Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed.
+- [Hydro One: Rates and billing](https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx) - official current rate schedule. Ongoing electricity service charges are operating costs and are separate from grid-hookup capital.
 - [Shelter Designs: Big Sky yurt kits for sale](https://www.shelterdesigns.net/custom-yurt-kits-for-sale/big-sky-yurt/) - published imported supplier USD base price. Published Big Sky base prices for 27 ft, 35 ft and 40 ft are imported shell evidence. Shipping/customs, final delivery, installation, Canadian engineering and local approvals are not included in the base price.
 - [Bank of Canada: Daily exchange rates](https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates-lookup/) - official indicative exchange rate. USD/CAD conversion used only to display an estimated Canadian equivalent; observed 2026-09-04. Supplier pricing remains published in USD.
 - [Government of Ontario: Build or buy a tiny home: Building Code requirements](https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-requirements) - official requirement guidance. Year-round homes require Building Code compliance, plumbing, energy efficiency, foundations/anchorage and site-specific water/sewage review.

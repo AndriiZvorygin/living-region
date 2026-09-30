@@ -163,6 +163,14 @@
         {"id": "qualified_electrical_labour", "label": "Qualified electrical installation", "category": "paid_labour", "quantity": 1, "unit": "allowance", "unit_price_cad": 700, "evidence_status": "planning_labour_allowance"},
         {"id": "electrical_inspection", "label": "Electrical inspection allowance", "category": "fees", "quantity": 1, "unit": "allowance", "unit_price_cad": 100, "evidence_status": "site_specific_fee_required"}
       ]
+    },
+    "grid_electricity": {
+      "label": "Grid electricity connection and customer-side service planning package",
+      "status": "provisional_connection_allowance_quote_required",
+      "rows": [
+        {"id": "grid_basic_connection", "label": "Basic utility connection", "category": "electrical_connection", "quantity": 1, "unit": "site-specific utility estimate", "unit_price_cad": 0, "evidence_status": "official_rule_quote_required", "note": "Hydro One's basic connection treatment may be no-charge where the dwelling lies along an existing distribution system and meets the Conditions of Service. This zero is a base-case rule treatment, not confirmation that a particular site qualifies."},
+        {"id": "grid_customer_side_service_allowance", "label": "Customer-side service, connection work and unresolved site allowance", "category": "electrical_connection", "quantity": 1, "unit": "provisional planning allowance", "unit_price_cad": 12000, "evidence_status": "provisional_quote_required", "note": "Retained from the prior generic grid alternative as a transparent placeholder for service entrance, meter/panel work, private trenching or overhead work, grounding, utility coordination, engineering, permits and site-specific connection work. Replace with a distributor estimate and electrical quote when available."}
+      ]
     }
   },
   "additional_assemblies": [

@@ -29,7 +29,7 @@ test('usable floor area shows layout deductions and full-storey envelope', () =>
 
 test('published supplier package is the first pricing input', () => {
   const result = calculateHouseCost({band: 'central'});
-  assert.equal(result.contract_version, '4.4.0');
+  assert.equal(result.contract_version, '4.5.0');
   assert.equal(result.supplier_package.id, 'yc_30_base_installed');
   assert.equal(result.supplier_package.selected_price_cad, 36404);
   assert.equal(result.supplier_package.price_basis, 'installed');
@@ -73,6 +73,25 @@ test('itemized utility package counts each household system once', () => {
   assert.equal(result.accounting.utility_single_home, true);
   assert.deepEqual(Object.keys(result.servicing.components).sort(), ['arc_household_systems', 'hot_water', 'household_electrical'].sort());
   assert.equal(Math.round(Object.values(result.servicing.components).reduce((total, value) => total + value, 0) * 100) / 100, 12450.62);
+});
+
+test('grid electricity is a selectable non-default alternative that replaces only off-grid electrical capital', () => {
+  const defaultResult = calculateHouseCost();
+  const grid = calculateHouseCost({servicingMode: 'grid_electricity'});
+  const utilityRows = grid.components.filter((row) => String(row.package_id).startsWith('utility_'));
+
+  assert.equal(defaultResult.servicing.mode, 'arc_household_systems');
+  assert.equal(grid.servicing.mode, 'grid_electricity');
+  assert.equal(grid.servicing.status, 'mixed_published_prices_and_provisional_items; mixed_published_price_and_design_allowance; provisional_connection_allowance_quote_required');
+  assert.deepEqual(Object.keys(grid.servicing.components).sort(), ['arc_household_systems', 'grid_electricity', 'hot_water'].sort());
+  assert.equal(utilityRows.some((row) => row.id === 'pv_400w'), false);
+  assert.equal(utilityRows.some((row) => row.id === 'grid_basic_connection'), true);
+  assert.equal(utilityRows.some((row) => row.id === 'grid_customer_side_service_allowance'), true);
+  assert.equal(Math.round(utilityRows.reduce((total, row) => total + row.cash_cost_cad, 0) * 100) / 100, 20744.62);
+  assert.equal(grid.servicing.grid_connection.status, 'quote_required');
+  assert.equal(grid.servicing.grid_connection.basic_connection_cad, 0);
+  assert.equal(grid.servicing.grid_connection.customer_side_and_unresolved_allowance_cad, 12000);
+  assert.ok(grid.totals.upfront_cash_required_cad > defaultResult.totals.upfront_cash_required_cad);
 });
 
 test('former-model reconciliation sums current itemized utility packages', () => {
@@ -227,7 +246,7 @@ test('completion stages expose outstanding work and stage-specific financing', (
 
 test('presentation contract exposes market evidence, BOM and source-linked rows', () => {
   const contract = buildHouseCostPresentationContract();
-  assert.equal(contract.contract_version, '4.4.0');
+  assert.equal(contract.contract_version, '4.5.0');
   assert.ok(contract.market_evidence.yurt_packages.length >= 8);
   assert.ok(contract.market_evidence.platform_design.rows.length >= 7);
   assert.ok(contract.central.components.some((row) => row.id === 'water_collection_storage_first_flush'));

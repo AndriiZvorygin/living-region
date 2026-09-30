@@ -1,5 +1,5 @@
 {
-  "contract_version": "4.4.0",
+  "contract_version": "4.5.0",
   "model_id": "arc_yurt_house_cost",
   "title": "ARC four-season yurt house cost model",
   "defaults": {
@@ -173,6 +173,31 @@
         "water_plumbing_sanitation": 5940,
         "household_electrical": 3300,
         "hot_water": 2000
+      }
+    },
+    "grid_electricity": {
+      "label": "ARC water/sanitation + grid electricity",
+      "description": "Retains the ARC household water, sanitation and seasonal hot-water systems while replacing the off-grid PV, battery and inverter package with a grid-electricity planning option. The CAD 12,000 customer-side allowance is a provisional planning value, not a utility offer; connection, trenching, engineering, approvals and local-distributor terms remain site-specific.",
+      "status": "provisional_grid_option_quote_required",
+      "components": {
+        "water_plumbing_sanitation": 5940,
+        "household_electrical": 12000,
+        "hot_water": 2000
+      },
+      "grid_connection": {
+        "utility_assumption": "Hydro One or the applicable local electricity distributor",
+        "basic_connection_cad": 0,
+        "customer_side_and_unresolved_allowance_cad": 12000,
+        "status": "quote_required",
+        "source_ids": [
+          "hydro_one_conditions_of_service_2024",
+          "hydro_one_connection_process"
+        ],
+        "assumptions": [
+          "A basic connection may be available at no direct charge where the dwelling lies along an existing distribution system, subject to the distributor's conditions.",
+          "Customer-side trenching or overhead work, conductor beyond the standard allowance, poles, system changes, easements, permits, expansion contributions and engineering may add cost.",
+          "The CAD 12,000 allowance is retained from the prior generic grid alternative as a clearly provisional placeholder until a site plan and utility estimate exist."
+        ]
       }
     },
     "generic_well_septic_grid": {
@@ -2400,6 +2425,32 @@
             "evidence_status": "site_specific_fee_required"
           }
         ]
+      },
+      "grid_electricity": {
+        "label": "Grid electricity connection and customer-side service planning package",
+        "status": "provisional_connection_allowance_quote_required",
+        "rows": [
+          {
+            "id": "grid_basic_connection",
+            "label": "Basic utility connection",
+            "category": "electrical_connection",
+            "quantity": 1,
+            "unit": "site-specific utility estimate",
+            "unit_price_cad": 0,
+            "evidence_status": "official_rule_quote_required",
+            "note": "Hydro One's basic connection treatment may be no-charge where the dwelling lies along an existing distribution system and meets the Conditions of Service. This zero is a base-case rule treatment, not confirmation that a particular site qualifies."
+          },
+          {
+            "id": "grid_customer_side_service_allowance",
+            "label": "Customer-side service, connection work and unresolved site allowance",
+            "category": "electrical_connection",
+            "quantity": 1,
+            "unit": "provisional planning allowance",
+            "unit_price_cad": 12000,
+            "evidence_status": "provisional_quote_required",
+            "note": "Retained from the prior generic grid alternative as a transparent placeholder for service entrance, meter/panel work, private trenching or overhead work, grounding, utility coordination, engineering, permits and site-specific connection work. Replace with a distributor estimate and electrical quote when available."
+          }
+        ]
       }
     },
     "additional_assemblies": [
@@ -2753,7 +2804,7 @@
     "note": "The historical exact sum is CAD 61,240 (CAD 50,000 + CAD 5,940 + CAD 2,000 + CAD 3,300); the public CAD 61,000 figure was rounded. The original itemized structural quote was not recovered. The audited model preserves this reference beside its independently itemized scope."
   },
   "central": {
-    "contract_version": "4.4.0",
+    "contract_version": "4.5.0",
     "model_id": "arc_yurt_house_cost",
     "package_label": "First-principles yurt package plus quantity-based completion model",
     "price_basis_date": "2026-09-07",
@@ -2955,6 +3006,7 @@
         "household_electrical": 3300,
         "hot_water": 2000
       },
+      "grid_connection": null,
       "shared_infrastructure_additions": {},
       "itemized_package": {
         "id": "utility_arc_household_systems",
@@ -6920,6 +6972,30 @@
         "note": "Canadian four-season package and installation/specification context; current quote required for a project."
       },
       {
+        "id": "hydro_one_conditions_of_service_2024",
+        "institution": "Hydro One",
+        "title": "Conditions of Service",
+        "url": "https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf",
+        "classification": "official utility conditions",
+        "note": "Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required."
+      },
+      {
+        "id": "hydro_one_connection_process",
+        "institution": "Hydro One",
+        "title": "Distribution connection process",
+        "url": "https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx",
+        "classification": "official utility process",
+        "note": "Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed."
+      },
+      {
+        "id": "hydro_one_rates",
+        "institution": "Hydro One",
+        "title": "Rates and billing",
+        "url": "https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx",
+        "classification": "official current rate schedule",
+        "note": "Ongoing electricity service charges are operating costs and are separate from grid-hookup capital."
+      },
+      {
         "id": "shelter_designs_big_sky",
         "institution": "Shelter Designs",
         "title": "Big Sky yurt kits for sale",
@@ -7531,6 +7607,32 @@
               "unit": "allowance",
               "unit_price_cad": 100,
               "evidence_status": "site_specific_fee_required"
+            }
+          ]
+        },
+        "grid_electricity": {
+          "label": "Grid electricity connection and customer-side service planning package",
+          "status": "provisional_connection_allowance_quote_required",
+          "rows": [
+            {
+              "id": "grid_basic_connection",
+              "label": "Basic utility connection",
+              "category": "electrical_connection",
+              "quantity": 1,
+              "unit": "site-specific utility estimate",
+              "unit_price_cad": 0,
+              "evidence_status": "official_rule_quote_required",
+              "note": "Hydro One's basic connection treatment may be no-charge where the dwelling lies along an existing distribution system and meets the Conditions of Service. This zero is a base-case rule treatment, not confirmation that a particular site qualifies."
+            },
+            {
+              "id": "grid_customer_side_service_allowance",
+              "label": "Customer-side service, connection work and unresolved site allowance",
+              "category": "electrical_connection",
+              "quantity": 1,
+              "unit": "provisional planning allowance",
+              "unit_price_cad": 12000,
+              "evidence_status": "provisional_quote_required",
+              "note": "Retained from the prior generic grid alternative as a transparent placeholder for service entrance, meter/panel work, private trenching or overhead work, grounding, utility coordination, engineering, permits and site-specific connection work. Replace with a distributor estimate and electrical quote when available."
             }
           ]
         }
@@ -8678,7 +8780,7 @@
   },
   "bands": {
     "low": {
-      "contract_version": "4.4.0",
+      "contract_version": "4.5.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-07",
@@ -8880,6 +8982,7 @@
           "household_electrical": 3300,
           "hot_water": 2000
         },
+        "grid_connection": null,
         "shared_infrastructure_additions": {},
         "itemized_package": {
           "id": "utility_arc_household_systems",
@@ -12845,6 +12948,30 @@
           "note": "Canadian four-season package and installation/specification context; current quote required for a project."
         },
         {
+          "id": "hydro_one_conditions_of_service_2024",
+          "institution": "Hydro One",
+          "title": "Conditions of Service",
+          "url": "https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf",
+          "classification": "official utility conditions",
+          "note": "Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required."
+        },
+        {
+          "id": "hydro_one_connection_process",
+          "institution": "Hydro One",
+          "title": "Distribution connection process",
+          "url": "https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx",
+          "classification": "official utility process",
+          "note": "Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed."
+        },
+        {
+          "id": "hydro_one_rates",
+          "institution": "Hydro One",
+          "title": "Rates and billing",
+          "url": "https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx",
+          "classification": "official current rate schedule",
+          "note": "Ongoing electricity service charges are operating costs and are separate from grid-hookup capital."
+        },
+        {
           "id": "shelter_designs_big_sky",
           "institution": "Shelter Designs",
           "title": "Big Sky yurt kits for sale",
@@ -13456,6 +13583,32 @@
                 "unit": "allowance",
                 "unit_price_cad": 100,
                 "evidence_status": "site_specific_fee_required"
+              }
+            ]
+          },
+          "grid_electricity": {
+            "label": "Grid electricity connection and customer-side service planning package",
+            "status": "provisional_connection_allowance_quote_required",
+            "rows": [
+              {
+                "id": "grid_basic_connection",
+                "label": "Basic utility connection",
+                "category": "electrical_connection",
+                "quantity": 1,
+                "unit": "site-specific utility estimate",
+                "unit_price_cad": 0,
+                "evidence_status": "official_rule_quote_required",
+                "note": "Hydro One's basic connection treatment may be no-charge where the dwelling lies along an existing distribution system and meets the Conditions of Service. This zero is a base-case rule treatment, not confirmation that a particular site qualifies."
+              },
+              {
+                "id": "grid_customer_side_service_allowance",
+                "label": "Customer-side service, connection work and unresolved site allowance",
+                "category": "electrical_connection",
+                "quantity": 1,
+                "unit": "provisional planning allowance",
+                "unit_price_cad": 12000,
+                "evidence_status": "provisional_quote_required",
+                "note": "Retained from the prior generic grid alternative as a transparent placeholder for service entrance, meter/panel work, private trenching or overhead work, grounding, utility coordination, engineering, permits and site-specific connection work. Replace with a distributor estimate and electrical quote when available."
               }
             ]
           }
@@ -14602,7 +14755,7 @@
       }
     },
     "central": {
-      "contract_version": "4.4.0",
+      "contract_version": "4.5.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-07",
@@ -14804,6 +14957,7 @@
           "household_electrical": 3300,
           "hot_water": 2000
         },
+        "grid_connection": null,
         "shared_infrastructure_additions": {},
         "itemized_package": {
           "id": "utility_arc_household_systems",
@@ -18769,6 +18923,30 @@
           "note": "Canadian four-season package and installation/specification context; current quote required for a project."
         },
         {
+          "id": "hydro_one_conditions_of_service_2024",
+          "institution": "Hydro One",
+          "title": "Conditions of Service",
+          "url": "https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf",
+          "classification": "official utility conditions",
+          "note": "Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required."
+        },
+        {
+          "id": "hydro_one_connection_process",
+          "institution": "Hydro One",
+          "title": "Distribution connection process",
+          "url": "https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx",
+          "classification": "official utility process",
+          "note": "Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed."
+        },
+        {
+          "id": "hydro_one_rates",
+          "institution": "Hydro One",
+          "title": "Rates and billing",
+          "url": "https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx",
+          "classification": "official current rate schedule",
+          "note": "Ongoing electricity service charges are operating costs and are separate from grid-hookup capital."
+        },
+        {
           "id": "shelter_designs_big_sky",
           "institution": "Shelter Designs",
           "title": "Big Sky yurt kits for sale",
@@ -19380,6 +19558,32 @@
                 "unit": "allowance",
                 "unit_price_cad": 100,
                 "evidence_status": "site_specific_fee_required"
+              }
+            ]
+          },
+          "grid_electricity": {
+            "label": "Grid electricity connection and customer-side service planning package",
+            "status": "provisional_connection_allowance_quote_required",
+            "rows": [
+              {
+                "id": "grid_basic_connection",
+                "label": "Basic utility connection",
+                "category": "electrical_connection",
+                "quantity": 1,
+                "unit": "site-specific utility estimate",
+                "unit_price_cad": 0,
+                "evidence_status": "official_rule_quote_required",
+                "note": "Hydro One's basic connection treatment may be no-charge where the dwelling lies along an existing distribution system and meets the Conditions of Service. This zero is a base-case rule treatment, not confirmation that a particular site qualifies."
+              },
+              {
+                "id": "grid_customer_side_service_allowance",
+                "label": "Customer-side service, connection work and unresolved site allowance",
+                "category": "electrical_connection",
+                "quantity": 1,
+                "unit": "provisional planning allowance",
+                "unit_price_cad": 12000,
+                "evidence_status": "provisional_quote_required",
+                "note": "Retained from the prior generic grid alternative as a transparent placeholder for service entrance, meter/panel work, private trenching or overhead work, grounding, utility coordination, engineering, permits and site-specific connection work. Replace with a distributor estimate and electrical quote when available."
               }
             ]
           }
@@ -20526,7 +20730,7 @@
       }
     },
     "high": {
-      "contract_version": "4.4.0",
+      "contract_version": "4.5.0",
       "model_id": "arc_yurt_house_cost",
       "package_label": "First-principles yurt package plus quantity-based completion model",
       "price_basis_date": "2026-09-07",
@@ -20728,6 +20932,7 @@
           "household_electrical": 3300,
           "hot_water": 2000
         },
+        "grid_connection": null,
         "shared_infrastructure_additions": {},
         "itemized_package": {
           "id": "utility_arc_household_systems",
@@ -24693,6 +24898,30 @@
           "note": "Canadian four-season package and installation/specification context; current quote required for a project."
         },
         {
+          "id": "hydro_one_conditions_of_service_2024",
+          "institution": "Hydro One",
+          "title": "Conditions of Service",
+          "url": "https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf",
+          "classification": "official utility conditions",
+          "note": "Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required."
+        },
+        {
+          "id": "hydro_one_connection_process",
+          "institution": "Hydro One",
+          "title": "Distribution connection process",
+          "url": "https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx",
+          "classification": "official utility process",
+          "note": "Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed."
+        },
+        {
+          "id": "hydro_one_rates",
+          "institution": "Hydro One",
+          "title": "Rates and billing",
+          "url": "https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx",
+          "classification": "official current rate schedule",
+          "note": "Ongoing electricity service charges are operating costs and are separate from grid-hookup capital."
+        },
+        {
           "id": "shelter_designs_big_sky",
           "institution": "Shelter Designs",
           "title": "Big Sky yurt kits for sale",
@@ -25304,6 +25533,32 @@
                 "unit": "allowance",
                 "unit_price_cad": 100,
                 "evidence_status": "site_specific_fee_required"
+              }
+            ]
+          },
+          "grid_electricity": {
+            "label": "Grid electricity connection and customer-side service planning package",
+            "status": "provisional_connection_allowance_quote_required",
+            "rows": [
+              {
+                "id": "grid_basic_connection",
+                "label": "Basic utility connection",
+                "category": "electrical_connection",
+                "quantity": 1,
+                "unit": "site-specific utility estimate",
+                "unit_price_cad": 0,
+                "evidence_status": "official_rule_quote_required",
+                "note": "Hydro One's basic connection treatment may be no-charge where the dwelling lies along an existing distribution system and meets the Conditions of Service. This zero is a base-case rule treatment, not confirmation that a particular site qualifies."
+              },
+              {
+                "id": "grid_customer_side_service_allowance",
+                "label": "Customer-side service, connection work and unresolved site allowance",
+                "category": "electrical_connection",
+                "quantity": 1,
+                "unit": "provisional planning allowance",
+                "unit_price_cad": 12000,
+                "evidence_status": "provisional_quote_required",
+                "note": "Retained from the prior generic grid alternative as a transparent placeholder for service entrance, meter/panel work, private trenching or overhead work, grounding, utility coordination, engineering, permits and site-specific connection work. Replace with a distributor estimate and electrical quote when available."
               }
             ]
           }
@@ -26767,6 +27022,7 @@
   "accounting_rules": [
     "A component is assigned one physical driver and appears once in the completed dwelling total.",
     "The ARC household utility package is carried forward once as water/plumbing/sanitation 5,940 CAD, hot water 2,000 CAD and electrical 3,300 CAD. Included paid labour and fees are decomposed for audit but are not added again. Sink, shower, toilet and their installation remain inside that package; bathroom fittings outside those fixtures are optional.",
+    "Grid electricity is an alternative to the off-grid household electrical package. The grid option retains the ARC water, sanitation and hot-water packages, excludes PV/battery/inverter equipment, and exposes utility connection, customer-side work, engineering and approval uncertainty instead of treating the provisional CAD 12,000 allowance as a utility quote.",
     "Centralized servicing removes the corresponding household component from resident dwelling capital and exposes the unresolved cost as a shared-infrastructure quotation requirement.",
     "Owner labour reduces upfront cash but remains visible as owner hours and imputed value; professional work is not treated as owner-replaceable.",
     "Taxes and contingency are explicit additions. They are not used to force agreement with the legacy CAD 61,000 benchmark.",
@@ -26796,6 +27052,30 @@
       "url": "https://www.yurts-canada.ca/pricing-faqs1",
       "classification": "supplier specification",
       "note": "Canadian four-season package and installation/specification context; current quote required for a project."
+    },
+    {
+      "id": "hydro_one_conditions_of_service_2024",
+      "institution": "Hydro One",
+      "title": "Conditions of Service",
+      "url": "https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf",
+      "classification": "official utility conditions",
+      "note": "Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required."
+    },
+    {
+      "id": "hydro_one_connection_process",
+      "institution": "Hydro One",
+      "title": "Distribution connection process",
+      "url": "https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx",
+      "classification": "official utility process",
+      "note": "Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed."
+    },
+    {
+      "id": "hydro_one_rates",
+      "institution": "Hydro One",
+      "title": "Rates and billing",
+      "url": "https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx",
+      "classification": "official current rate schedule",
+      "note": "Ongoing electricity service charges are operating costs and are separate from grid-hookup capital."
     },
     {
       "id": "shelter_designs_big_sky",

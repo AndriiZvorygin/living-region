@@ -123,6 +123,24 @@
       "status": "legacy_design_specification_reconciled_planning_assumption",
       "components": {"water_plumbing_sanitation": 5940, "household_electrical": 3300, "hot_water": 2000}
     },
+    "grid_electricity": {
+      "label": "ARC water/sanitation + grid electricity",
+      "description": "Retains the ARC household water, sanitation and seasonal hot-water systems while replacing the off-grid PV, battery and inverter package with a grid-electricity planning option. The CAD 12,000 customer-side allowance is a provisional planning value, not a utility offer; connection, trenching, engineering, approvals and local-distributor terms remain site-specific.",
+      "status": "provisional_grid_option_quote_required",
+      "components": {"water_plumbing_sanitation": 5940, "household_electrical": 12000, "hot_water": 2000},
+      "grid_connection": {
+        "utility_assumption": "Hydro One or the applicable local electricity distributor",
+        "basic_connection_cad": 0,
+        "customer_side_and_unresolved_allowance_cad": 12000,
+        "status": "quote_required",
+        "source_ids": ["hydro_one_conditions_of_service_2024", "hydro_one_connection_process"],
+        "assumptions": [
+          "A basic connection may be available at no direct charge where the dwelling lies along an existing distribution system, subject to the distributor's conditions.",
+          "Customer-side trenching or overhead work, conductor beyond the standard allowance, poles, system changes, easements, permits, expansion contributions and engineering may add cost.",
+          "The CAD 12,000 allowance is retained from the prior generic grid alternative as a clearly provisional placeholder until a site plan and utility estimate exist."
+        ]
+      }
+    },
     "generic_well_septic_grid": {
       "label": "Generic well / septic / grid alternatives",
       "description": "Site-specific alternative placeholders retained for sites where the ARC household package cannot be approved.",
@@ -231,6 +249,9 @@
     {"id": "arc_legacy", "institution": "Living Region", "title": "ARC dwelling cost evidence", "url": "https://github.com/AndriiZvorygin/living-region/blob/main/packages/carrying-capacity/data/source/arc-dwelling-costs.json", "classification": "derived from existing Living Region evidence", "note": "Existing integrated ARC package and utility components; original underlying quote remains unrecovered."},
     {"id": "biome_yurt", "institution": "Biome Canada", "title": "The Yurt", "url": "https://biome-canada.ca/products/the-yurt/", "classification": "supplier specification", "note": "Canadian diameter options and included structural/envelope elements support geometry and component boundaries; price is not adopted as a local installed quote."},
     {"id": "yurts_canada", "institution": "Yurts Canada", "title": "Pricing and FAQs", "url": "https://www.yurts-canada.ca/pricing-faqs1", "classification": "supplier specification", "note": "Canadian four-season package and installation/specification context; current quote required for a project."},
+    {"id": "hydro_one_conditions_of_service_2024", "institution": "Hydro One", "title": "Conditions of Service", "url": "https://www.hydroone.com/abouthydroone/conditionsofservice_/Documents/Hydro-One-Conditions-of-Service-Aug-2024.pdf", "classification": "official utility conditions", "note": "Basic connection treatment, standard service boundaries and customer responsibilities; site-specific connection estimates remain required."},
+    {"id": "hydro_one_connection_process", "institution": "Hydro One", "title": "Distribution connection process", "url": "https://www.hydroone.com/businessservices_/industrial-generators-ldcs/Pages/distribution-connection-process.aspx", "classification": "official utility process", "note": "Utility connection assessment, design and construction process; the applicable distributor and project scope must be confirmed."},
+    {"id": "hydro_one_rates", "institution": "Hydro One", "title": "Rates and billing", "url": "https://www.hydroone.com/RatesAndBilling_/Pages/default.aspx", "classification": "official current rate schedule", "note": "Ongoing electricity service charges are operating costs and are separate from grid-hookup capital."},
     {"id": "shelter_designs_big_sky", "institution": "Shelter Designs", "title": "Big Sky yurt kits for sale", "url": "https://www.shelterdesigns.net/custom-yurt-kits-for-sale/big-sky-yurt/", "classification": "published imported supplier USD base price", "note": "Published Big Sky base prices for 27 ft, 35 ft and 40 ft are imported shell evidence. Shipping/customs, final delivery, installation, Canadian engineering and local approvals are not included in the base price."},
     {"id": "bank_of_canada_usd_cad", "institution": "Bank of Canada", "title": "Daily exchange rates", "url": "https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates-lookup/", "classification": "official indicative exchange rate", "note": "USD/CAD conversion used only to display an estimated Canadian equivalent; observed 2026-09-04. Supplier pricing remains published in USD."},
     {"id": "ontario_tiny_code", "institution": "Government of Ontario", "title": "Build or buy a tiny home: Building Code requirements", "url": "https://www.ontario.ca/document/build-or-buy-tiny-home/building-code-requirements", "classification": "official requirement guidance", "note": "Year-round homes require Building Code compliance, plumbing, energy efficiency, foundations/anchorage and site-specific water/sewage review."},
@@ -241,6 +262,7 @@
   "accounting_rules": [
     "A component is assigned one physical driver and appears once in the completed dwelling total.",
     "The ARC household utility package is carried forward once as water/plumbing/sanitation 5,940 CAD, hot water 2,000 CAD and electrical 3,300 CAD. Included paid labour and fees are decomposed for audit but are not added again. Sink, shower, toilet and their installation remain inside that package; bathroom fittings outside those fixtures are optional.",
+    "Grid electricity is an alternative to the off-grid household electrical package. The grid option retains the ARC water, sanitation and hot-water packages, excludes PV/battery/inverter equipment, and exposes utility connection, customer-side work, engineering and approval uncertainty instead of treating the provisional CAD 12,000 allowance as a utility quote.",
     "Centralized servicing removes the corresponding household component from resident dwelling capital and exposes the unresolved cost as a shared-infrastructure quotation requirement.",
     "Owner labour reduces upfront cash but remains visible as owner hours and imputed value; professional work is not treated as owner-replaceable.",
     "Taxes and contingency are explicit additions. They are not used to force agreement with the legacy CAD 61,000 benchmark.",
