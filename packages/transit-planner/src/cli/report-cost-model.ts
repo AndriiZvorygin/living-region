@@ -1,17 +1,17 @@
 import {mkdir, writeFile} from "node:fs/promises";
 import {dirname, resolve} from "node:path";
 import {calculatePhase1BoardingSensitivity, calculateTransitCostModel, DEFAULT_TRANSIT_PHASES, OWEN_SOUND_TRANSIT_COST_CONTRACT_VERSION, TRANSIT_BASELINE} from "../cost-model";
-import {calculateHybridOnDemandPilot, calculateOnDemandNetwork, DEFAULT_ON_DEMAND_WINDOWS, ON_DEMAND_NETWORK_ASSUMPTIONS, ON_DEMAND_TRANSIT_CONTRACT_VERSION} from "../on-demand-cost-model";
+import {calculateOnDemandNetwork, calculateOnDemandPilot, DEFAULT_ON_DEMAND_WINDOWS, ON_DEMAND_NETWORK_ASSUMPTIONS, ON_DEMAND_TRANSIT_CONTRACT_VERSION} from "../on-demand-cost-model";
 
 const root = resolve("packages/education-web/public/generated/transit");
 const knowRoot = resolve("know/produce/transit-cost-model");
 const model: any = calculateTransitCostModel({through_phase_id: "phase4"});
-const onDemandHybrid = calculateHybridOnDemandPilot();
-const onDemandNetwork = [1, 2, 3].map((core_vehicle_count) => calculateOnDemandNetwork({core_vehicle_count}));
+const onDemandPilot = calculateOnDemandPilot();
+const onDemandNetwork = [0, 1, 2, 3].map((core_vehicle_count) => calculateOnDemandNetwork({core_vehicle_count}));
 const output = {
   ...model,
   phase_definitions: DEFAULT_TRANSIT_PHASES,
-  on_demand: {contract_version: ON_DEMAND_TRANSIT_CONTRACT_VERSION, hybrid_pilot: onDemandHybrid, windows: DEFAULT_ON_DEMAND_WINDOWS, network_comparison: onDemandNetwork, assumptions: ON_DEMAND_NETWORK_ASSUMPTIONS},
+  on_demand: {contract_version: ON_DEMAND_TRANSIT_CONTRACT_VERSION, pilot: onDemandPilot, windows: DEFAULT_ON_DEMAND_WINDOWS, network_comparison: onDemandNetwork, assumptions: ON_DEMAND_NETWORK_ASSUMPTIONS, service_modes: ['scheduled_buses', 'on_demand_rides']},
   phase1_boarding_sensitivity: calculatePhase1BoardingSensitivity(),
   generated_at: "2026-10-20",
   generation: {contract: OWEN_SOUND_TRANSIT_COST_CONTRACT_VERSION, source: "packages/transit-planner/src/cost-model.ts"}
@@ -25,7 +25,7 @@ const markdown = `# Owen Sound Transit Cost Model\n\nGenerated from contract ${O
 await mkdir(root, {recursive: true});
 await mkdir(knowRoot, {recursive: true});
 await writeFile(resolve(root, "cost-model.json"), JSON.stringify(output, null, 2) + "\n");
-const onDemandMarkdown = `\n\n## On-demand hybrid pilot\n\nThe default hybrid pilot selects Sunday daytime and weekday evenings alongside current buses: ${onDemandHybrid.selected.annual_vehicle_hours.toLocaleString("en-CA")} vehicle-hours, ${range(onDemandHybrid.selected.net_cost_cad.low, onDemandHybrid.selected.net_cost_cad.high)} net municipal cost and ${range(onDemandHybrid.selected.net_cost_per_household_cad.low, onDemandHybrid.selected.net_cost_per_household_cad.high)} per household equivalent. All four windows total ${range(calculateHybridOnDemandPilot({selected_window_ids: DEFAULT_ON_DEMAND_WINDOWS.map((window) => window.id)}).selected.net_cost_cad.low, calculateHybridOnDemandPilot({selected_window_ids: DEFAULT_ON_DEMAND_WINDOWS.map((window) => window.id)}).selected.net_cost_cad.high)} net.\n\n## Advanced full-network comparison\n\n| Paid core vehicles | Core hours | On-demand hours | Gross cost | Net cost | Difference from current net |\n| ---: | ---: | ---: | ---: | ---: | ---: |\n${networkRows}\n\nThis is a planning estimate with paid local drivers, accessible core service, phone booking, dispatch, insurance, vehicle reserve and five-year annualized setup allowances. Regional service and contributions remain separate.\n`;
+const onDemandMarkdown = `\n\n## On-demand service options\n\nThe default selected on-demand service uses Sunday daytime and weekday evenings: ${onDemandPilot.selected.annual_vehicle_hours.toLocaleString("en-CA")} vehicle-hours, ${range(onDemandPilot.selected.net_cost_cad.low, onDemandPilot.selected.net_cost_cad.high)} net municipal cost and ${range(onDemandPilot.selected.net_cost_per_household_cad.low, onDemandPilot.selected.net_cost_per_household_cad.high)} per household equivalent. People can combine this component with the selected scheduled-bus phase or view it on its own. All four on-demand windows total ${range(calculateOnDemandPilot({selected_window_ids: DEFAULT_ON_DEMAND_WINDOWS.map((window) => window.id)}).selected.net_cost_cad.low, calculateOnDemandPilot({selected_window_ids: DEFAULT_ON_DEMAND_WINDOWS.map((window) => window.id)}).selected.net_cost_cad.high)} net.\n\n## Full-network service comparison\n\n| Paid core buses | Core hours | On-demand hours | Gross cost | Net cost | Difference from current net |\n| ---: | ---: | ---: | ---: | ---: | ---: |\n${networkRows}\n\nZero core buses is the rideshare-only planning case. One to three core buses are combined service cases with on-demand coverage filling the remaining baseline hours. This is a planning estimate with paid local drivers, accessible service, phone booking, dispatch, insurance, vehicle reserve and five-year annualized setup allowances. Regional service and contributions remain separate.\n`;
 const fullMarkdown = markdown.replace('on 2026-09-02.', 'on 2026-10-20.') + onDemandMarkdown;
 await writeFile(resolve(root, "cost-model.md"), fullMarkdown);
 await writeFile(resolve(knowRoot, "owen-sound-transit-cost-model.json"), JSON.stringify(output, null, 2) + "\n");

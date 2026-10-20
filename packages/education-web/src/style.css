@@ -238,6 +238,12 @@ main { max-width: 1180px; }
 .transit-on-demand-answer span, .transit-on-demand-answer small { display: block; color: #e8eee8; }
 .transit-on-demand-answer span { font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
 .transit-on-demand-answer strong { display: block; margin: 8px 0; color: #f6d67b; font-size: 1.7rem; }
+.service-mode-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; padding: 0; border: 0; }
+.service-mode-picker legend { grid-column: 1 / -1; margin-bottom: 2px; font-weight: 800; }
+.service-mode-picker label { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; padding: 16px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+.service-mode-picker label:has(input:checked) { border-color: var(--teal); background: #f5faf5; }
+.service-mode-picker input { grid-row: span 2; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--teal); }
+.service-mode-picker label span { color: var(--muted); font-size: .8rem; }
 .on-demand-window-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 22px 0; }
 .on-demand-window { display: flex; min-width: 0; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--line); border-left: 4px solid var(--line); background: #fff; cursor: pointer; }
 .on-demand-window.selected { border-left-color: var(--teal); background: #f5faf5; }
@@ -252,7 +258,7 @@ main { max-width: 1180px; }
 .evidence-grid ul { margin: 10px 0 0; padding-left: 20px; }
 @media (max-width: 800px) { .transit-answer, .transit-stack, .evidence-grid { grid-template-columns: 1fr; } .transit-controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 800px) { .transit-on-demand-answer, .on-demand-window-grid { grid-template-columns: 1fr; } }
-@media (max-width: 430px) { .transit-controls-grid { grid-template-columns: 1fr; } .transit-answer { padding: 18px; } .transit-answer h2 { font-size: 1.8rem; } .transit-on-demand-answer strong { font-size: 1.45rem; } }
+@media (max-width: 430px) { .transit-controls-grid, .service-mode-picker { grid-template-columns: 1fr; } .service-mode-picker legend { grid-column: auto; } .transit-answer { padding: 18px; } .transit-answer h2 { font-size: 1.8rem; } .transit-on-demand-answer strong { font-size: 1.45rem; } }
 
 /* Owen Sound Local Representation cost model. */
 .local-representation-hero { border-bottom: 4px solid var(--amber); }

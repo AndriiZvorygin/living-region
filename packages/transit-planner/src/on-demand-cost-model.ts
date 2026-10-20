@@ -1,13 +1,13 @@
 /**
  * Owen Sound on-demand transit planning calculations.
  *
- * The hybrid window values are planning ranges supplied by the on-demand
+ * The selected-window values are planning ranges supplied by the on-demand
  * research packet. The full-network view follows the companion calculation
  * script and keeps local service, regional contributions and fare revenue
  * visible as separate lines.
  */
 
-export const ON_DEMAND_TRANSIT_CONTRACT_VERSION = "1.1.0";
+export const ON_DEMAND_TRANSIT_CONTRACT_VERSION = "1.2.0";
 
 export type OnDemandRange = {low: number; high: number};
 
@@ -27,7 +27,7 @@ export const ON_DEMAND_TRANSIT_SOURCES = [
     title: "On-demand transit replacement cost model",
     url: "https://helpos.ca/mayor/assets/transit/on-demand-replacement-cost-model.md",
     classification: "Derived from research model",
-    note: "Hybrid-window planning ranges and full-network arithmetic source."
+    note: "Selected on-demand-window planning ranges and full-network arithmetic source."
   },
   {
     id: "grey_county_regional_transit_integration",
@@ -85,6 +85,7 @@ export const DEFAULT_ON_DEMAND_WINDOWS: OnDemandServiceWindow[] = [
 ];
 
 export const DEFAULT_ON_DEMAND_WINDOW_IDS = ["sunday_daytime", "weekday_evenings"] as const;
+export const DEFAULT_ON_DEMAND_SERVICE_MODES = ["scheduled_buses", "on_demand_rides"] as const;
 
 export const ON_DEMAND_NETWORK_ASSUMPTIONS = {
   baseline_vehicle_hours: 13_500,
@@ -111,7 +112,7 @@ function netRange(gross: OnDemandRange, fares: OnDemandRange, recurringContribut
   return range(gross.low - fares.high - recurringContribution, gross.high - fares.low - recurringContribution);
 }
 
-export function calculateHybridOnDemandPilot(options: {
+export function calculateOnDemandPilot(options: {
   selected_window_ids?: string[];
   household_equivalent_denominator?: number;
   regional_contribution_cad?: number;
@@ -134,7 +135,7 @@ export function calculateHybridOnDemandPilot(options: {
   }));
   return {
     contract_version: ON_DEMAND_TRANSIT_CONTRACT_VERSION,
-    mode: "hybrid_pilot" as const,
+    mode: "selected_on_demand_windows" as const,
     selected_window_ids: selectedWindows.map((window) => window.id),
     selected_windows: rows,
     regional_contribution_cad: round(regionalContribution),
@@ -149,11 +150,16 @@ export function calculateHybridOnDemandPilot(options: {
     assumptions: {
       range_pairing: "low net cost uses low gross cost and high fare revenue; high net cost uses high gross cost and low fare revenue",
       regional_boundary: "Regional contributions are an optional separate input and are not included in the local window ranges.",
-      operating_boundary: "The pilot runs alongside current fixed-route buses; its ranges are not added to the full-network replacement formula.",
+      operating_boundary: "Selected on-demand windows are a local service component; they are not added to the full-network replacement formula unless the service mix explicitly selects both components.",
       accessibility: "Phone booking, accessible trips, winter reliability and backup coverage require local operating design and quotation."
     },
     sources: ON_DEMAND_TRANSIT_SOURCES
   };
+}
+
+/** @deprecated Use calculateOnDemandPilot; retained for report and consumer compatibility. */
+export function calculateHybridOnDemandPilot(options: Parameters<typeof calculateOnDemandPilot>[0] = {}) {
+  return calculateOnDemandPilot(options);
 }
 
 export function calculateOnDemandNetwork(options: {
@@ -164,7 +170,8 @@ export function calculateOnDemandNetwork(options: {
   assumptions?: typeof ON_DEMAND_NETWORK_ASSUMPTIONS;
 } = {}) {
   const assumptions = options.assumptions ?? ON_DEMAND_NETWORK_ASSUMPTIONS;
-  const coreVehicleCount = Math.min(3, Math.max(1, Math.round(nonNegative(options.core_vehicle_count) || 1)));
+  const requestedCoreVehicles = options.core_vehicle_count == null ? 1 : Math.round(nonNegative(options.core_vehicle_count));
+  const coreVehicleCount = Math.min(3, Math.max(0, requestedCoreVehicles));
   const coreHours = coreVehicleCount * assumptions.core_hours_per_vehicle_year;
   const onDemandHours = Math.max(0, assumptions.baseline_vehicle_hours - coreHours);
   const coreCost = range(coreHours * assumptions.accessible_core_rate_cad_per_hour.low, coreHours * assumptions.accessible_core_rate_cad_per_hour.high);
@@ -205,5 +212,62 @@ export function calculateOnDemandNetwork(options: {
       planning_status: "Planning estimate, not a promised saving or approved operating budget."
     },
     sources: ON_DEMAND_TRANSIT_SOURCES
+  };
+}
+
+export type TransitServiceMixMode = "none" | "bus_only" | "rideshare_only" | "combined";
+
+type ServiceCostComponent = {
+  annual_vehicle_hours: number;
+  gross_cost_cad: OnDemandRange;
+  fare_revenue_cad: OnDemandRange;
+  recurring_funding_cad?: number;
+};
+
+function zeroServiceCostComponent(): ServiceCostComponent {
+  return {annual_vehicle_hours: 0, gross_cost_cad: {low: 0, high: 0}, fare_revenue_cad: {low: 0, high: 0}, recurring_funding_cad: 0};
+}
+
+function serviceNet(component: ServiceCostComponent): OnDemandRange {
+  return netRange(component.gross_cost_cad, component.fare_revenue_cad, nonNegative(component.recurring_funding_cad));
+}
+
+export function calculateTransitServiceMix(options: {
+  scheduled_buses?: boolean;
+  on_demand_rides?: boolean;
+  scheduled_service?: ServiceCostComponent;
+  on_demand_service?: ServiceCostComponent;
+  household_equivalent_denominator?: number;
+} = {}) {
+  const scheduledSelected = options.scheduled_buses ?? true;
+  const onDemandSelected = options.on_demand_rides ?? true;
+  const scheduled = scheduledSelected ? options.scheduled_service ?? zeroServiceCostComponent() : zeroServiceCostComponent();
+  const onDemand = onDemandSelected ? options.on_demand_service ?? zeroServiceCostComponent() : zeroServiceCostComponent();
+  const selectedModes = [scheduledSelected ? "scheduled_buses" : null, onDemandSelected ? "on_demand_rides" : null].filter(Boolean) as string[];
+  const mode: TransitServiceMixMode = scheduledSelected && onDemandSelected ? "combined" : scheduledSelected ? "bus_only" : onDemandSelected ? "rideshare_only" : "none";
+  const gross = range(scheduled.gross_cost_cad.low + onDemand.gross_cost_cad.low, scheduled.gross_cost_cad.high + onDemand.gross_cost_cad.high);
+  const fares = range(scheduled.fare_revenue_cad.low + onDemand.fare_revenue_cad.low, scheduled.fare_revenue_cad.high + onDemand.fare_revenue_cad.high);
+  const net = range(serviceNet(scheduled).low + serviceNet(onDemand).low, serviceNet(scheduled).high + serviceNet(onDemand).high);
+  const denominator = Math.max(1, nonNegative(options.household_equivalent_denominator) || 10_000);
+  const label = mode === "bus_only" ? "Bus only" : mode === "rideshare_only" ? "Rideshare only" : mode === "combined" ? "Combined service" : "No selected service";
+  return {
+    contract_version: ON_DEMAND_TRANSIT_CONTRACT_VERSION,
+    mode,
+    label,
+    selected_service_modes: selectedModes,
+    components: {scheduled_buses: scheduled, on_demand_rides: onDemand},
+    selected: {
+      annual_vehicle_hours: scheduled.annual_vehicle_hours + onDemand.annual_vehicle_hours,
+      gross_cost_cad: gross,
+      fare_revenue_cad: fares,
+      net_cost_cad: net,
+      net_cost_per_household_cad: range(net.low / denominator, net.high / denominator),
+      household_equivalent_denominator: denominator
+    },
+    assumptions: {
+      composition: "The label is derived from the checked service types. Scheduled buses use the selected fixed-route phase; on-demand rides use the selected on-demand component.",
+      range_pairing: "Low combined net adds each component's low net; high combined net adds each component's high net.",
+      funding_boundary: "Recurring funding is applied within the component that supplies it and is not subtracted twice."
+    }
   };
 }

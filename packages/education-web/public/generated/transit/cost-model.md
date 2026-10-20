@@ -32,16 +32,17 @@ Ranges pair the low gross cost with high fare revenue for the low municipal requ
 Phase costs, target ridership and Mobility Transit requirements are planning scenarios pending City operating data, accessibility review, fleet capacity, quotations and Council approval.
 
 
-## On-demand hybrid pilot
+## On-demand service options
 
-The default hybrid pilot selects Sunday daytime and weekday evenings alongside current buses: 3,224 vehicle-hours, $205,000–$230,000 net municipal cost and $21–$23 per household equivalent. All four windows total $236,000–$265,000 net.
+The default selected on-demand service uses Sunday daytime and weekday evenings: 3,224 vehicle-hours, $205,000–$230,000 net municipal cost and $21–$23 per household equivalent. People can combine this component with the selected scheduled-bus phase or view it on its own. All four on-demand windows total $236,000–$265,000 net.
 
-## Advanced full-network comparison
+## Full-network service comparison
 
-| Paid core vehicles | Core hours | On-demand hours | Gross cost | Net cost | Difference from current net |
+| Paid core buses | Core hours | On-demand hours | Gross cost | Net cost | Difference from current net |
 | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 0 | 13,500 | $1,200,000–$1,584,000 | $880,000–$1,264,000 | $-300,000–$84,000 |
 | 1 | 2,080 | 11,420 | $1,259,238–$1,655,094 | $939,238–$1,335,094 | $-240,762–$155,094 |
 | 2 | 4,160 | 9,340 | $1,318,477–$1,726,189 | $998,477–$1,406,189 | $-181,523–$226,189 |
 | 3 | 6,240 | 7,260 | $1,377,715–$1,797,283 | $1,057,715–$1,477,283 | $-122,285–$297,283 |
 
-This is a planning estimate with paid local drivers, accessible core service, phone booking, dispatch, insurance, vehicle reserve and five-year annualized setup allowances. Regional service and contributions remain separate.
+Zero core buses is the rideshare-only planning case. One to three core buses are combined service cases with on-demand coverage filling the remaining baseline hours. This is a planning estimate with paid local drivers, accessible service, phone booking, dispatch, insurance, vehicle reserve and five-year annualized setup allowances. Regional service and contributions remain separate.
