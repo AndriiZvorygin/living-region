@@ -154,6 +154,8 @@ function renderHouseCostPage() {
   page = enhanceImportedShellPage(page);
   return page
     .replace("Start with the supplier's yurt package, then add only the platform, four-season completion, household amenities and project costs you choose.", 'Transparent planning for a modest, full-time, year-round dwelling based on a yurt shell.')
+    .replace(/Yurt package/g, 'Frame package')
+    .replace(/yurt package/g, 'frame package')
     .replace(/<div class="hero-callout"><span>Opening price · Yurt package<\/span>[\s\S]*?<\/div>(?=<\/section>)/, '')
     .replace('</section><nav class="section-nav house-cost-nav"', `</section>${renderHouseCostIntroduction()}<nav class="section-nav house-cost-nav"`);
   const result = houseCostResult();

@@ -18,7 +18,7 @@ const sum = (rows, key) => rows.reduce((total, row) => total + finite(row[key]),
 const SOFT_COMPONENTS = new Set(['delivery', 'equipment_hire', 'design_engineering', 'permits']);
 
 export const HOUSE_COST_PRICING_LAYERS = [
-  {id: 'yurt_package', label: 'Yurt package', stage: 'bare_package', description: 'The selected supplier package and its published inclusions only.'},
+  {id: 'yurt_package', label: 'Frame package', stage: 'bare_package', description: 'The selected supplier frame package for the yurt shell and its published inclusions only.'},
   {id: 'platform_foundation', label: 'Platform and foundation', stage: 'platform_supported_shell', description: 'The preliminary platform/foundation BOM, supports, fasteners and assembly.'},
   {id: 'four_season_completion', label: 'Four-season completion', stage: 'four_season_structure', description: 'Additional openings, envelope work, heating, chimney, ventilation and layout structure.'},
   {id: 'basic_household_amenities', label: 'Basic household amenities', stage: 'basic_completed_arc', description: 'Household water, sanitation, shower, hot water, electrical and minimal kitchen/bath fit-out.'},
@@ -29,7 +29,7 @@ const COMPLETION_STAGE_IDS = new Set([...HOUSE_COST_PRICING_LAYERS.map((layer) =
 const COMPLETION_STAGE_ALIASES = {package: 'yurt_package', bare_package: 'yurt_package', platform_shell: 'platform_supported_shell', four_season: 'four_season_structure', completed: 'basic_completed_arc'};
 const COMPLETION_STAGE_LAYER_COUNTS = {yurt_package: 1, platform_supported_shell: 2, four_season_structure: 3, basic_completed_arc: HOUSE_COST_PRICING_LAYERS.length};
 const COMPLETION_STAGE_PRESENTATION = {
-  yurt_package: {label: 'Yurt package', description: 'Package-only view: the selected supplier price and its published inclusions. It is not a platform-supported or habitable dwelling.'},
+  yurt_package: {label: 'Frame package', description: 'Package-only view: the selected supplier frame package for the yurt shell and its published inclusions. It is not a platform-supported or habitable dwelling.'},
   platform_supported_shell: {label: 'Platform-supported shell', description: 'Supplier package plus the preliminary platform and foundation BOM.'},
   four_season_structure: {label: 'Four-season structure', description: 'Platform-supported shell plus additional four-season completion work.'},
   basic_completed_arc: {label: 'Basic completed ARC dwelling', description: 'The modest ARC completion specification, including household systems and project-cost allowances.'}
@@ -912,7 +912,7 @@ function calculateFirstPrinciplesHouseCost(options = {}) {
   return {
     contract_version: HOUSE_COST_CONTRACT_VERSION,
     model_id: HOUSE_COST_MODEL_ID,
-    package_label: 'First-principles yurt package plus quantity-based completion model',
+    package_label: 'First-principles frame package for a yurt shell plus quantity-based completion model',
     price_basis_date: marketEvidence.price_basis_date,
     pricing_model: marketEvidence.pricing_model_id,
     band: input.band,

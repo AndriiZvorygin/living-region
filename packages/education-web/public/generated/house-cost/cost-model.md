@@ -126,7 +126,7 @@ The public starting view is the selected supplier package. It is distinct from t
 
 | Layer | Incremental cash | Running cash total | Component rows |
 | --- | ---: | ---: | --- |
-| Yurt package | $36,404.00 | $36,404.00 | purchased_yurt_package |
+| Frame package | $36,404.00 | $36,404.00 | purchased_yurt_package |
 | Platform and foundation | $8,218.49 | $44,622.49 | platform_support_blocks, platform_pt_beams, platform_joists, platform_decking, platform_floor_insulation, platform_vapour_layer, platform_connectors |
 | Four-season completion | $10,211.29 | $54,833.78 | privacy_partition, protective_floor_surface, interior_surface_finish, wood_stove_and_chimney, balanced_ventilation |
 | Basic household amenities | $14,295.47 | $69,129.25 | basic_counter, kitchen_cabinetry, bathroom_fittings, water_collection_storage_first_flush, water_demand_pump, water_sediment_and_uv, compact_pex_and_fittings, sink_and_shower_fixtures, composting_toilet, class_2_greywater, qualified_water_installation, water_permit_allowance, solar_thermal_collector, hot_water_storage_and_controls, thermosiphon_integration, hot_water_integration_labour, pv_400w, mppt_controller, lead_acid_bank, pure_sine_inverter, dc_ac_wiring_protection, qualified_electrical_labour, electrical_inspection |

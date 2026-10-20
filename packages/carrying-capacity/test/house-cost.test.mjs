@@ -205,6 +205,8 @@ test('layered pricing starts with the supplier package and reconciles every laye
   const bare = calculateHouseCost({completionStage: 'yurt_package'});
   const complete = calculateHouseCost({completionStage: 'basic_completed_arc'});
   assert.equal(bare.pricing_layers.length, 5);
+  assert.equal(bare.pricing_layers[0].label, 'Frame package');
+  assert.equal(bare.selected_stage.label, 'Frame package');
   assert.equal(bare.pricing_layers[0].incremental_cash_cost_cad, bare.supplier_package.selected_price_cad);
   assert.equal(bare.selected_stage.cash_cost_cad, bare.pricing_layers[0].cumulative_cash_cost_cad);
   assert.equal(complete.selected_stage.cash_cost_cad, complete.totals.upfront_cash_required_cad);

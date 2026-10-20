@@ -64,6 +64,7 @@ for (const diameter of [10.668, 12.192]) {
   if (!row || row.price_currency !== 'USD' || row.price_usd == null || row.estimated_price_cad == null || row.residential_use !== 'larger_imported_shell' || row.installation_status !== 'not_included' || row.quote_required_items?.length < 5 || row.structural_review_flags?.length < 5) throw new Error(`Shelter Designs ${diameter} ft evidence boundary is incomplete`);
 }
 if (!Array.isArray(house.pricing_layers) || house.pricing_layers.length !== 5) throw new Error('house-cost contract must expose five pricing layers');
+if (house.pricing_layers[0]?.label !== 'Frame package') throw new Error('house-cost opening layer label is stale');
 if (house.pricing_layers.at(-1)?.label !== 'Delivery, design, permits, tax and contingency') throw new Error('house-cost final layer label is stale');
 if (house.central?.water_package_reconciliation?.difference_cad !== 804.62) throw new Error('house-cost water-package reconciliation is missing or changed');
 if (house.procurement_routes?.local_fabrication_owner_built?.status !== 'unmodeled') throw new Error('house-cost local fabrication route must remain explicitly unmodeled');
