@@ -402,7 +402,10 @@ if (sharedQuery.has('transitHouseholds')) state.transitHouseholds = Number(share
 if (sharedQuery.has('transitOnDemandView')) transitOnDemandState.view = sharedQuery.get('transitOnDemandView') === 'network_comparison' ? 'network_comparison' : 'service_mix';
 if (sharedQuery.has('transitOnDemandWindows')) transitOnDemandState.windowIds = (sharedQuery.get('transitOnDemandWindows') ?? '').split(',').filter((id) => DEFAULT_ON_DEMAND_WINDOWS.some((window) => window.id === id));
 if (sharedQuery.has('transitServiceModes')) transitOnDemandState.serviceModes = (sharedQuery.get('transitServiceModes') ?? '').split(',').filter((mode) => DEFAULT_ON_DEMAND_SERVICE_MODES.includes(mode as typeof DEFAULT_ON_DEMAND_SERVICE_MODES[number]));
-if (sharedQuery.has('transitOnDemandCoreVehicles')) transitOnDemandState.coreVehicles = Math.min(3, Math.max(0, Number(sharedQuery.get('transitOnDemandCoreVehicles')) || transitOnDemandState.coreVehicles));
+if (sharedQuery.has('transitOnDemandCoreVehicles')) {
+  const requestedCoreVehicles = Number(sharedQuery.get('transitOnDemandCoreVehicles'));
+  transitOnDemandState.coreVehicles = Math.min(3, Math.max(0, Number.isFinite(requestedCoreVehicles) ? requestedCoreVehicles : transitOnDemandState.coreVehicles));
+}
 if (sharedQuery.has('transitOnDemandRegionalContribution')) transitOnDemandState.regionalContribution = Math.max(0, Number(sharedQuery.get('transitOnDemandRegionalContribution')) || 0);
 if (sharedQuery.has('transitOnDemandFareRevenue')) transitOnDemandState.fareRevenue = Math.max(0, Number(sharedQuery.get('transitOnDemandFareRevenue')) || 0);
 if (sharedQuery.has('localRepPreset')) { const preset = LOCAL_REPRESENTATION_SCENARIO_PRESETS.find((row) => row.id === sharedQuery.get('localRepPreset')); if (preset) { state.localRepresentation.preset_id = preset.id; state.localRepresentation.counts = {...preset.active_area_counts}; state.localRepresentation.active_wards = preset.active_wards; } }
