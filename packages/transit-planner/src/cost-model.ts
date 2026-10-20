@@ -1,6 +1,6 @@
 import evidence from "../data/source/owen-sound-transit-cost-evidence.json";
 
-export const OWEN_SOUND_TRANSIT_COST_CONTRACT_VERSION = "1.0.0";
+export const OWEN_SOUND_TRANSIT_COST_CONTRACT_VERSION = "1.1.0";
 export const TRANSIT_DAYS_PER_YEAR = 52;
 
 export type TransitFareScenario = "existing_fares" | "added_service_fare_free" | "entire_system_fare_free";

@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "last_updated": "2026-09-02",
   "baseline": {
     "year": 2026,
@@ -534,6 +534,457 @@
       }
     }
   ],
+  "on_demand": {
+    "contract_version": "1.1.0",
+    "hybrid_pilot": {
+      "contract_version": "1.1.0",
+      "mode": "hybrid_pilot",
+      "selected_window_ids": [
+        "sunday_daytime",
+        "weekday_evenings"
+      ],
+      "selected_windows": [
+        {
+          "id": "sunday_daytime",
+          "label": "Sunday daytime",
+          "description": "Approximately 9 a.m.–3 p.m.; connects with the terminal and retains accessible backup coverage.",
+          "annual_vehicle_hours": 624,
+          "gross_cost_cad": {
+            "low": 60000,
+            "high": 75000
+          },
+          "fare_revenue_cad": {
+            "low": 5000,
+            "high": 10000
+          },
+          "evidence_classification": "Campaign planning assumption",
+          "net_cost_cad": {
+            "low": 50000,
+            "high": 70000
+          }
+        },
+        {
+          "id": "weekday_evenings",
+          "label": "Weekday evenings",
+          "description": "Lower-demand evening coverage alongside the current daytime bus network.",
+          "annual_vehicle_hours": 2600,
+          "gross_cost_cad": {
+            "low": 195000,
+            "high": 195000
+          },
+          "fare_revenue_cad": {
+            "low": 35000,
+            "high": 40000
+          },
+          "evidence_classification": "Campaign planning assumption",
+          "net_cost_cad": {
+            "low": 155000,
+            "high": 160000
+          }
+        }
+      ],
+      "regional_contribution_cad": 0,
+      "selected": {
+        "annual_vehicle_hours": 3224,
+        "gross_cost_cad": {
+          "low": 255000,
+          "high": 270000
+        },
+        "fare_revenue_cad": {
+          "low": 40000,
+          "high": 50000
+        },
+        "net_cost_cad": {
+          "low": 205000,
+          "high": 230000
+        },
+        "net_cost_per_household_cad": {
+          "low": 20.5,
+          "high": 23
+        },
+        "household_equivalent_denominator": 10000
+      },
+      "assumptions": {
+        "range_pairing": "low net cost uses low gross cost and high fare revenue; high net cost uses high gross cost and low fare revenue",
+        "regional_boundary": "Regional contributions are an optional separate input and are not included in the local window ranges.",
+        "operating_boundary": "The pilot runs alongside current fixed-route buses; its ranges are not added to the full-network replacement formula.",
+        "accessibility": "Phone booking, accessible trips, winter reliability and backup coverage require local operating design and quotation."
+      },
+      "sources": [
+        {
+          "id": "on_demand_replacement_cost_model",
+          "title": "On-demand transit replacement cost model",
+          "url": "https://helpos.ca/mayor/assets/transit/on-demand-replacement-cost-model.md",
+          "classification": "Derived from research model",
+          "note": "Hybrid-window planning ranges and full-network arithmetic source."
+        },
+        {
+          "id": "grey_county_regional_transit_integration",
+          "title": "Grey County regional transit integration",
+          "url": "https://helpos.ca/mayor/assets/transit/grey-county-regional-transit-integration.md",
+          "classification": "Research context",
+          "note": "Separates Owen Sound local service from GTR, GOST and the developing regional network."
+        },
+        {
+          "id": "on_demand_calculation_script",
+          "title": "calculate_on_demand_transit_cost.mjs",
+          "url": "https://helpos.ca/mayor/assets/transit/calculate_on_demand_transit_cost.mjs",
+          "classification": "Calculation source",
+          "note": "Core-hour, on-demand-hour, overhead and fare arithmetic."
+        }
+      ]
+    },
+    "windows": [
+      {
+        "id": "sunday_daytime",
+        "label": "Sunday daytime",
+        "description": "Approximately 9 a.m.–3 p.m.; connects with the terminal and retains accessible backup coverage.",
+        "annual_vehicle_hours": 624,
+        "gross_cost_cad": {
+          "low": 60000,
+          "high": 75000
+        },
+        "fare_revenue_cad": {
+          "low": 5000,
+          "high": 10000
+        },
+        "evidence_classification": "Campaign planning assumption"
+      },
+      {
+        "id": "weekday_evenings",
+        "label": "Weekday evenings",
+        "description": "Lower-demand evening coverage alongside the current daytime bus network.",
+        "annual_vehicle_hours": 2600,
+        "gross_cost_cad": {
+          "low": 195000,
+          "high": 195000
+        },
+        "fare_revenue_cad": {
+          "low": 35000,
+          "high": 40000
+        },
+        "evidence_classification": "Campaign planning assumption"
+      },
+      {
+        "id": "saturday_daytime",
+        "label": "Saturday daytime",
+        "description": "Additional weekend daytime coverage with phone booking and accessible service retained.",
+        "annual_vehicle_hours": 410,
+        "gross_cost_cad": {
+          "low": 28000,
+          "high": 28000
+        },
+        "fare_revenue_cad": {
+          "low": 10000,
+          "high": 12000
+        },
+        "evidence_classification": "Campaign planning assumption"
+      },
+      {
+        "id": "saturday_evenings",
+        "label": "Saturday evenings",
+        "description": "Additional Saturday evening coverage, subject to driver supply and winter backup review.",
+        "annual_vehicle_hours": 365,
+        "gross_cost_cad": {
+          "low": 25000,
+          "high": 25000
+        },
+        "fare_revenue_cad": {
+          "low": 8000,
+          "high": 10000
+        },
+        "evidence_classification": "Campaign planning assumption"
+      }
+    ],
+    "network_comparison": [
+      {
+        "contract_version": "1.1.0",
+        "mode": "network_comparison",
+        "core_vehicle_count": 1,
+        "core_hours": 2080,
+        "on_demand_hours": 11420,
+        "baseline_vehicle_hours": 13500,
+        "core_share": 0.154074,
+        "on_demand_share": 0.845926,
+        "cost_components": {
+          "core_vehicle_cost_cad": {
+            "low": 204838.4,
+            "high": 245814.4
+          },
+          "on_demand_vehicle_cost_cad": {
+            "low": 799400,
+            "high": 959280
+          },
+          "setup_annualized_cad": {
+            "low": 5000,
+            "high": 20000
+          },
+          "dispatch_booking_support_cad": {
+            "low": 150000,
+            "high": 250000
+          },
+          "insurance_vehicle_reserve_cad": {
+            "low": 100000,
+            "high": 180000
+          }
+        },
+        "fare_revenue_cad": {
+          "low": 320000,
+          "high": 320000
+        },
+        "regional_contribution_cad": 0,
+        "gross_cost_cad": {
+          "low": 1259238.4,
+          "high": 1655094.4
+        },
+        "net_cost_cad": {
+          "low": 939238.4,
+          "high": 1335094.4
+        },
+        "net_cost_per_household_cad": {
+          "low": 93.92384,
+          "high": 133.50944
+        },
+        "difference_from_current_net_cost_cad": {
+          "low": -240761.6,
+          "high": 155094.4
+        },
+        "household_equivalent_denominator": 10000,
+        "assumptions": {
+          "rate_basis": "On-demand $70–$84/hour; accessible core $98.48–$118.18/hour.",
+          "overhead": "Dispatch, phone booking, scheduling, administration, insurance and vehicle reserve are visible annual allowances.",
+          "setup": "One-time setup is annualized over 5 years for comparison; it is not a permanent operating cost.",
+          "fare_basis": "Held-constant $320,000 annual fare revenue from the research script; update with current local fare/pass data.",
+          "driver_supply": "Drivers are paid, screened and trained; availability and backup coverage remain quotation or operating data required.",
+          "regional_boundary": "Regional service and any regional contribution are separate from the Owen Sound local operating envelope.",
+          "planning_status": "Planning estimate, not a promised saving or approved operating budget."
+        },
+        "sources": [
+          {
+            "id": "on_demand_replacement_cost_model",
+            "title": "On-demand transit replacement cost model",
+            "url": "https://helpos.ca/mayor/assets/transit/on-demand-replacement-cost-model.md",
+            "classification": "Derived from research model",
+            "note": "Hybrid-window planning ranges and full-network arithmetic source."
+          },
+          {
+            "id": "grey_county_regional_transit_integration",
+            "title": "Grey County regional transit integration",
+            "url": "https://helpos.ca/mayor/assets/transit/grey-county-regional-transit-integration.md",
+            "classification": "Research context",
+            "note": "Separates Owen Sound local service from GTR, GOST and the developing regional network."
+          },
+          {
+            "id": "on_demand_calculation_script",
+            "title": "calculate_on_demand_transit_cost.mjs",
+            "url": "https://helpos.ca/mayor/assets/transit/calculate_on_demand_transit_cost.mjs",
+            "classification": "Calculation source",
+            "note": "Core-hour, on-demand-hour, overhead and fare arithmetic."
+          }
+        ]
+      },
+      {
+        "contract_version": "1.1.0",
+        "mode": "network_comparison",
+        "core_vehicle_count": 2,
+        "core_hours": 4160,
+        "on_demand_hours": 9340,
+        "baseline_vehicle_hours": 13500,
+        "core_share": 0.308148,
+        "on_demand_share": 0.691852,
+        "cost_components": {
+          "core_vehicle_cost_cad": {
+            "low": 409676.8,
+            "high": 491628.8
+          },
+          "on_demand_vehicle_cost_cad": {
+            "low": 653800,
+            "high": 784560
+          },
+          "setup_annualized_cad": {
+            "low": 5000,
+            "high": 20000
+          },
+          "dispatch_booking_support_cad": {
+            "low": 150000,
+            "high": 250000
+          },
+          "insurance_vehicle_reserve_cad": {
+            "low": 100000,
+            "high": 180000
+          }
+        },
+        "fare_revenue_cad": {
+          "low": 320000,
+          "high": 320000
+        },
+        "regional_contribution_cad": 0,
+        "gross_cost_cad": {
+          "low": 1318476.8,
+          "high": 1726188.8
+        },
+        "net_cost_cad": {
+          "low": 998476.8,
+          "high": 1406188.8
+        },
+        "net_cost_per_household_cad": {
+          "low": 99.84768,
+          "high": 140.61888
+        },
+        "difference_from_current_net_cost_cad": {
+          "low": -181523.2,
+          "high": 226188.8
+        },
+        "household_equivalent_denominator": 10000,
+        "assumptions": {
+          "rate_basis": "On-demand $70–$84/hour; accessible core $98.48–$118.18/hour.",
+          "overhead": "Dispatch, phone booking, scheduling, administration, insurance and vehicle reserve are visible annual allowances.",
+          "setup": "One-time setup is annualized over 5 years for comparison; it is not a permanent operating cost.",
+          "fare_basis": "Held-constant $320,000 annual fare revenue from the research script; update with current local fare/pass data.",
+          "driver_supply": "Drivers are paid, screened and trained; availability and backup coverage remain quotation or operating data required.",
+          "regional_boundary": "Regional service and any regional contribution are separate from the Owen Sound local operating envelope.",
+          "planning_status": "Planning estimate, not a promised saving or approved operating budget."
+        },
+        "sources": [
+          {
+            "id": "on_demand_replacement_cost_model",
+            "title": "On-demand transit replacement cost model",
+            "url": "https://helpos.ca/mayor/assets/transit/on-demand-replacement-cost-model.md",
+            "classification": "Derived from research model",
+            "note": "Hybrid-window planning ranges and full-network arithmetic source."
+          },
+          {
+            "id": "grey_county_regional_transit_integration",
+            "title": "Grey County regional transit integration",
+            "url": "https://helpos.ca/mayor/assets/transit/grey-county-regional-transit-integration.md",
+            "classification": "Research context",
+            "note": "Separates Owen Sound local service from GTR, GOST and the developing regional network."
+          },
+          {
+            "id": "on_demand_calculation_script",
+            "title": "calculate_on_demand_transit_cost.mjs",
+            "url": "https://helpos.ca/mayor/assets/transit/calculate_on_demand_transit_cost.mjs",
+            "classification": "Calculation source",
+            "note": "Core-hour, on-demand-hour, overhead and fare arithmetic."
+          }
+        ]
+      },
+      {
+        "contract_version": "1.1.0",
+        "mode": "network_comparison",
+        "core_vehicle_count": 3,
+        "core_hours": 6240,
+        "on_demand_hours": 7260,
+        "baseline_vehicle_hours": 13500,
+        "core_share": 0.462222,
+        "on_demand_share": 0.537778,
+        "cost_components": {
+          "core_vehicle_cost_cad": {
+            "low": 614515.2,
+            "high": 737443.2
+          },
+          "on_demand_vehicle_cost_cad": {
+            "low": 508200,
+            "high": 609840
+          },
+          "setup_annualized_cad": {
+            "low": 5000,
+            "high": 20000
+          },
+          "dispatch_booking_support_cad": {
+            "low": 150000,
+            "high": 250000
+          },
+          "insurance_vehicle_reserve_cad": {
+            "low": 100000,
+            "high": 180000
+          }
+        },
+        "fare_revenue_cad": {
+          "low": 320000,
+          "high": 320000
+        },
+        "regional_contribution_cad": 0,
+        "gross_cost_cad": {
+          "low": 1377715.2,
+          "high": 1797283.2
+        },
+        "net_cost_cad": {
+          "low": 1057715.2,
+          "high": 1477283.2
+        },
+        "net_cost_per_household_cad": {
+          "low": 105.77152,
+          "high": 147.72832
+        },
+        "difference_from_current_net_cost_cad": {
+          "low": -122284.8,
+          "high": 297283.2
+        },
+        "household_equivalent_denominator": 10000,
+        "assumptions": {
+          "rate_basis": "On-demand $70–$84/hour; accessible core $98.48–$118.18/hour.",
+          "overhead": "Dispatch, phone booking, scheduling, administration, insurance and vehicle reserve are visible annual allowances.",
+          "setup": "One-time setup is annualized over 5 years for comparison; it is not a permanent operating cost.",
+          "fare_basis": "Held-constant $320,000 annual fare revenue from the research script; update with current local fare/pass data.",
+          "driver_supply": "Drivers are paid, screened and trained; availability and backup coverage remain quotation or operating data required.",
+          "regional_boundary": "Regional service and any regional contribution are separate from the Owen Sound local operating envelope.",
+          "planning_status": "Planning estimate, not a promised saving or approved operating budget."
+        },
+        "sources": [
+          {
+            "id": "on_demand_replacement_cost_model",
+            "title": "On-demand transit replacement cost model",
+            "url": "https://helpos.ca/mayor/assets/transit/on-demand-replacement-cost-model.md",
+            "classification": "Derived from research model",
+            "note": "Hybrid-window planning ranges and full-network arithmetic source."
+          },
+          {
+            "id": "grey_county_regional_transit_integration",
+            "title": "Grey County regional transit integration",
+            "url": "https://helpos.ca/mayor/assets/transit/grey-county-regional-transit-integration.md",
+            "classification": "Research context",
+            "note": "Separates Owen Sound local service from GTR, GOST and the developing regional network."
+          },
+          {
+            "id": "on_demand_calculation_script",
+            "title": "calculate_on_demand_transit_cost.mjs",
+            "url": "https://helpos.ca/mayor/assets/transit/calculate_on_demand_transit_cost.mjs",
+            "classification": "Calculation source",
+            "note": "Core-hour, on-demand-hour, overhead and fare arithmetic."
+          }
+        ]
+      }
+    ],
+    "assumptions": {
+      "baseline_vehicle_hours": 13500,
+      "baseline_annual_fare_revenue_cad": 320000,
+      "comparison_net_cost_cad": 1180000,
+      "core_hours_per_vehicle_year": 2080,
+      "on_demand_rate_cad_per_hour": {
+        "low": 70,
+        "high": 84
+      },
+      "accessible_core_rate_cad_per_hour": {
+        "low": 98.48,
+        "high": 118.18
+      },
+      "dispatch_booking_support_cad": {
+        "low": 150000,
+        "high": 250000
+      },
+      "insurance_vehicle_reserve_cad": {
+        "low": 100000,
+        "high": 180000
+      },
+      "setup_cost_cad": {
+        "low": 25000,
+        "high": 100000
+      },
+      "setup_amortization_years": 5,
+      "evidence_classification": "Campaign planning assumption"
+    }
+  },
   "phase1_boarding_sensitivity": [
     {
       "boardings_per_vehicle_hour": 4,
@@ -651,9 +1102,9 @@
       "one_time_capital_grants_or_reserves_cad": 0
     }
   ],
-  "generated_at": "2026-09-02",
+  "generated_at": "2026-10-20",
   "generation": {
-    "contract": "1.0.0",
+    "contract": "1.1.0",
     "source": "packages/transit-planner/src/cost-model.ts"
   }
 }
