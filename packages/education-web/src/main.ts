@@ -324,7 +324,8 @@ const state: {contract?: Contract; page: string; site: string; preset: string; m
 
 state.localRepresentation.preset_id = DEFAULT_LOCAL_REPRESENTATION_SCENARIO_ID;
 state.localRepresentation.counts = {tier1: 70, tier2: 0, tier3: 0, tier4: 0};
-const transitOnDemandState: {view: 'service_mix' | 'network_comparison'; windowIds: string[]; serviceModes: string[]; coreVehicles: number; regionalContribution: number; fareRevenue: number} = {view: 'service_mix', windowIds: [...DEFAULT_ON_DEMAND_WINDOW_IDS], serviceModes: [...DEFAULT_ON_DEMAND_SERVICE_MODES], coreVehicles: 2, regionalContribution: 0, fareRevenue: ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad};
+const defaultOnDemandRideTargets: Record<string, number> = Object.fromEntries(DEFAULT_ON_DEMAND_WINDOWS.map((window) => [window.id, window.default_completed_rides_year]));
+const transitOnDemandState: {view: 'service_mix' | 'network_comparison'; windowIds: string[]; rideTargets: Record<string, number>; serviceModes: string[]; coreVehicles: number; regionalContribution: number; fareRevenue: number} = {view: 'service_mix', windowIds: [...DEFAULT_ON_DEMAND_WINDOW_IDS], rideTargets: {...defaultOnDemandRideTargets}, serviceModes: [...DEFAULT_ON_DEMAND_SERVICE_MODES], coreVehicles: 2, regionalContribution: 0, fareRevenue: ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad};
 const applicationState = state;
 
 type HouseCostUiState = {
@@ -409,6 +410,10 @@ if (sharedQuery.has('transitHours')) state.transitDirectHours = Number(sharedQue
 if (sharedQuery.has('transitHouseholds')) state.transitHouseholds = Number(sharedQuery.get('transitHouseholds')) || state.transitHouseholds;
 if (sharedQuery.has('transitOnDemandView')) transitOnDemandState.view = sharedQuery.get('transitOnDemandView') === 'network_comparison' ? 'network_comparison' : 'service_mix';
 if (sharedQuery.has('transitOnDemandWindows')) transitOnDemandState.windowIds = (sharedQuery.get('transitOnDemandWindows') ?? '').split(',').filter((id) => DEFAULT_ON_DEMAND_WINDOWS.some((window) => window.id === id));
+if (sharedQuery.has('transitOnDemandRides')) {
+  const targets = parseJsonQuery<Record<string, number>>('transitOnDemandRides');
+  if (targets) DEFAULT_ON_DEMAND_WINDOWS.forEach((window) => { if (Number.isFinite(Number(targets[window.id]))) transitOnDemandState.rideTargets[window.id] = Math.max(0, Math.round(Number(targets[window.id]))); });
+}
 if (sharedQuery.has('transitServiceModes')) transitOnDemandState.serviceModes = (sharedQuery.get('transitServiceModes') ?? '').split(',').filter((mode) => DEFAULT_ON_DEMAND_SERVICE_MODES.includes(mode as typeof DEFAULT_ON_DEMAND_SERVICE_MODES[number]));
 if (sharedQuery.has('transitOnDemandCoreVehicles')) {
   const requestedCoreVehicles = Number(sharedQuery.get('transitOnDemandCoreVehicles'));
@@ -459,7 +464,7 @@ function houseCostParams() { const h = houseCostState; const params = new URLSea
 function houseCostOptions() { const h = houseCostState; return {band: h.band, completionStage: h.completionStage, yurtSupplierId: h.supplierId, servicingMode: h.servicingMode, labourMode: h.labourMode, completionSelections: h.completionSelections, design: {diameter_m: h.diameter_m, wall_height_m: h.wall_height_m, roof_pitch_degrees: h.roof_pitch_degrees, household_size: h.household_size, layout: h.layout, window_count: h.window_count, door_count: h.door_count, partition_loss_fraction: h.partition_loss_fraction}, unitRateOverrides: h.unitRateOverrides, taxRate: h.taxRate, contingencyRate: h.contingencyRate, labourRateCadPerHour: h.labourRate, ownerLabourValueRateCadPerHour: h.ownerRate, customCompletedQuoteCad: h.customQuote, financing: {ownership: h.ownership, downPaymentRate: h.downPaymentRate, downPaymentCad: h.downPaymentCad, rateType: h.rateType, customRateAnnual: h.customRateAnnual, interestRateAnnual: h.interestRate, insuranceMode: h.insuranceMode, amortizationYears: h.amortizationYears, loanTermYears: h.loanTermYears}}; }
 function houseCostResult() { return calculateHouseCost(houseCostOptions()); }
 function arcParams() { const params = scenarioParams(true); houseCostParams().forEach((value, key) => params.set(key, value)); return params; }
-function transitParams() { return new URLSearchParams({transitPhase: state.transitPhase, transitFare: state.transitFareScenario, transitHours: String(state.transitUseDirectHours ? state.transitDirectHours : 0), transitHouseholds: String(state.transitHouseholds), transitOnDemandView: transitOnDemandState.view, transitOnDemandWindows: transitOnDemandState.windowIds.join(','), transitServiceModes: transitOnDemandState.serviceModes.join(','), transitOnDemandCoreVehicles: String(transitOnDemandState.coreVehicles), transitOnDemandRegionalContribution: String(transitOnDemandState.regionalContribution), transitOnDemandFareRevenue: String(transitOnDemandState.fareRevenue)}); }
+function transitParams() { return new URLSearchParams({transitPhase: state.transitPhase, transitFare: state.transitFareScenario, transitHours: String(state.transitUseDirectHours ? state.transitDirectHours : 0), transitHouseholds: String(state.transitHouseholds), transitOnDemandView: transitOnDemandState.view, transitOnDemandWindows: transitOnDemandState.windowIds.join(','), transitOnDemandRides: JSON.stringify(transitOnDemandState.rideTargets), transitServiceModes: transitOnDemandState.serviceModes.join(','), transitOnDemandCoreVehicles: String(transitOnDemandState.coreVehicles), transitOnDemandRegionalContribution: String(transitOnDemandState.regionalContribution), transitOnDemandFareRevenue: String(transitOnDemandState.fareRevenue)}); }
 function localRepresentationParams() { const local = state.localRepresentation; return new URLSearchParams({localRepPreset: local.preset_id, localRepTime: local.time_scenario, localRepOverhead: local.overhead_preset, localRepCustomOverhead: String(local.custom_overhead_percent), localRepWards: String(local.active_wards), localRepHouseholds: String(local.households_per_area), localRepWage: String(local.living_wage_cad), localRepDenominator: String(local.household_denominator), localRepLevy: String(local.resident_levy_cad), localRepTier1: String(local.counts.tier1), localRepTier2: String(local.counts.tier2), localRepTier3: String(local.counts.tier3), localRepTier4: String(local.counts.tier4), localRepTimeOverrides: JSON.stringify(local.time_overrides), localRepCustomInputs: JSON.stringify(local.custom), localRepProgram: JSON.stringify(local.program), localRepFunding: JSON.stringify(local.funding), localRepAvoided: JSON.stringify(local.avoided_costs)}); }
 function capacityHref() { return `${appUrl('/carrying-capacity')}?${scenarioParams().toString()}#land-requirement`; }
 function memberFromProfile(profile: any, index: number): Member { return {id: `member-${Date.now()}-${index}`, label: profile.label ?? `Household member ${index + 1}`, age_y: profile.age_y, sex: profile.sex, weight_kg: profile.weight_kg, height_cm: profile.height_cm, activity: profile.activity, labour_level: Number(profile.age_y) < 19 ? 'dependent' : 'moderate'}; }
@@ -675,22 +680,37 @@ function transitEvidenceBadge(classification: string) { return `<span class="evi
 function transitCadRange(row: any, low = 'net_municipal_cost_low_cad', high = 'net_municipal_cost_high_cad') { return `${cad(row[low])}–${cad(row[high])}`; }
 function onDemandCadRange(row: {low: number; high: number}) { return `${cad(row.low)}–${cad(row.high)}`; }
 function renderOnDemandTransitSection() {
+  const pilot = calculateOnDemandPilot({selected_window_ids: transitOnDemandState.windowIds, target_completed_rides_by_window: transitOnDemandState.rideTargets, household_equivalent_denominator: state.transitHouseholds, regional_contribution_cad: transitOnDemandState.regionalContribution});
+  const selectedWindows = DEFAULT_ON_DEMAND_WINDOWS.filter((window) => transitOnDemandState.windowIds.includes(window.id)).map((window) => window.label).join(', ') || 'none selected';
+  const demandSummary = `<div class="transit-demand-summary"><p class="eyebrow">On-demand demand target</p><strong>${fmt(pilot.selected.target_completed_rides_year, 0)} completed rides/year</strong><p>${esc(selectedWindows)} · ${fmt(pilot.selected.annual_vehicle_hours, 0)} derived vehicle-hours</p><small>Set targets by time window below. Uncheck scheduled buses for a rideshare-only plan.</small></div>`;
+  return renderOnDemandTransitSectionMarkup()
+    .replace('Local service choices', 'Demand-led local service')
+    .replace('Choose buses, rideshare, or both', 'Set ride targets and choose the service')
+    .replace('Check the service types you want to compare.', 'Select the service types you want to operate or compare.')
+    .replace('Selected service mix', 'Selected service plan')
+    .replace('On-demand rides · selected windows', 'On-demand rideshare · selected windows and targets')
+    .replace('<div class="transit-on-demand-answer">', `${demandSummary}<div class="transit-on-demand-answer">`);
+}
+
+function renderOnDemandTransitSectionMarkup() {
   const state = {transitHouseholds: applicationState.transitHouseholds, transitOnDemandView: transitOnDemandState.view, transitOnDemandRegionalContribution: transitOnDemandState.regionalContribution, transitOnDemandCoreVehicles: transitOnDemandState.coreVehicles, transitOnDemandFareRevenue: transitOnDemandState.fareRevenue};
   const transit = transitModelForUi();
   const scheduled = transit.selected;
-  const pilot = calculateOnDemandPilot({selected_window_ids: transitOnDemandState.windowIds, household_equivalent_denominator: state.transitHouseholds, regional_contribution_cad: transitOnDemandState.regionalContribution});
+  const pilot = calculateOnDemandPilot({selected_window_ids: transitOnDemandState.windowIds, target_completed_rides_by_window: transitOnDemandState.rideTargets, household_equivalent_denominator: state.transitHouseholds, regional_contribution_cad: transitOnDemandState.regionalContribution});
+  const pilotAllWindows = calculateOnDemandPilot({selected_window_ids: DEFAULT_ON_DEMAND_WINDOWS.map((window) => window.id), target_completed_rides_by_window: transitOnDemandState.rideTargets, household_equivalent_denominator: state.transitHouseholds, regional_contribution_cad: transitOnDemandState.regionalContribution});
   const serviceMix = calculateTransitServiceMix({
     scheduled_buses: transitOnDemandState.serviceModes.includes('scheduled_buses'),
     on_demand_rides: transitOnDemandState.serviceModes.includes('on_demand_rides'),
-    scheduled_service: {annual_vehicle_hours: scheduled.conventional_vehicle_hours, gross_cost_cad: {low: scheduled.gross_cost_low_cad, high: scheduled.gross_cost_high_cad}, fare_revenue_cad: {low: scheduled.fare_revenue_low_cad, high: scheduled.fare_revenue_high_cad}, recurring_funding_cad: scheduled.recurring_funding_cad},
+    scheduled_service: {annual_vehicle_hours: scheduled.conventional_vehicle_hours, annual_completed_rides: scheduled.incremental_boardings, gross_cost_cad: {low: scheduled.gross_cost_low_cad, high: scheduled.gross_cost_high_cad}, fare_revenue_cad: {low: scheduled.fare_revenue_low_cad, high: scheduled.fare_revenue_high_cad}, recurring_funding_cad: scheduled.recurring_funding_cad},
     on_demand_service: {...pilot.selected, recurring_funding_cad: transitOnDemandState.regionalContribution},
     household_equivalent_denominator: state.transitHouseholds
   });
   const network = calculateOnDemandNetwork({core_vehicle_count: transitOnDemandState.coreVehicles, household_equivalent_denominator: state.transitHouseholds, fare_revenue_cad: transitOnDemandState.fareRevenue, regional_contribution_cad: transitOnDemandState.regionalContribution});
   const windowCards = DEFAULT_ON_DEMAND_WINDOWS.map((window) => {
     const selected = pilot.selected_window_ids.includes(window.id);
-    const row = pilot.selected_windows.find((candidate) => candidate.id === window.id) ?? {net_cost_cad: {low: window.gross_cost_cad.low - window.fare_revenue_cad.high, high: window.gross_cost_cad.high - window.fare_revenue_cad.low}};
-    return `<label class="on-demand-window ${selected ? 'selected' : ''}"><span class="on-demand-window-check"><input type="checkbox" data-on-demand-window="${esc(window.id)}" ${selected ? 'checked' : ''}><strong>${esc(window.label)}</strong></span><small>${fmt(window.annual_vehicle_hours, 0)} vehicle-hours · gross ${onDemandCadRange(window.gross_cost_cad)} · fares ${onDemandCadRange(window.fare_revenue_cad)} · net ${onDemandCadRange(row.net_cost_cad)}</small><em>${esc(window.description)}</em><span class="evidence-status">${esc(window.evidence_classification)}</span></label>`;
+    const row = pilotAllWindows.selected_windows.find((candidate) => candidate.id === window.id) ?? {annual_vehicle_hours: 0, target_completed_rides_year: 0, gross_cost_cad: {low: 0, high: 0}, fare_revenue_cad: {low: 0, high: 0}, net_cost_cad: {low: 0, high: 0}};
+    const target = transitOnDemandState.rideTargets[window.id] ?? window.default_completed_rides_year;
+    return `<div class="on-demand-window ${selected ? 'selected' : ''}"><label class="on-demand-window-check"><input type="checkbox" data-on-demand-window="${esc(window.id)}" ${selected ? 'checked' : ''}><strong>${esc(window.label)}</strong></label><label class="control on-demand-rides-target"><span>Target completed rides</span><input type="number" min="0" step="1" data-on-demand-rides="${esc(window.id)}" value="${target}"><em>rides/year</em></label><small>${fmt(row.target_completed_rides_year, 0)} rides · ${fmt(row.annual_vehicle_hours, 0)} vehicle-hours · gross ${onDemandCadRange(row.gross_cost_cad)} · fares ${onDemandCadRange(row.fare_revenue_cad)} · net ${onDemandCadRange(row.net_cost_cad)}</small><em>${esc(window.description)}</em><span class="evidence-status">${esc(window.evidence_classification)} · target is editable</span></div>`;
   }).join('');
   const networkRows = [0, 1, 2, 3].map((count) => calculateOnDemandNetwork({core_vehicle_count: count, household_equivalent_denominator: state.transitHouseholds, fare_revenue_cad: transitOnDemandState.fareRevenue, regional_contribution_cad: transitOnDemandState.regionalContribution})).map((row) => `<tr class="${row.core_vehicle_count === network.core_vehicle_count ? 'selected-row' : ''}"><th scope="row">${row.core_vehicle_count}</th><td>${row.core_vehicle_count === 0 ? 'Rideshare only' : row.on_demand_hours === 0 ? 'Bus only' : 'Combined service'}</td><td>${fmt(row.core_hours, 0)}</td><td>${fmt(row.on_demand_hours, 0)}</td><td>${onDemandCadRange(row.gross_cost_cad)}</td><td>${onDemandCadRange(row.fare_revenue_cad)}</td><td>${onDemandCadRange(row.net_cost_cad)}</td><td>${onDemandCadRange(row.difference_from_current_net_cost_cad)}</td><td>${onDemandCadRange(row.net_cost_per_household_cad)}</td></tr>`).join('');
   const sourceLinks = ON_DEMAND_TRANSIT_SOURCES.map((source) => `<p><strong>${esc(source.title)}</strong><br>${transitEvidenceBadge(source.classification)} · <a href="${esc(source.url)}" target="_blank" rel="noreferrer">source</a><br><span>${esc(source.note)}</span></p>`).join('');
@@ -825,6 +845,11 @@ function bind() {
       transitOnDemandState.windowIds = node.checked ? [...new Set([...transitOnDemandState.windowIds, id])] : transitOnDemandState.windowIds.filter((candidate) => candidate !== id);
       render();
     }));
+    document.querySelectorAll<HTMLInputElement>('[data-on-demand-rides]').forEach((node) => node.addEventListener('change', () => {
+      const id = node.dataset.onDemandRides ?? '';
+      transitOnDemandState.rideTargets[id] = Math.max(0, Math.round(Number(node.value) || 0));
+      render();
+    }));
     const onDemandCoreVehicles = $('#transit-on-demand-core-vehicles') as HTMLInputElement | null;
     onDemandCoreVehicles?.addEventListener('change', () => { transitOnDemandState.coreVehicles = Math.min(3, Math.max(1, Math.round(Number(onDemandCoreVehicles.value) || 1))); render(); });
     const onDemandRegionalContribution = $('#transit-on-demand-regional-contribution') as HTMLInputElement | null;
@@ -857,7 +882,7 @@ function bind() {
       ['transit-one-time', (value) => { state.transitOneTimeFunds = value; }]
     ];
     numeric.forEach(([id, update]) => { const element = $(`#${id}`) as HTMLInputElement | null; element?.addEventListener('change', () => { update(Number(element.value)); render(); }); });
-    $('#transit-reset')?.addEventListener('click', () => { setTransitPhaseDefaults('phase1'); state.transitFareScenario = 'existing_fares'; state.transitUseDirectHours = true; state.transitGrants = 0; state.transitCitySavings = 0; state.transitTransitionSavings = 0; state.transitOtherRevenue = 0; state.transitOneTimeFunds = 0; state.transitHouseholds = 10000; state.transitBaselineFareRevenue = TRANSIT_BASELINE.transit_revenue_cad; transitOnDemandState.view = 'service_mix'; transitOnDemandState.windowIds = [...DEFAULT_ON_DEMAND_WINDOW_IDS]; transitOnDemandState.serviceModes = [...DEFAULT_ON_DEMAND_SERVICE_MODES]; transitOnDemandState.coreVehicles = 2; transitOnDemandState.regionalContribution = 0; transitOnDemandState.fareRevenue = ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad; render(); });
+    $('#transit-reset')?.addEventListener('click', () => { setTransitPhaseDefaults('phase1'); state.transitFareScenario = 'existing_fares'; state.transitUseDirectHours = true; state.transitGrants = 0; state.transitCitySavings = 0; state.transitTransitionSavings = 0; state.transitOtherRevenue = 0; state.transitOneTimeFunds = 0; state.transitHouseholds = 10000; state.transitBaselineFareRevenue = TRANSIT_BASELINE.transit_revenue_cad; transitOnDemandState.view = 'service_mix'; transitOnDemandState.windowIds = [...DEFAULT_ON_DEMAND_WINDOW_IDS]; transitOnDemandState.rideTargets = {...defaultOnDemandRideTargets}; transitOnDemandState.serviceModes = [...DEFAULT_ON_DEMAND_SERVICE_MODES]; transitOnDemandState.coreVehicles = 2; transitOnDemandState.regionalContribution = 0; transitOnDemandState.fareRevenue = ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad; render(); });
   }
   if (state.page === '/house-cost') {
     enhanceHouseCostSelectionUi();

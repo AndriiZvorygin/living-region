@@ -249,6 +249,12 @@ main { max-width: 1180px; }
 .on-demand-window.selected { border-left-color: var(--teal); background: #f5faf5; }
 .on-demand-window-check { display: flex; align-items: center; gap: 9px; }
 .on-demand-window-check input { width: 20px; height: 20px; accent-color: var(--teal); }
+.on-demand-rides-target { display: grid; grid-template-columns: minmax(0, 1fr) minmax(110px, 140px); align-items: center; gap: 10px; }
+.on-demand-rides-target span { font-weight: 700; }
+.on-demand-rides-target input { width: 100%; min-width: 0; }
+.transit-demand-summary { margin: 20px 0; padding: 18px; border-left: 4px solid var(--amber); background: #fff9e7; }
+.transit-demand-summary strong { display: block; margin: 4px 0; font-size: 1.55rem; color: var(--ink); }
+.transit-demand-summary p, .transit-demand-summary small { display: block; margin: 4px 0 0; color: var(--muted); }
 .on-demand-window small, .on-demand-window em { color: var(--muted); font-size: .78rem; }
 .on-demand-window em { font-style: normal; line-height: 1.4; }
 .selected-row { background: #eef7f1; }

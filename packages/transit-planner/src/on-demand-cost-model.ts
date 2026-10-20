@@ -7,7 +7,7 @@
  * visible as separate lines.
  */
 
-export const ON_DEMAND_TRANSIT_CONTRACT_VERSION = "1.2.0";
+export const ON_DEMAND_TRANSIT_CONTRACT_VERSION = "1.3.0";
 
 export type OnDemandRange = {low: number; high: number};
 
@@ -16,6 +16,8 @@ export type OnDemandServiceWindow = {
   label: string;
   description: string;
   annual_vehicle_hours: number;
+  default_completed_rides_year: number;
+  completed_rides_per_vehicle_hour: number;
   gross_cost_cad: OnDemandRange;
   fare_revenue_cad: OnDemandRange;
   evidence_classification: string;
@@ -51,6 +53,8 @@ export const DEFAULT_ON_DEMAND_WINDOWS: OnDemandServiceWindow[] = [
     label: "Sunday daytime",
     description: "Approximately 9 a.m.–3 p.m.; connects with the terminal and retains accessible backup coverage.",
     annual_vehicle_hours: 624,
+    default_completed_rides_year: 2_496,
+    completed_rides_per_vehicle_hour: 4,
     gross_cost_cad: {low: 60_000, high: 75_000},
     fare_revenue_cad: {low: 5_000, high: 10_000},
     evidence_classification: "Campaign planning assumption"
@@ -60,6 +64,8 @@ export const DEFAULT_ON_DEMAND_WINDOWS: OnDemandServiceWindow[] = [
     label: "Weekday evenings",
     description: "Lower-demand evening coverage alongside the current daytime bus network.",
     annual_vehicle_hours: 2_600,
+    default_completed_rides_year: 10_400,
+    completed_rides_per_vehicle_hour: 4,
     gross_cost_cad: {low: 195_000, high: 195_000},
     fare_revenue_cad: {low: 35_000, high: 40_000},
     evidence_classification: "Campaign planning assumption"
@@ -69,6 +75,8 @@ export const DEFAULT_ON_DEMAND_WINDOWS: OnDemandServiceWindow[] = [
     label: "Saturday daytime",
     description: "Additional weekend daytime coverage with phone booking and accessible service retained.",
     annual_vehicle_hours: 410,
+    default_completed_rides_year: 1_640,
+    completed_rides_per_vehicle_hour: 4,
     gross_cost_cad: {low: 28_000, high: 28_000},
     fare_revenue_cad: {low: 10_000, high: 12_000},
     evidence_classification: "Campaign planning assumption"
@@ -78,6 +86,8 @@ export const DEFAULT_ON_DEMAND_WINDOWS: OnDemandServiceWindow[] = [
     label: "Saturday evenings",
     description: "Additional Saturday evening coverage, subject to driver supply and winter backup review.",
     annual_vehicle_hours: 365,
+    default_completed_rides_year: 1_460,
+    completed_rides_per_vehicle_hour: 4,
     gross_cost_cad: {low: 25_000, high: 25_000},
     fare_revenue_cad: {low: 8_000, high: 10_000},
     evidence_classification: "Campaign planning assumption"
@@ -112,8 +122,20 @@ function netRange(gross: OnDemandRange, fares: OnDemandRange, recurringContribut
   return range(gross.low - fares.high - recurringContribution, gross.high - fares.low - recurringContribution);
 }
 
+function windowDemand(window: OnDemandServiceWindow, targetOverride?: number) {
+  const sourceHours = nonNegative(window.annual_vehicle_hours);
+  const defaultRides = nonNegative(window.default_completed_rides_year) || sourceHours;
+  const ridesPerVehicleHour = nonNegative(window.completed_rides_per_vehicle_hour) || (defaultRides / Math.max(1, sourceHours));
+  const targetRides = Math.round(Math.max(0, targetOverride == null ? defaultRides : nonNegative(targetOverride)));
+  const annualVehicleHours = targetRides / Math.max(1, ridesPerVehicleHour);
+  const grossPerVehicleHour = {low: window.gross_cost_cad.low / Math.max(1, sourceHours), high: window.gross_cost_cad.high / Math.max(1, sourceHours)};
+  const farePerRide = {low: window.fare_revenue_cad.low / Math.max(1, defaultRides), high: window.fare_revenue_cad.high / Math.max(1, defaultRides)};
+  return {defaultRides, targetRides, ridesPerVehicleHour, annualVehicleHours, grossPerVehicleHour, farePerRide};
+}
+
 export function calculateOnDemandPilot(options: {
   selected_window_ids?: string[];
+  target_completed_rides_by_window?: Record<string, number>;
   household_equivalent_denominator?: number;
   regional_contribution_cad?: number;
   windows?: OnDemandServiceWindow[];
@@ -121,17 +143,34 @@ export function calculateOnDemandPilot(options: {
   const windows = options.windows ?? DEFAULT_ON_DEMAND_WINDOWS;
   const selectedIds = new Set(options.selected_window_ids ?? DEFAULT_ON_DEMAND_WINDOW_IDS);
   const selectedWindows = windows.filter((window) => selectedIds.has(window.id));
-  const totals = selectedWindows.reduce((sum, window) => ({
-    hours: sum.hours + window.annual_vehicle_hours,
-    gross: {low: sum.gross.low + window.gross_cost_cad.low, high: sum.gross.high + window.gross_cost_cad.high},
-    fares: {low: sum.fares.low + window.fare_revenue_cad.low, high: sum.fares.high + window.fare_revenue_cad.high}
-  }), {hours: 0, gross: {low: 0, high: 0}, fares: {low: 0, high: 0}});
+  const demandRows = selectedWindows.map((window) => {
+    const demand = windowDemand(window, options.target_completed_rides_by_window?.[window.id]);
+    const isDefaultTarget = demand.targetRides === demand.defaultRides;
+    return {
+      window,
+      demand,
+      gross: isDefaultTarget ? window.gross_cost_cad : range(demand.annualVehicleHours * demand.grossPerVehicleHour.low, demand.annualVehicleHours * demand.grossPerVehicleHour.high),
+      fares: isDefaultTarget ? window.fare_revenue_cad : range(demand.targetRides * demand.farePerRide.low, demand.targetRides * demand.farePerRide.high)
+    };
+  });
+  const totals = demandRows.reduce((sum, {demand, gross, fares}) => ({
+    hours: sum.hours + demand.annualVehicleHours,
+    rides: sum.rides + demand.targetRides,
+    gross: {low: sum.gross.low + gross.low, high: sum.gross.high + gross.high},
+    fares: {low: sum.fares.low + fares.low, high: sum.fares.high + fares.high}
+  }), {hours: 0, rides: 0, gross: {low: 0, high: 0}, fares: {low: 0, high: 0}});
   const regionalContribution = nonNegative(options.regional_contribution_cad);
   const net = netRange(totals.gross, totals.fares, regionalContribution);
   const denominator = Math.max(1, nonNegative(options.household_equivalent_denominator) || 10_000);
-  const rows = selectedWindows.map((window) => ({
+  const rows = demandRows.map(({window, demand, gross, fares}) => ({
     ...window,
-    net_cost_cad: netRange(window.gross_cost_cad, window.fare_revenue_cad)
+    target_completed_rides_year: demand.targetRides,
+    annual_vehicle_hours: round(demand.annualVehicleHours),
+    gross_cost_per_vehicle_hour_cad: demand.grossPerVehicleHour,
+    fare_contribution_per_completed_ride_cad: demand.farePerRide,
+    gross_cost_cad: gross,
+    fare_revenue_cad: fares,
+    net_cost_cad: netRange(gross, fares)
   }));
   return {
     contract_version: ON_DEMAND_TRANSIT_CONTRACT_VERSION,
@@ -140,7 +179,9 @@ export function calculateOnDemandPilot(options: {
     selected_windows: rows,
     regional_contribution_cad: round(regionalContribution),
     selected: {
-      annual_vehicle_hours: totals.hours,
+      annual_completed_rides: totals.rides,
+      target_completed_rides_year: totals.rides,
+      annual_vehicle_hours: round(totals.hours),
       gross_cost_cad: range(totals.gross.low, totals.gross.high),
       fare_revenue_cad: range(totals.fares.low, totals.fares.high),
       net_cost_cad: net,
@@ -148,6 +189,8 @@ export function calculateOnDemandPilot(options: {
       household_equivalent_denominator: denominator
     },
     assumptions: {
+      demand_basis: "Users set a completed-rides target for each selected service window. Vehicle-hours scale from the window's completed-rides-per-vehicle-hour planning assumption; cost and fare ranges then scale from the published default window values.",
+      default_target_basis: "Default ride targets preserve the published window hours at four completed rides per vehicle-hour. This is a planning assumption, not observed route-level demand.",
       range_pairing: "low net cost uses low gross cost and high fare revenue; high net cost uses high gross cost and low fare revenue",
       regional_boundary: "Regional contributions are an optional separate input and are not included in the local window ranges.",
       operating_boundary: "Selected on-demand windows are a local service component; they are not added to the full-network replacement formula unless the service mix explicitly selects both components.",
@@ -219,6 +262,7 @@ export type TransitServiceMixMode = "none" | "bus_only" | "rideshare_only" | "co
 
 type ServiceCostComponent = {
   annual_vehicle_hours: number;
+  annual_completed_rides?: number;
   gross_cost_cad: OnDemandRange;
   fare_revenue_cad: OnDemandRange;
   recurring_funding_cad?: number;
@@ -257,6 +301,7 @@ export function calculateTransitServiceMix(options: {
     selected_service_modes: selectedModes,
     components: {scheduled_buses: scheduled, on_demand_rides: onDemand},
     selected: {
+      annual_completed_rides: (scheduled.annual_completed_rides ?? 0) + (onDemand.annual_completed_rides ?? 0),
       annual_vehicle_hours: scheduled.annual_vehicle_hours + onDemand.annual_vehicle_hours,
       gross_cost_cad: gross,
       fare_revenue_cad: fares,

@@ -25,6 +25,29 @@ describe('Owen Sound on-demand selected service windows', () => {
     expect(result.selected.net_cost_cad).toEqual({low: -10_000, high: -10_000});
     expect(result.regional_contribution_cad).toBe(10_000);
   });
+
+  it('scales cost and hours from an editable completed-rides target', () => {
+    const result = calculateOnDemandPilot({
+      selected_window_ids: ['weekday_evenings'],
+      target_completed_rides_by_window: {weekday_evenings: 5_200}
+    });
+    expect(result.selected.target_completed_rides_year).toBe(5_200);
+    expect(result.selected.annual_vehicle_hours).toBe(1_300);
+    expect(result.selected.gross_cost_cad).toEqual({low: 97_500, high: 97_500});
+    expect(result.selected.fare_revenue_cad).toEqual({low: 17_500, high: 20_000});
+    expect(result.selected_windows[0].target_completed_rides_year).toBe(5_200);
+  });
+
+  it('supports a weekend-only rideshare plan with no scheduled-bus component', () => {
+    const result = calculateOnDemandPilot({
+      selected_window_ids: ['saturday_daytime', 'saturday_evenings'],
+      target_completed_rides_by_window: {saturday_daytime: 820, saturday_evenings: 730}
+    });
+    expect(result.selected.target_completed_rides_year).toBe(1_550);
+    expect(result.selected.annual_vehicle_hours).toBe(387.5);
+    expect(result.selected.gross_cost_cad.low).toBeCloseTo(26_500, 6);
+    expect(result.selected.gross_cost_cad.high).toBeCloseTo(26_500, 6);
+  });
 });
 
 describe('Owen Sound on-demand full-network comparison', () => {
