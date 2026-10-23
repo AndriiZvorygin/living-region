@@ -339,6 +339,9 @@ main { max-width: 1180px; }
 .house-control-grid > div { min-width: 0; padding: 19px; border-top: 3px solid var(--sage); background: #fff; }
 .house-control-grid h3 { margin-top: 0; }
 .house-control-grid .controls-row { margin-bottom: 12px; }
+.house-diameter-size { display: grid; align-content: center; gap: 4px; min-width: 190px; padding-top: 23px; }
+.house-diameter-size span, .house-diameter-size small { color: var(--muted); font-size: .78rem; }
+.house-diameter-size strong { color: var(--ink); font-size: .95rem; }
 .house-quote-control { max-width: 430px; margin-top: 15px; }
 .house-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 22px; }
 .house-completion-controls { margin-top: 24px; padding: 19px; border-top: 3px solid var(--amber); background: #fff; }

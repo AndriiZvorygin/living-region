@@ -155,6 +155,9 @@ function renderHouseCostIntroductionMarkup() {
 
 function renderHouseCostPage() {
   let page = renderFirstPrinciplesHouseCostPage();
+  const footprint = houseCostResult().geometry.footprint_m2;
+  const diameterSizeReadout = `<div class="house-diameter-size" aria-live="polite"><span>Shell footprint</span><strong>${fmt(footprint, 1)} m² · ${fmt(footprint * 10.7639104167, 0)} ft²</strong><small>circular floor area before interior deductions</small></div>`;
+  page = page.replace(/(<label class="control"><span>Yurt diameter<\/span><input id="house-diameter"[^>]*><em>m<\/em><\/label>)/, `$1${diameterSizeReadout}`);
   page = page.replace('Published or supplier-estimated packages in Canadian dollars', 'Published prices and indicative CAD equivalents');
   page = orderHouseCostChoices(page);
   page = enhanceImportedShellPage(page);
