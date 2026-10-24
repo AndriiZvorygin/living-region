@@ -1,0 +1,8 @@
+ward_id,ward_name,resident_electors,matched_address_electors,unmatched_fallback_electors,target_resident_electors,delta_from_target,legacy_polls
+NW,Northwest,2688,1605,1083,2639.86,48.14,"014;026;027;028"
+NE,Northeast,2619,1598,1021,2639.86,-20.86,"003;004"
+W,West,2687,1229,1458,2639.86,47.14,"021;022;023;024;025;030"
+C,Central,2620,1258,1362,2639.86,-19.86,"001;002;015;016;029"
+E,East,2619,1491,1128,2639.86,-20.86,"005;006;007;008;009;031"
+SW,Southwest,2628,1895,733,2639.86,-11.86,"017;018;019;020"
+SE,Southeast,2618,1900,718,2639.86,-21.86,"010;011;012;013"
