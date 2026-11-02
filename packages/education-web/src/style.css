@@ -259,7 +259,8 @@ main { max-width: 1180px; }
 .transit-demand-controls { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 16px; margin: 20px 0; padding: 18px; border: 1px solid var(--line); background: #fff; }
 .transit-share-control output { float: right; color: var(--teal); font-weight: 800; }
 .transit-share-control input[type="range"] { width: 100%; margin: 12px 0 2px; padding: 0; accent-color: var(--teal); }
-.transit-share-control em { display: flex; justify-content: space-between; gap: 12px; }
+.transit-share-control em { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .75rem; font-style: normal; font-weight: 700; }
+.transit-share-control em span:last-child { text-align: right; }
 .on-demand-window small, .on-demand-window em { color: var(--muted); font-size: .78rem; }
 .on-demand-window em { font-style: normal; line-height: 1.4; }
 .selected-row { background: #eef7f1; }
