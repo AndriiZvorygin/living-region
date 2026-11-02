@@ -1,0 +1,3 @@
+# Private election extracts must never be stored with the aggregate layer.
+ElectorExtract_*.csv
+ElectorExtract_*.zip

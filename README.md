@@ -24,6 +24,14 @@ Living Region is an open-source regional resilience model for testing how land, 
 - parcel ownership/address-level dwelling data still missing
 - model outputs are scenario diagnostics, not official forecasts
 
+## Owen Sound local representation
+
+The aggregate-only preliminary ward and local-area layout is preserved at
+[`data/derived/owen-sound-local-representation/`](data/derived/owen-sound-local-representation/).
+It includes candidate ward and local-area polygons, aggregate counts, maps,
+and a retention/provenance note. Private elector extracts and row-level joins
+are excluded.
+
 ## Unified model architecture
 
 Living Region is the regional umbrella. Its first-class
