@@ -7,7 +7,7 @@
  * visible as separate lines.
  */
 
-export const ON_DEMAND_TRANSIT_CONTRACT_VERSION = "1.3.0";
+export const ON_DEMAND_TRANSIT_CONTRACT_VERSION = "1.4.0";
 
 export type OnDemandRange = {low: number; high: number};
 
@@ -276,17 +276,48 @@ function serviceNet(component: ServiceCostComponent): OnDemandRange {
   return netRange(component.gross_cost_cad, component.fare_revenue_cad, nonNegative(component.recurring_funding_cad));
 }
 
+function scaleServiceComponent(component: ServiceCostComponent, targetRides: number): ServiceCostComponent {
+  const baseRides = nonNegative(component.annual_completed_rides);
+  const scale = baseRides > 0 ? targetRides / baseRides : 0;
+  return {
+    annual_vehicle_hours: round(component.annual_vehicle_hours * scale),
+    annual_completed_rides: Math.round(targetRides),
+    gross_cost_cad: range(component.gross_cost_cad.low * scale, component.gross_cost_cad.high * scale),
+    fare_revenue_cad: range(component.fare_revenue_cad.low * scale, component.fare_revenue_cad.high * scale),
+    recurring_funding_cad: round(nonNegative(component.recurring_funding_cad) * scale)
+  };
+}
+
 export function calculateTransitServiceMix(options: {
   scheduled_buses?: boolean;
   on_demand_rides?: boolean;
+  total_completed_rides_year?: number;
+  on_demand_share_percent?: number;
   scheduled_service?: ServiceCostComponent;
   on_demand_service?: ServiceCostComponent;
   household_equivalent_denominator?: number;
 } = {}) {
   const scheduledSelected = options.scheduled_buses ?? true;
   const onDemandSelected = options.on_demand_rides ?? true;
-  const scheduled = scheduledSelected ? options.scheduled_service ?? zeroServiceCostComponent() : zeroServiceCostComponent();
-  const onDemand = onDemandSelected ? options.on_demand_service ?? zeroServiceCostComponent() : zeroServiceCostComponent();
+  const scheduledBase = options.scheduled_service ?? zeroServiceCostComponent();
+  const onDemandBase = options.on_demand_service ?? zeroServiceCostComponent();
+  const allocationMode = options.total_completed_rides_year != null || options.on_demand_share_percent != null;
+  let scheduled = scheduledSelected ? scheduledBase : zeroServiceCostComponent();
+  let onDemand = onDemandSelected ? onDemandBase : zeroServiceCostComponent();
+  let scheduledSharePercent: number | null = null;
+  let onDemandSharePercent: number | null = null;
+  let totalCompletedRides: number | null = null;
+  if (allocationMode) {
+    totalCompletedRides = Math.round(nonNegative(options.total_completed_rides_year));
+    const requestedShare = Math.min(100, Math.max(0, finite(options.on_demand_share_percent, 0)));
+    const bothSelected = scheduledSelected && onDemandSelected;
+    onDemandSharePercent = bothSelected ? requestedShare : onDemandSelected ? 100 : 0;
+    scheduledSharePercent = bothSelected ? 100 - requestedShare : scheduledSelected ? 100 : 0;
+    const onDemandRides = Math.round(totalCompletedRides * onDemandSharePercent / 100);
+    const scheduledRides = totalCompletedRides - onDemandRides;
+    scheduled = scheduledSelected ? scaleServiceComponent(scheduledBase, scheduledRides) : zeroServiceCostComponent();
+    onDemand = onDemandSelected ? scaleServiceComponent(onDemandBase, onDemandRides) : zeroServiceCostComponent();
+  }
   const selectedModes = [scheduledSelected ? "scheduled_buses" : null, onDemandSelected ? "on_demand_rides" : null].filter(Boolean) as string[];
   const mode: TransitServiceMixMode = scheduledSelected && onDemandSelected ? "combined" : scheduledSelected ? "bus_only" : onDemandSelected ? "rideshare_only" : "none";
   const gross = range(scheduled.gross_cost_cad.low + onDemand.gross_cost_cad.low, scheduled.gross_cost_cad.high + onDemand.gross_cost_cad.high);
@@ -307,10 +338,14 @@ export function calculateTransitServiceMix(options: {
       fare_revenue_cad: fares,
       net_cost_cad: net,
       net_cost_per_household_cad: range(net.low / denominator, net.high / denominator),
-      household_equivalent_denominator: denominator
+      household_equivalent_denominator: denominator,
+      total_completed_rides_year: totalCompletedRides,
+      scheduled_share_percent: scheduledSharePercent,
+      on_demand_share_percent: onDemandSharePercent
     },
     assumptions: {
       composition: "The label is derived from the checked service types. Scheduled buses use the selected fixed-route phase; on-demand rides use the selected on-demand component.",
+      demand_allocation: allocationMode ? "The total completed-rides target is held constant while the slider reallocates those rides between scheduled buses and on-demand rideshare. Costs, hours and fares scale from each service component's base completed-rides rate." : "Legacy component-selection mode preserves the independently selected service totals.",
       range_pairing: "Low combined net adds each component's low net; high combined net adds each component's high net.",
       funding_boundary: "Recurring funding is applied within the component that supplies it and is not subtracted twice."
     }

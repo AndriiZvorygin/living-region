@@ -330,6 +330,9 @@ state.localRepresentation.counts = {tier1: 70, tier2: 0, tier3: 0, tier4: 0};
 const defaultOnDemandRideTargets: Record<string, number> = Object.fromEntries(DEFAULT_ON_DEMAND_WINDOWS.map((window) => [window.id, window.default_completed_rides_year]));
 const transitOnDemandState: {view: 'service_mix' | 'network_comparison'; windowIds: string[]; rideTargets: Record<string, number>; serviceModes: string[]; coreVehicles: number; regionalContribution: number; fareRevenue: number} = {view: 'service_mix', windowIds: [...DEFAULT_ON_DEMAND_WINDOW_IDS], rideTargets: {...defaultOnDemandRideTargets}, serviceModes: [...DEFAULT_ON_DEMAND_SERVICE_MODES], coreVehicles: 2, regionalContribution: 0, fareRevenue: ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad};
 const applicationState = state;
+const DEFAULT_TRANSIT_DEMAND_RIDES = 16_640;
+let transitDemandTargetRides = DEFAULT_TRANSIT_DEMAND_RIDES;
+let transitOnDemandSharePercent = 50;
 
 type HouseCostUiState = {
   band: 'low' | 'central' | 'high'; diameter_m: number; wall_height_m: number; roof_pitch_degrees: number;
@@ -413,11 +416,19 @@ if (sharedQuery.has('transitHours')) state.transitDirectHours = Number(sharedQue
 if (sharedQuery.has('transitHouseholds')) state.transitHouseholds = Number(sharedQuery.get('transitHouseholds')) || state.transitHouseholds;
 if (sharedQuery.has('transitOnDemandView')) transitOnDemandState.view = sharedQuery.get('transitOnDemandView') === 'network_comparison' ? 'network_comparison' : 'service_mix';
 if (sharedQuery.has('transitOnDemandWindows')) transitOnDemandState.windowIds = (sharedQuery.get('transitOnDemandWindows') ?? '').split(',').filter((id) => DEFAULT_ON_DEMAND_WINDOWS.some((window) => window.id === id));
+if (sharedQuery.has('transitDemandRides')) transitDemandTargetRides = Math.max(0, Math.round(Number(sharedQuery.get('transitDemandRides')) || DEFAULT_TRANSIT_DEMAND_RIDES));
+if (sharedQuery.has('transitOnDemandShare')) transitOnDemandSharePercent = Math.min(100, Math.max(0, Number(sharedQuery.get('transitOnDemandShare')) || 0));
 if (sharedQuery.has('transitOnDemandRides')) {
   const targets = parseJsonQuery<Record<string, number>>('transitOnDemandRides');
-  if (targets) DEFAULT_ON_DEMAND_WINDOWS.forEach((window) => { if (Number.isFinite(Number(targets[window.id]))) transitOnDemandState.rideTargets[window.id] = Math.max(0, Math.round(Number(targets[window.id]))); });
+  if (targets) {
+    DEFAULT_ON_DEMAND_WINDOWS.forEach((window) => { if (Number.isFinite(Number(targets[window.id]))) transitOnDemandState.rideTargets[window.id] = Math.max(0, Math.round(Number(targets[window.id]))); });
+    if (!sharedQuery.has('transitDemandRides')) transitDemandTargetRides = Object.values(transitOnDemandState.rideTargets).reduce((sum, value) => sum + value, 0);
+  }
 }
-if (sharedQuery.has('transitServiceModes')) transitOnDemandState.serviceModes = (sharedQuery.get('transitServiceModes') ?? '').split(',').filter((mode) => DEFAULT_ON_DEMAND_SERVICE_MODES.includes(mode as typeof DEFAULT_ON_DEMAND_SERVICE_MODES[number]));
+if (sharedQuery.has('transitServiceModes')) {
+  transitOnDemandState.serviceModes = (sharedQuery.get('transitServiceModes') ?? '').split(',').filter((mode) => DEFAULT_ON_DEMAND_SERVICE_MODES.includes(mode as typeof DEFAULT_ON_DEMAND_SERVICE_MODES[number]));
+  if (!sharedQuery.has('transitOnDemandShare')) transitOnDemandSharePercent = transitOnDemandState.serviceModes.includes('on_demand_rides') && !transitOnDemandState.serviceModes.includes('scheduled_buses') ? 100 : transitOnDemandState.serviceModes.includes('scheduled_buses') && !transitOnDemandState.serviceModes.includes('on_demand_rides') ? 0 : 50;
+}
 if (sharedQuery.has('transitOnDemandCoreVehicles')) {
   const requestedCoreVehicles = Number(sharedQuery.get('transitOnDemandCoreVehicles'));
   transitOnDemandState.coreVehicles = Math.min(3, Math.max(0, Number.isFinite(requestedCoreVehicles) ? requestedCoreVehicles : transitOnDemandState.coreVehicles));
@@ -467,7 +478,8 @@ function houseCostParams() { const h = houseCostState; const params = new URLSea
 function houseCostOptions() { const h = houseCostState; return {band: h.band, completionStage: h.completionStage, yurtSupplierId: h.supplierId, servicingMode: h.servicingMode, labourMode: h.labourMode, completionSelections: h.completionSelections, design: {diameter_m: h.diameter_m, wall_height_m: h.wall_height_m, roof_pitch_degrees: h.roof_pitch_degrees, household_size: h.household_size, layout: h.layout, window_count: h.window_count, door_count: h.door_count, partition_loss_fraction: h.partition_loss_fraction}, unitRateOverrides: h.unitRateOverrides, taxRate: h.taxRate, contingencyRate: h.contingencyRate, labourRateCadPerHour: h.labourRate, ownerLabourValueRateCadPerHour: h.ownerRate, customCompletedQuoteCad: h.customQuote, financing: {ownership: h.ownership, downPaymentRate: h.downPaymentRate, downPaymentCad: h.downPaymentCad, rateType: h.rateType, customRateAnnual: h.customRateAnnual, interestRateAnnual: h.interestRate, insuranceMode: h.insuranceMode, amortizationYears: h.amortizationYears, loanTermYears: h.loanTermYears}}; }
 function houseCostResult() { return calculateHouseCost(houseCostOptions()); }
 function arcParams() { const params = scenarioParams(true); houseCostParams().forEach((value, key) => params.set(key, value)); return params; }
-function transitParams() { return new URLSearchParams({transitPhase: state.transitPhase, transitFare: state.transitFareScenario, transitHours: String(state.transitUseDirectHours ? state.transitDirectHours : 0), transitHouseholds: String(state.transitHouseholds), transitOnDemandView: transitOnDemandState.view, transitOnDemandWindows: transitOnDemandState.windowIds.join(','), transitOnDemandRides: JSON.stringify(transitOnDemandState.rideTargets), transitServiceModes: transitOnDemandState.serviceModes.join(','), transitOnDemandCoreVehicles: String(transitOnDemandState.coreVehicles), transitOnDemandRegionalContribution: String(transitOnDemandState.regionalContribution), transitOnDemandFareRevenue: String(transitOnDemandState.fareRevenue)}); }
+function syncTransitOnDemandModes() { transitOnDemandState.serviceModes = transitOnDemandSharePercent <= 0 ? ['scheduled_buses'] : transitOnDemandSharePercent >= 100 ? ['on_demand_rides'] : [...DEFAULT_ON_DEMAND_SERVICE_MODES]; }
+function transitParams() { syncTransitOnDemandModes(); return new URLSearchParams({transitPhase: state.transitPhase, transitFare: state.transitFareScenario, transitHours: String(state.transitUseDirectHours ? state.transitDirectHours : 0), transitHouseholds: String(state.transitHouseholds), transitOnDemandView: transitOnDemandState.view, transitOnDemandWindows: transitOnDemandState.windowIds.join(','), transitDemandRides: String(transitDemandTargetRides), transitOnDemandShare: String(transitOnDemandSharePercent), transitOnDemandRides: JSON.stringify(transitOnDemandState.rideTargets), transitServiceModes: transitOnDemandState.serviceModes.join(','), transitOnDemandCoreVehicles: String(transitOnDemandState.coreVehicles), transitOnDemandRegionalContribution: String(transitOnDemandState.regionalContribution), transitOnDemandFareRevenue: String(transitOnDemandState.fareRevenue)}); }
 function localRepresentationParams() { const local = state.localRepresentation; return new URLSearchParams({localRepPreset: local.preset_id, localRepTime: local.time_scenario, localRepOverhead: local.overhead_preset, localRepCustomOverhead: String(local.custom_overhead_percent), localRepWards: String(local.active_wards), localRepHouseholds: String(local.households_per_area), localRepWage: String(local.living_wage_cad), localRepDenominator: String(local.household_denominator), localRepLevy: String(local.resident_levy_cad), localRepTier1: String(local.counts.tier1), localRepTier2: String(local.counts.tier2), localRepTier3: String(local.counts.tier3), localRepTier4: String(local.counts.tier4), localRepTimeOverrides: JSON.stringify(local.time_overrides), localRepCustomInputs: JSON.stringify(local.custom), localRepProgram: JSON.stringify(local.program), localRepFunding: JSON.stringify(local.funding), localRepAvoided: JSON.stringify(local.avoided_costs)}); }
 function capacityHref() { return `${appUrl('/carrying-capacity')}?${scenarioParams().toString()}#land-requirement`; }
 function memberFromProfile(profile: any, index: number): Member { return {id: `member-${Date.now()}-${index}`, label: profile.label ?? `Household member ${index + 1}`, age_y: profile.age_y, sex: profile.sex, weight_kg: profile.weight_kg, height_cm: profile.height_cm, activity: profile.activity, labour_level: Number(profile.age_y) < 19 ? 'dependent' : 'moderate'}; }
@@ -678,25 +690,31 @@ function setTransitPhaseDefaults(phaseId: string) {
   state.transitBoardings = phase.target_boardings_per_vehicle_hour;
   state.transitFareLow = phase.fare_contribution_low_cad;
   state.transitFareHigh = phase.fare_contribution_high_cad;
+  transitDemandTargetRides = Math.round(phase.conventional_vehicle_hours * phase.target_boardings_per_vehicle_hour);
 }
 function transitEvidenceBadge(classification: string) { return `<span class="evidence-status">${esc(classification)}</span>`; }
 function transitCadRange(row: any, low = 'net_municipal_cost_low_cad', high = 'net_municipal_cost_high_cad') { return `${cad(row[low])}–${cad(row[high])}`; }
 function onDemandCadRange(row: {low: number; high: number}) { return `${cad(row.low)}–${cad(row.high)}`; }
 function renderOnDemandTransitSection() {
+  syncTransitOnDemandModes();
   const pilot = calculateOnDemandPilot({selected_window_ids: transitOnDemandState.windowIds, target_completed_rides_by_window: transitOnDemandState.rideTargets, household_equivalent_denominator: state.transitHouseholds, regional_contribution_cad: transitOnDemandState.regionalContribution});
   const selectedWindows = DEFAULT_ON_DEMAND_WINDOWS.filter((window) => transitOnDemandState.windowIds.includes(window.id)).map((window) => window.label).join(', ') || 'none selected';
-  const demandSummary = `<div class="transit-demand-summary"><p class="eyebrow">On-demand demand target</p><strong>${fmt(pilot.selected.target_completed_rides_year, 0)} completed rides/year</strong><p>${esc(selectedWindows)} · ${fmt(pilot.selected.annual_vehicle_hours, 0)} derived vehicle-hours</p><small>Set targets by time window below. Uncheck scheduled buses for a rideshare-only plan.</small></div>`;
+  const demandSummary = `<div class="transit-demand-summary"><p class="eyebrow">Shared demand target</p><strong>${fmt(transitDemandTargetRides, 0)} completed rides/year</strong><p>${fmt(100 - transitOnDemandSharePercent, 0)}% scheduled buses · ${fmt(transitOnDemandSharePercent, 0)}% on-demand rideshare</p><small>${esc(selectedWindows)} are the on-demand service windows. The slider reallocates the same completed-rides target between service types.</small></div>`;
   return renderOnDemandTransitSectionMarkup()
     .replace('Local service choices', 'Demand-led local service')
-    .replace('Choose buses, rideshare, or both', 'Set ride targets and choose the service')
-    .replace('Check the service types you want to compare.', 'Select the service types you want to operate or compare.')
+    .replace('Choose buses, rideshare, or both', 'Set the demand target and service mix')
+    .replace('Check the service types you want to compare.', 'Set one annual completed-rides target, then move the slider between scheduled buses and on-demand rideshare.')
     .replace('Selected service mix', 'Selected service plan')
-    .replace('On-demand rides · selected windows', 'On-demand rideshare · selected windows and targets')
+    .replace('On-demand rides · selected windows', 'On-demand rideshare · selected windows and allocation')
+    .replace(/<fieldset class="service-mode-picker">[\s\S]*?<\/fieldset>/, `<div class="transit-demand-controls"><label class="control"><span>Total completed rides target</span><input id="transit-on-demand-total-rides" type="number" min="0" step="100" value="${transitDemandTargetRides}"><em>rides/year</em></label><label class="control transit-share-control"><span>On-demand rideshare share <output>${fmt(transitOnDemandSharePercent, 0)}%</output></span><input id="transit-on-demand-share" type="range" min="0" max="100" step="5" value="${transitOnDemandSharePercent}"><em>0% scheduled · 100% on-demand</em></label></div>`)
+    .replace('This composition adds only the checked components. Uncheck scheduled buses to see the selected rideshare windows alone; uncheck on-demand rides to see the scheduled-bus phase alone.', 'The total completed-rides target stays constant as the slider reallocates service. Window selections determine when on-demand rideshare operates.')
+    .replace(/<span>Target completed rides<\/span>/g, '<span>On-demand window weight</span>')
+    .replace(/<em>rides\/year<\/em>/g, '<em>annual reference weight</em>')
     .replace('<div class="transit-on-demand-answer">', `${demandSummary}<div class="transit-on-demand-answer">`);
 }
 
 function renderOnDemandTransitSectionMarkup() {
-  const state = {transitHouseholds: applicationState.transitHouseholds, transitOnDemandView: transitOnDemandState.view, transitOnDemandRegionalContribution: transitOnDemandState.regionalContribution, transitOnDemandCoreVehicles: transitOnDemandState.coreVehicles, transitOnDemandFareRevenue: transitOnDemandState.fareRevenue};
+  const state = {transitHouseholds: applicationState.transitHouseholds, transitOnDemandView: transitOnDemandState.view, transitOnDemandRegionalContribution: transitOnDemandState.regionalContribution, transitOnDemandCoreVehicles: transitOnDemandState.coreVehicles, transitOnDemandFareRevenue: transitOnDemandState.fareRevenue, transitDemandTargetRides, transitOnDemandSharePercent};
   const transit = transitModelForUi();
   const scheduled = transit.selected;
   const pilot = calculateOnDemandPilot({selected_window_ids: transitOnDemandState.windowIds, target_completed_rides_by_window: transitOnDemandState.rideTargets, household_equivalent_denominator: state.transitHouseholds, regional_contribution_cad: transitOnDemandState.regionalContribution});
@@ -704,6 +722,8 @@ function renderOnDemandTransitSectionMarkup() {
   const serviceMix = calculateTransitServiceMix({
     scheduled_buses: transitOnDemandState.serviceModes.includes('scheduled_buses'),
     on_demand_rides: transitOnDemandState.serviceModes.includes('on_demand_rides'),
+    total_completed_rides_year: state.transitDemandTargetRides,
+    on_demand_share_percent: state.transitOnDemandSharePercent,
     scheduled_service: {annual_vehicle_hours: scheduled.conventional_vehicle_hours, annual_completed_rides: scheduled.incremental_boardings, gross_cost_cad: {low: scheduled.gross_cost_low_cad, high: scheduled.gross_cost_high_cad}, fare_revenue_cad: {low: scheduled.fare_revenue_low_cad, high: scheduled.fare_revenue_high_cad}, recurring_funding_cad: scheduled.recurring_funding_cad},
     on_demand_service: {...pilot.selected, recurring_funding_cad: transitOnDemandState.regionalContribution},
     household_equivalent_denominator: state.transitHouseholds
@@ -838,6 +858,10 @@ function bind() {
     if (transitOnDemandState.view === 'network_comparison') $('#on-demand details')?.setAttribute('open', '');
     const onDemandView = $('#transit-on-demand-view') as HTMLSelectElement | null;
     onDemandView?.addEventListener('change', () => { transitOnDemandState.view = onDemandView.value === 'network_comparison' ? 'network_comparison' : 'service_mix'; render(); });
+    const onDemandTotalRides = $('#transit-on-demand-total-rides') as HTMLInputElement | null;
+    onDemandTotalRides?.addEventListener('change', () => { transitDemandTargetRides = Math.max(0, Math.round(Number(onDemandTotalRides.value) || 0)); render(); });
+    const onDemandShare = $('#transit-on-demand-share') as HTMLInputElement | null;
+    onDemandShare?.addEventListener('change', () => { transitOnDemandSharePercent = Math.min(100, Math.max(0, Math.round(Number(onDemandShare.value) || 0))); syncTransitOnDemandModes(); render(); });
     document.querySelectorAll<HTMLInputElement>('[data-on-demand-service]').forEach((node) => node.addEventListener('change', () => {
       const mode = node.dataset.onDemandService ?? '';
       transitOnDemandState.serviceModes = node.checked ? [...new Set([...transitOnDemandState.serviceModes, mode])] : transitOnDemandState.serviceModes.filter((candidate) => candidate !== mode);
@@ -885,7 +909,7 @@ function bind() {
       ['transit-one-time', (value) => { state.transitOneTimeFunds = value; }]
     ];
     numeric.forEach(([id, update]) => { const element = $(`#${id}`) as HTMLInputElement | null; element?.addEventListener('change', () => { update(Number(element.value)); render(); }); });
-    $('#transit-reset')?.addEventListener('click', () => { setTransitPhaseDefaults('phase1'); state.transitFareScenario = 'existing_fares'; state.transitUseDirectHours = true; state.transitGrants = 0; state.transitCitySavings = 0; state.transitTransitionSavings = 0; state.transitOtherRevenue = 0; state.transitOneTimeFunds = 0; state.transitHouseholds = 10000; state.transitBaselineFareRevenue = TRANSIT_BASELINE.transit_revenue_cad; transitOnDemandState.view = 'service_mix'; transitOnDemandState.windowIds = [...DEFAULT_ON_DEMAND_WINDOW_IDS]; transitOnDemandState.rideTargets = {...defaultOnDemandRideTargets}; transitOnDemandState.serviceModes = [...DEFAULT_ON_DEMAND_SERVICE_MODES]; transitOnDemandState.coreVehicles = 2; transitOnDemandState.regionalContribution = 0; transitOnDemandState.fareRevenue = ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad; render(); });
+    $('#transit-reset')?.addEventListener('click', () => { setTransitPhaseDefaults('phase1'); transitOnDemandSharePercent = 50; state.transitFareScenario = 'existing_fares'; state.transitUseDirectHours = true; state.transitGrants = 0; state.transitCitySavings = 0; state.transitTransitionSavings = 0; state.transitOtherRevenue = 0; state.transitOneTimeFunds = 0; state.transitHouseholds = 10000; state.transitBaselineFareRevenue = TRANSIT_BASELINE.transit_revenue_cad; transitOnDemandState.view = 'service_mix'; transitOnDemandState.windowIds = [...DEFAULT_ON_DEMAND_WINDOW_IDS]; transitOnDemandState.rideTargets = {...defaultOnDemandRideTargets}; syncTransitOnDemandModes(); transitOnDemandState.coreVehicles = 2; transitOnDemandState.regionalContribution = 0; transitOnDemandState.fareRevenue = ON_DEMAND_NETWORK_ASSUMPTIONS.baseline_annual_fare_revenue_cad; render(); });
   }
   if (state.page === '/house-cost') {
     enhanceHouseCostSelectionUi();

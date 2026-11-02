@@ -223,7 +223,8 @@ main { max-width: 1180px; }
 .transit-answer p { color: #e8eee8; }
 .household-equivalent-note { max-width: 900px; padding: 14px 16px; border-left: 4px solid var(--amber); background: #f7f7f2; }
 .transit-stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
-.transit-stack > div, .funding-panel { padding: 18px; border: 1px solid var(--line); background: #fff; }
+.transit-stack > div, .funding-panel { min-width: 0; padding: 18px; border: 1px solid var(--line); background: #fff; }
+.transit-stack .cost-total > * { min-width: 0; overflow-wrap: anywhere; }
 .transit-stack h3, .funding-panel h3 { margin-top: 0; }
 .transit-controls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0; }
 .transit-controls-grid .checkbox-control { min-width: 0; }
@@ -255,6 +256,10 @@ main { max-width: 1180px; }
 .transit-demand-summary { margin: 20px 0; padding: 18px; border-left: 4px solid var(--amber); background: #fff9e7; }
 .transit-demand-summary strong { display: block; margin: 4px 0; font-size: 1.55rem; color: var(--ink); }
 .transit-demand-summary p, .transit-demand-summary small { display: block; margin: 4px 0 0; color: var(--muted); }
+.transit-demand-controls { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 16px; margin: 20px 0; padding: 18px; border: 1px solid var(--line); background: #fff; }
+.transit-share-control output { float: right; color: var(--teal); font-weight: 800; }
+.transit-share-control input[type="range"] { width: 100%; margin: 12px 0 2px; padding: 0; accent-color: var(--teal); }
+.transit-share-control em { display: flex; justify-content: space-between; gap: 12px; }
 .on-demand-window small, .on-demand-window em { color: var(--muted); font-size: .78rem; }
 .on-demand-window em { font-style: normal; line-height: 1.4; }
 .selected-row { background: #eef7f1; }
@@ -264,7 +269,7 @@ main { max-width: 1180px; }
 .evidence-grid ul { margin: 10px 0 0; padding-left: 20px; }
 @media (max-width: 800px) { .transit-answer, .transit-stack, .evidence-grid { grid-template-columns: 1fr; } .transit-controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 800px) { .transit-on-demand-answer, .on-demand-window-grid { grid-template-columns: 1fr; } }
-@media (max-width: 430px) { .transit-controls-grid, .service-mode-picker { grid-template-columns: 1fr; } .service-mode-picker legend { grid-column: auto; } .transit-answer { padding: 18px; } .transit-answer h2 { font-size: 1.8rem; } .transit-on-demand-answer strong { font-size: 1.45rem; } }
+@media (max-width: 430px) { .transit-controls-grid, .transit-demand-controls, .service-mode-picker { grid-template-columns: 1fr; } .service-mode-picker legend { grid-column: auto; } .transit-answer { padding: 18px; } .transit-answer h2 { font-size: 1.8rem; } .transit-on-demand-answer strong { font-size: 1.45rem; } }
 
 /* Owen Sound Local Representation cost model. */
 .local-representation-hero { border-bottom: 4px solid var(--amber); }

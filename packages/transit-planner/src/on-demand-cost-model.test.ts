@@ -114,4 +114,25 @@ describe('Owen Sound service composition', () => {
     });
     expect(result.selected.net_cost_cad).toEqual({low: 195_000, high: 220_000});
   });
+
+  it('keeps the completed-rides target constant while reallocating service share', () => {
+    const baseOptions = {
+      scheduled_buses: true,
+      on_demand_rides: true,
+      total_completed_rides_year: 10_000,
+      scheduled_service: {annual_vehicle_hours: 1_000, annual_completed_rides: 10_000, gross_cost_cad: {low: 100_000, high: 200_000}, fare_revenue_cad: {low: 10_000, high: 20_000}},
+      on_demand_service: {annual_vehicle_hours: 1_000, annual_completed_rides: 10_000, gross_cost_cad: {low: 120_000, high: 160_000}, fare_revenue_cad: {low: 20_000, high: 30_000}}
+    };
+    const busOnly = calculateTransitServiceMix({...baseOptions, on_demand_share_percent: 0});
+    const split = calculateTransitServiceMix({...baseOptions, on_demand_share_percent: 50});
+    const rideshareOnly = calculateTransitServiceMix({...baseOptions, on_demand_share_percent: 100});
+    expect(busOnly.selected.annual_completed_rides).toBe(10_000);
+    expect(busOnly.components.on_demand_rides.annual_completed_rides).toBe(0);
+    expect(rideshareOnly.selected.annual_completed_rides).toBe(10_000);
+    expect(rideshareOnly.components.scheduled_buses.annual_completed_rides).toBe(0);
+    expect(split.selected.annual_completed_rides).toBe(10_000);
+    expect(split.components.scheduled_buses.annual_completed_rides).toBe(5_000);
+    expect(split.components.on_demand_rides.annual_completed_rides).toBe(5_000);
+    expect(split.selected.annual_vehicle_hours).toBe(1_000);
+  });
 });

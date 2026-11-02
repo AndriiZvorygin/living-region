@@ -535,9 +535,9 @@
     }
   ],
   "on_demand": {
-    "contract_version": "1.3.0",
+    "contract_version": "1.4.0",
     "pilot": {
-      "contract_version": "1.3.0",
+      "contract_version": "1.4.0",
       "mode": "selected_on_demand_windows",
       "selected_window_ids": [
         "sunday_daytime",
@@ -732,7 +732,7 @@
     ],
     "network_comparison": [
       {
-        "contract_version": "1.3.0",
+        "contract_version": "1.4.0",
         "mode": "network_comparison",
         "core_vehicle_count": 0,
         "core_hours": 0,
@@ -818,7 +818,7 @@
         ]
       },
       {
-        "contract_version": "1.3.0",
+        "contract_version": "1.4.0",
         "mode": "network_comparison",
         "core_vehicle_count": 1,
         "core_hours": 2080,
@@ -904,7 +904,7 @@
         ]
       },
       {
-        "contract_version": "1.3.0",
+        "contract_version": "1.4.0",
         "mode": "network_comparison",
         "core_vehicle_count": 2,
         "core_hours": 4160,
@@ -990,7 +990,7 @@
         ]
       },
       {
-        "contract_version": "1.3.0",
+        "contract_version": "1.4.0",
         "mode": "network_comparison",
         "core_vehicle_count": 3,
         "core_hours": 6240,
